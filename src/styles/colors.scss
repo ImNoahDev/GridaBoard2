@@ -1,0 +1,74 @@
+$primary: #7D89EF;
+$secondary: #B3DDED;
+$accent: #2A2D45;
+$error: #FF7777;
+$info: #65BEFF;
+$success:#87C651;
+$warning: #FFC569;
+$anchor: #5C68CB;
+
+$text: #131316;
+
+$gray0: #000000;
+$gray1: #2A2A2E;
+$gray2: #424245;
+$gray3: #646569;
+$gray4: #87888C;
+$gray5: #9F9FA4;
+$gray6: #B6B7BC;
+$gray7: #CDCED3;
+$gray8: #DADCE0;
+$gray9: #E4E5EB;
+$gray10: #F0F1F7;
+$gray11: #FFFFFF;
+
+:root {
+  --primary: #{$primary};
+  --secondary: #{$secondary};
+  --accent: #{$accent};
+  --error: #{$error};
+  --info: #{$info};
+  --success: #{$success};
+  --warning: #{$warning};
+  --anchor: #{$anchor};
+  --gray0: #{$gray0};
+  --gray1: #{$gray1};
+  --gray2: #{$gray2};
+  --gray3: #{$gray3};
+  --gray4: #{$gray4};
+  --gray5: #{$gray5};
+  --gray6: #{$gray6};
+  --gray7: #{$gray7};
+  --gray8: #{$gray8};
+  --gray9: #{$gray9};
+  --gray10: #{$gray10};
+  --gray11: #{$gray11};
+
+  --text: #{$text};
+}
+
+:export {
+  primary: #{$primary};
+  secondary: #{$secondary};
+  accent: #{$accent};
+  error: #{$error};
+  info: #{$info};
+  success: #{$success};
+  warning: #{$warning};
+  anchor: #{$anchor};
+  gray0: #{$gray0};
+  gray1: #{$gray1};
+  gray2: #{$gray2};
+  gray3: #{$gray3};
+  gray4: #{$gray4};
+  gray5: #{$gray5};
+  gray6: #{$gray6};
+  gray7: #{$gray7};
+  gray8: #{$gray8};
+  gray9: #{$gray9};
+  gray10: #{$gray10};
+  gray11: #{$gray11};
+
+  text: #{$text};
+}
+
