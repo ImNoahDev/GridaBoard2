@@ -399,7 +399,7 @@ export class NeoSmartpen {
     let passcode = prompt("please enter passcode " + (9 - event.retryCount));
     this.protocolHandler.sendPasscode(passcode);
 
-    let mac = this.mac;
+    let mac = this.protocolHandler.getMac();
     if (!mac) {
       throw new Error("mac address was not registered");
     }
