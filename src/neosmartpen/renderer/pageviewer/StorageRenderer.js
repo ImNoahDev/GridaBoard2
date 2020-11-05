@@ -1,9 +1,9 @@
 import React from "react";
 // import React, { Component } from 'react';
 import PropTypes from "prop-types";
-import { InkStorage, PenEventName } from "../../../neosmartpen";
+import { InkStorage, PenEventName } from "../..";
 
-import PageRenderer, { ZoomFitEnum } from "./PageRenderer";
+import StorageRenderWorker, { ZoomFitEnum } from "./StorageRenderWorker";
 import { Paper } from "@material-ui/core";
 import { NeoSmartpen, PenManager } from "../../index";
 
@@ -48,7 +48,7 @@ const propTypes = {
   // function (props, propName, componentName) {
   //   if (propName === "playState" && !PLAYSTATE.hasOwnProperty(props.playState)) {
   //     return new Error(
-  //       "Invalid prop `playState` supplied to `ReplayContainer`. Validation failed."
+  //       "Invalid prop `playState` supplied to `StorageRenderer`. Validation failed."
   //     );
   //   }
   // },
@@ -79,9 +79,18 @@ const defaultProps = {
 //   },
 // });
 
-class ReplayContainer extends React.Component {
+/**
+ * 스토리지와 자동으로 연결되는 renderer 
+ * TO DO: 2020/11/05
+ *    1)  현재는 연결된 모든 펜들의 stroke가 나오게 되어 있는데, 
+ *        pen의 ID로 filtering할 수 있도록 property를 넣을 수 있게 할 것
+ * 
+ *    2)  본 컴포는트는 Storage에서 Event를 받아 rendering하는 것이므로,
+ *        Pen에서 realtime으로 event를 받아 rendering하는 별도의 component를 만들 것
+ */
+class StorageRenderer extends React.Component {
   state = {
-    /** @type {PageRenderer} */
+    /** @type {StorageRenderWorker} */
     renderer: null,
     pageId: "",
 
@@ -130,13 +139,13 @@ class ReplayContainer extends React.Component {
     };
 
     // // 실시간 데이터 전송을 위해, penStorage와 view를 연결한다.
-    // if (this.inkStorage) {
-    //   let filter = { mac: null };
-    //   inkStorage.addEventListener(PenEventName.ON_PEN_DOWN, this.onLivePenDown.bind(this), filter);
-    //   inkStorage.addEventListener(PenEventName.ON_PEN_PAGEINFO, this.onLivePenPageInfo.bind(this), filter);
-    //   inkStorage.addEventListener(PenEventName.ON_PEN_MOVE, this.onLivePenMove.bind(this), filter);
-    //   inkStorage.addEventListener(PenEventName.ON_PEN_UP, this.onLivePenUp.bind(this), filter);
-    // }
+    if (this.inkStorage) {
+      let filter = { mac: null };
+      inkStorage.addEventListener(PenEventName.ON_PEN_DOWN, this.onLivePenDown.bind(this), filter);
+      inkStorage.addEventListener(PenEventName.ON_PEN_PAGEINFO, this.onLivePenPageInfo.bind(this), filter);
+      inkStorage.addEventListener(PenEventName.ON_PEN_MOVE, this.onLivePenMove.bind(this), filter);
+      inkStorage.addEventListener(PenEventName.ON_PEN_UP, this.onLivePenUp.bind(this), filter);
+    }
 
     this.canvasId = uuidv4();
   }
@@ -371,7 +380,7 @@ class ReplayContainer extends React.Component {
       viewFit: this.state.viewFit,
     };
 
-    let renderer = new PageRenderer(options);
+    let renderer = new StorageRenderWorker(options);
 
     // let bg_header = EXAM_FILE_RESOURCES[tab_value].bg_img_header;
     // let bgurl = window.location.origin + bg_header + pageId + ".jpg";
@@ -471,7 +480,6 @@ class ReplayContainer extends React.Component {
     // penManager에 연결 
     let penManager = PenManager.getInstance();
     penManager.unregisterRenderContainer(this);
-
   }
 
   render() {
@@ -486,7 +494,7 @@ class ReplayContainer extends React.Component {
 
     return (
       <div id="replayContainer" ref={this.myRef}>
-        <h1>{section}.{owner}.{book}.{page}:{penEventCount}</h1>
+        <h1>StorageRenderer</h1><h2>{section}.{owner}.{book}.{page}:{penEventCount}</h2>
         <Paper style={{ height: this.size.height, width: this.size.width }}>
           <canvas id={this.canvasId} ref={this.canvasRef} />
         </Paper>
@@ -495,8 +503,8 @@ class ReplayContainer extends React.Component {
   }
 }
 
-ReplayContainer.propTypes = propTypes;
-ReplayContainer.defaultProps = defaultProps;
+StorageRenderer.propTypes = propTypes;
+StorageRenderer.defaultProps = defaultProps;
 
-// export default withStyles(styles)(ReplayContainer);
-export default ReplayContainer;
+// export default withStyles(styles)(StorageRenderer);
+export default StorageRenderer;

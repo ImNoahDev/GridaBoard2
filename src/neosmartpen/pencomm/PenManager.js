@@ -1,4 +1,4 @@
-import { ReplayContainer } from "..";
+import { StorageRenderer } from "..";
 import { NeoSmartpen } from "./neosmartpen";
 
 let _penmanager_instance = null;
@@ -10,7 +10,7 @@ export class PenManager {
     /** @type {Array.<{mac:string, pen:NeoSmartpen}>} */
     this.penArray = [];
 
-    /** @type {Array.<ReplayContainer>} */
+    /** @type {Array.<StorageRenderer>} */
     this.render = [];
   }
 

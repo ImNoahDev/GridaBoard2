@@ -3,7 +3,7 @@ import { makeStyles } from "@material-ui/core/styles";
 
 // View
 import KerisBottom from "./replaybar/KerisBottom";
-import ReplayContaineriner, { PLAYSTATE } from "./pageviewer/ReplayContainer";
+import ReplayContaineriner, { PLAYSTATE } from "./pageviewer/StorageRenderer";
 // import KerisRight from "./KerisRight";
 
 import { findStrokesChunkAtTime, getTimeStr } from "./StrokeInfo";

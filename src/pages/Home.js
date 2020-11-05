@@ -1,7 +1,7 @@
 import React from "react";
 import { makeStyles } from '@material-ui/core/styles';
-import { ReplayContainer, InkStorage } from "../neosmartpen";
-import { PLAYSTATE } from "../neosmartpen/renderer/pageviewer/ReplayContainer";
+import { StorageRenderer, InkStorage } from "../neosmartpen";
+import { PLAYSTATE } from "../neosmartpen/renderer/pageviewer/StorageRenderer";
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from "@material-ui/core";
 
 const useStyles = makeStyles({
@@ -31,28 +31,28 @@ const Home = () => {
           <TableBody>
             <TableRow key={1}>
               <TableCell rowSpan={2} colspan={2} component="th" scope="row">
-                <ReplayContainer scale={1} pageId={"0.0.0.0"} playState={PLAYSTATE.live} width={1024} height={640} />
+                <StorageRenderer scale={1} pageId={"0.0.0.0"} playState={PLAYSTATE.live} width={1024} height={640} />
               </TableCell>
 
               <TableCell rowSpan={2} colspan={2} component="th" scope="row">
-                <ReplayContainer scale={1} pageId={"0.0.0.0"} playState={PLAYSTATE.live} width={512} height={320} />
+                <StorageRenderer scale={1} pageId={"0.0.0.0"} playState={PLAYSTATE.live} width={512} height={320} />
               </TableCell>
             </TableRow>
 
               {/* <TableCell component="th" scope="row">
-                <ReplayContainer scale={1} inkStorage={null} pageId={"0.0.0.0"} playState={PLAYSTATE.live} width={240} height={320} />
+                <StorageRenderer scale={1} inkStorage={null} pageId={"0.0.0.0"} playState={PLAYSTATE.live} width={240} height={320} />
               </TableCell>
 
               <TableCell component="th" scope="row">
-                <ReplayContainer scale={1} inkStorage={ps} pageId={"0.0.0.0"} playState={PLAYSTATE.live} width={240} height={320} />
+                <StorageRenderer scale={1} inkStorage={ps} pageId={"0.0.0.0"} playState={PLAYSTATE.live} width={240} height={320} />
               </TableCell>
             </TableRow>
             <TableRow key={2}>
               <TableCell component="th" scope="row">
-                <ReplayContainer scale={1} inkStorage={ps} pageId={"0.0.0.0"} playState={PLAYSTATE.live} width={240} height={320} />
+                <StorageRenderer scale={1} inkStorage={ps} pageId={"0.0.0.0"} playState={PLAYSTATE.live} width={240} height={320} />
               </TableCell>
               <TableCell component="th" scope="row">
-                <ReplayContainer scale={1} inkStorage={ps} pageId={"0.0.0.0"} playState={PLAYSTATE.live} width={240} height={320} />
+                <StorageRenderer scale={1} inkStorage={ps} pageId={"0.0.0.0"} playState={PLAYSTATE.live} width={240} height={320} />
               </TableCell> */}
 
           </TableBody>

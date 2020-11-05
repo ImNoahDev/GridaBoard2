@@ -1,7 +1,7 @@
 import { NeoSmartpen, PenEventName } from "./pencomm/neosmartpen";
 import { InkStorage } from "./penstorage";
 // import KerisMain from "./renderer/KerisMain";
-import ReplayContainer from "./renderer/pageviewer/ReplayContainer";
+import StorageRenderer from "./renderer/pageviewer/StorageRenderer";
 import NoteserverClient from "./noteserver/NoteserverClient";
 import { paperInfo } from "./noteserver/PaperInfo";
 import { PenManager } from "./pencomm/PenManager";
@@ -25,7 +25,7 @@ import "./types";
 
 export {
   NeoSmartpen, InkStorage,
-  ReplayContainer, PenEventName,
+  StorageRenderer, PenEventName,
   paperInfo, NoteserverClient,
   PenManager,
   

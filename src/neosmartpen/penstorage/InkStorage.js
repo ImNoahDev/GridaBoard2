@@ -223,7 +223,7 @@ export default class InkStorage {
     this.realtime[strokeKey] = stroke;
 
     // hand the event
-    // this.dispatcher.dispatch(PenEventName.ON_PEN_DOWN, { strokeKey, mac, time, stroke });
+    this.dispatcher.dispatch(PenEventName.ON_PEN_DOWN, { strokeKey, mac, time, stroke });
 
     return stroke;
   }
@@ -248,7 +248,7 @@ export default class InkStorage {
     this.addRealtimeToPage(stroke);
 
     // hand the event
-    // this.dispatcher.dispatch(PenEventName.ON_PEN_PAGEINFO, { strokeKey, mac: stroke.mac, stroke, section, owner, book, page, time });
+    this.dispatcher.dispatch(PenEventName.ON_PEN_PAGEINFO, { strokeKey, mac: stroke.mac, stroke, section, owner, book, page, time });
   }
 
   /**
@@ -287,7 +287,7 @@ export default class InkStorage {
     strokeAddDot(stroke, dot);
 
     // hand the event
-    // this.dispatcher.dispatch(PenEventName.ON_PEN_MOVE, { strokeKey, mac: stroke.mac, stroke, dot });
+    this.dispatcher.dispatch(PenEventName.ON_PEN_MOVE, { strokeKey, mac: stroke.mac, stroke, dot });
   }
 
   /**
@@ -312,8 +312,8 @@ export default class InkStorage {
     this.removeFromRealtime(stroke);
 
     // hand the event
-    // const { mac, section, owner, book, page } = stroke;
-    // this.dispatcher.dispatch(PenEventName.ON_PEN_UP, { strokeKey, mac, stroke, section, owner, book, page });
+    const { mac, section, owner, book, page } = stroke;
+    this.dispatcher.dispatch(PenEventName.ON_PEN_UP, { strokeKey, mac, stroke, section, owner, book, page });
   }
 
   getState() {

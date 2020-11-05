@@ -1,7 +1,7 @@
 import "../../types";
 import { fabric } from "fabric";
-import { PLAYSTATE } from "./ReplayContainer";
-import { InkStorage } from "../../../neosmartpen";
+import { PLAYSTATE } from "./StorageRenderer";
+import { InkStorage } from "../..";
 import { PATH_THICKNESS_SCALE, drawPath, drawLinePath } from "./DrawCurves";
 import { NCODE_TO_SCREEN_SCALE } from "../../constants";
 import { paperInfo } from "../../noteserver/PaperInfo";
@@ -27,7 +27,7 @@ export const ZoomFitEnum = {
 const STROKE_OBJECT_ID = "ns";
 const GRID_OBJECT_ID = "g";
 
-export default class PageRenderer {
+export default class StorageRenderWorker {
   /**
    *
    * @param {{canvasName:string, storage:InkStorage, viewFit:ZoomFitEnum, autoStop:boolean, playTimeHandler:function, playStateHandler:function, }} options

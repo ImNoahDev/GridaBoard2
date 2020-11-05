@@ -9,7 +9,7 @@ import Slider from "@material-ui/core/Slider";
 import StrokeGraph from "./StrokeGraph";
 import { getStrokesTimeInfo, getTimeStr } from "../StrokeInfo";
 // import { cyan500 } from '@material-ui/styles/colors';
-import { PLAYSTATE } from "../pageviewer/ReplayContainer";
+import { PLAYSTATE } from "../pageviewer/StorageRenderer";
 import { Checkbox } from '@material-ui/core';
 
 const styles = (theme) => ({
