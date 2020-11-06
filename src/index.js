@@ -14,6 +14,7 @@ import Root from './client/Root';
 import './index.css';
 import * as serviceWorker from './serviceWorker';
 
+
 ReactDOM.render(
   <React.StrictMode>
     <Root />
