@@ -58,7 +58,7 @@ export default class StorageRenderWorker {
     /** @type {{width:number, height:number}} */
     this.currSize = { width: 0, height: 0 };
 
-    /** @type {{key:string, {stroke:NeoStroke, path:Path}}} */
+    /** @type {Object.<string, {stroke:NeoStroke, path:fabric.Path}>} */
     this.livePaths = {};
 
     /** @type {{section?:number, owner?:number, book?:number, page?:number, Xmin:number, Ymin:number, Xmax:number, Ymax:number, Mag?:number}} */
@@ -198,7 +198,7 @@ export default class StorageRenderWorker {
       height: paperHeight * this.base_scale,
     };
 
-    console.log(`Grid: scale=${this.base_scale} (width, height)=(${size.width}, ${size.height})`);
+    // console.log(`Grid: scale=${this.base_scale} (width, height)=(${size.width}, ${size.height})`);
 
     const ratio = 1;
 
@@ -934,7 +934,7 @@ export default class StorageRenderWorker {
     };
 
     let strokeThickness = this.base_scale * thickness;
-    console.log(strokeThickness);
+    // console.log(strokeThickness);
     // if ( strokeThickness < 0.5 ) strokeThickness = 0.5;
     let pathData = drawPath(pointArray, strokeThickness);
     // let pathData = drawLinePath(pointArray);

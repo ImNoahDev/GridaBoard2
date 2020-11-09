@@ -36,6 +36,9 @@ export default class InkStorage {
 
   }
 
+  /**
+   * @return {InkStorage}
+   */
   static getInstance() {
     if (_storage_instance) return _storage_instance;
 

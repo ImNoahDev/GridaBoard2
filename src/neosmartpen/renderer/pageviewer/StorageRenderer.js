@@ -6,15 +6,7 @@ import { InkStorage, PenEventName } from "../..";
 import StorageRenderWorker, { ZoomFitEnum } from "./StorageRenderWorker";
 import { Paper } from "@material-ui/core";
 import { NeoSmartpen, PenManager } from "../../index";
-
-function uuidv4() {
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-    var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
-    return v.toString(16);
-  });
-}
-
-
+import { uuidv4 } from "../../utils/UtilsFunc";
 
 
 export const PLAYSTATE = Object.freeze({
@@ -477,9 +469,22 @@ class StorageRenderer extends React.Component {
     // this.state.renderer.stopInterval();
     window.removeEventListener("resize", this.resizeListener);
 
-    // penManager에 연결 
+    // penManager에 연결 해제
     let penManager = PenManager.getInstance();
     penManager.unregisterRenderContainer(this);
+
+    // ink storage와 연결 해제
+        // // 실시간 데이터 전송을 위해, penStorage와 view를 연결한다.
+    if (this.inkStorage) {
+      let inkStorage = this.inkStorage;
+
+      inkStorage.removeEventListener(PenEventName.ON_PEN_DOWN, this.onLivePenDown.bind(this));
+      inkStorage.removeEventListener(PenEventName.ON_PEN_PAGEINFO, this.onLivePenPageInfo.bind(this));
+      inkStorage.removeEventListener(PenEventName.ON_PEN_MOVE, this.onLivePenMove.bind(this));
+      inkStorage.removeEventListener(PenEventName.ON_PEN_UP, this.onLivePenUp.bind(this));
+    }
+
+
   }
 
   render() {

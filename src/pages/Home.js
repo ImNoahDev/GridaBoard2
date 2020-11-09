@@ -1,8 +1,25 @@
-import React from "react";
+import React, { useState } from "react";
 import { makeStyles } from '@material-ui/core/styles';
-import { StorageRenderer, InkStorage } from "../neosmartpen";
+import { StorageRenderer, PenBasedRenderer } from "../neosmartpen";
 import { PLAYSTATE } from "../neosmartpen/renderer/pageviewer/StorageRenderer";
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from "@material-ui/core";
+import { Button, Box } from "@material-ui/core";
+
+import {
+  //PenEvent,
+  NeoSmartpen, NeopenInterface, InkStorage, paperInfo, NoteserverClient, PenEventName
+} from "../neosmartpen";
+
+
+
+const getNoteInfo = (event) => {
+  // let url = "http://nbs.neolab.net/v1/notebooks/attributes?device=android";
+  let note_info = new NoteserverClient();
+  note_info.getNoteInfo({});
+};
+
+
+
 
 const useStyles = makeStyles({
   table: {
@@ -10,51 +27,90 @@ const useStyles = makeStyles({
   },
 });
 
+let _pens = new Array(0);
+let _num_pens = 0;
 
 const Home = () => {
+  const useForceUpdate = () => useState()[1];
+  const forceUpdate = useForceUpdate();
+
   const classes = useStyles();
+  const [num_pens, setNumPens] = useState(0);
+  const [pens, setPens] = useState(new Array(0));
+
+
+  /**
+   * @param {{pen:NeoSmartpen, mac:string, event:PenEvent}} e
+   */
+  const onPenConnected = (e) => {
+    const pen = e.pen;
+    console.log(`Home: onPenConnected, mac=${pen.getMac()}`);
+
+    setPens([..._pens]);
+
+    _num_pens++;
+    setNumPens(_num_pens);
+  };
+
+  /**
+   * @param {{pen:NeoSmartpen, mac:string, event:PenEvent}} e
+   */
+  const onPenDisonnected = (e) => {
+    const pen = e.pen;
+    const mac = pen.getMac();
+    console.log(`Home: OnPenDisconnected, mac=${pen.getMac()}`);
+
+    const index = _pens.findIndex(p => p.getMac() === mac);
+
+    if (index > -1) {
+      _pens.splice(index, 1);
+      setPens([..._pens]);
+
+      _num_pens--;
+      setNumPens(_num_pens);
+    }
+  };
+
+  /**
+   * @param {*} event
+   */
+  const handleConnectPen = (event) => {
+    let new_pen = new NeoSmartpen();
+
+    if (new_pen.connect()) {
+      new_pen.addEventListener(PenEventName.ON_CONNECTED, onPenConnected);
+      new_pen.addEventListener(PenEventName.ON_DISCONNECTED, onPenDisonnected);
+
+      _pens.push( new_pen );
+    }
+  };
 
   return (
     <div>
       <hr />
+      <h1> Pen Connected: {num_pens}</h1>
+      {/* 펜 연결 버튼 */}
+      <Button variant="outlined" color="primary" onClick={(event) => handleConnectPen(event)} >
+        <Box fontSize={16} fontWeight="fontWeightBold" >펜 연결</Box>
+      </Button>
+
+      {/* 공책 정보 받아오기 테스트 버튼 */}
+      <Button variant="outlined" color="primary" onClick={(event) => getNoteInfo(event)} >
+        <Box fontSize={16} fontWeight="fontWeightBold" >공책 정보 가져오기</Box>
+      </Button>
+
       <TableContainer component={Paper}>
         <Table className={classes.table} size="small" aria-label="a dense table">
-          {/* <TableHead>
-            <TableRow>
-              <TableCell>Dessert (100g serving)</TableCell>
-              <TableCell align="right">Calories</TableCell>
-              <TableCell align="right">Fat&nbsp;(g)</TableCell>
-              <TableCell align="right">Carbs&nbsp;(g)</TableCell>
-              <TableCell align="right">Protein&nbsp;(g)</TableCell>
-            </TableRow>
-          </TableHead> */}
           <TableBody>
             <TableRow key={1}>
-              <TableCell rowSpan={2} colspan={2} component="th" scope="row">
-                <StorageRenderer scale={1} pageId={"0.0.0.0"} playState={PLAYSTATE.live} width={1024} height={640} />
+              <TableCell component="th" scope="row">
+                <StorageRenderer scale={1} pageId={"0.0.0.0"} playState={PLAYSTATE.live} width={800} height={400} />
               </TableCell>
 
-              <TableCell rowSpan={2} colspan={2} component="th" scope="row">
-                <StorageRenderer scale={1} pageId={"0.0.0.0"} playState={PLAYSTATE.live} width={512} height={320} />
+              <TableCell component="th" scope="row">
+                <PenBasedRenderer scale={1} pageId={"0.0.0.0"} playState={PLAYSTATE.live} width={800} height={400} pens={pens} />
               </TableCell>
             </TableRow>
-
-              {/* <TableCell component="th" scope="row">
-                <StorageRenderer scale={1} inkStorage={null} pageId={"0.0.0.0"} playState={PLAYSTATE.live} width={240} height={320} />
-              </TableCell>
-
-              <TableCell component="th" scope="row">
-                <StorageRenderer scale={1} inkStorage={ps} pageId={"0.0.0.0"} playState={PLAYSTATE.live} width={240} height={320} />
-              </TableCell>
-            </TableRow>
-            <TableRow key={2}>
-              <TableCell component="th" scope="row">
-                <StorageRenderer scale={1} inkStorage={ps} pageId={"0.0.0.0"} playState={PLAYSTATE.live} width={240} height={320} />
-              </TableCell>
-              <TableCell component="th" scope="row">
-                <StorageRenderer scale={1} inkStorage={ps} pageId={"0.0.0.0"} playState={PLAYSTATE.live} width={240} height={320} />
-              </TableCell> */}
-
           </TableBody>
         </Table>
       </TableContainer>

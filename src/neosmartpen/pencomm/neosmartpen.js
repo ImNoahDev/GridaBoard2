@@ -2,6 +2,7 @@ import PenComm, { deviceSelectDlg } from "./pencomm";
 import InkStorage from "../penstorage/InkStorage";
 import { paperInfo } from "../noteserver/PaperInfo";
 import Dispatcher from "../penstorage/EventSystem";
+import PenManager from "./PenManager";
 import "../types";
 
 /** @enum {string} */
@@ -33,12 +34,7 @@ const PEN_STATE = {
 };
 
 export class NeoSmartpen {
-
-  /**
-   * @param {InkStorage} customStorage
-   */
-  constructor(customStorage) {
-    this.currPenMovement = {
+  currPenMovement = {
       /** @type {PenEvent} */
       downEvent: null,
 
@@ -58,16 +54,50 @@ export class NeoSmartpen {
       stroke: null,
     };
 
-    this.lastInfoEvent = null;
+  /** @type {PenEvent} */
+  lastInfoEvent = null;
 
     /** @type {PenComm} */
-    this.protocolHandler = new PenComm(this);
+  protocolHandler = new PenComm(this);
 
+    /** @type {string} */
+  mac = null;
+
+    /** @type {PEN_STATE} */
+  lastState = PEN_STATE.NONE;
+
+  surfaceInfo = {
+    /** @type {number} */
+      section: 3,
+    /** @type {number} */
+      owner: 27,
+    /** @type {Array<number>} */
+      book: [168],
+    /** @type {number} */
+      Xmin: 3.12,
+    /** @type {number} */
+      Ymin: 3.12,
+    /** @type {number} */
+      Xmax: 91.68,
+    /** @type {number} */
+      Ymax: 128.36,
+    /** @type {number} */
+      Mag: 1,
+    }
+
+  /** @type {InkStorage} */
+  storage = InkStorage.getInstance();
+
+  /** @type {PenManager} */
+  manager = PenManager.getInstance();
+
+  dispatcher = new Dispatcher();
+
+  /**
+   * @param {InkStorage?} customStorage
+   */
+  constructor(customStorage = null) {
     // this.appPen = appPenHandler;
-
-    /** @type {InkStorage} */
-    this.storage = null;
-
     if (customStorage) {
       console.log("use custom Ink Storage");
       this.storage = customStorage;
@@ -77,26 +107,6 @@ export class NeoSmartpen {
       this.storage = InkStorage.getInstance();
     }
 
-    /** @type {string} */
-    this.mac = null;
-
-    /** @type {PEN_STATE} */
-    this.lastState = PEN_STATE.NONE;
-
-    /** @type {{section?:number, owner?:number, book?:Array.<number>, Xmin:number, Ymin:number, Xmax:number, Ymax:number, Mag?:number}} */
-    this.surfaceInfo = {
-      section: 3,
-      owner: 27,
-      book: [168],
-      Xmin: 3.12,
-      Ymin: 3.12,
-      Xmax: 91.68,
-      Ymax: 128.36,
-      Mag: 1,
-    }
-
-
-    this.dispatcher = new Dispatcher();
   }
 
   /**
@@ -107,17 +117,33 @@ export class NeoSmartpen {
   }
 
   /**
-   *
+   * @return {BluetoothDevice}
+   */
+  getBtDevice = () => {
+    return this.protocolHandler.getBtDevice();
+  }
+
+  /**
+   * @return {boolean}
    */
   async connect() {
     let device = await deviceSelectDlg();
 
+    if (this.manager.alreadyConnected(device)) {
+      console.error(`bluetooth device(id:${device.id}) already connectged or connecting process is being processed`);
+      return false;
+    }
+
     if (device) {
       this.protocolHandler.connect(device);
+      this.manager.add(this, device);
     }
     else {
       console.error("Device NULL");
+      return false;
     }
+
+    return true;
   }
 
 
@@ -175,6 +201,8 @@ export class NeoSmartpen {
 
     let strokeKey = stroke.key;
     this.currPenMovement.stroke = stroke;
+
+    console.log(`NeoSmartpen dispatch event ON_PEN_DOWN`);
     this.dispatcher.dispatch(PenEventName.ON_PEN_DOWN, { strokeKey, mac, time, stroke });
 
 
@@ -345,7 +373,7 @@ export class NeoSmartpen {
     if (!mac) {
       throw new Error("mac address was not registered");
     }
-    this.dispatcher.dispatch(PenEventName.ON_HOVER_MOVE, { mac, event });
+    this.dispatcher.dispatch(PenEventName.ON_HOVER_MOVE, { pen: this, mac, event });
   }
 
   /**
@@ -367,7 +395,7 @@ export class NeoSmartpen {
     this.storage.closeStroke(strokeKey);
 
     const { mac, section, owner, book, page } = stroke;
-    this.dispatcher.dispatch(PenEventName.ON_PEN_UP, { strokeKey, mac, stroke, section, owner, book, page });
+    this.dispatcher.dispatch(PenEventName.ON_PEN_UP, { strokeKey, mac, pen: this, stroke, section, owner, book, page });
 
     this.resetPenStroke();
   }
@@ -385,7 +413,9 @@ export class NeoSmartpen {
     if (!mac) {
       throw new Error("mac address was not registered");
     }
-    this.dispatcher.dispatch(PenEventName.ON_NCODE_ERROR, { mac, event });
+
+    this.manager.onNcodeError({ pen: this, event });
+    this.dispatcher.dispatch(PenEventName.ON_NCODE_ERROR, { pen: this, mac, event });
   }
 
 
@@ -403,7 +433,7 @@ export class NeoSmartpen {
     if (!mac) {
       throw new Error("mac address was not registered");
     }
-    this.dispatcher.dispatch(PenEventName.ON_PW_REQUIRED, { mac, event });
+    this.dispatcher.dispatch(PenEventName.ON_PW_REQUIRED, { pen: this, mac, event });
     // throw new Error("Not implemented: onPasscodeRequired");
   }
 
@@ -419,8 +449,10 @@ export class NeoSmartpen {
     console.log("CONNECTED");
     let mac = this.protocolHandler.getMac();
     this.mac = mac;
+    console.log(`Connected: ${mac}`);
 
-    this.dispatcher.dispatch(PenEventName.ON_CONNECTED, { mac, event });
+    this.manager.onConnected({ pen: this, event });
+    this.dispatcher.dispatch(PenEventName.ON_CONNECTED, { pen: this, mac, event });
   }
 
   /**
@@ -435,7 +467,7 @@ export class NeoSmartpen {
     if (!mac) {
       throw new Error("mac address was not registered");
     }
-    this.dispatcher.dispatch(PenEventName.ON_UPGRADE_NEEDED, { mac, event });
+    this.dispatcher.dispatch(PenEventName.ON_UPGRADE_NEEDED, { pen: this, mac, event });
   }
 
   /**
@@ -450,18 +482,23 @@ export class NeoSmartpen {
     if (!mac) {
       throw new Error("mac address was not registered");
     }
-    this.dispatcher.dispatch(PenEventName.ON_DISCONNECTED, { mac, event });
+
+    this.manager.onDisconnected({ pen: this, event });
+    this.dispatcher.dispatch(PenEventName.ON_DISCONNECTED, { pen: this, mac, event });
   }
 
 
 
   /**
  * @public
- * @param {string} eventName 
+  * @param {PenEventName} eventName
  * @param {function} listener 
  */
   addEventListener(eventName, listener) {
-    console.log("bound", listener);
+    if (eventName === PenEventName.ON_PEN_DOWN) {
+      console.log(`NeoSmartpen: addEventListener ${eventName}`);
+    }
+
     this.dispatcher.on(eventName, listener);
   }
 

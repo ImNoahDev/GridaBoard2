@@ -1,14 +1,5 @@
 import "../types";
-
-/**
- * @return {string} - uuid
- */
-function uuidv4() {
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-    var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
-    return v.toString(16);
-  });
-}
+import { uuidv4 } from "../utils/UtilsFunc";
 
 
 /**
@@ -22,9 +13,10 @@ function uuidv4() {
  *
  * @return {NeoStroke}
  */
-export function initStroke(section, owner, book, page, startTime, mac = "") {
+export function initStroke(section, owner, book, page, startTime, mac) {
   let sourceId = uuidv4();
-  let strokeKey = sourceId + mac;
+  // let strokeKey = sourceId + mac;
+  let strokeKey = sourceId;
 
   /** @type {NeoStroke} */
   let stroke = {
@@ -40,6 +32,8 @@ export function initStroke(section, owner, book, page, startTime, mac = "") {
     dotArray: Array(0),
 
     opened: true,
+
+    mac,
   };
 
   return stroke;

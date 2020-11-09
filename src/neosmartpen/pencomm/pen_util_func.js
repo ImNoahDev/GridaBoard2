@@ -1,11 +1,11 @@
 
 // pen packet에 있는 escape code를 처리
 export function unescapePacket(packet) {
-  var len = packet.length;
-  var unescapedBuf = new Uint8Array(len);
+  const len = packet.length;
+  const unescapedBuf = new Uint8Array(len);
 
-  var cnt = 0;
-  for (var i = 0; i < len; i++) {
+  let cnt = 0;
+  for (let i = 0; i < len; i++) {
     if (packet[i] === 0x7d) {
       unescapedBuf[cnt++] = packet[i + 1] ^ 0x20;
       i++;
@@ -18,8 +18,8 @@ export function unescapePacket(packet) {
 }
 
 export function intFromBytes(data, start, length) {
-  var val = 0;
-  for (var i = start + length - 1; i >= start; --i) {
+  let val = 0;
+  for (let i = start + length - 1; i >= start; --i) {
     val += data[i];
     if (i > start) {
       val = val << 8;
@@ -34,4 +34,16 @@ export async function sleep(ms) {
       resolve();
     }, ms);
   });
+}
+
+
+export function decimalToHex(d, padding) {
+    let hex = Number(d).toString(16);
+    padding = typeof (padding) === "undefined" || padding === null ? padding = 2 : padding;
+
+    while (hex.length < padding) {
+        hex = "0" + hex;
+    }
+
+    return hex.toUpperCase();
 }

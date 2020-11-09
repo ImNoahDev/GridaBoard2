@@ -1,7 +1,7 @@
 import { PenCommBase, ProtocolHandlerBase, deviceSelectDlg } from "./pencomm_base";
 import { DeviceTypeEnum } from "./pencomm_enum";
 import { PenEventEnum, makePenEvent } from "./pencomm_event";
-import { intFromBytes } from "./pen_util_func";
+import { intFromBytes, decimalToHex } from "./pen_util_func";
 import { PEN_PACKET_START, PEN_PACKET_END } from "./pencomm_const";
 // import { NeoSmartpen } from "./neosmartpen";
 
@@ -63,44 +63,72 @@ function getPenType(typeNumber) {
 
 
 export default class PenComm extends ProtocolHandlerBase {
+  /** @type {BluetoothDevice} */
+  btDevice = null;
+
+    // device information
+  deviceInfo = {
+    /** @type {string} */
+      modelName: "", // NWP-F30 ~ NWP-F121HL
+
+    /** @type {number} */
+      protocolVer: 100, // 1.00 ==> 100
+
+    /** @type {DeviceTypeEnum} */
+      deviceType: DeviceTypeEnum.NONE,
+
+    /** @type {string} */
+    mac: "00:00:00:00:00:00",
+    };
+
+  isPenDown = false;
+
+  penCommBase = new PenCommBase(this);
+
   /**
    *
    * @param {NeoSmartpen} penHandler
    */
   constructor(penHandler) {
     super();
-
     this.penHandler = penHandler;
-    this.penCommBase = new PenCommBase(this);
-
-    // device information
-    this.deviceInfo = {
-      modelName: "", // NWP-F30 ~ NWP-F121HL
-      protocolVer: 100, // 1.00 ==> 100
-      deviceType: DeviceTypeEnum.NONE,
-      mac: "000000",
-    };
-
-    this.isPenDown = false;
-
   }
-  getMac() {
+
+  getMac = () => {
     return this.deviceInfo.mac;
   }
 
-  getModelName() {
+  /**
+   * @return {string}
+   */
+
+  getModelName = () => {
     return this.deviceInfo.modelName;
   }
 
-  getProtocolVer() {
+  /**
+   * @return {number}
+   */
+  getProtocolVer = () => {
     return this.deviceInfo.protocolVer;
   }
+
+
+  /**
+   * @public
+   * @return {BluetoothDevice}
+   */
+  getBtDevice = () => {
+    return this.btDevice;
+  }
+
 
   /**
    *
    * @param {BluetoothDevice} btDevice
    */
   connect = (btDevice) => {
+    this.btDevice = btDevice;
     this.penCommBase.connect(btDevice, this.onPhysicallyConnected);
   }
 
@@ -116,7 +144,9 @@ export default class PenComm extends ProtocolHandlerBase {
 
 
   onDisconnected = () => {
-    throw new Error("Not implemented: processUnitPacket");
+    const e = makePenEvent(this.deviceInfo.deviceType, PenEventEnum.ON_DISCONNECTED, {});
+
+    this.penHandler.onDisconnected(e);
   }
 
 
@@ -244,7 +274,13 @@ export default class PenComm extends ProtocolHandlerBase {
 
     this.deviceInfo.modelName = modelNameString;
     this.deviceInfo.protocolVer = protocolVer;
-    this.deviceInfo.mac = intFromBytes(buf, 63, 6).toString(16).toUpperCase();
+    // this.deviceInfo.mac = intFromBytes(buf, 63, 6).toString(16).toUpperCase();
+    this.deviceInfo.mac = decimalToHex(buf[63], 2) + ":" +
+      decimalToHex(buf[64], 2) + ":" +
+      decimalToHex(buf[65], 2) + ":" +
+      decimalToHex(buf[66], 2) + ":" +
+      decimalToHex(buf[67], 2) + ":" +
+      decimalToHex(buf[68], 2);
 
     //
     let typeNumber = intFromBytes(buf, 61, 2);
@@ -906,7 +942,7 @@ export default class PenComm extends ProtocolHandlerBase {
     */
     // var error_code = buf[2];
     var res_type = buf[6];
-    console.log("    response from pen: 0x" + res_type.toString(16));
+    console.log(`    response from pen: ${res_type === 0 ? "success" : "fail:" + res_type.toString(16)}`);
   }
 
 
@@ -938,7 +974,7 @@ export default class PenComm extends ProtocolHandlerBase {
         infoMessage = `need to upgrade firmware greater than 2.18 (current version=${this.deviceInfo.protocolVer / 100})`;
       }
 
-      var e = makePenEvent(this.deviceInfo.deviceType, PenEventEnum.ON_CONNECTED, { errorCode, infoMessage });
+      const e = makePenEvent(this.deviceInfo.deviceType, PenEventEnum.ON_CONNECTED, { errorCode, infoMessage });
       this.penHandler.onConnected(e);
 
       // set auto hover mode

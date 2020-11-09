@@ -59,32 +59,36 @@ const PEN_BT_UUID = {
 }
 
 export class PenCommBase {
+
+    protocolHandler = null;
+
+    /**@type {BluetoothDevice} */
+    btDevice = null;
+    // this.btServer = null;
+
+    _btWriteSocket = null;
+    _btNotifyIndicate = null;
+
+    // this._bluetooth_MTU = 1024;
+
+    _bt_buffer = new Uint8Array(0);
+    // this.modelNameString = null;
+
+    inConnecting = false;
+    inDisconnecting = false;
+    connected = false;
+
+    _state = DEVICE_STATE.disconnected;
+
+
   /**
    *
    * @param {ProtocolHandlerBase} protocolHandler
    */
   constructor(protocolHandler) {
     this.protocolHandler = protocolHandler;
-
-    /**@type {BluetoothDevice} */
-    this.btDevice = null;
-    // this.btServer = null;
-
-    this._btWriteSocket = null;
-    this._btNotifyIndicate = null;
-
-    // this._bluetooth_MTU = 1024;
-
-    this._bt_buffer = new Uint8Array(0);
-    // this.modelNameString = null;
-
-    this.inConnecting = false;
-    this.inDisconnecting = false;
-    this.connected = false;
-
-    this._state = DEVICE_STATE.disconnected;
-
   }
+
 
   /**
    *
@@ -193,7 +197,7 @@ export class PenCommBase {
   }
 
   // disconnect function:
-  disconnect() {
+  disconnect = () => {
     console.log(`     DISCONNECT operation`);
     this.inDisconnecting = true;
     let self = this;
@@ -206,11 +210,11 @@ export class PenCommBase {
     }
   }
 
-  preDisconnected() {
+  preDisconnected = () => {
     throw new Error("Not implemented: preDisconnected");
   }
 
-  onDeviceDisconnected() {
+  onDeviceDisconnected = () => {
     this.inDisconnecting = false;
     this.btDevice = null;
     this.btServer = null;
@@ -222,11 +226,11 @@ export class PenCommBase {
 
     // 상위로 전달
     let handler = this.protocolHandler;
-    this.protocolHandler = null;
     if (handler) handler.onDisconnected();
+    // this.protocolHandler = null;
   }
 
-  write(buf) {
+  write = (buf) => {
     try {
       this._btWriteSocket.writeValue(buf);
     }

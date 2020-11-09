@@ -63,11 +63,6 @@ const Menu = () => {
         <li><NavLink to="/posts" activeStyle={activeStyle}>Posts</NavLink></li>
       </ul>
 
-      {/* 필기재생 버튼 */}
-      <Button variant="outlined" color="primary" onClick={(event) => handleGotoResult(event)} >
-        <Box fontSize={16} fontWeight="fontWeightBold" >펜 연결</Box>
-      </Button>
-
       <Button variant="outlined" color="primary" onClick={(event) => getNoteInfo(event)} >
         <Box fontSize={16} fontWeight="fontWeightBold" >공책 정보 가져오기</Box>
       </Button>
