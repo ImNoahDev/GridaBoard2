@@ -89,14 +89,9 @@ const Home = () => {
     <div>
       <hr />
       <h1> Pen Connected: {num_pens}</h1>
-      {/* 펜 연결 버튼 */}
+      {/* Connect a pen */}
       <Button variant="outlined" color="primary" onClick={(event) => handleConnectPen(event)} >
-        <Box fontSize={16} fontWeight="fontWeightBold" >펜 연결</Box>
-      </Button>
-
-      {/* 공책 정보 받아오기 테스트 버튼 */}
-      <Button variant="outlined" color="primary" onClick={(event) => getNoteInfo(event)} >
-        <Box fontSize={16} fontWeight="fontWeightBold" >공책 정보 가져오기</Box>
+        <Box fontSize={16} fontWeight="fontWeightBold" >Connect</Box>
       </Button>
 
       <TableContainer component={Paper}>
