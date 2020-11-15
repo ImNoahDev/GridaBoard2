@@ -1,4 +1,6 @@
-import { NeoSmartpen, PenEventName } from "./pencomm/neosmartpen";
+import { NeoSmartpen } from "./pencomm/neosmartpen";
+import { PenEventName } from "./DataStructure";
+
 import { InkStorage } from "./penstorage";
 // import KerisMain from "./renderer/KerisMain";
 import StorageRenderer from "./renderer/pageviewer/StorageRenderer";
@@ -7,7 +9,8 @@ import PenBasedRenderer from "./renderer/pageviewer/PenBasedRenderer";
 import NoteserverClient from "./noteserver/NoteserverClient";
 import { paperInfo } from "./noteserver/PaperInfo";
 import PenManager from "./pencomm/PenManager";
-import { uuidv4 } from "./utils/UtilsFunc";
+import { uuidv4, pdfSizeToDIsplayPixel } from "./utils/UtilsFunc";
+import { PLAYSTATE, ZoomFitEnum } from "./renderer/pageviewer/RenderWorkerBase";
 
 import {
   SINGLE_CODE_SIZE_PER_INCH,
@@ -48,5 +51,7 @@ export {
   PDF_DEFAULT_DPI,
   DISPLAY_DEFAULT_DPI,
 
+  PLAYSTATE, ZoomFitEnum,
   uuidv4,
+  pdfSizeToDIsplayPixel,
 };

@@ -1,6 +1,6 @@
 import "../../types";
 import { fabric } from "fabric";
-import { PLAYSTATE } from "./StorageRenderer";
+import { PLAYSTATE } from "./RenderWorkerBase";
 import { InkStorage } from "../..";
 import { PATH_THICKNESS_SCALE, drawPath, drawLinePath } from "./DrawCurves";
 import { NCODE_TO_SCREEN_SCALE } from "../../constants";

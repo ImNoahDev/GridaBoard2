@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import { makeStyles } from '@material-ui/core/styles';
-import { StorageRenderer, PenBasedRenderer } from "../neosmartpen";
-import { PLAYSTATE } from "../neosmartpen/renderer/pageviewer/StorageRenderer";
+import { StorageRenderer, PenBasedRenderer, PLAYSTATE } from "../neosmartpen";
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from "@material-ui/core";
 import { Button, Box } from "@material-ui/core";
+import NeoPdfViewer from "../neosmartpen/pdf/NeoPdfViewer";
 
 import {
   //PenEvent,
@@ -81,20 +81,76 @@ const Home = () => {
       new_pen.addEventListener(PenEventName.ON_CONNECTED, onPenConnected);
       new_pen.addEventListener(PenEventName.ON_DISCONNECTED, onPenDisonnected);
 
-      _pens.push( new_pen );
+      _pens.push(new_pen);
     }
   };
 
+  const tempStyle = {
+    position: "absolute",
+    height: "100%",
+    width: "100%",
+    left: "0px",
+    top: "0px",
+    overflow: "hidden",
+  }
+
   return (
     <div>
-      <hr />
-      <h1> Pen Connected: {num_pens}</h1>
-      {/* Connect a pen */}
-      <Button variant="outlined" color="primary" onClick={(event) => handleConnectPen(event)} >
-        <Box fontSize={16} fontWeight="fontWeightBold" >Connect</Box>
-      </Button>
+      <div style={{
+        position: "absolute",
+        display: "flex", flexDirection: "row-reverse",
+        alignItems: "center",
+        left: "0px", top: "0px",
+        width: "100%", height: "40px",
+        zIndex: 100,
+      }}>
+        {/* Connect a pen */}
+        <div style={{ fontSize: "20px", fontWeight: "bold" }}>
+          <Button variant="outlined" color="primary" onClick={(event) => handleConnectPen(event)} >
+            <Box fontSize={14} fontWeight="fontWeightBold" >Connect</Box>
+          </Button>
+        </div>
+        <div style={{ flex: 1 }}>
+        </div>
 
-      <TableContainer component={Paper}>
+        <div style={{ fontSize: "20px", fontWeight: "bold" }}>
+          Pen Connected: {num_pens}
+        </div>
+
+        <div style={{ flex: 8 }}>
+        </div>
+      </div>
+
+
+      {/* <div style={{position:"relative"}}>
+        <div style={tempStyle}>
+          <NeoPdfViewer url={"./mixed_output.pdf"} />
+        </div>
+        <div style={tempStyle}>
+          <StorageRenderer scale={1} pageId={"0.0.0.0"} playState={PLAYSTATE.live} width={800} height={400} />
+        </div>
+      </div>  */}
+
+
+      <div style={{
+        // position: "absolute",
+        left: "0px", top: "0px",
+        flexDirection: "row-reverse", display: "flex",
+        width: "100%", height: "40px",
+        alignItems: "center",
+        zIndex: 1,
+      }}>
+        <div style={tempStyle}>
+          <NeoPdfViewer url={"./mixed_output.pdf"} />
+        </div>
+        <div style={tempStyle}>
+          <PenBasedRenderer scale={1} pageId={"0.0.0.0"} playState={PLAYSTATE.live} pens={pens} />
+        </div>
+      </div>
+
+
+
+      {/* <TableContainer component={Paper}>
         <Table className={classes.table} size="small" aria-label="a dense table">
           <TableBody>
             <TableRow key={1}>
@@ -108,10 +164,10 @@ const Home = () => {
             </TableRow>
           </TableBody>
         </Table>
-      </TableContainer>
+      </TableContainer> */}
 
 
-    </div>
+    </div >
   );
 };
 
