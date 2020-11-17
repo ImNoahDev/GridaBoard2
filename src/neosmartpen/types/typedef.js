@@ -59,7 +59,7 @@
  * for error
  * @property {number=} brightness
  * @property {number=} exposureTime
- * @property {number=} ndacTime
+ * @property {number=} ndacProcessTime
  * @property {number=} labelCount
  * @property {number=} ndacErrorCode
  * @property {number=} ndacClassType - (0:G3C6, 1:N3C6)

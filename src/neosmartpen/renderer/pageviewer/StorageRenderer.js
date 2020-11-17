@@ -7,18 +7,7 @@ import StorageRenderWorker, { ZoomFitEnum } from "./StorageRenderWorker";
 import { Paper } from "@material-ui/core";
 import { NeoSmartpen, PenManager } from "../../index";
 import { uuidv4 } from "../../utils/UtilsFunc";
-
-
-export const PLAYSTATE = Object.freeze({
-  live: Symbol("LIVE"),
-  play: Symbol("PLAY"),
-  stop: Symbol("STOP"),
-  pause: Symbol("PAUSE"),
-  rewind: Symbol("REWIND"),
-  trackRewind: Symbol("REWIND_TRACK"),
-  setAutoStop: Symbol("SET_AUTO_STOP"),
-  unsetAutoStop: Symbol("UNSET_AUTO_STOP"),
-});
+import { PLAYSTATE } from "./RenderWorkerBase";
 
 const propTypes = {
   scale: PropTypes.number,
@@ -500,9 +489,7 @@ class StorageRenderer extends React.Component {
     return (
       <div id="replayContainer" ref={this.myRef}>
         <h1>StorageRenderer</h1><h2>{section}.{owner}.{book}.{page}:{penEventCount}</h2>
-        <Paper style={{ height: this.size.height, width: this.size.width }}>
-          <canvas id={this.canvasId} ref={this.canvasRef} />
-        </Paper>
+          <canvas id={this.canvasId} ref={this.canvasRef} style={{ height: this.size.height, width: this.size.width }}/>
       </div>
     );
   }
