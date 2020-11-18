@@ -6,6 +6,8 @@ import { Button, Box } from "@material-ui/core";
 import NeoPdfViewer from "../neosmartpen/pdf/NeoPdfViewer";
 import UpperNav from '../components/navbar/UpperNav';
 import BottomNav from '../components/navbar/BottomNav';
+import MenuWide from '../components/buttons/MenuWide'
+import '../styles/main.css'
 
 import {
   //PenEvent,
@@ -112,19 +114,17 @@ const Home = () => {
             <Box fontSize={14} fontWeight="fontWeightBold" >Connect</Box>
           </Button>
         </div>
-        <div style={{ flex: 1 }}>
-        </div>
+        <div style={{ flex: 1 }}></div>
 
         <div style={{ fontSize: "20px", fontWeight: "bold" }}>
           Pen Connected: {num_pens}
         </div>
-
+        
         <div>
           <UpperNav />
         </div>
 
-        <div style={{ flex: 8 }}>
-        </div>
+        <div style={{ flex: 8 }}></div>
       </div>
 
       <div>
@@ -149,15 +149,22 @@ const Home = () => {
         alignItems: "center",
         zIndex: 1,
       }}>
+        <div class="d-flex flex-column h-100">
         <div style={tempStyle}>
           <NeoPdfViewer url={"./mixed_output.pdf"} />
         </div>
+        
+        <div id="leftmenu" class="main-container flex-grow-1">
+            <div id="menu-wide" class="d-flex menu-container float-left h-100">
+              <MenuWide/>
+            </div>
+        </div>
+
         <div style={tempStyle}>
           <PenBasedRenderer scale={1} pageId={"0.0.0.0"} playState={PLAYSTATE.live} pens={pens} />
         </div>
+        </div>
       </div>
-
-
 
       {/* <TableContainer component={Paper}>
         <Table className={classes.table} size="small" aria-label="a dense table">
@@ -174,7 +181,6 @@ const Home = () => {
           </TableBody>
         </Table>
       </TableContainer> */}
-
 
     </div >
   );
