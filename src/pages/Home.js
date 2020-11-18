@@ -5,8 +5,20 @@ import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper
 import { Button, Box } from "@material-ui/core";
 import NeoPdfViewer from "../neosmartpen/pdf/NeoPdfViewer";
 import UpperNav from '../components/navbar/UpperNav';
-// import BottomNav from '../components/navbar/BottomNav';
-import MenuWide from '../components/buttons/MenuWide'
+
+import ConnectButton from '../components/buttons/ConnectButton'
+
+import PenTypeButton from '../components/buttons/PenTypeButton'
+import TrashButton from '../components/buttons/TrashButton'
+import RotateButton from '../components/buttons/RotateButton'
+import BackgroundButton from '../components/buttons/BackgroundButton'
+
+import FitButton from '../components/buttons/FitButton'
+import ZoomButton from '../components/buttons/ZoomButton'
+import FullScreenButton from '../components/buttons/FullScreenButton'
+
+import TracePointButton from '../components/buttons/TracePointButton'
+
 import '../styles/main.css'
 import Canvas from '../components/view/Canvas';
 import ColorButtons from '../components/navbar/ColorButtons';
@@ -175,7 +187,21 @@ const Home = () => {
         
         <div id="leftmenu" class="main-container flex-grow-1">
             <div id="menu-wide" class="d-flex menu-container float-left h-100">
-              <MenuWide/>
+              <div className="d-flex flex-column justify-content-between" style = {{zIndex: 1030}}>
+                <ConnectButton/>
+                <div className="btn-group-vertical neo_shadow" style = {{ marginBottom: 10 }}>
+                  <div className="btn-group dropright" role="group">
+                    <PenTypeButton/>
+                  </div>
+                  <TrashButton/><RotateButton/><BackgroundButton/>
+                </div>
+                <div class="btn-group-vertical neo_shadow" style = {{ marginBottom: 10 }}>
+                  <FitButton/><ZoomButton/><FullScreenButton/>
+                </div>
+                <div class="btn-group-vertical neo_shadow" style = {{ marginBottom: 10 }}>
+                  <TracePointButton/>
+                </div>
+              </div>
             </div>
         </div>
 
