@@ -100,6 +100,10 @@ const Home = () => {
 
   return (
     <div>
+      <div>
+        <UpperNav />
+      </div>
+
       <div style={{
         position: "absolute",
         display: "flex", flexDirection: "row-reverse",
@@ -119,12 +123,9 @@ const Home = () => {
         <div style={{ fontSize: "20px", fontWeight: "bold" }}>
           Pen Connected: {num_pens}
         </div>
-        
-        <div>
-          <UpperNav />
-        </div>
 
-        <div style={{ flex: 8 }}></div>
+        <div style={{ flex: 8 }}>
+        </div>
       </div>
 
       <div>
@@ -139,7 +140,6 @@ const Home = () => {
           <StorageRenderer scale={1} pageId={"0.0.0.0"} playState={PLAYSTATE.live} width={800} height={400} />
         </div>
       </div>  */}
-
 
       <div style={{
         // position: "absolute",
