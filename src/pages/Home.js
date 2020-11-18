@@ -5,9 +5,15 @@ import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper
 import { Button, Box } from "@material-ui/core";
 import NeoPdfViewer from "../neosmartpen/pdf/NeoPdfViewer";
 import UpperNav from '../components/navbar/UpperNav';
-import BottomNav from '../components/navbar/BottomNav';
+// import BottomNav from '../components/navbar/BottomNav';
 import MenuWide from '../components/buttons/MenuWide'
 import '../styles/main.css'
+import Canvas from '../components/view/Canvas';
+import ColorButtons from '../components/navbar/ColorButtons';
+import PageNumbering from '../components/navbar/PageNumbering';
+import PrintButton from '../components/navbar/PrintButton';
+import FileLoad from '../components/navbar/FileLoad';
+import CalibrationMenual from '../components/navbar/CalibrationMenual';
 
 import {
   //PenEvent,
@@ -104,6 +110,10 @@ const Home = () => {
         <UpperNav />
       </div>
 
+      <div>
+        <Canvas />
+      </div>
+
       <div style={{
         position: "absolute",
         display: "flex", flexDirection: "row-reverse",
@@ -127,10 +137,19 @@ const Home = () => {
         <div style={{ flex: 8 }}>
         </div>
       </div>
-
-      <div>
+      
+      <nav id="colornav" className="navbar fixed-bottom navbar-light bg-transparent">
+        <ColorButtons />
+        <div className="navbar-menu d-flex justify-content-center align-items-center neo_shadow">
+          <PageNumbering />
+          <PrintButton />
+          <FileLoad />
+        </div>
+        <CalibrationMenual />
+      </nav>
+      {/* <div>
         <BottomNav />
-      </div>
+      </div> */}
 
       {/* <div style={{position:"relative"}}>
         <div style={tempStyle}>
