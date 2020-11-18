@@ -1,0 +1,85 @@
+/* 2 state 버튼을 구현하기 위한 부분 */
+.hover-image,
+.c2:hover:not(.disabled) .normal-image {
+    display: none;
+}
+
+.c2:hover:not(.disabled) .hover-image {
+    display: inline;
+}
+
+/* 4 state 버튼을 구현하기 위한 부분 */
+.toggle-on.normal-image,
+.c2.checked .toggle-off.normal-image {
+    display: none;
+}
+
+.c2.checked .toggle-on.normal-image {
+    display: inline;
+}
+
+.c2.checked:hover .toggle-off.hover-image,
+.c2.checked:hover .toggle-on.normal-image {
+    display: none;
+}
+
+.c2.checked:hover .toggle-on.hover-image {
+    display: inline;
+}
+
+.c2:hover .toggle-on.hover-image {
+    display: none;
+}
+
+/* .c2:hover .hover-image,
+.c2:hover .hover-text {
+	display: inline;
+}
+
+.c2.toggle-on .toggle-off.normal-image {
+    display:none;
+} */
+
+
+
+
+/* 6 state 버튼을 구현하기 위한 부분 */
+.c2.state_1 .state_1.normal-image,
+.c2.state_2 .state_2.normal-image,
+.c2.state_0:hover .state_0.hover-image,
+.c2.state_1:hover .state_1.hover-image,
+.c2.state_2:hover .state_2.hover-image
+{
+    display: inline;
+}
+
+
+
+.state_1.normal-image,
+.state_2.normal-image,
+.c2:hover .state_0.normal-image,
+.c2:hover .state_1.hover-image,
+.c2:hover .state_2.hover-image,
+
+.c2.state_0 .state_1.normal-image,
+.c2.state_0 .state_2.normal-image,
+.c2.state_1 .state_0.normal-image,
+.c2.state_1 .state_2.normal-image,
+.c2.state_2 .state_0.normal-image,
+.c2.state_2 .state_1.normal-image,
+
+.c2.state_0:hover .state_1.hover-image,
+.c2.state_0:hover .state_2.hover-image,
+
+.c2.state_1:hover .state_0.hover-image,
+.c2.state_1:hover .state_1.normal-image,
+.c2.state_1:hover .state_2.hover-image,
+
+.c2.state_2:hover .state_0.hover-image,
+.c2.state_2:hover .state_1.hover-image,
+.c2.state_2:hover .state_2.normal-image
+{
+    display: none;
+}
+
+

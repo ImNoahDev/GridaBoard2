@@ -1,0 +1,177 @@
+/* https://www.tutorialspoint.com/css/css_paged_media.htm */
+
+/* div.print_center {
+    width: 794px;
+    height: 1123px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+div.print_center > img {
+    max-width: 100%;
+    max-height: 100%;
+} */
+
+#printContainer {
+    display: none;
+}
+
+@media print {
+    /* @page {
+        all: initial;
+        all: unset;
+    } */
+
+    @page {
+        /* size: auto; auto is the initial value */
+        /* size: 21cm 29.7cm;  */
+        size: a4;
+        margin: 0;
+        /* margin-left: 10mm; */
+        /* margin-right: 10mm; */
+    }
+
+    /* General rules for printing. */
+    html,
+    body {
+        border: 0;
+        margin: 0;
+        padding: 0;
+        /* width: 190mm; */
+    }
+
+    #print-area {
+        position: absolute;
+        height: 100%;
+        overflow: visible;
+    }
+
+    /* Rules for browsers that don't support mozPrintCallback. */
+    #dpi,
+    #eee,
+    #tooltip-container,
+    #landing_modal,
+    .container,
+    #print_modal,
+    .modal-container,
+    #landing_modal,
+    #uppernav,
+    #leftmenu,
+    #errorWrapper,
+    #colornav,
+    #ui,
+    #tt2,
+    #ttt,
+    #writing_board,
+    #pdf_canvas,
+    #ink_canvas,
+    #pdf_file_input,
+    #pdf_file_append,
+    .file_input,
+    .progress,
+    #pdfframe,
+    .bgtheme,
+    #bgthemeMenu,
+    #penMenu,
+    #overlayContainer,
+    .neo-overlay,
+    #modal,
+    .modal-backdrop,
+    .bootbox,
+    .modal,
+    #modal-dialog,
+    #modal-content,
+    #fileLoadingOverlay,
+    .modal-dialog,
+    .modal-dialog-centered,
+    .screenOnly,
+    .show,
+    .textLayer {
+        display: none;
+        visibility: hidden;
+        opacity: 0;
+    }
+
+    #viewerContainer {
+        overflow: visible;
+    }
+
+    #mainContainer,
+    #viewerContainer,
+    .page,
+    .page canvas {
+        position: static;
+        padding: 0;
+        margin: 0;
+    }
+
+    .page {
+        float: left;
+        display: none;
+        border: none;
+        box-shadow: none;
+        background-clip: content-box;
+        background-color: rgba(255, 255, 255, 1);
+    }
+
+    .page[data-loaded] {
+        display: block;
+    }
+
+    .fileInput {
+        display: none;
+    }
+
+    /* Rules for browsers that support PDF.js printing */
+    #printContainer {
+        display: block;
+    }
+    #printContainer {
+        visibility: visible;
+
+        /*background-color: white;*/
+        height: 100%;
+        width: 100%;
+        /* position: fixed; */
+        top: 0;
+        left: 0;
+        margin: 0;
+        padding: 0px;
+        font-size: 14px;
+        line-height: 18px;
+
+        position: absolute;
+        height: 100%;
+        overflow: visible;
+    }
+    /* wrapper around (scaled) print canvas elements */
+    #printContainer > div {
+        position: relative;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        overflow: visible;
+        page-break-after: always;
+        page-break-inside: avoid;
+    }
+
+    /* #printContainer > div.evenpage {
+        page-break-after: always;
+    }
+
+    #printContainer > div.oddpage {
+        page-break-after: avoid ;
+    } */
+
+    #printContainer canvas,
+    #printContainer img {
+        display: block;
+    }
+}
+
+.visibleLargeView,
+.visibleMediumView,
+.visibleSmallView {
+    display: none;
+}

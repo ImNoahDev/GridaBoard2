@@ -1,0 +1,145 @@
+
+#overlayContainer {
+    display: table;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.4);
+    z-index: 40000;
+    left: 0px;
+    top: 0px;
+
+}
+.modal-dialog-centered {
+    /* position: absolute; */
+    /* height: 100%; */
+
+}
+
+#overlayContainer.hidden {
+    display: none;
+    z-index:40000;
+}
+
+
+#overlayContainer > * {
+    overflow: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+#overlayContainer > .container {
+    display: table-cell;
+    vertical-align: middle;
+    text-align: center;
+}
+
+#overlayContainer > .container > .dialog {
+    border-radius: 0.3rem;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 25px;
+
+    display: inline-block;
+    padding: 15px 25px;
+    border-spacing: 10px;
+    color: rgba(0, 0, 0, 1);
+
+    font: bold sans-serif;
+
+    /* line-height: 30px; */
+    background-color: rgba(255, 255, 255, 1); /* fallback */
+    /* background-image: url('images/texture.png'), linear-gradient(rgba(82, 82, 255, 0.99), rgba(69, 69, 69, 0.95)); */
+    border: 1px solid rgba(0, 0, 0, 0.5);
+    /* border-radius: 4px; */
+    box-shadow: 6px 6px 10px  rgba(0, 0, 0, 0.5);
+}
+
+
+.dialog > .row {
+    display: table-row;
+}
+
+.dialog > .row > * {
+    display: table-cell;
+    /* padding: 10px; */
+}
+
+.dialog .toolbarField {
+    margin: 5px 0;
+}
+
+/* .dialog .separator {
+    display: block;
+    margin: 4px 0;
+    height: 1px;
+    width: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.08);
+} */
+
+/* .dialog .buttonRow {
+    text-align: center;
+    vertical-align: middle;
+} */
+
+.dialog:link {
+    color: rgba(255, 255, 255, 1);
+}
+
+
+.overlayButton {
+        border-radius: 0.3rem;
+        /* display: inline-block; */
+    border: 0 none;
+    /* background: none; */
+    /* width: 32px;
+    height: 25px; */
+
+    /* font-size: 1rem; */
+    /* font-weight: 400; */
+    /* line-height: 1.5; */
+
+    min-width: 16px;
+    /* padding: 40px 6px 0; */
+    /* border: 1px solid rgba(0, 0, 0, 0); */
+    /* border-radius: 2px; */
+    color: rgba(0, 0, 0, 1);
+    /* font-size: 20px; */
+    /* line-height: 14px; */
+    user-select: none;
+    /* Opera does not support user-select, use <... unselectable="on"> instead */
+    cursor: default;
+
+    background-color: rgba(255, 255, 255, 1.2);
+    /* background-color: linear-gradient(rgba(255, 255, 255, 1), rgba(255, 255, 255, 1)); */
+    box-shadow: 6px 6px 10px  rgba(0, 0, 0, 0.5);
+
+    width: auto;
+    /* margin: 3px 4px 2px !important; */
+    padding: 2px 20px !important;
+}
+
+.overlayButton[disabled] {
+    opacity: .5;
+}
+
+.overlayButton:hover,
+.overlayButton:focus {
+     background-color: rgba(0,227,234,1.0);
+    /* background-color: rgba(0, 0, 0, 0.2); */
+    /* box-shadow: 0 1px 0 rgba(255, 255, 255, 0.05) inset, 0 0 1px rgba(255, 255, 255, 0.15) inset, 0 0 1px rgba(0, 0, 0, 0.05); */
+    z-index: 199;
+}
+
+
+
+.tutorial_btn {
+    margin-left: 5px;
+    box-shadow: 4px 4px 10px rgba(0,0,0,0.2);
+}
+
+.popover {
+    box-shadow: 4px 4px 10px rgba(0,0,0,0.7);
+
+}
