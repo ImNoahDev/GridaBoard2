@@ -42,15 +42,17 @@ interface IPenBasedRendererState {
 /**
  * Properties
  */
-interface IPenBasedRendererProps {
+type IPenBasedRendererProps ={
   pageId?: string,
   inkStorage?: InkStorage,
   playState?: PLAYSTATE,
   pens?: NeoSmartpen[],
 
   scale?: number,
-  width?: number,
-  height?: number,
+  width?: number;
+  height?: number;
+
+  viewFit?: ZoomFitEnum;
 }
 
 
@@ -59,7 +61,7 @@ interface IPenBasedRendererProps {
  *    1)  Pen에서 Event를 받아 실시간 rendering만 하는 component로 만들것
  *
  */
-class PenBasedRenderer extends React.Component<IPenBasedRendererProps, IPenBasedRendererState> {
+export default class PenBasedRenderer extends React.Component<IPenBasedRendererProps, IPenBasedRendererState> {
   state: IPenBasedRendererState = {
     renderer: null,
     pageId: "",
@@ -76,7 +78,7 @@ class PenBasedRenderer extends React.Component<IPenBasedRendererProps, IPenBased
       page: -1,
     },
 
-    viewFit: ZoomFitEnum.WIDTH,
+    viewFit: ZoomFitEnum.ACTUAL,
 
     /** @type {Array.<NeoSmartpen>} */
     pens: [],
@@ -104,7 +106,7 @@ class PenBasedRenderer extends React.Component<IPenBasedRendererProps, IPenBased
     this.myRef = React.createRef();
 
     /** @type {{pageId:number, inkStorage:InkStorage, scale:number, playState:number, pens:Array.<NeoSmartpen> }} */
-    let { pageId, inkStorage, scale, playState, width, height, pens } = props;
+    let { pageId, inkStorage, scale, playState, width, height, pens, viewFit } = props;
 
     if (!inkStorage) {
       inkStorage = InkStorage.getInstance();
@@ -113,10 +115,11 @@ class PenBasedRenderer extends React.Component<IPenBasedRendererProps, IPenBased
     this.inkStorage = inkStorage;
 
     this.state = {
+      ...this.state,
       pageId,
       scale,
       playState,
-      ...this.state
+      viewFit: viewFit ? viewFit : ZoomFitEnum.ACTUAL,
     };
 
     this.canvasId = uuidv4();
@@ -164,7 +167,7 @@ class PenBasedRenderer extends React.Component<IPenBasedRendererProps, IPenBased
       let parentHeight = node.offsetHeight;
       let parentWidth = node.offsetWidth;
 
-      console.log(`(width, height) = (${parentHeight}, ${parentWidth})`);
+      console.log(`Parent window (width, height) = (${parentWidth}, ${parentHeight})`);
 
       if (!width || !height) {
         width = parentWidth;
@@ -183,6 +186,8 @@ class PenBasedRenderer extends React.Component<IPenBasedRendererProps, IPenBased
 
     // const page = pages.filter((p) => p.pageNumber === pageId)[0];
     // console.log("Draw Stroke size", pageId, "canvas size", size, "rect", rect);
+
+    console.log(`PenBasedRenderer: size ${this.propsSize.width}, ${this.propsSize.height}`);
 
     this.initRenderer(this.propsSize);
     window.addEventListener("resize", this.resizeListener);
@@ -455,4 +460,3 @@ class PenBasedRenderer extends React.Component<IPenBasedRendererProps, IPenBased
   }
 }
 
-export default PenBasedRenderer;

@@ -1,7 +1,13 @@
 import { IPoint, IPointForce } from "../../DataStructure/Structures";
 
-export const PATH_THICKNESS_SCALE = 16384;
-export const PATH_THICKNESS_SCALE_DET = 0.00006103515625;
+// export const PATH_THICKNESS_SCALE = 16384;
+// export const PATH_THICKNESS_SCALE_DET = 0.00006103515625;
+
+
+export const PATH_THICKNESS_SCALE = 1;
+export const PATH_THICKNESS_SCALE_DET = 1;
+
+
 
 /**
  *
