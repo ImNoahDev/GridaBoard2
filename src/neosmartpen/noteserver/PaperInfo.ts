@@ -1,16 +1,16 @@
 import {
-  SINGLE_CODE_SIZE_PER_INCH,
-  NCODE_TO_MM_SCALE,
+  // SINGLE_CODE_SIZE_PER_INCH,
+  // NCODE_TO_MM_SCALE,
   NCODE_TO_INCH_SCALE,
-  NCODE_TO_SCREEN_SCALE,
-  INCH_TO_MM,
+  // NCODE_TO_SCREEN_SCALE,
+  // INCH_TO_MM,
 
   DEFAULT_SECTION,
   DEFAULT_OWNER,
   DEFAULT_BOOK,
 
-  PDF_DEFAULT_DPI,
-  DISPLAY_DEFAULT_DPI,
+  // PDF_DEFAULT_DPI,
+  // DISPLAY_DEFAULT_DPI,
 } from "../constants";
 
 import { IPageSOBP, INcodeSOBPxy, ISize, INoteServerSizeInfo } from "../DataStructure/Structures";
@@ -235,7 +235,7 @@ class PaperInfo {
    * @param coordInfo
    */
   isPUI = (coordInfo: INcodeSOBPxy): boolean => {
-    const { section, owner, book, page, x, y } = coordInfo;
+    const { owner, book, page, } = coordInfo;
     // console.log( `isPUI: ${owner}.${book}.${page}`);
     if (owner === 27 && book === 161 && page === 1) {
       return true;
@@ -256,7 +256,7 @@ class PaperInfo {
    * @param pageInfo
    */
   getPaperSize = (pageInfo: IPageSOBP): ISize => {
-    const { section, owner, book, page } = pageInfo;
+    // const { section, owner, book, page } = pageInfo;
     let size: ISize = { width: 0, height: 0 };
     let paper_info = this.getPaperInfo(pageInfo);
 
@@ -301,10 +301,10 @@ class PaperInfo {
    * @param {{section?:number, owner:number, book:number, page?:number}} pageInfo
    */
   getPaperInfo = (pageInfo: IPageSOBP): INoteServerSizeInfo => {
-    const { section, owner, book, page } = pageInfo;
+    const { owner, book } = pageInfo;
 
     let info = PaperType.paperA4_dummy;
-    let found = false;
+    // let found = false;
 
     let keys = Object.keys(PaperType);
     for (let j = 0; j < keys.length; j++) {
@@ -316,7 +316,7 @@ class PaperInfo {
         if (value.owner === owner && idx > -1) {
           info = value;
           info.name = key;
-          found = true;
+          // found = true;
           break;
         }
       } else {
@@ -324,7 +324,7 @@ class PaperInfo {
         if (value.owner === owner && value.book === book) {
           info = value;
           info.name = key;
-          found = true;
+          // found = true;
           break;
         }
       }

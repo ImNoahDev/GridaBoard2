@@ -7,7 +7,7 @@ import "../types";
 import { IPenEvent } from "../DataStructure/Structures";
 import { NeoStroke, PEN_STATE, PenEventName } from "../DataStructure";
 import { IWritingSurfaceInfo } from "../DataStructure/Structures";
-
+import NeoDot from "../DataStructure/NeoDot";
 
 
 interface IPenMovement {
@@ -17,6 +17,21 @@ interface IPenMovement {
   upEvent: IPenEvent,
   numMovement: number,
   stroke: NeoStroke,
+
+}
+
+enum IPenRendererEnum {
+  PEN = 0,
+  MARKER = 1,
+  PENCIL = 2,
+  ERASER = 3,
+  BRUSH = 4,
+  FOUNTAINPEN = 5,
+};
+
+type IPenRenderFactor = {
+  thickness: number,
+  color: string,    // "rgba(0,0,0,255)"
 
 }
 
@@ -30,10 +45,18 @@ export class NeoSmartpen {
     stroke: null,
   };
 
+  /** 펜 종류 마다의 굵기와 색깔 */
+  penState: IPenRenderFactor[] = new Array(Object.keys(IPenRendererEnum).length);
+
+  /** 펜 종류 (렌더러 종류) */
+  penRendererType: IPenRendererEnum = IPenRendererEnum.PEN;
+
   lastInfoEvent: IPenEvent = null;
   protocolHandler: PenComm = new PenComm(this);
   mac: string = null;
+
   lastState: PEN_STATE = PEN_STATE.NONE;
+
   surfaceInfo: IWritingSurfaceInfo = {
     section: 3,
     owner: 27,
@@ -65,6 +88,10 @@ export class NeoSmartpen {
       this.storage = InkStorage.getInstance();
     }
 
+    this.penState.forEach(item => {
+      item.thickness = 1;
+      item.color = "rgba(0,0,0,255)";
+    });
   }
 
   /**
@@ -157,7 +184,11 @@ export class NeoSmartpen {
 
     let mac = this.mac;
     let time = event.timeStamp;
-    let stroke = this.storage.openStroke(mac, time, event.penTipMode, event.color);
+    let stroke = this.storage.openStroke(mac, time, 
+      event.penTipMode /**0:pen, 1:eraser */,
+      this.penState[this.penRendererType].color,
+      this.penState[this.penRendererType].thickness
+    );
 
 
     let strokeKey = stroke.key;
@@ -294,14 +325,14 @@ export class NeoSmartpen {
       console.error("Ink Storage has not been initialized");
     }
 
-    let dot = {
+    const dot = new NeoDot({
       dotType: 2,   // moving
       deltaTime: event.timediff,
       time: event.timeStamp,
       f: event.force,
       x: event.x,
       y: event.y,
-    };
+    });
 
     let stroke = this.currPenMovement.stroke;
     let strokeKey = stroke.key;

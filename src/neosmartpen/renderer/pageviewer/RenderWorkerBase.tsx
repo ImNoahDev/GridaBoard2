@@ -29,10 +29,10 @@ export enum PLAYSTATE {
 };
 
 export enum ZoomFitEnum {
+  ACTUAL,
   WIDTH,
   HEIGHT,
   FULL,
-  ACTUAL,
 }
 
 
@@ -88,7 +88,7 @@ export default class RenderWorkerBase {
   currSize: { width: number, height: number } = { width: 0, height: 0 };
 
   /** FabricJs canvas */
-  canvas: fabric.Canvas = null;
+  canvasFb: fabric.Canvas = null;
 
   /** mouse에 따라 pan, zoom이 가능한지에 대한 여부 */
   mouseAction: boolean = true;
@@ -126,6 +126,9 @@ export default class RenderWorkerBase {
   /** Ncode to Screen scale */
   base_scale: number;
 
+  /** logical zoom in/out */
+  scale: number = 1;
+
   /** zoom fit */
   viewFit: ZoomFitEnum = ZoomFitEnum.ACTUAL;
 
@@ -155,12 +158,20 @@ export default class RenderWorkerBase {
     this.currSize = { width, height };
 
     this.base_scale = ncodeToDisplayPixel(1);
+    this.scale = 1;
 
-    this.canvas = null;
+    this.canvasFb = null;
 
     if (bgColor !== undefined) this.bgColor = bgColor;
     if (typeof (mouseAction) === "boolean") this.mouseAction = mouseAction;
-    if (typeof (viewFit) !== undefined) this.viewFit = viewFit;
+
+    if (viewFit) {
+      this.viewFit = viewFit;
+    }
+    else {
+      this.viewFit = ZoomFitEnum.ACTUAL;
+    }
+
     if (typeof (shouldDisplayGrid) === "boolean") this.shouldDisplayGrid = shouldDisplayGrid;
     this.init();
   }
@@ -176,8 +187,11 @@ export default class RenderWorkerBase {
     // scaleCanvas(HtmlCanvas);
     const dpr = 1;
 
-    this.canvas = new fabric.Canvas(this.canvasId, {
-      backgroundColor: this.bgColor ? this.bgColor : "rgba(255,255,255,0)",
+    console.log( `Fabric canvas inited: size(${size.width}, ${size.height})`);
+
+    this.canvasFb = new fabric.Canvas(this.canvasId, {
+      
+      backgroundColor: this.bgColor ? this.bgColor : "rgba(255,255,0,0.5)",
       selection: false,
       controlsAboveOverlay: false,
       selectionLineWidth: 4,
@@ -186,13 +200,13 @@ export default class RenderWorkerBase {
 
     });
 
-    let canvas = this.canvas;
+    let canvasFb = this.canvasFb;
 
     if (this.mouseAction) {
-      canvas.on('mouse:down', this.onCanvasMouseDown);
-      canvas.on('mouse:move', this.onCanvasMouseMove);
-      canvas.on('mouse:up', this.onCanvasMousUp);
-      canvas.on('mouse:wheel', this.onCanvasMouseWheel);
+      canvasFb.on('mouse:down', this.onCanvasMouseDown);
+      canvasFb.on('mouse:move', this.onCanvasMouseMove);
+      canvasFb.on('mouse:up', this.onCanvasMousUp);
+      canvasFb.on('mouse:wheel', this.onCanvasMouseWheel);
     }
 
     this.drawPageLayout();
@@ -203,9 +217,11 @@ export default class RenderWorkerBase {
     const ncode_width = Xmax - Xmin;
     const ncode_height = Ymax - Ymin;
 
+    const actual_width = ncodeToDisplayPixel(ncode_width);
+    const actual_height = ncodeToDisplayPixel(ncode_height);
     let s: ISize = {
-      width: ncodeToDisplayPixel(ncode_width),
-      height: ncodeToDisplayPixel(ncode_height),
+      width: actual_width * this.scale,
+      height: actual_height * this.scale,
     };
 
     return s;
@@ -213,20 +229,21 @@ export default class RenderWorkerBase {
 
   drawPageLayout = () => {
     if (!this.shouldDisplayGrid) return;
-    const canvas = this.canvas;
+    const canvasFb = this.canvasFb;
 
     // 지우기
-    if (this.canvas) {
-      let objects = this.canvas.getObjects();
+    if (this.canvasFb) {
+      let objects = this.canvasFb.getObjects();
       let strokes = objects.filter(obj => obj.data === GRID_OBJECT_ID);
 
       strokes.forEach((obj) => {
-        this.canvas.remove(obj);
+        this.canvasFb.remove(obj);
       });
     }
 
     // 그리기
     const size = this.getSurfaceSize_CSS();
+    console.log(`drawPageLayout: ${size.width}, ${size.height}`);
 
     // console.log(`Grid: scale=${this.base_scale} (width, height)=(${size.width}, ${size.height})`);
 
@@ -246,7 +263,7 @@ export default class RenderWorkerBase {
       data: GRID_OBJECT_ID,
 
     });
-    canvas.add(rect);
+    canvasFb.add(rect);
 
     for (let x = 0; x < size.width; x += 10) {
       let line = new fabric.Line([x, 0, x, size.height], {
@@ -259,7 +276,7 @@ export default class RenderWorkerBase {
         data: GRID_OBJECT_ID,
       });
 
-      canvas.add(line);
+      canvasFb.add(line);
     }
 
 
@@ -274,7 +291,7 @@ export default class RenderWorkerBase {
         data: GRID_OBJECT_ID,
       });
 
-      canvas.add(line);
+      canvasFb.add(line);
     }
 
   }
@@ -288,22 +305,22 @@ export default class RenderWorkerBase {
    */
   enableMouseAction = (sw: boolean) => {
     if (this.mouseAction !== sw) {
-      let canvas = this.canvas;
+      let canvasFb = this.canvasFb;
 
       if (sw === false) {
 
         this.onCanvasMousUp();
 
-        canvas.off('mouse:down', this.onCanvasMouseDown);
-        canvas.off('mouse:move', this.onCanvasMouseMove);
-        canvas.off('mouse:up', this.onCanvasMousUp);
-        canvas.off('mouse:wheel', this.onCanvasMouseWheel);
+        canvasFb.off('mouse:down', this.onCanvasMouseDown);
+        canvasFb.off('mouse:move', this.onCanvasMouseMove);
+        canvasFb.off('mouse:up', this.onCanvasMousUp);
+        canvasFb.off('mouse:wheel', this.onCanvasMouseWheel);
       }
       else {
-        canvas.on('mouse:down', this.onCanvasMouseDown);
-        canvas.on('mouse:move', this.onCanvasMouseMove);
-        canvas.on('mouse:up', this.onCanvasMousUp);
-        canvas.on('mouse:wheel', this.onCanvasMouseWheel);
+        canvasFb.on('mouse:down', this.onCanvasMouseDown);
+        canvasFb.on('mouse:move', this.onCanvasMouseMove);
+        canvasFb.on('mouse:up', this.onCanvasMousUp);
+        canvasFb.on('mouse:wheel', this.onCanvasMouseWheel);
       }
     }
     this.mouseAction = sw;
@@ -325,7 +342,7 @@ export default class RenderWorkerBase {
    * @param {Object} opt
    */
   onCanvasMouseDown = (opt: any) => {
-    let canvas = this.canvas;
+    let canvasFb = this.canvasFb;
 
     let evt: MouseEvent = opt.e;
 
@@ -333,7 +350,7 @@ export default class RenderWorkerBase {
     this.pan.lastPosX = evt.clientX;
     this.pan.lastPosY = evt.clientY;
 
-    canvas.selection = false;
+    canvasFb.selection = false;
 
   }
 
@@ -342,19 +359,19 @@ export default class RenderWorkerBase {
    * @param {Object} opt
    */
   onCanvasMouseMove = (opt: any) => {
-    let canvas = this.canvas;
+    let canvasFb = this.canvasFb;
 
     if (this.pan.isDragging) {
       let e: MouseEvent = opt.e;
       // console.log(`Point ${e.clientX}, ${e.clientY}`);
-      let vpt = canvas.viewportTransform;
+      let vpt = canvasFb.viewportTransform;
       vpt[4] += e.clientX - this.pan.lastPosX;
       vpt[5] += e.clientY - this.pan.lastPosY;
 
       this.scrollBoundaryCheck();
 
       // canvas.setViewportTransform(vpt);
-      canvas.requestRenderAll();
+      canvasFb.requestRenderAll();
       this.pan.lastPosX = e.clientX;
       this.pan.lastPosY = e.clientY;
 
@@ -367,14 +384,14 @@ export default class RenderWorkerBase {
    * @param {Object} opt
    */
   onCanvasMousUp = (opt: any = undefined) => {
-    let canvas = this.canvas;
+    let canvasFb = this.canvasFb;
 
 
     // on mouse up we want to recalculate new interaction
     // for all objects, so we call setViewportTransform
-    canvas.setViewportTransform(canvas.viewportTransform);
+    canvasFb.setViewportTransform(canvasFb.viewportTransform);
     this.pan.isDragging = false;
-    canvas.selection = false;
+    canvasFb.selection = false;
 
 
     // let vpt = canvas.viewportTransform;
@@ -388,10 +405,10 @@ export default class RenderWorkerBase {
   onCanvasMouseWheel = (opt: any) => {
     let evt: MouseEvent = opt.e;
     if ((!this.zoomCtrlKey) || (this.zoomCtrlKey === true && evt.ctrlKey === true)) {
-      let canvas = this.canvas;
+      let canvasFb = this.canvasFb;
 
       let delta = opt.e.deltaY;
-      let zoom = canvas.getZoom();
+      let zoom = canvasFb.getZoom();
       zoom *= 0.999 ** delta;
 
       this.setCanvasZoom(zoom, opt);
@@ -403,24 +420,24 @@ export default class RenderWorkerBase {
    */
   scrollBoundaryCheck = () => {
     return;
-    const canvas = this.canvas;
-    const zoom = canvas.getZoom();
+    const canvasFb = this.canvasFb;
+    const zoom = canvasFb.getZoom();
 
     // http://fabricjs.com/fabric-intro-part-5#pan_zoom
-    let vpt = canvas.viewportTransform;
+    let vpt = canvasFb.viewportTransform;
 
     if (vpt[4] >= 0) {
       vpt[4] = 0;
     }
-    else if (vpt[4] < canvas.getWidth() - this.currSize.width * zoom) {
-      vpt[4] = canvas.getWidth() - this.currSize.width * zoom;
+    else if (vpt[4] < canvasFb.getWidth() - this.currSize.width * zoom) {
+      vpt[4] = canvasFb.getWidth() - this.currSize.width * zoom;
     }
 
     if (vpt[5] >= 0) {
       vpt[5] = 0;
     }
-    else if (vpt[5] < canvas.getHeight() - this.currSize.height * zoom) {
-      vpt[5] = canvas.getHeight() - this.currSize.height * zoom;
+    else if (vpt[5] < canvasFb.getHeight() - this.currSize.height * zoom) {
+      vpt[5] = canvasFb.getHeight() - this.currSize.height * zoom;
     }
 
     if (zoom < 1) {
@@ -435,7 +452,7 @@ export default class RenderWorkerBase {
    * @param {Object} opt
    */
   setCanvasZoom = (zoom: number, opt: any) => {
-    let canvas = this.canvas;
+    let canvas = this.canvasFb;
 
     if (zoom > 20) zoom = 20;
     if (zoom < 0.01) zoom = 0.01;
@@ -495,10 +512,10 @@ export default class RenderWorkerBase {
   protected getScreenXY = (canvasXY: { x: number, y: number }) => {
     const { x, y } = canvasXY;
 
-    let canvas = this.canvas;
-    let vpt = canvas.viewportTransform;
+    let canvasFb = this.canvasFb;
+    let vpt = canvasFb.viewportTransform;
 
-    let zoom = this.canvas.getZoom();
+    let zoom = this.canvasFb.getZoom();
     let offset_x = vpt[4];
     let offset_y = vpt[5];
 
@@ -527,30 +544,34 @@ export default class RenderWorkerBase {
 
 
   /**
-  * @public
-  * @param {ZoomFitEnum} mode
-  * @param {{width:number, height:number}} szPaper
-  * @param {number} currScale
-  */
-  public calcScaleFactor(mode: ZoomFitEnum, szPaper: { width: number, height: number }, currScale: number): number {
+   * 
+   * @param mode 
+   * @param szPaper 
+   * @param currScale 
+   */
+  protected calcScaleFactor(mode: ZoomFitEnum, szPaper: { width: number, height: number }, currScale: number): number {
+
+    const actual_width = szPaper.width * this.base_scale;
+    const actual_height = szPaper.height * this.base_scale;
+    
     const szCanvas = this.currSize;
     let scale = 1;
     switch (mode) {
       case ZoomFitEnum.WIDTH:
-        scale = szCanvas.width / szPaper.width;
+        scale = szCanvas.width / actual_width;
 
         break;
 
       case ZoomFitEnum.HEIGHT:
-        scale = szCanvas.height / szPaper.height;
+        scale = szCanvas.height / actual_height;
         break;
 
       case ZoomFitEnum.FULL:
-        scale = Math.min(szCanvas.width / szPaper.width, szCanvas.height / szPaper.height);
+        scale = Math.min(szCanvas.width / actual_width, szCanvas.height / actual_height);
         break;
 
       case ZoomFitEnum.ACTUAL:
-        scale = NCODE_TO_SCREEN_SCALE;
+        scale = 1;
         break;
 
       default:
@@ -578,8 +599,8 @@ export default class RenderWorkerBase {
     let dx = 0, dy = 0;
     let shouldScroll = false;
 
-    let canvas = this.canvas;
-    let vpt = canvas.viewportTransform;
+    let canvasFb = this.canvasFb;
+    let vpt = canvasFb.viewportTransform;
     let offset_x = vpt[4];
     let offset_y = vpt[5];
 
@@ -626,8 +647,8 @@ export default class RenderWorkerBase {
    * @param {boolean} animate
    */
   protected scrollCanvasToPoint = (point: { x: number, y: number }, animate: boolean) => {
-    let canvas = this.canvas;
-    let vpt = canvas.viewportTransform;
+    let canvasFb = this.canvasFb;
+    let vpt = canvasFb.viewportTransform;
 
     if (animate) {
       if (this.scrollAnimateTimer) {
@@ -649,13 +670,13 @@ export default class RenderWorkerBase {
         y0 += step_y;
         vpt[4] = x0;
         vpt[5] = y0;
-        canvas.requestRenderAll();
+        canvasFb.requestRenderAll();
 
         count++;
         if (count === div) {
           window.clearInterval(this.scrollAnimateTimer);
           this.scrollAnimateTimer = null;
-          canvas.setViewportTransform(canvas.viewportTransform);
+          canvasFb.setViewportTransform(canvasFb.viewportTransform);
         }
       }, 20);
     }
@@ -663,8 +684,8 @@ export default class RenderWorkerBase {
       vpt[4] = point.x;
       vpt[5] = point.y;
       this.scrollBoundaryCheck();
-      canvas.requestRenderAll();
-      canvas.setViewportTransform(canvas.viewportTransform);
+      canvasFb.requestRenderAll();
+      canvasFb.setViewportTransform(canvasFb.viewportTransform);
     }
 
   }
@@ -675,12 +696,14 @@ export default class RenderWorkerBase {
    * @param {{width:number, height:number}} size
    */
   resize = (size: { width: number, height: number }) => {
+    console.log( `RenderWorkerBase: resized window ${size.width}, ${size.height}`);
+
     let zoom = size.width / this.initialSize.width;
     this.currSize = { ...size };
 
-    this.canvas.setHeight(size.height);
-    this.canvas.setWidth(size.width);
+    this.canvasFb.setHeight(size.height);
+    this.canvasFb.setWidth(size.width);
 
-    this.canvas.setZoom(zoom);
+    this.canvasFb.setZoom(zoom);
   };
 }

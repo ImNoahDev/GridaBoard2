@@ -28,29 +28,25 @@ export default class InkStorage {
   constructor() {
     if (_storage_instance) return _storage_instance;
 
-    /** @type {Array.<NeoStroke>} */
     this.completed = [];            // completed strokes
 
-    /** @type {Map.<string, NeoStroke>} - sourceKey ("uuid" + "mac") ==> Stroke */
+    /** sourceKey ("uuid" ) ==> Stroke */
     this.realtime = new Map();    // realtime strokes (incompleted strokes)
 
-    /** @type {Map.<string, Array.<NeoStroke>>} - (pageId) ==> ({penId : NeoStroke[]}) */
+    /** (pageId) ==> ({penId : NeoStroke[]}) */
     this.completedOnPage = new Map();
 
-    /** @type {Map.<string, Map.<string,NeoStroke> >} - (pageId) ==> ({strokeKey : NeoStroke}) */
+    /** (pageId) ==> ({strokeKey : NeoStroke}) */
     this.realtimeOnPage = new Map();
 
     _storage_instance = this;
-
     this.dispatcher = new Dispatcher();
-
-    /** @type {{section:number, book:number, owner:number, page:number}} */
     this.lastPageInfo = { section: -1, book: -1, owner: -1, page: -1 };
 
   }
 
   /**
-   * @return {InkStorage}
+   * 
    */
   static getInstance(): InkStorage {
     if (_storage_instance) return _storage_instance;
@@ -60,32 +56,30 @@ export default class InkStorage {
   }
 
   /**
-   * @public
-   * @param {string} eventName
-   * @param {function} listener
-   * @param {{mac:string}} filter
+   * 
+   * @param eventName 
+   * @param listener 
+   * @param filter 
    */
-  addEventListener(eventName: string, listener: Function, filter: any) {
+  public addEventListener(eventName: string, listener: Function, filter: any) {
     this.dispatcher.on(eventName, listener, filter);
     console.log("bound", listener);
   }
 
   /**
-   * @public
-   * @param {string} eventName
-   * @param {function} listener
+   * 
+   * @param eventName 
+   * @param listener 
    */
-  removeEventListener(eventName: string, listener: Function) {
+  public removeEventListener(eventName: string, listener: Function) {
     this.dispatcher.off(eventName, listener);
   }
 
-
   /**
-   * @public
-   * @param {{section:number, owner:number, book:number, page:number}} pageInfo
-   * @return {Array.<NeoStroke>}
+   * 
+   * @param pageInfo 
    */
-  getPageStrokes(pageInfo: IPageSOBP): NeoStroke[] {
+  public getPageStrokes(pageInfo: IPageSOBP): NeoStroke[] {
     const { section, book, owner, page } = pageInfo;
     const pageId = InkStorage.getPageId({ section, book, owner, page });
 
@@ -97,11 +91,10 @@ export default class InkStorage {
   }
 
   /**
-   * @public
-   * @param {{section:number, owner:number, book:number, page:number}} pageInfo
-   * @return {Array.<NeoStroke>}
+   * 
+   * @param pageInfo 
    */
-  getPageStrokes_live(pageInfo: IPageSOBP): NeoStroke[] {
+  public getPageStrokes_live(pageInfo: IPageSOBP): NeoStroke[] {
     const { section, book, owner, page } = pageInfo;
     const pageId = InkStorage.getPageId({ section, book, owner, page });
 
@@ -126,19 +119,17 @@ export default class InkStorage {
   }
 
   /**
-   * @public
-   * @return {{section:number, owner:number, book:number, page:number}}
+   * 
    */
-  getLastPageInfo(): IPageSOBP {
+  public getLastPageInfo(): IPageSOBP {
     return this.lastPageInfo;
   }
 
-
   /**
-   * @private
-   * @param {NeoStroke} stroke
+   * 
+   * @param stroke 
    */
-  addCompletedToPage(stroke: NeoStroke) {
+  private addCompletedToPage(stroke: NeoStroke) {
     const { section, book, owner, page } = stroke;
     const pageId = InkStorage.getPageId({ section, book, owner, page });
     // console.log( `add completed: ${mac},  ${pageId} = ${section}.${book}.${owner}.${page} `);
@@ -164,10 +155,10 @@ export default class InkStorage {
   }
 
   /**
-   * @private
-   * @param {NeoStroke} stroke
+   * 
+   * @param stroke 
    */
-  addRealtimeToPage(stroke: NeoStroke) {
+  private addRealtimeToPage(stroke: NeoStroke) {
     const { section, book, owner, page, key } = stroke;
     let pageId = InkStorage.getPageId({ section, book, owner, page });
 
@@ -184,10 +175,10 @@ export default class InkStorage {
   }
 
   /**
-   * @private
-   * @param {NeoStroke} stroke
+   * 
+   * @param stroke 
    */
-  removeFromRealtime(stroke: NeoStroke) {
+  private removeFromRealtime(stroke: NeoStroke) {
     const { section, book, owner, page, key } = stroke;
     let pageId = InkStorage.getPageId({ section, book, owner, page });
 
@@ -204,32 +195,33 @@ export default class InkStorage {
     this.realtime[key] = null;
   }
 
+
   /**
-   * @static
-   * @param {IPageSOBP} info
-   * @return {string}
+   * 
+   * @param info 
    */
   static getPageId(info: IPageSOBP): string {
     const { section, book, owner, page } = info;
     return `${section}.${book}.${owner}.${page}`;
   }
 
-
   /**
    * create realtime stroke, wait for "appendDot", ..., "closeStroke"
-   * @public
-   * @param {string} mac
-   * @param {number} time
-   *
-   * @return {NeoStroke}
+   * @param mac 
+   * @param time 
+   * @param penTipMode 
+   * @param penColor 
+   * @param thickness 
    */
-  openStroke(mac: string, time: number, penType: number, penColor: number): NeoStroke {
+  public openStroke(mac: string, time: number,
+    penTipMode: number/**0:pen, 1:eraser */,
+    penColor: string, thickness: number): NeoStroke {
     // let stroke = new NeoStroke(mac);
 
     // let stroke = initStroke(-1 /* section */, -1 /* owner */, -1 /*book */, -1 /* page */, time, mac);
-    let stroke = new NeoStroke(-1 /* section */, -1 /* owner */, -1 /*book */, -1 /* page */, time, mac);
+    let stroke = new NeoStroke(-1 /* section */, -1 /* owner */, -1 /*book */, -1 /* page */, time, mac, thickness);
     stroke.color = penColor;
-    stroke.thickness = 1;     // kitty
+    // stroke.thickness = thickness;     // kitty
     stroke.penTipMode = 0;    // kitty
 
     // stroke.init(section, owner, book, page, startTime);
@@ -247,14 +239,14 @@ export default class InkStorage {
 
   /**
    * create realtime stroke, wait for "appendDot", ..., "closeStroke"
-   * @public
-   * @param {string} strokeKey
-   * @param {number} owner
-   * @param {number} book
-   * @param {number} page
-   * @param {number} time
+   * @param strokeKey 
+   * @param section 
+   * @param owner 
+   * @param book 
+   * @param page 
+   * @param time 
    */
-  setStrokeInfo(strokeKey: string, section: number, owner: number, book: number, page: number, time: number) {
+  public setStrokeInfo(strokeKey: string, section: number, owner: number, book: number, page: number, time: number) {
     let stroke = this.realtime[strokeKey];
     stroke.section = section;
     stroke.owner = owner;
@@ -268,11 +260,10 @@ export default class InkStorage {
   }
 
   /**
-   *
-   * @param {string} strokeKey
-   * @return {NeoStroke}
+   * 
+   * @param strokeKey 
    */
-  getRealTimeStroke(strokeKey: string): NeoStroke {
+  public getRealTimeStroke(strokeKey: string): NeoStroke {
     /** @type {NeoStroke} */
     let stroke = this.realtime[strokeKey];
     if (!stroke) {
@@ -286,11 +277,10 @@ export default class InkStorage {
 
   /**
    * add dot to the stroke opened
-   * @public
-   * @param {string} strokeKey
-   * @param {NeoDot} dot
+   * @param strokeKey 
+   * @param dot 
    */
-  appendDot(strokeKey: string, dot: NeoDot) {
+  public appendDot(strokeKey: string, dot: NeoDot) {
     /** @type {NeoStroke} */
     let stroke = this.realtime[strokeKey];
     if (!stroke) {
@@ -308,10 +298,9 @@ export default class InkStorage {
 
   /**
    * close stroke to move to "completed"
-   * @public
-   * @param {string} strokeKey
+   * @param strokeKey 
    */
-  closeStroke(strokeKey: string) {
+  public closeStroke(strokeKey: string) {
     /** @type {NeoStroke} */
     let stroke = this.realtime[strokeKey];
     if (!stroke) {
@@ -331,26 +320,4 @@ export default class InkStorage {
     const { mac, section, owner, book, page } = stroke;
     this.dispatcher.dispatch(PenEventName.ON_PEN_UP, { strokeKey, mac, stroke, section, owner, book, page });
   }
-
-  // getState() {
-  //   /** @type {Object} */
-  //   let strokesCountPage = {};
-  //   this.completedOnPage.forEach((strokes, pageId) => {
-  //     strokesCountPage[pageId] = strokes.length;
-  //   });
-
-  //   let stokresCountRealtime = {};
-  //   this.realtimeOnPage.forEach((strokeMap, pageId) => {
-
-  //     let dotCount = {};
-  //     strokeMap.forEach((stroke, strokeKey) => {
-  //       dotCount[strokeKey] = stroke.dotCount;
-  //     });
-
-  //     stokresCountRealtime[pageId] = {
-  //       stroke_count: strokeMap.size,
-  //       dot_count: dotCount,
-  //     };
-  //   });
-  // }
 }

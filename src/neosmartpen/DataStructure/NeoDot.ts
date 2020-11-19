@@ -7,4 +7,15 @@ export default class NeoDot {
   x: number; // - x
   y: number; // - y
 
+  constructor(dot: NeoDot) {
+    const { dotType, deltaTime, time, f, x, y } = dot;
+
+    this.dotType = dotType;
+    this.deltaTime = deltaTime;
+    this.time = time;
+    this.f = f;
+    this.x = x;
+    this.y = y;
+  }
+
 }

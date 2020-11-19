@@ -8,6 +8,8 @@ import { InkStorage } from "../..";
 import { drawPath } from "./DrawCurves";
 // import { NCODE_TO_SCREEN_SCALE } from "../../constants";
 import { paperInfo } from "../../noteserver/PaperInfo";
+import { NeoDot, NeoStroke } from "../../DataStructure";
+import { IPageSOBP } from "../../DataStructure/Structures";
 
 
 
@@ -58,6 +60,10 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
       }
       this.storage = storage;
     }
+
+
+    const { section, owner, book, page } = this.surfaceInfo;
+    this.changePage(section, owner, book, page, true);
   }
 
   // /**
@@ -105,13 +111,13 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
     const { path, stroke } = pathData;
 
     if (path) {
-      this.canvas.remove(path);
+      this.canvasFb.remove(path);
     }
 
     let new_path = this.createPenPathFromStroke(stroke);
 
-    if (this.canvas) {
-      this.canvas.add(new_path);
+    if (this.canvasFb) {
+      this.canvasFb.add(new_path);
       pathData.path = new_path;
     }
 
@@ -156,6 +162,7 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
    * @param {boolean} forceToRefresh
    */
   changePage = (section: number, owner: number, book: number, page: number, forceToRefresh: boolean) => {
+    console.log("changePage");
     let currPage = this.surfaceInfo;
 
     if ((!forceToRefresh)
@@ -176,7 +183,7 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
 
     }
     let szPaper = paperInfo.getPaperSize({ section, owner, book, page });
-    this.base_scale = this.calcScaleFactor(this.viewFit, szPaper, this.base_scale);
+    this.scale = this.calcScaleFactor(this.viewFit, szPaper, this.base_scale);
 
     // 현재 모든 stroke를 지운다.
     this.removeAllCanvasObject();
@@ -189,12 +196,49 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
     let pageInfo = { section, owner, book, page };
     let strokes = this.storage.getPageStrokes(pageInfo);
 
+    const testStroke = this.generateA4CornerStrokeForTest(pageInfo);
+    strokes.push(testStroke);
+
     // 페이지의 stroke를 fabric.Path로 바꾼다.
     this.addStrokePaths(strokes);
 
     // page refresh
-    this.canvas.requestRenderAll();
+    this.canvasFb.requestRenderAll();
   }
+
+  private generateDotForTest(x: number, y: number): NeoDot {
+    const dot = new NeoDot({
+      dotType: 2,   // moving
+      deltaTime: 2,
+      time: 0,
+      f: 100,
+      x, y,
+    });
+
+    return dot;
+  }
+
+  private generateA4CornerStrokeForTest(pageInfo: IPageSOBP): NeoStroke {
+    // for debug
+    const { section, owner, book, page } = pageInfo;
+    const defaultStroke = new NeoStroke(section, owner, book, page, 0, "00:00:00:00:00:00", 1);
+
+    let dot0 = this.generateDotForTest(3.12, 3.12);
+    defaultStroke.addDot(dot0);
+
+    let dot1 = this.generateDotForTest(91.68, 3.12);
+    defaultStroke.addDot(dot1);
+
+    let dot2 = this.generateDotForTest(91.68, 128.36);
+    defaultStroke.addDot(dot2);
+
+    let dot3 = this.generateDotForTest(3.12, 128.36);
+    defaultStroke.addDot(dot3);
+    defaultStroke.addDot(dot0);
+
+    return defaultStroke;
+  }
+
 
   /**
    * @private
@@ -208,9 +252,9 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
    * @private
    */
   removeAllPaths = () => {
-    if (!this.canvas) return;
+    if (!this.canvasFb) return;
     this.localPathArray.forEach(path => {
-      this.canvas.remove(path);
+      this.canvasFb.remove(path);
     });
 
     this.localPathArray = new Array(0);
@@ -220,19 +264,19 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
    * @private
    */
   removeAllStrokeObject = () => {
-    if (this.canvas) {
-      let objects = this.canvas.getObjects();
+    if (this.canvasFb) {
+      let objects = this.canvasFb.getObjects();
       let strokes = objects.filter(obj => obj.data === STROKE_OBJECT_ID);
 
       strokes.forEach((path) => {
-        this.canvas.remove(path);
+        this.canvasFb.remove(path);
       });
     }
   };
 
   removeAllCanvasObject = () => {
-    if (this.canvas) {
-      this.canvas.clear();
+    if (this.canvasFb) {
+      this.canvasFb.clear();
     }
   };
 
@@ -242,12 +286,12 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
    * @param {Array<NeoStroke>} strokes
    */
   addStrokePaths = (strokes) => {
-    if (!this.canvas) return;
+    if (!this.canvasFb) return;
 
     strokes.forEach((stroke) => {
       if (stroke.dotArray.length > 0) {
         let path = this.createPenPathFromStroke(stroke);
-        this.canvas.add(path);
+        this.canvasFb.add(path);
         this.localPathArray.push(path);
       }
     });
@@ -268,9 +312,9 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
 
     const pathOption = {
       objectCaching: false,
-      stroke: color,
-      fill: color,
-      color: color,
+      stroke: "rgba(255,0,0,255)", //color,
+      fill: "rgba(255,0,0,255)", //color,
+      color: "rgba(255,0,0,255)", //color,
       opacity: 1,
       // strokeWidth: 10,
       originX: 'left',
