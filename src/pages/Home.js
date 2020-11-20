@@ -1,13 +1,13 @@
 import React, { useState } from "react";
-import { makeStyles } from '@material-ui/core/styles';
-import { StorageRenderer, PenBasedRenderer, PLAYSTATE } from "../neosmartpen";
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from "@material-ui/core";
+// import { makeStyles } from '@material-ui/core/styles';
+import { PenBasedRenderer, PLAYSTATE } from "../neosmartpen";
+// import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from "@material-ui/core";
 import { Button, Box } from "@material-ui/core";
 import NeoPdfViewer from "../neosmartpen/pdf/NeoPdfViewer";
 
 import {
   //PenEvent,
-  NeoSmartpen, NeopenInterface, InkStorage, paperInfo, NoteserverClient, PenEventName
+  NeoSmartpen, NoteserverClient, PenEventName
 } from "../neosmartpen";
 
 
@@ -20,21 +20,14 @@ const getNoteInfo = (event) => {
 
 
 
-
-const useStyles = makeStyles({
-  table: {
-    minWidth: 480,
-  },
-});
-
 let _pens = new Array(0);
 let _num_pens = 0;
 
 const Home = () => {
-  const useForceUpdate = () => useState()[1];
-  const forceUpdate = useForceUpdate();
+  // const useForceUpdate = () => useState()[1];
+  // const forceUpdate = useForceUpdate();
 
-  const classes = useStyles();
+  // const classes = useStyles();
   const [num_pens, setNumPens] = useState(0);
   const [pens, setPens] = useState(new Array(0));
 
@@ -95,8 +88,17 @@ const Home = () => {
   }
 
   return (
-    <div>
-      <div style={{
+
+    <div id={"home_div"} style={{
+      position: "absolute",
+      left: "0px", top: "0px",
+      flexDirection: "row-reverse", display: "flex",
+      width: "100%", height: "100%",
+      alignItems: "center",
+      zIndex: 1,
+    }}>
+
+      <div id={"button_div"}  style={{
         position: "absolute",
         display: "flex", flexDirection: "row-reverse",
         alignItems: "center",
@@ -108,6 +110,11 @@ const Home = () => {
         <div style={{ fontSize: "20px", fontWeight: "bold" }}>
           <Button variant="outlined" color="primary" onClick={(event) => handleConnectPen(event)} >
             <Box fontSize={14} fontWeight="fontWeightBold" >Connect</Box>
+          </Button>
+        </div>
+        <div style={{ fontSize: "20px", fontWeight: "bold" }}>
+          <Button variant="outlined" color="primary" onClick={(event) => getNoteInfo(event)} >
+            <Box fontSize={14} fontWeight="fontWeightBold" >Get Notebook Infos</Box>
           </Button>
         </div>
         <div style={{ flex: 1 }}>
@@ -132,18 +139,18 @@ const Home = () => {
       </div>  */}
 
 
-      <div style={{
+      <div id={"mixed_view"} style={{
         // position: "absolute",
         left: "0px", top: "0px",
         flexDirection: "row-reverse", display: "flex",
-        width: "100%", height: "40px",
+        width: "100%", height: "100%",
         alignItems: "center",
         zIndex: 1,
       }}>
-        <div style={tempStyle}>
+        <div id={"pdf_layer"} style={tempStyle}>
           <NeoPdfViewer url={"./mixed_output.pdf"} />
         </div>
-        <div style={tempStyle}>
+        <div id={"ink_layer"} style={tempStyle}>
           <PenBasedRenderer scale={1} pageId={"0.0.0.0"} playState={PLAYSTATE.live} pens={pens} />
         </div>
       </div>

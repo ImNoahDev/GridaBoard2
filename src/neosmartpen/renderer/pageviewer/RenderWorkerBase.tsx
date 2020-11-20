@@ -2,9 +2,9 @@ import "../../types";
 import { fabric } from "fabric";
 import { InkStorage } from "../..";
 import { PATH_THICKNESS_SCALE } from "./DrawCurves";
-import { NCODE_TO_SCREEN_SCALE } from "../../constants";
+// import { NCODE_TO_SCREEN_SCALE } from "../../constants";
 import { IWritingSurfaceInfo, ISize } from "../../DataStructure/Structures";
-import { scaleCanvas, getDisplayRatio, ncodeToDisplayPixel } from "../../utils/UtilsFunc";
+import { ncodeToDisplayPixel } from "../../utils/UtilsFunc";
 // import { paperInfo } from "../../noteserver/PaperInfo";
 // import { plugToRequest } from "react-cookies";
 // import { scaleCanvas } from "../../utils/UtilsFunc";
@@ -418,31 +418,31 @@ export default class RenderWorkerBase {
    * @protected
    */
   scrollBoundaryCheck = () => {
-    return;
-    const canvasFb = this.canvasFb;
-    const zoom = canvasFb.getZoom();
 
-    // http://fabricjs.com/fabric-intro-part-5#pan_zoom
-    let vpt = canvasFb.viewportTransform;
+    // const canvasFb = this.canvasFb;
+    // const zoom = canvasFb.getZoom();
 
-    if (vpt[4] >= 0) {
-      vpt[4] = 0;
-    }
-    else if (vpt[4] < canvasFb.getWidth() - this.currSize.width * zoom) {
-      vpt[4] = canvasFb.getWidth() - this.currSize.width * zoom;
-    }
+    // // http://fabricjs.com/fabric-intro-part-5#pan_zoom
+    // let vpt = canvasFb.viewportTransform;
 
-    if (vpt[5] >= 0) {
-      vpt[5] = 0;
-    }
-    else if (vpt[5] < canvasFb.getHeight() - this.currSize.height * zoom) {
-      vpt[5] = canvasFb.getHeight() - this.currSize.height * zoom;
-    }
+    // if (vpt[4] >= 0) {
+    //   vpt[4] = 0;
+    // }
+    // else if (vpt[4] < canvasFb.getWidth() - this.currSize.width * zoom) {
+    //   vpt[4] = canvasFb.getWidth() - this.currSize.width * zoom;
+    // }
 
-    if (zoom < 1) {
-      vpt[4] = (this.currSize.width - this.currSize.width * zoom) / 2;
-      vpt[5] = (this.currSize.height - this.currSize.height * zoom) / 2;
-    }
+    // if (vpt[5] >= 0) {
+    //   vpt[5] = 0;
+    // }
+    // else if (vpt[5] < canvasFb.getHeight() - this.currSize.height * zoom) {
+    //   vpt[5] = canvasFb.getHeight() - this.currSize.height * zoom;
+    // }
+
+    // if (zoom < 1) {
+    //   vpt[4] = (this.currSize.width - this.currSize.width * zoom) / 2;
+    //   vpt[5] = (this.currSize.height - this.currSize.height * zoom) / 2;
+    // }
   }
 
   /**

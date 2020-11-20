@@ -76,7 +76,7 @@ export const drawLinePath = (points: IPoint[]): string => {
  *
  * @param points
  */
-const drawCurvePath = (points: IPoint[]): string => {
+export const drawCurvePath = (points: IPoint[]): string => {
   if (points.length < 1) {
     return "";
   }

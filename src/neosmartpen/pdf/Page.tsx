@@ -124,9 +124,9 @@ class Page extends Component<PageProps> {
    */
   _renderPage(page: PdfJs.PDFPageProxy) {
     console.log(this.props);
-    let { scale } = this.props;
+    // let { scale } = this.props;
 
-    let aa = 2;
+    // let aa = 2;
 
     let viewport: any = page.getViewport({ scale: 1 });
     let { width, height } = viewport;

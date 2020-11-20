@@ -15,11 +15,11 @@ import { IPageSOBP } from "../../DataStructure/Structures";
 
 
 
-const timeTickDuration = 20; // ms
-const DISABLED_STROKE_COLOR = "rgba(0, 0, 0, 0.1)";
-const INVISIBLE_STROKE_COLOR = "rgba(255, 255, 255, 0)";
-const INCOMPLETE_STROKE_COLOR = "rgba(255, 0, 255, 0.4)";
-const CURRENT_POINT_STROKE_COLOR = "rgba(255, 255, 255, 1)";
+// const timeTickDuration = 20; // ms
+// const DISABLED_STROKE_COLOR = "rgba(0, 0, 0, 0.1)";
+// const INVISIBLE_STROKE_COLOR = "rgba(255, 255, 255, 0)";
+// const INCOMPLETE_STROKE_COLOR = "rgba(255, 0, 255, 0.4)";
+// const CURRENT_POINT_STROKE_COLOR = "rgba(255, 255, 255, 1)";
 
 
 
@@ -32,7 +32,7 @@ export const ZoomFitEnum = {
 }
 
 const STROKE_OBJECT_ID = "ns";
-const GRID_OBJECT_ID = "g";
+// const GRID_OBJECT_ID = "g";
 
 export default class PenBasedRenderWorker extends RenderWorkerBase {
 
@@ -67,6 +67,9 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
 
     const { section, owner, book, page } = this.surfaceInfo;
     this.changePage(section, owner, book, page, true);
+
+    console.log(`constructor size ${options.width}, ${options.height}`)
+    this.resize({ width: options.width, height: options.height });
   }
 
   // /**
@@ -199,6 +202,7 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
     let pageInfo = { section, owner, book, page };
     let strokes = this.storage.getPageStrokes(pageInfo);
 
+    //test
     const testStroke = this.generateA4CornerStrokeForTest(pageInfo);
     strokes.push(testStroke);
 
@@ -214,7 +218,7 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
       dotType: 2,   // moving
       deltaTime: 2,
       time: 0,
-      f: 0.1,
+      f: 255,
       x, y,
     });
 
@@ -228,7 +232,7 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
       section, owner, book, page,
       startTime: 0,
       mac: "00:00:00:00:00:00",
-      color: "rgba(255,0,0,255)",
+      color: "rgba(0,0,255,255)",
       brushType: IBrushType.PEN,
       thickness: 1,
     }
@@ -236,24 +240,23 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
 
     let dot: NeoDot;
 
-    let dot0 = this.generateDotForTest(3.12, 3.12);
+    let dot0 = this.generateDotForTest(0, 0);
     defaultStroke.addDot(dot0);
 
-    dot = this.generateDotForTest(91.68, 3.12);
+    dot = this.generateDotForTest(88.56, 0);
     defaultStroke.addDot(dot);
     defaultStroke.addDot(dot);
 
-    dot = this.generateDotForTest(91.68, 3.12);
+    dot = this.generateDotForTest(88.56, 125.24);
     defaultStroke.addDot(dot);
     defaultStroke.addDot(dot);
 
-    dot = this.generateDotForTest(91.68, 128.36);
+    dot = this.generateDotForTest(0, 125.24);
     defaultStroke.addDot(dot);
     defaultStroke.addDot(dot);
 
-    dot = this.generateDotForTest(3.12, 128.36);
+    dot = this.generateDotForTest(0, 0);
     defaultStroke.addDot(dot);
-    defaultStroke.addDot(dot0);
 
     return defaultStroke;
   }
@@ -327,9 +330,9 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
 
     const pathOption = {
       objectCaching: false,
-      stroke: "rgba(255,0,0,255)", //color,
-      fill: "rgba(255,0,0,255)", //color,
-      color: "rgba(255,0,0,255)", //color,
+      stroke: color,
+      fill: color,
+      color: color,
       opacity: 1,
       // strokeWidth: 10,
       originX: 'left',

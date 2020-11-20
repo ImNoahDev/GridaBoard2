@@ -127,16 +127,16 @@ function getZippedResouce(zipurl, bookInfo) {
 }
 
 export default class NoteserverClient {
-  constructor() {
+  // constructor() {
 
-  }
+  // }
 
   /**
    *
    * @param {{section:number, owner:number, book:number, page:number}} pageInfo
    */
   async getNoteInfo(pageInfo) {
-    const { section, owner, book } = pageInfo;
+    // const { section, owner, book } = pageInfo;
 
     let url = "http://nbs.neolab.net/v1/notebooks/attributes?device=android";
     let el: any = document.getElementById('str')

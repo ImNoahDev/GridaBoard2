@@ -33,34 +33,34 @@ const bufferArray_first = new Uint8Array(
 );
 
 
-/**
- *
- * @param {number} typeNumber - 0:pen, 1:eraser, 2:player, on 2020/10/01
- * @return {DeviceTypeEnum} - a member of DeviceTypeEnum
- */
-function getPenType(typeNumber): DeviceTypeEnum {
-  let result = DeviceTypeEnum.PEN;
-  switch (typeNumber) {
-    case 0:
-      result = DeviceTypeEnum.PEN;
-      break;
+// /**
+//  *
+//  * @param {number} typeNumber - 0:pen, 1:eraser, 2:player, on 2020/10/01
+//  * @return {DeviceTypeEnum} - a member of DeviceTypeEnum
+//  */
+// function getPenType(typeNumber): DeviceTypeEnum {
+//   let result = DeviceTypeEnum.PEN;
+//   switch (typeNumber) {
+//     case 0:
+//       result = DeviceTypeEnum.PEN;
+//       break;
 
-    case 1:
-      result = DeviceTypeEnum.ERASER;
-      break;
+//     case 1:
+//       result = DeviceTypeEnum.ERASER;
+//       break;
 
-    case 2:
-      result = DeviceTypeEnum.PLAYER;
-      break;
+//     case 2:
+//       result = DeviceTypeEnum.PLAYER;
+//       break;
 
-    default:
-      result = DeviceTypeEnum.PEN;
-      console.error(`device type mismatch (not 0, 1, neither 2), Pen type from pen is ${typeNumber}`);
-      break;
-  }
+//     default:
+//       result = DeviceTypeEnum.PEN;
+//       console.error(`device type mismatch (not 0, 1, neither 2), Pen type from pen is ${typeNumber}`);
+//       break;
+//   }
 
-  return result;
-}
+//   return result;
+// }
 
 
 export default class PenComm extends ProtocolHandlerBase {

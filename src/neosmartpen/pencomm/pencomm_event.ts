@@ -2,7 +2,7 @@ import { DeviceTypeEnum } from "./pencomm_enum";
 import { IPenEvent } from "../DataStructure/Structures";
 
 import "../types";
-import { convertCompilerOptionsFromJson } from "typescript";
+// import { convertCompilerOptionsFromJson } from "typescript";
 
 export const PenEventEnum = {
   PEN_UP: "pen_up",
