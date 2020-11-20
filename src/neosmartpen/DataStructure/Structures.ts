@@ -106,3 +106,10 @@ export type IPenEvent = {
   ndacClassType?: number;  // - (0:G3C6, 1:N3C6)
   continuousErrorCount?: number;
 }
+
+
+export type IBrushState = {
+  thickness: number,
+  color: string,    // "rgba(0,0,0,255)"
+
+}

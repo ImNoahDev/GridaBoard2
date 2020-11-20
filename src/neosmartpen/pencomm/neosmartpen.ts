@@ -1,14 +1,14 @@
 import PenComm, { deviceSelectDlg } from "./pencomm";
-import InkStorage from "../penstorage/InkStorage";
+import InkStorage, { IOpenStrokeArg } from "../penstorage/InkStorage";
 import { paperInfo } from "../noteserver/PaperInfo";
 import Dispatcher from "../penstorage/EventSystem";
 import PenManager from "./PenManager";
 import "../types";
-import { IPenEvent } from "../DataStructure/Structures";
+import { IPenEvent, IBrushState } from "../DataStructure/Structures";
 import { NeoStroke, PEN_STATE, PenEventName } from "../DataStructure";
 import { IWritingSurfaceInfo } from "../DataStructure/Structures";
 import NeoDot from "../DataStructure/NeoDot";
-
+import { IBrushType } from "../DataStructure/Enums"
 
 interface IPenMovement {
   downEvent: IPenEvent,
@@ -20,20 +20,6 @@ interface IPenMovement {
 
 }
 
-enum IPenRendererEnum {
-  PEN = 0,
-  MARKER = 1,
-  PENCIL = 2,
-  ERASER = 3,
-  BRUSH = 4,
-  FOUNTAINPEN = 5,
-};
-
-type IPenRenderFactor = {
-  thickness: number,
-  color: string,    // "rgba(0,0,0,255)"
-
-}
 
 export class NeoSmartpen {
   currPenMovement: IPenMovement = {
@@ -46,10 +32,10 @@ export class NeoSmartpen {
   };
 
   /** 펜 종류 마다의 굵기와 색깔 */
-  penState: IPenRenderFactor[] = new Array(Object.keys(IPenRendererEnum).length);
+  penState: IBrushState[] = new Array(Object.keys(IBrushType).length);
 
   /** 펜 종류 (렌더러 종류) */
-  penRendererType: IPenRendererEnum = IPenRendererEnum.PEN;
+  penRendererType: IBrushType = IBrushType.PEN;
 
   lastInfoEvent: IPenEvent = null;
   protocolHandler: PenComm = new PenComm(this);
@@ -88,10 +74,12 @@ export class NeoSmartpen {
       this.storage = InkStorage.getInstance();
     }
 
-    this.penState.forEach(item => {
-      item.thickness = 1;
-      item.color = "rgba(0,0,0,255)";
-    });
+    for (let i = 0; i < this.penState.length; i++) {
+      this.penState[i] = {
+        thickness: 0.1,
+        color: "rgba(0,0,0,255)",
+      };
+    }
   }
 
   /**
@@ -184,13 +172,17 @@ export class NeoSmartpen {
 
     let mac = this.mac;
     let time = event.timeStamp;
-    let stroke = this.storage.openStroke(mac, time, 
-      event.penTipMode /**0:pen, 1:eraser */,
-      this.penState[this.penRendererType].color,
-      this.penState[this.penRendererType].thickness
-    );
 
+    const openStrokeArg: IOpenStrokeArg = {
+      mac,
+      time,
+      penTipMode: event.penTipMode,
+      brushType: this.penRendererType,
+      thickness: this.penState[this.penRendererType].thickness,
+      color: this.penState[this.penRendererType].color,
+    }
 
+    let stroke = this.storage.openStroke(openStrokeArg);
     let strokeKey = stroke.key;
     this.currPenMovement.stroke = stroke;
 
@@ -475,11 +467,13 @@ export class NeoSmartpen {
     // ph.onDisconnected(event);
     let mac = this.mac;
     if (!mac) {
-      throw new Error("mac address was not registered");
+      console.error(`mac address was not registered`);
+      console.error(event);
     }
-
-    this.manager.onDisconnected({ pen: this, event });
-    this.dispatcher.dispatch(PenEventName.ON_DISCONNECTED, { pen: this, mac, event });
+    else {
+      this.manager.onDisconnected({ pen: this, event });
+      this.dispatcher.dispatch(PenEventName.ON_DISCONNECTED, { pen: this, mac, event });
+    }
   }
 
 

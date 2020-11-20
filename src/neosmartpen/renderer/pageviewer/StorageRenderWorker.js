@@ -905,14 +905,9 @@ export default class StorageRenderWorker {
     const pathOption = {
       objectCaching: false,
 
-      // color: color,
-      // stroke: color,
-      // fill: color,
-      // color: "black",
-      // stroke: '#000000',
-      stroke: "rgb(127, 127, 127)",
-      fill: "rgb(127, 127, 127)",
       color: color,
+      stroke: color,
+      fill: color,
       opacity: 1,
       // strokeWidth: 10,
       originX: 'left',
