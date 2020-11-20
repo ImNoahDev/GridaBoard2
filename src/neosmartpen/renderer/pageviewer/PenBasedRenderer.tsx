@@ -7,18 +7,40 @@ import { ZoomFitEnum, PLAYSTATE, IRenderWorkerOption } from "./RenderWorkerBase"
 import PenBasedRenderWorker from "./PenBasedRenderWorker";
 // import { Paper } from "@material-ui/core";
 import { NeoSmartpen, PenManager } from "../../index";
-import { uuidv4, getDisplayRatio } from "../../utils/UtilsFunc";
+import * as UTIL from "../../utils/UtilsFunc";
 
 import { Size } from "../../types";
+import { IPageSOBP } from "../../DataStructure/Structures";
+// import { Util } from "pdfjs-dist";
 
 export { PLAYSTATE };
+
+
+/**
+ * Properties
+ */
+type IPenBasedRendererProps = {
+  pageInfo: IPageSOBP,
+  inkStorage?: InkStorage,
+  playState?: PLAYSTATE,
+  pens?: NeoSmartpen[],
+
+  scale?: number,
+  width?: number;
+  height?: number;
+
+  viewFit?: ZoomFitEnum;
+
+  onNcodePageChanged: Function;
+  onCanvasShapeChanged: Function;
+}
+
 
 /**
  * State
  */
 interface IPenBasedRendererState {
   renderer: PenBasedRenderWorker | null,
-  pageId: string,
 
   sizeUpdate: number,
   penEventCount: number,
@@ -39,24 +61,8 @@ interface IPenBasedRendererState {
   playState: PLAYSTATE,
 
   renderCount: number,
+
 }
-
-/**
- * Properties
- */
-type IPenBasedRendererProps = {
-  pageId?: string,
-  inkStorage?: InkStorage,
-  playState?: PLAYSTATE,
-  pens?: NeoSmartpen[],
-
-  scale?: number,
-  width?: number;
-  height?: number;
-
-  viewFit?: ZoomFitEnum;
-}
-
 
 /**
  * TO DO: 2020/11/05
@@ -66,8 +72,6 @@ type IPenBasedRendererProps = {
 export default class PenBasedRenderer extends React.Component<IPenBasedRendererProps, IPenBasedRendererState> {
   state: IPenBasedRendererState = {
     renderer: null,
-    pageId: "",
-
     sizeUpdate: 0,
     penEventCount: 0,
     strokeCount: 0,
@@ -107,25 +111,20 @@ export default class PenBasedRenderer extends React.Component<IPenBasedRendererP
     this.canvasRef = React.createRef();
     this.myRef = React.createRef();
 
-    // /** @type {{pageId:number, inkStorage:InkStorage, scale:number, playState:number, pens:Array.<NeoSmartpen> }} */
-    let { pageId, inkStorage, scale, playState, width, height, pens, viewFit } = props;
-
-    if (pageId) {
-      this.state.pageId = pageId;
-      this.state.pageInfo = InkStorage.getPageSOBP(pageId);
-      console.log(this.state.pageInfo);
-    }
-
+    let { pageInfo, inkStorage, scale, playState, width, height, pens, viewFit } = props;
     this.inkStorage = inkStorage ? inkStorage : InkStorage.getInstance();
+
+    this.state.pageInfo = pageInfo ? pageInfo : this.state.pageInfo;
     this.state.scale = scale ? scale : this.state.scale;
     this.state.playState = playState ? playState : this.state.playState;
     this.state.viewFit = viewFit ? viewFit : this.state.viewFit;
 
-    this.canvasId = uuidv4();
+    this.canvasId = UTIL.uuidv4();
 
     this.curr_pens = pens;
     this.propsSize = { scale, width, height };
   }
+
 
   /**
    * @private
@@ -189,6 +188,7 @@ export default class PenBasedRenderer extends React.Component<IPenBasedRendererP
 
     console.log(`PenBasedRenderer: size ${this.propsSize.width}, ${this.propsSize.height}`);
 
+    console.log("Renderer Inited");
     this.initRenderer(this.propsSize);
     window.addEventListener("resize", this.resizeListener);
 
@@ -285,6 +285,7 @@ export default class PenBasedRenderer extends React.Component<IPenBasedRendererP
       width,
       height,
       viewFit: this.state.viewFit,
+      onCanvasShapeChanged: this.props.onCanvasShapeChanged,
     };
 
     let renderer = new PenBasedRenderWorker(options);
@@ -304,6 +305,7 @@ export default class PenBasedRenderer extends React.Component<IPenBasedRendererP
     }
   }
 
+
   /**
    *
    * @param {{strokeKey:string, mac:string, stroke:NeoStroke, section:number, owner:number, book:number, page:number}} event
@@ -312,21 +314,31 @@ export default class PenBasedRenderer extends React.Component<IPenBasedRendererP
     const { penEventCount } = this.state;
     const { section, owner, book, page } = event;
 
+    const prevPageInfo = this.state.pageInfo;
+    if (UTIL.isSamePage(prevPageInfo, event)) {
+      return;
+    }
+
+    /** 내부 상태를 바꾼다. */
     this.setState({
       penEventCount: penEventCount + 1,
       pageInfo: { section, owner, book, page }
     });
 
+    /** 테스트용 */
     const inkStorage = this.inkStorage;
     if (inkStorage) {
       let pageStrokesCount = inkStorage.getPageStrokes(event).length;
       this.setState({ strokeCount: pageStrokesCount });
     }
 
+    /** 잉크 렌더러의 페이지를 바꾼다 */
     if (this.state.renderer) {
       this.state.renderer.changePage(section, owner, book, page, false);
     }
-    // console.log(event);
+
+    /** pdf pageNo를 바꿀 수 있게, container에게 전달한다. */
+    this.props.onNcodePageChanged({ section, owner, book, page });
   }
 
 
@@ -404,7 +416,7 @@ export default class PenBasedRenderer extends React.Component<IPenBasedRendererP
     // const manager = PenManager.getInstance();
     // let connected_pens = manager.getConnectedPens();
 
-    const dpr = getDisplayRatio();
+    const dpr = UTIL.getDisplayRatio();
     // const windowWidth = window.innerWidth / dpr;
     const windowHeight = window.innerHeight / dpr;
     const aWidth = document.body.clientWidth;

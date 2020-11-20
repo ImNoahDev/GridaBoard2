@@ -47,6 +47,8 @@ export type IRenderWorkerOption = {
   mouseAction?: boolean,
   shouldDisplayGrid?: boolean,
   storage?: InkStorage,
+
+  onCanvasShapeChanged: Function,
 }
 
 /**
@@ -136,6 +138,9 @@ export default class RenderWorkerBase {
 
   /** animation timer */
   scrollAnimateTimer: number = null;
+  options: IRenderWorkerOption;
+
+
 
   /**
    *
@@ -172,6 +177,8 @@ export default class RenderWorkerBase {
     }
 
     if (typeof (shouldDisplayGrid) === "boolean") this.shouldDisplayGrid = shouldDisplayGrid;
+
+    this.options = options;
     this.init();
   }
 
@@ -369,13 +376,29 @@ export default class RenderWorkerBase {
 
       this.scrollBoundaryCheck();
 
+      // event 전달
+      this.reportCanvasChanged();
       // canvas.setViewportTransform(vpt);
       canvasFb.requestRenderAll();
+
       this.pan.lastPosX = e.clientX;
       this.pan.lastPosY = e.clientY;
 
+
+
       // this.canvasBoundaryCheck();
     }
+  }
+
+  reportCanvasChanged = () => {
+    let canvasFb = this.canvasFb;
+    let vpt = canvasFb.viewportTransform;
+    const offsetX = vpt[4];
+    const offsetY = vpt[5];
+
+    const zoom = canvasFb.getZoom();
+
+    this.options.onCanvasShapeChanged({ offsetX, offsetY, zoom });
   }
 
   /**
@@ -462,10 +485,14 @@ export default class RenderWorkerBase {
     if (opt) canvas.zoomToPoint(pt, zoom);
     else canvas.setZoom(zoom);
 
+
     opt.e.preventDefault();
     opt.e.stopPropagation();
 
     this.scrollBoundaryCheck();
+
+    // event 전달
+    this.reportCanvasChanged();
   }
 
   /**

@@ -1,6 +1,6 @@
 /// <reference types="pdfjs-dist" />
 
-import React from "react";
+import React, { CSSProperties } from "react";
 // import PropTypes from "prop-types";
 import { Page } from './Page';
 import * as PdfJs from "pdfjs-dist";
@@ -16,6 +16,8 @@ var CMAP_PACKED = true;
 interface INeoPdfViewerProps {
   url: string,
   pageNo: number,
+  onReportPdfInfo: Function,
+  position: { offsetX: number, offsetY: number, zoom: number },
 }
 
 interface INeoPdfViewerState {
@@ -49,23 +51,41 @@ export default class NeoPdfViewer extends React.Component<INeoPdfViewerProps, IN
     }
     );
 
+    let self = this;
 
     loadingTask.promise.then(
       (pdf: PdfJs.PDFDocumentProxy) => {
+        self.props.onReportPdfInfo(pdf);
         console.log(pdf);
         this.setState({ pdf });
       });
   }
 
+  componentWillUnmount() {
+    if (this.state.pdf) {
+      const pdf = this.state.pdf;
+      pdf.destroy();
+    }
+  }
+
 
   render() {
-    const {  pdf } = this.state;
+    const { pdf } = this.state;
+    console.log("Pdf Viewer Renderer");
+    console.log(this.props.position);
+
+    const pdfCanvas: CSSProperties = {
+      zoom: this.props.position.zoom,
+    }
 
     if (pdf) {
       return (
-        <div className="pdf-viewer">
-          <Page pdf={pdf} index={this.props.pageNo} key={`document-page-${this.props.pageNo}`}
-            {...this.props}
+        <div className="pdf-viewer" style={pdfCanvas}>
+          <Page
+            pdf={pdf} index={this.props.pageNo}
+            key={`document-page-${this.props.pageNo}`}
+
+            position={this.props.position}
           />
         </div>
       );

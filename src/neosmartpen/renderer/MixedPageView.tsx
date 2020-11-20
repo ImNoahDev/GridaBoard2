@@ -2,8 +2,8 @@ import React, { CSSProperties } from "react";
 import PenBasedRenderer, { PLAYSTATE } from "./pageviewer/PenBasedRenderer";
 import NeoPdfViewer from "./pdf/NeoPdfViewer";
 import { IPageSOBP } from "../DataStructure/Structures";
-import { NeoSmartpen }from "../pencomm/neosmartpen";
-
+import { NeoSmartpen } from "../pencomm/neosmartpen";
+import * as PdfJs from "pdfjs-dist";
 
 export interface IMixedPageViewProps {
   pageInfo?: IPageSOBP;
@@ -12,7 +12,6 @@ export interface IMixedPageViewProps {
   pens: NeoSmartpen[];
 
   scale: number,
-  pageId: string,
   playState: PLAYSTATE;
 }
 
@@ -22,18 +21,26 @@ export interface IMixedPageViewState {
 
   /** NOTE: pageNo라고 씌어 있는 것은, 항상 PDF의 페이지번호(1부터 시작)를 나타내기로 한다.  */
   pageNo: number;
+  canvasPosition: { offsetX: number, offsetY: number, zoom: number },
+
+  renderCount: number;
 }
 
 const tempStyle: CSSProperties = {
   position: "absolute",
-  height: "100%",
-  width: "100%",
+  // height: "100%",
+  // width: "100%",
   left: "0px",
   top: "0px",
   overflow: "hidden",
 }
 
 export default class MixedPageView extends React.Component<IMixedPageViewProps, IMixedPageViewState> {
+  waitingForFirstStroke: boolean = true;
+  pdf: PdfJs.PDFDocumentProxy;
+
+
+
   constructor(props: IMixedPageViewProps) {
     super(props);
 
@@ -43,7 +50,12 @@ export default class MixedPageView extends React.Component<IMixedPageViewProps, 
       pageInfo = { section: -1, owner: -1, book: -1, page: -1, }
     }
 
-    this.state = { pageInfo, pdfUrl, pageNo };
+    const canvasPosition = { offsetX: 0, offsetY: 0, zoom: 1 };
+    this.state = { pageInfo, pdfUrl, pageNo, canvasPosition, renderCount: 0 };
+  }
+
+  onReportPdfInfo = (pdf: PdfJs.PDFDocumentProxy) => {
+    this.pdf = pdf;
   }
 
   onNcodePageChanged = (pageInfo: IPageSOBP) => {
@@ -51,12 +63,52 @@ export default class MixedPageView extends React.Component<IMixedPageViewProps, 
      * 임시코드, 2020/11/20, 나중에는 ncode와 매핑되어 있는 정보를 가지고 pageNo를 설정해야 한다 
      * 또는, PDF 파일을 바꿀 수 있도록 해야 한다. 
     */
-    const pageDelta = pageInfo.page - this.props.pageInfo.page;
-    this.setState({ pageNo: pageDelta + 1 });
+
+    if (this.pdf) {
+      const numPages = this.pdf.numPages;
+
+      let pageDelta = 0;
+      if (this.waitingForFirstStroke) {
+        pageDelta = 0;
+        this.waitingForFirstStroke = false;
+        this.setState({ pageInfo });
+      }
+      else {
+        pageDelta = pageInfo.page - this.state.pageInfo.page;
+        pageDelta += numPages;
+        pageDelta = pageDelta % numPages;
+      }
+      this.setState({ pageNo: pageDelta + 1 });
+
+    }
     /** 여기까지 임시 내용 */
   }
 
+  onCanvasShapeChanged = (arg: { offsetX: number, offsetY: number, zoom: number }) => {
+    console.log(arg);
+    this.setState({ canvasPosition: arg });
+
+    const r = this.state.renderCount;
+    this.setState({ renderCount: r + 1 });
+  }
+
+  shouldComponentUpdate(nextProps: IMixedPageViewProps, nextState: IMixedPageViewState) {
+    // console.log("update requested");
+    return true;
+  }
+
   render() {
+    const pdfCanvas: CSSProperties = {
+      position: "absolute",
+      // height: "100%",
+      // width: "100%",
+      left: this.state.canvasPosition.offsetX + "px",
+      top: this.state.canvasPosition.offsetY + "px",
+      // zoom: this.state.canvasPosition.zoom,
+      overflow: "hidden",
+    }
+
+    // console.log(this.state.canvasPosition);
     return (
       <div id={"mixed_view"} style={{
         // position: "absolute",
@@ -66,11 +118,20 @@ export default class MixedPageView extends React.Component<IMixedPageViewProps, 
         alignItems: "center",
         zIndex: 1,
       }}>
-        <div id={"pdf_layer"} style={tempStyle}>
-          <NeoPdfViewer url={this.state.pdfUrl} pageNo={this.state.pageNo} />
+        <div id={"pdf_layer"} style={pdfCanvas}>
+          <NeoPdfViewer
+            url={this.state.pdfUrl} pageNo={this.state.pageNo} onReportPdfInfo={this.onReportPdfInfo}
+            position={this.state.canvasPosition}
+          />
         </div>
         <div id={"ink_layer"} style={tempStyle}>
-          <PenBasedRenderer scale={1} pageId={"0.0.0.0"} playState={PLAYSTATE.live} pens={this.props.pens} />
+          <PenBasedRenderer
+            scale={1}
+            pageInfo={{ section: 0, owner: 0, book: 0, page: 0 }}
+            playState={PLAYSTATE.live} pens={this.props.pens}
+            onNcodePageChanged={this.onNcodePageChanged}
+            onCanvasShapeChanged={this.onCanvasShapeChanged}
+          />
         </div>
       </div>
     );

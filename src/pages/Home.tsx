@@ -164,7 +164,7 @@ const Home = () => {
         // position: "absolute",
         left: "0px", top: "0px",
         flexDirection: "row-reverse", display: "flex",
-        width: "100%", height: "80%",
+        width: "5%", height: "80%",
         alignItems: "center",
         zIndex: 100,
       }}>
@@ -190,7 +190,9 @@ const Home = () => {
           </div>
         </div>
       </div>
-      <MixedPageView pdfUrl={PDF_URL} pageNo={1} scale={1} pageId={"0.0.0.0"} playState={PLAYSTATE.live} pens={pens} />
+
+      
+      <MixedPageView pdfUrl={PDF_URL} pageNo={1} scale={1} playState={PLAYSTATE.live} pens={pens} />
     </div >
   );
 };
