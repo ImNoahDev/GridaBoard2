@@ -40,3 +40,15 @@ export enum PenEventName {
 };
 
 
+
+
+
+export enum IBrushType {
+  PEN = 0,
+  MARKER = 1,
+  PENCIL = 2,
+  ERASER = 3,
+  BRUSH = 4,
+  FOUNTAINPEN = 5,
+};
+

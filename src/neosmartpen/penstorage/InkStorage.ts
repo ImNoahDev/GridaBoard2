@@ -1,13 +1,23 @@
 import "../types";
 // import { initStroke, strokeAddDot, closeStroke } from "./neostroke";
-import { NeoStroke, NeoDot, PenEventName } from "../DataStructure";
+import { NeoStroke, NeoDot, PenEventName, IBrushType } from "../DataStructure";
 import { IPageSOBP } from "../DataStructure/Structures";
 import Dispatcher from "./EventSystem";
+import { INeoStrokeProps } from "../DataStructure/NeoStroke";
 
 /** @type {InkStorage} */
 let _storage_instance = null;
 
 
+export interface IOpenStrokeArg {
+  mac: string,
+  time: number,
+  penTipMode: number/**0:pen, 1:eraser */,
+
+  brushType: IBrushType,
+  thickness: number,
+  color: string,
+}
 
 
 export default class InkStorage {
@@ -205,6 +215,27 @@ export default class InkStorage {
     return `${section}.${book}.${owner}.${page}`;
   }
 
+  static getPageSOBP( pageId: string ) : IPageSOBP {
+    const arr = pageId.split(".");
+    if ( arr.length !== 4 ) {
+      return { 
+        section: -1,
+        owner:-1,
+        book:-1,
+        page:-1,
+      };
+    }
+
+    const ret : IPageSOBP = {
+      section: parseInt(arr[0]),
+      owner: parseInt(arr[1]),
+      book: parseInt(arr[2]),
+      page: parseInt(arr[3]),
+    }
+
+    return ret;
+  }
+
   /**
    * create realtime stroke, wait for "appendDot", ..., "closeStroke"
    * @param mac 
@@ -213,14 +244,24 @@ export default class InkStorage {
    * @param penColor 
    * @param thickness 
    */
-  public openStroke(mac: string, time: number,
-    penTipMode: number/**0:pen, 1:eraser */,
-    penColor: string, thickness: number): NeoStroke {
+
+  public openStroke(args: IOpenStrokeArg): NeoStroke {
     // let stroke = new NeoStroke(mac);
 
     // let stroke = initStroke(-1 /* section */, -1 /* owner */, -1 /*book */, -1 /* page */, time, mac);
-    let stroke = new NeoStroke(-1 /* section */, -1 /* owner */, -1 /*book */, -1 /* page */, time, mac, thickness);
-    stroke.color = penColor;
+    const { mac, time, thickness, brushType, color } = args;
+    const strokeProps: INeoStrokeProps = {
+      section: -1,
+      owner: -1,
+      book: -1,
+      page: -1,
+      startTime: time,
+      mac,
+      thickness,
+      brushType,
+      color,
+    }
+    let stroke = new NeoStroke(strokeProps);
     // stroke.thickness = thickness;     // kitty
     stroke.penTipMode = 0;    // kitty
 

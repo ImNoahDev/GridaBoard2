@@ -9,6 +9,8 @@ import { drawPath } from "./DrawCurves";
 // import { NCODE_TO_SCREEN_SCALE } from "../../constants";
 import { paperInfo } from "../../noteserver/PaperInfo";
 import { NeoDot, NeoStroke } from "../../DataStructure";
+import { IBrushType } from "../../DataStructure/Enums";
+import { INeoStrokeProps } from "../../DataStructure/NeoStroke";
 import { IPageSOBP } from "../../DataStructure/Structures";
 
 
@@ -44,9 +46,10 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
 
   storage = InkStorage.getInstance();
 
+
   /**
-   *
-   * @param {IRenderWorkerOption} options
+   * 
+   * @param options 
    */
   constructor(options: IRenderWorkerOption) {
     super(options);
@@ -211,7 +214,7 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
       dotType: 2,   // moving
       deltaTime: 2,
       time: 0,
-      f: 100,
+      f: 0.1,
       x, y,
     });
 
@@ -221,19 +224,35 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
   private generateA4CornerStrokeForTest(pageInfo: IPageSOBP): NeoStroke {
     // for debug
     const { section, owner, book, page } = pageInfo;
-    const defaultStroke = new NeoStroke(section, owner, book, page, 0, "00:00:00:00:00:00", 1);
+    const strokeArg: INeoStrokeProps = {
+      section, owner, book, page,
+      startTime: 0,
+      mac: "00:00:00:00:00:00",
+      color: "rgba(255,0,0,255)",
+      brushType: IBrushType.PEN,
+      thickness: 1,
+    }
+    const defaultStroke = new NeoStroke(strokeArg);
+
+    let dot: NeoDot;
 
     let dot0 = this.generateDotForTest(3.12, 3.12);
     defaultStroke.addDot(dot0);
 
-    let dot1 = this.generateDotForTest(91.68, 3.12);
-    defaultStroke.addDot(dot1);
+    dot = this.generateDotForTest(91.68, 3.12);
+    defaultStroke.addDot(dot);
+    defaultStroke.addDot(dot);
 
-    let dot2 = this.generateDotForTest(91.68, 128.36);
-    defaultStroke.addDot(dot2);
+    dot = this.generateDotForTest(91.68, 3.12);
+    defaultStroke.addDot(dot);
+    defaultStroke.addDot(dot);
 
-    let dot3 = this.generateDotForTest(3.12, 128.36);
-    defaultStroke.addDot(dot3);
+    dot = this.generateDotForTest(91.68, 128.36);
+    defaultStroke.addDot(dot);
+    defaultStroke.addDot(dot);
+
+    dot = this.generateDotForTest(3.12, 128.36);
+    defaultStroke.addDot(dot);
     defaultStroke.addDot(dot0);
 
     return defaultStroke;
@@ -297,11 +316,7 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
     });
   }
 
-  /**
-   * @protected
-   * @param {NeoStroke} stroke
-   */
-  createPenPathFromStroke = (stroke) => {
+  createPenPathFromStroke = (stroke: NeoStroke) => {
     const { dotArray, color, thickness } = stroke;
 
     let pointArray = [];
@@ -325,7 +340,7 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
       evented: true,
     };
 
-    let strokeThickness = this.base_scale * thickness;
+    let strokeThickness = thickness / 64;
     let pathData = drawPath(pointArray, strokeThickness);
     let path = new fabric.Path(pathData, pathOption);
 

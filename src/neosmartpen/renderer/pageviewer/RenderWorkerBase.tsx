@@ -42,7 +42,6 @@ export type IRenderWorkerOption = {
   canvasRef: React.RefObject<HTMLCanvasElement>,
   width: number,
   height: number,
-  style: { width: number, height: number },
   viewFit: ZoomFitEnum,
   bgColor?: string,
   mouseAction?: boolean,
@@ -187,10 +186,10 @@ export default class RenderWorkerBase {
     // scaleCanvas(HtmlCanvas);
     const dpr = 1;
 
-    console.log( `Fabric canvas inited: size(${size.width}, ${size.height})`);
+    console.log(`Fabric canvas inited: size(${size.width}, ${size.height})`);
 
     this.canvasFb = new fabric.Canvas(this.canvasId, {
-      
+
       backgroundColor: this.bgColor ? this.bgColor : "rgba(255,255,0,0.5)",
       selection: false,
       controlsAboveOverlay: false,
@@ -553,7 +552,7 @@ export default class RenderWorkerBase {
 
     const actual_width = szPaper.width * this.base_scale;
     const actual_height = szPaper.height * this.base_scale;
-    
+
     const szCanvas = this.currSize;
     let scale = 1;
     switch (mode) {
@@ -696,7 +695,7 @@ export default class RenderWorkerBase {
    * @param {{width:number, height:number}} size
    */
   resize = (size: { width: number, height: number }) => {
-    console.log( `RenderWorkerBase: resized window ${size.width}, ${size.height}`);
+    console.log(`RenderWorkerBase: resized window ${size.width}, ${size.height}`);
 
     let zoom = size.width / this.initialSize.width;
     this.currSize = { ...size };

@@ -42,7 +42,7 @@ interface IPenBasedRendererState {
 /**
  * Properties
  */
-type IPenBasedRendererProps ={
+type IPenBasedRendererProps = {
   pageId?: string,
   inkStorage?: InkStorage,
   playState?: PLAYSTATE,
@@ -99,28 +99,25 @@ export default class PenBasedRenderer extends React.Component<IPenBasedRendererP
   inkStorage: InkStorage = null;
   curr_pens: NeoSmartpen[] = new Array(0);
 
-  constructor(props: any) {
+  constructor(props: IPenBasedRendererProps) {
     super(props);
     // kitty
     this.canvasRef = React.createRef();
     this.myRef = React.createRef();
 
-    /** @type {{pageId:number, inkStorage:InkStorage, scale:number, playState:number, pens:Array.<NeoSmartpen> }} */
+    // /** @type {{pageId:number, inkStorage:InkStorage, scale:number, playState:number, pens:Array.<NeoSmartpen> }} */
     let { pageId, inkStorage, scale, playState, width, height, pens, viewFit } = props;
 
-    if (!inkStorage) {
-      inkStorage = InkStorage.getInstance();
+    if (pageId) {
+      this.state.pageId = pageId;
+      this.state.pageInfo = InkStorage.getPageSOBP(pageId);
+      console.log(this.state.pageInfo);
     }
 
-    this.inkStorage = inkStorage;
-
-    this.state = {
-      ...this.state,
-      pageId,
-      scale,
-      playState,
-      viewFit: viewFit ? viewFit : ZoomFitEnum.ACTUAL,
-    };
+    this.inkStorage = inkStorage ? inkStorage : InkStorage.getInstance();
+    this.state.scale = scale ? scale : this.state.scale;
+    this.state.playState = playState ? playState : this.state.playState;
+    this.state.viewFit = viewFit ? viewFit : this.state.viewFit;
 
     this.canvasId = uuidv4();
 
@@ -284,10 +281,6 @@ export default class PenBasedRenderer extends React.Component<IPenBasedRendererP
       canvasRef: this.canvasRef,
       width,
       height,
-      style: {
-        width,
-        height
-      },
       viewFit: this.state.viewFit,
     };
 
