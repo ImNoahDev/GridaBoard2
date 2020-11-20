@@ -119,7 +119,7 @@ const Home = () => {
         </div>
       </div>
 
-      <MixedPageView pdfUrl={PDF_URL} pageNo={1} scale={1} pageId={"0.0.0.0"} playState={PLAYSTATE.live} pens={pens} />
+      <MixedPageView pdfUrl={PDF_URL} pageNo={1} scale={1} playState={PLAYSTATE.live} pens={pens} />
     </div >
   );
 };

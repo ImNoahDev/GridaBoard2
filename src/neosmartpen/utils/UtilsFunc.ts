@@ -1,5 +1,6 @@
 import { backingStoreRatio } from "./JsUtils";
 import * as CONST from "../constants";
+import { IPageSOBP } from "../DataStructure/Structures";
 export { backingStoreRatio };
 
 
@@ -81,10 +82,18 @@ export function pdfSizeUnitToDIsplayPixel(n: number): number {
 }
 
 
-export function pdfSizeToDIsplayPixel(sz: {width:number, height:number}): {width:number, height:number} {
+export function pdfSizeToDIsplayPixel(sz: { width: number, height: number }): { width: number, height: number } {
   return {
     width: pdfSizeUnitToDIsplayPixel(sz.width),
     height: pdfSizeUnitToDIsplayPixel(sz.height),
   };
 }
 
+
+export function isSamePage(page1: IPageSOBP, page2: IPageSOBP): boolean {
+  if (page1.page !== page2.page || page1.book !== page2.book || page1.owner !== page2.owner || page1.section !== page2.section) {
+    return false;
+  }
+
+  return true;
+}
