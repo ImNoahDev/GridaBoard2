@@ -1,7 +1,7 @@
 /// <reference types="pdfjs-dist" />
 
 import React, { Component } from 'react';
-import { pdfSizeToDIsplayPixel } from "../";
+import { pdfSizeToDIsplayPixel } from "../../utils/UtilsFunc";
 
 import "pdfjs-dist";
 import * as PdfJs from "pdfjs-dist";
@@ -62,8 +62,8 @@ interface PageState {
 }
 
 interface PageProps {
-  pdf?: PdfJs.PDFDocumentProxy,
-  index?: number,
+  pdf: PdfJs.PDFDocumentProxy,
+  index: number,
   scale?: number,
 }
 
@@ -78,7 +78,8 @@ class Page extends Component<PageProps> {
   canvas: HTMLCanvasElement | null = null;
 
   shouldComponentUpdate(nextProps: any, nextState: any) {
-    return this.props.pdf !== nextProps.pdf || this.state.status !== nextState.status;
+    const ret = this.props.pdf !== nextProps.pdf || this.state.status !== nextState.status;
+    return ret;
   }
 
   componentDidUpdate(nextProps: any) {

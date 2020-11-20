@@ -11,6 +11,8 @@ import { uuidv4, getDisplayRatio } from "../../utils/UtilsFunc";
 
 import { Size } from "../../types";
 
+export { PLAYSTATE };
+
 /**
  * State
  */
@@ -348,6 +350,7 @@ export default class PenBasedRenderer extends React.Component<IPenBasedRendererP
    * @param {{strokeKey:string, mac:string, stroke, section:number, owner:number, book:number, page:number}} event
    */
   onLivePenUp = (event) => {
+    console.log("Pen Up");
     if (this.state.renderer) {
       this.state.renderer.closeLiveStroke(event);
     }
@@ -449,7 +452,7 @@ export default class PenBasedRenderer extends React.Component<IPenBasedRendererP
             style={{
               width: width ? width : aWidth,
               height: height ? height : aHeight
-            }}         />
+            }} />
           {/* </Paper> */}
         </div>
       </div >

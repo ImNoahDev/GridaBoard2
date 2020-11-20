@@ -11,6 +11,7 @@ import { paperInfo } from "./noteserver/PaperInfo";
 import PenManager from "./pencomm/PenManager";
 import { uuidv4, pdfSizeToDIsplayPixel } from "./utils/UtilsFunc";
 import { PLAYSTATE, ZoomFitEnum } from "./renderer/pageviewer/RenderWorkerBase";
+import MixedPageView from "./renderer/MixedPageView";
 
 import {
   SINGLE_CODE_SIZE_PER_INCH,
@@ -51,6 +52,7 @@ export {
   PDF_DEFAULT_DPI,
   DISPLAY_DEFAULT_DPI,
 
+  MixedPageView,
   PLAYSTATE, ZoomFitEnum,
   uuidv4,
   pdfSizeToDIsplayPixel,
