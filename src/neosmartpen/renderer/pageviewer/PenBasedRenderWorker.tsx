@@ -327,9 +327,9 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
 
     const pathOption = {
       objectCaching: false,
-      stroke: "rgba(255,0,0,255)", //color,
-      fill: "rgba(255,0,0,255)", //color,
-      color: "rgba(255,0,0,255)", //color,
+      stroke: color, //color,
+      fill: color, //color,
+      color: color, //color,
       opacity: 1,
       // strokeWidth: 10,
       originX: 'left',

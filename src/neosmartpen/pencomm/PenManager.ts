@@ -2,6 +2,7 @@ import { NeoSmartpen } from "./neosmartpen";
 import { IPenEvent } from "../DataStructure/Structures";
 
 let _penmanager_instance = null;
+var _active_pen:NeoSmartpen = null;
 
 export default class PenManager {
   /** @type {Array.<{id:string, mac:string, pen:NeoSmartpen, connected:boolean}>} */
@@ -9,7 +10,24 @@ export default class PenManager {
 
   /** @type {Array.<StorageRenderer>} */
   render = [];
+  
+  color: string;
+  colors: string[] = [
+    "rgb(101, 44, 179, 255)", // 0 보라
+    "rgb(255,255,255, 255)", // 하양
+    "rgb(0,0,0, 255)", // 검정
+    "rgb(180, 180, 180, 255)", // 회색
 
+    "rgb(254, 244, 69, 255)", // 노랑
+
+    "rgb(250, 199, 16, 255)", //주황
+    "rgb(227, 95, 72, 255)", //주홍
+    "rgb(16, 205, 212, 255)", //파랑빛
+
+    "rgb(11, 167, 137, 255)", //초록
+    "rgb(218, 34, 99, 255)", // 9 자주
+    "rgb(101, 44, 179, 255)" // 10 보라
+  ];
 
   constructor() {
     if (_penmanager_instance) return _penmanager_instance;
@@ -72,6 +90,18 @@ export default class PenManager {
     const index = this.penArray.findIndex(penInfo => penInfo.id === btDeviceId);
     if (index > -1) {
       this.penArray.splice(index, 1);
+    }
+  }
+
+  setActivePen = (penId: string) => {
+    _active_pen = this.penArray.find(penInfo => penInfo.pen.mac === penId).pen;
+  }
+
+  setColor(color_num: number) {
+    this.color = this.colors[color_num];
+
+    if (_active_pen) {
+        _active_pen.setColor(this.color);
     }
   }
 

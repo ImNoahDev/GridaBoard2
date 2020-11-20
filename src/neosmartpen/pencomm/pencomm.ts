@@ -745,7 +745,8 @@ export default class PenComm extends ProtocolHandlerBase {
         ndacProcessTime,
         labelCount,
         ndacErrorCode,
-        ndacClassType
+        ndacClassType,
+        penId:this.getMac()
       });
     // this.isPenDown = true;
 
@@ -780,7 +781,7 @@ export default class PenComm extends ProtocolHandlerBase {
 
     this.isPenDown = true;
 
-    const e = makePenEvent(this.deviceInfo.deviceType, PenEventEnum.PEN_DOWN, { penTipMode, color, timeStamp });
+    const e = makePenEvent(this.deviceInfo.deviceType, PenEventEnum.PEN_DOWN, { penTipMode, color, timeStamp, penId:this.getMac() });
     this.penHandler.onPenDown(e);
   }
 

@@ -189,7 +189,7 @@ export class NeoSmartpen {
     console.log(`NeoSmartpen dispatch event ON_PEN_DOWN`);
     this.dispatcher.dispatch(PenEventName.ON_PEN_DOWN, { strokeKey, mac, time, stroke });
 
-
+    this.manager.setActivePen(event.penId);
     // event 전달
     // let ph = this.appPen;
     // ph.onPenDown(event);
@@ -262,6 +262,7 @@ export class NeoSmartpen {
       // ph.onPageInfo(event);
     }
 
+    
     // event 전달
     // let ph = this.appPen;
     // if (hover) ph.onHoverPageInfo(event);
@@ -476,7 +477,9 @@ export class NeoSmartpen {
     }
   }
 
-
+  setColor(color: string) {
+    this.penState[this.penRendererType].color = color;
+  }
 
   /**
    *
