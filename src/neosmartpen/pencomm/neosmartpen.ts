@@ -102,7 +102,14 @@ export class NeoSmartpen {
    *
    */
   async connect(): Promise<boolean> {
-    let device = await deviceSelectDlg();
+    let device = null;
+    try {
+      device = await deviceSelectDlg();
+    }
+    catch (e) {
+      console.log(e);
+      return false;
+    }
 
     if (this.manager.isAlreadyConnected(device)) {
       console.error(`bluetooth device(id:${device.id}) already connectged or connecting process is being processed`);

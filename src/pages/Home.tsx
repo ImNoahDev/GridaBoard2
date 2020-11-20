@@ -1,14 +1,13 @@
 import React, { useState } from "react";
-// import { makeStyles } from '@material-ui/core/styles';
-import { PenBasedRenderer, PLAYSTATE } from "../neosmartpen";
-// import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from "@material-ui/core";
+import { PLAYSTATE, MixedPageView } from "../neosmartpen";
 import { Button, Box } from "@material-ui/core";
-import NeoPdfViewer from "../neosmartpen/pdf/NeoPdfViewer";
 
 import {
   //PenEvent,
   NeoSmartpen, NoteserverClient, PenEventName
 } from "../neosmartpen";
+
+const PDF_URL = "./2020학년도 서울대학교 수시모집 일반전형 면접 및 구술고사 문항.pdf";
 
 
 
@@ -21,6 +20,7 @@ const getNoteInfo = (event) => {
 
 
 let _pens = new Array(0);
+let tempPens = new Array(0);
 let _num_pens = 0;
 
 const Home = () => {
@@ -38,6 +38,7 @@ const Home = () => {
   const onPenConnected = (e) => {
     const pen = e.pen;
     console.log(`Home: onPenConnected, mac=${pen.getMac()}`);
+    _pens.push(pen);
 
     setPens([..._pens]);
 
@@ -74,21 +75,11 @@ const Home = () => {
       new_pen.addEventListener(PenEventName.ON_CONNECTED, onPenConnected);
       new_pen.addEventListener(PenEventName.ON_DISCONNECTED, onPenDisonnected);
 
-      _pens.push(new_pen);
+      tempPens.push(new_pen);
     }
   };
 
-  const tempStyle = {
-    position: "absolute",
-    height: "100%",
-    width: "100%",
-    left: "0px",
-    top: "0px",
-    overflow: "hidden",
-  }
-
   return (
-
     <div id={"home_div"} style={{
       position: "absolute",
       left: "0px", top: "0px",
@@ -98,7 +89,7 @@ const Home = () => {
       zIndex: 1,
     }}>
 
-      <div id={"button_div"}  style={{
+      <div id={"button_div"} style={{
         position: "absolute",
         display: "flex", flexDirection: "row-reverse",
         alignItems: "center",
@@ -128,52 +119,7 @@ const Home = () => {
         </div>
       </div>
 
-
-      {/* <div style={{position:"relative"}}>
-        <div style={tempStyle}>
-          <NeoPdfViewer url={"./mixed_output.pdf"} />
-        </div>
-        <div style={tempStyle}>
-          <StorageRenderer scale={1} pageId={"0.0.0.0"} playState={PLAYSTATE.live} width={800} height={400} />
-        </div>
-      </div>  */}
-
-
-      <div id={"mixed_view"} style={{
-        // position: "absolute",
-        left: "0px", top: "0px",
-        flexDirection: "row-reverse", display: "flex",
-        width: "100%", height: "100%",
-        alignItems: "center",
-        zIndex: 1,
-      }}>
-        <div id={"pdf_layer"} style={tempStyle}>
-          <NeoPdfViewer url={"./mixed_output.pdf"} />
-        </div>
-        <div id={"ink_layer"} style={tempStyle}>
-          <PenBasedRenderer scale={1} pageId={"0.0.0.0"} playState={PLAYSTATE.live} pens={pens} />
-        </div>
-      </div>
-
-
-
-      {/* <TableContainer component={Paper}>
-        <Table className={classes.table} size="small" aria-label="a dense table">
-          <TableBody>
-            <TableRow key={1}>
-              <TableCell component="th" scope="row">
-                <StorageRenderer scale={1} pageId={"0.0.0.0"} playState={PLAYSTATE.live} width={800} height={400} />
-              </TableCell>
-
-              <TableCell component="th" scope="row">
-                <PenBasedRenderer scale={1} pageId={"0.0.0.0"} playState={PLAYSTATE.live} width={800} height={400} pens={pens} />
-              </TableCell>
-            </TableRow>
-          </TableBody>
-        </Table>
-      </TableContainer> */}
-
-
+      <MixedPageView pdfUrl={PDF_URL} pageNo={1} scale={1} pageId={"0.0.0.0"} playState={PLAYSTATE.live} pens={pens} />
     </div >
   );
 };

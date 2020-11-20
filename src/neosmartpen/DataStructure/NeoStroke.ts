@@ -60,7 +60,7 @@ export default class NeoStroke {
    * @param {string} [mac]
    */
   constructor(props: INeoStrokeProps ) {
-    const { section, owner, book, page, startTime, mac, thickness, brushType } = props;
+    const { section, owner, book, page, startTime, mac, thickness, brushType, color} = props;
     let sourceId = uuidv4();
     this.key = sourceId;
     this.mac = mac;
@@ -76,6 +76,8 @@ export default class NeoStroke {
 
     this.thickness = thickness;
     this.brushType = brushType;
+
+    this.color = color;
   }
 
 
