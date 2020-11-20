@@ -1,13 +1,13 @@
 import React from "react";
 // import React, { Component } from 'react';
-import PropTypes from "prop-types";
+// import PropTypes from "prop-types";
 import { InkStorage, PenEventName } from "../..";
 
 import { ZoomFitEnum, PLAYSTATE, IRenderWorkerOption } from "./RenderWorkerBase";
 import PenBasedRenderWorker from "./PenBasedRenderWorker";
-import { Paper } from "@material-ui/core";
+// import { Paper } from "@material-ui/core";
 import { NeoSmartpen, PenManager } from "../../index";
-import { uuidv4, scaleCanvas, getDisplayRatio } from "../../utils/UtilsFunc";
+import { uuidv4, getDisplayRatio } from "../../utils/UtilsFunc";
 
 import { Size } from "../../types";
 
@@ -171,7 +171,8 @@ export default class PenBasedRenderer extends React.Component<IPenBasedRendererP
         height = parentHeight;
         this.propsSize = { width, height, scale: this.propsSize.scale };
 
-        this.setState({ renderCount: this.state.renderCount++ });
+        const renderCount = this.state.renderCount;
+        this.setState({ renderCount: renderCount + 1 });
       }
     }
 
@@ -179,7 +180,7 @@ export default class PenBasedRenderer extends React.Component<IPenBasedRendererP
 
     /** @type {{pageId:number, width:number, height:number, pens:Array.<NeoSmartpen> }} */
 
-    let rect = { x: 0, y: 0, width, height };
+    // let rect = { x: 0, y: 0, width, height };
 
     // const page = pages.filter((p) => p.pageNumber === pageId)[0];
     // console.log("Draw Stroke size", pageId, "canvas size", size, "rect", rect);
@@ -256,7 +257,7 @@ export default class PenBasedRenderer extends React.Component<IPenBasedRendererP
 
     const rect = { x: 0, y: 0, width, height };
     // const { rect } = this.state;
-    const { penEventCount } = this.state;
+    // const { penEventCount } = this.state;
     this.size = this.getSize(scale, rect);
 
     if (this.state.renderer) {
@@ -306,7 +307,7 @@ export default class PenBasedRenderer extends React.Component<IPenBasedRendererP
    * @param {{strokeKey:string, mac:string, stroke:NeoStroke, section:number, owner:number, book:number, page:number}} event
    */
   onLivePenPageInfo = (event) => {
-    const { penEventCount, pageInfo } = this.state;
+    const { penEventCount } = this.state;
     const { section, owner, book, page } = event;
 
     this.setState({
@@ -397,14 +398,14 @@ export default class PenBasedRenderer extends React.Component<IPenBasedRendererP
     const { penEventCount } = this.state;
     this.size = this.getSize(scale, rect);
 
-    const manager = PenManager.getInstance();
-    let connected_pens = manager.getConnectedPens();
+    // const manager = PenManager.getInstance();
+    // let connected_pens = manager.getConnectedPens();
 
     const dpr = getDisplayRatio();
-    const windowWidth = window.innerWidth / dpr;
+    // const windowWidth = window.innerWidth / dpr;
     const windowHeight = window.innerHeight / dpr;
     const aWidth = document.body.clientWidth;
-    const aWidth2 = document.body.scrollWidth;
+    // const aWidth2 = document.body.scrollWidth;
     const aHeight = windowHeight;
 
     const statusBarHeight = 400;
@@ -424,8 +425,8 @@ export default class PenBasedRenderer extends React.Component<IPenBasedRendererP
           }}>
             <div>
               <ul>
-                {pens.map(pen => (
-                  <li key={pen.mac}>{pen.mac}</li>
+                {pens.map((pen, i) => (
+                  <li key={i}>{pen.mac}</li>
                 ))}
               </ul>
             </div>
@@ -445,7 +446,10 @@ export default class PenBasedRenderer extends React.Component<IPenBasedRendererP
         }}>
           {/* <Paper style={{ height: this.size.height, width: this.size.width }}> */}
           <canvas id={this.canvasId} ref={this.canvasRef}
-            width={width ? width : aWidth} height={height ? height : aHeight} />
+            style={{
+              width: width ? width : aWidth,
+              height: height ? height : aHeight
+            }}         />
           {/* </Paper> */}
         </div>
       </div >

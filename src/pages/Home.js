@@ -1,7 +1,4 @@
 import React, { useState } from "react";
-import { makeStyles } from '@material-ui/core/styles';
-import { StorageRenderer, PenBasedRenderer, PLAYSTATE } from "../neosmartpen";
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from "@material-ui/core";
 import { Button, Box } from "@material-ui/core";
 import NeoPdfViewer from "../neosmartpen/pdf/NeoPdfViewer";
 import UpperNav from '../components/navbar/UpperNav';
@@ -28,10 +25,10 @@ import PrintButton from '../components/navbar/PrintButton';
 import FileLoad from '../components/navbar/FileLoad';
 import CalibrationMenual from '../components/navbar/CalibrationMenual';
 // import MenuButton from '../components/navbar/MenuButton';
-
+import { PenBasedRenderer, PLAYSTATE } from "../neosmartpen";
 import {
   //PenEvent,
-  NeoSmartpen, NeopenInterface, InkStorage, paperInfo, NoteserverClient, PenEventName
+  NeoSmartpen, NoteserverClient, PenEventName
 } from "../neosmartpen";
 
 const menuStyle = {
@@ -61,6 +58,7 @@ function hideAndShowFnc () {
   
 }
 
+
 const getNoteInfo = (event) => {
   // let url = "http://nbs.neolab.net/v1/notebooks/attributes?device=android";
   let note_info = new NoteserverClient();
@@ -68,23 +66,11 @@ const getNoteInfo = (event) => {
 };
 
 
-
-
-const useStyles = makeStyles({
-  table: {
-    minWidth: 480,
-  },
-});
-
 let _pens = new Array(0);
 let _num_pens = 0;
 let manager = PenManager.getInstance();
 
 const Home = () => {
-  const useForceUpdate = () => useState()[1];
-  const forceUpdate = useForceUpdate();
-
-  const classes = useStyles();
   const [num_pens, setNumPens] = useState(0);
   const [pens, setPens] = useState(new Array(0));
 
@@ -121,12 +107,17 @@ const Home = () => {
   }
 
   return (
-    <div>
-      <div>
-        <UpperNav />
-      </div>
 
-      <div style={{
+    <div id={"home_div"} style={{
+      position: "absolute",
+      left: "0px", top: "0px",
+      flexDirection: "row-reverse", display: "flex",
+      width: "100%", height: "100%",
+      alignItems: "center",
+      zIndex: 1,
+    }}>
+
+      <div id={"button_div"}  style={{
         position: "absolute",
         display: "flex", flexDirection: "row-reverse",
         alignItems: "center",
@@ -135,12 +126,13 @@ const Home = () => {
         zIndex: 100,
       }}>
         {/* Connect a pen */}
-        {/* <div style={{ fontSize: "20px", fontWeight: "bold" }}>
-          <Button variant="outlined" color="primary" onClick={(event) => handleConnectPen(event)} >
-            <Box fontSize={14} fontWeight="fontWeightBold" >Connect</Box>
+        <div style={{ fontSize: "20px", fontWeight: "bold" }}>
+          <Button variant="outlined" color="primary" onClick={(event) => getNoteInfo(event)} >
+            <Box fontSize={14} fontWeight="fontWeightBold" >Get Notebook Infos</Box>
           </Button>
-        </div> */}
-        <div style={{ flex: 1 }}></div>
+        </div>
+        <div style={{ flex: 1 }}>
+        </div>
 
         <div style={{ fontSize: "20px", fontWeight: "bold" }}>
           Pen Connected: {num_pens}
@@ -167,9 +159,7 @@ const Home = () => {
         </div>
         <div id="navbar_center">
           <div className="navbar-menu d-flex justify-content-center align-items-center neo_shadow">
-            <PageNumbering />
-            <PrintButton />
-            <FileLoad />
+            <PageNumbering /><PrintButton /><FileLoad />
           </div>
         </div>
         <div id="navbar_end">
@@ -178,9 +168,37 @@ const Home = () => {
           </div>
         </div>
       </nav>
-      {/* <div>
-        <BottomNav />
-      </div> */}
+
+      <div style={{
+        // position: "absolute",
+        left: "0px", top: "0px",
+        flexDirection: "row-reverse", display: "flex",
+        width: "100%", height: "80%",
+        alignItems: "center",
+        zIndex: 100,
+      }}>
+        <div class="d-flex flex-column h-100">
+          <div id="leftmenu" class="main-container flex-grow-1">
+              <div id="menu-wide" class="d-flex menu-container float-left h-100">
+                <div className="d-flex flex-column justify-content-between" style = {{zIndex: 1030}}>
+                  <ConnectButton onPenLinkChanged={e => onPenLinkChanged(e)} />
+                  <div className="btn-group-vertical neo_shadow" style = {{ marginBottom: 10 }}>
+                    <div className="btn-group dropright" role="group">
+                      <PenTypeButton/>
+                    </div>
+                    <TrashButton/><RotateButton/><BackgroundButton/>
+                  </div>
+                  <div class="btn-group-vertical neo_shadow" style = {{ marginBottom: 10 }}>
+                    <FitButton/><ZoomButton/><FullScreenButton/>
+                  </div>
+                  <div class="btn-group-vertical neo_shadow" style = {{ marginBottom: 10 }}>
+                    <TracePointButton/>
+                  </div>
+                </div>
+              </div>
+          </div>
+        </div>
+      </div>
 
       {/* <div style={{position:"relative"}}>
         <div style={tempStyle}>
@@ -191,44 +209,24 @@ const Home = () => {
         </div>
       </div>  */}
 
-      <div style={{
+
+      <div id={"mixed_view"} style={{
         // position: "absolute",
         left: "0px", top: "0px",
         flexDirection: "row-reverse", display: "flex",
-        width: "100%", height: "40px",
+        width: "100%", height: "100%",
         alignItems: "center",
         zIndex: 1,
       }}>
-        <div class="d-flex flex-column h-100">
-        <div style={tempStyle}>
+        <div id={"pdf_layer"} style={tempStyle}>
           <NeoPdfViewer url={"./mixed_output.pdf"} />
         </div>
-        
-        <div id="leftmenu" class="main-container flex-grow-1">
-            <div id="menu-wide" class="d-flex menu-container float-left h-100">
-              <div className="d-flex flex-column justify-content-between" style = {{zIndex: 1030}}>
-                <ConnectButton onPenLinkChanged={e => onPenLinkChanged(e)} />
-                <div className="btn-group-vertical neo_shadow" style = {{ marginBottom: 10 }}>
-                  <div className="btn-group dropright" role="group">
-                    <PenTypeButton/>
-                  </div>
-                  <TrashButton/><RotateButton/><BackgroundButton/>
-                </div>
-                <div class="btn-group-vertical neo_shadow" style = {{ marginBottom: 10 }}>
-                  <FitButton/><ZoomButton/><FullScreenButton/>
-                </div>
-                <div class="btn-group-vertical neo_shadow" style = {{ marginBottom: 10 }}>
-                  <TracePointButton/>
-                </div>
-              </div>
-            </div>
-        </div>
-
-        <div style={tempStyle}>
+        <div id={"ink_layer"} style={tempStyle}>
           <PenBasedRenderer scale={1} pageId={"0.0.0.0"} playState={PLAYSTATE.live} pens={pens} />
         </div>
-        </div>
       </div>
+
+
 
       {/* <TableContainer component={Paper}>
         <Table className={classes.table} size="small" aria-label="a dense table">
@@ -245,6 +243,7 @@ const Home = () => {
           </TableBody>
         </Table>
       </TableContainer> */}
+
 
     </div >
   );

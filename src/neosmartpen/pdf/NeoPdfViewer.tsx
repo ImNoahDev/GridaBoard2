@@ -50,7 +50,7 @@ export default class NeoPdfViewer extends React.Component {
   scroller = React.createRef();
 
   componentDidMount() {
-    const { documentZoom } = this.state;
+    // const { documentZoom } = this.state;
 
     let loadingTask = PdfJs.getDocument({
       url: PDF_URL,

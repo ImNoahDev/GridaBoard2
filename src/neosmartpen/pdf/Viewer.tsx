@@ -14,7 +14,7 @@ const Viewer = (props: any) => {
   const { pdf } = props;
 
   console.log(pdf);
-  const numPages = pdf ? pdf._pdfInfo.numPages : 0;
+  // const numPages = pdf ? pdf._pdfInfo.numPages : 0;
 
   if (pdf) {
     return (

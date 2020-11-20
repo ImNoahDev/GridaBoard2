@@ -4,8 +4,8 @@ import PropTypes from "prop-types";
 import { InkStorage, PenEventName } from "../..";
 
 import StorageRenderWorker, { ZoomFitEnum } from "./StorageRenderWorker";
-import { Paper } from "@material-ui/core";
-import { NeoSmartpen, PenManager } from "../../index";
+// import { Paper } from "@material-ui/core";
+import {  PenManager } from "../../index";
 import { uuidv4 } from "../../utils/UtilsFunc";
 import { PLAYSTATE } from "./RenderWorkerBase";
 
@@ -170,7 +170,7 @@ class StorageRenderer extends React.Component {
    * @param {{strokeKey:string, mac:string, stroke:NeoStroke, section:number, owner:number, book:number, page:number}} event 
    */
   onLivePenPageInfo = (event) => {
-    const { penEventCount, pageInfo } = this.state;
+    const { penEventCount } = this.state;
     const { section, owner, book, page } = event;
 
     this.setState({
@@ -336,12 +336,12 @@ class StorageRenderer extends React.Component {
 
   initRenderer(size) {
     const {
-      pages,
-      pageId,
+      // pages,
+      // pageId,
       scale,
       playTimeHandler,
       playStateHandler,
-      strokeStream,
+      // strokeStream,
       autoStop,
       width,
       height
@@ -411,7 +411,7 @@ class StorageRenderer extends React.Component {
 
     const rect = { x: 0, y: 0, width, height };
     // const { rect } = this.state;
-    const { penEventCount } = this.state;
+    // const { penEventCount } = this.state;
     this.size = this.getSize(scale, rect);
 
     if (this.state.renderer) {

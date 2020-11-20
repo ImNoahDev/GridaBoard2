@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import { BrowserRouter } from "react-router-dom";
 import { Route, Switch } from "react-router-dom";
 import { Home, About, Posts } from "../pages";
-import Menu from '../components/Menu';
+// import Menu from '../components/Menu';
 
 class App extends Component {
   render() {

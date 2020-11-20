@@ -2,15 +2,15 @@ import "../../types";
 import { fabric } from "fabric";
 import { PLAYSTATE } from "./RenderWorkerBase";
 import { InkStorage } from "../..";
-import { PATH_THICKNESS_SCALE, drawPath, drawLinePath } from "./DrawCurves";
+import { PATH_THICKNESS_SCALE, drawPath } from "./DrawCurves";
 import { NCODE_TO_SCREEN_SCALE } from "../../constants";
 import { paperInfo } from "../../noteserver/PaperInfo";
 
 const timeTickDuration = 20; // ms
 const DISABLED_STROKE_COLOR = "rgba(0, 0, 0, 0.1)";
-const INVISIBLE_STROKE_COLOR = "rgba(255, 255, 255, 0)";
-const INCOMPLETE_STROKE_COLOR = "rgba(255, 0, 255, 0.4)";
-const CURRENT_POINT_STROKE_COLOR = "rgba(255, 255, 255, 1)";
+// const INVISIBLE_STROKE_COLOR = "rgba(255, 255, 255, 0)";
+// const INCOMPLETE_STROKE_COLOR = "rgba(255, 0, 255, 0.4)";
+// const CURRENT_POINT_STROKE_COLOR = "rgba(255, 255, 255, 1)";
 
 
 
@@ -257,7 +257,7 @@ export default class StorageRenderWorker {
     let canvas = this.canvas;
 
     let evt = opt.e;
-    // if (evt.altKey === true) 
+    if (evt.altKey === true) 
     {
       canvas.isDragging = true;
       canvas.selection = false;
@@ -308,7 +308,7 @@ export default class StorageRenderWorker {
     canvas.selection = false;
 
 
-    let vpt = canvas.viewportTransform;
+    // let vpt = canvas.viewportTransform;
     // console.log(vpt);
   }
 
@@ -328,7 +328,7 @@ export default class StorageRenderWorker {
 
 
   scrollBoundaryCheck = () => {
-    return;
+
     const canvas = this.canvas;
     const zoom = canvas.getZoom();
 
@@ -704,7 +704,7 @@ export default class StorageRenderWorker {
     }
 
     const color = stroke.color;
-    const zoom = this.canvas.getZoom();
+    // const zoom = this.canvas.getZoom();
     // const thickness = stroke.thickness * zoom;
     const thickness = stroke.thickness;
     path = this.createPathFromDots(stroke.dotArray, color, thickness);
@@ -867,7 +867,7 @@ export default class StorageRenderWorker {
     strokes.forEach((stroke) => {
       if (stroke.dotArray.length > 0) {
         let color = stroke.color;
-        const zoom = this.canvas.getZoom();
+        // const zoom = this.canvas.getZoom();
         // const thickness = stroke.thickness * zoom;
         const thickness = stroke.thickness;
 
@@ -884,10 +884,10 @@ export default class StorageRenderWorker {
 
   // Draw Dot from Pen
   createPathFromDots = (dots, color, thickness) => {
-    let scale = this.base_scale;
+    // let scale = this.base_scale;
 
     // console.log("dot Count", dots.length);
-    let rect = this.rect;
+    // let rect = this.rect;
     // console.log(rect);
 
     let pointArray = [];
@@ -915,7 +915,7 @@ export default class StorageRenderWorker {
       selectable: false,
 
       objType: STROKE_OBJECT_ID,    // neostroke
-      selectable: false,
+      // selectable: false,
       //  hasRotatingPoint: false
 
       // strokeWidth: 2,

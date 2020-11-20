@@ -3,14 +3,11 @@ import { Link, NavLink } from "react-router-dom";
 import { Button, Box } from "@material-ui/core";
 import {
   //PenEvent,
-  NeoSmartpen, NeopenInterface, InkStorage, paperInfo, NoteserverClient, PenEventName
+    NoteserverClient
 } from "../neosmartpen";
 
 
 
-let penHandler = null;
-let pen = [];
-let storage = InkStorage.getInstance();
 
 
 const getNoteInfo = (event) => {
@@ -22,24 +19,6 @@ const getNoteInfo = (event) => {
   note_info.getNoteInfo({});
 };
 
-
-const handleGotoResult = (event) => {
-  // penHandler = new PenTest();
-  let new_pen = new NeoSmartpen();
-
-  // let filter = { mac: new_pen.getMac()) };
-  // let inkStorage = InkStorage.getInstance();
-  // inkStorage.addEventListener(PenEventName.ON_PEN_DOWN, this.onLivePenDown.bind(this), filter);
-  // inkStorage.addEventListener(PenEventName.ON_PEN_PAGEINFO, this.onLivePenPageInfo.bind(this), filter);
-  // inkStorage.addEventListener(PenEventName.ON_PEN_MOVE, this.onLivePenMove.bind(this), filter);
-  // inkStorage.addEventListener(PenEventName.ON_PEN_UP, this.onLivePenUp.bind(this), filter);
-  // inkStorage.addEventListener(PenEventName.ON_CONNECTED, () => { pen.push(new_pen); }, filter);
-
-
-  new_pen.connect();
-  pen.push(new_pen);
-  
-};
 
 const Menu = () => {
   const activeStyle = {
