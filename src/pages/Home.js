@@ -172,7 +172,7 @@ const Home = () => {
       </div>
       
       <nav id="colornav" className="navbar fixed-bottom navbar-light bg-transparent">
-        <div className="d-flex flex-row bd-highlight mb-3">
+        <div className="d-inline-flex p-2 bd-highlight">
           <div className="navbar-menu d-flex justify-content-end align-items-end neo_shadow">
             {/* <MenuButton onClick={hideAndShowFnc} /> */}
             <button id="btn_menu" type="button" className="btn btn-neo " title="Open a menu" onClick={hideAndShowFnc}>
