@@ -4,6 +4,8 @@ import PenManager from "../../neosmartpen/pencomm/PenManager";
 import Tooltip, { TooltipProps } from '@material-ui/core/Tooltip';
 import { Theme, Typography, withStyles } from '@material-ui/core';
 
+const manager: PenManager = PenManager.getInstance();
+
 const PenColorTooltip = withStyles((theme: Theme) => ({
     tooltip: {
         backgroundColor: '#f5f5f9',
@@ -14,9 +16,8 @@ const PenColorTooltip = withStyles((theme: Theme) => ({
     },
 }))(Tooltip);
 
-class penColor extends React.Component {
-  manager: PenManager = PenManager.getInstance();
-  render() {
+const ColorButtons = () => {
+    
     return (
         // <div className="color_bar neo_shadow float-left bottom_text color_bar">
         <React.Fragment>
@@ -38,7 +39,7 @@ class penColor extends React.Component {
           </div>
           <div className="btn-group">
               <button id="clr_1" type="button" className="btn btn-neo color_btn othercolors" title="color 1" 
-               onClick={() => this.manager.setColor(1)}>
+                onClick={() => manager.setColor(1)}>
                   <PenColorTooltip placement="top" title={
                         <React.Fragment>
                             <Typography color="inherit">Pen Color [White]</Typography>
@@ -53,7 +54,7 @@ class penColor extends React.Component {
               </button>
 
               <button id="clr_2" type="button" className="btn btn-neo color_btn" title="Pen color"
-              onClick={() => this.manager.setColor(2)}>
+                onClick={() => manager.setColor(2)}>
                   <PenColorTooltip placement="top" title={
                         <React.Fragment>
                             <Typography color="inherit">Pen Color [Black]</Typography>
@@ -67,7 +68,7 @@ class penColor extends React.Component {
                     </PenColorTooltip>
               </button>
               <button id="clr_3" type="button" className="btn btn-neo color_btn othercolors" title="color 3"
-              onClick={() => this.manager.setColor(3)}>
+                onClick={() => manager.setColor(3)}>
                   <PenColorTooltip placement="top" title={
                         <React.Fragment>
                             <Typography color="inherit">Pen Color [Nobel]</Typography>
@@ -81,7 +82,7 @@ class penColor extends React.Component {
                     </PenColorTooltip>
               </button>
               <button id="clr_4" type="button" className="btn btn-neo color_btn othercolors" title="color 4"
-              onClick={() => this.manager.setColor(4)}>
+                onClick={() => manager.setColor(4)}>
                   <PenColorTooltip placement="top" title={
                         <React.Fragment>
                             <Typography color="inherit">Pen Color [Gorse]</Typography>
@@ -95,7 +96,7 @@ class penColor extends React.Component {
                     </PenColorTooltip>
               </button>
               <button id="clr_5" type="button" className="btn btn-neo  color_btn othercolors" title="color 5"
-              onClick={() => this.manager.setColor(5)}>
+                onClick={() => manager.setColor(5)}>
                   <PenColorTooltip placement="top" title={
                         <React.Fragment>
                             <Typography color="inherit">Pen Color [Lightning Yellow]</Typography>
@@ -109,7 +110,7 @@ class penColor extends React.Component {
                     </PenColorTooltip>
               </button>
               <button id="clr_6" type="button" className="btn btn-neo  color_btn othercolors" title="color 6"
-              onClick={() => this.manager.setColor(6)}>
+                onClick={() => manager.setColor(6)}>
                   <PenColorTooltip placement="top" title={
                         <React.Fragment>
                             <Typography color="inherit">Pen Color [Red Damask]</Typography>
@@ -123,7 +124,7 @@ class penColor extends React.Component {
                     </PenColorTooltip>
               </button>
               <button id="clr_7" type="button" className="btn btn-neo  color_btn othercolors" title="color 7"
-              onClick={() => this.manager.setColor(7)}>
+                onClick={() => manager.setColor(7)}>
                   <PenColorTooltip placement="top" title={
                         <React.Fragment>
                             <Typography color="inherit">Pen Color [Bright Turquoise]</Typography>
@@ -137,7 +138,7 @@ class penColor extends React.Component {
                     </PenColorTooltip>
               </button>
               <button id="clr_8" type="button" className="btn btn-neo  color_btn othercolors" title="color 8"
-              onClick={() => this.manager.setColor(8)}>
+                onClick={() => manager.setColor(8)}>
                   <PenColorTooltip placement="top" title={
                         <React.Fragment>
                             <Typography color="inherit">Pen Color [Niagara]</Typography>
@@ -151,7 +152,7 @@ class penColor extends React.Component {
                     </PenColorTooltip>
               </button>
               <button id="clr_9" type="button" className="btn btn-neo  color_btn othercolors" title="color 9"
-              onClick={() => this.manager.setColor(9)}>
+                onClick={() => manager.setColor(9)}>
                   <PenColorTooltip placement="top" title={
                         <React.Fragment>
                             <Typography color="inherit">Pen Color [Cerise Red]</Typography>
@@ -165,7 +166,7 @@ class penColor extends React.Component {
                     </PenColorTooltip>
               </button>
               <button id="clr_0" type="button" className="btn btn-neo color_btn othercolors" title="color 0"
-              onClick={() => this.manager.setColor(0)}>
+                onClick={() => manager.setColor(0)}>
                   <PenColorTooltip placement="top" title={
                         <React.Fragment>
                             <Typography color="inherit">Pen Color [Purple Heart]</Typography>
@@ -181,8 +182,6 @@ class penColor extends React.Component {
           </div>
       {/* </div> */}
       </React.Fragment>
-    )
+    );
   }
-}
-
-export default penColor;
+export default ColorButtons;

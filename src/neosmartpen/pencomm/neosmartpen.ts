@@ -481,6 +481,14 @@ export class NeoSmartpen {
     this.penState[this.penRendererType].color = color;
   }
 
+  setThickness(thickness: number) {
+    this.penState[this.penRendererType].thickness = thickness;
+  }
+  
+  setPenRendererType(type) {
+    this.penRendererType = type;
+  }
+  
   /**
    *
    * @param eventName

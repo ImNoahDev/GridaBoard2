@@ -6,6 +6,8 @@ import { Button, Box } from "@material-ui/core";
 import NeoPdfViewer from "../neosmartpen/pdf/NeoPdfViewer";
 import UpperNav from '../components/navbar/UpperNav';
 
+import PenManager from '../neosmartpen/pencomm/PenManager';
+
 import ConnectButton from '../components/buttons/ConnectButton'
 
 import PenTypeButton from '../components/buttons/PenTypeButton'
@@ -76,6 +78,7 @@ const useStyles = makeStyles({
 
 let _pens = new Array(0);
 let _num_pens = 0;
+let manager = PenManager.getInstance();
 
 const Home = () => {
   const useForceUpdate = () => useState()[1];
@@ -85,52 +88,28 @@ const Home = () => {
   const [num_pens, setNumPens] = useState(0);
   const [pens, setPens] = useState(new Array(0));
 
-
-  /**
-   * @param {{pen:NeoSmartpen, mac:string, event:PenEvent}} e
-   */
-  const onPenConnected = (e) => {
+  const onPenLinkChanged = e => {
     const pen = e.pen;
-    console.log(`Home: onPenConnected, mac=${pen.getMac()}`);
-
-    setPens([..._pens]);
-
-    _num_pens++;
-    setNumPens(_num_pens);
-  };
-
-  /**
-   * @param {{pen:NeoSmartpen, mac:string, event:PenEvent}} e
-   */
-  const onPenDisonnected = (e) => {
-    const pen = e.pen;
-    const mac = pen.getMac();
-    console.log(`Home: OnPenDisconnected, mac=${pen.getMac()}`);
-
-    const index = _pens.findIndex(p => p.getMac() === mac);
-
-    if (index > -1) {
-      _pens.splice(index, 1);
+    if (e.event.event === 'on_connected') {
+      _pens.push(pen);
       setPens([..._pens]);
 
-      _num_pens--;
+      _num_pens++;
       setNumPens(_num_pens);
+    } 
+    else if (e.event.event === 'on_disconnected') {
+      const mac = pen.getMac();
+      console.log(`Home: OnPenDisconnected, mac=${pen.getMac()}`);
+      const index = _pens.findIndex(p => p.getMac() === mac);
+
+      if (index > -1) {
+        _pens.splice(index, 1);
+        setPens([..._pens]);
+        _num_pens--;
+        setNumPens(_num_pens);
+      }
     }
-  };
-
-  /**
-   * @param {*} event
-   */
-  const handleConnectPen = (event) => {
-    let new_pen = new NeoSmartpen();
-
-    if (new_pen.connect()) {
-      new_pen.addEventListener(PenEventName.ON_CONNECTED, onPenConnected);
-      new_pen.addEventListener(PenEventName.ON_DISCONNECTED, onPenDisonnected);
-
-      _pens.push(new_pen);
-    }
-  };
+  }
 
   const tempStyle = {
     position: "absolute",
@@ -156,11 +135,11 @@ const Home = () => {
         zIndex: 100,
       }}>
         {/* Connect a pen */}
-        <div style={{ fontSize: "20px", fontWeight: "bold" }}>
+        {/* <div style={{ fontSize: "20px", fontWeight: "bold" }}>
           <Button variant="outlined" color="primary" onClick={(event) => handleConnectPen(event)} >
             <Box fontSize={14} fontWeight="fontWeightBold" >Connect</Box>
           </Button>
-        </div>
+        </div> */}
         <div style={{ flex: 1 }}></div>
 
         <div style={{ fontSize: "20px", fontWeight: "bold" }}>
@@ -228,7 +207,7 @@ const Home = () => {
         <div id="leftmenu" class="main-container flex-grow-1">
             <div id="menu-wide" class="d-flex menu-container float-left h-100">
               <div className="d-flex flex-column justify-content-between" style = {{zIndex: 1030}}>
-                <ConnectButton/>
+                <ConnectButton onPenLinkChanged={e => onPenLinkChanged(e)} />
                 <div className="btn-group-vertical neo_shadow" style = {{ marginBottom: 10 }}>
                   <div className="btn-group dropright" role="group">
                     <PenTypeButton/>

@@ -6,10 +6,9 @@
   "configurations": [
     {
       "name": "Attach to Chrome",
-      "port": 9222,
-      "request": "attach",
+      "request": "launch",
       "type": "pwa-chrome",
-      "urlFilter": "http://localhost:3000*",
+      "url": "http://localhost:3000",
       "webRoot": "${workspaceFolder}"
     },
   ]

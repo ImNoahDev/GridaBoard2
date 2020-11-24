@@ -1,17 +1,25 @@
 import { NeoSmartpen } from "./neosmartpen";
 import { IPenEvent } from "../DataStructure/Structures";
+import { IBrushType } from "../DataStructure/Enums"
+import PenBasedRenderer from "../renderer/pageviewer/PenBasedRenderer";
+import ThemeManager from "../../styles/ThemeManager"
+import jQuery from "jquery";
 
+let $ = jQuery;
 let _penmanager_instance = null;
 var _active_pen:NeoSmartpen = null;
 
+export const DEFAULT_PEN_COLOR_NUM: number = 2;
+export const DEFAULT_PEN_THICKNESS: number = 2;
+export const DEFAULT_PEN_RENDERER_TYPE: IBrushType = IBrushType.PEN;
+
 export default class PenManager {
   /** @type {Array.<{id:string, mac:string, pen:NeoSmartpen, connected:boolean}>} */
-  penArray = [];
+  penArray = new Array(0);
 
   /** @type {Array.<StorageRenderer>} */
   render = [];
   
-  color: string;
   colors: string[] = [
     "rgb(101, 44, 179, 255)", // 0 보라
     "rgb(255,255,255, 255)", // 하양
@@ -28,6 +36,16 @@ export default class PenManager {
     "rgb(218, 34, 99, 255)", // 9 자주
     "rgb(101, 44, 179, 255)" // 10 보라
   ];
+
+  color: string = this.colors[DEFAULT_PEN_COLOR_NUM];
+  thickness: number = DEFAULT_PEN_THICKNESS;
+  penRendererType: IBrushType = DEFAULT_PEN_RENDERER_TYPE;
+
+  init = () => {
+    this.setThickness(DEFAULT_PEN_THICKNESS);
+    this.setPenRendererType(DEFAULT_PEN_RENDERER_TYPE);
+    this.setColor(DEFAULT_PEN_COLOR_NUM);
+  }
 
   constructor() {
     if (_penmanager_instance) return _penmanager_instance;
@@ -98,6 +116,7 @@ export default class PenManager {
   }
 
   setColor(color_num: number) {
+    this.toggleColorRadioButton(color_num);
     this.color = this.colors[color_num];
 
     if (_active_pen) {
@@ -105,6 +124,64 @@ export default class PenManager {
     }
   }
 
+  toggleColorRadioButton(color_num) {
+    var $elem = $(`.color_${color_num}`);
+    this.toggleColorRadioButton_inner(undefined, $elem);
+  }
+  
+  toggleColorRadioButton_inner(e, $elem) {
+    if ($elem === undefined) {
+        $elem = $(e.target);
+    }
+    if ($elem.hasClass("color_icon")) {
+        $(".color_icon").each(function (item) {
+          $(item).removeClass("pressed");
+        });
+        $elem.addClass("pressed");
+    }
+  }
+  
+  setPenRendererType(type) {
+    var $elem = $("#btn_brush").find(".c2");
+    this.setPenTypeStatus($elem, type);
+  
+    this.penRendererType = type;
+  
+    if (_active_pen) {
+        _active_pen.setPenRendererType(this.penRendererType);
+    }
+  }
+  
+  setPenTypeStatus($elem, type) {
+    if (type == IBrushType.MARKER) {
+        $elem.removeClass("state_0");
+        $elem.removeClass("state_2");
+  
+        $elem.addClass("state_1");
+    } else if (type == IBrushType.ERASER) {
+        $elem.removeClass("state_0");
+        $elem.removeClass("state_1");
+  
+        $elem.addClass("state_2");
+    } else if (type == IBrushType.PEN) {
+        $elem.removeClass("state_1");
+        $elem.removeClass("state_2");
+  
+        $elem.addClass("state_0");
+    }
+  }
+  
+  setThickness(thickness: number) {
+    $("#thickness_num").text(thickness);
+  
+    thickness = thickness * 2;
+    this.thickness = thickness;
+  
+    if (_active_pen) {
+        _active_pen.setThickness(this.thickness);
+    }
+  }
+  
   registerRenderContainer = (renderContainer) => {
     this.render.push(renderContainer);
   }
@@ -136,6 +213,9 @@ export default class PenManager {
       console.log("PenManager: something wrong, un-added pen connected");
       this.penArray.push({ id: pen.getBtDevice().id, mac: pen.getMac(), pen, connected: true });
     }
+
+    const themeManager = ThemeManager.getInstance();
+    themeManager.enablePenRelatedButtons(true);
   }
 
   /**
