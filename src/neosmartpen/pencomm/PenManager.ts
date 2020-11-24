@@ -124,7 +124,7 @@ export default class PenManager {
     }
   }
 
-  toggleColorRadioButton(color_num) {
+  toggleColorRadioButton(color_num: number) {
     var $elem = $(`.color_${color_num}`);
     this.toggleColorRadioButton_inner(undefined, $elem);
   }
@@ -141,7 +141,7 @@ export default class PenManager {
     }
   }
   
-  setPenRendererType(type) {
+  setPenRendererType(type: IBrushType) {
     var $elem = $("#btn_brush").find(".c2");
     this.setPenTypeStatus($elem, type);
   

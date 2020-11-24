@@ -12,6 +12,7 @@ import { NeoDot, NeoStroke } from "../../DataStructure";
 import { IBrushType } from "../../DataStructure/Enums";
 import { INeoStrokeProps } from "../../DataStructure/NeoStroke";
 import { IPageSOBP } from "../../DataStructure/Structures";
+import { ViewArray } from "@material-ui/icons";
 
 
 
@@ -317,7 +318,7 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
   }
 
   createPenPathFromStroke = (stroke: NeoStroke) => {
-    const { dotArray, color, thickness } = stroke;
+    var { dotArray, color, thickness, brushType } = stroke;
 
     let pointArray = [];
     dotArray.forEach((dot) => {
@@ -325,12 +326,18 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
       pointArray.push(pt);
     });
 
+    var opacity: number;
+    switch (brushType) {
+      case 0 : opacity = 1; break;
+      case 1 : opacity = 0.3; thickness = (thickness + 1) * 4; break;
+      default: opacity = 1; break;
+    }
     const pathOption = {
       objectCaching: false,
-      stroke: color, //color,
+      stroke: "rgba(0,0,0,0)", //color,"rgba(0,0,0,0)"
       fill: color, //color,
       color: color, //color,
-      opacity: 1,
+      opacity: opacity,
       // strokeWidth: 10,
       originX: 'left',
       originY: 'top',

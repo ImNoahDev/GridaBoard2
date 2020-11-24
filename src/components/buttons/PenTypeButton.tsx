@@ -3,6 +3,7 @@ import '../../styles/buttons.css';
 import Tooltip, { TooltipProps } from '@material-ui/core/Tooltip';
 import { Theme, Typography, withStyles } from '@material-ui/core';
 import PenManager from "../../neosmartpen/pencomm/PenManager";
+import { IBrushType } from "../../neosmartpen/DataStructure";
 
 const PenTypeTooltip = withStyles((theme: Theme) => ({
     tooltip: {
@@ -14,12 +15,13 @@ const PenTypeTooltip = withStyles((theme: Theme) => ({
     },
 }))(Tooltip);
 
+const manager: PenManager = PenManager.getInstance();
+
 export default class PenTypeButton extends React.Component {
   shouldComponentUpdate(nextProps: any, nextState: any) {
     return false;
   }
     
-  manager: PenManager = PenManager.getInstance();s
   render() {
     return (
       <React.Fragment>
@@ -52,7 +54,8 @@ export default class PenTypeButton extends React.Component {
             <div className="dropdown-menu dropdown-menu-right p-0 border border-0" aria-labelledby="btn_brush">
                 {/* 펜/형광펜 */}
                 <div className="btn-group">
-                    <button id="btn_pen" type="button" className="btn btn-neo btn-neo-dropdown">
+                    <button id="btn_pen" type="button" className="btn btn-neo btn-neo-dropdown"
+                    onClick={() => manager.setPenRendererType(IBrushType.PEN)}>
                     <PenTypeTooltip placement="left" title={
                         <React.Fragment>
                             <Typography color="inherit">Pen Type</Typography>
@@ -67,7 +70,8 @@ export default class PenTypeButton extends React.Component {
                         </div>
                     </PenTypeTooltip>
                     </button>
-                    <button id="btn_marker" type="button" className="btn btn-neo btn-neo-dropdown">
+                    <button id="btn_marker" type="button" className="btn btn-neo btn-neo-dropdown" 
+                    onClick={() => manager.setPenRendererType(IBrushType.MARKER)}>
                         <PenTypeTooltip placement="left" title={
                             <React.Fragment>
                                 <Typography color="inherit">Pen Type</Typography>
@@ -82,7 +86,8 @@ export default class PenTypeButton extends React.Component {
                             </div>
                         </PenTypeTooltip>
                     </button>
-                    <button id="btn_eraser" type="button" className="btn btn-neo btn-neo-dropdown">
+                    <button id="btn_eraser" type="button" className="btn btn-neo btn-neo-dropdown" 
+                    onClick={() => manager.setPenRendererType(IBrushType.ERASER)}>
                         <PenTypeTooltip placement="left" title={
                             <React.Fragment>
                                 <Typography color="inherit">Pen Type</Typography>
@@ -102,7 +107,7 @@ export default class PenTypeButton extends React.Component {
                 {/* 선 굵기 */}
                 <div className="dropdown-divider"></div>
                 <div className="btn-group">
-                    <button id="btn_thick_1" type="button" className="btn btn-neo btn-neo-dropdown" onClick={() => this.manager.setThickness(1)}>
+                    <button id="btn_thick_1" type="button" className="btn btn-neo btn-neo-dropdown" onClick={() => manager.setThickness(1)}>
                         <PenTypeTooltip placement="left" title={
                             <React.Fragment>
                                 <Typography color="inherit">Pen Type</Typography>
@@ -117,7 +122,7 @@ export default class PenTypeButton extends React.Component {
                             </div>
                         </PenTypeTooltip>
                     </button>
-                    <button id="btn_thick_2" type="button" className="btn btn-neo btn-neo-dropdown" onClick={() => this.manager.setThickness(2)}>
+                    <button id="btn_thick_2" type="button" className="btn btn-neo btn-neo-dropdown" onClick={() => manager.setThickness(2)}>
                         <PenTypeTooltip placement="left" title={
                             <React.Fragment>
                                 <Typography color="inherit">Pen Type</Typography>
@@ -132,7 +137,7 @@ export default class PenTypeButton extends React.Component {
                             </div>
                         </PenTypeTooltip> 
                     </button>
-                    <button id="btn_thick_3" type="button" className="btn btn-neo btn-neo-dropdown" onClick={() => this.manager.setThickness(3)}>
+                    <button id="btn_thick_3" type="button" className="btn btn-neo btn-neo-dropdown" onClick={() => manager.setThickness(3)}>
                         <PenTypeTooltip placement="left" title={
                             <React.Fragment>
                                 <Typography color="inherit">Pen Type</Typography>
@@ -147,7 +152,7 @@ export default class PenTypeButton extends React.Component {
                             </div>
                         </PenTypeTooltip> 
                     </button>
-                    <button id="btn_thick_4" type="button" className="btn btn-neo btn-neo-dropdown" onClick={() => this.manager.setThickness(4)}>
+                    <button id="btn_thick_4" type="button" className="btn btn-neo btn-neo-dropdown" onClick={() => manager.setThickness(4)}>
                         <PenTypeTooltip placement="left" title={
                             <React.Fragment>
                                 <Typography color="inherit">Pen Type</Typography>
@@ -162,7 +167,7 @@ export default class PenTypeButton extends React.Component {
                             </div>
                         </PenTypeTooltip> 
                     </button>
-                    <button id="btn_thick_5" type="button" className="btn btn-neo btn-neo-dropdown" onClick={() => this.manager.setThickness(5)}>
+                    <button id="btn_thick_5" type="button" className="btn btn-neo btn-neo-dropdown" onClick={() => manager.setThickness(5)}>
                         <PenTypeTooltip placement="left" title={
                             <React.Fragment>
                                 <Typography color="inherit">Pen Type</Typography>
