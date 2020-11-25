@@ -54,7 +54,7 @@ export default class ThemeManager {
           // 흰색 펜이면
           c = 2;
       }
-      this.penManager.setPenColor(c);
+      this.penManager.setColor(c);
   }
 
   // blackboard 등
@@ -65,7 +65,7 @@ export default class ThemeManager {
           c = 1;
       }
 
-      this.penManager.setPenColor(c);
+      this.penManager.setColor(c);
   }
 
   private setThemeDark(val) {
