@@ -547,6 +547,7 @@ export default class PenComm extends ProtocolHandlerBase {
 
     const isPenDown = buf[4] === 0;
     const penTipMode = buf[13];
+    const penId = this.getMac();
     const timeStamp = intFromBytes(buf, 5, 8);   // ARGB
     this.setTimeStamp(timeStamp);
 
@@ -554,7 +555,7 @@ export default class PenComm extends ProtocolHandlerBase {
       console.log("------------ Pen down --------------");
       this.isPenDown = true;
 
-      const event = makePenEvent(this.deviceInfo.deviceType, PenEventEnum.PEN_DOWN, { penTipMode, timeStamp });
+      const event = makePenEvent(this.deviceInfo.deviceType, PenEventEnum.PEN_DOWN, { penTipMode, timeStamp, penId });
       this.penHandler.onPenDown(event);
 
       return;
@@ -733,7 +734,7 @@ export default class PenComm extends ProtocolHandlerBase {
     const labelCount = intFromBytes(buf, 10, 2);
     const ndacErrorCode = buf[12];
     const ndacClassType = buf[14];
-
+    const penId = this.getMac();
 
     const e = makePenEvent(this.deviceInfo.deviceType, PenEventEnum.ERROR,
       {
@@ -745,7 +746,8 @@ export default class PenComm extends ProtocolHandlerBase {
         ndacProcessTime,
         labelCount,
         ndacErrorCode,
-        ndacClassType
+        ndacClassType,
+        penId
       });
     // this.isPenDown = true;
 
@@ -777,10 +779,11 @@ export default class PenComm extends ProtocolHandlerBase {
 
     const penTipMode = buf[13];
     const color = intFromBytes(buf, 14, 4);   // ARGB
+    const penId = this.getMac();
 
     this.isPenDown = true;
 
-    const e = makePenEvent(this.deviceInfo.deviceType, PenEventEnum.PEN_DOWN, { penTipMode, color, timeStamp });
+    const e = makePenEvent(this.deviceInfo.deviceType, PenEventEnum.PEN_DOWN, { penTipMode, color, timeStamp, penId });
     this.penHandler.onPenDown(e);
   }
 
