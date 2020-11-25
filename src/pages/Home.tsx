@@ -110,6 +110,15 @@ const Home = () => {
   }
 
   return (
+  <div> 
+    <nav id="uppernav" className="navbar navbar-light bg-transparent" style={{float: "left"}}>
+      <a id="grida_board" className="navbar-brand" href="#">Grida board
+        <small id="neo_smartpen" className="text-muted">
+          <span data-l10n-id="by_neosmart_pen"> by Neo smartpen</span>
+        </small>
+      </a>
+    </nav>
+    
     <div id={"home_div"} style={{
       position: "absolute",
       left: "0px", top: "0px",
@@ -118,7 +127,6 @@ const Home = () => {
       alignItems: "center",
       zIndex: 1,
     }}>
-
       <div id={"button_div"} style={{
         position: "absolute",
         display: "flex", flexDirection: "row-reverse",
@@ -143,7 +151,9 @@ const Home = () => {
         <div style={{ flex: 8 }}>
         </div>
       </div>
-      
+
+
+
       <nav id="colornav" className="navbar fixed-bottom navbar-light bg-transparent">
         <div className="d-inline-flex p-2 bd-highlight">
           <div className="navbar-menu d-flex justify-content-end align-items-end neo_shadow">
@@ -214,6 +224,7 @@ const Home = () => {
       
       <MixedPageView pdfUrl={PDF_URL} pageNo={1} scale={1} playState={PLAYSTATE.live} pens={pens} ref={pageRef} />
     </div >
+  </div>
   );
 };
 

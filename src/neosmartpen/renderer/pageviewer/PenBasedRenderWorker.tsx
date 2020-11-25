@@ -154,8 +154,35 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
     delete this.livePaths[event.strokeKey];
   }
 
-  moveHoverPoint = (event) => {
+  moveHoverPoint = (e) => {
+    var pathArr = new Array(0);;
+      for (var i = 0; i < 6; i++) {
+        var path = new fabric.Circle({
+            radius: (6 - i) * 2,
+            fill: "#ff2222",
+            stroke: "#ff2222",
+            opacity: 1, //(6 - i) / 6 / 2,
+        });
+        pathArr.push(path);
+      }
 
+      const dot = {x:e.event.x, y:e.event.y}
+      const canvas_xy = this.getCanvasXY(dot);
+      
+      console.log('x : ' + e.event.x);
+      // var inkCanvasPos_x = px * matrix.a + py * matrix.b + matrix.tx;
+      // var inkCanvasPos_y = px * matrix.c + py * matrix.d + matrix.ty;
+
+      for (i = 6 - 1; i > 0; i--) {
+        pathArr[i].left = canvas_xy.x;
+        pathArr[i].top = canvas_xy.y;
+      }
+      this.canvasFb.add(path);
+
+      // e.event.pathHoverPoints.
+      // event.event.x;
+      // event.event.y;
+      console.log('move hover point');
   }
 
 
@@ -337,9 +364,9 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
 
     const pathOption = {
       objectCaching: false,
-      stroke: color,
-      fill: color,
-      color: color,
+      stroke: "rgba(0,0,0,255)", //"rgba(0,0,0,255)"
+      fill: "rgba(0,0,0,255)", //위에 두놈은 그려지는 순간의 color
+      color: "rgba(0,0,0,0)", //얘가 canvas에 저장되는 color
       opacity: opacity,
       // strokeWidth: 10,
       originX: 'left',
