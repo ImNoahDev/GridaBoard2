@@ -1,6 +1,8 @@
 import React from "react";
 import App from "../shared/App";
-import configureStore from "../store/configureStore";
+import thunk from 'redux-thunk';
+import {applyMiddleware, combineReducers, compose, createStore} from 'redux';
+import rootReducer from "../store/rootReducer";
 import { Provider } from "react-redux";
 import { theme } from "../styles/theme";
 import {
@@ -18,8 +20,9 @@ import {
   // Snackbar,
 } from "@material-ui/core";
 
+const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 
-export const store = configureStore();
+export const store = createStore(rootReducer, composeEnhancers(applyMiddleware(thunk)));
 
 const Root = () => (
   <Provider store={store}>
