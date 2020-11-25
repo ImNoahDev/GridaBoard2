@@ -100,6 +100,13 @@ export default class InkStorage {
     return [];
   }
 
+  public removeStrokeFromPage(pageInfo: IPageSOBP) {
+    const { section, book, owner, page } = pageInfo;
+    const pageId = InkStorage.getPageId({ section, book, owner, page });
+
+    let completed = this.completedOnPage;
+    completed.delete(pageId);
+  }
   /**
    * 
    * @param pageInfo 

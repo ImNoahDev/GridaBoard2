@@ -320,7 +320,7 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
   }
 
   createPenPathFromStroke = (stroke: NeoStroke) => {
-    const { dotArray, color, thickness } = stroke;
+    const { dotArray, color, thickness, brushType } = stroke;
 
     let pointArray = [];
     dotArray.forEach((dot) => {
@@ -328,12 +328,19 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
       pointArray.push(pt);
     });
 
+    var opacity: number;
+    switch (brushType) {
+      case 0 : opacity = 1; break;
+      case 1 : opacity = 0.3; break;
+      default: opacity = 1; break;
+    }
+
     const pathOption = {
       objectCaching: false,
       stroke: color,
       fill: color,
       color: color,
-      opacity: 1,
+      opacity: opacity,
       // strokeWidth: 10,
       originX: 'left',
       originY: 'top',

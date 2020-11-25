@@ -39,7 +39,7 @@ export default class MixedPageView extends React.Component<IMixedPageViewProps, 
   waitingForFirstStroke: boolean = true;
   pdf: PdfJs.PDFDocumentProxy;
 
-
+  rendererRef: React.RefObject<PenBasedRenderer> = React.createRef();
 
   constructor(props: IMixedPageViewProps) {
     super(props);
@@ -131,6 +131,7 @@ export default class MixedPageView extends React.Component<IMixedPageViewProps, 
             playState={PLAYSTATE.live} pens={this.props.pens}
             onNcodePageChanged={this.onNcodePageChanged}
             onCanvasShapeChanged={this.onCanvasShapeChanged}
+            ref={this.rendererRef}
           />
         </div>
       </div>

@@ -1,13 +1,13 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { PLAYSTATE, MixedPageView } from "../neosmartpen";
 import { Button, Box } from "@material-ui/core";
 
 import PenManager from '../neosmartpen/pencomm/PenManager';
+import InkStorage from "../neosmartpen/penstorage/InkStorage";
 
 import ConnectButton from '../components/buttons/ConnectButton'
 
 import PenTypeButton from '../components/buttons/PenTypeButton'
-import TrashButton from '../components/buttons/TrashButton'
 import RotateButton from '../components/buttons/RotateButton'
 import BackgroundButton from '../components/buttons/BackgroundButton'
 
@@ -71,7 +71,9 @@ let tempPens = new Array(0);
 let _num_pens = 0;
 let manager = PenManager.getInstance();
 
+
 const Home = () => {
+  const pageRef: React.RefObject<MixedPageView> = useRef();
   const [num_pens, setNumPens] = useState(0);
   const [pens, setPens] = useState(new Array(0));
 
@@ -96,6 +98,15 @@ const Home = () => {
         setNumPens(_num_pens);
       }
     }
+  }
+
+  const handleTrashBtn = () => {
+    const penRendererState = pageRef.current.rendererRef.current.state;
+
+    penRendererState.renderer.removeAllCanvasObject();
+    InkStorage.getInstance().removeStrokeFromPage(penRendererState.pageInfo);
+
+    console.log('Handle Trash Btn');
   }
 
   return (
@@ -177,7 +188,17 @@ const Home = () => {
                     <div className="btn-group dropright" role="group">
                       <PenTypeButton/>
                     </div>
-                    <TrashButton/><RotateButton/><BackgroundButton/>
+
+                    {/* Trash Button  */}
+                    <button id="btn_trash" type="button" title="Clear" className="btn btn-neo btn-neo-dropdown"
+                    onClick={() => handleTrashBtn()}>
+                      <div className="c2">
+                          <img src= { require("../icons/icon_trash_n.png") } className="normal-image"></img>
+                          <img src= { require("../icons/icon_trash_p.png") } className="hover-image"></img>
+                      </div>
+                    </button> 
+
+                    <RotateButton/><BackgroundButton/>
                   </div>
                   <div className="btn-group-vertical neo_shadow" style = {{ marginBottom: 10 }}>
                     <FitButton/><ZoomButton/><FullScreenButton/>
@@ -190,9 +211,8 @@ const Home = () => {
           </div>
         </div>
       </div>
-
       
-      <MixedPageView pdfUrl={PDF_URL} pageNo={1} scale={1} playState={PLAYSTATE.live} pens={pens} />
+      <MixedPageView pdfUrl={PDF_URL} pageNo={1} scale={1} playState={PLAYSTATE.live} pens={pens} ref={pageRef} />
     </div >
   );
 };
