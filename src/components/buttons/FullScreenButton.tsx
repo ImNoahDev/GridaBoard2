@@ -2,6 +2,7 @@ import React, { Component, useState } from "react";
 import '../../styles/buttons.css';
 import Tooltip, { TooltipProps } from '@material-ui/core/Tooltip';
 import { Theme, Typography, withStyles } from '@material-ui/core';
+import ThemeManager from "../../styles/ThemeManager";
 
 const FullscreenTooltip = withStyles((theme: Theme) => ({
   tooltip: {
@@ -16,7 +17,8 @@ const FullscreenTooltip = withStyles((theme: Theme) => ({
 export default class FullScreenButton extends React.Component {
   render() {
     return (
-      <button id="btn_fullscreen" type="button" className="btn btn-neo btn-neo-vertical" title="Fullscreen">
+      <button id="btn_fullscreen" type="button" className="btn btn-neo btn-neo-vertical" title="Fullscreen"
+      onClick = {() => ThemeManager.getInstance().toggleFullScreen()}>
           <FullscreenTooltip placement="left" title={
           <React.Fragment>
               <Typography color="inherit">Fullscreen</Typography>
