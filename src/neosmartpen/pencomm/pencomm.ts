@@ -855,10 +855,11 @@ export default class PenComm extends ProtocolHandlerBase {
     const book = intFromBytes(buf, 9, 4);
     const page = intFromBytes(buf, 13, 4);
 
-    const eventMode = PenEventEnum.PAGE_INFO;
+    var eventMode = PenEventEnum.PAGE_INFO;
     // if (!this.isPenDown) {
     //   eventMode = PenEventEnum.PAGE_INFO_HOVER;
     // }
+
     const e = makePenEvent(this.deviceInfo.deviceType, eventMode, { section, owner, book, page, timeStamp: this.currentTime });
     const isHover = eventMode === PenEventEnum.PAGE_INFO_HOVER;
 

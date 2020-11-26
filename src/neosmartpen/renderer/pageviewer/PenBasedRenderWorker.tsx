@@ -13,7 +13,8 @@ import { IBrushType } from "../../DataStructure/Enums";
 import { INeoStrokeProps } from "../../DataStructure/NeoStroke";
 import { IPageSOBP } from "../../DataStructure/Structures";
 
-
+import jQuery from "jquery";
+let $ = jQuery;
 
 // const timeTickDuration = 20; // ms
 // const DISABLED_STROKE_COLOR = "rgba(0, 0, 0, 0.1)";
@@ -21,7 +22,9 @@ import { IPageSOBP } from "../../DataStructure/Structures";
 // const INCOMPLETE_STROKE_COLOR = "rgba(255, 0, 255, 0.4)";
 // const CURRENT_POINT_STROKE_COLOR = "rgba(255, 255, 255, 1)";
 
-
+const NUM_HOVER_POINTERS = 6;
+const REMOVE_HOVER_POINTS_INTERVAL = 50; // 50ms
+const REMOVE_HOVER_POINTS_WAIT = 20; // 20 * 50ms = 1sec
 
 /** @enum {string}  */
 export const ZoomFitEnum = {
@@ -46,6 +49,9 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
 
   storage = InkStorage.getInstance();
 
+  visibleHoverPoints: number = NUM_HOVER_POINTERS;
+  pathHoverPoints: Array<fabric.Circle> = new Array(0);
+  
 
   /**
    * 
@@ -154,35 +160,76 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
     delete this.livePaths[event.strokeKey];
   }
 
+  addHoverPoints = (e) => {
+    for (var i=0; i<e.pen.pathHoverPoints.length; i++) {
+      this.canvasFb.add(e.pen.pathHoverPoints[0]);
+    }
+
+    console.log('hover points added')
+  }
+
   moveHoverPoint = (e) => {
-    var pathArr = new Array(0);;
-      for (var i = 0; i < 6; i++) {
-        var path = new fabric.Circle({
-            radius: (6 - i) * 2,
-            fill: "#ff2222",
-            stroke: "#ff2222",
-            opacity: 1, //(6 - i) / 6 / 2,
-        });
-        pathArr.push(path);
-      }
 
-      const dot = {x:e.event.x, y:e.event.y}
-      const canvas_xy = this.getCanvasXY(dot);
-      
-      console.log('x : ' + e.event.x);
-      // var inkCanvasPos_x = px * matrix.a + py * matrix.b + matrix.tx;
-      // var inkCanvasPos_y = px * matrix.c + py * matrix.d + matrix.ty;
+    const dot = {x:e.event.x, y:e.event.y}
+    const canvas_xy = this.getCanvasXY(dot);
+    
+    var i: number;
 
-      for (i = 6 - 1; i > 0; i--) {
-        pathArr[i].left = canvas_xy.x;
-        pathArr[i].top = canvas_xy.y;
-      }
-      this.canvasFb.add(path);
+    for (i = NUM_HOVER_POINTERS - 1; i > 0; i--) {
+      e.pen.pathHoverPoints[i].left = e.pen.pathHoverPoints[i-1].left;
+      e.pen.pathHoverPoints[i].top = e.pen.pathHoverPoints[i-1].top;
+    }
 
-      // e.event.pathHoverPoints.
-      // event.event.x;
-      // event.event.y;
-      console.log('move hover point');
+    e.pen.pathHoverPoints[0].left = canvas_xy.x;
+    e.pen.pathHoverPoints[0].top = canvas_xy.y;
+
+
+
+    var isPointerVisible = $("#btn_tracepoint").find(".c2").hasClass("checked");
+    console.log('flag : ' + isPointerVisible);
+
+
+    e.pen.visibleHoverPoints = NUM_HOVER_POINTERS;
+
+    for (i = 0; i < e.pen.visibleHoverPoints; i++) {
+      e.pen.pathHoverPoints[i].visible = isPointerVisible;
+    }
+
+    if (e.pen._timeOut) {
+        clearInterval(e.pen._timeOut);
+        e.pen._timeOut = null;
+    }
+    e.pen.waitCount = 0;
+
+    var pen = e.pen;
+    var self = this;
+
+    e.pen.timeOut = setInterval(() => {
+      pen.waitCount++;
+
+        // 1초 뒤
+        if (pen.waitCount > REMOVE_HOVER_POINTS_WAIT) {
+            for (i = NUM_HOVER_POINTERS - 1; i > 0; i--) {
+                pen.pathHoverPoints[i].left = pen.pathHoverPoints[i - 1].left;
+                pen.pathHoverPoints[i].top = pen.pathHoverPoints[i - 1].top;
+            }
+            pen.pathHoverPoints[0].left = -30;
+            pen.pathHoverPoints[0].top = -30;
+
+            pen.visibleHoverPoints--;
+            if (pen.visibleHoverPoints >= 0) {
+                pen.pathHoverPoints[pen.visibleHoverPoints].visible = false;
+            } else {
+                clearInterval(pen.timeOut);
+            }
+        }
+    }, REMOVE_HOVER_POINTS_INTERVAL);
+
+    //계속 6개씩 add 할게 아니라 현재 지점에 대해서만 render를 해야돼. 한칸 움직였는데 지금 6개씩 그리고있짜나...
+    for (i = NUM_HOVER_POINTERS - 1; i > -1; i--) {
+      this.canvasFb.add(e.pen.pathHoverPoints[i])
+    }
+
   }
 
 

@@ -136,6 +136,7 @@ export default class PenBasedRenderer extends React.Component<IPenBasedRendererP
     pen.addEventListener(PenEventName.ON_PEN_MOVE, this.onLivePenMove);
     pen.addEventListener(PenEventName.ON_PEN_UP, this.onLivePenUp);
     pen.addEventListener(PenEventName.ON_HOVER_MOVE, this.onLiveHoverMove);
+    pen.addEventListener(PenEventName.ON_PEN_HOVER_PAGEINFO, this.onLiveHoverPageInfo);
   }
 
   /**
@@ -376,6 +377,11 @@ export default class PenBasedRenderer extends React.Component<IPenBasedRendererP
     // console.log(event);
   }
 
+  onLiveHoverPageInfo = (event) => {
+    if (this.state.renderer) {
+      this.state.renderer.addHoverPoints(event);
+    }
+  }
 
   /**
    *
@@ -391,7 +397,6 @@ export default class PenBasedRenderer extends React.Component<IPenBasedRendererP
     // this.setState({ liveDotCount: liveDotCount + 1 });
     // console.log(event);
   }
-
 
   getSize = (scale, rect) => {
     let size = {

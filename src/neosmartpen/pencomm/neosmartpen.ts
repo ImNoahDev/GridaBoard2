@@ -9,6 +9,7 @@ import { NeoStroke, PEN_STATE, PenEventName } from "../DataStructure";
 import { IWritingSurfaceInfo } from "../DataStructure/Structures";
 import NeoDot from "../DataStructure/NeoDot";
 import { IBrushType } from "../DataStructure/Enums"
+import { fabric } from "fabric";
 
 interface IPenMovement {
   downEvent: IPenEvent,
@@ -20,6 +21,7 @@ interface IPenMovement {
 
 }
 
+const NUM_HOVER_POINTERS = 6;
 
 export class NeoSmartpen {
   currPenMovement: IPenMovement = {
@@ -58,7 +60,10 @@ export class NeoSmartpen {
   manager: PenManager = PenManager.getInstance();
   dispatcher: Dispatcher = new Dispatcher();
 
-
+  visibleHoverPoints = NUM_HOVER_POINTERS;
+  pathHoverPoints: Array<fabric.Circle> = new Array(0);
+  timeOut = null;
+  waitCount: number = 0;
   /**
    *
    * @param customStorage
@@ -79,6 +84,23 @@ export class NeoSmartpen {
         thickness: 0.1,
         color: "rgba(0,0,0,255)",
       };
+    }
+
+  }
+
+  initHoverCursor() {
+    for (var i = 0; i < 6; i++) {
+      var path = new fabric.Circle({
+          radius: (NUM_HOVER_POINTERS - i) ,
+          fill: "#ff2222",
+          stroke: "#ff2222",
+          opacity: (NUM_HOVER_POINTERS - i) / NUM_HOVER_POINTERS / 2,
+          left : -30,
+          top : -30,
+          hasControls : false,
+          dirty: true
+      });
+      this.pathHoverPoints.push(path);
     }
   }
 
@@ -254,21 +276,21 @@ export class NeoSmartpen {
             strokeKey, mac, stroke, section, owner, book, page,
             time: event.timeStamp
           });
-
-        }
-        else {
-          // hand hover page the event
-          this.dispatcher.dispatch(PenEventName.ON_PEN_HOVER_PAGEINFO, {
-            mac, section, owner, book, page, time: event.timeStamp
-          });
-
         }
       }
-
+      
       // let ph = this.appPen;
       // ph.onPageInfo(event);
     }
+    
+    if (hover) {
+      const { section, owner, book, page, timeStamp } = event;
+      let mac = this.mac;
 
+      this.dispatcher.dispatch(PenEventName.ON_PEN_HOVER_PAGEINFO, {
+        mac, section, owner, book, page, time: event.timeStamp, pen:this
+      });
+    }
     
     // event 전달
     // let ph = this.appPen;
@@ -366,6 +388,21 @@ export class NeoSmartpen {
       throw new Error("mac address was not registered");
     }
     this.dispatcher.dispatch(PenEventName.ON_HOVER_MOVE, { pen: this, mac, event });
+  }
+
+    /**
+   * hover 상태에서 움직임
+   * @param event
+   */
+  onHoverPageInfo = (event: IPenEvent) => {
+    this.lastState = PEN_STATE.HOVER_MOVE;
+;
+    let mac = this.mac;
+    if (!mac) {
+      throw new Error("mac address was not registered");
+    }
+
+    this.dispatcher.dispatch(PenEventName.ON_PEN_HOVER_PAGEINFO, { pen: this, mac, event });
   }
 
   /**
