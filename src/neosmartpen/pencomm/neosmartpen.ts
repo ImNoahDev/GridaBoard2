@@ -64,6 +64,8 @@ export class NeoSmartpen {
   pathHoverPoints: Array<fabric.Circle> = new Array(0);
   timeOut = null;
   waitCount: number = 0;
+
+  pathPenTracker: fabric.Circle;
   /**
    *
    * @param customStorage
@@ -88,6 +90,20 @@ export class NeoSmartpen {
 
   }
 
+  initPenTracker() {
+    this.pathPenTracker = new fabric.Circle({
+      left : -30,
+      top : -30,
+      radius: 5,
+      opacity : 0.3,
+      fill: "#7a7aff",
+      stroke: "#7a7aff",
+      dirty: true,
+      name : 'penTracker',
+      data : 'pt'
+    });
+  }
+
   initHoverCursor() {
     for (var i = 0; i < 6; i++) {
       var path = new fabric.Circle({
@@ -98,7 +114,9 @@ export class NeoSmartpen {
           left : -30,
           top : -30,
           hasControls : false,
-          dirty: true
+          dirty: true,
+          name : 'hoverPoint',
+          data : 'hp'
       });
       this.pathHoverPoints.push(path);
     }
@@ -359,9 +377,10 @@ export class NeoSmartpen {
     let stroke = this.currPenMovement.stroke;
     let strokeKey = stroke.key;
     this.storage.appendDot(strokeKey, dot);
+    let pen = this;
 
     // hand the event
-    this.dispatcher.dispatch(PenEventName.ON_PEN_MOVE, { strokeKey, mac: stroke.mac, stroke, dot });
+    this.dispatcher.dispatch(PenEventName.ON_PEN_MOVE, { strokeKey, mac: stroke.mac, stroke, dot, pen });
 
     // 이벤트 전달
     // console.log("    -> onPenMove" + event);

@@ -32,7 +32,9 @@ const ConnectButton = (props) => {
       new_pen.addEventListener(PenEventName.ON_CONNECTED, onPenLinkChanged);
       new_pen.addEventListener(PenEventName.ON_DISCONNECTED, onPenLinkChanged);
 
-      new_pen.initHoverCursor(); //실제 device가 연결되기도 전인 pen 생성자에서 해줄 이유는 없는거 같으니
+      //실제 device가 연결되기도 전인 pen 생성자에서 해줄 이유는 없는거 같으니
+      new_pen.initHoverCursor();
+      new_pen.initPenTracker();
     }
   };
 

@@ -119,22 +119,47 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
    * @param {{strokeKey:string, mac:string, stroke:NeoStroke, dot:NeoDot}} event
    */
   pushLiveDot = (event: any) => {
+    //pen tracker rendering
+    this.movePenTracker(event);
+    
     let pathData = this.livePaths[event.strokeKey];
     const { path, stroke } = pathData;
-
+    
     if (path) {
       this.canvasFb.remove(path);
     }
-
+    
     let new_path = this.createPenPathFromStroke(stroke);
-
+    
     if (this.canvasFb) {
       this.canvasFb.add(new_path);
       pathData.path = new_path;
     }
-
+    
     const dot = event.dot;
     this.focusToDot(dot);
+  }
+
+  movePenTracker = (event:any) => {
+    const dot = event.dot;
+    const canvas_xy = this.getCanvasXY(dot);
+    const screen_xy = this.getScreenXY(canvas_xy);
+    const penTracker = event.pen.pathPenTracker;
+    
+    let objects = this.canvasFb.getObjects();
+    let penTrackerObj = objects.filter(obj => obj.data === 'pt');
+
+    if (penTrackerObj.length === 0) {
+        this.canvasFb.add(event.pen.pathPenTracker);
+      }
+    else {
+    }
+
+    var radius = penTracker.radius;
+    penTracker.visible = true;
+    penTracker.set({left : screen_xy.x - radius, top: screen_xy.y - radius});
+    penTracker.setCoords();
+    this.canvasFb.renderAll();
   }
 
   /**
@@ -162,42 +187,55 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
 
   addHoverPoints = (e) => {
     for (var i=0; i<e.pen.pathHoverPoints.length; i++) {
-      this.canvasFb.add(e.pen.pathHoverPoints[0]);
+      this.canvasFb.add(e.pen.pathHoverPoints[i]);
     }
-
-    console.log('hover points added')
+    
+    this.canvasFb.add(e.pen.pathPenTracker);
+    console.log('hover points & pen tracker added')
   }
 
   moveHoverPoint = (e) => {
+
+    let objects = this.canvasFb.getObjects();
+    let hoverPoints = objects.filter(obj => obj.data === 'hp');
+
+    if (hoverPoints.length === 0) {
+      for (var i=0; i<e.pen.pathHoverPoints.length; i++) {
+        this.canvasFb.add(e.pen.pathHoverPoints[i]);
+      }
+    }
+    else {
+    }
 
     const dot = {x:e.event.x, y:e.event.y}
     const canvas_xy = this.getCanvasXY(dot);
     
     var i: number;
-
     for (i = NUM_HOVER_POINTERS - 1; i > 0; i--) {
       e.pen.pathHoverPoints[i].left = e.pen.pathHoverPoints[i-1].left;
       e.pen.pathHoverPoints[i].top = e.pen.pathHoverPoints[i-1].top;
+      e.pen.pathHoverPoints[i].setCoords();
+      this.canvasFb.renderAll();
     }
 
     e.pen.pathHoverPoints[0].left = canvas_xy.x;
     e.pen.pathHoverPoints[0].top = canvas_xy.y;
-
-
+    e.pen.pathHoverPoints[0].setCoords();
+    this.canvasFb.renderAll();
 
     var isPointerVisible = $("#btn_tracepoint").find(".c2").hasClass("checked");
     console.log('flag : ' + isPointerVisible);
-
 
     e.pen.visibleHoverPoints = NUM_HOVER_POINTERS;
 
     for (i = 0; i < e.pen.visibleHoverPoints; i++) {
       e.pen.pathHoverPoints[i].visible = isPointerVisible;
+      this.canvasFb.renderAll();
     }
 
-    if (e.pen._timeOut) {
-        clearInterval(e.pen._timeOut);
-        e.pen._timeOut = null;
+    if (e.pen.timeOut) {
+        clearInterval(e.pen.timeOut);
+        e.pen.timeOut = null;
     }
     e.pen.waitCount = 0;
 
@@ -206,9 +244,8 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
 
     e.pen.timeOut = setInterval(() => {
       pen.waitCount++;
-
         // 1초 뒤
-        if (pen.waitCount > REMOVE_HOVER_POINTS_WAIT) {
+        if (pen.waitCount > 20) {
             for (i = NUM_HOVER_POINTERS - 1; i > 0; i--) {
                 pen.pathHoverPoints[i].left = pen.pathHoverPoints[i - 1].left;
                 pen.pathHoverPoints[i].top = pen.pathHoverPoints[i - 1].top;
@@ -219,17 +256,12 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
             pen.visibleHoverPoints--;
             if (pen.visibleHoverPoints >= 0) {
                 pen.pathHoverPoints[pen.visibleHoverPoints].visible = false;
+                self.canvasFb.renderAll();
             } else {
                 clearInterval(pen.timeOut);
             }
         }
     }, REMOVE_HOVER_POINTS_INTERVAL);
-
-    //계속 6개씩 add 할게 아니라 현재 지점에 대해서만 render를 해야돼. 한칸 움직였는데 지금 6개씩 그리고있짜나...
-    for (i = NUM_HOVER_POINTERS - 1; i > -1; i--) {
-      this.canvasFb.add(e.pen.pathHoverPoints[i])
-    }
-
   }
 
 
@@ -413,7 +445,7 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
       objectCaching: false,
       stroke: "rgba(0,0,0,255)", //"rgba(0,0,0,255)"
       fill: "rgba(0,0,0,255)", //위에 두놈은 그려지는 순간의 color
-      color: "rgba(0,0,0,0)", //얘가 canvas에 저장되는 color
+      color: "rgba(0,0,0,255)", //얘가 canvas에 저장되는 color
       opacity: opacity,
       // strokeWidth: 10,
       originX: 'left',
