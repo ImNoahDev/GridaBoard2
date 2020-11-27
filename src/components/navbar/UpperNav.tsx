@@ -1,5 +1,8 @@
 import React from 'react';
 import '../../styles/main.css';
+import Login from './Login';
+import Upload from './Upload';
+// import Get from './Get';
 
 class upperNav extends React.Component {
     render() {
@@ -10,6 +13,9 @@ class upperNav extends React.Component {
                         <span data-l10n-id="by_neosmart_pen"> by Neo smartpen</span>
                     </small>
                 </a>
+                <Login />
+                {/* <Upload /> */}
+                {/* <Get /> */}
             </nav>
         )
     }

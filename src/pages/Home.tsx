@@ -23,6 +23,7 @@ import PageNumbering from '../components/navbar/PageNumbering';
 import PrintButton from '../components/navbar/PrintButton';
 import FileLoad from '../components/navbar/FileLoad';
 import CalibrationMenual from '../components/navbar/CalibrationMenual';
+import UpperNav from '../components/navbar/UpperNav';
 
 import {
   //PenEvent,
@@ -147,6 +148,8 @@ const Home = () => {
         <div style={{ fontSize: "20px", fontWeight: "bold" }}>
           Pen Connected: {num_pens}
         </div>
+
+        <UpperNav />
 
         <div style={{ flex: 8 }}>
         </div>

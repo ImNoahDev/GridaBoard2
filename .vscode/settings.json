@@ -2,5 +2,6 @@
   "editor.tabSize": 2,
   "prettier.printWidth": 132,
   "prettier.jsxBracketSameLine": true,
-  "prettier.endOfLine": "auto"
+  "prettier.endOfLine": "auto",
+  "prettier.tabWidth": 2
 }
