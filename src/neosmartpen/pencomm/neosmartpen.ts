@@ -42,7 +42,7 @@ export class NeoSmartpen {
   lastInfoEvent: IPenEvent = null;
   protocolHandler: PenComm = new PenComm(this);
   mac: string = null;
-
+  
   lastState: PEN_STATE = PEN_STATE.NONE;
 
   surfaceInfo: IWritingSurfaceInfo = {
@@ -64,6 +64,7 @@ export class NeoSmartpen {
   pathHoverPoints: Array<fabric.Circle> = new Array(0);
   timeOut = null;
   waitCount: number = 0;
+  eraserLastPoint:object = {};
 
   pathPenTracker: fabric.Circle;
   /**
@@ -438,14 +439,16 @@ export class NeoSmartpen {
       console.error("Ink Storage has not been initialized");
     }
 
-    let stroke = this.currPenMovement.stroke;
-    let strokeKey = stroke.key;
-    this.storage.closeStroke(strokeKey);
+    if (this.penRendererType !== IBrushType.ERASER) {
+      let stroke = this.currPenMovement.stroke;
+      let strokeKey = stroke.key;
+      this.storage.closeStroke(strokeKey);
 
-    const { mac, section, owner, book, page } = stroke;
-    this.dispatcher.dispatch(PenEventName.ON_PEN_UP, { strokeKey, mac, pen: this, stroke, section, owner, book, page });
+      const { mac, section, owner, book, page } = stroke;
+      this.dispatcher.dispatch(PenEventName.ON_PEN_UP, { strokeKey, mac, pen: this, stroke, section, owner, book, page });
 
-    this.resetPenStroke();
+      this.resetPenStroke();
+    }
   }
 
   /**
