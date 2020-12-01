@@ -14,7 +14,7 @@ class upperNav extends React.Component {
                     </small>
                 </a>
                 <Login />
-                {/* <Upload /> */}
+                <Upload />
                 {/* <Get /> */}
             </nav>
         )

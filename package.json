@@ -43,6 +43,7 @@
     "redux": "^4.0.5",
     "redux-cookies": "^1.0.1",
     "redux-thunk": "^2.3.0",
+    "superagent": "^6.1.0",
     "typescript": "4.0.5"
   },
   "scripts": {

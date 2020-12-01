@@ -33,21 +33,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>
     <script src="./external/bootbox-releated/bootstrap-4.4.1.js"></script>
-    <script src="https://apis.google.com/js/client.js?onload=onLoadCallback"></script>
-    <script>
-      window.onload = function() {
-        var request = {
-    'client_id': '199553124799-fsa01ovuea7v855aglpjp000qd73h63q.apps.googleusercontent.com',
-    'scope': 'https://www.googleapis.com/auth/drive'
-  }
-  gapi.load('client', function () {
-    gapi.client.load('drive', 'v2', function () {
-        gapi.client.drive.files.create({
-          "name": "newFile.txt",
-        }).execute();
-    });
-      }
-    </script>
+    <script src="https://apis.google.com/js/client.js?onload=init"></script>
     <title>React App</title>
   </head>
   <body>

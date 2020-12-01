@@ -32,6 +32,6 @@
     "declarationDir": "./types" // 이 폴더에 만들어주는 옵션
   },
   "include": [
-    "src/**/*.tsx", "src/styles/ThemeManager.ts"
+    "src/**/*.tsx", "src/styles/ThemeManager.ts", "src/components/navbar/Upload.js"
   ]
 }
