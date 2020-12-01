@@ -1,8 +1,6 @@
 import React from 'react';
 import { gapi } from 'gapi-script';
 import $ from 'jquery';
-import superagent from 'superagent';
-import { request } from 'http';
 import { GoogleLogin } from 'react-google-login';
 // import { create } from 'domain';
 // import { create } from 'googleapis';
