@@ -13,7 +13,6 @@ class upperNav extends React.Component {
                         <span data-l10n-id="by_neosmart_pen"> by Neo smartpen</span>
                     </small>
                 </a>
-                <Login />
                 <Upload />
                 {/* <Get /> */}
             </nav>
