@@ -79,17 +79,20 @@ import { GoogleLogin } from 'react-google-login';
   //         // request.execute(function(resp) { console.log(resp); });
   //     });
   // }
+  
 
 function createFile() {
-  var parentId = '';//some parentId of a folder under which to create the new folder
+  // var parentId = 'root';//some parentId of a folder under which to create the new folder
   var fileMetadata = {
-    'name' : 'New Folder',
+    'name' : 'test.txt',
     'mimeType' : 'application/vnd.google-apps.folder',
-    'parents': [parentId]
+    // 'uploadType': 'application/txt',
+    // 'parents': [parentId]
   };
   gapi.client.load('drive', 'v3', function() {
     gapi.client.request({
-      'path': '/drive/v3/files',
+      // 'path': '/drive/v3/files',
+      'path': 'https://www.googleapis.com/upload/drive/v3/files',
       'method': 'POST', function () {
         gapi.client.files.create({
           resource: fileMetadata,
