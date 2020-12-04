@@ -50,7 +50,7 @@ export default class ThemeManager {
   // white board 등
   private setPenColorNormal() {
       var c = this.penManager.defaultColorNum;
-      if (c == 1) {
+      if (c === 1) {
           // 흰색 펜이면
           c = 2;
       }
@@ -60,7 +60,7 @@ export default class ThemeManager {
   // blackboard 등
   private setPenColorInverse() {
       var c = this.penManager.defaultColorNum;
-      if (c == 2) {
+      if (c === 2) {
           // 검은색 펜이면
           c = 1;
       }

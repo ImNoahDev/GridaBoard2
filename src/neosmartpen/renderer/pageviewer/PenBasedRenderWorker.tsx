@@ -497,9 +497,9 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
 
     const pathOption = {
       objectCaching: false,
-      stroke: "rgba(0,0,0,255)", //"rgba(0,0,0,255)"
-      fill: "rgba(0,0,0,255)", //위에 두놈은 그려지는 순간의 color
-      color: "rgba(0,0,0,255)", //얘가 canvas에 저장되는 color
+      stroke: color, //"rgba(0,0,0,255)"
+      fill: color, //위에 두놈은 그려지는 순간의 color
+      color: color, //얘가 canvas에 저장되는 color
       opacity: opacity,
       // strokeWidth: 10,
       originX: 'left',
