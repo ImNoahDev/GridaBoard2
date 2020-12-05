@@ -24,6 +24,7 @@ interface PageState {
   page: PdfJs.PDFPageProxy | null,
   width: number,
   height: number,
+  imgSrc: string,
 }
 
 class Page extends Component<PageProps> {
@@ -31,11 +32,13 @@ class Page extends Component<PageProps> {
     status: 'N/A',
     page: null,
     width: 0,
-    height: 0
+    height: 0,
+    imgSrc: URL.createObjectURL(new Blob()),
   };
 
   canvas: HTMLCanvasElement | null = null;
   inRendering: boolean = false;
+  inImageRendering: boolean = false;
 
   scaleCanvas(canvas: HTMLCanvasElement, width: number, height: number, zoom: number) {
     // assume the device pixel ratio is 1 if the browser doesn't specify it
@@ -80,12 +83,13 @@ class Page extends Component<PageProps> {
   shouldComponentUpdate(nextProps: PageProps, nextState: PageState) {
     const ret = this.props.pdf !== nextProps.pdf || this.state.status !== nextState.status;
     const zoomChanged = nextProps.position.zoom !== this.props.position.zoom;
+    const imageChanged = nextState.imgSrc !== this.state.imgSrc;
 
-    if (!this.inRendering && zoomChanged) {
-      this._renderPage(this.state.page);
+    if (zoomChanged) {
+      this.renderPage(this.state.page, nextProps.position.zoom);
     }
 
-    return ret || zoomChanged;
+    return ret || zoomChanged || imageChanged;
   }
 
   componentDidUpdate(nextProps: PageProps) {
@@ -113,6 +117,21 @@ class Page extends Component<PageProps> {
   };
 
   /**
+   * 
+   * @param page 
+   * @param zoom 
+   */
+  renderPage = (page: PdfJs.PDFPageProxy, zoom: number) => {
+    if (!this.inRendering) {
+      this._renderPage(page);
+    }
+    if (!this.inImageRendering) {
+      // this.renderPageToImage(page, zoom);
+    }
+
+  }
+
+  /**
    *
    */
   _loadPage = (pdf: PdfJs.PDFDocumentProxy) => {
@@ -122,15 +141,72 @@ class Page extends Component<PageProps> {
       (page) => {
         this.setState(page);
         this.setState({ status: 'rendering' });
-        this._renderPage(page);
+        this.renderPage(page, this.props.position.zoom);
       }
     );
   }
+
+
+
+  renderPageToImage = (page: PdfJs.PDFPageProxy, zoom: number): HTMLImageElement => {
+    let img = document.createElement("img");
+    var canvas = document.createElement("canvas");
+
+    this.inImageRendering = true;
+
+    console.log(this.props);
+    // let { scale } = this.props;
+
+    // let aa = 2;
+
+    let viewport: any = page.getViewport({ scale: 1 });
+    let { width, height } = viewport;
+
+    let size = { width, height };
+    const displaySize = pdfSizeToDIsplayPixel(size);
+    const new_scale = displaySize.width / viewport.width;
+
+    viewport = page.getViewport({ scale: new_scale });
+
+    let ctx = canvas.getContext('2d');
+
+    // scaleCanvas(canvas, ctx, width, height);
+    this.scaleCanvas(canvas, displaySize.width, displaySize.height, zoom);
+    console.log(viewport);
+
+    let renderTask = page.render({
+      canvasContext: ctx,
+      viewport,
+      // intent: "print",
+    });
+
+    let self = this;
+    renderTask.promise.then(() => {
+      self.setState({ status: 'rendered', page, width, height });
+
+      const canvasAny: any = canvas;
+      if ("toBlob" in canvasAny) {
+        canvasAny.toBlob(function (blob) {
+          self.setState({ imgSrc: URL.createObjectURL(blob) });
+        });
+      } else {
+        self.setState({ imgSrc: canvasAny.toDataURL() });
+      }
+
+      // self.setState({ status: 'rendered', page, width, height });
+
+      this.inImageRendering = false;
+    });
+
+    return img;
+  }
+
 
   /**
    *
    */
   _renderPage = (page: PdfJs.PDFPageProxy) => {
+    // return;
     this.inRendering = true;
 
     console.log(this.props);
@@ -147,7 +223,7 @@ class Page extends Component<PageProps> {
     const new_scale = displaySize.width / viewport.width;
 
     viewport = page.getViewport({ scale: new_scale });
-
+    // viewport.viewBox[2] = 100;
     let ctx = canvas.getContext('2d');
 
     // scaleCanvas(canvas, ctx, width, height);
@@ -173,6 +249,7 @@ class Page extends Component<PageProps> {
     console.log("PDF Page Renderered");
     return (
       <div className={`pdf-page ${status}`} >
+        {/* <img src={this.state.imgSrc} /> */}
         <canvas ref={this.setCanvasRef} />
       </div>
     );
