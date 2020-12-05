@@ -1,6 +1,6 @@
 /// <reference types="pdfjs-dist" />
 
-import React, { Component, CSSProperties } from 'react';
+import React, { Component } from 'react';
 import { pdfSizeToDIsplayPixel } from "../../utils/UtilsFunc";
 
 import "pdfjs-dist";
