@@ -1,6 +1,8 @@
 import React from 'react';
 import { gapi } from 'gapi-script';
 import { GoogleLogin } from 'react-google-login';
+import * as PdfJs from "pdfjs-dist";
+
 import { resolve } from 'path';
 
 var FOLDER_ID = "root";
@@ -45,7 +47,7 @@ export default class Upload extends React.Component {
                 })
                 var content = `
                   {"sobp" : {"s":3,"o":281,"b":123,"p":2},
-                   "pdf_info" : {"file_name" : "filename","create_date" : "date","fp" : "finger print"}
+                   "pdf_info" : {"file_name" : "filename","fp" : "finger print"}
                   }
                 `; //여기에다가 새로운 content 내용을 받을거야
                 getFileRequest.then(await function(response) {
@@ -97,7 +99,7 @@ export default class Upload extends React.Component {
     var fileContent = `
     {"mapping_info":[
       {"sobp" : {"s":3,"o":281,"b":123,"p":1},
-       "pdf_info" : {"file_name" : "filename","create_date" : "date","fp" : "finger print"}
+       "pdf_info" : {"file_name" : "filename","fp" : "finger print"}
       }
     ]}`; //sobp object와 pdf info를 object로 받아서 stringfy해준 뒤 fileContent에 삽입
     var file = new Blob([fileContent], {type: 'text/plain'});
@@ -217,6 +219,41 @@ export default class Upload extends React.Component {
     });
   }
 
+  readPDF = () => {
+    gapi.load('client', function () {
+      gapi.client.load('drive', 'v2', async function () {
+        const fileResponse = await gapi.client.drive.files.list();
+        var files = fileResponse.result.items;
+
+        if (files && files.length > 0) {
+          for (var i = 0; i < files.length; i++) {
+            var file = files[i];
+            var fileId = file.id;
+            var getFileRequest = gapi.client.drive.files.get({
+              fileId: fileId,
+              alt: 'media',
+            });
+
+            if (file.mimeType === 'application/pdf') {
+              console.log(getFileRequest);
+              console.log(file.mimeType);
+
+              getFileRequest.then(await function(response) {
+                var docInitParams = { data: response.body };
+                PdfJs.getDocument(docInitParams).promise.then(function(pdf) {
+                  console.log('finger : ');
+                  console.log(pdf.fingerprint);
+                });
+              }, function(error) {
+                console.error(error)
+              })
+            }
+          }
+        }
+      });
+    });
+  }
+
   render() {
       return (
         <div>
@@ -225,6 +262,9 @@ export default class Upload extends React.Component {
         </button>
         <button id="read_mapping_info" onClick={this.readMappingInfo}>
           Read Mapping Info
+        </button>
+        <button id="read_mapping_info" onClick={this.readPDF}>
+          Read PDF
         </button>
           <GoogleLogin 
             clientId="169738066451-5u100n2i6rko17jhmtpvq0bnjuedj7g4.apps.googleusercontent.com"

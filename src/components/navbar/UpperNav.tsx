@@ -1,6 +1,5 @@
 import React from 'react';
 import '../../styles/main.css';
-import Login from './Login';
 import Upload from './Upload';
 // import Get from './Get';
 
@@ -14,7 +13,6 @@ class upperNav extends React.Component {
                     </small>
                 </a>
                 <Upload />
-                {/* <Get /> */}
             </nav>
         )
     }
