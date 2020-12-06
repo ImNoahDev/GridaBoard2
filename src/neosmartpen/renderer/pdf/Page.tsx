@@ -25,6 +25,7 @@ interface PageState {
   width: number,
   height: number,
   imgSrc: string,
+  renderCount: number;
 }
 
 class Page extends Component<PageProps> {
@@ -34,6 +35,7 @@ class Page extends Component<PageProps> {
     width: 0,
     height: 0,
     imgSrc: URL.createObjectURL(new Blob()),
+    renderCount: 0,
   };
 
   canvas: HTMLCanvasElement | null = null;
@@ -81,19 +83,27 @@ class Page extends Component<PageProps> {
 
 
   shouldComponentUpdate(nextProps: PageProps, nextState: PageState) {
-    const ret = this.props.pdf !== nextProps.pdf || this.state.status !== nextState.status;
+    const ret = this.state.status !== nextState.status || this.state.renderCount !== nextState.renderCount || this.state.page !== nextState.page;
     const zoomChanged = nextProps.position.zoom !== this.props.position.zoom;
     const imageChanged = nextState.imgSrc !== this.state.imgSrc;
 
     if (zoomChanged) {
       this.renderPage(this.state.page, nextProps.position.zoom);
+      return false;
     }
 
-    return ret || zoomChanged || imageChanged;
+    const pdfChanged = this.props.pdf !== nextProps.pdf;
+    if (pdfChanged) {
+      this._update(nextProps.pdf);
+      return false;
+    }
+
+    return true;
+    // return ret || zoomChanged || imageChanged;
   }
 
   componentDidUpdate(nextProps: PageProps) {
-    this._update(nextProps.pdf);
+    // this._update(nextProps.pdf);
   }
 
   componentDidMount() {
@@ -117,9 +127,9 @@ class Page extends Component<PageProps> {
   };
 
   /**
-   * 
-   * @param page 
-   * @param zoom 
+   *
+   * @param page
+   * @param zoom
    */
   renderPage = (page: PdfJs.PDFPageProxy, zoom: number) => {
     if (!this.inRendering) {
@@ -135,12 +145,11 @@ class Page extends Component<PageProps> {
    *
    */
   _loadPage = (pdf: PdfJs.PDFDocumentProxy) => {
-    if (this.state.status === 'rendering' || this.state.page !== null) return;
+    if (this.state.status === 'rendering') return;
 
     pdf.getPage(this.props.index).then(
       (page) => {
-        this.setState(page);
-        this.setState({ status: 'rendering' });
+        this.setState({ page, status: 'rendering' });
         this.renderPage(page, this.props.position.zoom);
       }
     );
@@ -172,7 +181,12 @@ class Page extends Component<PageProps> {
 
     // scaleCanvas(canvas, ctx, width, height);
     this.scaleCanvas(canvas, displaySize.width, displaySize.height, zoom);
+
+    ctx.save();
+    ctx.fillStyle = "rgba(255, 255, 255, 255)";     // 투명 캔버스
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
     console.log(viewport);
+    ctx.restore();
 
     let renderTask = page.render({
       canvasContext: ctx,
@@ -238,7 +252,8 @@ class Page extends Component<PageProps> {
 
     let self = this;
     renderTask.promise.then(() => {
-      self.setState({ status: 'rendered', page, width, height });
+      let renderCount = this.state.renderCount + 1;
+      self.setState({ status: 'rendered', page, width, height, renderCount });
       this.inRendering = false;
     });
   }
@@ -246,7 +261,6 @@ class Page extends Component<PageProps> {
   render = () => {
     let { status } = this.state;
 
-    console.log("PDF Page Renderered");
     return (
       <div className={`pdf-page ${status}`} >
         {/* <img src={this.state.imgSrc} /> */}

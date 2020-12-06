@@ -5,7 +5,7 @@ import { IPageSOBP } from "../DataStructure/Structures";
 import { NeoSmartpen } from "../pencomm/neosmartpen";
 import * as PdfJs from "pdfjs-dist";
 
-export interface IMixedPageViewProps {
+interface Props {
   pageInfo?: IPageSOBP;
   pdfUrl: string;
   pageNo: number;
@@ -15,7 +15,7 @@ export interface IMixedPageViewProps {
   playState: PLAYSTATE;
 }
 
-export interface IMixedPageViewState {
+interface State {
   pageInfo: IPageSOBP;
   pdfUrl: string;
 
@@ -35,13 +35,13 @@ const tempStyle: CSSProperties = {
   overflow: "hidden",
 }
 
-export default class MixedPageView extends React.Component<IMixedPageViewProps, IMixedPageViewState> {
+export default class MixedPageView extends React.Component<Props, State> {
   waitingForFirstStroke: boolean = true;
   pdf: PdfJs.PDFDocumentProxy;
 
 
 
-  constructor(props: IMixedPageViewProps) {
+  constructor(props: Props) {
     super(props);
 
     let { pageInfo, pdfUrl, pageNo } = props;
@@ -59,9 +59,9 @@ export default class MixedPageView extends React.Component<IMixedPageViewProps, 
   }
 
   onNcodePageChanged = (pageInfo: IPageSOBP) => {
-    /** 
-     * 임시코드, 2020/11/20, 나중에는 ncode와 매핑되어 있는 정보를 가지고 pageNo를 설정해야 한다 
-     * 또는, PDF 파일을 바꿀 수 있도록 해야 한다. 
+    /**
+     * 임시코드, 2020/11/20, 나중에는 ncode와 매핑되어 있는 정보를 가지고 pageNo를 설정해야 한다
+     * 또는, PDF 파일을 바꿀 수 있도록 해야 한다.
     */
 
     if (this.pdf) {
@@ -92,7 +92,11 @@ export default class MixedPageView extends React.Component<IMixedPageViewProps, 
     this.setState({ renderCount: r + 1 });
   }
 
-  shouldComponentUpdate(nextProps: IMixedPageViewProps, nextState: IMixedPageViewState) {
+  shouldComponentUpdate(nextProps: Props, nextState: State) {
+    if (nextProps.pdfUrl !== this.props.pdfUrl) {
+      this.setState({ pdfUrl: nextProps.pdfUrl });
+      return false;
+    }
     // console.log("update requested");
     return true;
   }

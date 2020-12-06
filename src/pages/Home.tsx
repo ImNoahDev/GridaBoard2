@@ -31,6 +31,7 @@ const Home = () => {
   // const classes = useStyles();
   const [num_pens, setNumPens] = useState(0);
   const [pens, setPens] = useState(new Array(0));
+  const [pdfUrl, setUrl] = useState(PDF_URL);
 
 
   /**
@@ -80,10 +81,10 @@ const Home = () => {
     }
   };
 
+  // 이 함수에서 pdf를 연다
   const onFileOpen = (event) => {
-
     console.log(event.url)
-
+    setUrl(event.url);
   };
 
   return (
@@ -133,7 +134,7 @@ const Home = () => {
         </div>
       </div>
 
-      <MixedPageView pdfUrl={PDF_URL} pageNo={1} scale={1} playState={PLAYSTATE.live} pens={pens} />
+      <MixedPageView pdfUrl={pdfUrl} pageNo={1} scale={1} playState={PLAYSTATE.live} pens={pens} />
     </div >
   );
 };

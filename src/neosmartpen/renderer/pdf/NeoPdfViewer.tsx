@@ -13,52 +13,70 @@ var CMAP_URL = "pdfjs-dist/cmaps/";
 var CMAP_PACKED = true;
 
 
-interface INeoPdfViewerProps {
+interface Props {
   url: string,
   pageNo: number,
   onReportPdfInfo: Function,
   position: { offsetX: number, offsetY: number, zoom: number },
 }
 
-interface INeoPdfViewerState {
+interface State {
   pdf: PdfJs.PDFDocumentProxy,
   scale: number,
   documentZoom: number,
+  status: string,
 }
 
-export default class NeoPdfViewer extends React.Component<INeoPdfViewerProps, INeoPdfViewerState> {
+export default class NeoPdfViewer extends React.Component<Props, State> {
   static displayName = "Viewer";
   documentContainer = React.createRef();
   document = React.createRef();
   scroller = React.createRef();
 
-  constructor(Props: INeoPdfViewerProps) {
+  constructor(Props: Props) {
     super(Props);
     this.state = {
       pdf: null,
       scale: 1.0,
       documentZoom: 1.0,
+      status: "N/A",
     };
   }
 
   componentDidMount() {
+    this.loadDocument(this.props.url);
+  }
+
+  loadDocument = (url: string) => {
     // const { documentZoom } = this.state;
 
     let loadingTask = PdfJs.getDocument({
-      url: this.props.url,
+      url,
       cMapUrl: CMAP_URL,
       cMapPacked: CMAP_PACKED,
     }
     );
 
     let self = this;
+    this.setState({ status: "loading" });
 
     loadingTask.promise.then(
       (pdf: PdfJs.PDFDocumentProxy) => {
         self.props.onReportPdfInfo(pdf);
-        console.log(pdf);
+        // console.log(pdf);
         this.setState({ pdf });
+        this.setState({ status: "loaded" });
+
+        console.log("pdf loaded");
       });
+  }
+
+  shouldComponentUpdate(nextProps: Props, nextState: State) {
+    if (nextProps.url !== this.props.url) {
+      this.loadDocument(nextProps.url);
+      return false;
+    }
+    return true;
   }
 
   componentWillUnmount() {
