@@ -1,3 +1,5 @@
+import React from "react";
+
 export const PortraitOrientation = () => (
   <style type="text/css">
     {"@media print{@page {size: portrait; margin:0}}"}

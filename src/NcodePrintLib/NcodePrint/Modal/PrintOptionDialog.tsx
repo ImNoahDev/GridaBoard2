@@ -237,11 +237,11 @@ export default function PrintOptionDialog () {
                   id: 'mediaSize'
                 }}
               >
-                <MenuItem value={MediaSize.A4}>A4</MenuItem>
-                <MenuItem value={MediaSize.A3}>A3</MenuItem>
-                <MenuItem value={MediaSize.B4}>B4</MenuItem>
-                <MenuItem value={MediaSize.B5}>B5</MenuItem>
-                <MenuItem value={MediaSize.Letter}>Letter</MenuItem>
+                <MenuItem value={"A4"}>A4</MenuItem>
+                <MenuItem value={"A3"}>A3</MenuItem>
+                <MenuItem value={"B4"}>B4</MenuItem>
+                <MenuItem value={"B5"}>B5</MenuItem>
+                <MenuItem value={"Letter"}>Letter</MenuItem>
               </Select>
             </FormControl>
           </form>
@@ -367,9 +367,9 @@ export default function PrintOptionDialog () {
                   id: 'pageInfo'
                 }}
               >
-                <MenuItem value={PageInfo.first_page}>3, 27, 1068, 1</MenuItem>
-                <MenuItem value={PageInfo.second_page}>3, 27, 1069, 1</MenuItem>
-                <MenuItem value={PageInfo.third_page}>3, 27, 1070, 1</MenuItem>
+                <MenuItem value={1}>3, 27, 1068, 1</MenuItem>
+                <MenuItem value={2}>3, 27, 1069, 1</MenuItem>
+                <MenuItem value={3}>3, 27, 1070, 1</MenuItem>
               </Select>
             </FormControl>
           </form>

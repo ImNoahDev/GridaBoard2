@@ -5,7 +5,7 @@ import * as Gaussian from "./GaussianElimination";
 import expect from "expect.js";
 /**
  * private
- * @param points 
+ * @param points
  */
 function initEchelonMtx_Homography(points: TransformPointPairs): EchelonMatrix {
   expect(points.src.type).to.be("homography");
@@ -57,7 +57,7 @@ function initEchelonMtx_Homography(points: TransformPointPairs): EchelonMatrix {
 
 /**
  * private
- * @param points 
+ * @param points
  */
 function initEchelonMtx_Affine(points: TransformPointPairs): EchelonMatrix {
   expect(points.src.type).to.be("affine");
@@ -104,7 +104,7 @@ function initEchelonMtx_Affine(points: TransformPointPairs): EchelonMatrix {
 
 /**
  * public
- * @param points 
+ * @param points
  */
 export function solveHomography(points: TransformPointPairs): TransformParameters {
   expect(points.src.type).to.be("homography");
@@ -138,7 +138,7 @@ export function solveHomography(points: TransformPointPairs): TransformParameter
 
 /**
  * public
- * @param points 
+ * @param points
  */
 export function solveAffine(points: TransformPointPairs): TransformParameters {
   expect(points.src.type).to.be("affine");
@@ -169,8 +169,8 @@ export function solveAffine(points: TransformPointPairs): TransformParameters {
 
 /**
  * public
- * @param mtx 
- * @param pt 
+ * @param mtx
+ * @param pt
  * @return Ipoint
  */
 export function applyTransform(pt: IPoint, params: TransformParameters): IPoint {

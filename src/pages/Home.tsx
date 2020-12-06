@@ -6,6 +6,7 @@ import {
   //PenEvent,
   NeoSmartpen, NoteserverClient, PenEventName
 } from "../neosmartpen";
+import { FileBrowserButton } from "../NcodePrintLib";
 
 const PDF_URL = "./2020학년도 서울대학교 수시모집 일반전형 면접 및 구술고사 문항.pdf";
 
@@ -79,6 +80,12 @@ const Home = () => {
     }
   };
 
+  const onFileOpen = (event) => {
+
+    console.log(event.url)
+
+  };
+
   return (
     <div id={"home_div"} style={{
       position: "absolute",
@@ -98,6 +105,13 @@ const Home = () => {
         zIndex: 100,
       }}>
         {/* Connect a pen */}
+        <div style={{ fontSize: "20px", fontWeight: "bold" }}>
+          <FileBrowserButton variant="contained" color="primary" callback={onFileOpen}>
+            <Box fontSize={14} fontWeight="fontWeightBold" >PDF열기</Box>
+          </FileBrowserButton>
+        </div>
+
+
         <div style={{ fontSize: "20px", fontWeight: "bold" }}>
           <Button variant="outlined" color="primary" onClick={(event) => handleConnectPen(event)} >
             <Box fontSize={14} fontWeight="fontWeightBold" >Connect</Box>
