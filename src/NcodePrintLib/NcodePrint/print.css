@@ -1,0 +1,44 @@
+.relativeCSS {
+  /* border: solid 1px #ff0000; */
+  display: "none";
+}
+
+.testclass {
+  background: rgba(76, 175, 80, 0.3);
+}
+
+.indicator {
+  font-size: 2rem;
+  color: #ff0000;
+  font-weight: 700;
+}
+
+@media print {
+  .relativeCSS {
+    /* border: solid 1px #ff0000; */
+    display: "block";
+    
+  }
+
+  @page {
+    /* size: auto; */
+    /* size: portrait; */
+    /* size: landscape; */
+
+    /* size: 6in; */
+    /* size: 4in 6in; */
+
+    /* size: 21cm 29.7cm; */
+    /* size: 210mm 297mm; */
+
+    /* size: A4; */
+    /* size: B5; */
+    /* size: letter; */
+
+    /* size: A4 portrait; */
+    /* size: A4 landscape; */
+    size: A4 landscape;
+
+    margin: 0;
+  }
+}
