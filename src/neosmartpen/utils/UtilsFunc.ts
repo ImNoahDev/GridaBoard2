@@ -90,6 +90,15 @@ export function pdfSizeToDIsplayPixel(sz: { width: number, height: number }): { 
 }
 
 
+export function pdfSizeToDIsplayPixel_int(sz: { width: number, height: number }): { width: number, height: number } {
+  return {
+    width: Math.floor(pdfSizeUnitToDIsplayPixel(sz.width)),
+    height: Math.floor(pdfSizeUnitToDIsplayPixel(sz.height))
+  };
+}
+
+
+
 export function isSamePage(page1: IPageSOBP, page2: IPageSOBP): boolean {
   if (page1.page !== page2.page || page1.book !== page2.book || page1.owner !== page2.owner || page1.section !== page2.section) {
     return false;

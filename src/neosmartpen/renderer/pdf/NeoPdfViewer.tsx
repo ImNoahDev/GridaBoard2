@@ -87,8 +87,8 @@ export default class NeoPdfViewer extends React.Component<Props, State> {
 
   render() {
     const { pdf } = this.state;
-    console.log("Pdf Viewer Renderer");
-    console.log(this.props.position);
+    // console.log("Pdf Viewer Renderer");
+    // console.log(this.props.position);
 
     const pdfCanvas: CSSProperties = {
       zoom: this.props.position.zoom,

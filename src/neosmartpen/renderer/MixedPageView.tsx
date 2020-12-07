@@ -81,7 +81,7 @@ export default class MixedPageView extends React.Component<Props, State> {
   }
 
   onCanvasShapeChanged = (arg: { offsetX: number, offsetY: number, zoom: number }) => {
-    console.log(arg);
+    // console.log(arg);
     this.setState({ canvasPosition: arg });
 
     const r = this.state.renderCount;

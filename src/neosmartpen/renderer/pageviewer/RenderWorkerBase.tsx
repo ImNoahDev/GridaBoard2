@@ -29,7 +29,7 @@ export enum PLAYSTATE {
   unsetAutoStop,
 }
 
-export type IRenderWorkerOption = {
+export interface IRenderWorkerOption {
   canvasId: string,
 
   canvasRef: React.RefObject<HTMLCanvasElement>,
