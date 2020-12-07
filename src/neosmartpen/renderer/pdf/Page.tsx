@@ -238,19 +238,23 @@ class Page extends Component<PageProps> {
       }
     }
 
-    const dest = this.backPlaneCanvas;
-    dest.width = canvas.width;
-    dest.height = canvas.height;
+    if (canvas.width > 0 && canvas.height > 0) {
+      const dest = this.backPlaneCanvas;
+      dest.width = canvas.width;
+      dest.height = canvas.height;
 
-    const destCtx = dest.getContext("2d");
-    destCtx.drawImage(canvas, 0, 0);
-    this.renderTask = null;
+      const destCtx = dest.getContext("2d");
+      destCtx.drawImage(canvas, 0, 0);
+      this.renderTask = null;
 
-    return {
-      result: true,
-      px_width,
-      px_height,
+      return {
+        result: true,
+        px_width,
+        px_height,
+      }
     }
+
+    return {...this.area};
   }
 
 
