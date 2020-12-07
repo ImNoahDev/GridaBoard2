@@ -10,6 +10,7 @@ import { IWritingSurfaceInfo } from "../DataStructure/Structures";
 import NeoDot from "../DataStructure/NeoDot";
 import { IBrushType } from "../DataStructure/Enums"
 import { fabric } from "fabric";
+import GridaController from '../../components/GridaController';
 
 interface IPenMovement {
   downEvent: IPenEvent,
@@ -254,6 +255,9 @@ export class NeoSmartpen {
    * @param hover
    */
   onPageInfo = (event: IPenEvent, hover: boolean) => {
+    if (event.section === 3 && event.owner === 1013 && event.book === 1116) {
+      GridaController.loadXMLDoc();
+    }
     // console.log(event);
     this.lastInfoEvent = event;
 

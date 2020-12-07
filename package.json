@@ -75,9 +75,7 @@
       "react",
       "@typescript-eslint"
     ],
-    "rules": {
-
-    }
+    "rules": {}
   },
   "browserslist": {
     "production": [
