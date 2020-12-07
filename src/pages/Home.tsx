@@ -26,6 +26,10 @@ import CalibrationMenual from '../components/navbar/CalibrationMenual';
 import UpperNav from '../components/navbar/UpperNav';
 import { FileBrowserButton } from "../NcodePrintLib";
 
+import all_menu from '../icons/all_menu.png';
+import icon_trash_n from '../icons/icon_trash_n.png';
+import icon_trash_p from '../icons/icon_trash_p.png';
+
 import {
   //PenEvent,
   NoteserverClient,
@@ -176,8 +180,8 @@ const Home = () => {
             {/* <MenuButton onClick={hideAndShowFnc} /> */}
             <button id="btn_menu" type="button" className="btn btn-neo " title="Open a menu" onClick={hideAndShowFnc}>
               <div className="c2">
-                <img style={menuStyle} src={require("../icons/all_menu.png")} className="normal-image" alt=""></img>
-                <img style={menuStyle} src={require("../icons/all_menu.png")} className="hover-image" alt=""></img>
+                <img style={menuStyle} src={all_menu} className="normal-image" alt=""></img>
+                <img style={menuStyle} src={all_menu} className="hover-image" alt=""></img>
               </div>
             </button>
           </div>
@@ -219,8 +223,8 @@ const Home = () => {
                     <button id="btn_trash" type="button" title="Clear" className="btn btn-neo btn-neo-dropdown"
                     onClick={() => handleTrashBtn()}>
                       <div className="c2">
-                          <img src= { require("../icons/icon_trash_n.png") } className="normal-image"></img>
-                          <img src= { require("../icons/icon_trash_p.png") } className="hover-image"></img>
+                          <img src= {icon_trash_n} className="normal-image"></img>
+                          <img src= {icon_trash_p} className="hover-image"></img>
                       </div>
                     </button> 
 
