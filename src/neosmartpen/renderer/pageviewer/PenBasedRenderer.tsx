@@ -9,8 +9,8 @@ import PenBasedRenderWorker from "./PenBasedRenderWorker";
 import { NeoSmartpen, PenManager } from "../../index";
 import * as UTIL from "../../utils/UtilsFunc";
 
-import { Size } from "../../types";
-import { IPageSOBP } from "../../DataStructure/Structures";
+
+import { IPageSOBP, ISize } from "../../DataStructure/Structures";
 // import { Util } from "pdfjs-dist";
 
 export { PLAYSTATE };
@@ -96,7 +96,7 @@ export default class PenBasedRenderer extends React.Component<IPenBasedRendererP
   };
 
   propsSize: { scale: number, width: number, height: number } = { scale: 1, width: 0, height: 0 };
-  size: Size = { width: 0, height: 0 };
+  size: ISize = { width: 0, height: 0 };
 
   canvasId: string = "";
   canvasRef: React.RefObject<HTMLCanvasElement> = null;

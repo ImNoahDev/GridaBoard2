@@ -17,11 +17,10 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
-    "jsx": "react-jsx",
+    "jsx": "react",
     "watch": true,
     "sourceMap": true,
     "typeRoots": [
-      "./src/types",
       "./src/neosmartpen/types"
     ],
     "declaration": true,
