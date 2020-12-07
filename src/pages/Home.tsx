@@ -144,13 +144,6 @@ const Home = () => {
           width: "100%", height: "40px",
           zIndex: 100,
         }}>
-          {/* Connect a pen */}
-          <div style={{ fontSize: "20px", fontWeight: "bold" }}>
-            <FileBrowserButton variant="contained" color="primary" onFileOpen={onFileOpen}>
-              <Box fontSize={14} fontWeight="fontWeightBold" >PDF열기</Box>
-            </FileBrowserButton>
-          </div>
-
           <div style={{ fontSize: "20px", fontWeight: "bold" }}>
             <Button variant="outlined" color="primary" onClick={(event) => getNoteInfo(event)} >
               <Box fontSize={14} fontWeight="fontWeightBold" >Get Notebook Infos</Box>
@@ -188,7 +181,7 @@ const Home = () => {
           </div>
           <div id="navbar_center">
             <div className="navbar-menu d-flex justify-content-center align-items-center neo_shadow">
-              <PageNumbering /><PrintButton /><FileLoad />
+              <PageNumbering /><PrintButton /><FileBrowserButton onFileOpen={onFileOpen}/>
             </div>
           </div>
           <div id="navbar_end">
