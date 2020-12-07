@@ -20,24 +20,41 @@ export default class PenManager {
   /** @type {Array.<StorageRenderer>} */
   render = [];
   
-  colors: string[] = [
-    "rgb(101, 44, 179, 255)", // 0 보라
-    "rgb(255,255,255, 255)", // 하양
-    "rgb(0,0,0, 255)", // 검정
-    "rgb(180, 180, 180, 255)", // 회색
+  pen_colors: string[] = [
+    "rgb(169, 169, 169)", // 0 DARK_GARY #FFAAAAAA #A9A9A9
+    "rgb(255, 0, 0)", // 1 RED #FFFF0200 #FF0000  rgb(255, 0, 0, 0)
+    "rgb(255, 255, 2)", // 2 YELLOW #FFFFD001 #FFFF02
+    "rgb(0, 0, 128)", // 3 NAVY #FF012EE2 #000080
 
-    "rgb(254, 244, 69, 255)", // 노랑
+    "rgb(0, 0, 0)", // 4 BLACK #FF000000 #000000
 
-    "rgb(250, 199, 16, 255)", //주황
-    "rgb(227, 95, 72, 255)", //주홍
-    "rgb(16, 205, 212, 255)", //파랑빛
+    "rgb(211, 211, 211)", // 5 LIGHT_GRAY #FFE5E5E5 #D3D3D3
+    "rgb(255, 165, 0)", // 6 ORANGE #FFFF6500 #FFA500
+    "rgb(0, 128, 0)", // 7 GREEN #FF3CDD00 #008000
 
-    "rgb(11, 167, 137, 255)", //초록
-    "rgb(218, 34, 99, 255)", // 9 자주
-    "rgb(101, 44, 179, 255)" // 10 보라
+    "rgb(0, 0, 255)", // 8 BLUE #FF00ABEB #0000FF
+    "rgb(128, 0, 128)", // 9 PURPLE #FF6C00E2 #800080
+    "rgb(169, 169, 169)" // 10 DARK_GARY #FFAAAAAA #A9A9A9
   ];
 
-  color: string = this.colors[DEFAULT_PEN_COLOR_NUM];
+  marker_colors: string[] = [
+    "rgb(217, 217, 224)", // 0 
+    "rgb(232, 155, 162)", // 1 
+    "rgb(244, 244, 175)", // 2 
+    "rgb(166, 166, 212)", // 3 
+
+    "rgb(167, 167, 174)", // 4
+
+    "rgb(231, 231, 238)", // 5
+    "rgb(241, 214, 171)", // 6
+    "rgb(166, 205, 173)", // 7
+
+    "rgb(167, 167, 251)", // 8
+    "rgb(205, 166, 212)", // 9
+    "rgb(217, 217, 224)" // 10
+  ];
+
+  color: string = this.pen_colors[DEFAULT_PEN_COLOR_NUM];
   thickness: number = DEFAULT_PEN_THICKNESS;
   penRendererType: IBrushType = DEFAULT_PEN_RENDERER_TYPE;
 
@@ -117,7 +134,7 @@ export default class PenManager {
 
   setColor(color_num: number) {
     this.toggleColorRadioButton(color_num);
-    this.color = this.colors[color_num];
+    this.color = this.pen_colors[color_num];
 
     if (_active_pen) {
         _active_pen.setColor(this.color);
@@ -144,6 +161,17 @@ export default class PenManager {
   setPenRendererType(type: IBrushType) {
     var $elem = $("#btn_brush").find(".c2");
     this.setPenTypeStatus($elem, type);
+
+    if (type === IBrushType.MARKER) {
+      for(var i = 0; i < 11; i++) {
+        $('#clr_' + [i]).find(".color_" + [i]).css('background-color', this.marker_colors[i]);
+      }
+    }
+    else if (type === IBrushType.PEN) {
+      for(var i = 0; i < 11; i++) {
+        $('#clr_' + [i]).find(".color_" + [i]).css('background-color', this.pen_colors[i]);
+      }
+    }
   
     this.penRendererType = type;
   

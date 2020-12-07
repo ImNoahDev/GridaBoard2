@@ -219,37 +219,37 @@ hr {
 }
 
 .color_btn .color_1 {
-    background-color: white;
+    background-color: rgb(255, 0, 0);
 }
 
 .color_btn .color_2 {
-    background-color: rgb(0, 0, 0);
+    background-color: rgb(255, 255, 2);
 }
 .color_btn .color_3 {
-    background-color: rgb(180, 180, 180);
+    background-color: rgb(0, 0, 128);
 }
 
 .color_btn .color_4 {
-    background-color: rgb(254, 244, 69);
+    background-color: rgb(0, 0, 0);
 }
 .color_btn .color_5 {
-    background-color: rgb(250, 199, 16);
+    background-color: rgb(211, 211, 211);
 }
 .color_btn .color_6 {
-    background-color: rgb(227, 95, 72);
+    background-color: rgb(255, 165, 0);
 }
 .color_btn .color_7 {
-    background-color: rgb(16, 205, 212);
+    background-color: rgb(0, 128, 0);
 }
 .color_btn .color_8 {
-    background-color: rgb(11, 167, 137);
+    background-color: rgb(0, 0, 255);
 }
 .color_btn .color_9 {
-    background-color: rgb(218, 34, 99);
+    background-color: rgb(128, 0, 128);
 }
 
 .color_btn .color_0 {
-    background-color: rgb(101, 44, 179);
+    background-color: rgb(169, 169, 169);
 }
 
 .btn-toolbar-colorbar {
