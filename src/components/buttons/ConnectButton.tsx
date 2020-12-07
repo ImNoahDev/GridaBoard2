@@ -1,10 +1,15 @@
 import React, { Component, useState } from "react";
+
 import '../../styles/buttons.css';
 import Tooltip, { TooltipProps } from '@material-ui/core/Tooltip';
 import { Theme, Typography, withStyles } from '@material-ui/core';
 import PenManager from '../../neosmartpen/pencomm/PenManager'
 import {PenEventName,} from '../../neosmartpen';
 
+import icon_smartpen_connected_p from '../../icons/icon_smartpen_connected_p.png';
+import icon_smartpen_disconnected_n from '../../icons/icon_smartpen_disconnected_n.png'; 
+import icon_smartpen_connected_n from '../../icons/icon_smartpen_connected_n.png'; 
+import icon_smartpen_disconnected_p from '../../icons/icon_smartpen_disconnected_p.png'; 
 const ConnectTooltip = withStyles((theme: Theme) => ({
   tooltip: {
       backgroundColor: '#f5f5f9',
@@ -50,10 +55,10 @@ const ConnectButton = (props) => {
           </React.Fragment>
               } onClick={() => handleConnectPen()}>
           <div className="c2 ">
-            <img src={require("../../icons/icon_smartpen_connected_p.png")} className="toggle-off hover-image"></img>
-            <img src={require("../../icons/icon_smartpen_disconnected_n.png")} className="toggle-off normal-image"></img>
-            <img src={require("../../icons/icon_smartpen_connected_n.png")} className="toggle-on normal-image"></img>
-            <img src={require("../../icons/icon_smartpen_disconnected_p.png")} className="toggle-on hover-image"></img>
+            <img src={icon_smartpen_connected_p} className="toggle-off hover-image"></img>
+            <img src={icon_smartpen_disconnected_n} className="toggle-off normal-image"></img>
+            <img src={icon_smartpen_connected_n} className="toggle-on normal-image"></img>
+            <img src={icon_smartpen_disconnected_p} className="toggle-on hover-image"></img>
 
             <span id="pen_id" className="pen-badge badge badge-pill badge-light">0/0</span>
           </div>

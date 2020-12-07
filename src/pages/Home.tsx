@@ -24,14 +24,11 @@ import PrintButton from '../components/navbar/PrintButton';
 import FileLoad from '../components/navbar/FileLoad';
 import CalibrationMenual from '../components/navbar/CalibrationMenual';
 import UpperNav from '../components/navbar/UpperNav';
-
-import React, { useState } from "react";
-import { PLAYSTATE, MixedPageView } from "../neosmartpen";
-import { Button, Box } from "@material-ui/core";
+import { FileBrowserButton } from "../NcodePrintLib";
 
 import {
   //PenEvent,
-  NeoSmartpen, NoteserverClient, PenEventName
+  NoteserverClient,
 } from "../neosmartpen";
 
 const PDF_URL = "./2020학년도 서울대학교 수시모집 일반전형 면접 및 구술고사 문항.pdf";
@@ -62,7 +59,7 @@ function hideAndShowFnc () {
   }
   
 }
-import { FileBrowserButton } from "../NcodePrintLib";
+
 
 
 const getNoteInfo = (event) => {
@@ -73,9 +70,7 @@ const getNoteInfo = (event) => {
 
 
 let _pens = new Array(0);
-let tempPens = new Array(0);
 let _num_pens = 0;
-let manager = PenManager.getInstance();
 
 
 const Home = () => {
@@ -155,12 +150,6 @@ const Home = () => {
           </FileBrowserButton>
         </div>
 
-
-        <div style={{ fontSize: "20px", fontWeight: "bold" }}>
-          <Button variant="outlined" color="primary" onClick={(event) => handleConnectPen(event)} >
-            <Box fontSize={14} fontWeight="fontWeightBold" >Connect</Box>
-          </Button>
-        </div>
         <div style={{ fontSize: "20px", fontWeight: "bold" }}>
           <Button variant="outlined" color="primary" onClick={(event) => getNoteInfo(event)} >
             <Box fontSize={14} fontWeight="fontWeightBold" >Get Notebook Infos</Box>
@@ -187,8 +176,8 @@ const Home = () => {
             {/* <MenuButton onClick={hideAndShowFnc} /> */}
             <button id="btn_menu" type="button" className="btn btn-neo " title="Open a menu" onClick={hideAndShowFnc}>
               <div className="c2">
-                <img style={menuStyle} src={require('../icons/all_menu.png')} className="normal-image"></img>
-                <img style={menuStyle} src={require('../icons/all_menu.png')} className="hover-image"></img>
+                <img style={menuStyle} src={require("../icons/all_menu.png")} className="normal-image" alt=""></img>
+                <img style={menuStyle} src={require("../icons/all_menu.png")} className="hover-image" alt=""></img>
               </div>
             </button>
           </div>
@@ -249,7 +238,7 @@ const Home = () => {
         </div>
       </div>
       
-      <MixedPageView pdfUrl={pdfUrl} pageNo={1} scale={1} playState={PLAYSTATE.live} pens={pens} />
+      <MixedPageView pdfUrl={pdfUrl} pageNo={1} scale={1} playState={PLAYSTATE.live} pens={pens} ref={pageRef}/>
     </div >
   </div>
   );

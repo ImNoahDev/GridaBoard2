@@ -20,15 +20,6 @@ interface Props {
   position: { offsetX: number, offsetY: number, zoom: number },
 }
 
-<<<<<<< HEAD
-interface INeoPdfViewerState {
-  pdf: PdfJs.PDFDocumentProxy,
-  scale: number,
-  documentZoom: number,
-}
-
-export default class NeoPdfViewer extends React.Component<INeoPdfViewerProps, INeoPdfViewerState> {
-=======
 interface State {
   pdf: PdfJs.PDFDocumentProxy,
   scale: number,
@@ -37,36 +28,22 @@ interface State {
 }
 
 export default class NeoPdfViewer extends React.Component<Props, State> {
->>>>>>> other/main
   static displayName = "Viewer";
   documentContainer = React.createRef();
   document = React.createRef();
   scroller = React.createRef();
 
-<<<<<<< HEAD
-  constructor(Props: INeoPdfViewerProps) {
-=======
   constructor(Props: Props) {
->>>>>>> other/main
     super(Props);
     this.state = {
       pdf: null,
       scale: 1.0,
       documentZoom: 1.0,
-<<<<<<< HEAD
-=======
       status: "N/A",
->>>>>>> other/main
     };
   }
 
   componentDidMount() {
-<<<<<<< HEAD
-    // const { documentZoom } = this.state;
-
-    let loadingTask = PdfJs.getDocument({
-      url: this.props.url,
-=======
     this.loadDocument(this.props.url);
   }
 
@@ -75,28 +52,17 @@ export default class NeoPdfViewer extends React.Component<Props, State> {
 
     let loadingTask = PdfJs.getDocument({
       url,
->>>>>>> other/main
       cMapUrl: CMAP_URL,
       cMapPacked: CMAP_PACKED,
     }
     );
 
     let self = this;
-<<<<<<< HEAD
-=======
     this.setState({ status: "loading" });
->>>>>>> other/main
 
     loadingTask.promise.then(
       (pdf: PdfJs.PDFDocumentProxy) => {
         self.props.onReportPdfInfo(pdf);
-<<<<<<< HEAD
-        console.log(pdf);
-        this.setState({ pdf });
-      });
-  }
-
-=======
         // console.log(pdf);
         this.setState({ pdf });
         this.setState({ status: "loaded" });
@@ -113,7 +79,6 @@ export default class NeoPdfViewer extends React.Component<Props, State> {
     return true;
   }
 
->>>>>>> other/main
   componentWillUnmount() {
     if (this.state.pdf) {
       const pdf = this.state.pdf;

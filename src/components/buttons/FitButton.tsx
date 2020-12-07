@@ -3,6 +3,17 @@ import '../../styles/buttons.css';
 import Tooltip, { TooltipProps } from '@material-ui/core/Tooltip';
 import { Theme, Typography, withStyles } from '@material-ui/core';
 
+import icon_ratio_n from "../../icons/icon_ratio_n.png";
+import icon_ratio_p from "../../icons/icon_ratio_p.png";
+import icon_fit_width_n from "../../icons/icon_fit_width_n.png";
+import icon_fit_width_p from "../../icons/icon_fit_width_p.png";
+import icon_fit_height_n from "../../icons/icon_fit_height_n.png";
+import icon_fit_height_p from "../../icons/icon_fit_height_p.png";
+import icon_fit_canvas_n from "../../icons/icon_fit_canvas_n.png";
+import icon_fit_canvas_p from "../../icons/icon_fit_canvas_p.png";
+import icon_fit_paper_n from "../../icons/icon_fit_paper_n.png";
+import icon_fit_paper_p from "../../icons/icon_fit_paper_p.png";
+
 const FitTooltip = withStyles((theme: Theme) => ({
   tooltip: {
       backgroundColor: '#f5f5f9',
@@ -29,37 +40,37 @@ export default class FitButton extends React.Component {
                 </React.Fragment>
                     }>
                 <div className="c2">
-                  <img src={ require("../../icons/icon_ratio_n.png") } className="normal-image"></img>
-                  <img src={ require("../../icons/icon_ratio_p.png") } className="hover-image"></img>
+                  <img src={icon_ratio_n} className="normal-image"></img>
+                  <img src={icon_ratio_p} className="hover-image"></img>
                 </div>
             </FitTooltip>
           </button>
           <div className="dropdown-menu p-0 border border-0 " aria-labelledby="btn_eraser">
               <a id="btn_fit_width" className="dropdown-item" href="javascript:void(0)">
                   <div className="c2">
-                      <img src={ require("../../icons/icon_fit_width_n.png") } className="normal-image"></img>
-                      <img src={ require("../../icons/icon_fit_width_p.png") } className="hover-image"></img>
+                      <img src={icon_fit_width_n} className="normal-image"></img>
+                      <img src={icon_fit_width_p} className="hover-image"></img>
                       <span className="bg-dropmenu" data-l10n-id="page_scale_width">Fit to width</span>
                   </div>
               </a>
               <a id="btn_fit_height" className="dropdown-item" href="javascript:void(0)">
                   <div className="c2">
-                      <img src={ require("../../icons/icon_fit_height_n.png") } className="normal-image"></img>
-                      <img src={ require("../../icons/icon_fit_height_p.png") } className="hover-image"></img>
+                      <img src={icon_fit_height_n} className="normal-image"></img>
+                      <img src={icon_fit_height_p} className="hover-image"></img>
                       <span className="bg-dropmenu" data-l10n-id="page_scale_fit">Fit to height</span>
                   </div>
               </a>
               <a id="btn_fit_canvas" className="dropdown-item" href="javascript:void(0)">
                   <div className="c2">
-                      <img src={ require("../../icons/icon_fit_canvas_n.png") } className="normal-image"></img>
-                      <img src={ require("../../icons/icon_fit_canvas_p.png") } className="hover-image"></img>
+                      <img src={icon_fit_canvas_n} className="normal-image"></img>
+                      <img src={icon_fit_canvas_p} className="hover-image"></img>
                       <span className="bg-dropmenu" data-l10n-id="page_scale_auto">Fit to full page</span>
                   </div>
               </a>
               <a id="btn_fit_paper" className="dropdown-item" href="javascript:void(0)">
                   <div className="c2">
-                      <img src={ require("../../icons/icon_fit_paper_n.png") } className="normal-image"></img>
-                      <img src={ require("../../icons/icon_fit_paper_p.png") } className="hover-image"></img>
+                      <img src={icon_fit_paper_n} className="normal-image"></img>
+                      <img src={icon_fit_paper_p} className="hover-image"></img>
                       <span className="bg-dropmenu" data-l10n-id="page_scale_actual">Fit to 100%</span>
                   </div>
               </a>

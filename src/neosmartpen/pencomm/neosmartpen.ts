@@ -301,6 +301,8 @@ export class NeoSmartpen {
           this.dispatcher.dispatch(PenEventName.ON_PEN_HOVER_PAGEINFO, {
             mac, section, owner, book, page, time: event.timeStamp
           });
+
+        }
       }
       
       // let ph = this.appPen;
@@ -324,10 +326,7 @@ export class NeoSmartpen {
   }
 
 
-  /**
-   * 종이 정보로부터 펜의 좌표를 보정
-   * @param event
-   */
+
   private adjustPaperXminYmin = (event: IPenEvent) => {
     event.x -= this.surfaceInfo.Xmin;
     event.y -= this.surfaceInfo.Ymin;

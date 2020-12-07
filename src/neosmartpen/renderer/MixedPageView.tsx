@@ -15,11 +15,7 @@ interface Props {
   playState: PLAYSTATE;
 }
 
-<<<<<<< HEAD
-export interface IMixedPageViewState {
-=======
 interface State {
->>>>>>> other/main
   pageInfo: IPageSOBP;
   pdfUrl: string;
 
@@ -39,23 +35,13 @@ const tempStyle: CSSProperties = {
   overflow: "hidden",
 }
 
-<<<<<<< HEAD
-export default class MixedPageView extends React.Component<IMixedPageViewProps, IMixedPageViewState> {
-  waitingForFirstStroke: boolean = true;
-  pdf: PdfJs.PDFDocumentProxy;
-
-  rendererRef: React.RefObject<PenBasedRenderer> = React.createRef();
-
-  constructor(props: IMixedPageViewProps) {
-=======
 export default class MixedPageView extends React.Component<Props, State> {
   waitingForFirstStroke: boolean = true;
   pdf: PdfJs.PDFDocumentProxy;
-
+  rendererRef: React.RefObject<PenBasedRenderer> = React.createRef();
 
 
   constructor(props: Props) {
->>>>>>> other/main
     super(props);
 
     let { pageInfo, pdfUrl, pageNo } = props;
@@ -73,17 +59,6 @@ export default class MixedPageView extends React.Component<Props, State> {
   }
 
   onNcodePageChanged = (pageInfo: IPageSOBP) => {
-<<<<<<< HEAD
-    /** 
-     * 임시코드, 2020/11/20, 나중에는 ncode와 매핑되어 있는 정보를 가지고 pageNo를 설정해야 한다 
-     * 또는, PDF 파일을 바꿀 수 있도록 해야 한다. 
-=======
-    /**
-     * 임시코드, 2020/11/20, 나중에는 ncode와 매핑되어 있는 정보를 가지고 pageNo를 설정해야 한다
-     * 또는, PDF 파일을 바꿀 수 있도록 해야 한다.
->>>>>>> other/main
-    */
-
     if (this.pdf) {
       const numPages = this.pdf.numPages;
 
@@ -112,15 +87,11 @@ export default class MixedPageView extends React.Component<Props, State> {
     this.setState({ renderCount: r + 1 });
   }
 
-<<<<<<< HEAD
-  shouldComponentUpdate(nextProps: IMixedPageViewProps, nextState: IMixedPageViewState) {
-=======
   shouldComponentUpdate(nextProps: Props, nextState: State) {
     if (nextProps.pdfUrl !== this.props.pdfUrl) {
       this.setState({ pdfUrl: nextProps.pdfUrl });
       return false;
     }
->>>>>>> other/main
     // console.log("update requested");
     return true;
   }
@@ -159,10 +130,7 @@ export default class MixedPageView extends React.Component<Props, State> {
             playState={PLAYSTATE.live} pens={this.props.pens}
             onNcodePageChanged={this.onNcodePageChanged}
             onCanvasShapeChanged={this.onCanvasShapeChanged}
-<<<<<<< HEAD
             ref={this.rendererRef}
-=======
->>>>>>> other/main
           />
         </div>
       </div>

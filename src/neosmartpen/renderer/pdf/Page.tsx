@@ -24,11 +24,8 @@ interface PageState {
   page: PdfJs.PDFPageProxy | null,
   width: number,
   height: number,
-<<<<<<< HEAD
-=======
   imgSrc: string,
   renderCount: number;
->>>>>>> other/main
 }
 
 class Page extends Component<PageProps> {
@@ -36,21 +33,14 @@ class Page extends Component<PageProps> {
     status: 'N/A',
     page: null,
     width: 0,
-<<<<<<< HEAD
-    height: 0
-=======
     height: 0,
     imgSrc: URL.createObjectURL(new Blob()),
     renderCount: 0,
->>>>>>> other/main
   };
 
   canvas: HTMLCanvasElement | null = null;
   inRendering: boolean = false;
-<<<<<<< HEAD
-=======
   inImageRendering: boolean = false;
->>>>>>> other/main
 
   scaleCanvas(canvas: HTMLCanvasElement, width: number, height: number, zoom: number) {
     // assume the device pixel ratio is 1 if the browser doesn't specify it
@@ -93,20 +83,6 @@ class Page extends Component<PageProps> {
 
 
   shouldComponentUpdate(nextProps: PageProps, nextState: PageState) {
-<<<<<<< HEAD
-    const ret = this.props.pdf !== nextProps.pdf || this.state.status !== nextState.status;
-    const zoomChanged = nextProps.position.zoom !== this.props.position.zoom;
-
-    if (!this.inRendering && zoomChanged) {
-      this._renderPage(this.state.page);
-    }
-
-    return ret || zoomChanged;
-  }
-
-  componentDidUpdate(nextProps: PageProps) {
-    this._update(nextProps.pdf);
-=======
     const ret = this.state.status !== nextState.status || this.state.renderCount !== nextState.renderCount || this.state.page !== nextState.page;
     const zoomChanged = nextProps.position.zoom !== this.props.position.zoom;
     const imageChanged = nextState.imgSrc !== this.state.imgSrc;
@@ -128,7 +104,6 @@ class Page extends Component<PageProps> {
 
   componentDidUpdate(nextProps: PageProps) {
     // this._update(nextProps.pdf);
->>>>>>> other/main
   }
 
   componentDidMount() {
@@ -153,17 +128,6 @@ class Page extends Component<PageProps> {
 
   /**
    *
-<<<<<<< HEAD
-   */
-  _loadPage = (pdf: PdfJs.PDFDocumentProxy) => {
-    if (this.state.status === 'rendering' || this.state.page !== null) return;
-
-    pdf.getPage(this.props.index).then(
-      (page) => {
-        this.setState(page);
-        this.setState({ status: 'rendering' });
-        this._renderPage(page);
-=======
    * @param page
    * @param zoom
    */
@@ -187,13 +151,10 @@ class Page extends Component<PageProps> {
       (page) => {
         this.setState({ page, status: 'rendering' });
         this.renderPage(page, this.props.position.zoom);
->>>>>>> other/main
       }
     );
   }
 
-<<<<<<< HEAD
-=======
 
 
   renderPageToImage = (page: PdfJs.PDFPageProxy, zoom: number): HTMLImageElement => {
@@ -255,15 +216,11 @@ class Page extends Component<PageProps> {
   }
 
 
->>>>>>> other/main
   /**
    *
    */
   _renderPage = (page: PdfJs.PDFPageProxy) => {
-<<<<<<< HEAD
-=======
     // return;
->>>>>>> other/main
     this.inRendering = true;
 
     console.log(this.props);
@@ -280,11 +237,7 @@ class Page extends Component<PageProps> {
     const new_scale = displaySize.width / viewport.width;
 
     viewport = page.getViewport({ scale: new_scale });
-<<<<<<< HEAD
-
-=======
     // viewport.viewBox[2] = 100;
->>>>>>> other/main
     let ctx = canvas.getContext('2d');
 
     // scaleCanvas(canvas, ctx, width, height);
@@ -299,12 +252,8 @@ class Page extends Component<PageProps> {
 
     let self = this;
     renderTask.promise.then(() => {
-<<<<<<< HEAD
-      self.setState({ status: 'rendered', page, width, height });
-=======
       let renderCount = this.state.renderCount + 1;
       self.setState({ status: 'rendered', page, width, height, renderCount });
->>>>>>> other/main
       this.inRendering = false;
     });
   }
@@ -312,15 +261,9 @@ class Page extends Component<PageProps> {
   render = () => {
     let { status } = this.state;
 
-<<<<<<< HEAD
-    console.log("PDF Page Renderered");
-    return (
-      <div className={`pdf-page ${status}`} >
-=======
     return (
       <div className={`pdf-page ${status}`} >
         {/* <img src={this.state.imgSrc} /> */}
->>>>>>> other/main
         <canvas ref={this.setCanvasRef} />
       </div>
     );
