@@ -75,7 +75,9 @@
       "react",
       "@typescript-eslint"
     ],
-    "rules": {}
+    "rules": {
+
+    }
   },
   "browserslist": {
     "production": [
@@ -97,6 +99,8 @@
     "typescript": "4.1.2"
   },
   "rules": {
-    "no-unused-vars": "off"
+    "no-unused-vars": "off",
+    "no-prototype-builtins": "off",
+    " @typescript-eslint/no-inferrable-types": "off"
   }
 }
