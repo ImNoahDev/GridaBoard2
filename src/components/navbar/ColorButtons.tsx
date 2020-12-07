@@ -21,28 +21,12 @@ const ColorButtons = () => {
     return (
         // <div className="color_bar neo_shadow float-left bottom_text color_bar">
         <React.Fragment>
-          <div className="btn-group-vertical">
-              <button id="pen_info_btn" type="button" disabled className="btn btn-neo" title="Status">
-                  <div className="c2 disabled state_0">
-                      <img src={require('../../icons/icon_pen_n.png')} className="state_0 normal-image" />
-                      <img src={require('../../icons/icon_pen_p.png')} className="state_0 hover-image"></img>
-
-                      <img src={require('../../icons/icon_highlight_n.png')} className="state_1 normal-image"></img>
-                      <img src={require('../../icons/icon_highlight_p.png')} className="state_1 hover-image"></img>
-
-                      <img src={require('../../icons/icon_eraser_n.png')} className="state_2 normal-image"></img>
-                      <img src={require('../../icons/icon_eraser_p.png')} className="state_2 hover-image"></img>
-
-                      <span id="thickness_num_bottom" className="thickness-badge badge badge-pill badge-secondary">2</span>
-                  </div>
-              </button>
-          </div>
           <div className="btn-group">
               <button id="clr_1" type="button" className="btn btn-neo color_btn othercolors" title="color 1" 
                 onClick={() => manager.setColor(1)}>
                   <PenColorTooltip placement="top" title={
                         <React.Fragment>
-                            <Typography color="inherit">Pen Color [White]</Typography>
+                            <Typography color="inherit">Pen Color [RED]</Typography>
                             <em>{"표시되는 펜의 색상을 선택합니다"}</em>
                             <br></br>
                             <b>{"키보드 버튼 1로 선택 가능합니다"}</b>
@@ -57,7 +41,7 @@ const ColorButtons = () => {
                 onClick={() => manager.setColor(2)}>
                   <PenColorTooltip placement="top" title={
                         <React.Fragment>
-                            <Typography color="inherit">Pen Color [Black]</Typography>
+                            <Typography color="inherit">Pen Color [YELLOW]</Typography>
                             <em>{"표시되는 펜의 색상을 선택합니다"}</em>
                             <br></br>
                             <b>{"키보드 버튼 2로 선택 가능합니다"}</b>
@@ -71,7 +55,7 @@ const ColorButtons = () => {
                 onClick={() => manager.setColor(3)}>
                   <PenColorTooltip placement="top" title={
                         <React.Fragment>
-                            <Typography color="inherit">Pen Color [Nobel]</Typography>
+                            <Typography color="inherit">Pen Color [NAVY]</Typography>
                             <em>{"표시되는 펜의 색상을 선택합니다"}</em>
                             <br></br>
                             <b>{"키보드 버튼 3로 선택 가능합니다"}</b>
@@ -85,7 +69,7 @@ const ColorButtons = () => {
                 onClick={() => manager.setColor(4)}>
                   <PenColorTooltip placement="top" title={
                         <React.Fragment>
-                            <Typography color="inherit">Pen Color [Gorse]</Typography>
+                            <Typography color="inherit">Pen Color [BLACK]</Typography>
                             <em>{"표시되는 펜의 색상을 선택합니다"}</em>
                             <br></br>
                             <b>{"키보드 버튼 4로 선택 가능합니다"}</b>
@@ -99,7 +83,7 @@ const ColorButtons = () => {
                 onClick={() => manager.setColor(5)}>
                   <PenColorTooltip placement="top" title={
                         <React.Fragment>
-                            <Typography color="inherit">Pen Color [Lightning Yellow]</Typography>
+                            <Typography color="inherit">Pen Color [LIGHT_GRAY]</Typography>
                             <em>{"표시되는 펜의 색상을 선택합니다"}</em>
                             <br></br>
                             <b>{"키보드 버튼 5로 선택 가능합니다"}</b>
@@ -113,7 +97,7 @@ const ColorButtons = () => {
                 onClick={() => manager.setColor(6)}>
                   <PenColorTooltip placement="top" title={
                         <React.Fragment>
-                            <Typography color="inherit">Pen Color [Red Damask]</Typography>
+                            <Typography color="inherit">Pen Color [ORANGE]</Typography>
                             <em>{"표시되는 펜의 색상을 선택합니다"}</em>
                             <br></br>
                             <b>{"키보드 버튼 6로 선택 가능합니다"}</b>
@@ -127,7 +111,7 @@ const ColorButtons = () => {
                 onClick={() => manager.setColor(7)}>
                   <PenColorTooltip placement="top" title={
                         <React.Fragment>
-                            <Typography color="inherit">Pen Color [Bright Turquoise]</Typography>
+                            <Typography color="inherit">Pen Color [GREEN]</Typography>
                             <em>{"표시되는 펜의 색상을 선택합니다"}</em>
                             <br></br>
                             <b>{"키보드 버튼 7로 선택 가능합니다"}</b>
@@ -141,7 +125,7 @@ const ColorButtons = () => {
                 onClick={() => manager.setColor(8)}>
                   <PenColorTooltip placement="top" title={
                         <React.Fragment>
-                            <Typography color="inherit">Pen Color [Niagara]</Typography>
+                            <Typography color="inherit">Pen Color [BLUE]</Typography>
                             <em>{"표시되는 펜의 색상을 선택합니다"}</em>
                             <br></br>
                             <b>{"키보드 버튼 8로 선택 가능합니다"}</b>
@@ -155,7 +139,7 @@ const ColorButtons = () => {
                 onClick={() => manager.setColor(9)}>
                   <PenColorTooltip placement="top" title={
                         <React.Fragment>
-                            <Typography color="inherit">Pen Color [Cerise Red]</Typography>
+                            <Typography color="inherit">Pen Color [PURPLE]</Typography>
                             <em>{"표시되는 펜의 색상을 선택합니다"}</em>
                             <br></br>
                             <b>{"키보드 버튼 9로 선택 가능합니다"}</b>
@@ -169,7 +153,7 @@ const ColorButtons = () => {
                 onClick={() => manager.setColor(0)}>
                   <PenColorTooltip placement="top" title={
                         <React.Fragment>
-                            <Typography color="inherit">Pen Color [Purple Heart]</Typography>
+                            <Typography color="inherit">Pen Color [DARK_GRAY]</Typography>
                             <em>{"표시되는 펜의 색상을 선택합니다"}</em>
                             <br></br>
                             <b>{"키보드 버튼 0로 선택 가능합니다"}</b>
