@@ -37,14 +37,14 @@ export default class PenTypeButton extends React.Component {
                     </React.Fragment>
                         }>
                     <div className="c2 disabled state_0">
-                        <img src={require("../../icons/icon_pen_n.png")} className="state_0 normal-image"></img>
-                        <img src={require("../../icons/icon_pen_p.png")} className="state_0 hover-image"></img>
+                        <img src="../../icons/icon_pen_n.png" className="state_0 normal-image"></img>
+                        <img src="../../icons/icon_pen_p.png" className="state_0 hover-image"></img>
 
-                        <img src={require("../../icons/icon_highlight_n.png")} className="state_1 normal-image"></img>
-                        <img src={require("../../icons/icon_highlight_p.png")} className="state_1 hover-image"></img>
+                        <img src="../../icons/icon_highlight_n.png" className="state_1 normal-image"></img>
+                        <img src="../../icons/icon_highlight_p.png" className="state_1 hover-image"></img>
 
-                        <img src={require("../../icons/icon_eraser_n.png")} className="state_2 normal-image"></img>
-                        <img src={require("../../icons/icon_eraser_p.png")} className="state_2 hover-image"></img>
+                        <img src="../../icons/icon_eraser_n.png" className="state_2 normal-image"></img>
+                        <img src="../../icons/icon_eraser_p.png" className="state_2 hover-image"></img>
 
                         <span id="thickness_num" className="thickness-badge badge badge-pill badge-secondary">2</span>
                     </div>
@@ -65,8 +65,8 @@ export default class PenTypeButton extends React.Component {
                         </React.Fragment>
                             }>
                         <div className="c2">
-                            <img src = { require("../../icons/icon_pen_n.png") } className="normal-image"></img>
-                            <img src = { require("../../icons/icon_pen_p.png") } className="hover-image"></img>
+                            <img src = "../../icons/icon_pen_n.png" className="normal-image"></img>
+                            <img src = "../../icons/icon_pen_p.png" className="hover-image"></img>
                         </div>
                     </PenTypeTooltip>
                     </button>
@@ -81,8 +81,8 @@ export default class PenTypeButton extends React.Component {
                             </React.Fragment>
                                 }>
                             <div className="c2">
-                                <img src= { require("../../icons/icon_highlight_n.png") } className="normal-image"></img>
-                                <img src= { require("../../icons/icon_highlight_p.png") } className="hover-image"></img>
+                                <img src= "../../icons/icon_highlight_n.png" className="normal-image"></img>
+                                <img src= "../../icons/icon_highlight_p.png" className="hover-image"></img>
                             </div>
                         </PenTypeTooltip>
                     </button>
@@ -97,8 +97,8 @@ export default class PenTypeButton extends React.Component {
                             </React.Fragment>
                                 }>
                             <div className="c2">
-                                <img src = { require("../../icons/icon_eraser_n.png") } className="normal-image"></img>
-                                <img src = { require("../../icons/icon_eraser_p.png") } className="hover-image"></img>
+                                <img src = "../../icons/icon_eraser_n.png" className="normal-image"></img>
+                                <img src = "../../icons/icon_eraser_p.png" className="hover-image"></img>
                             </div>
                         </PenTypeTooltip>
                     </button>
@@ -117,8 +117,8 @@ export default class PenTypeButton extends React.Component {
                             </React.Fragment>
                                 }>
                             <div className="c2">
-                                <img src = { require("../../icons/icon_thickness_01_n.png") } className="normal-image"></img>
-                                <img src = { require("../../icons/icon_thickness_01_p.png") } className="hover-image"></img>
+                                <img src = "../../icons/icon_thickness_01_n.png" className="normal-image"></img>
+                                <img src = "../../icons/icon_thickness_01_p.png" className="hover-image"></img>
                             </div>
                         </PenTypeTooltip>
                     </button>
@@ -132,8 +132,8 @@ export default class PenTypeButton extends React.Component {
                             </React.Fragment>
                                 }>
                             <div className="c2">
-                                <img src = { require("../../icons/icon_thickness_02_n.png") } className="normal-image"></img>
-                                <img src = { require("../../icons/icon_thickness_02_p.png") } className="hover-image"></img>
+                                <img src = "../../icons/icon_thickness_02_n.png" className="normal-image"></img>
+                                <img src = "../../icons/icon_thickness_02_p.png" className="hover-image"></img>
                             </div>
                         </PenTypeTooltip> 
                     </button>
@@ -147,8 +147,8 @@ export default class PenTypeButton extends React.Component {
                             </React.Fragment>
                                 }>
                             <div className="c2">
-                                <img src = { require("../../icons/icon_thickness_03_n.png") } className="normal-image"></img>
-                                <img src = { require("../../icons/icon_thickness_03_p.png") } className="hover-image"></img>
+                                <img src = "../../icons/icon_thickness_03_n.png" className="normal-image"></img>
+                                <img src = "../../icons/icon_thickness_03_p.png" className="hover-image"></img>
                             </div>
                         </PenTypeTooltip> 
                     </button>
@@ -162,8 +162,8 @@ export default class PenTypeButton extends React.Component {
                             </React.Fragment>
                                 }>
                             <div className="c2">
-                                <img src = { require("../../icons/icon_thickness_04_n.png") } className="normal-image"></img>
-                                <img src = { require("../../icons/icon_thickness_04_p.png") } className="hover-image"></img>
+                                <img src = "../../icons/icon_thickness_04_n.png" className="normal-image"></img>
+                                <img src = "../../icons/icon_thickness_04_p.png" className="hover-image"></img>
                             </div>
                         </PenTypeTooltip> 
                     </button>
@@ -177,8 +177,8 @@ export default class PenTypeButton extends React.Component {
                             </React.Fragment>
                                 }>
                             <div className="c2">
-                                <img src = { require("../../icons/icon_thickness_05_n.png") } className="normal-image"></img>
-                                <img src = { require("../../icons/icon_thickness_05_p.png") } className="hover-image"></img>
+                                <img src = "../../icons/icon_thickness_05_n.png" className="normal-image"></img>
+                                <img src = "../../icons/icon_thickness_05_p.png" className="hover-image"></img>
                             </div>
                         </PenTypeTooltip> 
                     </button>

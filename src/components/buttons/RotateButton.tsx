@@ -2,10 +2,6 @@ import React, { Component, useState } from "react";
 import '../../styles/buttons.css';
 import Tooltip, { TooltipProps } from '@material-ui/core/Tooltip';
 import { Theme, Typography, withStyles } from '@material-ui/core';
-import icon_portrait_n from '../../icons/icon_portrait_n.png';
-import icon_portrait_p from "../../icons/icon_portrait_p.png";
-import icon_landscape_n from "../../icons/icon_landscape_n.png";
-import icon_landscape_p from "../../icons/icon_landscape_p.png";
 
 const RotateTooltip = withStyles((theme: Theme) => ({
   tooltip: {
@@ -31,10 +27,10 @@ export default class RotateButton extends React.Component {
             </React.Fragment>
                 }>
             <div className="c2">
-              <img src= {icon_portrait_n} className="toggle-off normal-image"></img>
-              <img src= {icon_portrait_p} className="toggle-off hover-image"></img>
-              <img src= {icon_landscape_n} className="toggle-on normal-image"></img>
-              <img src= {icon_landscape_p} className="toggle-on hover-image"></img>
+              <img src="../../icons/icon_portrait_n.png" className="toggle-off normal-image"></img>
+              <img src="../../icons/icon_portrait_p.png" className="toggle-off hover-image"></img>
+              <img src="../../icons/icon_landscape_n.png" className="toggle-on normal-image"></img>
+              <img src="../../icons/icon_landscape_p.png" className="toggle-on hover-image"></img>
             </div>
         </RotateTooltip>
       </button>
