@@ -7,7 +7,7 @@ export enum DeviceTypeEnum {
   STYLUS = "stylus",
   FSIR = "fsir",
   NONE = "none",
-};
+}
 
 
 export enum PenModelEnum {
@@ -21,4 +21,4 @@ export enum PenModelEnum {
   E101 = DeviceTypeEnum.ERASER,
 
   X100 = DeviceTypeEnum.STYLUS,
-};
+}

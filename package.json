@@ -62,7 +62,11 @@
     "extends": [
       "react-app",
       "react-app/jest"
-    ]
+    ],
+    "parserOptions": {
+      "parser": "babel-eslint"
+    },
+    "rules": {}
   },
   "browserslist": {
     "production": [
@@ -82,5 +86,8 @@
     "eslint": "7.15.0",
     "eslint-plugin-react": "7.21.5",
     "typescript": "^4.1.2"
+  },
+  "rules": {
+    "no-unused-vars": "off"
   }
 }

@@ -26,7 +26,7 @@ export enum PLAYSTATE {
   trackRewind,
   setAutoStop,
   unsetAutoStop,
-};
+}
 
 export enum ZoomFitEnum {
   ACTUAL,
@@ -48,7 +48,7 @@ export type IRenderWorkerOption = {
   shouldDisplayGrid?: boolean,
   storage?: InkStorage,
 
-  onCanvasShapeChanged: Function,
+  onCanvasShapeChanged: (arg: { offsetX, offsetY, zoom }) => void,
 }
 
 /**
@@ -75,12 +75,12 @@ export default class RenderWorkerBase {
 
   name: string;
   /** canvas element ID */
-  canvasId: string = "";
+  canvasId = "";
 
   canvasRef: React.RefObject<HTMLCanvasElement>;
 
   /** background color */
-  bgColor: string = "rgba(255,255,255,0)";
+  bgColor = "rgba(255,255,255,0)";
 
   /** the size when first initied */
   initialSize: { width: number, height: number } = { width: 0, height: 0 };
@@ -92,10 +92,10 @@ export default class RenderWorkerBase {
   canvasFb: fabric.Canvas = null;
 
   /** mouse에 따라 pan, zoom이 가능한지에 대한 여부 */
-  mouseAction: boolean = true;
+  mouseAction = true;
 
   /**  mouse에 따라 pan, zoom이 가능한지에 대한 여부 */
-  zoomCtrlKey: boolean = false;
+  zoomCtrlKey = false;
 
   /** mouse drag & panning 을 위해 */
   pan: { isDragging: boolean, lastPosX: number, lastPosY: number } = {
@@ -105,7 +105,7 @@ export default class RenderWorkerBase {
   };
 
   /** pen stroke에 따라 자동 focus를 맞추도록 */
-  autoFocus: boolean = true;
+  autoFocus = true;
 
   /** <canvas>내의 drawing canvas(fabric canvas)의 offset, 현재는 안 씀 - 2020/11/08*/
   offset: { x: number, y: number } = { x: 0, y: 0 };
@@ -128,13 +128,13 @@ export default class RenderWorkerBase {
   base_scale: number;
 
   /** logical zoom in/out */
-  scale: number = 1;
+  scale = 1;
 
   /** zoom fit */
   viewFit: ZoomFitEnum = ZoomFitEnum.ACTUAL;
 
   /** determine whether border and grid lines displayed or not */
-  shouldDisplayGrid: boolean = true;
+  shouldDisplayGrid = true;
 
   /** animation timer */
   scrollAnimateTimer: number = null;
@@ -206,7 +206,7 @@ export default class RenderWorkerBase {
 
     });
 
-    let canvasFb = this.canvasFb;
+    const canvasFb = this.canvasFb;
 
     if (this.mouseAction) {
       canvasFb.on('mouse:down', this.onCanvasMouseDown);
@@ -225,7 +225,7 @@ export default class RenderWorkerBase {
 
     const actual_width = ncodeToDisplayPixel(ncode_width);
     const actual_height = ncodeToDisplayPixel(ncode_height);
-    let s: ISize = {
+    const s: ISize = {
       width: actual_width * this.scale,
       height: actual_height * this.scale,
     };
@@ -239,8 +239,8 @@ export default class RenderWorkerBase {
 
     // 지우기
     if (this.canvasFb) {
-      let objects = this.canvasFb.getObjects();
-      let strokes = objects.filter(obj => obj.data === GRID_OBJECT_ID);
+      const objects = this.canvasFb.getObjects();
+      const strokes = objects.filter(obj => obj.data === GRID_OBJECT_ID);
 
       strokes.forEach((obj) => {
         this.canvasFb.remove(obj);
@@ -255,7 +255,7 @@ export default class RenderWorkerBase {
 
     const ratio = 1;
 
-    let rect = new fabric.Rect({
+    const rect = new fabric.Rect({
       width: size.width * ratio - 5,
       height: size.height * ratio - 5,
       strokeWidth: 5,
@@ -272,7 +272,7 @@ export default class RenderWorkerBase {
     canvasFb.add(rect);
 
     for (let x = 0; x < size.width; x += 10) {
-      let line = new fabric.Line([x, 0, x, size.height], {
+      const line = new fabric.Line([x, 0, x, size.height], {
         strokeWidth: 0.5,
         stroke: "rgba(0,0,0,0.1)",
         hasControls: false,
@@ -287,7 +287,7 @@ export default class RenderWorkerBase {
 
 
     for (let y = 0; y < size.height; y += 10) {
-      let line = new fabric.Line([0, y, size.width, y], {
+      const line = new fabric.Line([0, y, size.width, y], {
         strokeWidth: 0.5,
         stroke: "rgba(0,0,0,0.1)",
         hasControls: false,

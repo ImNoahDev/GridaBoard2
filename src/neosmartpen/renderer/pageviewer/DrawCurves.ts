@@ -83,18 +83,18 @@ export const drawCurvePath = (points: IPoint[]): string => {
   let bezier = "";
   bezier += "M" + points[0].x + "," + points[0].y;
 
-  let n = points.length - 1;
-  var controlPoints = [];
+  const n = points.length - 1;
+  let controlPoints = [];
 
   for (let i = 0; i < n; i++) {
-    let p = points[i];
+    const p = points[i];
 
     if (controlPoints.length < 5) {
       controlPoints.push(p);
       continue;
     }
 
-    let endPoint = {
+    const endPoint = {
       x: (controlPoints[2].x + p.x) / 2,
       y: (controlPoints[2].y + p.y) / 2,
     };
@@ -102,7 +102,7 @@ export const drawCurvePath = (points: IPoint[]): string => {
     bezier += point3Curve(controlPoints[1], controlPoints[2], endPoint);
     controlPoints = [endPoint, p];
   }
-  let p = points[n];
+  const p = points[n];
 
   while (controlPoints.length < 5) {
     controlPoints.push(p);
@@ -117,13 +117,13 @@ export const drawCurvePath = (points: IPoint[]): string => {
  *
  * @param obj
  */
-const clone = (obj: Object): Object => {
+const clone = (obj: any): any => {
   if (obj === null || typeof obj !== "object") return obj;
 
-  var copy = obj.constructor();
+  const copy = obj.constructor();
 
-  for (var attr in obj) {
-    if (obj.hasOwnProperty(attr)) {
+  for (const attr in obj) {
+    if (Object.prototype.hasOwnProperty.call(obj, attr)) {
       copy[attr] = clone(obj[attr]);
     }
   }
@@ -138,24 +138,24 @@ const clone = (obj: Object): Object => {
 // Drawing Function
 export const drawPath = (points: IPointForce[], strokeThickness: number): string => {
   if (points.length < 3) {
-    return "" ;
+    return "";
   }
 
-  var bezier = "";
-  let scaled_pen_thickness = strokeThickness;
+  let bezier = "";
+  const scaled_pen_thickness = strokeThickness;
 
   // first 1.0f --> lineScale
-  var x0, x1, x2, x3, y0, y1, y2, y3, p0, p1, p2, p3;
-  var vx01, vy01, vx21, vy21;
+  let x0, x1, x2, x3, y0, y1, y2, y3, p0, p1, p2, p3;
+  let vx01, vy01, vx21, vy21;
 
   // unit tangent vectors 0->1 and 1<-2
-  var norm, n_x0, n_y0, n_x2, n_y2;
+  let norm, n_x0, n_y0, n_x2, n_y2;
 
   // the normals
-  var temp = { x: 0, y: 0 };
-  var endPoint = { x: 0, y: 0 };
-  var controlPoint1 = { x: 0, y: 0 };
-  var controlPoint2 = { x: 0, y: 0 };
+  const temp = { x: 0, y: 0 };
+  const endPoint = { x: 0, y: 0 };
+  const controlPoint1 = { x: 0, y: 0 };
+  const controlPoint2 = { x: 0, y: 0 };
   // the first actual points is treated as a midpoint
   x0 = points[0].x + 0.1;
   y0 = points[0].y;
@@ -172,7 +172,7 @@ export const drawPath = (points: IPointForce[], strokeThickness: number): string
   n_x0 = vy01;
   n_y0 = -vx01;
   // Trip back path will be saved.
-  var pathPointStore = [];
+  const pathPointStore = [];
   temp.x = x0 + n_x0;
   temp.y = y0 + n_y0;
 
@@ -183,9 +183,9 @@ export const drawPath = (points: IPointForce[], strokeThickness: number): string
   controlPoint2.x = x0 + n_x0 - vx01;
   controlPoint2.y = y0 + n_y0 - vy01;
   //Save last path. I'll be back here....
-  let ep = clone(endPoint);
-  let cp1 = clone(controlPoint1);
-  let cp2 = clone(controlPoint2);
+  const ep = clone(endPoint);
+  const cp1 = clone(controlPoint1);
+  const cp2 = clone(controlPoint2);
   pathPointStore.push({
     endPoint: ep,
     controlPoint1: cp1,
@@ -194,7 +194,7 @@ export const drawPath = (points: IPointForce[], strokeThickness: number): string
 
   // drawing setting
   bezier += pointBegin(temp);
-  for (var i = 2; i < points.length - 1; i++) {
+  for (let i = 2; i < points.length - 1; i++) {
     x3 = points[i].x;
     // + 0.1f;
     y3 = points[i].y;
@@ -228,9 +228,9 @@ export const drawPath = (points: IPointForce[], strokeThickness: number): string
     controlPoint1.y = y1 - n_y2;
     controlPoint2.x = x1 - n_x0;
     controlPoint2.y = y1 - n_y0;
-    let ep = clone(endPoint);
-    let cp1 = clone(controlPoint1);
-    let cp2 = clone(controlPoint2);
+    const ep = clone(endPoint);
+    const cp1 = clone(controlPoint1);
+    const cp2 = clone(controlPoint2);
     pathPointStore.push({
       endPoint: ep,
       controlPoint1: cp1,
@@ -286,7 +286,7 @@ export const drawPath = (points: IPointForce[], strokeThickness: number): string
   // Trace back to the starting points
   // console.log("reverse start", pathPointStore)
   while (pathPointStore.length) {
-    var repath = pathPointStore.pop();
+    const repath = pathPointStore.pop();
     bezier += point3Curve(
       repath.controlPoint1,
       repath.controlPoint2,

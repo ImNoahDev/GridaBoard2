@@ -36,7 +36,7 @@ const tempStyle: CSSProperties = {
 }
 
 export default class MixedPageView extends React.Component<Props, State> {
-  waitingForFirstStroke: boolean = true;
+  waitingForFirstStroke = true;
   pdf: PdfJs.PDFDocumentProxy;
   rendererRef: React.RefObject<PenBasedRenderer> = React.createRef();
 

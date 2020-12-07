@@ -164,12 +164,7 @@ export default class PenComm extends ProtocolHandlerBase {
   }
 
   write = (buf: Uint8Array): Promise<void> => {
-    try {
-      return this.penCommBase.write(buf);
-    }
-    catch (e) {
-      throw e;
-    }
+    return this.penCommBase.write(buf);
   }
 
 
@@ -594,7 +589,7 @@ export default class PenComm extends ProtocolHandlerBase {
     const page = intFromBytes(buf, 12, 4);
     //console.log('owner:' + ownerId + ', book:' + bookId + ', page:' + pageId);
 
-    var eventMode = PenEventEnum.PAGE_INFO;
+    let eventMode = PenEventEnum.PAGE_INFO;
     if (!this.isPenDown) {
       eventMode = PenEventEnum.PAGE_INFO_HOVER;
     }
@@ -645,7 +640,7 @@ export default class PenComm extends ProtocolHandlerBase {
     const x = dotX + dotFx / 100;
     const y = dotY + dotFy / 100;
 
-    const e = makePenEvent(this.deviceInfo.deviceType, PenEventEnum.PEN_MOVE, {  force, x, y, timediff, timeStamp: this.currentTime });
+    const e = makePenEvent(this.deviceInfo.deviceType, PenEventEnum.PEN_MOVE, { force, x, y, timediff, timeStamp: this.currentTime });
     // e.force = force;
     // e.x = x;
     // e.y = y;
@@ -855,7 +850,7 @@ export default class PenComm extends ProtocolHandlerBase {
     const book = intFromBytes(buf, 9, 4);
     const page = intFromBytes(buf, 13, 4);
 
-    var eventMode = PenEventEnum.PAGE_INFO;
+    let eventMode = PenEventEnum.PAGE_INFO;
     if (!this.isPenDown) {
       eventMode = PenEventEnum.PAGE_INFO_HOVER;
     }
@@ -1035,7 +1030,7 @@ export default class PenComm extends ProtocolHandlerBase {
      *  3:  2 - length
     */
 
-    let Errcode = buf[2];
+    const Errcode = buf[2];
 
     if (Errcode === 0) {
       console.log("    BT protocol #4 <- You can write.");

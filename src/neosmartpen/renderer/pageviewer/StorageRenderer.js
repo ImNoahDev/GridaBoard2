@@ -9,56 +9,6 @@ import {  PenManager } from "../../index";
 import { uuidv4 } from "../../utils/UtilsFunc";
 import { PLAYSTATE } from "./RenderWorkerBase";
 
-const propTypes = {
-  scale: PropTypes.number,
-  width: PropTypes.number,
-  height: PropTypes.number,
-  // rect: PropTypes.object,
-  pageId: PropTypes.string,
-  inkStorage: PropTypes.instanceOf(InkStorage),
-
-  playTimeHandler: PropTypes.func,
-  playStateHandler: PropTypes.func,
-
-
-  isPlay: PropTypes.bool,
-  replaySpeed: PropTypes.number,
-  playTime: PropTypes.number,
-
-  playState: PropTypes.symbol,
-  // function (props, propName, componentName) {
-  //   if (propName === "playState" && !PLAYSTATE.hasOwnProperty(props.playState)) {
-  //     return new Error(
-  //       "Invalid prop `playState` supplied to `StorageRenderer`. Validation failed."
-  //     );
-  //   }
-  // },
-};
-
-
-const defaultProps = {
-  scale: 1,
-  pageId: "0.0.0.0",    // s.o.b.p
-  inkStorage: null,
-  playState: PLAYSTATE.live,
-};
-
-// const styles = (theme) => ({
-//   root: {
-//     overflow: "hidden",
-//     // overflowX: "hidden",
-//     display: "flex",
-//     position: "relative",
-//     paddingTop: 0,
-//     height: "100%",
-//     width: "100%",
-//   },
-//   paper: {
-//     // marginTop: 10,
-//     margin: "auto",
-//     // backgroundColor: "white"
-//   },
-// });
 
 /**
  * 스토리지와 자동으로 연결되는 renderer 
@@ -495,8 +445,8 @@ class StorageRenderer extends React.Component {
   }
 }
 
-StorageRenderer.propTypes = propTypes;
-StorageRenderer.defaultProps = defaultProps;
+// StorageRenderer.propTypes = propTypes;
+// StorageRenderer.defaultProps = defaultProps;
 
 // export default withStyles(styles)(StorageRenderer);
 export default StorageRenderer;

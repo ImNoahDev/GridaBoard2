@@ -60,7 +60,7 @@ interface State {
 export class PageForPrint extends Component<Props, State> {
   canvas: HTMLCanvasElement = null;
   // pageImageDescs: IPdfPageCanvasDesc[] = [];
-  entireRotation: number = 0;
+  entireRotation = 0;
 
   uuid: string;
   state = {
@@ -240,8 +240,8 @@ export class PageForPrint extends Component<Props, State> {
     debug++;
     console.log(`color check = ${debug}`);
     const { width, height } = mainCanvas;
-    let id = ctx.getImageData(0, 0, width, height);
-    let pd = id.data;
+    const id = ctx.getImageData(0, 0, width, height);
+    const pd = id.data;
     let index = 0;
 
     const m: { [key: string]: number } = {};
@@ -365,7 +365,7 @@ export class PageForPrint extends Component<Props, State> {
   prepareMainCanvas = async (printOption: IPrintOption): Promise<ICanvasShapeDesc> => {
     /** Prepare main canvas */
 
-    let mainCanvas = this.canvas;
+    const mainCanvas = this.canvas;
 
     if (!mainCanvas) {
       console.log("main canvas is null");
@@ -387,8 +387,8 @@ export class PageForPrint extends Component<Props, State> {
     // const toAvoidPageBreak = 1;
     // let mediaCssWidth = Math.floor(width_css);
     // let mediaCssHeight = Math.floor(height_css);
-    let mediaCssWidth = width_css;
-    let mediaCssHeight = height_css;
+    const mediaCssWidth = width_css;
+    const mediaCssHeight = height_css;
 
     /** 이렇게 css의 크기를 변경해 주면, pixel의 크기도 변경해야 한다. 그때 가로 세로의 원래 비율을 유지하는 것이 굉장히 중요 */
     // mediaCssWidth -= toAvoidPageBreak;
@@ -469,8 +469,8 @@ export class PageForPrint extends Component<Props, State> {
 
   /** imageRendering: "pixelated"가 굉장히 중요 */
   render() {
-    let { sheetIndex } = this.props;
-    let { width, height, status } = this.state;
+    const { sheetIndex } = this.props;
+    const { width, height, status } = this.state;
     // console.log(`status [${status}],  Page orientation: ${isLandscape ? "LandscapeOrientation" : "PortraitOrientation"}`);
     const style = {
       // width, height,

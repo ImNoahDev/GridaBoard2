@@ -9,8 +9,8 @@ PdfJs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/$
 // const PDF_URL = 'https://mozilla.github.io/pdf.js/web/compressed.tracemonkey-pldi-09.pdf';
 // const PDF_URL = "./2020학년도 서울대학교 수시모집 일반전형 면접 및 구술고사 문항.pdf";
 // const PDF_URL = "https://uploads.codesandbox.io/uploads/user/faa4155a-f802-458d-81ad-90b4709d0cf8/4ETB-10.1.1.324.5566.pdf";
-var CMAP_URL = "pdfjs-dist/cmaps/";
-var CMAP_PACKED = true;
+const CMAP_URL = "pdfjs-dist/cmaps/";
+const CMAP_PACKED = true;
 
 
 interface Props {

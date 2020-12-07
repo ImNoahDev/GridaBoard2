@@ -151,7 +151,7 @@ export default class StorageRenderWorker {
       height: size.height,
     });
 
-    let canvas = this.canvas;
+    const canvas = this.canvas;
 
     canvas.on('mouse:down', this.onCanvasMouseDown);
     canvas.on('mouse:move', this.onCanvasMouseMove);
@@ -181,8 +181,8 @@ export default class StorageRenderWorker {
 
     // 지우기
     if (this.canvas) {
-      let objects = this.canvas.getObjects();
-      let strokes = objects.filter(obj => obj.objType === GRID_OBJECT_ID);
+      const objects = this.canvas.getObjects();
+      const strokes = objects.filter(obj => obj.objType === GRID_OBJECT_ID);
 
       strokes.forEach((obj) => {
         this.canvas.remove(obj);
@@ -202,7 +202,7 @@ export default class StorageRenderWorker {
 
     const ratio = 1;
 
-    let rect = new fabric.Rect({
+    const rect = new fabric.Rect({
       width: size.width * ratio - 5,
       height: size.height * ratio - 5,
       strokeWidth: 5,
@@ -219,7 +219,7 @@ export default class StorageRenderWorker {
     canvas.add(rect);
 
     for (let x = 0; x < size.width; x += 10) {
-      let line = new fabric.Line([x, 0, x, size.height], {
+      const line = new fabric.Line([x, 0, x, size.height], {
         strokeWidth: 0.5,
         stroke: "rgba(0,0,0,0.1)",
         hasControls: false,
@@ -234,7 +234,7 @@ export default class StorageRenderWorker {
 
 
     for (let y = 0; y < size.height; y += 10) {
-      let line = new fabric.Line([0, y, size.width, y], {
+      const line = new fabric.Line([0, y, size.width, y], {
         strokeWidth: 0.5,
         stroke: "rgba(0,0,0,0.1)",
         hasControls: false,
@@ -254,9 +254,9 @@ export default class StorageRenderWorker {
    * @param {Object} opt 
    */
   onCanvasMouseDown = (opt) => {
-    let canvas = this.canvas;
+    const canvas = this.canvas;
 
-    let evt = opt.e;
+    const evt = opt.e;
     if (evt.altKey === true) 
     {
       canvas.isDragging = true;
@@ -271,12 +271,12 @@ export default class StorageRenderWorker {
    * @param {Object} opt 
    */
   onCanvasMouseMove = (opt) => {
-    let canvas = this.canvas;
+    const canvas = this.canvas;
 
     if (canvas.isDragging) {
-      let e = opt.e;
+      const e = opt.e;
       // console.log(`Point ${e.clientX}, ${e.clientY}`);
-      let vpt = canvas.viewportTransform;
+      const vpt = canvas.viewportTransform;
       vpt[4] += e.clientX - canvas.lastPosX;
       vpt[5] += e.clientY - canvas.lastPosY;
 
@@ -298,7 +298,7 @@ export default class StorageRenderWorker {
    * @param {Object} opt 
    */
   onCanvasMousUp = (opt) => {
-    let canvas = this.canvas;
+    const canvas = this.canvas;
 
 
     // on mouse up we want to recalculate new interaction
@@ -317,9 +317,9 @@ export default class StorageRenderWorker {
    * @param {Object} opt 
    */
   onCanvasMouseWheel = (opt) => {
-    let canvas = this.canvas;
+    const canvas = this.canvas;
 
-    let delta = opt.e.deltaY;
+    const delta = opt.e.deltaY;
     let zoom = canvas.getZoom();
     zoom *= 0.999 ** delta;
 
@@ -333,7 +333,7 @@ export default class StorageRenderWorker {
     const zoom = canvas.getZoom();
 
     // http://fabricjs.com/fabric-intro-part-5#pan_zoom
-    let vpt = canvas.viewportTransform;
+    const vpt = canvas.viewportTransform;
 
     if (vpt[4] >= 0) {
       vpt[4] = 0;
@@ -360,7 +360,7 @@ export default class StorageRenderWorker {
    * @param {Object} opt 
    */
   setCanvasZoom = (zoom, opt) => {
-    let canvas = this.canvas;
+    const canvas = this.canvas;
 
     if (zoom > 20) zoom = 20;
     if (zoom < 0.01) zoom = 0.01;
@@ -387,43 +387,43 @@ export default class StorageRenderWorker {
     let dx = 0, dy = 0;
     let shouldScroll = false;
 
-    let canvas = this.canvas;
-    let vpt = canvas.viewportTransform;
-    let offset_x = vpt[4];
-    let offset_y = vpt[5];
+    const canvas = this.canvas;
+    const vpt = canvas.viewportTransform;
+    const offset_x = vpt[4];
+    const offset_y = vpt[5];
 
     if (screen_xy.x < 0) {
       // scroll to left
-      let target = this.currSize.width * margin_to_go_ratio;
+      const target = this.currSize.width * margin_to_go_ratio;
       dx = target - screen_xy.x;
       shouldScroll = true;
     }
 
     if (screen_xy.y < 0) {
       // scroll to top
-      let target = this.currSize.height * margin_to_go_ratio;
+      const target = this.currSize.height * margin_to_go_ratio;
       dy = target - screen_xy.y;
       shouldScroll = true;
     }
 
     if (screen_xy.x > this.currSize.width) {
       // scroll to right
-      let target = this.currSize.width * (1 - margin_to_go_ratio);
+      const target = this.currSize.width * (1 - margin_to_go_ratio);
       dx = target - screen_xy.x;
       shouldScroll = true;
     }
 
     if (screen_xy.y > this.currSize.height) {
       // scroll to bottom
-      let target = this.currSize.height * (1 - margin_to_go_ratio);
+      const target = this.currSize.height * (1 - margin_to_go_ratio);
       dy = target - screen_xy.y;
       shouldScroll = true;
     }
 
     if (shouldScroll) {
 
-      let new_offset_x = offset_x + dx;
-      let new_offset_y = offset_y + dy;
+      const new_offset_x = offset_x + dx;
+      const new_offset_y = offset_y + dy;
 
       this.scrollCanvasToPoint({ x: new_offset_x, y: new_offset_y }, true);
     }
@@ -435,8 +435,8 @@ export default class StorageRenderWorker {
    * @param {boolean} animate
    */
   scrollCanvasToPoint = (point, animate) => {
-    let canvas = this.canvas;
-    let vpt = canvas.viewportTransform;
+    const canvas = this.canvas;
+    const vpt = canvas.viewportTransform;
 
     if (animate) {
       if (this.scrollAnimateInterval) {
@@ -445,12 +445,12 @@ export default class StorageRenderWorker {
       }
       let x0 = vpt[4];
       let y0 = vpt[5];
-      let x1 = point.x;
-      let y1 = point.y;
+      const x1 = point.x;
+      const y1 = point.y;
 
       const div = 10;
-      let step_x = (x1 - x0) / div;
-      let step_y = (y1 - y0) / div;
+      const step_x = (x1 - x0) / div;
+      const step_y = (y1 - y0) / div;
       let count = 0;
 
       this.scrollAnimateInterval = setInterval(() => {
@@ -488,10 +488,10 @@ export default class StorageRenderWorker {
     const { x, y, f } = ncodeXY;
     const { Xmin, Ymin } = this.surfaceInfo;
 
-    let scale = this.base_scale;
+    const scale = this.base_scale;
 
-    let cx = (x - Xmin) * scale + this.offset_x;
-    let cy = (y - Ymin) * scale + this.offset_y;
+    const cx = (x - Xmin) * scale + this.offset_x;
+    const cy = (y - Ymin) * scale + this.offset_y;
 
     return { x: cx, y: cy, f };
   }
@@ -505,7 +505,7 @@ export default class StorageRenderWorker {
     const { x, y, f } = ncodeXY;
     const { Xmin, Ymin } = this.surfaceInfo;
 
-    let scale = this.base_scale;
+    const scale = this.base_scale;
 
     let cx = (x - Xmin) * scale + this.offset_x;
     let cy = (y - Ymin) * scale + this.offset_y;
@@ -523,16 +523,16 @@ export default class StorageRenderWorker {
   getScreenXY = (canvasXY) => {
     const { x, y } = canvasXY;
 
-    let canvas = this.canvas;
-    let vpt = canvas.viewportTransform;
+    const canvas = this.canvas;
+    const vpt = canvas.viewportTransform;
 
-    let zoom = this.canvas.getZoom();
-    let offset_x = vpt[4];
-    let offset_y = vpt[5];
+    const zoom = this.canvas.getZoom();
+    const offset_x = vpt[4];
+    const offset_y = vpt[5];
 
 
-    let sx = x * zoom + offset_x;
-    let sy = y * zoom + offset_y;
+    const sx = x * zoom + offset_x;
+    const sy = y * zoom + offset_y;
 
     return { x: sx, y: sy };
   }
@@ -545,10 +545,10 @@ export default class StorageRenderWorker {
   getNcodeXY = (screenXY) => {
     const { x, y } = screenXY;
 
-    let scale = this.base_scale;
+    const scale = this.base_scale;
 
-    let nx = (x - this.offset_x) / scale;
-    let ny = (y - this.offset_y) / scale;
+    const nx = (x - this.offset_x) / scale;
+    const ny = (y - this.offset_y) / scale;
 
     return { x: nx, y: ny };
   }
@@ -569,13 +569,13 @@ export default class StorageRenderWorker {
     // kitty, 임시
     this.resetPathArray();
 
-    let pageInfo = this.storage.getLastPageInfo();
+    const pageInfo = this.storage.getLastPageInfo();
     let strokes = this.storage.getPageStrokes(pageInfo);
-    let live_strokes = this.storage.getPageStrokes_live(pageInfo);
+    const live_strokes = this.storage.getPageStrokes_live(pageInfo);
     strokes = strokes.concat(live_strokes);
 
     if (strokes && strokes.length > 0) {
-      let page_start_time = strokes[0].dotArray[0].time;
+      const page_start_time = strokes[0].dotArray[0].time;
 
       this.initPathArray(strokes, 1, page_start_time);
     }
@@ -629,7 +629,7 @@ export default class StorageRenderWorker {
    * @param {boolean} forceToRefresh
    */
   changePage = (section, owner, book, page, forceToRefresh) => {
-    let currPage = this.surfaceInfo;
+    const currPage = this.surfaceInfo;
 
     if ((!forceToRefresh)
       && (section === currPage.section
@@ -639,7 +639,7 @@ export default class StorageRenderWorker {
 
 
     // 페이지 정보와 scale을 조정한다.
-    let info = paperInfo.getPaperInfo({ section, owner, book, page });
+    const info = paperInfo.getPaperInfo({ section, owner, book, page });
     if (info) {
       this.surfaceInfo = {
         section, owner, book, page,
@@ -648,7 +648,7 @@ export default class StorageRenderWorker {
       };
 
     }
-    let szPaper = paperInfo.getPaperSize({ section, owner, book, page });
+    const szPaper = paperInfo.getPaperSize({ section, owner, book, page });
     this.base_scale = this.calcScaleFactor(this.viewFit, szPaper, this.base_scale);
 
 
@@ -657,11 +657,11 @@ export default class StorageRenderWorker {
     this.resetPathArray();
 
     // 페이지의 stroke를 그린다
-    let pageInfo = { section, owner, book, page };
-    let strokes = this.storage.getPageStrokes(pageInfo);
+    const pageInfo = { section, owner, book, page };
+    const strokes = this.storage.getPageStrokes(pageInfo);
 
     if (strokes && strokes.length > 0) {
-      let page_start_time = strokes[0].dotArray[0].time;
+      const page_start_time = strokes[0].dotArray[0].time;
       this.initPathArray(strokes, 1, page_start_time);
     }
 
@@ -695,9 +695,9 @@ export default class StorageRenderWorker {
    * @param {{strokeKey:string, mac:string, stroke:NeoStroke, dot:NeoDot}} event 
    */
   pushLiveDot = (event) => {
-    let pathData = this.livePaths[event.strokeKey];
+    const pathData = this.livePaths[event.strokeKey];
     let path = pathData.path;
-    let stroke = pathData.stroke;
+    const stroke = pathData.stroke;
 
     if (path) {
       this.canvas.remove(path);
@@ -723,8 +723,8 @@ export default class StorageRenderWorker {
    * @param {{strokeKey:string, mac:string, stroke, section:number, owner:number, book:number, page:number}} event 
    */
   closeLiveStroke = (event) => {
-    let pathData = this.livePaths[event.strokeKey];
-    let path = pathData.path;
+    const pathData = this.livePaths[event.strokeKey];
+    const path = pathData.path;
 
     if (path) {
       this.pathArray.push(path);
@@ -742,7 +742,7 @@ export default class StorageRenderWorker {
   };
 
   resize = (size) => {
-    let zoom = size.width / this.initialSize.width;
+    const zoom = size.width / this.initialSize.width;
     this.currSize = { ...size };
 
     this.canvas.setHeight(size.height);
@@ -788,13 +788,13 @@ export default class StorageRenderWorker {
   };
 
   rewindToPageStart = () => {
-    let newTime = this.startTime_page - this.startTime_whole - 1;
+    const newTime = this.startTime_page - this.startTime_whole - 1;
     return newTime;
   };
 
   setPageStrokes = (page, strokeStream) => {
     const { section, owner, book, pageNumber } = page;
-    let strokes_kitty = strokeStream.strokes.filter(
+    const strokes_kitty = strokeStream.strokes.filter(
       (s) =>
         s.book === book &&
         s.owner === owner &&
@@ -806,19 +806,19 @@ export default class StorageRenderWorker {
     let lastStroke, lastDot;
 
     // 페이지, 시작시간, 끝시각
-    let page_start_time = strokes_kitty[0].dotArray[0].time;
+    const page_start_time = strokes_kitty[0].dotArray[0].time;
     lastStroke = strokes_kitty[strokes_kitty.length - 1];
     lastDot = lastStroke.dotArray[lastStroke.dotArray.length - 1];
-    let page_end_time = lastDot.time;
+    const page_end_time = lastDot.time;
 
     this.startTime_page = page_start_time;
     this.endTime_page = page_end_time + 1;
 
     // 전체 필기, 시작시간, 끝시간
-    let whole_start_time = strokeStream.strokes[0].dotArray[0].time;
+    const whole_start_time = strokeStream.strokes[0].dotArray[0].time;
     lastStroke = strokeStream.strokes[strokeStream.strokes.length - 1];
     lastDot = lastStroke.dotArray[lastStroke.dotArray.length - 1];
-    let whole_end_time = lastDot.time;
+    const whole_end_time = lastDot.time;
 
     this.startTime_whole = whole_start_time;
     this.endTime_whole = whole_end_time + 1;
@@ -854,8 +854,8 @@ export default class StorageRenderWorker {
 
   resetPathArray = () => {
     if (this.canvas) {
-      let objects = this.canvas.getObjects();
-      let strokes = objects.filter(obj => obj.objType === STROKE_OBJECT_ID);
+      const objects = this.canvas.getObjects();
+      const strokes = objects.filter(obj => obj.objType === STROKE_OBJECT_ID);
 
       strokes.forEach((path) => {
         this.canvas.remove(path);
@@ -866,12 +866,12 @@ export default class StorageRenderWorker {
   initPathArray = (strokes, scale, startTime) => {
     strokes.forEach((stroke) => {
       if (stroke.dotArray.length > 0) {
-        let color = stroke.color;
+        const color = stroke.color;
         // const zoom = this.canvas.getZoom();
         // const thickness = stroke.thickness * zoom;
         const thickness = stroke.thickness;
 
-        let path = this.createPathFromDots(stroke.dotArray, color, thickness, scale, startTime);
+        const path = this.createPathFromDots(stroke.dotArray, color, thickness, scale, startTime);
         this.pathArray.push(path);
         if (this.canvas) {
           this.canvas.add(path);
@@ -890,9 +890,9 @@ export default class StorageRenderWorker {
     // let rect = this.rect;
     // console.log(rect);
 
-    let pointArray = [];
+    const pointArray = [];
     dots.forEach((dot) => {
-      let pt = this.getCanvasXY_scaled(dot);
+      const pt = this.getCanvasXY_scaled(dot);
       pointArray.push(pt);
     });
 
@@ -928,12 +928,12 @@ export default class StorageRenderWorker {
       // base_scale: scale,
     };
 
-    let strokeThickness = this.base_scale * thickness;
+    const strokeThickness = this.base_scale * thickness;
     // console.log(strokeThickness);
     // if ( strokeThickness < 0.5 ) strokeThickness = 0.5;
-    let pathData = drawPath(pointArray, strokeThickness);
+    const pathData = drawPath(pointArray, strokeThickness);
     // let pathData = drawLinePath(pointArray);
-    let path = new fabric.Path(pathData, pathOption);
+    const path = new fabric.Path(pathData, pathOption);
 
     return path;
   };
@@ -952,8 +952,8 @@ export default class StorageRenderWorker {
    * time tick
    */
   onTick = () => {
-    let delta_time = timeTickDuration * this.replaySpeed;
-    let playTime = this.playingTime + delta_time;
+    const delta_time = timeTickDuration * this.replaySpeed;
+    const playTime = this.playingTime + delta_time;
 
     // if (Math.floor(playTime / 1000) !== Math.floor(this.playingTime / 1000))
     this.playingTimeHandler(this.playingTime);
@@ -1002,9 +1002,9 @@ export default class StorageRenderWorker {
       });
     }
     else {
-      let time_base = this.startTime_whole;
+      const time_base = this.startTime_whole;
 
-      let time_abs = playingTime + time_base;
+      const time_abs = playingTime + time_base;
       this.pathArray.forEach((path) => {
 
         if (time_abs <= path.startTime) {
@@ -1024,7 +1024,7 @@ export default class StorageRenderWorker {
       });
 
       if (this.pathArray.length > 0) {
-        let endTime = this.pathArray[this.pathArray.length - 1].endTime;
+        const endTime = this.pathArray[this.pathArray.length - 1].endTime;
         // 모든 획이 다 그려져야 하는 상황이면 temp 획을 안보이게 한다.
         if (endTime && endTime < time_abs) {
           this.canvas.remove(this.tempPath);
@@ -1034,7 +1034,7 @@ export default class StorageRenderWorker {
           this.tempPath_disabled = null;
 
           // 확인 사살, 맨 마지막 획만
-          let path = this.pathArray[this.pathArray.length - 1];
+          const path = this.pathArray[this.pathArray.length - 1];
           path.fill = path.color;
           path.stroke = path.color;
         }

@@ -19,7 +19,7 @@ export { PLAYSTATE };
 /**
  * Properties
  */
-type IPenBasedRendererProps = {
+type Props = {
   pageInfo: IPageSOBP,
   inkStorage?: InkStorage,
   playState?: PLAYSTATE,
@@ -31,15 +31,15 @@ type IPenBasedRendererProps = {
 
   viewFit?: ZoomFitEnum;
 
-  onNcodePageChanged: Function;
-  onCanvasShapeChanged: Function;
+  onNcodePageChanged: (arg: { section, owner, book, page }) => void;
+  onCanvasShapeChanged: (arg: { offsetX, offsetY, zoom }) => void;
 }
 
 
 /**
  * State
  */
-interface IPenBasedRendererState {
+interface State {
   renderer: PenBasedRenderWorker | null,
 
   sizeUpdate: number,
@@ -69,8 +69,8 @@ interface IPenBasedRendererState {
  *    1)  Pen에서 Event를 받아 실시간 rendering만 하는 component로 만들것
  *
  */
-export default class PenBasedRenderer extends React.Component<IPenBasedRendererProps, IPenBasedRendererState> {
-  state: IPenBasedRendererState = {
+export default class PenBasedRenderer extends React.Component<Props, State> {
+  state: State = {
     renderer: null,
     sizeUpdate: 0,
     penEventCount: 0,
@@ -98,20 +98,20 @@ export default class PenBasedRenderer extends React.Component<IPenBasedRendererP
   propsSize: { scale: number, width: number, height: number } = { scale: 1, width: 0, height: 0 };
   size: ISize = { width: 0, height: 0 };
 
-  canvasId: string = "";
+  canvasId = "";
   canvasRef: React.RefObject<HTMLCanvasElement> = null;
   myRef: React.RefObject<HTMLDivElement> = null;
 
   inkStorage: InkStorage = null;
   curr_pens: NeoSmartpen[] = new Array(0);
 
-  constructor(props: IPenBasedRendererProps) {
+  constructor(props: Props) {
     super(props);
     // kitty
     this.canvasRef = React.createRef();
     this.myRef = React.createRef();
 
-    let { pageInfo, inkStorage, scale, playState, width, height, pens, viewFit } = props;
+    const { pageInfo, inkStorage, scale, playState, width, height, pens, viewFit } = props;
     this.inkStorage = inkStorage ? inkStorage : InkStorage.getInstance();
 
     this.state.pageInfo = pageInfo ? pageInfo : this.state.pageInfo;
@@ -158,13 +158,13 @@ export default class PenBasedRenderer extends React.Component<IPenBasedRendererP
    * @public
    */
   componentDidMount() {
-    let { pens } = this.props;
+    const { pens } = this.props;
     let { width, height } = this.propsSize;
 
     const node = this.myRef.current;
     if (node) {
-      let parentHeight = node.offsetHeight;
-      let parentWidth = node.offsetWidth;
+      const parentHeight = node.offsetHeight;
+      const parentWidth = node.offsetWidth;
 
       console.log(`Parent window (width, height) = (${parentWidth}, ${parentHeight})`);
 
@@ -205,7 +205,7 @@ export default class PenBasedRenderer extends React.Component<IPenBasedRendererP
    * @override
    * @public
    */
-  shouldComponentUpdate(nextProps: IPenBasedRendererProps, nextState: IPenBasedRendererState) {
+  shouldComponentUpdate(nextProps: Props, nextState: State) {
     let ret_val = true;
 
     if (nextProps.pens !== this.curr_pens) {
@@ -245,7 +245,7 @@ export default class PenBasedRenderer extends React.Component<IPenBasedRendererP
     window.removeEventListener("resize", this.resizeListener);
 
     // penManager에 연결 해제
-    let penManager = PenManager.getInstance();
+    const penManager = PenManager.getInstance();
     penManager.unregisterRenderContainer(this);
   }
 
@@ -289,7 +289,7 @@ export default class PenBasedRenderer extends React.Component<IPenBasedRendererP
       onCanvasShapeChanged: this.props.onCanvasShapeChanged,
     };
 
-    let renderer = new PenBasedRenderWorker(options);
+    const renderer = new PenBasedRenderWorker(options);
     this.setState({ renderer: renderer });
   }
 
@@ -329,7 +329,7 @@ export default class PenBasedRenderer extends React.Component<IPenBasedRendererP
     /** 테스트용 */
     const inkStorage = this.inkStorage;
     if (inkStorage) {
-      let pageStrokesCount = inkStorage.getPageStrokes(event).length;
+      const pageStrokesCount = inkStorage.getPageStrokes(event).length;
       this.setState({ strokeCount: pageStrokesCount });
     }
 
@@ -399,7 +399,7 @@ export default class PenBasedRenderer extends React.Component<IPenBasedRendererP
   }
 
   getSize = (scale, rect) => {
-    let size = {
+    const size = {
       width: rect.width,
       height: rect.height,
     };

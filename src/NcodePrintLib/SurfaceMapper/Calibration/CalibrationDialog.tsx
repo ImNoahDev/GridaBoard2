@@ -95,6 +95,7 @@ export default function CalibrationDialog(props: Props) {
   const classes2 = useStyles2();
 
   const handleSave = (e) => {
+    console.log("Save");
   }
 
   const onChange = (e) => {

@@ -8,12 +8,12 @@ import "../types";
 
 export const getStrokesTimeInfo = (strokeStream) => {
   // 전체 필기, 시작시간, 끝시간
-  let whole_stroke_start_time = strokeStream.strokes[0].dotArray[0].time;
+  const whole_stroke_start_time = strokeStream.strokes[0].dotArray[0].time;
 
-  let whole_last_stroke = strokeStream.strokes[strokeStream.strokes.length - 1];
-  let whole_last_dot =
+  const whole_last_stroke = strokeStream.strokes[strokeStream.strokes.length - 1];
+  const whole_last_dot =
     whole_last_stroke.dotArray[whole_last_stroke.dotArray.length - 1];
-  let whole_stroke_end_time = whole_last_dot.time;
+  const whole_stroke_end_time = whole_last_dot.time;
 
   return {
     start: whole_stroke_start_time,
@@ -44,12 +44,12 @@ const equalStroke = (a, b) => {
  * @param {number} start_time - absoltute time
  */
 export const findStrokesChunkAtTime = (strokes_chunks, time_ms, start_time) => {
-  let found = strokes_chunks.filter(chunk => {
-    let strokes = chunk;
-    let start = strokes[0].startTime;
-    let end = strokes[strokes.length - 1].endTime;
+  const found = strokes_chunks.filter(chunk => {
+    const strokes = chunk;
+    const start = strokes[0].startTime;
+    const end = strokes[strokes.length - 1].endTime;
 
-    let time_abs = time_ms + start_time;
+    const time_abs = time_ms + start_time;
 
     // console.log( `${start} <= ${time_abs} <= ${end}`);
     if (start <= time_abs && time_abs <= end) return true;
@@ -57,7 +57,7 @@ export const findStrokesChunkAtTime = (strokes_chunks, time_ms, start_time) => {
   });
 
   if (found[0]) {
-    let strokes = found[0];
+    const strokes = found[0];
     return {
       section: strokes[0].section,
       owner: strokes[0].owner,
@@ -83,8 +83,8 @@ export const chunkPageStrokes = (strokes) => {
 
   let prev = null;
   // 주어진 배열을 탐색
-  for (let stroke of strokes) {
-    let curr = {
+  for (const stroke of strokes) {
+    const curr = {
       section: stroke.section,
       owner: stroke.owner,
       book: stroke.book,
@@ -112,7 +112,7 @@ export const getTimeStr = (miliseconds, format = null) => {
   // let deci = Math.round(mili / 100);
 
   let mm = Math.floor(sec / 60);
-  let hh = Math.floor(mm / 60);
+  const hh = Math.floor(mm / 60);
 
   mm = mm - hh * 60;
   sec = sec - hh * 3600 - mm * 60;

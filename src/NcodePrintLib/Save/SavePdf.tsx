@@ -44,7 +44,7 @@ export async function addGraphicAndSavePdf(url: string, saveName: string) {
   const pdfBytes = await pdfDoc.save();
   console.log(pdfBytes);
 
-  var blob = new Blob([pdfBytes]);
+  let blob = new Blob([pdfBytes]);
   saveAs(blob, saveName);
 
   console.log(firstPage);

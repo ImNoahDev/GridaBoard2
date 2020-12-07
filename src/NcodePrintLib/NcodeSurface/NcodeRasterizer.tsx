@@ -17,10 +17,10 @@ const debugNcode_h = 500;
 
 
 export function drawArrow(context: CanvasRenderingContext2D, fromx: number, fromy: number, tox: number, toy: number) {
-  var headlen = 100; // length of head in pixels
-  var dx = tox - fromx;
-  var dy = toy - fromy;
-  var angle = Math.atan2(dy, dx);
+  let headlen = 100; // length of head in pixels
+  let dx = tox - fromx;
+  let dy = toy - fromy;
+  let angle = Math.atan2(dy, dx);
 
   context.beginPath();
   context.moveTo(fromx, fromy);
@@ -408,7 +408,7 @@ export default class NcodeRasterizer {
       let charIndex = 0;
       for (let x = 0; x < width; x += glyphDistancePx_canvas) {
         if (charIndex + glyphStringSkipLeft >= 0) {
-          var glyph = code_txt[charIndex + glyphStringSkipLeft];
+          let glyph = code_txt[charIndex + glyphStringSkipLeft];
 
           const pos = codePos[glyph];
           let dx = 0, dy = 0;
@@ -443,7 +443,7 @@ export default class NcodeRasterizer {
       let charIndex = 0;
       for (let x = 0; x < width; x += glyphDistancePx_canvas) {
         if (charIndex + glyphStringSkipLeft >= 0) {
-          var glyph = code_txt[charIndex + glyphStringSkipLeft];
+          let glyph = code_txt[charIndex + glyphStringSkipLeft];
 
           const pos = codePos[glyph];
           let dx = 0, dy = 0;

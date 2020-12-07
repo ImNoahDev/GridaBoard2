@@ -31,7 +31,7 @@ export const PenEventEnum = {
  */
 function getTimeTicks(): number {
   // 0.1 milliseconds tick
-  var d = new Date();
+  const d = new Date();
 
   // https://stackoverflow.com/questions/7966559/how-to-convert-javascript-date-object-to-ticks
   //
@@ -39,7 +39,7 @@ function getTimeTicks(): number {
   // The .NET DateTime type's origin is midnight on 1 January 0001.
   // var epochTicks = 621355968000000000;
   // var ticks = d.getTime() * 10000 + epochTicks;
-  var ticks = d.getTime() * 10000;
+  const ticks = d.getTime() * 10000;
   return ticks;
 }
 
@@ -55,7 +55,7 @@ export function makePenEvent(penType: DeviceTypeEnum, eventName: string, options
     console.error("timeStamp has not been provided");
   }
 
-  let timeStamp = options.timeStamp;
+  const timeStamp = options.timeStamp;
   // if (!timeStamp) timeStamp = getTimeTicks();
 
   const event: IPenEvent = {

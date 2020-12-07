@@ -18,7 +18,7 @@ import "../types";
 export async function deviceSelectDlg(): Promise<BluetoothDevice> {
   console.log("********* Requesting any Bluetooth Device... **********");
 
-  let options = {
+  const options = {
     // acceptAllDevices: true,
     filters: [
       { services: [PEN_SERVICE_UUID_16, PEN_SERVICE_UUID_128] },
@@ -55,7 +55,7 @@ enum DEVICE_STATE {
   disconnected = 0,
   connecting = 1,
   connected = 2,
-};
+}
 
 type GetServiceReturnType = {
   service: BluetoothRemoteGATTService,
@@ -147,12 +147,12 @@ export class PenCommBase {
     }
 
     try {
-      let result = await this.getServiceProcess(uuids[0], server);
+      const result = await this.getServiceProcess(uuids[0], server);
       return result;
     } catch (e) {
       console.log(`  ==> failed`);
       if (e.message.indexOf("No Services matching UUID") > -1) {
-        let result = await this.getServiceProcess(uuids[1], server);
+        const result = await this.getServiceProcess(uuids[1], server);
         return result;
       } else {
         throw e;
@@ -166,7 +166,7 @@ export class PenCommBase {
    * @param btDevice 
    * @param protocolStartCallback 
    */
-  connect = async (btDevice: BluetoothDevice, protocolStartCallback: Function): Promise<boolean> => {
+  connect = async (btDevice: BluetoothDevice, protocolStartCallback: () => void): Promise<boolean> => {
     if (this._state !== DEVICE_STATE.disconnected)
       return false;
 
@@ -182,7 +182,7 @@ export class PenCommBase {
       server = await btDevice.gatt.connect();
     }
     catch (e) {
-      let isBTdevice = e.message.indexOf("adapter");
+      const isBTdevice = e.message.indexOf("adapter");
       if (isBTdevice > -1) console.log("Bluetooth LE dongle is not found");
 
       console.error(e);
@@ -192,7 +192,7 @@ export class PenCommBase {
     console.log(`2. get Service and Sockets, connected:${server.connected}`);
 
     try {
-      let { writeSocket, notifyIndicate } = await this.getService(server);
+      const { writeSocket, notifyIndicate } = await this.getService(server);
 
       console.log("3. Add Event listeners");
       notifyIndicate.addEventListener("characteristicvaluechanged", this.onPenPacketReceived);
@@ -209,7 +209,7 @@ export class PenCommBase {
 
     }
     catch (e) {
-      let isBTdevice = e.message.indexOf("adapter");
+      const isBTdevice = e.message.indexOf("adapter");
       if (isBTdevice > -1) console.log("Bluetooth LE dongle is not found");
       console.error(e);
       return false;
@@ -227,7 +227,7 @@ export class PenCommBase {
   disconnect = () => {
     console.log(`     DISCONNECT operation`);
     this.inDisconnecting = true;
-    let self = this;
+    const self = this;
     if (!self.connected || self.btDevice === null) {
       return;
     }
@@ -258,7 +258,7 @@ export class PenCommBase {
     this._bt_buffer = new Uint8Array(0);
 
     // 상위로 전달
-    let handler = this.protocolHandler;
+    const handler = this.protocolHandler;
     if (handler) handler.onDisconnected();
     // this.protocolHandler = null;
   }
@@ -268,12 +268,7 @@ export class PenCommBase {
    * @param buf 
    */
   write = (buf: Uint8Array): Promise<void> => {
-    try {
-      return this._btWriteSocket.writeValue(buf);
-    }
-    catch (e) {
-      throw e;
-    }
+    return this._btWriteSocket.writeValue(buf);
   }
 
 
@@ -287,7 +282,7 @@ export class PenCommBase {
    */
   onPenPacketReceived = (event: any) => {
     // console.log("    handle Data");
-    let self = this;
+    const self = this;
 
     const value = event.target.value;
     const data_length = event.target.value.byteLength;

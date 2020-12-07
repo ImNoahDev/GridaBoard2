@@ -1,10 +1,12 @@
+export type EventCallbackType = (data) => void;
+
 export interface PenEventFilter {
   mac: string[] | undefined;
   allowAll: boolean;
 }
 
 interface CallbackItem {
-  callback: Function;
+  callback: EventCallbackType;
   filter: PenEventFilter;
 }
 
@@ -22,7 +24,7 @@ class DispatcherEvent {
    * @param {function} callback
    * @param {{mac:string}=} filter
    */
-  registerCallback(callback: Function, filter?: PenEventFilter) {
+  registerCallback(callback: EventCallbackType, filter?: PenEventFilter) {
     if (!filter) {
       filter = { mac: undefined, allowAll: true };
     }
@@ -35,7 +37,7 @@ class DispatcherEvent {
    * @param {function} callback
    * @return {boolean}
    */
-  unregisterCallback(callback: Function): boolean {
+  unregisterCallback(callback: EventCallbackType): boolean {
     // Get the index of the callback in the callbacks array
     // const index = this.callbacks.indexOf(callback);
     const index = this.callbacks.findIndex((item) => item.callback === callback);
@@ -60,7 +62,7 @@ class DispatcherEvent {
 
     // loop through the callbacks and call each one
     callbacks.forEach((item) => {
-      let filter = item.filter;
+      const filter = item.filter;
       if (!data.mac || filter.allowAll || !filter.mac || filter.mac === data.mac || filter.mac.indexOf(data.mac) > -1) {
         item.callback(data);
       }
@@ -95,7 +97,7 @@ export default class EventDispatcher {
    * @param {function} callback
    * @param {{mac:string}=} filter
    */
-  on(eventName: string, callback: Function, filter: PenEventFilter) {
+  on(eventName: string, callback: EventCallbackType, filter: PenEventFilter) {
     // First we grab the event from this.events
     let event = this.events[eventName];
 
@@ -113,14 +115,14 @@ export default class EventDispatcher {
    * @param {string} eventName
    * @param {function} callback
    */
-  off(eventName: string, callback: Function) {
+  off(eventName: string, callback: EventCallbackType) {
     const event = this.events[eventName];
 
     // Check that the event exists and it has the callback registered
     if (!event) return;
 
     const flag = event.unregisterCallback(callback);
-    if ( flag ) {
+    if (flag) {
       // if the event has no callbacks left, delete the event
       if (event.callbacks.length === 0) {
         delete this.events[eventName];

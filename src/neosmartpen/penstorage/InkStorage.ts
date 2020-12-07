@@ -2,7 +2,7 @@ import "../types";
 // import { initStroke, strokeAddDot, closeStroke } from "./neostroke";
 import { NeoStroke, NeoDot, PenEventName, IBrushType } from "../DataStructure";
 import { IPageSOBP } from "../DataStructure/Structures";
-import Dispatcher from "./EventSystem";
+import Dispatcher, { EventCallbackType } from "./EventSystem";
 import { INeoStrokeProps } from "../DataStructure/NeoStroke";
 
 /** @type {InkStorage} */
@@ -71,7 +71,7 @@ export default class InkStorage {
    * @param listener 
    * @param filter 
    */
-  public addEventListener(eventName: string, listener: Function, filter: any) {
+  public addEventListener(eventName: string, listener: EventCallbackType, filter: any) {
     this.dispatcher.on(eventName, listener, filter);
     console.log("bound", listener);
   }
@@ -81,7 +81,7 @@ export default class InkStorage {
    * @param eventName 
    * @param listener 
    */
-  public removeEventListener(eventName: string, listener: Function) {
+  public removeEventListener(eventName: string, listener: EventCallbackType) {
     this.dispatcher.off(eventName, listener);
   }
 
@@ -93,8 +93,8 @@ export default class InkStorage {
     const { section, book, owner, page } = pageInfo;
     const pageId = InkStorage.getPageId({ section, book, owner, page });
 
-    let completed = this.completedOnPage;
-    let arr = completed.get(pageId);
+    const completed = this.completedOnPage;
+    const arr = completed.get(pageId);
     if (arr) return arr;
 
     return [];
@@ -104,7 +104,7 @@ export default class InkStorage {
     const { section, book, owner, page } = pageInfo;
     const pageId = InkStorage.getPageId({ section, book, owner, page });
 
-    let completed = this.completedOnPage;
+    const completed = this.completedOnPage;
     completed.delete(pageId);
   }
   /**
@@ -117,15 +117,15 @@ export default class InkStorage {
 
 
     /** @type {Map.<string, Map>} - (pageId) ==> (strokeKey ==> NeoStroke) */
-    let realtime = this.realtimeOnPage;
+    const realtime = this.realtimeOnPage;
 
     /** @type {Map.<string, NeoStroke>} - (strokeKey) ==> (NeoStroke) */
-    let penStrokesMap = realtime.get(pageId);
+    const penStrokesMap = realtime.get(pageId);
 
     if (penStrokesMap) {
       /** @type {Array.<NeoStroke>} */
-      let arr = [];
-      penStrokesMap.forEach((value, key) => {
+      const arr = [];
+      penStrokesMap.forEach((value) => {
         arr.push(value);
       });
 
@@ -156,14 +156,14 @@ export default class InkStorage {
       // 배열이 없으면 만들어 준다.
 
       /** @type {Map.<string, Array.<NeoStroke>>} - (pageId) ==> (NeoStroke[]) */
-      let completed = this.completedOnPage;
+      const completed = this.completedOnPage;
       if (!completed.has(pageId)) {
         completed.set(pageId, new Array(0));
       }
 
       // 배열에 넣는다.
       /** @type {Array.<NeoStroke>} */
-      let arr = completed.get(pageId);
+      const arr = completed.get(pageId);
       arr.push(stroke);
 
       this.lastPageInfo = { section, book, owner, page };
@@ -177,15 +177,15 @@ export default class InkStorage {
    */
   private addRealtimeToPage(stroke: NeoStroke) {
     const { section, book, owner, page, key } = stroke;
-    let pageId = InkStorage.getPageId({ section, book, owner, page });
+    const pageId = InkStorage.getPageId({ section, book, owner, page });
 
 
     /** @type {Map.<string, Map>} - (pageId) ==> (strokeKey ==> NeoStroke) */
-    let realtime = this.realtimeOnPage;
+    const realtime = this.realtimeOnPage;
     if (!realtime.has(pageId)) realtime.set(pageId, new Map());
 
     /** @type {Map.<string, NeoStroke>} - (strokeKey) ==> (NeoStroke) */
-    let penStrokesMap = realtime.get(pageId);
+    const penStrokesMap = realtime.get(pageId);
 
     const strokeKey = key;
     penStrokesMap.set(strokeKey, stroke);
@@ -197,13 +197,13 @@ export default class InkStorage {
    */
   private removeFromRealtime(stroke: NeoStroke) {
     const { section, book, owner, page, key } = stroke;
-    let pageId = InkStorage.getPageId({ section, book, owner, page });
+    const pageId = InkStorage.getPageId({ section, book, owner, page });
 
     /** @type {Map.<string, Map>} - (pageId) ==> (strokeKey ==> NeoStroke) */
-    let realtime = this.realtimeOnPage;
+    const realtime = this.realtimeOnPage;
     if (realtime.has(pageId)) {
       /** @type {Map.<string, NeoStroke>} - (strokeKey) ==> (NeoStroke) */
-      let penStrokesMap = realtime.get(pageId);
+      const penStrokesMap = realtime.get(pageId);
 
       const strokeKey = key;
       penStrokesMap.delete(strokeKey);
@@ -268,13 +268,13 @@ export default class InkStorage {
       brushType,
       color,
     }
-    let stroke = new NeoStroke(strokeProps);
+    const stroke = new NeoStroke(strokeProps);
     // stroke.thickness = thickness;     // kitty
     stroke.penTipMode = 0;    // kitty
 
     // stroke.init(section, owner, book, page, startTime);
 
-    let strokeKey = stroke.key;
+    const strokeKey = stroke.key;
     if (this.realtime[strokeKey]) this.realtime[strokeKey] = null;
     this.realtime[strokeKey] = stroke;
 
@@ -295,7 +295,7 @@ export default class InkStorage {
    * @param time 
    */
   public setStrokeInfo(strokeKey: string, section: number, owner: number, book: number, page: number, time: number) {
-    let stroke = this.realtime[strokeKey];
+    const stroke = this.realtime[strokeKey];
     stroke.section = section;
     stroke.owner = owner;
     stroke.book = book;
@@ -313,7 +313,7 @@ export default class InkStorage {
    */
   public getRealTimeStroke(strokeKey: string): NeoStroke {
     /** @type {NeoStroke} */
-    let stroke = this.realtime[strokeKey];
+    const stroke = this.realtime[strokeKey];
     if (!stroke) {
       console.error(`stroke was not initiated`);
       return null;
@@ -330,7 +330,7 @@ export default class InkStorage {
    */
   public appendDot(strokeKey: string, dot: NeoDot) {
     /** @type {NeoStroke} */
-    let stroke = this.realtime[strokeKey];
+    const stroke = this.realtime[strokeKey];
     if (!stroke) {
       console.error(`stroke was not initiated`);
       console.error(dot);
@@ -350,7 +350,7 @@ export default class InkStorage {
    */
   public closeStroke(strokeKey: string) {
     /** @type {NeoStroke} */
-    let stroke = this.realtime[strokeKey];
+    const stroke = this.realtime[strokeKey];
     if (!stroke) {
       console.error(`stroke was not initiated`);
       return;

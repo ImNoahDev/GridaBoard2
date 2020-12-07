@@ -40,10 +40,10 @@ const menuStyle = {
 }
 
 function hideAndShowFnc() {
-  var colorMenu = document.getElementById('color_bar');
-  var leftMenu = document.getElementById('leftmenu');
-  var navCenter = document.getElementById('navbar_center');
-  var navEnd = document.getElementById('navbar_end');
+  let colorMenu = document.getElementById('color_bar');
+  let leftMenu = document.getElementById('leftmenu');
+  let navCenter = document.getElementById('navbar_center');
+  let navEnd = document.getElementById('navbar_end');
 
   if (colorMenu.style.display === 'none' && navCenter.style.display === 'none'
     && navEnd.style.display === 'none' && leftMenu.style.display === 'none') {

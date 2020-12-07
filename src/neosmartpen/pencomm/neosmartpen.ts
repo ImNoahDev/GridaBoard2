@@ -1,7 +1,7 @@
 import PenComm, { deviceSelectDlg } from "./pencomm";
 import InkStorage, { IOpenStrokeArg } from "../penstorage/InkStorage";
 import { paperInfo } from "../noteserver/PaperInfo";
-import Dispatcher from "../penstorage/EventSystem";
+import Dispatcher, { EventCallbackType } from "../penstorage/EventSystem";
 import PenManager from "./PenManager";
 import "../types";
 import { IPenEvent, IBrushState } from "../DataStructure/Structures";
@@ -42,7 +42,7 @@ export class NeoSmartpen {
   lastInfoEvent: IPenEvent = null;
   protocolHandler: PenComm = new PenComm(this);
   mac: string = null;
-  
+
   lastState: PEN_STATE = PEN_STATE.NONE;
 
   surfaceInfo: IWritingSurfaceInfo = {
@@ -63,8 +63,8 @@ export class NeoSmartpen {
   visibleHoverPoints = NUM_HOVER_POINTERS;
   pathHoverPoints: Array<fabric.Circle> = new Array(0);
   timeOut = null;
-  waitCount: number = 0;
-  eraserLastPoint:object = {};
+  waitCount = 0;
+  eraserLastPoint = {};
 
   pathPenTracker: fabric.Circle;
   /**
@@ -93,31 +93,31 @@ export class NeoSmartpen {
 
   initPenTracker() {
     this.pathPenTracker = new fabric.Circle({
-      left : -30,
-      top : -30,
+      left: -30,
+      top: -30,
       radius: 5,
-      opacity : 0.3,
+      opacity: 0.3,
       fill: "#7a7aff",
       stroke: "#7a7aff",
       dirty: true,
-      name : 'penTracker',
-      data : 'pt'
+      name: 'penTracker',
+      data: 'pt'
     });
   }
 
   initHoverCursor() {
-    for (var i = 0; i < 6; i++) {
-      var path = new fabric.Circle({
-          radius: (NUM_HOVER_POINTERS - i) ,
-          fill: "#ff2222",
-          stroke: "#ff2222",
-          opacity: (NUM_HOVER_POINTERS - i) / NUM_HOVER_POINTERS / 2,
-          left : -30,
-          top : -30,
-          hasControls : false,
-          dirty: true,
-          name : 'hoverPoint',
-          data : 'hp'
+    for (let i = 0; i < 6; i++) {
+      const path = new fabric.Circle({
+        radius: (NUM_HOVER_POINTERS - i),
+        fill: "#ff2222",
+        stroke: "#ff2222",
+        opacity: (NUM_HOVER_POINTERS - i) / NUM_HOVER_POINTERS / 2,
+        left: -30,
+        top: -30,
+        hasControls: false,
+        dirty: true,
+        name: 'hoverPoint',
+        data: 'hp'
       });
       this.pathHoverPoints.push(path);
     }
@@ -192,7 +192,7 @@ export class NeoSmartpen {
    */
   resetPenStroke = () => {
     // let { currPenMovement} = this;
-    let p = this.currPenMovement;
+    const p = this.currPenMovement;
 
     p.downEvent = null;
     p.infoEvent = null;
@@ -218,8 +218,8 @@ export class NeoSmartpen {
       console.error("Ink Storage has not been initialized");
     }
 
-    let mac = this.mac;
-    let time = event.timeStamp;
+    const mac = this.mac;
+    const time = event.timeStamp;
 
     const openStrokeArg: IOpenStrokeArg = {
       mac,
@@ -230,8 +230,8 @@ export class NeoSmartpen {
       color: this.penState[this.penRendererType].color,
     }
 
-    let stroke = this.storage.openStroke(openStrokeArg);
-    let strokeKey = stroke.key;
+    const stroke = this.storage.openStroke(openStrokeArg);
+    const strokeKey = stroke.key;
     this.currPenMovement.stroke = stroke;
 
     console.log(`NeoSmartpen dispatch event ON_PEN_DOWN`);
@@ -259,7 +259,7 @@ export class NeoSmartpen {
 
 
     // margin 값을 가져오기 위해서
-    let info = paperInfo.getPaperInfo({ section: event.section, book: event.book, owner: event.owner, page: event.page });
+    const info = paperInfo.getPaperInfo({ section: event.section, book: event.book, owner: event.owner, page: event.page });
     if (info) this.surfaceInfo = info;
 
     // 이전에 펜 down이 있었으면
@@ -279,15 +279,15 @@ export class NeoSmartpen {
       }
       else {
         const { section, owner, book, page, timeStamp } = event;
-        let mac = this.mac;
+        const mac = this.mac;
         if (!mac) {
           throw new Error("mac address was not registered");
         }
 
         if (!hover) {
           // storage에 저장
-          let stroke = this.currPenMovement.stroke;
-          let strokeKey = stroke.key;
+          const stroke = this.currPenMovement.stroke;
+          const strokeKey = stroke.key;
           this.storage.setStrokeInfo(strokeKey, section, owner, book, page, timeStamp);
 
           // hand pen page the event
@@ -304,20 +304,20 @@ export class NeoSmartpen {
 
         }
       }
-      
+
       // let ph = this.appPen;
       // ph.onPageInfo(event);
     }
-    
+
     if (hover) {
       const { section, owner, book, page, timeStamp } = event;
-      let mac = this.mac;
+      const mac = this.mac;
 
       this.dispatcher.dispatch(PenEventName.ON_PEN_HOVER_PAGEINFO, {
-        mac, section, owner, book, page, time: event.timeStamp, pen:this
+        mac, section, owner, book, page, time: timeStamp, pen: this
       });
     }
-    
+
     // event 전달
     // let ph = this.appPen;
     // if (hover) ph.onHoverPageInfo(event);
@@ -379,10 +379,10 @@ export class NeoSmartpen {
       y: event.y,
     });
 
-    let stroke = this.currPenMovement.stroke;
-    let strokeKey = stroke.key;
+    const stroke = this.currPenMovement.stroke;
+    const strokeKey = stroke.key;
     this.storage.appendDot(strokeKey, dot);
-    let pen = this;
+    const pen = this;
 
     // hand the event
     this.dispatcher.dispatch(PenEventName.ON_PEN_MOVE, { strokeKey, mac: stroke.mac, stroke, dot, pen });
@@ -407,21 +407,21 @@ export class NeoSmartpen {
     // console.log("    -> onHoverMove" + event);
     // let ph = this.appPen;
     // ph.onHoverMove(event);
-    let mac = this.mac;
+    const mac = this.mac;
     if (!mac) {
       throw new Error("mac address was not registered");
     }
     this.dispatcher.dispatch(PenEventName.ON_HOVER_MOVE, { pen: this, mac, event });
   }
 
-    /**
-   * hover 상태에서 움직임
-   * @param event
-   */
+  /**
+ * hover 상태에서 움직임
+ * @param event
+ */
   onHoverPageInfo = (event: IPenEvent) => {
     this.lastState = PEN_STATE.HOVER_MOVE;
-;
-    let mac = this.mac;
+
+    const mac = this.mac;
     if (!mac) {
       throw new Error("mac address was not registered");
     }
@@ -444,8 +444,8 @@ export class NeoSmartpen {
     }
 
     if (this.penRendererType !== IBrushType.ERASER) {
-      let stroke = this.currPenMovement.stroke;
-      let strokeKey = stroke.key;
+      const stroke = this.currPenMovement.stroke;
+      const strokeKey = stroke.key;
       this.storage.closeStroke(strokeKey);
 
       const { mac, section, owner, book, page } = stroke;
@@ -464,7 +464,7 @@ export class NeoSmartpen {
 
     // let ph = this.appPen;
     // ph.onNcodeError(event);
-    let mac = this.mac;
+    const mac = this.mac;
     if (!mac) {
       throw new Error("mac address was not registered");
     }
@@ -481,10 +481,10 @@ export class NeoSmartpen {
    */
   onPasscodeRequired = (event: IPenEvent) => {
     console.log("onPasscodeRequired" + event);
-    let passcode = prompt("please enter passcode " + (9 - event.retryCount));
+    const passcode = prompt("please enter passcode " + (9 - event.retryCount));
     this.protocolHandler.sendPasscode(passcode);
 
-    let mac = this.protocolHandler.getMac();
+    const mac = this.protocolHandler.getMac();
     if (!mac) {
       throw new Error("mac address was not registered");
     }
@@ -503,7 +503,7 @@ export class NeoSmartpen {
     // ph.onConnected(event);
 
     console.log("CONNECTED");
-    let mac = this.protocolHandler.getMac();
+    const mac = this.protocolHandler.getMac();
     this.mac = mac;
     console.log(`Connected: ${mac}`);
 
@@ -520,7 +520,7 @@ export class NeoSmartpen {
     // let ph = this.appPen;
     // ph.onFirmwareUpgradeNeeded(event);
 
-    let mac = this.mac;
+    const mac = this.mac;
     if (!mac) {
       throw new Error("mac address was not registered");
     }
@@ -536,7 +536,7 @@ export class NeoSmartpen {
     // let event = makePenEvent(DeviceTypeEnum.PEN, PenEventEnum.ON_DISCONNECTED);
     // let ph = this.appPen;
     // ph.onDisconnected(event);
-    let mac = this.mac;
+    const mac = this.mac;
     if (!mac) {
       console.error(`mac address was not registered`);
       console.error(event);
@@ -554,17 +554,17 @@ export class NeoSmartpen {
   setThickness(thickness: number) {
     this.penState[this.penRendererType].thickness = thickness;
   }
-  
+
   setPenRendererType(type) {
     this.penRendererType = type;
   }
-  
+
   /**
    *
    * @param eventName
    * @param listener
    */
-  public addEventListener(eventName: PenEventName, listener: Function) {
+  public addEventListener(eventName: PenEventName, listener: EventCallbackType) {
     if (eventName === PenEventName.ON_PEN_DOWN) {
       console.log(`NeoSmartpen: addEventListener ${eventName}`);
     }
@@ -578,7 +578,7 @@ export class NeoSmartpen {
    * @param eventName
    * @param listener
    */
-  public removeEventListener(eventName: PenEventName, listener: Function) {
+  public removeEventListener(eventName: PenEventName, listener: EventCallbackType) {
     this.dispatcher.off(eventName, listener);
   }
 }

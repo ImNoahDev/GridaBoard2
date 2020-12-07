@@ -1,16 +1,15 @@
 import { NeoSmartpen } from "./neosmartpen";
 import { IPenEvent } from "../DataStructure/Structures";
 import { IBrushType } from "../DataStructure/Enums"
-import PenBasedRenderer from "../renderer/pageviewer/PenBasedRenderer";
+// import PenBasedRenderer from "../renderer/pageviewer/PenBasedRenderer";
 import ThemeManager from "../../styles/ThemeManager"
-import jQuery from "jquery";
+import $ from "jquery";
 
-let $ = jQuery;
 let _penmanager_instance = null;
-var _active_pen:NeoSmartpen = null;
+let _active_pen: NeoSmartpen = null;
 
-export const DEFAULT_PEN_COLOR_NUM: number = 2;
-export const DEFAULT_PEN_THICKNESS: number = 2;
+export const DEFAULT_PEN_COLOR_NUM = 2;
+export const DEFAULT_PEN_THICKNESS = 2;
 export const DEFAULT_PEN_RENDERER_TYPE: IBrushType = IBrushType.PEN;
 
 export default class PenManager {
@@ -19,7 +18,7 @@ export default class PenManager {
 
   /** @type {Array.<StorageRenderer>} */
   render = [];
-  
+
   pen_colors: string[] = [
     "rgb(169, 169, 169)", // 0 DARK_GARY #FFAAAAAA #A9A9A9
     "rgb(255, 0, 0)", // 1 RED #FFFF0200 #FF0000  rgb(255, 0, 0, 0)
@@ -82,7 +81,7 @@ export default class PenManager {
    * 
    */
   public createPen = (): NeoSmartpen => {
-    let pen = new NeoSmartpen();
+    const pen = new NeoSmartpen();
     return pen;
   }
 
@@ -137,79 +136,79 @@ export default class PenManager {
     this.color = this.pen_colors[color_num];
 
     if (_active_pen) {
-        _active_pen.setColor(this.color);
+      _active_pen.setColor(this.color);
     }
   }
 
   toggleColorRadioButton(color_num: number) {
-    var $elem = $(`.color_${color_num}`);
+    const $elem = $(`.color_${color_num}`);
     this.toggleColorRadioButton_inner(undefined, $elem);
   }
-  
+
   toggleColorRadioButton_inner(e, $elem) {
     if ($elem === undefined) {
-        $elem = $(e.target);
+      $elem = $(e.target);
     }
     if ($elem.hasClass("color_icon")) {
-        $(".color_icon").each(function (item) {
-          $(item).removeClass("pressed");
-        });
-        $elem.addClass("pressed");
+      $(".color_icon").each(function (item) {
+        $(item).removeClass("pressed");
+      });
+      $elem.addClass("pressed");
     }
   }
-  
+
   setPenRendererType(type: IBrushType) {
-    var $elem = $("#btn_brush").find(".c2");
+    const $elem = $("#btn_brush").find(".c2");
     this.setPenTypeStatus($elem, type);
 
     if (type === IBrushType.MARKER) {
-      for(var i = 0; i < 11; i++) {
+      for (let i = 0; i < 11; i++) {
         $('#clr_' + [i]).find(".color_" + [i]).css('background-color', this.marker_colors[i]);
       }
     }
     else if (type === IBrushType.PEN) {
-      for(var i = 0; i < 11; i++) {
+      for (let i = 0; i < 11; i++) {
         $('#clr_' + [i]).find(".color_" + [i]).css('background-color', this.pen_colors[i]);
       }
     }
-  
+
     this.penRendererType = type;
-  
+
     if (_active_pen) {
-        _active_pen.setPenRendererType(this.penRendererType);
+      _active_pen.setPenRendererType(this.penRendererType);
     }
   }
-  
+
   setPenTypeStatus($elem, type) {
     if (type == IBrushType.MARKER) {
-        $elem.removeClass("state_0");
-        $elem.removeClass("state_2");
-  
-        $elem.addClass("state_1");
+      $elem.removeClass("state_0");
+      $elem.removeClass("state_2");
+
+      $elem.addClass("state_1");
     } else if (type == IBrushType.ERASER) {
-        $elem.removeClass("state_0");
-        $elem.removeClass("state_1");
-  
-        $elem.addClass("state_2");
+      $elem.removeClass("state_0");
+      $elem.removeClass("state_1");
+
+      $elem.addClass("state_2");
     } else if (type == IBrushType.PEN) {
-        $elem.removeClass("state_1");
-        $elem.removeClass("state_2");
-  
-        $elem.addClass("state_0");
+      $elem.removeClass("state_1");
+      $elem.removeClass("state_2");
+
+      $elem.addClass("state_0");
     }
   }
-  
+
   setThickness(thickness: number) {
     $("#thickness_num").text(thickness);
-  
+
     thickness = thickness * 2;
     this.thickness = thickness;
-  
+
     if (_active_pen) {
-        _active_pen.setThickness(this.thickness);
+      _active_pen.setThickness(this.thickness);
     }
   }
-  
+
   registerRenderContainer = (renderContainer) => {
     this.render.push(renderContainer);
   }
@@ -277,7 +276,7 @@ export default class PenManager {
    */
   getConnectedPens = (): NeoSmartpen[] => {
     /** @type {Array<NeoSmartpen>} */
-    let ret = new Array(0);
+    const ret = new Array(0);
 
     this.penArray.forEach(penInfo => {
       if (penInfo.connected) {

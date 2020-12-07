@@ -12,7 +12,7 @@ const TracePointButton = () => {
   const dispatch = useDispatch();
 
   const setEnable = (elem_name: string, sw: boolean) => {
-    var $elem = $(`#${elem_name}`);
+    let $elem = $(`#${elem_name}`);
     if (sw) {
         let $elem = $("#btn_tracepoint").find(".c2");
         $elem.addClass("checked");

@@ -39,8 +39,8 @@ class Page extends Component<PageProps> {
   };
 
   canvas: HTMLCanvasElement | null = null;
-  inRendering: boolean = false;
-  inImageRendering: boolean = false;
+  inRendering = false;
+  inImageRendering = false;
 
   scaleCanvas(canvas: HTMLCanvasElement, width: number, height: number, zoom: number) {
     // assume the device pixel ratio is 1 if the browser doesn't specify it
@@ -158,8 +158,8 @@ class Page extends Component<PageProps> {
 
 
   renderPageToImage = (page: PdfJs.PDFPageProxy, zoom: number): HTMLImageElement => {
-    let img = document.createElement("img");
-    var canvas = document.createElement("canvas");
+    const img = document.createElement("img");
+    const canvas = document.createElement("canvas");
 
     this.inImageRendering = true;
 
@@ -169,15 +169,15 @@ class Page extends Component<PageProps> {
     // let aa = 2;
 
     let viewport: any = page.getViewport({ scale: 1 });
-    let { width, height } = viewport;
+    const { width, height } = viewport;
 
-    let size = { width, height };
+    const size = { width, height };
     const displaySize = pdfSizeToDIsplayPixel(size);
     const new_scale = displaySize.width / viewport.width;
 
     viewport = page.getViewport({ scale: new_scale });
 
-    let ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext('2d');
 
     // scaleCanvas(canvas, ctx, width, height);
     this.scaleCanvas(canvas, displaySize.width, displaySize.height, zoom);
@@ -188,13 +188,13 @@ class Page extends Component<PageProps> {
     console.log(viewport);
     ctx.restore();
 
-    let renderTask = page.render({
+    const renderTask = page.render({
       canvasContext: ctx,
       viewport,
       // intent: "print",
     });
 
-    let self = this;
+    const self = this;
     renderTask.promise.then(() => {
       self.setState({ status: 'rendered', page, width, height });
 
@@ -229,37 +229,37 @@ class Page extends Component<PageProps> {
     // let aa = 2;
 
     let viewport: any = page.getViewport({ scale: 1 });
-    let { width, height } = viewport;
-    let canvas = this.canvas;
+    const { width, height } = viewport;
+    const canvas = this.canvas;
 
-    let size = { width, height };
+    const size = { width, height };
     const displaySize = pdfSizeToDIsplayPixel(size);
     const new_scale = displaySize.width / viewport.width;
 
     viewport = page.getViewport({ scale: new_scale });
     // viewport.viewBox[2] = 100;
-    let ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext('2d');
 
     // scaleCanvas(canvas, ctx, width, height);
     this.scaleCanvas(canvas, displaySize.width, displaySize.height, this.props.position.zoom);
     console.log(viewport);
 
-    let renderTask = page.render({
+    const renderTask = page.render({
       canvasContext: ctx,
       viewport,
       // intent: "print",
     });
 
-    let self = this;
+    const self = this;
     renderTask.promise.then(() => {
-      let renderCount = this.state.renderCount + 1;
+      const renderCount = this.state.renderCount + 1;
       self.setState({ status: 'rendered', page, width, height, renderCount });
       this.inRendering = false;
     });
   }
 
   render = () => {
-    let { status } = this.state;
+    const { status } = this.state;
 
     return (
       <div className={`pdf-page ${status}`} >

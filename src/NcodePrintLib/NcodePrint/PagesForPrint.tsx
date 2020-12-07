@@ -111,14 +111,11 @@ export class PagesForPrint extends React.Component<Props, State> {
           (v, i) => {
             // console.log(`Page displaying ${i}`);
             return (
-              <div>
-                {/* { isLandscape ? (<LandscapeOrientation />) : (<PortraitOrientation />)} */}
-                { console.log(`[key] page-${pdf.fingerprint}-${i}`)}
-
+              <div key={`page-div-${pdf.fingerprint}-${i}`}>
                 <PageForPrint
                   pdf={pdf}
-                  sheetIndex={i}
                   key={`page-${pdf.fingerprint}-${i}`}
+                  sheetIndex={i}
                   name={`page-${pdf.fingerprint}-${i}`}
                   OnPagePrepared={OnPagePrepared}
                   printOption={printOption}

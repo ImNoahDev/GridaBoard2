@@ -13,8 +13,8 @@ import { IBrushType } from "../../DataStructure/Enums";
 import { INeoStrokeProps } from "../../DataStructure/NeoStroke";
 import { IPageSOBP } from "../../DataStructure/Structures";
 
-import jQuery from "jquery";
-let $ = jQuery;
+import $ from "jquery";
+
 
 // const timeTickDuration = 20; // ms
 // const DISABLED_STROKE_COLOR = "rgba(0, 0, 0, 0.1)";
@@ -51,7 +51,7 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
 
   visibleHoverPoints: number = NUM_HOVER_POINTERS;
   pathHoverPoints: Array<fabric.Circle> = new Array(0);
-  
+
 
   /**
    * 
@@ -121,16 +121,16 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
   pushLiveDot = (event: any) => {
     //pen tracker rendering
     this.movePenTracker(event);
-    
-    let pathData = this.livePaths[event.strokeKey];
+
+    const pathData = this.livePaths[event.strokeKey];
     const { path, stroke } = pathData;
     const dot = event.dot;
 
     if (path) {
       this.canvasFb.remove(path);
     }
-    
-    
+
+
 
     //지우개 구현
     const canvas_xy = this.getCanvasXY(dot);
@@ -145,14 +145,14 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
       pen.eraserLastPoint = { x: screen_xy.x, y: screen_xy.y };
     }
     else {
-      let new_path = this.createPenPathFromStroke(stroke);
-      
+      const new_path = this.createPenPathFromStroke(stroke);
+
       if (this.canvasFb) {
         this.canvasFb.add(new_path);
         pathData.path = new_path;
       }
-      
-      
+
+
       this.focusToDot(dot);
     }
   }
@@ -162,13 +162,13 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
    * @param {{strokeKey:string, mac:string, stroke, section:number, owner:number, book:number, page:number}} event
    */
   closeLiveStroke = (event) => {
-    let pathData = this.livePaths[event.strokeKey];
+    const pathData = this.livePaths[event.strokeKey];
 
     if (!pathData || pathData.path === undefined) {
       console.log(`undefined path`);
     }
 
-    let path = pathData.path;
+    const path = pathData.path;
 
     if (path) {
       this.localPathArray.push(path);
@@ -180,24 +180,22 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
     delete this.livePaths[event.strokeKey];
   }
 
-  movePenTracker = (event:any) => {
+  movePenTracker = (event: any) => {
     const dot = event.dot;
     const canvas_xy = this.getCanvasXY(dot);
     const screen_xy = this.getScreenXY(canvas_xy);
     const penTracker = event.pen.pathPenTracker;
-    
-    let objects = this.canvasFb.getObjects();
-    let penTrackerObj = objects.filter(obj => obj.data === 'pt');
+
+    const objects = this.canvasFb.getObjects();
+    const penTrackerObj = objects.filter(obj => obj.data === 'pt');
 
     if (penTrackerObj.length === 0) {
-        this.canvasFb.add(event.pen.pathPenTracker);
-      }
-    else {
+      this.canvasFb.add(event.pen.pathPenTracker);
     }
 
-    var radius = penTracker.radius;
+    const radius = penTracker.radius;
     penTracker.visible = true;
-    penTracker.set({left : screen_xy.x - radius, top: screen_xy.y - radius});
+    penTracker.set({ left: screen_xy.x - radius, top: screen_xy.y - radius });
     penTracker.setCoords();
     this.canvasFb.renderAll();
 
@@ -210,23 +208,23 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
     }
 
     if (pen.timeOut) {
-        clearInterval(pen.timeOut);
-        pen.timeOut = null;
+      clearInterval(pen.timeOut);
+      pen.timeOut = null;
     }
 
 
   }
 
   eraseOnLine(ink_x0, ink_y0, ink_x1, ink_y1, stroke) {
-    var pathData = 'M ' + ink_x0 + ' ' + ink_y0 + ' L ' + ink_x1 + ' ' + ink_y1;
-    var eraserPath = new fabric.Path(pathData);
-    eraserPath.set({left : ink_x0, top: ink_y0, opacity: 0});
+    const pathData = 'M ' + ink_x0 + ' ' + ink_y0 + ' L ' + ink_x1 + ' ' + ink_y1;
+    const eraserPath = new fabric.Path(pathData);
+    eraserPath.set({ left: ink_x0, top: ink_y0, opacity: 0 });
 
-    let paths = this.canvasFb.getObjects().filter(obj => obj.data === 'ns');
+    const paths = this.canvasFb.getObjects().filter(obj => obj.data === 'ns');
 
-    for (var i = 0; i < this.localPathArray.length; i++) {
-      var path = this.localPathArray[i];
-      
+    for (let i = 0; i < this.localPathArray.length; i++) {
+      const path = this.localPathArray[i];
+
       if (path.intersectsWithObject(eraserPath)) {
         this.canvasFb.remove(path);
 
@@ -241,34 +239,31 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
   }
 
   addHoverPoints = (e) => {
-    for (var i=0; i<e.pen.pathHoverPoints.length; i++) {
+    for (let i = 0; i < e.pen.pathHoverPoints.length; i++) {
       this.canvasFb.add(e.pen.pathHoverPoints[i]);
     }
-    
+
     this.canvasFb.add(e.pen.pathPenTracker);
     console.log('hover points & pen tracker added')
   }
 
   moveHoverPoint = (e) => {
 
-    let objects = this.canvasFb.getObjects();
-    let hoverPoints = objects.filter(obj => obj.data === 'hp');
+    const objects = this.canvasFb.getObjects();
+    const hoverPoints = objects.filter(obj => obj.data === 'hp');
 
     if (hoverPoints.length === 0) {
-      for (var i=0; i<e.pen.pathHoverPoints.length; i++) {
+      for (let i = 0; i < e.pen.pathHoverPoints.length; i++) {
         this.canvasFb.add(e.pen.pathHoverPoints[i]);
       }
     }
-    else {
-    }
 
-    const dot = {x:e.event.x, y:e.event.y}
+    const dot = { x: e.event.x, y: e.event.y }
     const canvas_xy = this.getCanvasXY(dot);
-    
-    var i: number;
-    for (i = NUM_HOVER_POINTERS - 1; i > 0; i--) {
-      e.pen.pathHoverPoints[i].left = e.pen.pathHoverPoints[i-1].left;
-      e.pen.pathHoverPoints[i].top = e.pen.pathHoverPoints[i-1].top;
+
+    for (let i = NUM_HOVER_POINTERS - 1; i > 0; i--) {
+      e.pen.pathHoverPoints[i].left = e.pen.pathHoverPoints[i - 1].left;
+      e.pen.pathHoverPoints[i].top = e.pen.pathHoverPoints[i - 1].top;
       e.pen.pathHoverPoints[i].setCoords();
       this.canvasFb.renderAll();
     }
@@ -278,43 +273,43 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
     e.pen.pathHoverPoints[0].setCoords();
     this.canvasFb.renderAll();
 
-    var isPointerVisible = $("#btn_tracepoint").find(".c2").hasClass("checked");
+    const isPointerVisible = $("#btn_tracepoint").find(".c2").hasClass("checked");
 
     e.pen.visibleHoverPoints = NUM_HOVER_POINTERS;
 
-    for (i = 0; i < e.pen.visibleHoverPoints; i++) {
+    for (let i = 0; i < e.pen.visibleHoverPoints; i++) {
       e.pen.pathHoverPoints[i].visible = isPointerVisible;
       this.canvasFb.renderAll();
     }
 
     if (e.pen.timeOut) {
-        clearInterval(e.pen.timeOut);
-        e.pen.timeOut = null;
+      clearInterval(e.pen.timeOut);
+      e.pen.timeOut = null;
     }
     e.pen.waitCount = 0;
 
-    var pen = e.pen;
-    var self = this;
+    const pen = e.pen;
+    const self = this;
 
     e.pen.timeOut = setInterval(() => {
       pen.waitCount++;
-        // 1초 뒤
-        if (pen.waitCount > 20) {
-            for (i = NUM_HOVER_POINTERS - 1; i > 0; i--) {
-                pen.pathHoverPoints[i].left = pen.pathHoverPoints[i - 1].left;
-                pen.pathHoverPoints[i].top = pen.pathHoverPoints[i - 1].top;
-            }
-            pen.pathHoverPoints[0].left = -30;
-            pen.pathHoverPoints[0].top = -30;
-
-            pen.visibleHoverPoints--;
-            if (pen.visibleHoverPoints >= 0) {
-                pen.pathHoverPoints[pen.visibleHoverPoints].visible = false;
-                self.canvasFb.renderAll();
-            } else {
-                clearInterval(pen.timeOut);
-            }
+      // 1초 뒤
+      if (pen.waitCount > 20) {
+        for (let i = NUM_HOVER_POINTERS - 1; i > 0; i--) {
+          pen.pathHoverPoints[i].left = pen.pathHoverPoints[i - 1].left;
+          pen.pathHoverPoints[i].top = pen.pathHoverPoints[i - 1].top;
         }
+        pen.pathHoverPoints[0].left = -30;
+        pen.pathHoverPoints[0].top = -30;
+
+        pen.visibleHoverPoints--;
+        if (pen.visibleHoverPoints >= 0) {
+          pen.pathHoverPoints[pen.visibleHoverPoints].visible = false;
+          self.canvasFb.renderAll();
+        } else {
+          clearInterval(pen.timeOut);
+        }
+      }
     }, REMOVE_HOVER_POINTS_INTERVAL);
   }
 
@@ -329,7 +324,7 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
    */
   changePage = (section: number, owner: number, book: number, page: number, forceToRefresh: boolean) => {
     console.log("changePage");
-    let currPage = this.surfaceInfo;
+    const currPage = this.surfaceInfo;
 
     if ((!forceToRefresh)
       && (section === currPage.section
@@ -339,7 +334,7 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
 
 
     // 페이지 정보와 scale을 조정한다.
-    let info = paperInfo.getPaperInfo({ section, owner, book, page });
+    const info = paperInfo.getPaperInfo({ section, owner, book, page });
     if (info) {
       this.surfaceInfo = {
         section, owner, book, page,
@@ -348,7 +343,7 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
       };
 
     }
-    let szPaper = paperInfo.getPaperSize({ section, owner, book, page });
+    const szPaper = paperInfo.getPaperSize({ section, owner, book, page });
     this.scale = this.calcScaleFactor(this.viewFit, szPaper, this.base_scale);
 
     // 현재 모든 stroke를 지운다.
@@ -359,8 +354,8 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
     this.drawPageLayout();
 
     // page에 있는 stroke를 가져온다
-    let pageInfo = { section, owner, book, page };
-    let strokes = this.storage.getPageStrokes(pageInfo);
+    const pageInfo = { section, owner, book, page };
+    const strokes = this.storage.getPageStrokes(pageInfo);
 
     //test
     const testStroke = this.generateA4CornerStrokeForTest(pageInfo);
@@ -400,7 +395,7 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
 
     let dot: NeoDot;
 
-    let dot0 = this.generateDotForTest(0, 0);
+    const dot0 = this.generateDotForTest(0, 0);
     defaultStroke.addDot(dot0);
 
     dot = this.generateDotForTest(88.56, 0);
@@ -447,8 +442,8 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
    */
   removeAllStrokeObject = () => {
     if (this.canvasFb) {
-      let objects = this.canvasFb.getObjects();
-      let strokes = objects.filter(obj => obj.data === STROKE_OBJECT_ID);
+      const objects = this.canvasFb.getObjects();
+      const strokes = objects.filter(obj => obj.data === STROKE_OBJECT_ID);
 
       strokes.forEach((path) => {
         this.canvasFb.remove(path);
@@ -472,7 +467,7 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
 
     strokes.forEach((stroke) => {
       if (stroke.dotArray.length > 0) {
-        let path = this.createPenPathFromStroke(stroke);
+        const path = this.createPenPathFromStroke(stroke);
         this.canvasFb.add(path);
         this.localPathArray.push(path);
       }
@@ -482,16 +477,16 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
   createPenPathFromStroke = (stroke: NeoStroke) => {
     const { dotArray, color, thickness, brushType, key } = stroke;
 
-    let pointArray = [];
+    const pointArray = [];
     dotArray.forEach((dot) => {
-      let pt = this.getCanvasXY_scaled(dot);
+      const pt = this.getCanvasXY_scaled(dot);
       pointArray.push(pt);
     });
 
-    var opacity: number;
+    let opacity = 0;
     switch (brushType) {
-      case 0 : opacity = 1; break;
-      case 1 : opacity = 0.3; break;
+      case 0: opacity = 1; break;
+      case 1: opacity = 0.3; break;
       default: opacity = 1; break;
     }
 
@@ -508,12 +503,12 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
 
       data: STROKE_OBJECT_ID,    // neostroke
       evented: true,
-      key : key,
+      key: key,
     };
 
-    let strokeThickness = thickness / 64;
-    let pathData = drawPath(pointArray, strokeThickness);
-    let path = new fabric.Path(pathData, pathOption);
+    const strokeThickness = thickness / 64;
+    const pathData = drawPath(pointArray, strokeThickness);
+    const path = new fabric.Path(pathData, pathOption);
 
     return path;
   }

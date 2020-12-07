@@ -60,11 +60,11 @@ const useStyles = makeStyles((theme) => ({
 
 const getPlayTime = (strokeStream) => {
   // 전체 필기, 시작시간, 끝시간
-  let whole_start_time = strokeStream.strokes[0].dotArray[0].time;
+  const whole_start_time = strokeStream.strokes[0].dotArray[0].time;
 
-  let last_stroke = strokeStream.strokes[strokeStream.strokes.length - 1];
-  let last_dot = last_stroke.dotArray[last_stroke.dotArray.length - 1];
-  let whole_end_time = last_dot.time;
+  const last_stroke = strokeStream.strokes[strokeStream.strokes.length - 1];
+  const last_dot = last_stroke.dotArray[last_stroke.dotArray.length - 1];
+  const whole_end_time = last_dot.time;
 
   return {
     start: whole_start_time,
@@ -202,7 +202,7 @@ export default function KerisMain(props) {
   };
 
   const playTimeHandler = (time_ms) => {
-    let timeStr = getTimeStr(time_ms);
+    const timeStr = getTimeStr(time_ms);
     // const old_caption = ({caption});
     if (timeStr !== cap) {
       setCaption(timeStr);
@@ -211,8 +211,8 @@ export default function KerisMain(props) {
     }
 
     // 페이지 전환이 있었는지 확인한다.
-    let start_time = props.strokeStream.startTime;
-    let code_info = findStrokesChunkAtTime(props.strokeChunks, time_ms, start_time);
+    const start_time = props.strokeStream.startTime;
+    const code_info = findStrokesChunkAtTime(props.strokeChunks, time_ms, start_time);
     if (code_info) {
       if (code_info.pageNum !== pageid) {
         console.log(`Change to page ${code_info.pageNum}`);

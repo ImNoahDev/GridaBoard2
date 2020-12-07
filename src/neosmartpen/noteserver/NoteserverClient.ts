@@ -1,7 +1,7 @@
-import jQuery from "jquery";
+import $ from "jquery";
 import JSZip from "jszip";
 
-let $ = jQuery;
+// const $ = jQuery;
 // window.$ = window.jQuery = jQuery;
 
 const NCODE_SIZE_IN_INCH = 8 * 7 / 600;
@@ -23,48 +23,48 @@ function extractMarginInfo(xml, option) {
 
 
 
-  let $bookXml = $(xml).find("book");
-  let title = $bookXml.find("title").text();
-  let author = $bookXml.find("author").text();
+  const $bookXml = $(xml).find("book");
+  const title = $bookXml.find("title").text();
+  const author = $bookXml.find("author").text();
 
-  let name = `${author}_${title}_${section}_${owner}_${book}`;
+  const name = `${author}_${title}_${section}_${owner}_${book}`;
 
   let Xmin_old = -1;
   let Ymin_old = -1;
   let Xmax_old = -1;
   let Ymax_old = -1;
 
-  let result = [];
+  const result = [];
 
-  let xmlData = $(xml).find("page_item");
+  const xmlData = $(xml).find("page_item");
 
   // $(xmlData).each(function () {
   xmlData.forEach(function (item) {
     // let ccc = $(this);
-    let ccc = $(item);
+    const ccc = $(item);
 
-    let x1 = parseFloat(ccc.attr("x1"));
-    let x2 = parseFloat(ccc.attr("x2"));
-    let y1 = parseFloat(ccc.attr("y1"));
-    let y2 = parseFloat(ccc.attr("y2"));
+    const x1 = parseFloat(ccc.attr("x1"));
+    const x2 = parseFloat(ccc.attr("x2"));
+    const y1 = parseFloat(ccc.attr("y1"));
+    const y2 = parseFloat(ccc.attr("y2"));
 
-    let crop_margin = ccc.attr("crop_margin");
-    let margins = crop_margin.split(",");
-    let l = parseFloat(margins[0]);
-    let t = parseFloat(margins[1]);
-    let r = parseFloat(margins[2]);
-    let b = parseFloat(margins[3]);
+    const crop_margin = ccc.attr("crop_margin");
+    const margins = crop_margin.split(",");
+    const l = parseFloat(margins[0]);
+    const t = parseFloat(margins[1]);
+    const r = parseFloat(margins[2]);
+    const b = parseFloat(margins[3]);
 
-    let page_no = parseInt(ccc.attr("number"));
+    const page_no = parseInt(ccc.attr("number"));
 
-    let Xmin = point72ToNcode(x1) + point72ToNcode(l);
-    let Ymin = point72ToNcode(y1) + point72ToNcode(t);
-    let Xmax = point72ToNcode(x2) - point72ToNcode(r);
-    let Ymax = point72ToNcode(y2) - point72ToNcode(b);
+    const Xmin = point72ToNcode(x1) + point72ToNcode(l);
+    const Ymin = point72ToNcode(y1) + point72ToNcode(t);
+    const Xmax = point72ToNcode(x2) - point72ToNcode(r);
+    const Ymax = point72ToNcode(y2) - point72ToNcode(b);
 
     if (Xmin !== Xmin_old || Xmax !== Xmax_old || Ymin !== Ymin_old || Ymax !== Ymax_old) {
       // console.log(ccc.html());
-      let obj = {
+      const obj = {
         name,
         section,
         owner,
@@ -104,14 +104,14 @@ function getZippedResouce(zipurl, bookInfo) {
     if (response.ok) {
       response.blob().then((data) => {
 
-        let zip = new JSZip();
+        const zip = new JSZip();
         zip.loadAsync(data).then(function (contents) {
           // console.log( contents.files);
           Object.keys(contents.files).forEach(function (filename) {
             zip.file(filename).async('nodebuffer').then(function (content) {
-              let n = filename.search(".nproj");
+              const n = filename.search(".nproj");
               if (n > 0) {
-                let xml = new TextDecoder("utf-8").decode(content);
+                const xml = new TextDecoder("utf-8").decode(content);
                 extractMarginInfo(xml, { filename, section, owner, book });
               }
               // let dest = path + filename;
@@ -138,9 +138,9 @@ export default class NoteserverClient {
   async getNoteInfo(pageInfo) {
     // const { section, owner, book } = pageInfo;
 
-    let url = "http://nbs.neolab.net/v1/notebooks/attributes?device=android";
-    let el: any = document.getElementById('str')
-    let s = encodeURIComponent(el.value);
+    const url = "http://nbs.neolab.net/v1/notebooks/attributes?device=android";
+    const el: HTMLInputElement = document.getElementById('str') as HTMLInputElement;
+    const s = encodeURIComponent(el.value);
 
 
 
@@ -155,17 +155,17 @@ export default class NoteserverClient {
       // jsonpCallback: "callback",
       success: function (data) {
         // console.log(data);
-        let arr = data.attributes;
+        const arr = data.attributes;
         for (let i = 0; i < arr.length; i++) {
           // for (let i = 0; i < 2; i++) {
-          let item = arr[i];
+          const item = arr[i];
 
-          let section = item.section_id;
-          let owner = item.owner_id;
-          let book = item.note_id;
+          const section = item.section_id;
+          const owner = item.owner_id;
+          const book = item.note_id;
 
           if (owner === 27 && book === 168) {
-            let zipurl = item.resource.zipimage;
+            const zipurl = item.resource.zipimage;
             getZippedResouce(zipurl, { section, owner, book });
           }
 
@@ -176,7 +176,7 @@ export default class NoteserverClient {
         console.log(error);
       },
       complete: function () {
-
+        console.log("completed");
       },
     });
 

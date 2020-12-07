@@ -3,7 +3,7 @@ import { INcodeSOBPxy, IPageSOBP } from "../DataStructure/Structures";
 import { isSamePage } from "../NcodeSurface";
 import { IPdfDocDesc } from "../NeoPdf/NeoPdfDocument";
 
-var _instance: MappingStorage = null;
+let _instance: MappingStorage = null;
 const LOCAL_STORAGE_ID = "GridaBoard_codeMappingInfo_v2";
 
 export default class MappingStorage {
@@ -22,8 +22,8 @@ export default class MappingStorage {
   register = (item: CoordinateTanslater) => {
     const params = item.mappingParams;
 
-    var now = new Date();
-    var timeStr =
+    let now = new Date();
+    let timeStr =
       `${addZeros(now.getFullYear(), 2)}/` +
       `${addZeros(now.getMonth() + 1, 2)}/` +
       `${addZeros(now.getDate(), 2)} ` +
@@ -124,10 +124,10 @@ export default class MappingStorage {
 
 
 function storageAvailable(type) {
-  var storage;
+  let storage;
   try {
     storage = window[type];
-    var x = "__storage_test__";
+    let x = "__storage_test__";
     storage.setItem(x, x);
     storage.removeItem(x);
     return true;
@@ -153,10 +153,10 @@ function storageAvailable(type) {
 
 function addZeros(num, digit) {
   // 자릿수 맞춰주기
-  var zero = "";
+  let zero = "";
   num = num.toString();
   if (num.length < digit) {
-    for (var i = 0; i < digit - num.length; i++) {
+    for (let i = 0; i < digit - num.length; i++) {
       zero += "0";
     }
   }

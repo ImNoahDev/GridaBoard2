@@ -257,8 +257,8 @@ class PaperInfo {
    */
   getPaperSize = (pageInfo: IPageSOBP): ISize => {
     // const { section, owner, book, page } = pageInfo;
-    let size: ISize = { width: 0, height: 0 };
-    let paper_info = this.getPaperInfo(pageInfo);
+    const size: ISize = { width: 0, height: 0 };
+    const paper_info = this.getPaperInfo(pageInfo);
 
     size.width = paper_info.Xmax - paper_info.Xmin;
     size.height = paper_info.Ymax - paper_info.Ymin;
@@ -274,7 +274,7 @@ class PaperInfo {
    */
   getPaperSize_px = (pageInfo: IPageSOBP, dpi: number): ISize => {
     // const { section, owner, book, page } = pageInfo;
-    let size = this.getPaperSize(pageInfo);
+    const size = this.getPaperSize(pageInfo);
     size.width = size.width * NCODE_TO_INCH_SCALE * dpi;
     size.height = size.height * NCODE_TO_INCH_SCALE * dpi;
 
@@ -288,7 +288,7 @@ class PaperInfo {
   getPaperSize_inch = (pageInfo: IPageSOBP): ISize => {
     // const { section, owner, book, page, } = pageInfo;
 
-    let size = this.getPaperSize(pageInfo);
+    const size = this.getPaperSize(pageInfo);
     size.width = size.width * NCODE_TO_INCH_SCALE;
     size.height = size.height * NCODE_TO_INCH_SCALE;
 
@@ -306,13 +306,13 @@ class PaperInfo {
     let info = PaperType.paperA4_dummy;
     // let found = false;
 
-    let keys = Object.keys(PaperType);
+    const keys = Object.keys(PaperType);
     for (let j = 0; j < keys.length; j++) {
-      let key = keys[j];
-      let value = PaperType[key];
+      const key = keys[j];
+      const value = PaperType[key];
 
       if (Array.isArray(value.book)) {
-        let idx = value.book.findIndex((elem) => elem === book);
+        const idx = value.book.findIndex((elem) => elem === book);
         if (value.owner === owner && idx > -1) {
           info = value;
           info.name = key;
