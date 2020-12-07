@@ -259,22 +259,15 @@ export default class Upload extends React.Component {
   render() {
       return (
         <div>
-        <button id="mapping_info_process" onClick={this.mappingInfoUploadProcess}>
-          Upload Mapping Info
-        </button>
-        <button id="read_mapping_info" onClick={this.readMappingInfo}>
-          Read Mapping Info
-        </button>
-        <button id="read_mapping_info" onClick={this.readPDF}>
-          Read PDF
-        </button>
-          <GoogleLogin 
-            clientId="169738066451-5u100n2i6rko17jhmtpvq0bnjuedj7g4.apps.googleusercontent.com"
-            buttonText="Login"
-            onSuccess={this.responseGoogle}
-            onFailure={this.responseGoogle}
-            cookiePolicy={'single_host_origin'}
-          />
+          <button id="mapping_info_process" onClick={this.mappingInfoUploadProcess}>
+            Upload Mapping Info
+          </button>
+          <button id="read_mapping_info" onClick={this.readMappingInfo}>
+            Read Mapping Info
+          </button>
+          <button id="read_mapping_info" onClick={this.readPDF}>
+            Read PDF
+          </button>
         </div>
       )
   }

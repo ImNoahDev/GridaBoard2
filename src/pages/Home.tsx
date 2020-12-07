@@ -24,6 +24,8 @@ import FileLoad from '../components/navbar/FileLoad';
 import CalibrationMenual from '../components/navbar/CalibrationMenual';
 import UpperNav from '../components/navbar/UpperNav';
 import { FileBrowserButton, IFileBrowserReturn } from "../NcodePrintLib";
+import GoogleBtn from '../components/GoogleBtn';
+import Upload from '../components/navbar/Upload';
 
 import {
   //PenEvent,
@@ -156,7 +158,8 @@ const Home = () => {
             Pen Connected: {num_pens}
           </div>
 
-          <UpperNav />
+          <Upload />
+          <GoogleBtn />
 
           <div style={{ flex: 8 }}>
           </div>
