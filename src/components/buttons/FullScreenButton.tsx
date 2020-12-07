@@ -4,9 +4,6 @@ import Tooltip, { TooltipProps } from '@material-ui/core/Tooltip';
 import { Theme, Typography, withStyles } from '@material-ui/core';
 import ThemeManager from "../../styles/ThemeManager";
 
-import icon_fullscreen_n from "../../icons/icon_fullscreen_n.png";
-import icon_fullscreen_p from "../../icons/icon_fullscreen_p.png";
-
 const FullscreenTooltip = withStyles((theme: Theme) => ({
   tooltip: {
       backgroundColor: '#f5f5f9',
@@ -31,8 +28,8 @@ export default class FullScreenButton extends React.Component {
           </React.Fragment>
               }>
           <div className="c2">
-              <img src={icon_fullscreen_n} className="normal-image"></img>
-              <img src={icon_fullscreen_p} className="hover-image"></img>
+              <img src="../../icons/icon_fullscreen_n.png" className="normal-image"></img>
+              <img src="../../icons/icon_fullscreen_p.png" className="hover-image"></img>
           </div>
         </FullscreenTooltip>
       </button>

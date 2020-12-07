@@ -24,10 +24,8 @@ import FileLoad from '../components/navbar/FileLoad';
 import CalibrationMenual from '../components/navbar/CalibrationMenual';
 import UpperNav from '../components/navbar/UpperNav';
 import { FileBrowserButton, IFileBrowserReturn } from "../NcodePrintLib";
-
-import all_menu from '../icons/all_menu.png';
-import icon_trash_n from '../icons/icon_trash_n.png';
-import icon_trash_p from '../icons/icon_trash_p.png';
+import GoogleBtn from '../components/GoogleBtn';
+import Upload from '../components/navbar/Upload';
 
 import {
   //PenEvent,
@@ -148,13 +146,6 @@ const Home = () => {
           width: "100%", height: "40px",
           zIndex: 100,
         }}>
-          {/* Connect a pen */}
-          <div style={{ fontSize: "20px", fontWeight: "bold" }}>
-            <FileBrowserButton variant="contained" color="primary" onFileOpen={onFileOpen}>
-              <Box fontSize={14} fontWeight="fontWeightBold" >PDF열기</Box>
-            </FileBrowserButton>
-          </div>
-
           <div style={{ fontSize: "20px", fontWeight: "bold" }}>
             <Button variant="outlined" color="primary" onClick={(event) => getNoteInfo(event)} >
               <Box fontSize={14} fontWeight="fontWeightBold" >Get Notebook Infos</Box>
@@ -167,7 +158,8 @@ const Home = () => {
             Pen Connected: {num_pens}
           </div>
 
-          <UpperNav />
+          <Upload />
+          <GoogleBtn />
 
           <div style={{ flex: 8 }}>
           </div>
@@ -181,8 +173,8 @@ const Home = () => {
             {/* <MenuButton onClick={hideAndShowFnc} /> */}
             <button id="btn_menu" type="button" className="btn btn-neo " title="Open a menu" onClick={hideAndShowFnc}>
               <div className="c2">
-                <img style={menuStyle} src={all_menu} className="normal-image" alt=""></img>
-                <img style={menuStyle} src={all_menu} className="hover-image" alt=""></img>
+                <img style={menuStyle} src='../icons/all_menu.png' className="normal-image" alt=""></img>
+                <img style={menuStyle} src='../icons/all_menu.png' className="hover-image" alt=""></img>
               </div>
             </button>
           </div>
@@ -192,7 +184,7 @@ const Home = () => {
           </div>
           <div id="navbar_center">
             <div className="navbar-menu d-flex justify-content-center align-items-center neo_shadow">
-              <PageNumbering /><PrintButton /><FileLoad />
+              <PageNumbering /><PrintButton /><FileBrowserButton onFileOpen={onFileOpen}/>
             </div>
           </div>
           <div id="navbar_end">
@@ -227,8 +219,8 @@ const Home = () => {
                     <button id="btn_trash" type="button" title="Clear" className="btn btn-neo btn-neo-dropdown"
                       onClick={() => handleTrashBtn()}>
                       <div className="c2">
-                          <img src= {icon_trash_n} className="normal-image"></img>
-                          <img src= {icon_trash_p} className="hover-image"></img>
+                          <img src='../icons/icon_trash_n.png' className="normal-image"></img>
+                          <img src='../icons/icon_trash_p.png' className="hover-image"></img>
                       </div>
                     </button>
 

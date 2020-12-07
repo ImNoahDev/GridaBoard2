@@ -27,8 +27,8 @@ class fileLoad extends React.Component {
             </React.Fragment>
                 }>
             <div className="c2">
-                <img src={require('../../icons/icon_file_n.png')} className="normal-image"></img>
-                <img src={require('../../icons/icon_file_p.png')} className="hover-image"></img>
+                <img src='../../icons/icon_file_n.png' className="normal-image"></img>
+                <img src='../../icons/icon_file_p.png' className="hover-image"></img>
             </div>
           </PdfFileTooltip>
         </button>

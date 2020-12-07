@@ -5,11 +5,6 @@ import { setPointerTracer } from '../../store/reducers/pointerTracer';
 import $ from "jquery";
 import { RootState } from '../../store/rootReducer';
 
-import icon_point_d from "../../icons/icon_point_d.png";
-import icon_point_p from "../../icons/icon_point_p.png";
-import icon_point_n from "../../icons/icon_point_n.png";
-
-
 const TracePointButton = () => {
   const isTrace = useSelector((state:RootState) => state.pointerTracer.isTrace)
   const dispatch = useDispatch();
@@ -34,10 +29,10 @@ const TracePointButton = () => {
       <button id="btn_tracepoint" type="button" className="btn btn-neo btn-neo-vertical" title="Trace Point"
       onClick = {() => onTogglePointerTracer()}>
           <div className="c2 checked">
-              <img src={icon_point_d} className="toggle-off normal-image"></img>
-              <img src={icon_point_p} className="toggle-off hover-image"></img>
-              <img src={icon_point_n} className="toggle-on normal-image"></img>
-              <img src={icon_point_p} className="toggle-on hover-image"></img>
+              <img src="../../icons/icon_point_d.png" className="toggle-off normal-image"></img>
+              <img src="../../icons/icon_point_p.png" className="toggle-off hover-image"></img>
+              <img src="../../icons/icon_point_n.png" className="toggle-on normal-image"></img>
+              <img src="../../icons/icon_point_p.png" className="toggle-on hover-image"></img>
           </div>
       </button>
     );

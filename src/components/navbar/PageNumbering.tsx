@@ -28,8 +28,8 @@ class pageNumbering extends React.Component {
             </React.Fragment>
                 }>
             <div className="c2">
-              <img src={require('../../icons/icon_prev_n.png')} className="normal-image"></img>
-              <img src={require('../../icons/icon_prev_p.png')} className="hover-image"></img>
+              <img src='../../icons/icon_prev_n.png' className="normal-image"></img>
+              <img src='../../icons/icon_prev_p.png' className="hover-image"></img>
             </div>
           </PageTooltip>
         </button>
@@ -49,8 +49,8 @@ class pageNumbering extends React.Component {
             </React.Fragment>
                 }>
             <div className="c2">
-                <img src={require('../../icons/icon_next_n.png')} className="normal-image"></img>
-                <img src={require('../../icons/icon_next_p.png')} className="hover-image"></img>
+                <img src='../../icons/icon_next_n.png' className="normal-image"></img>
+                <img src='../../icons/icon_next_p.png' className="hover-image"></img>
             </div>
           </PageTooltip>
         </button>

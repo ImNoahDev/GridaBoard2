@@ -12,8 +12,8 @@ class calibrationMenual extends React.Component {
     return (
           <button id="btn_start_calibration" disabled type="button" className="btn btn-neo" title="Pairing paper with PDF">
               <div className="c2 disabled">
-                  <img style={style} src={require('../../icons/icon_calibration_n.png')} className="normal-image"></img>
-                  <img style={style} src={require('../../icons/icon_calibration_p.png')} className="hover-image"></img>
+                  <img style={style} src='../../icons/icon_calibration_n.png' className="normal-image"></img>
+                  <img style={style} src='../../icons/icon_calibration_p.png' className="hover-image"></img>
               </div>
           </button>
     )
