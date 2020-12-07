@@ -26,6 +26,10 @@ import CalibrationMenual from '../components/navbar/CalibrationMenual';
 import UpperNav from '../components/navbar/UpperNav';
 import { FileBrowserButton, IFileBrowserReturn } from "../NcodePrintLib";
 
+import all_menu from '../icons/all_menu.png';
+import icon_trash_n from '../icons/icon_trash_n.png';
+import icon_trash_p from '../icons/icon_trash_p.png';
+
 import {
   //PenEvent,
   NoteserverClient,
@@ -40,10 +44,10 @@ const menuStyle = {
 }
 
 function hideAndShowFnc() {
-  let colorMenu = document.getElementById('color_bar');
-  let leftMenu = document.getElementById('leftmenu');
-  let navCenter = document.getElementById('navbar_center');
-  let navEnd = document.getElementById('navbar_end');
+  var colorMenu = document.getElementById('color_bar');
+  var leftMenu = document.getElementById('leftmenu');
+  var navCenter = document.getElementById('navbar_center');
+  var navEnd = document.getElementById('navbar_end');
 
   if (colorMenu.style.display === 'none' && navCenter.style.display === 'none'
     && navEnd.style.display === 'none' && leftMenu.style.display === 'none') {
@@ -172,20 +176,20 @@ const Home = () => {
 
 
 
-        <nav id="colornav" className="navbar fixed-bottom navbar-light bg-transparent">
-          <div className="d-inline-flex p-2 bd-highlight">
-            <div className="navbar-menu d-flex justify-content-end align-items-end neo_shadow">
-              {/* <MenuButton onClick={hideAndShowFnc} /> */}
-              <button id="btn_menu" type="button" className="btn btn-neo " title="Open a menu" onClick={hideAndShowFnc}>
-                <div className="c2">
-                  <img style={menuStyle} src={require("../icons/all_menu.png")} className="normal-image" alt=""></img>
-                  <img style={menuStyle} src={require("../icons/all_menu.png")} className="hover-image" alt=""></img>
-                </div>
-              </button>
-            </div>
-            <div id="color_bar" className="color_bar neo_shadow float-left bottom_text color_bar">
-              <ColorButtons />
-            </div>
+      <nav id="colornav" className="navbar fixed-bottom navbar-light bg-transparent">
+        <div className="d-inline-flex p-2 bd-highlight">
+          <div className="navbar-menu d-flex justify-content-end align-items-end neo_shadow">
+            {/* <MenuButton onClick={hideAndShowFnc} /> */}
+            <button id="btn_menu" type="button" className="btn btn-neo " title="Open a menu" onClick={hideAndShowFnc}>
+              <div className="c2">
+                <img style={menuStyle} src={all_menu} className="normal-image" alt=""></img>
+                <img style={menuStyle} src={all_menu} className="hover-image" alt=""></img>
+              </div>
+            </button>
+          </div>
+          <div id="color_bar" className="color_bar neo_shadow float-left bottom_text color_bar">
+            <ColorButtons />
+
           </div>
           <div id="navbar_center">
             <div className="navbar-menu d-flex justify-content-center align-items-center neo_shadow">
@@ -197,7 +201,10 @@ const Home = () => {
               <CalibrationMenual />
             </div>
           </div>
-        </nav>
+
+        </div>
+      </nav>
+
 
         <div style={{
           // position: "absolute",
@@ -221,8 +228,8 @@ const Home = () => {
                     <button id="btn_trash" type="button" title="Clear" className="btn btn-neo btn-neo-dropdown"
                       onClick={() => handleTrashBtn()}>
                       <div className="c2">
-                        <img src={require("../icons/icon_trash_n.png")} className="normal-image"></img>
-                        <img src={require("../icons/icon_trash_p.png")} className="hover-image"></img>
+                          <img src= {icon_trash_n} className="normal-image"></img>
+                          <img src= {icon_trash_p} className="hover-image"></img>
                       </div>
                     </button>
 
