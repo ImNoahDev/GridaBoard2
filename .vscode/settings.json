@@ -1,5 +1,8 @@
 {
   "editor.tabSize": 2,
+  "javascript.referencesCodeLens.enabled": true,
+  "typescript.referencesCodeLens.enabled": true,
+  "typescript.referencesCodeLens.showOnAllFunctions": true,
   "prettier.printWidth": 132,
   "prettier.jsxBracketSameLine": true,
   "prettier.endOfLine": "auto",

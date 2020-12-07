@@ -10,7 +10,7 @@
     "skipLibCheck": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
-    "strict": true,
+    "strict": false,
     "forceConsistentCasingInFileNames": true,
     "module": "esnext",
     "moduleResolution": "node",
@@ -18,20 +18,17 @@
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react",
-
-    "strictNullChecks": false,
-    "noImplicitAny": false,
-    "noImplicitThis": true,
-    "noImplicitReturns": true,
-
+    "watch": true,
+    "sourceMap": true,
     "typeRoots": [
       "./src/types",
-      "./src/neosmartpen/types",
-    ], // 보통 types 폴더를 만들어 타입 정의
-    "declaration": true, // lib 만들 때 .d.ts 파일을 자동으로
-    "declarationDir": "./types" // 이 폴더에 만들어주는 옵션
+      "./src/neosmartpen/types"
+    ],
+    "declaration": true,
+    "declarationDir": "./types",
+    "noFallthroughCasesInSwitch": true
   },
   "include": [
-    "src/**/*.tsx", "src/styles/ThemeManager.ts", "src/components/navbar/Upload.js"
+    "src"
   ]
 }

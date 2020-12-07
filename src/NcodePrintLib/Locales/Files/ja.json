@@ -1,0 +1,36 @@
+{
+  "language_en": "English",
+  "language_ko": "한국어",
+  "language_ja": "日本語",
+
+  "hello": "こんにちは",
+
+  "connect pen": "ぺん接続",
+
+  "start_calibration": "인쇄물 등록 시작",
+
+  "calibration_dlg_title": "인쇄물의 자동 매칭 준비",
+  "calibration_pen_connect": "スマートペンが接続されていません。入力補正のために、まずスマートペンを接続してください。",
+  "calibration_touch_lefttop": "印刷された文書の左上にあるマークをスマートペンでタッチしてください。",
+  "calibration_touch_bottomright": "印刷された文書の右下にあるマークをスマートペンでタッチしてください。",
+  "calibration_touch_bottomright_part": "印刷された文書の右下の象限のどこでもスマートペンでタッチしてください。",
+  "calibration_touch_bottomright_part_again": "確認のため、もう一度右下の象限のどこでもスマートペンでタッチしてください。",
+  "calibration_proceeding_next": "スマートペンでタッチすると次に進みます。",
+
+  "calibration_number_1": "一番目",
+  "calibration_number_2": "二番目",
+  "calibration_number_3": "3番目",
+
+  "calibration_dialog_title": "ページ {{page}}/{{total_page}}, {{message}}",
+
+  "calibration_not_same_page_title": "以前と違うページ",
+  "calibration_not_same_page_text": "同じPDFページは、一つのNcode用紙に対応しなければなりません。やり直しになります。",
+
+  "calibration_duplicated_title": "すでに登録したページと重複",
+  "calibration_duplicated_text": "すでに登録したページと重なっています。プリントの内容を確認してください。",
+
+  "already_conncted_pen_title": "接続されているペン",
+  "already_conncted_pen_text": "すでに接続されているペンです。接続ボタンを押して他のペンを選択してください。",
+
+  "by_neosmart_pen": "ネオスマートペン"
+}

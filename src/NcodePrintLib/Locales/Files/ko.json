@@ -1,0 +1,33 @@
+{
+  "language_en": "English",
+  "language_ko": "한국어",
+  "language_ja": "日本語",
+
+  "hello": "안녕하세요",
+
+  "connect_pen": "펜 연결",
+
+  "start_calibration": "인쇄물 등록 시작",
+
+  "calibration_dlg_title": "인쇄물의 자동 인식을 위한 등록",
+  "calibration_pen_connect": "펜이 연결되어 있지 않습니다. 입력 보정을 위해서는 먼저 펜을 연결해 주십시오.",
+  "calibration_touch_lefttop": "인쇄된 문서의 왼쪽 상단에 있는 마크를 스마트 펜으로 터치해 주십시오.",
+  "calibration_touch_bottomright": "인쇄된 문서의 오른쪽 하단에 있는 마크를 스마트 펜으로 터치해 주십시오.",
+  "calibration_touch_bottomright_part": "인쇄된 문서의 오른쪽 하단 사분면의 어느 곳이든 스마트 펜으로 터치해 주십시오.",
+  "calibration_touch_bottomright_part_again": "확인을 위해, 다시 한번 오른쪽 하단 사분면의 어느 곳이든 스마트 펜으로 터치해 주십시오.",
+  "calibration_proceeding_next": "스마트 펜으로 터치하면 다음 단계로 넘어갑니다.",
+
+  "calibration_number_1": "첫번째",
+  "calibration_number_2": "두번째",
+  "calibration_number_3": "세번째",
+
+  "calibration_dialog_title": "페이지 {{page}}/{{total_page}}, {{message}}",
+
+  "calibration_not_same_page_title": "동일한 페이지가 아님",
+  "calibration_not_same_page_text": "같은 PDF 페이지는 하나의 Ncode 용지에 대응되어야 합니다.",
+
+  "calibration_duplicated_title": "이전에 등록한 페이지와 겹침",
+  "calibration_duplicated_text": "이전에 등록한 페이지와 겹치는 페이지입니다. 인쇄된 용지를 확인해 주십시오.",
+
+  "by_neosmart_pen": "by Neo Smartpen"
+}

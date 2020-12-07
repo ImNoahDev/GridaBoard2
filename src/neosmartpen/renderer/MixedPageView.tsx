@@ -5,7 +5,7 @@ import { IPageSOBP } from "../DataStructure/Structures";
 import { NeoSmartpen } from "../pencomm/neosmartpen";
 import * as PdfJs from "pdfjs-dist";
 
-export interface IMixedPageViewProps {
+interface Props {
   pageInfo?: IPageSOBP;
   pdfUrl: string;
   pageNo: number;
@@ -15,7 +15,11 @@ export interface IMixedPageViewProps {
   playState: PLAYSTATE;
 }
 
+<<<<<<< HEAD
 export interface IMixedPageViewState {
+=======
+interface State {
+>>>>>>> other/main
   pageInfo: IPageSOBP;
   pdfUrl: string;
 
@@ -35,6 +39,7 @@ const tempStyle: CSSProperties = {
   overflow: "hidden",
 }
 
+<<<<<<< HEAD
 export default class MixedPageView extends React.Component<IMixedPageViewProps, IMixedPageViewState> {
   waitingForFirstStroke: boolean = true;
   pdf: PdfJs.PDFDocumentProxy;
@@ -42,6 +47,15 @@ export default class MixedPageView extends React.Component<IMixedPageViewProps, 
   rendererRef: React.RefObject<PenBasedRenderer> = React.createRef();
 
   constructor(props: IMixedPageViewProps) {
+=======
+export default class MixedPageView extends React.Component<Props, State> {
+  waitingForFirstStroke: boolean = true;
+  pdf: PdfJs.PDFDocumentProxy;
+
+
+
+  constructor(props: Props) {
+>>>>>>> other/main
     super(props);
 
     let { pageInfo, pdfUrl, pageNo } = props;
@@ -59,9 +73,15 @@ export default class MixedPageView extends React.Component<IMixedPageViewProps, 
   }
 
   onNcodePageChanged = (pageInfo: IPageSOBP) => {
+<<<<<<< HEAD
     /** 
      * 임시코드, 2020/11/20, 나중에는 ncode와 매핑되어 있는 정보를 가지고 pageNo를 설정해야 한다 
      * 또는, PDF 파일을 바꿀 수 있도록 해야 한다. 
+=======
+    /**
+     * 임시코드, 2020/11/20, 나중에는 ncode와 매핑되어 있는 정보를 가지고 pageNo를 설정해야 한다
+     * 또는, PDF 파일을 바꿀 수 있도록 해야 한다.
+>>>>>>> other/main
     */
 
     if (this.pdf) {
@@ -92,7 +112,15 @@ export default class MixedPageView extends React.Component<IMixedPageViewProps, 
     this.setState({ renderCount: r + 1 });
   }
 
+<<<<<<< HEAD
   shouldComponentUpdate(nextProps: IMixedPageViewProps, nextState: IMixedPageViewState) {
+=======
+  shouldComponentUpdate(nextProps: Props, nextState: State) {
+    if (nextProps.pdfUrl !== this.props.pdfUrl) {
+      this.setState({ pdfUrl: nextProps.pdfUrl });
+      return false;
+    }
+>>>>>>> other/main
     // console.log("update requested");
     return true;
   }
@@ -131,7 +159,10 @@ export default class MixedPageView extends React.Component<IMixedPageViewProps, 
             playState={PLAYSTATE.live} pens={this.props.pens}
             onNcodePageChanged={this.onNcodePageChanged}
             onCanvasShapeChanged={this.onCanvasShapeChanged}
+<<<<<<< HEAD
             ref={this.rendererRef}
+=======
+>>>>>>> other/main
           />
         </div>
       </div>

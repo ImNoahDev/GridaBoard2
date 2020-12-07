@@ -1,7 +1,6 @@
 {
   "short_name": "React App",
   "name": "Create React App Sample",
-  "version": "2020.4.1",
   "icons": [
     {
       "src": "favicon.ico",

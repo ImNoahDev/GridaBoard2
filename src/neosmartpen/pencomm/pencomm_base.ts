@@ -140,7 +140,7 @@ export class PenCommBase {
    * 
    * @param server 
    */
-  async getService(server: BluetoothRemoteGATTServer): Promise<GetServiceReturnType> {
+  getService = async (server: BluetoothRemoteGATTServer): Promise<GetServiceReturnType> => {
     let uuids = [PEN_BT_UUID.old, PEN_BT_UUID.new];
     if (server.device.name === "Smartpen dimo_d") {
       uuids = [PEN_BT_UUID.new, PEN_BT_UUID.old];
@@ -166,7 +166,7 @@ export class PenCommBase {
    * @param btDevice 
    * @param protocolStartCallback 
    */
-  async connect(btDevice: BluetoothDevice, protocolStartCallback: Function): Promise<boolean> {
+  connect = async (btDevice: BluetoothDevice, protocolStartCallback: Function): Promise<boolean> => {
     if (this._state !== DEVICE_STATE.disconnected)
       return false;
 

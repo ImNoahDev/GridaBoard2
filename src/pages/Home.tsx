@@ -25,6 +25,10 @@ import FileLoad from '../components/navbar/FileLoad';
 import CalibrationMenual from '../components/navbar/CalibrationMenual';
 import UpperNav from '../components/navbar/UpperNav';
 
+import React, { useState } from "react";
+import { PLAYSTATE, MixedPageView } from "../neosmartpen";
+import { Button, Box } from "@material-ui/core";
+
 import {
   //PenEvent,
   NeoSmartpen, NoteserverClient, PenEventName
@@ -58,6 +62,7 @@ function hideAndShowFnc () {
   }
   
 }
+import { FileBrowserButton } from "../NcodePrintLib";
 
 
 const getNoteInfo = (event) => {
@@ -77,6 +82,7 @@ const Home = () => {
   const pageRef: React.RefObject<MixedPageView> = useRef();
   const [num_pens, setNumPens] = useState(0);
   const [pens, setPens] = useState(new Array(0));
+  const [pdfUrl, setUrl] = useState(PDF_URL);
 
   const onPenLinkChanged = e => {
     const pen = e.pen;
@@ -110,6 +116,12 @@ const Home = () => {
     console.log('Handle Trash Btn');
   }
 
+  // 이 함수에서 pdf를 연다
+  const onFileOpen = (event) => {
+    console.log(event.url)
+    setUrl(event.url);
+  };
+  
   return (
   <div> 
     <nav id="uppernav" className="navbar navbar-light bg-transparent" style={{float: "left"}}>
@@ -137,6 +149,18 @@ const Home = () => {
         zIndex: 100,
       }}>
         {/* Connect a pen */}
+        <div style={{ fontSize: "20px", fontWeight: "bold" }}>
+          <FileBrowserButton variant="contained" color="primary" callback={onFileOpen}>
+            <Box fontSize={14} fontWeight="fontWeightBold" >PDF열기</Box>
+          </FileBrowserButton>
+        </div>
+
+
+        <div style={{ fontSize: "20px", fontWeight: "bold" }}>
+          <Button variant="outlined" color="primary" onClick={(event) => handleConnectPen(event)} >
+            <Box fontSize={14} fontWeight="fontWeightBold" >Connect</Box>
+          </Button>
+        </div>
         <div style={{ fontSize: "20px", fontWeight: "bold" }}>
           <Button variant="outlined" color="primary" onClick={(event) => getNoteInfo(event)} >
             <Box fontSize={14} fontWeight="fontWeightBold" >Get Notebook Infos</Box>
@@ -225,7 +249,7 @@ const Home = () => {
         </div>
       </div>
       
-      <MixedPageView pdfUrl={PDF_URL} pageNo={1} scale={1} playState={PLAYSTATE.live} pens={pens} ref={pageRef} />
+      <MixedPageView pdfUrl={pdfUrl} pageNo={1} scale={1} playState={PLAYSTATE.live} pens={pens} />
     </div >
   </div>
   );

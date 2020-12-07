@@ -1,0 +1,36 @@
+{
+  "language_en": "English",
+  "language_ko": "한국어",
+  "language_ja": "日本語",
+
+  "hello": "Hello",
+
+  "connect_pen": "Connect pen",
+
+  "start_calibration": "인쇄물 등록 시작",
+
+  "calibration_dlg_title": "인쇄물의 자동 매칭 준비",
+  "calibration_pen_connect": "Please connect a Smartpen first to proceed calibration",
+  "calibration_touch_lefttop": "Please touch the mark on the upper left of the printed document with a Smartpen.",
+  "calibration_touch_bottomright": "Please touch the mark on the bottom right of the printed document with a Smartpen.",
+  "calibration_touch_bottomright_part": "Please touch anywhere in the lower right quadrant of the printed document with a Smartpen.",
+  "calibration_touch_bottomright_part_again": "Please touch anywhere AGAIN in the lower right quadrant of the printed document with a Smartpen.",
+  "calibration_proceeding_next": "Touch to move to the next step.",
+
+  "calibration_number_1": "1st",
+  "calibration_number_2": "2nd",
+  "calibration_number_3": "3rd",
+
+  "calibration_not_same_page_title": "Not the same page",
+  "calibration_not_same_page_text": "One page of PDF should be connected single Ncode Page. Please try again the page.",
+
+  "calibration_duplicated_title": "Duplicated page",
+  "calibration_duplicated_text": "The page touched is already registered. Please confirm the paper printed.",
+
+  "already_conncted_pen_title": "Pen already connected",
+  "already_conncted_pen_text": "The pen selected is already connected. Please choose another pen.",
+
+  "calibration_dialog_title": "page {{page}}/{{total_page}}, {{message}}",
+
+  "by_neosmart_pen": "by Neo Smartpen"
+}

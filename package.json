@@ -3,47 +3,66 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@material-ui/core": "^4.11.0",
+    "@material-ui/core": "4.11.0",
     "@material-ui/icons": "^4.9.1",
-    "@testing-library/jest-dom": "^4.2.4",
-    "@testing-library/react": "^9.3.2",
-    "@testing-library/user-event": "^7.1.2",
+    "@testing-library/jest-dom": "^5.11.6",
+    "@testing-library/react": "^11.2.2",
+    "@testing-library/user-event": "^12.5.0",
     "@types/fabric": "3.6.9",
+    "@types/i18next": "^13.0.0",
     "@types/jest": "26.0.15",
     "@types/node": "14.14.7",
     "@types/pdfjs-dist": "2.1.6",
     "@types/react": "16.9.56",
     "@types/react-dom": "16.9.9",
+    "@types/react-i18next": "^8.1.0",
+    "@types/sprintf-js": "1.1.2",
     "@types/web-bluetooth": "0.0.9",
+    "bootstrap": "4.5.3",
+    "cmake-js": "^6.1.0",
+    "expect.js": "0.3.1",
     "fabric": "^4.2.0",
+    "file-saver": "2.0.2",
     "gapi-script": "^1.0.2",
     "jquery": "^3.5.1",
-    "jszip": "3.5.0",
+    "jszip": "^3.5.0",
     "node-sass": "^4.14.1",
+    "pdf-lib": "1.11.2",
     "pdfjs-dist": "2.5.207",
     "query-string": "^6.13.4",
-    "react": "^16.13.1",
+    "react": "^17.0.1",
     "react-bluetooth": "^0.0.0",
+    "react-bootstrap": "1.4.0",
     "react-cookies": "^0.1.1",
-    "react-dom": "^16.13.1",
+    "react-dom": "^17.0.1",
     "react-google-login": "^5.1.25",
+    "react-i18next": "^11.7.4",
     "react-redux": "^7.2.1",
     "react-router-dom": "^5.2.0",
-    "react-scripts": "3.4.3",
-    "react-split": "^2.0.9",
+    "react-scripts": "4.0.1",
+    "react-to-print": "^2.11.0",
+    "react-virtualized": "^9.22.2",
+    "react-window": "1.8.6",
     "redux": "^4.0.5",
     "redux-cookies": "^1.0.1",
     "redux-thunk": "^2.3.0",
-    "typescript": "4.0.5"
+    "sprintf-js": "^1.1.2",
+    "web-bluetooth": "0.1.2",
+    "web-vitals": "^0.2.4",
+    "zlib": "^1.0.5"
   },
   "scripts": {
     "start": "react-scripts start",
+    "https": "set HTTPS=true&&react-scripts start",
     "build": "react-scripts build",
-    "test": "react-scripts test --env=jsdom",
+    "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
-    "extends": "react-app"
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
   },
   "browserslist": {
     "production": [
@@ -58,7 +77,6 @@
     ]
   },
   "devDependencies": {
-    "cross-env": "^7.0.2",
-    "post-npm-install": "^2.0.0"
+    "typescript": "^4.1.2"
   }
 }

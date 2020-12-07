@@ -296,6 +296,11 @@ export class NeoSmartpen {
             time: event.timeStamp
           });
         }
+        else {
+          // hand hover page the event
+          this.dispatcher.dispatch(PenEventName.ON_PEN_HOVER_PAGEINFO, {
+            mac, section, owner, book, page, time: event.timeStamp
+          });
       }
       
       // let ph = this.appPen;
