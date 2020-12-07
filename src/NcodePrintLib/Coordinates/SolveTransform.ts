@@ -15,8 +15,8 @@ function initEchelonMtx_Homography(points: TransformPointPairs): EchelonMatrix {
 
   // [0..7][0..8]의 행렬, 가우스 소거법을 쓰기 위해서
   for (let i = 0; i < 4; i++) {
-    let r1 = i * 2;
-    let r2 = r1 + 1;
+    const r1 = i * 2;
+    const r2 = r1 + 1;
 
     const src = points.src.pts[i];
     const dst = points.dst.pts[i];

@@ -163,7 +163,7 @@ export default class CoordinateTanslater {
     };
 
     // 정방향 파라메터로 역방향의 대상이 되는 점을 연산
-    let dstPts: TransformPoints = {
+    const dstPts: TransformPoints = {
       type: "homography",
       unit: "nu",
       pts: new Array(4),

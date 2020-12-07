@@ -2,7 +2,6 @@ import React, { useState, useRef } from "react";
 import { PLAYSTATE, MixedPageView } from "../neosmartpen";
 import { Button, Box } from "@material-ui/core";
 
-import PenManager from '../neosmartpen/pencomm/PenManager';
 import InkStorage from "../neosmartpen/penstorage/InkStorage";
 
 import ConnectButton from '../components/buttons/ConnectButton'
@@ -44,10 +43,10 @@ const menuStyle = {
 }
 
 function hideAndShowFnc() {
-  var colorMenu = document.getElementById('color_bar');
-  var leftMenu = document.getElementById('leftmenu');
-  var navCenter = document.getElementById('navbar_center');
-  var navEnd = document.getElementById('navbar_end');
+  const colorMenu = document.getElementById('color_bar');
+  const leftMenu = document.getElementById('leftmenu');
+  const navCenter = document.getElementById('navbar_center');
+  const navEnd = document.getElementById('navbar_end');
 
   if (colorMenu.style.display === 'none' && navCenter.style.display === 'none'
     && navEnd.style.display === 'none' && leftMenu.style.display === 'none') {
@@ -68,12 +67,12 @@ function hideAndShowFnc() {
 
 const getNoteInfo = (event) => {
   // let url = "http://nbs.neolab.net/v1/notebooks/attributes?device=android";
-  let note_info = new NoteserverClient();
+  const note_info = new NoteserverClient();
   note_info.getNoteInfo({});
 };
 
 
-let _pens = new Array(0);
+const _pens = new Array(0);
 let _num_pens = 0;
 
 

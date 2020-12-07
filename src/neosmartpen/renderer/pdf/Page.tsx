@@ -1,5 +1,3 @@
-/// <reference types="pdfjs-dist" />
-
 import React, { Component } from 'react';
 import { pdfSizeToDIsplayPixel } from "../../utils/UtilsFunc";
 
@@ -83,9 +81,9 @@ class Page extends Component<PageProps> {
 
 
   shouldComponentUpdate(nextProps: PageProps, nextState: PageState) {
-    const ret = this.state.status !== nextState.status || this.state.renderCount !== nextState.renderCount || this.state.page !== nextState.page;
+    // const ret = this.state.status !== nextState.status || this.state.renderCount !== nextState.renderCount || this.state.page !== nextState.page;
     const zoomChanged = nextProps.position.zoom !== this.props.position.zoom;
-    const imageChanged = nextState.imgSrc !== this.state.imgSrc;
+    // const imageChanged = nextState.imgSrc !== this.state.imgSrc;
 
     if (zoomChanged) {
       this.renderPage(this.state.page, nextProps.position.zoom);

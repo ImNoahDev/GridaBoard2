@@ -3,7 +3,7 @@ import React from "react";
 // import PropTypes from "prop-types";
 import { InkStorage, PenEventName } from "../..";
 
-import { ZoomFitEnum, PLAYSTATE, IRenderWorkerOption } from "./RenderWorkerBase";
+import { PLAYSTATE, IRenderWorkerOption } from "./RenderWorkerBase";
 import PenBasedRenderWorker from "./PenBasedRenderWorker";
 // import { Paper } from "@material-ui/core";
 import { NeoSmartpen, PenManager } from "../../index";
@@ -11,6 +11,7 @@ import * as UTIL from "../../utils/UtilsFunc";
 
 
 import { IPageSOBP, ISize } from "../../DataStructure/Structures";
+import { ZoomFitEnum } from "./StorageRenderWorker";
 // import { Util } from "pdfjs-dist";
 
 export { PLAYSTATE };
@@ -31,7 +32,7 @@ type Props = {
 
   viewFit?: ZoomFitEnum;
 
-  onNcodePageChanged: (arg: { section, owner, book, page }) => void;
+  onNcodePageChanged: (arg: IPageSOBP) => void;
   onCanvasShapeChanged: (arg: { offsetX, offsetY, zoom }) => void;
 }
 

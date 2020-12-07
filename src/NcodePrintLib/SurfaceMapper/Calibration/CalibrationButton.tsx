@@ -1,28 +1,12 @@
 import React, { useState } from "react";
-// import { Container, Modal, Row, Col, Button } from "react-bootstrap";
-
-import { makeStyles } from '@material-ui/core/styles';
-import { Button, Box } from "@material-ui/core";
+import { Button } from "@material-ui/core";
 import CalibrationDialog from "./CalibrationDialog";
 
-const useStyles = makeStyles((theme) => ({
-  form: {
-    display: 'flex',
-    flexDirection: 'column',
-    margin: 'auto',
-    width: 'fit-content',
-  },
-  formControl: {
-    marginTop: theme.spacing(2),
-    minWidth: 120,
-  },
-  formControlLabel: {
-    marginTop: theme.spacing(1),
-  },
-}));
+type Props = {
+  children?: any,
+};
 
-export default function CalibrationButton(props) {
-  const classes = useStyles();
+export default function CalibrationButton(props: Props) {
   const [open, setOpen] = useState(false);
   const [pageNo, setPageNo] = useState(1);
 
@@ -32,6 +16,7 @@ export default function CalibrationButton(props) {
 
   const handleClose = (e: {}, reason: "backdropClick" | "escapeKeyDown") => {
     setOpen(false);
+    console.log(e, reason);
   }
 
   return (

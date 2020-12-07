@@ -10,7 +10,7 @@ export const PAGES_CELL_SPACING = 120; // 600dpi px, 5.08mm
 function factor(n: number) {
   if (isNaN(n) || !isFinite(n) || n % 1 !== 0 || n === 0) return '' + n;
   if (n < 0) return '-' + factor(-n);
-  let minFactor = leastFactor(n);
+  const minFactor = leastFactor(n);
   if (n === minFactor) return n;
 
   const recursive = factor(n / minFactor);
@@ -27,7 +27,7 @@ function leastFactor(n: number) {
   if (n % 2 === 0) return 2;
   if (n % 3 === 0) return 3;
   if (n % 5 === 0) return 5;
-  let m = Math.sqrt(n);
+  const m = Math.sqrt(n);
   for (let i = 7; i <= m; i += 30) {
     if (n % i === 0) return i;
     if (n % (i + 4) === 0) return i + 4;
@@ -142,6 +142,7 @@ export function devideSurfaceAreaTo(printOptions: IPrintOption, szSrc: ISize, nu
   : IAreasDesc {
   const cellSpace = PAGES_CELL_SPACING;
 
+  // eslint-disable-next-line prefer-const
   let { rows, cols, rotation } = getCellMatrixShape(numItems, printOptions.direction);
 
   // if (rotation === 90) {

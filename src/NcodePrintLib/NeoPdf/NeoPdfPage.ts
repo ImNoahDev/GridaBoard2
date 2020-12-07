@@ -95,9 +95,9 @@ export default class NeoPdfPage {
 
     const page = this._pdfPage;
 
-    let viewport: PDF_VIEWPORT_DESC = this.viewport;
+    const viewport: PDF_VIEWPORT_DESC = this.viewport;
     const rotation = viewport.rotation;
-    let ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext('2d');
 
     const PRINT_RESOLUTION = dpi;
     const PRINT_UNITS = PRINT_RESOLUTION / PDF_DEFAULT_DPI;
@@ -128,7 +128,7 @@ export default class NeoPdfPage {
     };
 
 
-    let renderTask = page.render(renderContext);
+    const renderTask = page.render(renderContext);
     await renderTask.promise;
 
     const doc = this._doc;

@@ -33,7 +33,7 @@ export default class NcodeFetcher {
     }
     else {
       console.log("download glyph data file");
-      let promise = this.fetchNcodeData(pageInfo);
+      const promise = this.fetchNcodeData(pageInfo);
       this.fetchPromise = promise;
       const txt = await this.fetchPromise;
 
@@ -53,7 +53,7 @@ export default class NcodeFetcher {
       // console.log(`[fetch] ${pageInfo.section}.${pageInfo.owner}.${pageInfo.book}.${pageInfo.page}`);
       const url = this.getRawCodeDataUrl(pageInfo);
 
-      let blob = await fetch(url).then((r) => {
+      const blob = await fetch(url).then((r) => {
 
         if (r.ok) {
           return r.blob();

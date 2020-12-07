@@ -5,6 +5,7 @@ import { PATH_THICKNESS_SCALE } from "./DrawCurves";
 // import { NCODE_TO_SCREEN_SCALE } from "../../constants";
 import { IWritingSurfaceInfo, ISize } from "../../DataStructure/Structures";
 import { ncodeToDisplayPixel } from "../../utils/UtilsFunc";
+import { ZoomFitEnum } from "./StorageRenderWorker";
 // import { paperInfo } from "../../noteserver/PaperInfo";
 // import { plugToRequest } from "react-cookies";
 // import { scaleCanvas } from "../../utils/UtilsFunc";
@@ -27,14 +28,6 @@ export enum PLAYSTATE {
   setAutoStop,
   unsetAutoStop,
 }
-
-export enum ZoomFitEnum {
-  ACTUAL,
-  WIDTH,
-  HEIGHT,
-  FULL,
-}
-
 
 export type IRenderWorkerOption = {
   canvasId: string,
@@ -311,7 +304,7 @@ export default class RenderWorkerBase {
    */
   enableMouseAction = (sw: boolean) => {
     if (this.mouseAction !== sw) {
-      let canvasFb = this.canvasFb;
+      const canvasFb = this.canvasFb;
 
       if (sw === false) {
 
@@ -348,9 +341,9 @@ export default class RenderWorkerBase {
    * @param {Object} opt
    */
   onCanvasMouseDown = (opt: any) => {
-    let canvasFb = this.canvasFb;
+    const canvasFb = this.canvasFb;
 
-    let evt: MouseEvent = opt.e;
+    const evt: MouseEvent = opt.e;
 
     this.pan.isDragging = true;
     this.pan.lastPosX = evt.clientX;
@@ -365,12 +358,12 @@ export default class RenderWorkerBase {
    * @param {Object} opt
    */
   onCanvasMouseMove = (opt: any) => {
-    let canvasFb = this.canvasFb;
+    const canvasFb = this.canvasFb;
 
     if (this.pan.isDragging) {
-      let e: MouseEvent = opt.e;
+      const e: MouseEvent = opt.e;
       // console.log(`Point ${e.clientX}, ${e.clientY}`);
-      let vpt = canvasFb.viewportTransform;
+      const vpt = canvasFb.viewportTransform;
       vpt[4] += e.clientX - this.pan.lastPosX;
       vpt[5] += e.clientY - this.pan.lastPosY;
 
@@ -391,8 +384,8 @@ export default class RenderWorkerBase {
   }
 
   reportCanvasChanged = () => {
-    let canvasFb = this.canvasFb;
-    let vpt = canvasFb.viewportTransform;
+    const canvasFb = this.canvasFb;
+    const vpt = canvasFb.viewportTransform;
     const offsetX = vpt[4];
     const offsetY = vpt[5];
 
@@ -406,7 +399,7 @@ export default class RenderWorkerBase {
    * @param {Object} opt
    */
   onCanvasMousUp = (opt: any = undefined) => {
-    let canvasFb = this.canvasFb;
+    const canvasFb = this.canvasFb;
 
 
     // on mouse up we want to recalculate new interaction
@@ -425,11 +418,11 @@ export default class RenderWorkerBase {
    * @param {Object} opt
    */
   onCanvasMouseWheel = (opt: any) => {
-    let evt: MouseEvent = opt.e;
+    const evt: MouseEvent = opt.e;
     if ((!this.zoomCtrlKey) || (this.zoomCtrlKey === true && evt.ctrlKey === true)) {
-      let canvasFb = this.canvasFb;
+      const canvasFb = this.canvasFb;
 
-      let delta = opt.e.deltaY;
+      const delta = opt.e.deltaY;
       let zoom = canvasFb.getZoom();
       zoom *= 0.999 ** delta;
 
@@ -474,7 +467,7 @@ export default class RenderWorkerBase {
    * @param {Object} opt
    */
   setCanvasZoom = (zoom: number, opt: any) => {
-    let canvas = this.canvasFb;
+    const canvas = this.canvasFb;
 
     if (zoom > 20) zoom = 20;
     if (zoom < 0.01) zoom = 0.01;
@@ -503,10 +496,10 @@ export default class RenderWorkerBase {
     const { x, y, f } = ncodeXY;
     const { Xmin, Ymin } = this.surfaceInfo;
 
-    let scale = this.base_scale;
+    const scale = this.base_scale;
 
-    let cx = (x - Xmin) * scale + this.offset.x;
-    let cy = (y - Ymin) * scale + this.offset.y;
+    const cx = (x - Xmin) * scale + this.offset.x;
+    const cy = (y - Ymin) * scale + this.offset.y;
 
     return { x: cx, y: cy, f };
   }
@@ -520,7 +513,7 @@ export default class RenderWorkerBase {
     const { x, y, f } = ncodeXY;
     const { Xmin, Ymin } = this.surfaceInfo;
 
-    let scale = this.base_scale;
+    const scale = this.base_scale;
 
     let cx = (x - Xmin) * scale + this.offset.x;
     let cy = (y - Ymin) * scale + this.offset.y;
@@ -538,16 +531,16 @@ export default class RenderWorkerBase {
   protected getScreenXY = (canvasXY: { x: number, y: number }) => {
     const { x, y } = canvasXY;
 
-    let canvasFb = this.canvasFb;
-    let vpt = canvasFb.viewportTransform;
+    const canvasFb = this.canvasFb;
+    const vpt = canvasFb.viewportTransform;
 
-    let zoom = this.canvasFb.getZoom();
-    let offset_x = vpt[4];
-    let offset_y = vpt[5];
+    const zoom = this.canvasFb.getZoom();
+    const offset_x = vpt[4];
+    const offset_y = vpt[5];
 
 
-    let sx = x * zoom + offset_x;
-    let sy = y * zoom + offset_y;
+    const sx = x * zoom + offset_x;
+    const sy = y * zoom + offset_y;
 
     return { x: sx, y: sy };
   }
@@ -560,10 +553,10 @@ export default class RenderWorkerBase {
   protected getNcodeXY = (screenXY: { x: number, y: number }) => {
     const { x, y } = screenXY;
 
-    let scale_det = 1 / this.base_scale;
+    const scale_det = 1 / this.base_scale;
 
-    let nx = (x - this.offset.x) * scale_det;
-    let ny = (y - this.offset.y) * scale_det;
+    const nx = (x - this.offset.x) * scale_det;
+    const ny = (y - this.offset.y) * scale_det;
 
     return { x: nx, y: ny };
   }
@@ -625,43 +618,43 @@ export default class RenderWorkerBase {
     let dx = 0, dy = 0;
     let shouldScroll = false;
 
-    let canvasFb = this.canvasFb;
-    let vpt = canvasFb.viewportTransform;
-    let offset_x = vpt[4];
-    let offset_y = vpt[5];
+    const canvasFb = this.canvasFb;
+    const vpt = canvasFb.viewportTransform;
+    const offset_x = vpt[4];
+    const offset_y = vpt[5];
 
     if (screen_xy.x < 0) {
       // scroll to left
-      let target = this.currSize.width * margin_to_go_ratio;
+      const target = this.currSize.width * margin_to_go_ratio;
       dx = target - screen_xy.x;
       shouldScroll = true;
     }
 
     if (screen_xy.y < 0) {
       // scroll to top
-      let target = this.currSize.height * margin_to_go_ratio;
+      const target = this.currSize.height * margin_to_go_ratio;
       dy = target - screen_xy.y;
       shouldScroll = true;
     }
 
     if (screen_xy.x > this.currSize.width) {
       // scroll to right
-      let target = this.currSize.width * (1 - margin_to_go_ratio);
+      const target = this.currSize.width * (1 - margin_to_go_ratio);
       dx = target - screen_xy.x;
       shouldScroll = true;
     }
 
     if (screen_xy.y > this.currSize.height) {
       // scroll to bottom
-      let target = this.currSize.height * (1 - margin_to_go_ratio);
+      const target = this.currSize.height * (1 - margin_to_go_ratio);
       dy = target - screen_xy.y;
       shouldScroll = true;
     }
 
     if (shouldScroll) {
 
-      let new_offset_x = offset_x + dx;
-      let new_offset_y = offset_y + dy;
+      const new_offset_x = offset_x + dx;
+      const new_offset_y = offset_y + dy;
 
       this.scrollCanvasToPoint({ x: new_offset_x, y: new_offset_y }, true);
     }
@@ -673,8 +666,8 @@ export default class RenderWorkerBase {
    * @param {boolean} animate
    */
   protected scrollCanvasToPoint = (point: { x: number, y: number }, animate: boolean) => {
-    let canvasFb = this.canvasFb;
-    let vpt = canvasFb.viewportTransform;
+    const canvasFb = this.canvasFb;
+    const vpt = canvasFb.viewportTransform;
 
     if (animate) {
       if (this.scrollAnimateTimer) {
@@ -683,12 +676,12 @@ export default class RenderWorkerBase {
       }
       let x0 = vpt[4];
       let y0 = vpt[5];
-      let x1 = point.x;
-      let y1 = point.y;
+      const x1 = point.x;
+      const y1 = point.y;
 
       const div = 10;
-      let step_x = (x1 - x0) / div;
-      let step_y = (y1 - y0) / div;
+      const step_x = (x1 - x0) / div;
+      const step_y = (y1 - y0) / div;
       let count = 0;
 
       this.scrollAnimateTimer = window.setInterval(() => {
@@ -724,7 +717,7 @@ export default class RenderWorkerBase {
   resize = (size: { width: number, height: number }) => {
     console.log(`RenderWorkerBase: resized window ${size.width}, ${size.height}`);
 
-    let zoom = size.width / this.initialSize.width;
+    const zoom = size.width / this.initialSize.width;
     this.currSize = { ...size };
 
     this.canvasFb.setHeight(size.height);

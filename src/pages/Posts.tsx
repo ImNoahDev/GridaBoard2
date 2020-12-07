@@ -1,11 +1,18 @@
 import React from 'react';
 import { Link, Route } from 'react-router-dom';
-import { Post } from "../pages";
+import { Post } from ".";
 
-const Posts = ({ location, match }) => {
-  console.log( `location.pathname = ${location.pathname}`);
-  console.log( `match.url = ${match.url}` );
-  console.log( `match.path = ${match.path}` );
+
+type Props = {
+  location: any,
+  match: any,
+}
+const Posts = (props: Props) => {
+  const { location, match } = props;
+
+  console.log(`location.pathname = ${location.pathname}`);
+  console.log(`match.url = ${match.url}`);
+  console.log(`match.path = ${match.path}`);
   return (
     <div>
       <h2>Post List</h2>

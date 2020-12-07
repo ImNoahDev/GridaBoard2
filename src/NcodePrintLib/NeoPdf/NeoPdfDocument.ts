@@ -10,8 +10,8 @@ import MappingStorage from "../SurfaceMapper/MappingStorage";
 import NeoPdfPage, { IPdfPageCanvasDesc, PDF_VIEWPORT_DESC } from "./NeoPdfPage";
 
 PdfJs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${PdfJs.version}/pdf.worker.js`;
-let CMAP_URL = "./cmaps/";
-let CMAP_PACKED = true;
+const CMAP_URL = "./cmaps/";
+const CMAP_PACKED = true;
 
 export type IGetDocumentOptions = {
   url?: string,

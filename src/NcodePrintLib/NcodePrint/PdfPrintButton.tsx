@@ -156,7 +156,7 @@ export default class PdfPrintButton extends React.Component<Props, State> {
 
   loadPdf = (url) => {
 
-    let loadingPromise = NeoPdfManager.getDocument({ url });
+    const loadingPromise = NeoPdfManager.getDocument({ url });
     // console.log(`[yyy] `);
     // console.log(`[yyy] LOAIND: ${url}`);
     loadingPromise.then(

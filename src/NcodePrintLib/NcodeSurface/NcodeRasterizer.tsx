@@ -17,10 +17,10 @@ const debugNcode_h = 500;
 
 
 export function drawArrow(context: CanvasRenderingContext2D, fromx: number, fromy: number, tox: number, toy: number) {
-  let headlen = 100; // length of head in pixels
-  let dx = tox - fromx;
-  let dy = toy - fromy;
-  let angle = Math.atan2(dy, dx);
+  const headlen = 100; // length of head in pixels
+  const dx = tox - fromx;
+  const dy = toy - fromy;
+  const angle = Math.atan2(dy, dx);
 
   context.beginPath();
   context.moveTo(fromx, fromy);
@@ -200,7 +200,7 @@ export default class NcodeRasterizer {
     const { areas } = canvasAreas;
 
     // 캔버스를 준비
-    let canvas = document.createElement("canvas");
+    const canvas = document.createElement("canvas");
     canvas.width = size.width;
     canvas.height = size.height;
     const ctx = canvas.getContext("2d");
@@ -273,7 +273,7 @@ export default class NcodeRasterizer {
     return result;
   }
 
-  public putCode = async (context: ICanvasContextForCodeDraw, pageInfo: IPageSOBP, srcMapped: IPdfPixelArea): Promise<any> => {
+  public putCode = async (context: ICanvasContextForCodeDraw, pageInfo: IPageSOBP): Promise<any> => {
     // return new Promise( (resolve) => resolve() );   // kitty
     // this.rotation = rotation;
 
@@ -346,7 +346,7 @@ export default class NcodeRasterizer {
    * @param y
    * @param fullOfGlyphs - for debugging
    */
-  private drawNcodeSingleLine = (context: ICanvasContextForCodeDraw, code_txt: string, y: number, width: number, fullOfGlyphs: boolean = true): Promise<void> => {
+  private drawNcodeSingleLine = (context: ICanvasContextForCodeDraw, code_txt: string, y: number, width: number, fullOfGlyphs= true): Promise<void> => {
     // if (this.printOption.codeDensity > 2) {
     //   return this.drawNcodeSingleLine_BOLD(context, code_txt, y, fullOfGlyphs);
     // }
@@ -357,7 +357,7 @@ export default class NcodeRasterizer {
     return this.drawNcodeSingleLine_DOT(context, code_txt, y, width, fullOfGlyphs);
   }
 
-  private drawNcodeSingleLine_DOT = (context: ICanvasContextForCodeDraw, code_txt: string, y: number, width: number, fullOfGlyphs: boolean = true): Promise<void> => {
+  private drawNcodeSingleLine_DOT = (context: ICanvasContextForCodeDraw, code_txt: string, y: number, width: number, fullOfGlyphs = true): Promise<void> => {
     const { ctx, x: baseX, y: baseY } = context;
 
     const glyphStringSkipLeft = Math.round(this.printOption.marginLeft_nu * NCODE_CLASS6_NUM_DOTS);
@@ -391,7 +391,7 @@ export default class NcodeRasterizer {
     });
   }
 
-  private drawNcodeSingleLine_NORMAL = (context: ICanvasContextForCodeDraw, code_txt: string, y: number, width: number, fullOfGlyphs: boolean = true): Promise<void> => {
+  private drawNcodeSingleLine_NORMAL = (context: ICanvasContextForCodeDraw, code_txt: string, y: number, width: number, fullOfGlyphs = true): Promise<void> => {
     const { ctx, x: baseX, y: baseY } = context;
 
     const glyphStringSkipLeft = Math.round(this.printOption.marginLeft_nu * NCODE_CLASS6_NUM_DOTS);
@@ -408,7 +408,7 @@ export default class NcodeRasterizer {
       let charIndex = 0;
       for (let x = 0; x < width; x += glyphDistancePx_canvas) {
         if (charIndex + glyphStringSkipLeft >= 0) {
-          let glyph = code_txt[charIndex + glyphStringSkipLeft];
+          const glyph = code_txt[charIndex + glyphStringSkipLeft];
 
           const pos = codePos[glyph];
           let dx = 0, dy = 0;
@@ -429,7 +429,7 @@ export default class NcodeRasterizer {
     });
   }
 
-  private drawNcodeSingleLine_BOLD = (context: ICanvasContextForCodeDraw, code_txt: string, y: number, width: number, fullOfGlyphs: boolean = true): Promise<void> => {
+  private drawNcodeSingleLine_BOLD = (context: ICanvasContextForCodeDraw, code_txt: string, y: number, width: number, fullOfGlyphs = true): Promise<void> => {
     const { ctx, x: baseX, y: baseY } = context;
 
     const glyphStringSkipLeft = Math.round(this.printOption.marginLeft_nu * NCODE_CLASS6_NUM_DOTS);
@@ -443,7 +443,7 @@ export default class NcodeRasterizer {
       let charIndex = 0;
       for (let x = 0; x < width; x += glyphDistancePx_canvas) {
         if (charIndex + glyphStringSkipLeft >= 0) {
-          let glyph = code_txt[charIndex + glyphStringSkipLeft];
+          const glyph = code_txt[charIndex + glyphStringSkipLeft];
 
           const pos = codePos[glyph];
           let dx = 0, dy = 0;
@@ -581,8 +581,8 @@ export function getNcodeAtCanvasPixel(pt: IPointDpi, areas: ICellsOnSheetDesc)
 
   if (areas.ncodeAreas.length < 1) return null;
 
-  let { x, y, dpi } = pt;
-  const scale = areas.ncodeAreas[0].dpi / dpi;
+  let { x, y } = pt;
+  const scale = areas.ncodeAreas[0].dpi / pt.dpi;
   x *= scale;
   y *= scale;
 
@@ -615,7 +615,7 @@ export function getNcodeRectAtCanvasPixel(rc: IRectDpi, areas: ICellsOnSheetDesc
 
   rc = autoSetDpi(rc);
   const scale = areas.ncodeAreas[0].dpi / rc.dpi;
-  let center: IPointDpi = {
+  const center: IPointDpi = {
     x: rc.x + (rc.width / 2),
     y: rc.y + (rc.height / 2),
     dpi: rc.dpi,

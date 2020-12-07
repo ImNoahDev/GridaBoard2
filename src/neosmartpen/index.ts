@@ -10,7 +10,7 @@ import NoteserverClient from "./noteserver/NoteserverClient";
 import { paperInfo } from "./noteserver/PaperInfo";
 import PenManager from "./pencomm/PenManager";
 import { uuidv4, pdfSizeToDIsplayPixel } from "./utils/UtilsFunc";
-import { PLAYSTATE, ZoomFitEnum } from "./renderer/pageviewer/RenderWorkerBase";
+import { PLAYSTATE } from "./renderer/pageviewer/RenderWorkerBase";
 import MixedPageView from "./renderer/MixedPageView";
 
 import {
@@ -42,7 +42,7 @@ export {
   SINGLE_CODE_SIZE_PER_INCH,
   NCODE_TO_MM_SCALE,
   NCODE_TO_INCH_SCALE,
-  NCODE_TO_SCREEN_SCALE,
+  NCODE_TO_SCREEN_SCALE, 
   INCH_TO_MM,
 
   DEFAULT_SECTION,
@@ -53,7 +53,7 @@ export {
   DISPLAY_DEFAULT_DPI,
 
   MixedPageView,
-  PLAYSTATE, ZoomFitEnum,
+  PLAYSTATE, 
   uuidv4,
   pdfSizeToDIsplayPixel,
 };

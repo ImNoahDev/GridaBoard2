@@ -5,6 +5,7 @@ import { InkStorage } from "../..";
 import { PATH_THICKNESS_SCALE, drawPath } from "./DrawCurves";
 import { NCODE_TO_SCREEN_SCALE } from "../../constants";
 import { paperInfo } from "../../noteserver/PaperInfo";
+import { ILineOptions, IRectOptions } from "fabric/fabric-impl";
 
 const timeTickDuration = 20; // ms
 const DISABLED_STROKE_COLOR = "rgba(0, 0, 0, 0.1)";
@@ -17,11 +18,16 @@ const DISABLED_STROKE_COLOR = "rgba(0, 0, 0, 0.1)";
 /**
  * @enum {string}
  */
-export const ZoomFitEnum = {
-  WIDTH: "width",
-  HEIGHT: "height",
-  FULL: "full",
-  ACTUAL: "100%",
+
+export enum ZoomFitEnum {
+  // eslint-disable-next-line no-unused-vars
+  ACTUAL,
+  // eslint-disable-next-line no-unused-vars
+  WIDTH,
+  // eslint-disable-next-line no-unused-vars
+  HEIGHT,
+  // eslint-disable-next-line no-unused-vars
+  FULL,
 }
 
 const STROKE_OBJECT_ID = "ns";
@@ -32,6 +38,98 @@ export default class StorageRenderWorker {
    *
    * @param {{canvasName:string, storage:InkStorage, viewFit:ZoomFitEnum, autoStop:boolean, playTimeHandler:function, playStateHandler:function, }} options
    */
+
+  viewFit;
+
+  /** @type {InkStorage} */
+  storage;
+
+  base_scale = NCODE_TO_SCREEN_SCALE;
+  offset_x = 0;
+  offset_y = 0;
+
+  initialSize = { width: 0, height: 0 };
+
+  currSize = { width: 0, height: 0 };
+
+  livePaths = {};
+
+  surfaceInfo = {
+    section: 3,
+    owner: 27,
+    book: 168,
+    page: 1,
+
+    Xmin: 3.12,
+    Ymin: 3.12,
+    Xmax: 91.68,
+    Ymax: 128.36,
+    Mag: 1,
+  }
+
+  scrollAnimateInterval = null;
+
+  // 재생 시간과 관련된 변수
+
+  playingTimeHandler;
+  playStateHandler;
+
+
+  /**
+   * relative time
+   * absolute time(unix ms) = playingTime + startTime_whole
+   */
+  playingTime = -1;
+
+  /**
+   * absolute time(unix ms)
+   * relative time = absolute time - this.startTime_whole
+   */
+  startTime_page = 0;
+  endTime_page = 0;
+
+  startTime_whole = 0;
+  endTime_whole = 0;
+
+  /**
+   * the page info now being played
+   */
+  rel_auto_play_endtime = 0;
+  autoStop;
+  //
+  canvasName;
+  canvas = null;
+  frameconfig = 1;
+  bgcolor = 0;
+  bgurl = "";
+  strokWidth;
+  strokHeight = this.initialSize.height;
+  lineScale = [1, 3, 5, 7, 10];
+  pathArray = []; // Rendering Path
+
+  scaleX = 1;
+  scaleY = 1;
+  // for replay
+  renderTime = 0;
+  replaySpeed = 1;
+  dotArray = [];
+  strokes = null; // neoink format stroke
+  backgroundImage = null;
+
+  timer = null;
+
+  timeStr = "";
+  pageNumber = 0;
+
+  rect = { x: 0, y: 0, width: 800, height: 1000 };
+
+  scale;
+
+  seekCallback;
+
+  tempPath;
+
+  tempPath_disabled;
 
   constructor(options) {
     const { canvasName, viewFit, storage, playTimeHandler, playStateHandler, autoStop } = options;
@@ -214,8 +312,8 @@ export default class StorageRenderWorker {
       // lockMovementY: true,
       selectable: false,
       objType: GRID_OBJECT_ID,
+    } as IRectOptions);
 
-    });
     canvas.add(rect);
 
     for (let x = 0; x < size.width; x += 10) {
@@ -227,7 +325,7 @@ export default class StorageRenderWorker {
         lockMovementX: true,
         lockMovementY: true,
         objType: GRID_OBJECT_ID,
-      });
+      } as ILineOptions);
 
       canvas.add(line);
     }
@@ -242,7 +340,7 @@ export default class StorageRenderWorker {
         lockMovementX: true,
         lockMovementY: true,
         objType: GRID_OBJECT_ID,
-      });
+      } as ILineOptions);
 
       canvas.add(line);
     }
@@ -257,8 +355,7 @@ export default class StorageRenderWorker {
     const canvas = this.canvas;
 
     const evt = opt.e;
-    if (evt.altKey === true) 
-    {
+    if (evt.altKey === true) {
       canvas.isDragging = true;
       canvas.selection = false;
       canvas.lastPosX = evt.clientX;
@@ -871,7 +968,7 @@ export default class StorageRenderWorker {
         // const thickness = stroke.thickness * zoom;
         const thickness = stroke.thickness;
 
-        const path = this.createPathFromDots(stroke.dotArray, color, thickness, scale, startTime);
+        const path = this.createPathFromDots(stroke.dotArray, color, thickness);
         this.pathArray.push(path);
         if (this.canvas) {
           this.canvas.add(path);

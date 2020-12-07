@@ -2,26 +2,25 @@ import React, { Component, useState } from "react";
 import '../../styles/buttons.css';
 import { connect, useSelector, useDispatch } from 'react-redux';
 import { setPointerTracer } from '../../store/reducers/pointerTracer';
-import jQuery from "jquery";
+import $ from "jquery";
 import { RootState } from '../../store/rootReducer';
 
 import icon_point_d from "../../icons/icon_point_d.png";
 import icon_point_p from "../../icons/icon_point_p.png";
 import icon_point_n from "../../icons/icon_point_n.png";
 
-let $ = jQuery;
 
 const TracePointButton = () => {
   const isTrace = useSelector((state:RootState) => state.pointerTracer.isTrace)
   const dispatch = useDispatch();
 
   const setEnable = (elem_name: string, sw: boolean) => {
-    let $elem = $(`#${elem_name}`);
+    const $elem = $(`#${elem_name}`);
     if (sw) {
-        let $elem = $("#btn_tracepoint").find(".c2");
+        const $elem = $("#btn_tracepoint").find(".c2");
         $elem.addClass("checked");
     } else {
-        let $elem = $("#btn_tracepoint").find(".c2");
+        const $elem = $("#btn_tracepoint").find(".c2");
         $elem.removeClass("checked");
     }
   }

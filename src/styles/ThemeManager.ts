@@ -2,7 +2,7 @@
 import PenManager from '../neosmartpen/pencomm/PenManager';
 import jQuery from "jquery";
 
-let $ = jQuery;
+const $ = jQuery;
 let _thememanager_instance = null;
 
 export default class ThemeManager {
@@ -26,11 +26,11 @@ export default class ThemeManager {
       icon_name = "icon_ratio";
     }
 
-    let norm_img = "icons/" + icon_name + "_n.png";
-    let hover_img = "icons/" + icon_name + "_p.png";
+    const norm_img = "icons/" + icon_name + "_n.png";
+    const hover_img = "icons/" + icon_name + "_p.png";
 
-    let $elem = $("#btn_fit");
-    let $c2 = $elem.children(".c2");
+    const $elem = $("#btn_fit");
+    const $c2 = $elem.children(".c2");
     $c2.children(".normal-image").attr("src", norm_img);
     $c2.children(".hover-image").attr("src", hover_img);
   }
@@ -124,15 +124,15 @@ export default class ThemeManager {
   }
 
   public toggleFullScreen() {
-    let document: any = window.document;
+    const document: any = window.document;
 
-    let isInFullScreen =
+    const isInFullScreen =
       (document.fullscreenElement && document.fullscreenElement !== null) ||
       (document.webkitFullscreenElement && document.webkitFullscreenElement !== null) ||
       (document.mozFullScreenElement && document.mozFullScreenElement !== null) ||
       (document.msFullscreenElement && document.msFullscreenElement !== null);
 
-    let docElm = document.documentElement;
+    const docElm = document.documentElement;
     if (!isInFullScreen) {
       if (docElm.requestFullscreen) {
         docElm.requestFullscreen();
@@ -157,7 +157,7 @@ export default class ThemeManager {
   }
 
   private addDisabledAttr(elem_name, sw) {
-    let $elem = $(`#${elem_name}`);
+    const $elem = $(`#${elem_name}`);
     if (sw) {
       $elem.prop("disabled", false);
       $elem.children(".c2").removeClass("disabled");

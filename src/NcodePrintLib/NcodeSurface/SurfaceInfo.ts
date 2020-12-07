@@ -98,12 +98,12 @@ export function getNPaperInfo(pageInfo: IPageSOBP): INcodeSurfaceDesc {
   let found = paperType.paperA4_dummy;
   let found_key = "paperA4_dummy";
 
-  let keys = Object.keys(paperType);
+  const keys = Object.keys(paperType);
   for (let j = 0; j < keys.length; j++) {
-    let key = keys[j];
-    let value = paperType[key];
+    const key = keys[j];
+    const value = paperType[key];
 
-    let idx = value.books.indexOf(book);
+    const idx = value.books.indexOf(book);
     if (idx > -1) {
       if (section === value.section && owner === value.owner) {
         found = value;
@@ -131,7 +131,7 @@ export function getNPaperInfo(pageInfo: IPageSOBP): INcodeSurfaceDesc {
 
 
 export function getSurfaceSize_dpi(size: IPaperSize, dpi: number, isLandscape: boolean = false) {
-  let numerator = UNIT_TO_DPI[size.unit];
+  const numerator = UNIT_TO_DPI[size.unit];
   const ratio = 1.0;
 
   let width = size.width * ratio * dpi / numerator;

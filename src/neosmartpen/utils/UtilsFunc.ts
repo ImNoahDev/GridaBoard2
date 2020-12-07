@@ -10,13 +10,13 @@ export { backingStoreRatio };
 export function uuidv4(): string {
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
     // let r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
-    let r = Math.random() * 16 | 0, v = c === 'x' ? r : ((r & 0x3) | 0x8);
+    const r = Math.random() * 16 | 0, v = c === 'x' ? r : ((r & 0x3) | 0x8);
     return v.toString(16);
   });
 }
 
 export function getDisplayRatio(): number {
-  let dpr = window.devicePixelRatio || 1;
+  const dpr = window.devicePixelRatio || 1;
   return dpr;
 }
 
@@ -24,9 +24,9 @@ export function scaleCanvas(canvas: HTMLCanvasElement) {
   const context = canvas.getContext('2d');
 
   // Get the device pixel ratio, falling back to 1.
-  let dpr = window.devicePixelRatio || 1;
+  const dpr = window.devicePixelRatio || 1;
   // Get the size of the canvas in CSS pixels.
-  let rect = canvas.getBoundingClientRect();
+  const rect = canvas.getBoundingClientRect();
   const { width, height } = rect;
 
   // determine the actual ratio we want to draw at

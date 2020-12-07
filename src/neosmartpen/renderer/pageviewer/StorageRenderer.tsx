@@ -1,14 +1,36 @@
 import React from "react";
-// import React, { Component } from 'react';
-import PropTypes from "prop-types";
-import { InkStorage, PenEventName } from "../..";
+import { InkStorage, PenEventName, } from "../..";
 
 import StorageRenderWorker, { ZoomFitEnum } from "./StorageRenderWorker";
 // import { Paper } from "@material-ui/core";
-import {  PenManager } from "../../index";
+import { PenManager } from "../../index";
 import { uuidv4 } from "../../utils/UtilsFunc";
-import { PLAYSTATE } from "./RenderWorkerBase";
+import { IPageSOBP } from "../../../NcodePrintLib/DataStructure/Structures";
 
+
+type Props = {
+  pageId,
+  scale,
+  width,
+  height,
+
+}
+
+type State = {
+  renderer: StorageRenderWorker;
+  pageId: string;
+  sizeUpdate: number;
+
+  penEventCount: number;
+  strokeCount: number;
+  liveDotCount: number;
+
+  pageInfo: IPageSOBP;
+
+  viewFit: ZoomFitEnum;
+
+  scale: number;
+}
 
 /**
  * 스토리지와 자동으로 연결되는 renderer 
@@ -19,7 +41,7 @@ import { PLAYSTATE } from "./RenderWorkerBase";
  *    2)  본 컴포는트는 Storage에서 Event를 받아 rendering하는 것이므로,
  *        Pen에서 realtime으로 event를 받아 rendering하는 별도의 component를 만들 것
  */
-class StorageRenderer extends React.Component {
+class StorageRenderer extends React.Component<Props, State> {
   state = {
     /** @type {StorageRenderWorker} */
     renderer: null,
@@ -44,8 +66,18 @@ class StorageRenderer extends React.Component {
       page: -1,
     },
 
+    scale: 1,
+
     viewFit: ZoomFitEnum.WIDTH,
   };
+
+  canvasRef;
+  myRef;
+
+  inkStorage;
+  canvasId;
+
+  size;
 
   constructor(props) {
     super(props);
@@ -53,8 +85,8 @@ class StorageRenderer extends React.Component {
     this.canvasRef = React.createRef();
     this.myRef = React.createRef();
 
-    /** @type {{pageId:number, inkStorage:InkStorage, scale:number, playState:number }} */
-    let { pageId, inkStorage, scale, playState } = props;
+    const { pageId, scale } = props;
+    let inkStorage = props.inkStorage;
 
     if (!inkStorage) {
       inkStorage = InkStorage.getInstance();
@@ -65,13 +97,12 @@ class StorageRenderer extends React.Component {
     this.state = {
       pageId,
       scale,
-      playState,
       ...this.state
     };
 
     // // 실시간 데이터 전송을 위해, penStorage와 view를 연결한다.
     if (this.inkStorage) {
-      let filter = { mac: null };
+      const filter = { mac: null };
       inkStorage.addEventListener(PenEventName.ON_PEN_DOWN, this.onLivePenDown.bind(this), filter);
       inkStorage.addEventListener(PenEventName.ON_PEN_PAGEINFO, this.onLivePenPageInfo.bind(this), filter);
       inkStorage.addEventListener(PenEventName.ON_PEN_MOVE, this.onLivePenMove.bind(this), filter);
@@ -130,7 +161,7 @@ class StorageRenderer extends React.Component {
 
     const inkStorage = this.inkStorage;
     if (inkStorage) {
-      let pageStrokesCount = inkStorage.getPageStrokes(event).length;
+      const pageStrokesCount = inkStorage.getPageStrokes(event).length;
       this.setState({ strokeCount: pageStrokesCount });
     }
 
@@ -193,106 +224,15 @@ class StorageRenderer extends React.Component {
     }
   }
 
-  shouldComponentUpdate(nextProps, nextState) {
-    let ret_val = true;
-
-    if (nextState.penEventCount !== this.state.penEventCount) {
-      // re-rendering strokes
-      // console.log(`penEventCount: ${nextState.penEventCount}`);
-      // this.state.renderer.redrawPage();
-    }
-
-
-    if (nextProps.isPlay !== this.props.isPlay) {
-      if (nextProps.stopTrigger) {
-        this.state.renderer.replayStop();
-      }
-      if (nextProps.rewindTrigger) {
-        this.state.renderer.replayRewind();
-      }
-
-      if (nextProps.isPlay) {
-        this.state.renderer.replayStart();
-      } else {
-        this.state.renderer.replayPause();
-      }
-      ret_val = false;
-    }
-
-    // if (nextProps.isSaveTrigger !== this.props.isSaveTrigger) {
-    //   this.saveCanvas();
-    //   return false;
-    // }
-
-    if (nextProps.replaySpeed !== this.props.replaySpeed) {
-      this.state.renderer.setReplaySpeed(nextProps.replaySpeed);
-      ret_val = false;
-    }
-
-    // if (nextProps.pageId !== this.props.pageId) {
-    //   const { pageId, scale } = nextProps;
-    //   // let bgurl = window.location.origin + "/img/3_27_1089_" + pageId + ".jpg";
-
-    //   // let bg_header = EXAM_FILE_RESOURCES[tab_value].bg_img_header;
-    //   // let bgurl = window.location.origin + bg_header + pageId + ".jpg";
-
-    //   // this.props.playStateHandler(PLAYSTATE.stop);
-    //   // this.state.renderer.replayPause();
-    //   // this.state.renderer.replayStop();
-
-    //   // this.state.renderer.setCanvas(this.size, bgurl);
-
-    //   let page = this.props.pages.filter((p) => p.pageNumber === pageId)[0];
-    //   if (page) {
-    //     this.state.renderer.setPage(page);
-    //     this.state.renderer.preparePage(
-    //       page,
-    //       this.state.rect,
-    //       this.size,
-    //       scale
-    //     );
-    //   }
-
-    //   ret_val = false;
-    // }
-
-    if (nextProps.playTime !== this.props.playTime) {
-      this.state.renderer.setTimePoint(nextProps.playTime);
-      ret_val = false;
-    }
-
-    if (nextProps.autoStop !== this.props.autoStop) {
-      this.state.renderer.setAutoStop(nextProps.autoStop);
-      ret_val = false;
-    }
-
-    if (nextProps.caption !== this.props.caption) {
-      console.log(" caption changed ");
-      ret_val = false;
-    }
-
-    if (nextProps.stopTrigger) {
-      this.state.renderer.replayStop();
-      ret_val = false;
-    }
-
-    if (nextProps.rewindTrigger) {
-      this.state.renderer.replayRewind();
-      ret_val = false;
-    }
+  shouldComponentUpdate(nextProps: Props, nextState: State) {
+    const ret_val = true;
 
     return ret_val;
   }
 
   initRenderer(size) {
     const {
-      // pages,
-      // pageId,
       scale,
-      playTimeHandler,
-      playStateHandler,
-      // strokeStream,
-      autoStop,
       width,
       height
     } = this.props;
@@ -305,13 +245,10 @@ class StorageRenderer extends React.Component {
     const options = {
       canvasName: this.canvasId,
       storage: inkStorage,
-      autoStop,
-      playTimeHandler,
-      playStateHandler,
       viewFit: this.state.viewFit,
     };
 
-    let renderer = new StorageRenderWorker(options);
+    const renderer = new StorageRenderWorker(options);
 
     // let bg_header = EXAM_FILE_RESOURCES[tab_value].bg_img_header;
     // let bgurl = window.location.origin + bg_header + pageId + ".jpg";
@@ -329,16 +266,16 @@ class StorageRenderer extends React.Component {
     const node = this.myRef.current;
     if (node) {
 
-      let parentHeight = node.offsetHeight;
-      let parentWidth = node.offsetWidth;
+      const parentHeight = node.offsetHeight;
+      const parentWidth = node.offsetWidth;
 
       console.log(`(width, height) = (${parentHeight}, ${parentWidth})`);
     }
 
-    let size = this.size;
+    const size = this.size;
     const { pageId, width, height } = this.props;
 
-    let rect = { x: 0, y: 0, width, height };
+    const rect = { x: 0, y: 0, width, height };
 
     // const page = pages.filter((p) => p.pageNumber === pageId)[0];
     console.log("Draw Stroke size", pageId, "canvas size", size, "rect", rect);
@@ -348,7 +285,7 @@ class StorageRenderer extends React.Component {
 
 
     // penManager에 연결 
-    let penManager = PenManager.getInstance();
+    const penManager = PenManager.getInstance();
     penManager.registerRenderContainer(this);
   }
 
@@ -396,7 +333,7 @@ class StorageRenderer extends React.Component {
   // };
 
   getSize = (scale, rect) => {
-    let size = {
+    const size = {
       width: rect.width,
       height: rect.height,
     };
@@ -409,13 +346,13 @@ class StorageRenderer extends React.Component {
     window.removeEventListener("resize", this.resizeListener);
 
     // penManager에 연결 해제
-    let penManager = PenManager.getInstance();
+    const penManager = PenManager.getInstance();
     penManager.unregisterRenderContainer(this);
 
     // ink storage와 연결 해제
-        // // 실시간 데이터 전송을 위해, penStorage와 view를 연결한다.
+    // // 실시간 데이터 전송을 위해, penStorage와 view를 연결한다.
     if (this.inkStorage) {
-      let inkStorage = this.inkStorage;
+      const inkStorage = this.inkStorage;
 
       inkStorage.removeEventListener(PenEventName.ON_PEN_DOWN, this.onLivePenDown.bind(this));
       inkStorage.removeEventListener(PenEventName.ON_PEN_PAGEINFO, this.onLivePenPageInfo.bind(this));
@@ -439,7 +376,7 @@ class StorageRenderer extends React.Component {
     return (
       <div id="replayContainer" ref={this.myRef}>
         <h1>StorageRenderer</h1><h2>{section}.{owner}.{book}.{page}:{penEventCount}</h2>
-          <canvas id={this.canvasId} ref={this.canvasRef} style={{ height: this.size.height, width: this.size.width }}/>
+        <canvas id={this.canvasId} ref={this.canvasRef} style={{ height: this.size.height, width: this.size.width }} />
       </div>
     );
   }

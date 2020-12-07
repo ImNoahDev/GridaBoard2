@@ -1,5 +1,3 @@
-/// <reference types="pdfjs-dist" />
-
 import React, { CSSProperties } from "react";
 // import PropTypes from "prop-types";
 import { Page } from './Page';
@@ -50,14 +48,14 @@ export default class NeoPdfViewer extends React.Component<Props, State> {
   loadDocument = (url: string) => {
     // const { documentZoom } = this.state;
 
-    let loadingTask = PdfJs.getDocument({
+    const loadingTask = PdfJs.getDocument({
       url,
       cMapUrl: CMAP_URL,
       cMapPacked: CMAP_PACKED,
     }
     );
 
-    let self = this;
+    const self = this;
     this.setState({ status: "loading" });
 
     loadingTask.promise.then(

@@ -1,7 +1,6 @@
-import { CoordinateTanslater, IMappingParams, IPdfPageDesc } from "../Coordinates";
-import { INcodeSOBPxy, IPageSOBP } from "../DataStructure/Structures";
+import { CoordinateTanslater, IMappingParams } from "../Coordinates";
+import { INcodeSOBPxy } from "../DataStructure/Structures";
 import { isSamePage } from "../NcodeSurface";
-import { IPdfDocDesc } from "../NeoPdf/NeoPdfDocument";
 
 let _instance: MappingStorage = null;
 const LOCAL_STORAGE_ID = "GridaBoard_codeMappingInfo_v2";
@@ -10,6 +9,7 @@ export default class MappingStorage {
   _arrMapped: IMappingParams[] = [];
 
   private constructor() {
+    if (_instance) return _instance;
   }
 
   static getInstance() {
@@ -22,8 +22,8 @@ export default class MappingStorage {
   register = (item: CoordinateTanslater) => {
     const params = item.mappingParams;
 
-    let now = new Date();
-    let timeStr =
+    const now = new Date();
+    const timeStr =
       `${addZeros(now.getFullYear(), 2)}/` +
       `${addZeros(now.getMonth() + 1, 2)}/` +
       `${addZeros(now.getDate(), 2)} ` +
@@ -127,7 +127,7 @@ function storageAvailable(type) {
   let storage;
   try {
     storage = window[type];
-    let x = "__storage_test__";
+    const x = "__storage_test__";
     storage.setItem(x, x);
     storage.removeItem(x);
     return true;

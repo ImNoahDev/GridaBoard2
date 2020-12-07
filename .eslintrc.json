@@ -25,19 +25,19 @@
     "@typescript-eslint/explicit-module-boundary-types": "off",
     "@typescript-eslint/no-empty-function": "warn",
     "@typescript-eslint/no-explicit-any": "off",
-    "@typescript-eslint/no-extra-semi": "off",
-    "@typescript-eslint/no-inferrable-types": "off",
+    "@typescript-eslint/no-extra-semi": "warn",
+    "@typescript-eslint/no-inferrable-types": "warn",
     "@typescript-eslint/no-this-alias": "off",
     "@typescript-eslint/no-unused-vars": "off",
-    "@typescript-eslint/triple-slash-reference": "off",
-    "no-prototype-builtins": "off",
-    "no-async-promise-executor": "off",
-    "no-redeclare": "off",
-    "no-self-assign": "off",
+    "@typescript-eslint/triple-slash-reference": "warn",
+    "no-prototype-builtins": "warn",
+    "no-async-promise-executor": "warn",
+    "no-redeclare": "warn",
+    "no-self-assign": "warn",
     "no-unused-vars": "off",
     "no-var": "warn",
     "prefer-const": "warn",
-    "prefer-spread": "off",
-    "react/prop-types": "off"
+    "prefer-spread": "warn",
+    "react/prop-types": "warn"
   }
 }

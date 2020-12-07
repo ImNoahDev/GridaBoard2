@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import React, { Component, useState } from "react";
 
 import '../../styles/buttons.css';

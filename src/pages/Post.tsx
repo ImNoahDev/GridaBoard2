@@ -1,6 +1,10 @@
 import React from "react";
 
-const Post = ({ match }) => {
+type Props = {
+  match
+}
+const Post = (props: Props) => {
+  const { match } = props;
   return <div>포스트 {match.params.id}</div>;
 };
 

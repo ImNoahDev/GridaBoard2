@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import React from 'react';
 import { gapi } from 'gapi-script';
 import { GoogleLogin } from 'react-google-login';
@@ -5,12 +6,12 @@ import * as PdfJs from "pdfjs-dist";
 
 import { resolve } from 'path';
 
-let FOLDER_ID = "root";
+const FOLDER_ID = "root";
 
 export default class Upload extends React.Component {
   
   mappingInfoUploadProcess = async () => {
-    let self = this;
+    const self = this;
     let folderId;
     gapi.load('client', function () {
       gapi.client.load('drive', 'v2', async function () {
@@ -18,15 +19,15 @@ export default class Upload extends React.Component {
           q: "mimeType = 'application/vnd.google-apps.folder'" //폴더만 걸러주는 filter
         })
 
-        let folders = folderResponse.result.items;
+        const folders = folderResponse.result.items;
         let isGridaFolderExist = false;
 
         if (folders && folders.length > 0) {
           for (let i = 0; i < folders.length; i++) {
-            let folder = folders[i];
+            const folder = folders[i];
             if (folder.title === 'Grida') {
               isGridaFolderExist = true;
-              folderId = folderId;
+              // folderId = folderId;
             }
           }
         }
@@ -34,14 +35,14 @@ export default class Upload extends React.Component {
         if (isGridaFolderExist) {
           //mappingInfo.json 있는지 확인 후 없으면
           const fileResponse = await gapi.client.drive.files.list();
-          let files = fileResponse.result.items;
+          const files = fileResponse.result.items;
           let isMappingFileExist = false;
           if (files && files.length > 0) {
             for (let i = 0; i < files.length; i++) {
-              let file = files[i];
+              const file = files[i];
               if (file.title === 'mappingInfo.json') {
-                let fileId = file.id;
-                let getFileRequest = gapi.client.drive.files.get({
+                const fileId = file.id;
+                const getFileRequest = gapi.client.drive.files.get({
                   fileId: fileId,
                   alt: 'media'
                 })
@@ -52,15 +53,16 @@ export default class Upload extends React.Component {
                 `; //여기에다가 새로운 content 내용을 받을거야
                 getFileRequest.then(await function(response) {
 
-                  let currentMappingObj = JSON.parse(response.body);
-                  let newMappingObj = JSON.parse(content);
+                  const currentMappingObj = JSON.parse(response.body);
+                  const newMappingObj = JSON.parse(content);
 
                   currentMappingObj.mapping_info.push(newMappingObj);
                   
                   content = JSON.stringify(currentMappingObj);
                   
-                  let contentBlob = new Blob([content], {'type': 'application/json'});
+                  const contentBlob = new Blob([content], {'type': 'application/json'});
                   self.updateMappingInfo(fileId, contentBlob, function(resp) {
+                    console.log("updateMappingInfo callback called");
                   });
                 }, function(error) {
                   console.error(error)
@@ -82,7 +84,7 @@ export default class Upload extends React.Component {
   }
 
   updateMappingInfo = (fileId, contentBlob, callback) => {
-    let xhr = new XMLHttpRequest();
+    const xhr = new XMLHttpRequest();
     xhr.responseType = 'json';
     xhr.onreadystatechange = function() {
       if (xhr.readyState != XMLHttpRequest.DONE) {
@@ -96,26 +98,26 @@ export default class Upload extends React.Component {
   }
 
   createNewMappingInfo = async (folderId) => {
-    let fileContent = `
+    const fileContent = `
     {"mapping_info":[
       {"sobp" : {"s":3,"o":281,"b":123,"p":1},
        "pdf_info" : {"file_name" : "filename","fp" : "finger print"}
       }
     ]}`; //sobp object와 pdf info를 object로 받아서 stringfy해준 뒤 fileContent에 삽입
-    let file = new Blob([fileContent], {type: 'text/plain'});
-    let metadata = {
+    const file = new Blob([fileContent], {type: 'text/plain'});
+    const metadata = {
         'name': 'mappingInfo.json', // Filename at Google Drive
         'mimeType': 'application/json', // mimeType at Google Drive
         'parents': [folderId], // Folder ID at Google Drive
     };
     
-    let accessToken = gapi.auth.getToken().access_token; // Here gapi is used for retrieving the access token.
+    const accessToken = gapi.auth.getToken().access_token; // Here gapi is used for retrieving the access token.
 
-    let form = new FormData();
+    const form = new FormData();
     form.append('metadata', new Blob([JSON.stringify(metadata)], {type: 'application/json'}));
     form.append('file', file);
     
-    let xhr = new XMLHttpRequest();
+    const xhr = new XMLHttpRequest();
     xhr.open('post', 'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id');
     xhr.setRequestHeader('Authorization', 'Bearer ' + accessToken);
     xhr.responseType = 'json';
@@ -127,10 +129,10 @@ export default class Upload extends React.Component {
   }
 
   createGridaFolder = async () => {
-    let self = this;
-    let access_token = gapi.auth.getToken().access_token;
+    const self = this;
+    const access_token = gapi.auth.getToken().access_token;
 
-    let request = gapi.client.request({
+    const request = gapi.client.request({
         'path': '/drive/v2/files/',
         'method': 'POST',
         'headers': {
@@ -159,12 +161,12 @@ export default class Upload extends React.Component {
           'fields': "*"
         }).then(function(response) {
           console.log(response);
-          let files = response.result.items;
+          const files = response.result.items;
           console.log(response.result.items);
     
           if (files && files.length > 0) {
             for (let i = 0; i < files.length; i++) {
-              let file = files[i];
+              const file = files[i];
               if (file.title === 'hi.pdf') {
                 console.log('file : ');
                 console.log(file);
@@ -173,7 +175,7 @@ export default class Upload extends React.Component {
             }
           }
 
-          let request = gapi.client.drive.files.get({
+          const request = gapi.client.drive.files.get({
             fileId: fileId,
             alt: 'media'
           })
@@ -192,21 +194,21 @@ export default class Upload extends React.Component {
     gapi.load('client', function () {
       gapi.client.load('drive', 'v2', async function () {
         const fileResponse = await gapi.client.drive.files.list();
-        let files = fileResponse.result.items;
+        const files = fileResponse.result.items;
 
         if (files && files.length > 0) {
           for (let i = 0; i < files.length; i++) {
-            let file = files[i];
+            const file = files[i];
             if (file.title === 'mappingInfo.json') {
-              let fileId = file.id;
-              let getFileRequest = gapi.client.drive.files.get({
+              const fileId = file.id;
+              const getFileRequest = gapi.client.drive.files.get({
                 fileId: fileId,
                 alt: 'media'
               })
 
               getFileRequest.then(await function(response) {
-                let currentMappingObj = JSON.parse(response.body);
-                let content = JSON.stringify(currentMappingObj);
+                const currentMappingObj = JSON.parse(response.body);
+                const content = JSON.stringify(currentMappingObj);
                 console.log(content);
               }, function(error) {
                 console.error(error)
@@ -223,13 +225,13 @@ export default class Upload extends React.Component {
     gapi.load('client', function () {
       gapi.client.load('drive', 'v2', async function () {
         const fileResponse = await gapi.client.drive.files.list();
-        let files = fileResponse.result.items;
+        const files = fileResponse.result.items;
 
         if (files && files.length > 0) {
           for (let i = 0; i < files.length; i++) {
-            let file = files[i];
-            let fileId = file.id;
-            let getFileRequest = gapi.client.drive.files.get({
+            const file = files[i];
+            const fileId = file.id;
+            const getFileRequest = gapi.client.drive.files.get({
               fileId: fileId,
               alt: 'media',
             });
@@ -239,7 +241,7 @@ export default class Upload extends React.Component {
               console.log(file.mimeType);
 
               getFileRequest.then(await function(response) {
-                let docInitParams = { data: response.body };
+                const docInitParams = { data: response.body };
                 PdfJs.getDocument(docInitParams).promise.then(function(pdf) {
                   console.log('finger : ');
                   console.log(pdf.fingerprint);

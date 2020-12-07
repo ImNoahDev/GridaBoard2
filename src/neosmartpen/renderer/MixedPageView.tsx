@@ -44,7 +44,8 @@ export default class MixedPageView extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
 
-    let { pageInfo, pdfUrl, pageNo } = props;
+    const { pdfUrl, pageNo } = props;
+    let pageInfo = props.pageInfo;
 
     if (!pageInfo) {
       pageInfo = { section: -1, owner: -1, book: -1, page: -1, }
