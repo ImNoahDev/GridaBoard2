@@ -24,7 +24,7 @@ import PrintButton from '../components/navbar/PrintButton';
 import FileLoad from '../components/navbar/FileLoad';
 import CalibrationMenual from '../components/navbar/CalibrationMenual';
 import UpperNav from '../components/navbar/UpperNav';
-import { FileBrowserButton } from "../NcodePrintLib";
+import { FileBrowserButton, IFileBrowserReturn } from "../NcodePrintLib";
 
 import {
   //PenEvent,
@@ -39,25 +39,25 @@ const menuStyle = {
   padding: '4px'
 }
 
-function hideAndShowFnc () {
+function hideAndShowFnc() {
   var colorMenu = document.getElementById('color_bar');
   var leftMenu = document.getElementById('leftmenu');
   var navCenter = document.getElementById('navbar_center');
   var navEnd = document.getElementById('navbar_end');
 
-  if (colorMenu.style.display === 'none' && navCenter.style.display === 'none' 
-      && navEnd.style.display === 'none' && leftMenu.style.display === 'none') {
-      colorMenu.style.display = 'block';
-      navCenter.style.display = 'block';
-      navEnd.style.display = 'block';
-      leftMenu.style.display = 'block';
-  }else {
-      colorMenu.style.display = 'none';
-      navCenter.style.display = 'none';
-      navEnd.style.display = 'none';
-      leftMenu.style.display = 'none';
+  if (colorMenu.style.display === 'none' && navCenter.style.display === 'none'
+    && navEnd.style.display === 'none' && leftMenu.style.display === 'none') {
+    colorMenu.style.display = 'block';
+    navCenter.style.display = 'block';
+    navEnd.style.display = 'block';
+    leftMenu.style.display = 'block';
+  } else {
+    colorMenu.style.display = 'none';
+    navCenter.style.display = 'none';
+    navEnd.style.display = 'none';
+    leftMenu.style.display = 'none';
   }
-  
+
 }
 
 
@@ -87,7 +87,7 @@ const Home = () => {
 
       _num_pens++;
       setNumPens(_num_pens);
-    } 
+    }
     else if (e.event.event === 'on_disconnected') {
       const mac = pen.getMac();
       console.log(`Home: OnPenDisconnected, mac=${pen.getMac()}`);
@@ -112,135 +112,137 @@ const Home = () => {
   }
 
   // 이 함수에서 pdf를 연다
-  const onFileOpen = (event) => {
+  const onFileOpen = (event: IFileBrowserReturn) => {
     console.log(event.url)
-    setUrl(event.url);
+    if (event.result === "success") {
+      setUrl(event.url);
+    }
   };
-  
+
   return (
-  <div> 
-    <nav id="uppernav" className="navbar navbar-light bg-transparent" style={{float: "left"}}>
-      <a id="grida_board" className="navbar-brand" href="#">Grida board
+    <div>
+      <nav id="uppernav" className="navbar navbar-light bg-transparent" style={{ float: "left" }}>
+        <a id="grida_board" className="navbar-brand" href="#">Grida board
         <small id="neo_smartpen" className="text-muted">
-          <span data-l10n-id="by_neosmart_pen"> by Neo smartpen</span>
-        </small>
-      </a>
-    </nav>
-    
-    <div id={"home_div"} style={{
-      position: "absolute",
-      left: "0px", top: "0px",
-      flexDirection: "row-reverse", display: "flex",
-      width: "100%", height: "100%",
-      alignItems: "center",
-      zIndex: 1,
-    }}>
-      <div id={"button_div"} style={{
-        position: "absolute",
-        display: "flex", flexDirection: "row-reverse",
-        alignItems: "center",
-        left: "0px", top: "0px",
-        width: "100%", height: "40px",
-        zIndex: 100,
-      }}>
-        {/* Connect a pen */}
-        <div style={{ fontSize: "20px", fontWeight: "bold" }}>
-          <FileBrowserButton variant="contained" color="primary" callback={onFileOpen}>
-            <Box fontSize={14} fontWeight="fontWeightBold" >PDF열기</Box>
-          </FileBrowserButton>
-        </div>
-
-        <div style={{ fontSize: "20px", fontWeight: "bold" }}>
-          <Button variant="outlined" color="primary" onClick={(event) => getNoteInfo(event)} >
-            <Box fontSize={14} fontWeight="fontWeightBold" >Get Notebook Infos</Box>
-          </Button>
-        </div>
-        <div style={{ flex: 1 }}>
-        </div>
-
-        <div style={{ fontSize: "20px", fontWeight: "bold" }}>
-          Pen Connected: {num_pens}
-        </div>
-
-        <UpperNav />
-
-        <div style={{ flex: 8 }}>
-        </div>
-      </div>
-
-
-
-      <nav id="colornav" className="navbar fixed-bottom navbar-light bg-transparent">
-        <div className="d-inline-flex p-2 bd-highlight">
-          <div className="navbar-menu d-flex justify-content-end align-items-end neo_shadow">
-            {/* <MenuButton onClick={hideAndShowFnc} /> */}
-            <button id="btn_menu" type="button" className="btn btn-neo " title="Open a menu" onClick={hideAndShowFnc}>
-              <div className="c2">
-                <img style={menuStyle} src={require("../icons/all_menu.png")} className="normal-image" alt=""></img>
-                <img style={menuStyle} src={require("../icons/all_menu.png")} className="hover-image" alt=""></img>
-              </div>
-            </button>
-          </div>
-          <div id="color_bar" className="color_bar neo_shadow float-left bottom_text color_bar">
-            <ColorButtons />
-          </div>
-        </div>
-        <div id="navbar_center">
-          <div className="navbar-menu d-flex justify-content-center align-items-center neo_shadow">
-            <PageNumbering /><PrintButton /><FileLoad />
-          </div>
-        </div>
-        <div id="navbar_end">
-          <div className="navbar-menu d-flex justify-content-end align-items-end neo_shadow">
-            <CalibrationMenual />
-          </div>
-        </div>
+            <span data-l10n-id="by_neosmart_pen"> by Neo smartpen</span>
+          </small>
+        </a>
       </nav>
 
-      <div style={{
-        // position: "absolute",
+      <div id={"home_div"} style={{
+        position: "absolute",
         left: "0px", top: "0px",
         flexDirection: "row-reverse", display: "flex",
-        width: "5%", height: "80%",
+        width: "100%", height: "100%",
         alignItems: "center",
-        zIndex: 100,
+        zIndex: 1,
       }}>
-        <div className="d-flex flex-column h-100">
-          <div id="leftmenu" className="main-container flex-grow-1">
+        <div id={"button_div"} style={{
+          position: "absolute",
+          display: "flex", flexDirection: "row-reverse",
+          alignItems: "center",
+          left: "0px", top: "0px",
+          width: "100%", height: "40px",
+          zIndex: 100,
+        }}>
+          {/* Connect a pen */}
+          <div style={{ fontSize: "20px", fontWeight: "bold" }}>
+            <FileBrowserButton variant="contained" color="primary" onFileOpen={onFileOpen}>
+              <Box fontSize={14} fontWeight="fontWeightBold" >PDF열기</Box>
+            </FileBrowserButton>
+          </div>
+
+          <div style={{ fontSize: "20px", fontWeight: "bold" }}>
+            <Button variant="outlined" color="primary" onClick={(event) => getNoteInfo(event)} >
+              <Box fontSize={14} fontWeight="fontWeightBold" >Get Notebook Infos</Box>
+            </Button>
+          </div>
+          <div style={{ flex: 1 }}>
+          </div>
+
+          <div style={{ fontSize: "20px", fontWeight: "bold" }}>
+            Pen Connected: {num_pens}
+          </div>
+
+          <UpperNav />
+
+          <div style={{ flex: 8 }}>
+          </div>
+        </div>
+
+
+
+        <nav id="colornav" className="navbar fixed-bottom navbar-light bg-transparent">
+          <div className="d-inline-flex p-2 bd-highlight">
+            <div className="navbar-menu d-flex justify-content-end align-items-end neo_shadow">
+              {/* <MenuButton onClick={hideAndShowFnc} /> */}
+              <button id="btn_menu" type="button" className="btn btn-neo " title="Open a menu" onClick={hideAndShowFnc}>
+                <div className="c2">
+                  <img style={menuStyle} src={require("../icons/all_menu.png")} className="normal-image" alt=""></img>
+                  <img style={menuStyle} src={require("../icons/all_menu.png")} className="hover-image" alt=""></img>
+                </div>
+              </button>
+            </div>
+            <div id="color_bar" className="color_bar neo_shadow float-left bottom_text color_bar">
+              <ColorButtons />
+            </div>
+          </div>
+          <div id="navbar_center">
+            <div className="navbar-menu d-flex justify-content-center align-items-center neo_shadow">
+              <PageNumbering /><PrintButton /><FileLoad />
+            </div>
+          </div>
+          <div id="navbar_end">
+            <div className="navbar-menu d-flex justify-content-end align-items-end neo_shadow">
+              <CalibrationMenual />
+            </div>
+          </div>
+        </nav>
+
+        <div style={{
+          // position: "absolute",
+          left: "0px", top: "0px",
+          flexDirection: "row-reverse", display: "flex",
+          width: "5%", height: "80%",
+          alignItems: "center",
+          zIndex: 100,
+        }}>
+          <div className="d-flex flex-column h-100">
+            <div id="leftmenu" className="main-container flex-grow-1">
               <div id="menu-wide" className="d-flex menu-container float-left h-100">
-                <div className="d-flex flex-column justify-content-between" style = {{zIndex: 1030}}>
+                <div className="d-flex flex-column justify-content-between" style={{ zIndex: 1030 }}>
                   <ConnectButton onPenLinkChanged={e => onPenLinkChanged(e)} />
-                  <div className="btn-group-vertical neo_shadow" style = {{ marginBottom: 10 }}>
+                  <div className="btn-group-vertical neo_shadow" style={{ marginBottom: 10 }}>
                     <div className="btn-group dropright" role="group">
-                      <PenTypeButton/>
+                      <PenTypeButton />
                     </div>
 
                     {/* Trash Button  */}
                     <button id="btn_trash" type="button" title="Clear" className="btn btn-neo btn-neo-dropdown"
-                    onClick={() => handleTrashBtn()}>
+                      onClick={() => handleTrashBtn()}>
                       <div className="c2">
-                          <img src= { require("../icons/icon_trash_n.png") } className="normal-image"></img>
-                          <img src= { require("../icons/icon_trash_p.png") } className="hover-image"></img>
+                        <img src={require("../icons/icon_trash_n.png")} className="normal-image"></img>
+                        <img src={require("../icons/icon_trash_p.png")} className="hover-image"></img>
                       </div>
-                    </button> 
+                    </button>
 
-                    <RotateButton/><BackgroundButton/>
+                    <RotateButton /><BackgroundButton />
                   </div>
-                  <div className="btn-group-vertical neo_shadow" style = {{ marginBottom: 10 }}>
-                    <FitButton/><ZoomButton/><FullScreenButton/>
+                  <div className="btn-group-vertical neo_shadow" style={{ marginBottom: 10 }}>
+                    <FitButton /><ZoomButton /><FullScreenButton />
                   </div>
-                  <div className="btn-group-vertical neo_shadow" style = {{ marginBottom: 10 }}>
-                    <TracePointButton/>
+                  <div className="btn-group-vertical neo_shadow" style={{ marginBottom: 10 }}>
+                    <TracePointButton />
                   </div>
                 </div>
               </div>
+            </div>
           </div>
         </div>
-      </div>
-      
-      <MixedPageView pdfUrl={pdfUrl} pageNo={1} scale={1} playState={PLAYSTATE.live} pens={pens} ref={pageRef}/>
-    </div >
-  </div>
+
+        <MixedPageView pdfUrl={pdfUrl} pageNo={1} scale={1} playState={PLAYSTATE.live} pens={pens} ref={pageRef} />
+      </div >
+    </div>
   );
 };
 

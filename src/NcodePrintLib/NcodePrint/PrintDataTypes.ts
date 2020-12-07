@@ -8,6 +8,13 @@ import { ColorConvertMethod } from "../NcodeSurface/CanvasColorConverter";
 
 
 
+export interface  IFileBrowserReturn {
+  result: "success" | "canceled" | "failed",
+  url: string,
+  file: any,
+}
+
+
 export interface IPrintOption {
   codeDensity: number;      // 1 dot, 2dots, 3dots
   printDpi: number;         // 600 DPI, 300 DPI
