@@ -2,14 +2,9 @@ import { Button } from '@material-ui/core';
 import React, { useRef } from 'react';
 import { onSuccess, _uuid, onOpenClicked, openFileBrowser } from "./FileBrowser";
 
-export type IFileBrowserReturn = {
-  result: "success" | "canceled" | "failed",
-  url: string,
-  file: any,
 
-}
 type Props = {
-  callback: Function,
+  onFileOpen: Function,
 
   children?: React.ReactNode;
   color?: any;
@@ -26,7 +21,7 @@ type Props = {
 
 
 const FileBrowserButton = (props: Props) => {
-  const { callback } = props;
+  const { onFileOpen } = props;
   const _fileInput = useRef();
 
   async function fileOpen() {
@@ -38,12 +33,12 @@ const FileBrowserButton = (props: Props) => {
       const url = result.url;
       console.log(url);
 
-      if (callback) {
-        callback({ result: "success", url, file: result.file });
+      if (onFileOpen) {
+        onFileOpen({ result: "success", url, file: result.file });
       }
     } else {
       alert("파일 열기를 취소 했습니다");
-      callback({ result: "canceled", url: null });
+      onFileOpen({ result: "canceled", url: null });
     }
   }
 
