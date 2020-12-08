@@ -2,7 +2,7 @@ import React from "react";
 import { Button, } from "@material-ui/core";
 
 import { PrintPdfMain } from "./PrintPdfMain";
-import { IPrintingProgress, IPrintOption, } from "./PrintDataTypes";
+import { IPrintingReport, IPrintOption, } from "./PrintDataTypes";
 
 import NeoPdfDocument from "../NeoPdf/NeoPdfDocument";
 import NeoPdfManager from "../NeoPdf/NeoPdfManager";
@@ -15,7 +15,7 @@ import { IPageOverview } from "./PagesForPrint";
 
 type Props = {
   url: string,
-  reportProgress: Function,
+  reportProgress: (arg: IPrintingReport) => void,
   printOption: IPrintOption,
 
   children?: React.ReactNode;
@@ -30,6 +30,9 @@ type Props = {
   startIcon?: React.ReactNode;
   variant?: 'text' | 'outlined' | 'contained';
 }
+
+
+
 
 interface State {
 
@@ -62,7 +65,7 @@ interface State {
 /**
  * Class
  */
-export default class PdfPrintButton extends React.Component<Props, State> {
+export default class PrintPdfButton extends React.Component<Props, State> {
   // static displayName = "WholePageViewer";
 
   // static defaultProps = {
@@ -190,13 +193,15 @@ export default class PdfPrintButton extends React.Component<Props, State> {
       this.printOption.marginTop_nu = -0.5;
     }
 
-    // 모든 페이지를 인쇄
-    this.printOption.targetPages = Array.from({ length: numPages }, (_, i) => i + 1);
+    if (this.printOption.targetPages.length < 1) {
+      // 모든 페이지를 인쇄
+      this.printOption.targetPages = Array.from({ length: numPages }, (_, i) => i + 1);
+    }
 
     // 1,2 페이지만 인쇄
     // this.printOption.targetPages = Array.from({ length: 2 }, (_, i) => i + 1);
 
-    this.printOption.debugMode = 0;
+    // this.printOption.debugMode = 0;
   }
 
   startPrint = () => {
@@ -224,7 +229,7 @@ export default class PdfPrintButton extends React.Component<Props, State> {
     });
   }
 
-  updatePrintProgress = (event: IPrintingProgress) => {
+  updatePrintProgress = (event: IPrintingReport) => {
     const { preparedPages, numSheetsPrepared, completion } = event;
     const numPagesPrepared = preparedPages.length;
 
@@ -237,6 +242,8 @@ export default class PdfPrintButton extends React.Component<Props, State> {
     if (this.props.reportProgress) {
       this.props.reportProgress({
         status: "progress",
+        preparedPages,
+        numPagesToPrint: this.printOption.targetPages.length,
         numPagesPrepared,
         numSheetsPrepared,
         completion,
@@ -263,16 +270,6 @@ export default class PdfPrintButton extends React.Component<Props, State> {
   render() {
     const { pdf, printTrigger } = this.state;
     const printOption = this.printOption;
-
-    // const { numPagesPrepared, numSheetsPrepared, completion, numSheets, numPages } = this.state;
-
-    // // let msg = `sheets(${numSheetsPrepared}:${completion}% / ${numSheets}), pages(${numPagesPrepared}:${completion}% / ${numPages})`;
-    // // if (status === "printing") {
-    // //   msg = "Printing... " + msg;
-    // // }
-    // // else if (status === "completed") {
-    // //   msg = "Print completed... " + msg;
-    // // }
 
     return (
       <div className="pdf-context">
