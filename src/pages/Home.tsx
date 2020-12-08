@@ -200,32 +200,32 @@ const Home = () => {
 
 
         <nav id="colornav" className="navbar fixed-bottom navbar-light bg-transparent">
-          <div className="d-inline-flex p-2 bd-highlight">
-            <div className="navbar-menu d-flex justify-content-end align-items-end neo_shadow">
-              {/* <MenuButton onClick={hideAndShowFnc} /> */}
+          {/* <div className="d-inline-flex p-2 bd-highlight"> */}
+            <div className="navbar-menu d-flex justify-content-start align-items-end neo_shadow ">
               <button id="btn_menu" type="button" className="btn btn-neo " title="Open a menu" onClick={hideAndShowFnc}>
                 <div className="c2">
                   <img style={menuStyle} src='../icons/all_menu.png' className="normal-image" alt=""></img>
                   <img style={menuStyle} src='../icons/all_menu.png' className="hover-image" alt=""></img>
                 </div>
               </button>
+              <div id="color_bar" className="color_bar neo_shadow float-left bottom_text color_bar">
+                <ColorButtons />
+              </div>
             </div>
-            <div id="color_bar" className="color_bar neo_shadow float-left bottom_text color_bar">
-              <ColorButtons />
-
-            </div>
+            
             <div id="navbar_center">
               <div className="navbar-menu d-flex justify-content-center align-items-center neo_shadow">
                 <PageNumbering /><PrintButton /><FileBrowserButton onFileOpen={onFileOpen} />
               </div>
             </div>
+
             <div id="navbar_end">
               <div className="navbar-menu d-flex justify-content-end align-items-end neo_shadow">
                 <ManualCalibration />
               </div>
             </div>
 
-          </div>
+          {/* </div> */}
         </nav>
 
 
