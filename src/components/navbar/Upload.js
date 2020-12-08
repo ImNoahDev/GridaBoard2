@@ -3,9 +3,10 @@ import React from 'react';
 import { gapi } from 'gapi-script';
 import { GoogleLogin } from 'react-google-login';
 import * as PdfJs from "pdfjs-dist";
-
+import MappingStorage from "../../NcodePrintLib/SurfaceMapper/MappingStorage";
 import { resolve } from 'path';
 
+const st = MappingStorage.getInstance()
 const FOLDER_ID = "root";
 
 export default class Upload extends React.Component {
@@ -208,6 +209,7 @@ export default class Upload extends React.Component {
 
               getFileRequest.then(await function(response) {
                 const currentMappingObj = JSON.parse(response.body);
+                console.log(currentMappingObj);
                 const content = JSON.stringify(currentMappingObj);
                 console.log(content);
               }, function(error) {
@@ -259,7 +261,7 @@ export default class Upload extends React.Component {
   render() {
       return (
         <div>
-          <button id="mapping_info_process" onClick={this.mappingInfoUploadProcess}>
+          {/* <button id="mapping_info_process" onClick={this.mappingInfoUploadProcess}>
             Upload Mapping Info
           </button>
           <button id="read_mapping_info" onClick={this.readMappingInfo}>
@@ -267,6 +269,12 @@ export default class Upload extends React.Component {
           </button>
           <button id="read_mapping_info" onClick={this.readPDF}>
             Read PDF
+          </button> */}
+          <button id="read_mapping_info" onClick={st.saveOnCloud}>
+            Save on Cloud
+          </button>
+          <button id="read_mapping_info" onClick={st.getCloudData}>
+            Read on Cloud
           </button>
         </div>
       )

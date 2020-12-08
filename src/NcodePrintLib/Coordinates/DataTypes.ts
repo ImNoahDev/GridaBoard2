@@ -102,7 +102,7 @@ export type IPdfPageDesc = {
  *    y' = (x*h[3] + y*h[4] + h[5]) / G;
  */
 export interface IMappingParams {
-  /** 최초 store된 시각 */
+  /** 최초 로컬 Mapping Storage에 store된 시각 */
   timeString?: string,
 
   /** Ncode page information */

@@ -1,13 +1,15 @@
 import { CoordinateTanslater, IMappingParams } from "../Coordinates";
-import { INcodeSOBPxy } from "../DataStructure/Structures";
+import { INcodeSOBPxy, IPageSOBP } from "../DataStructure/Structures";
 import { isSamePage } from "../NcodeSurface";
+import * as cloud_util_func from "../../cloud_util_func";
 
 let _instance: MappingStorage = null;
 const LOCAL_STORAGE_ID = "GridaBoard_codeMappingInfo_v2";
 
 export default class MappingStorage {
   _arrMapped: IMappingParams[] = [];
-
+  _nextIssuableNcode: IPageSOBP = { section: -1, owner: -1, book: -1, page: -1 };
+  _testStorage;
   private constructor() {
     if (_instance) return _instance;
   }
@@ -19,9 +21,16 @@ export default class MappingStorage {
     return _instance;
   }
 
-  register = (item: CoordinateTanslater) => {
-    const params = item.mappingParams;
 
+  public issueNcode = (nPagesNeeded:number ) : IPageSOBP[] => {
+    // this._nextIssuableNcode를 참조해서 
+
+    // 임시
+    const nextNcode: IPageSOBP = { section: -1, owner: -1, book: -1, page: -1 };
+    return [nextNcode];
+  }
+
+  private getNowTimeStr = () => {
     const now = new Date();
     const timeStr =
       `${addZeros(now.getFullYear(), 2)}/` +
@@ -32,8 +41,43 @@ export default class MappingStorage {
       `${addZeros(now.getSeconds(), 2)}.` +
       `${addZeros(now.getMilliseconds(), 4)}`;
 
+    return timeStr;
+  }
+  register = (item: CoordinateTanslater) => {
+    const params = item.mappingParams;
+
+    const timeStr = this.getNowTimeStr();
     params.timeString = timeStr; // JSON.stringify(new Date());
     this._arrMapped.push(params);
+  }
+  public getCloudData() {
+    cloud_util_func.readMappingInfo();
+  }
+  public setTestStorage(obj) {
+    this._testStorage = obj;
+
+    console.log(this._testStorage);
+  }
+  public saveOnCloud = () => {
+
+    const params = {
+      timeString : "1111", 
+      pageInfo : {section : "1", book:"1", owner:"1", page:"1"}, 
+    }
+    const params2 = {
+      timeString : "1111", 
+      pageInfo : {section : "1", book:"1", owner:"1", page:"2"}, 
+    }
+    const nextCode = {
+      nextCode : {section : "1", book:"1", owner:"1", page:"3"}
+    }
+
+    var testArr = [];
+    testArr.push(params);
+    testArr.push(params2);
+    testArr.push(nextCode);
+
+    cloud_util_func.uploadMappingInfo(testArr);
   }
 
   /**

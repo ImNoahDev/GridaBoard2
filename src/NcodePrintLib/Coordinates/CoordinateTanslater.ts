@@ -89,11 +89,20 @@ export default class CoordinateTanslater {
 
   private _mappingParams: IMappingParams = null;
 
-  constructor(original: CoordinateTanslater = null) {
-    if (original) {
-      const json = JSON.stringify(original._mappingParams);
-      this._mappingParams = JSON.parse(json);
-      this.calcReverse();
+  constructor(arg: CoordinateTanslater | IMappingParams = null) {
+    if (arg) {
+      if (arg.hasOwnProperty("_mappingParams")) {
+        const trans = arg as CoordinateTanslater;
+        const json = JSON.stringify(trans._mappingParams);
+        this._mappingParams = JSON.parse(json);
+        this.calcReverse();
+      }
+      else {
+        const params = arg as IMappingParams;
+        const json = JSON.stringify(params);
+        this._mappingParams = JSON.parse(json);
+        this.calcReverse();
+      }
     }
   }
 
