@@ -72,7 +72,7 @@ export default class MappingStorage {
       nextCode : {section : "1", book:"1", owner:"1", page:"3"}
     }
 
-    var testArr = [];
+    const testArr = [];
     testArr.push(params);
     testArr.push(params2);
     testArr.push(nextCode);
