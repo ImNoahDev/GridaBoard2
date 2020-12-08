@@ -6,8 +6,8 @@ import MappingStorage from "./NcodePrintLib/SurfaceMapper/MappingStorage";
 const FOLDER_ID = "root";
 
 export async function uploadMappingInfo(content) {
-  var folderId;
-  var content = content;
+  let folderId;
+  // var content = content;
   gapi.load('client', function () {
     gapi.client.load('drive', 'v2', async function () {
       const folderResponse = await gapi.client.drive.files.list({
@@ -86,10 +86,10 @@ export async function updateMappingInfo(fileId, contentBlob, callback) {
 
 export async function createNewMappingInfo(folderId, content) {
   
-  var mappingInfoObj = {"mappingInfos" : [] }
+  const mappingInfoObj = {"mappingInfos" : [] }
   
   mappingInfoObj.mappingInfos.push(content);
-  var mappingInfoContent = JSON.stringify(mappingInfoObj);
+  const mappingInfoContent = JSON.stringify(mappingInfoObj);
   
   const file = new Blob([mappingInfoContent], {type: 'text/plain'});
   const metadata = {
@@ -117,7 +117,7 @@ export async function createNewMappingInfo(folderId, content) {
 
 export async function createGridaFolder(content) {
   const access_token = gapi.auth.getToken().access_token;
-  var content = content;
+  // var content = content;
 
   gapi.client.request(await {
       'path': '/drive/v2/files/',
