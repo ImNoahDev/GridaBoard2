@@ -21,9 +21,17 @@ import ColorButtons from '../components/navbar/ColorButtons';
 import PageNumbering from '../components/navbar/PageNumbering';
 import PrintButton from '../components/navbar/PrintButton';
 import FileLoad from '../components/navbar/FileLoad';
-import CalibrationMenual from '../components/navbar/CalibrationMenual';
+import ManualCalibration from '../components/navbar/CalibrationMenual';
 import UpperNav from '../components/navbar/UpperNav';
-import { FileBrowserButton, IFileBrowserReturn } from "../NcodePrintLib";
+
+import {
+  g_defaultPrintOption,
+  IFileBrowserReturn,
+  IPrintingReport,
+  PrintPdfButton,
+  FileBrowserButton
+} from "../NcodePrintLib";
+
 import GoogleBtn from '../components/GoogleBtn';
 import Upload from '../components/navbar/Upload';
 
@@ -112,6 +120,8 @@ const Home = () => {
     console.log('Handle Trash Btn');
   }
 
+
+
   // 이 함수에서 pdf를 연다
   const onFileOpen = (event: IFileBrowserReturn) => {
     console.log(event.url)
@@ -119,6 +129,19 @@ const Home = () => {
       setUrl(event.url);
     }
   };
+
+
+  // 여기서 인쇄의 실행 정도 퍼센트를 표시하도록 한다
+  const onReportProgress = (arg: IPrintingReport) => {
+    const numPagesToPrint = arg.numPagesToPrint;
+
+    console.log(arg.status);
+    console.log(`Pages prepared : ${arg.numPagesPrepared} / ${numPagesToPrint}`);
+    console.log(`Sheets prepared : ${arg.numSheetsPrepared}`);
+    console.log(`Completed percent : ${arg.completion}%`);
+  };
+
+  const printOption = g_defaultPrintOption;
 
   return (
     <div>
@@ -146,55 +169,64 @@ const Home = () => {
           width: "100%", height: "40px",
           zIndex: 100,
         }}>
+          <div style={{ flex: 1 }}> </div>
+
           <div style={{ fontSize: "20px", fontWeight: "bold" }}>
             <Button variant="outlined" color="primary" onClick={(event) => getNoteInfo(event)} >
-              <Box fontSize={14} fontWeight="fontWeightBold" >Get Notebook Infos</Box>
+              <Box fontSize={14} fontWeight="fontWeightBold" >공책 정보 받아오기(현재 실패)</Box>
             </Button>
           </div>
-          <div style={{ flex: 1 }}>
+          <div style={{ flex: 1 }}> </div>
+
+          <div style={{ fontSize: "20px", fontWeight: "bold" }}>
+            <PrintPdfButton variant="contained" color="primary" url={pdfUrl} printOption={printOption} reportProgress={onReportProgress}>
+              <Box fontSize={14} fontWeight="fontWeightBold" >인쇄 시험 (인쇄 옵션 창을 띄울것)</Box>
+            </PrintPdfButton>
           </div>
+          <div style={{ flex: 1 }}> </div>
 
           <div style={{ fontSize: "20px", fontWeight: "bold" }}>
             Pen Connected: {num_pens}
           </div>
+          <div style={{ flex: 1 }}> </div>
 
           <Upload />
+          <div style={{ flex: 1 }}> </div>
+
           <GoogleBtn />
-
-          <div style={{ flex: 8 }}>
-          </div>
+          <div style={{ flex: 11 }}> </div>
         </div>
 
 
 
-      <nav id="colornav" className="navbar fixed-bottom navbar-light bg-transparent">
-        <div className="d-inline-flex p-2 bd-highlight">
-          <div className="navbar-menu d-flex justify-content-end align-items-end neo_shadow">
-            {/* <MenuButton onClick={hideAndShowFnc} /> */}
-            <button id="btn_menu" type="button" className="btn btn-neo " title="Open a menu" onClick={hideAndShowFnc}>
-              <div className="c2">
-                <img style={menuStyle} src='../icons/all_menu.png' className="normal-image" alt=""></img>
-                <img style={menuStyle} src='../icons/all_menu.png' className="hover-image" alt=""></img>
-              </div>
-            </button>
-          </div>
-          <div id="color_bar" className="color_bar neo_shadow float-left bottom_text color_bar">
-            <ColorButtons />
-
-          </div>
-          <div id="navbar_center">
-            <div className="navbar-menu d-flex justify-content-center align-items-center neo_shadow">
-              <PageNumbering /><PrintButton /><FileBrowserButton onFileOpen={onFileOpen}/>
-            </div>
-          </div>
-          <div id="navbar_end">
+        <nav id="colornav" className="navbar fixed-bottom navbar-light bg-transparent">
+          <div className="d-inline-flex p-2 bd-highlight">
             <div className="navbar-menu d-flex justify-content-end align-items-end neo_shadow">
-              <CalibrationMenual />
+              {/* <MenuButton onClick={hideAndShowFnc} /> */}
+              <button id="btn_menu" type="button" className="btn btn-neo " title="Open a menu" onClick={hideAndShowFnc}>
+                <div className="c2">
+                  <img style={menuStyle} src='../icons/all_menu.png' className="normal-image" alt=""></img>
+                  <img style={menuStyle} src='../icons/all_menu.png' className="hover-image" alt=""></img>
+                </div>
+              </button>
             </div>
-          </div>
+            <div id="color_bar" className="color_bar neo_shadow float-left bottom_text color_bar">
+              <ColorButtons />
 
-        </div>
-      </nav>
+            </div>
+            <div id="navbar_center">
+              <div className="navbar-menu d-flex justify-content-center align-items-center neo_shadow">
+                <PageNumbering /><PrintButton /><FileBrowserButton onFileOpen={onFileOpen} />
+              </div>
+            </div>
+            <div id="navbar_end">
+              <div className="navbar-menu d-flex justify-content-end align-items-end neo_shadow">
+                <ManualCalibration />
+              </div>
+            </div>
+
+          </div>
+        </nav>
 
 
         <div style={{
@@ -219,8 +251,8 @@ const Home = () => {
                     <button id="btn_trash" type="button" title="Clear" className="btn btn-neo btn-neo-dropdown"
                       onClick={() => handleTrashBtn()}>
                       <div className="c2">
-                          <img src='../icons/icon_trash_n.png' className="normal-image"></img>
-                          <img src='../icons/icon_trash_p.png' className="hover-image"></img>
+                        <img src='../icons/icon_trash_n.png' className="normal-image"></img>
+                        <img src='../icons/icon_trash_p.png' className="hover-image"></img>
                       </div>
                     </button>
 

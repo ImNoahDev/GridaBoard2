@@ -14,7 +14,7 @@ import TextField from '@material-ui/core/TextField';
 
 import { Button, Box, Input } from "@material-ui/core";
 
-import { IPrintingProgress, IPrintOption, MediaSize, PageInfo } from '../PrintDataTypes';
+import { IPrintingReport, IPrintOption, MediaSize, PageInfo } from '../PrintDataTypes';
 
 import FormControl from '@material-ui/core/FormControl';
 import FormControlLabel from '@material-ui/core/FormControlLabel';

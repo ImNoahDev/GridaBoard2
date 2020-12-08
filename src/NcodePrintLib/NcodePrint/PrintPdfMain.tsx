@@ -2,7 +2,7 @@ import * as React from "react";
 
 import { IPageOverview, PagesForPrint } from "./PagesForPrint";
 import ReactToPrint from 'react-to-print';
-import { IPrintingProgress, IPrintOption } from "./PrintDataTypes";
+import { IPrintingReport, IPrintOption } from "./PrintDataTypes";
 import { compareObject } from "./UtilFunc";
 import { getCellMatrixShape } from "../NcodeSurface/SurfaceSplitter";
 import { LandscapeOrientation, PortraitOrientation } from "./PageOrientation";
@@ -136,8 +136,10 @@ export class PrintPdfMain extends React.Component<Props, State> {
 
     /** callback을 불러준다 */
     if (this.props.updatePrintProgress) {
-      const event: IPrintingProgress = {
+      const event: IPrintingReport = {
+        status: "progress",
         preparedPages: [...this.renderedPages],
+        numPagesPrepared: this.renderedPages.length,
         numSheetsPrepared: numCompleted,
         completion,
       }
@@ -260,25 +262,28 @@ export class PrintPdfMain extends React.Component<Props, State> {
                 removeAfterPrint
               // trigger={this.reactToPrintTrigger}
               />
-              {/* <PagesForPrint ref={this.setComponentRef} text={this.state.text}
+              <PagesForPrint ref={this.setComponentRef} text={this.state.text}
                 // key={`print-${pdf.fingerprint}-${globalPagesCnt}`}
                 pdf={pdf}
+                pagesOverview={pagesOverview}
                 shouldRenderPage={shouldRenderPage}
                 OnPagePrepared={this.OnPagePrepared}
                 printOption={printOption}
-              /> */}
+              />
             </div>
           ) : (<></>)
         }
 
-        <PagesForPrint ref={this.setComponentRef} text={this.state.text}
-          // key={`screen-${pdf.fingerprint}-${globalPagesCnt}`}
-          pdf={pdf}
-          pagesOverview={pagesOverview}
-          shouldRenderPage={shouldRenderPage}
-          OnPagePrepared={null}
-          printOption={printOption}
-        />
+        { printOption.debugMode > 0 ?
+          <PagesForPrint ref={this.setComponentRef} text={this.state.text}
+            // key={`screen-${pdf.fingerprint}-${globalPagesCnt}`}
+            pdf={pdf}
+            pagesOverview={pagesOverview}
+            shouldRenderPage={shouldRenderPage}
+            OnPagePrepared={null}
+            printOption={printOption}
+          />
+          : <></>}
       </div>
     );
   }

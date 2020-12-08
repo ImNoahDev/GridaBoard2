@@ -7,7 +7,7 @@ const style = {
   padding: '4px'
 }
 
-class calibrationMenual extends React.Component {
+class ManualCalibration extends React.Component {
   render() {
     return (
           <button id="btn_start_calibration" disabled type="button" className="btn btn-neo" title="Pairing paper with PDF">
@@ -20,4 +20,4 @@ class calibrationMenual extends React.Component {
   }
 }
 
-export default calibrationMenual;
+export default ManualCalibration;

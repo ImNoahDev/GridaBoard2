@@ -8,7 +8,29 @@ import { ColorConvertMethod } from "../NcodeSurface/CanvasColorConverter";
 
 
 
-export interface  IFileBrowserReturn {
+export interface IPrintingReport {
+  status: "progress" | "completed",
+  /** 준비된 페이지들 */
+  preparedPages?: number[],
+  /** 준비된 페이지 수 */
+  numPagesPrepared?: number,
+
+  /** 인쇄할 총 페이지 수 */
+  numPagesToPrint? : number,
+
+  /** 준비된 시트 단위 (용지) 수 */
+  numSheetsPrepared?: number,
+
+  /** 100 = 100% */
+  completion?: number,
+
+  /** 인쇄할 당시의 인쇄 옵션 */
+  printOption?: IPrintOption, 
+
+}
+
+
+export interface IFileBrowserReturn {
   result: "success" | "canceled" | "failed",
   url: string,
   file: any,
@@ -77,11 +99,7 @@ export const MediaSize: { [key: string]: IPaperSize } = {
 
 
 
-export interface IPrintingProgress {
-  preparedPages: number[],
-  numSheetsPrepared: number,
-  completion: number,   // 100 = 100%
-}
+
 
 export const PageInfo: { [key: string]: IPageSOBP } = {
   first_page: { section: 3, owner: 27, book: 1068, page: 1 },

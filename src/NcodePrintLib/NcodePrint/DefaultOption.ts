@@ -29,8 +29,8 @@ export const g_defaultPrintOption: IPrintOption = {
   marginTop_nu: -1,
 
   targetPages: [],
-  pagesPerSheet: 8,
+  pagesPerSheet: 2,
 
-  debugMode: 1,
+  debugMode: 0,
   hasToPutNcode: true,
 };
