@@ -101,7 +101,7 @@ export default class RenderWorkerBase {
   autoFocus = true;
 
   /** <canvas>내의 drawing canvas(fabric canvas)의 offset, 현재는 안 씀 - 2020/11/08*/
-  offset: { x: number, y: number } = { x: 0, y: 0 };
+  offset: { x: number, y: number, zoom: number } = { x: 0, y: 0, zoom: 1 };
 
   /** 종이 정보 */
   surfaceInfo: IWritingSurfaceInfo = {
@@ -264,34 +264,34 @@ export default class RenderWorkerBase {
     });
     canvasFb.add(rect);
 
-    for (let x = 0; x < size.width; x += 10) {
-      const line = new fabric.Line([x, 0, x, size.height], {
-        strokeWidth: 0.5,
-        stroke: "rgba(0,0,0,0.1)",
-        hasControls: false,
-        hasBorders: false,
-        lockMovementX: true,
-        lockMovementY: true,
-        data: GRID_OBJECT_ID,
-      });
+    // for (let x = 0; x < size.width; x += 10) {
+    //   const line = new fabric.Line([x, 0, x, size.height], {
+    //     strokeWidth: 0.5,
+    //     stroke: "rgba(0,0,0,0.1)",
+    //     hasControls: false,
+    //     hasBorders: false,
+    //     lockMovementX: true,
+    //     lockMovementY: true,
+    //     data: GRID_OBJECT_ID,
+    //   });
 
-      canvasFb.add(line);
-    }
+    //   canvasFb.add(line);
+    // }
 
 
-    for (let y = 0; y < size.height; y += 10) {
-      const line = new fabric.Line([0, y, size.width, y], {
-        strokeWidth: 0.5,
-        stroke: "rgba(0,0,0,0.1)",
-        hasControls: false,
-        hasBorders: false,
-        lockMovementX: true,
-        lockMovementY: true,
-        data: GRID_OBJECT_ID,
-      });
+    // for (let y = 0; y < size.height; y += 10) {
+    //   const line = new fabric.Line([0, y, size.width, y], {
+    //     strokeWidth: 0.5,
+    //     stroke: "rgba(0,0,0,0.1)",
+    //     hasControls: false,
+    //     hasBorders: false,
+    //     lockMovementX: true,
+    //     lockMovementY: true,
+    //     data: GRID_OBJECT_ID,
+    //   });
 
-      canvasFb.add(line);
-    }
+    //   canvasFb.add(line);
+    // }
 
   }
 
@@ -370,7 +370,11 @@ export default class RenderWorkerBase {
       this.scrollBoundaryCheck();
 
       // event 전달
-      this.reportCanvasChanged();
+      const offsetX = vpt[4];
+      const offsetY = vpt[5];
+      const zoom = canvasFb.getZoom();
+
+      this.reportCanvasChanged(offsetX, offsetY, zoom);
       // canvas.setViewportTransform(vpt);
       canvasFb.requestRenderAll();
 
@@ -383,14 +387,13 @@ export default class RenderWorkerBase {
     }
   }
 
-  reportCanvasChanged = () => {
-    const canvasFb = this.canvasFb;
-    const vpt = canvasFb.viewportTransform;
-    const offsetX = vpt[4];
-    const offsetY = vpt[5];
-
-    const zoom = canvasFb.getZoom();
-
+  reportCanvasChanged = (offsetX: number, offsetY: number, zoom: number) => {
+    // const canvasFb = this.canvasFb;
+    // const vpt = canvasFb.viewportTransform;
+    // const offsetX = vpt[4];
+    // const offsetY = vpt[5];
+    // const zoom = canvasFb.getZoom();
+    this.offset = { x: offsetX, y: offsetY, zoom };
     this.options.onCanvasShapeChanged({ offsetX, offsetY, zoom });
   }
 
@@ -423,7 +426,8 @@ export default class RenderWorkerBase {
       const canvasFb = this.canvasFb;
 
       const delta = opt.e.deltaY;
-      let zoom = canvasFb.getZoom();
+      // let zoom = canvasFb.getZoom();
+      let zoom = this.offset.zoom;
       zoom *= 0.999 ** delta;
 
       this.setCanvasZoom(zoom, opt);
@@ -469,10 +473,9 @@ export default class RenderWorkerBase {
   setCanvasZoom = (zoom: number, opt: any) => {
     const canvas = this.canvasFb;
 
-    if (zoom > 20) zoom = 20;
-    if (zoom < 0.01) zoom = 0.01;
+    if (zoom > 5) zoom = 5;
+    if (zoom < 0.1) zoom = 0.1;
 
-    /** @type {fabric.Point} */
     const evt: MouseEvent = opt.e;
     const pt = new fabric.Point(evt.offsetX, evt.offsetY);
     if (opt) canvas.zoomToPoint(pt, zoom);
@@ -484,8 +487,12 @@ export default class RenderWorkerBase {
 
     this.scrollBoundaryCheck();
 
+    const vpt = canvas.viewportTransform;
+    const offsetX = vpt[4];
+    const offsetY = vpt[5];
+
     // event 전달
-    this.reportCanvasChanged();
+    this.reportCanvasChanged(offsetX, offsetY, zoom);
   }
 
   /**

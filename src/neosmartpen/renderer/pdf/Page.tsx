@@ -4,8 +4,8 @@ import { pdfSizeToDIsplayPixel, pdfSizeToDIsplayPixel_int } from "../../utils/Ut
 import "pdfjs-dist";
 import * as PdfJs from "pdfjs-dist";
 import { PDF_DEFAULT_DPI } from '../../constants';
+import { sprintf } from 'sprintf-js';
 
-let nowRendering = false;
 /**
  * Page.js
  * Component rendering page of PDF
@@ -29,6 +29,12 @@ interface PageState {
   scratchCanvasStatus: "N/A" | "rendering" | "rendered",
 }
 
+type IBackRenderedStatus = {
+  result: boolean,
+  px_width: number,
+  px_height: number
+}
+
 class Page extends Component<PageProps> {
   state: PageState = {
     status: 'N/A',
@@ -42,22 +48,23 @@ class Page extends Component<PageProps> {
   };
 
   canvas: HTMLCanvasElement | null = null;
-  inRendering = false;
-  inImageRendering = false;
 
-  isRenderRunning = false;
+  inRendering = false;
 
   renderTask: PdfJs.PDFRenderTask = null;
 
-  backPlaneCanvas: HTMLCanvasElement = document.createElement("canvas");
-  scratchCanvas = document.createElement("canvas");
-
-  inited = false;
-
-  _prevZoom = 0;
-  area;
+  backPlane = {
+    canvas: document.createElement("canvas"),
+    inited: false,
+    nowRendering: false,
+    prevZoom: 0,
+    zoomQueue: [] as number[],
+    size: { result: false, px_width: 0, px_height: 0 },
+  };
 
   zoomQueue: number[] = [];
+
+
 
   scaleCanvas(canvas: HTMLCanvasElement, width: number, height: number, zoom: number) {
     // assume the device pixel ratio is 1 if the browser doesn't specify it
@@ -104,12 +111,7 @@ class Page extends Component<PageProps> {
   }
 
   timeOut = (n) => {
-    return new Promise(resolve => {
-      setTimeout(() => {
-        resolve(true);
-      }
-        , n);
-    })
+    return new Promise(resolve => { setTimeout(() => { resolve(true); }, n); });
   }
 
 
@@ -117,7 +119,6 @@ class Page extends Component<PageProps> {
     const zoomChanged = nextProps.position.zoom !== this.props.position.zoom;
 
     if (zoomChanged) {
-      console.log(`ZOOM changed = from ${this.props.position.zoom} to ${nextProps.position.zoom}`)
       this.renderPage(this.state.page, nextProps.position.zoom);
       return false;
     }
@@ -141,9 +142,6 @@ class Page extends Component<PageProps> {
     this.canvas = canvas;
   };
 
-  /**
-   *
-   */
   _update = (pdf: PdfJs.PDFDocumentProxy) => {
     if (pdf) {
       this._loadPage(pdf);
@@ -152,36 +150,20 @@ class Page extends Component<PageProps> {
     }
   };
 
-  /**
-   *
-   * @param page
-   * @param zoom
-   */
-  renderPage = (page: PdfJs.PDFPageProxy, zoom: number) => {
-    this._renderPage(page, zoom);
-
-  }
-
-  /**
-   *
-   */
   _loadPage = (pdf: PdfJs.PDFDocumentProxy) => {
     if (this.state.status === 'rendering') return;
 
     pdf.getPage(this.props.index).then(
       (page) => {
-        this.inited = false;
+        this.backPlane.inited = false;
         this.setState({ page, status: 'rendering' });
         this.renderPage(page, this.props.position.zoom);
       }
     );
   }
 
-
-
-
   renderToCanvasSafe = async (page: PdfJs.PDFPageProxy, zoom: number) => {
-    if (nowRendering && this.renderTask) {
+    if (this.backPlane.nowRendering && this.renderTask) {
       const renderTask = this.renderTask;
       renderTask.cancel();
       await renderTask;
@@ -189,12 +171,10 @@ class Page extends Component<PageProps> {
     return this.renderToCanvas(page, zoom);
   }
 
-  renderToCanvas = async (page: PdfJs.PDFPageProxy, zoom: number) => {
-    console.log(`[yyy] renderToCanvas`);
+  renderToCanvas = async (page: PdfJs.PDFPageProxy, zoom: number): Promise<IBackRenderedStatus> => {
+    const canvas = document.createElement("canvas");
 
-    const canvas = document.createElement("canvas");;
-
-    const PRINT_RESOLUTION = 96 * 1.66667 * zoom;
+    const PRINT_RESOLUTION = 96 * 2 * zoom;
     const PRINT_UNITS = PRINT_RESOLUTION / PDF_DEFAULT_DPI;
     const viewport: any = page.getViewport({ scale: 1 });
 
@@ -205,31 +185,19 @@ class Page extends Component<PageProps> {
     canvas.height = px_height;
 
     const ctx = canvas.getContext('2d');
-
-    // ctx.save();
-    // ctx.fillStyle = "rgb(255, 255, 255)";
-    // ctx.fillRect(0, 0, canvas.width, canvas.height);
-    // ctx.restore();
     try {
+      this.backPlane.nowRendering = true;
       const renderContext = {
         canvasContext: ctx,
         transform: [PRINT_UNITS, 0, 0, PRINT_UNITS, 0, 0],
-        viewport: page.getViewport({
-          scale: 1,
-          rotation: viewport.rotation
-        }),
+        viewport: page.getViewport({ scale: 1, rotation: viewport.rotation }),
         intent: "print"
       };
-
       this.renderTask = page.render(renderContext);
-
       await this.renderTask.promise;
     }
     catch (e) {
-      console.log(e);
-      console.log(`[yyy] canceled ${this.renderTask}`);
-
-      nowRendering = false;
+      this.backPlane.nowRendering = false;
       this.renderTask = null;
       return {
         result: false,
@@ -239,11 +207,11 @@ class Page extends Component<PageProps> {
     }
 
     if (canvas.width > 0 && canvas.height > 0) {
-      const dest = this.backPlaneCanvas;
-      dest.width = canvas.width;
-      dest.height = canvas.height;
+      const destCanvas = this.backPlane.canvas;
+      destCanvas.width = canvas.width;
+      destCanvas.height = canvas.height;
 
-      const destCtx = dest.getContext("2d");
+      const destCtx = destCanvas.getContext("2d");
       destCtx.drawImage(canvas, 0, 0);
       this.renderTask = null;
 
@@ -254,64 +222,56 @@ class Page extends Component<PageProps> {
       }
     }
 
-    return {...this.area};
+    return { ...this.backPlane.size };
   }
 
-
-  _renderPage = async (page: PdfJs.PDFPageProxy, zoom: number) => {
-    if (!this.inited) {
-      console.log(`[yyy] DRAWING`)
+  renderPage = async (page: PdfJs.PDFPageProxy, zoom: number) => {
+    if (!this.backPlane.inited) {
+      // console.log(`[yyy] DRAWING`)
       const result = await this.renderToCanvasSafe(page, zoom);
-      this.inited = result.result;
-      this.area = { ...result };
+      this.backPlane.inited = result.result;
+      this.backPlane.size = { ...result };
     }
 
-    // console.log(this.props);
-    // let { scale } = this.props;
-
-    // let aa = 2;
-
-    let viewport: any = page.getViewport({ scale: 1 });
+    const viewport: any = page.getViewport({ scale: 1 });
     const { width, height } = viewport;
     const canvas = this.canvas;
 
     const size = { width, height };
     const displaySize = pdfSizeToDIsplayPixel_int(size);
-    const new_scale = displaySize.width / viewport.width;
-
-    viewport = page.getViewport({ scale: new_scale });
-    // viewport.viewBox[2] = 100;
-    const ctx = canvas.getContext('2d');
+    // const new_scale = displaySize.width / viewport.width;
+    // viewport = page.getViewport({ scale: new_scale });
     const ret = this.scaleCanvas(canvas, displaySize.width, displaySize.height, zoom);
-    // console.log(`canvas resized = PX(${ret.px.width}, ${ret.px.height})  CSS(${ret.css.width},${ret.css.height})`)
+    const { px_width, px_height } = this.backPlane.size;
 
-    const { px_width, px_height } = this.area;
-    // console.log(`back plane = (${px_width}, ${px_height})`)
+    console.log(sprintf("back plane = zoom(%.1f) (%d, %d)", zoom, px_width, px_height));
 
-    ctx.drawImage(this.backPlaneCanvas, 0, 0, px_width, px_height, 0, 0, ret.px.width / ret.ratio, ret.px.height / ret.ratio);
-    const renderCount = this.state.renderCount + 1;
-    this.setState({ status: 'rendered', page, width, height, renderCount });
+    const ctx = canvas.getContext('2d');
+    const dw = ret.px.width / ret.ratio;
+    const dh = ret.px.height / ret.ratio;
 
-    if (this._prevZoom !== zoom) {
-      console.log("wait!");
+    ctx.drawImage(this.backPlane.canvas, 0, 0, px_width, px_height, 0, 0, dw, dh);
+
+    if (this.backPlane.prevZoom !== zoom) {
       this.zoomQueue.push(zoom);
       await this.timeOut(200);
-      console.log(`ZOOM count = ${this.zoomQueue.length}`)
-      zoom = this.zoomQueue[this.zoomQueue.length - 1];
-      this.zoomQueue.push(zoom);
+
+      const lastZoom = this.zoomQueue[this.zoomQueue.length - 1];
+      this.zoomQueue = this.zoomQueue.splice(1);
+      if ((lastZoom && zoom !== lastZoom) || zoom == this.backPlane.prevZoom) {
+        return;
+      }
 
       const result = await this.renderToCanvasSafe(page, zoom);
-
       if (result.result) {
-        this.area = { ...result };
+        this.backPlane.prevZoom = zoom;
+        this.backPlane.size = { ...result };
 
-        const { px_width, px_height } = this.area;
-        console.log(`lazy back plane = (${px_width}, ${px_height})`)
-        ctx.drawImage(this.backPlaneCanvas, 0, 0, px_width, px_height, 0, 0, ret.px.width / ret.ratio, ret.px.height / ret.ratio);
+        const { px_width, px_height } = result;
+        console.log(sprintf("LAZY plane = zoom(%.1f) (%d, %d)", zoom, px_width, px_height));
+        ctx.drawImage(this.backPlane.canvas, 0, 0, px_width, px_height, 0, 0, dw, dh);
 
         const renderCount = this.state.renderCount + 1;
-        this.setState({ status: 'rendered', page, width, height, renderCount });
-
         this.zoomQueue = [];
       }
       else {
@@ -321,54 +281,10 @@ class Page extends Component<PageProps> {
   }
 
 
-  /**
-   *
-   */
-  _renderPage_old = (page: PdfJs.PDFPageProxy) => {
-    // return;
-    this.inRendering = true;
-
-    console.log(this.props);
-    // let { scale } = this.props;
-
-    // let aa = 2;
-
-    let viewport: any = page.getViewport({ scale: 1 });
-    const { width, height } = viewport;
-    const canvas = this.canvas;
-
-    const size = { width, height };
-    const displaySize = pdfSizeToDIsplayPixel(size);
-    const new_scale = displaySize.width / viewport.width;
-
-    viewport = page.getViewport({ scale: new_scale });
-    // viewport.viewBox[2] = 100;
-    const ctx = canvas.getContext('2d');
-
-    // scaleCanvas(canvas, ctx, width, height);
-    this.scaleCanvas(canvas, displaySize.width, displaySize.height, this.props.position.zoom);
-    console.log(viewport);
-
-    const renderTask = page.render({
-      canvasContext: ctx,
-      viewport,
-      // intent: "print",
-    });
-
-    const self = this;
-    renderTask.promise.then(() => {
-      const renderCount = this.state.renderCount + 1;
-      self.setState({ status: 'rendered', page, width, height, renderCount });
-      this.inRendering = false;
-    });
-  }
-
   render = () => {
     const { status } = this.state;
-    // console.log("[yyy] component rendered")
     return (
       <div className={`pdf-page ${status}`} >
-        {/* <img src={this.state.imgSrc} /> */}
         <canvas ref={this.setCanvasRef} />
       </div>
     );
