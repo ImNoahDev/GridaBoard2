@@ -148,7 +148,7 @@ export class PageForPrint extends Component<Props, State> {
     const canvasDesc = await this.prepareMainCanvas(printOption);
 
     // PDF 이미지를 canvas버퍼에 넣어 둔다.
-    let pageImagesDesc = await this.preparePdfPageImages(pdf, pageNums);    // this.pageImageDescs
+    let pageImagesDesc = await this.preparePdfPageImages(pdf, pageNums, printOption);    // this.pageImageDescs
 
     // 분할된 Ncode plane을 준비
     const ncodePlane = await this.prepareSplittedNcodePlane(pageNums, printOption);
@@ -453,14 +453,13 @@ export class PageForPrint extends Component<Props, State> {
   /**
    * this.pdfCanvasDescs에 canvasDesc들을 넣어 둔다.
    */
-  private preparePdfPageImages = async (pdf: NeoPdfDocument, pageNums: number[])
+  private preparePdfPageImages = async (pdf: NeoPdfDocument, pageNums: number[], printOption: IPrintOption)
     : Promise<IPdfPageCanvasDesc[]> => {
 
-    const printOption = this.props.printOption;
     const { pagesPerSheet, pdfRenderingDpi } = printOption;
 
     const pdfDpi = pdfRenderingDpi / pagesPerSheet;
-    const descs = await pdf.renderPages_dpi(pageNums, pdfDpi, printOption.colorMode);
+    const descs = await pdf.renderPages_dpi(pageNums, pdfDpi, printOption.colorMode, printOption.luminanceMaxRatio);
     this.entireRotation = descs[0].rotation;
 
     return descs;

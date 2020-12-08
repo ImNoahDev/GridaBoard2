@@ -135,7 +135,7 @@ export default class NeoPdfDocument {
     return this._pdfDoc.getMetadata();
   }
 
-  public renderPages_dpi = async (pageNums: number[], dpi: number, colorConvertMode?: ColorConvertMethod)
+  public renderPages_dpi = async (pageNums: number[], dpi: number, colorConvertMode: ColorConvertMethod, luminanceMaxRatio: number)
     : Promise<IPdfPageCanvasDesc[]> => {
     const pdfDpi = dpi;
 
@@ -144,7 +144,7 @@ export default class NeoPdfDocument {
       const pageNo = pageNums[i];
       const neoPage = await this.getPageAsync(pageNo);
       const pr = neoPage.render_dpi(i, pdfDpi).then(async (canvasDesc) => {
-        return await neoPage.convertColor(canvasDesc, colorConvertMode);
+        return await neoPage.convertColor(canvasDesc, colorConvertMode, luminanceMaxRatio);
       })
       promises.push(pr);
     }

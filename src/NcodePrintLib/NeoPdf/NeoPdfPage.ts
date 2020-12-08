@@ -1,6 +1,6 @@
 import * as PdfJs from "pdfjs-dist";
 import { CoordinateTanslater, IPdfPageDesc } from "../Coordinates";
-import { IRectDpi,  } from "../DataStructure/Structures";
+import { IRectDpi, } from "../DataStructure/Structures";
 import { uuidv4 } from "../NcodePrint";
 import { CanvasColorConverter } from "../NcodeSurface";
 import { ColorConvertMethod } from "../NcodeSurface/CanvasColorConverter";
@@ -33,7 +33,7 @@ export default class NeoPdfPage {
 
   _ready: PdfJs.PDFPromise<PdfJs.PDFPageProxy>;
 
-  _loaded: boolean = false;
+  _loaded = false;
 
   private _defaultViewport: PDF_VIEWPORT_DESC;
 
@@ -155,11 +155,11 @@ export default class NeoPdfPage {
     return result;
   }
 
-  public convertColor = async (canvasDesc: IPdfPageCanvasDesc, colorConvertMode?: ColorConvertMethod) => {
+  public convertColor = async (canvasDesc: IPdfPageCanvasDesc, colorConvertMode: ColorConvertMethod, luminanceMaxRatio: number) => {
     if (colorConvertMode) {
       const pdfCanvas = canvasDesc.canvas;
       const converter = new CanvasColorConverter(pdfCanvas);
-      await converter.convert(colorConvertMode);
+      await converter.convert(colorConvertMode, luminanceMaxRatio);
     }
 
     return canvasDesc;

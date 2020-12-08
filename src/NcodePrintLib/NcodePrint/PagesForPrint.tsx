@@ -19,7 +19,7 @@ interface Props { // tslint:disable-line interface-over-type-literal
 
   pagesOverview: IPageOverview[],
 
-};
+}
 
 type State = {
   renderState: string,

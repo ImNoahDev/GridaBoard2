@@ -76,6 +76,9 @@ export interface IPrintOption {
 
   hasToPutNcode: boolean,
 
+  /** 색 농도 최대치, (최대값은 1.0) */
+  luminanceMaxRatio: number;
+
 }
 
 /**

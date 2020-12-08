@@ -33,4 +33,5 @@ export const g_defaultPrintOption: IPrintOption = {
 
   debugMode: 0,
   hasToPutNcode: true,
+  luminanceMaxRatio: 0.8,
 };
