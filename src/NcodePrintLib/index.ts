@@ -7,7 +7,7 @@ import { addGraphicAndSavePdf } from "./Save/SavePdf";
 import { MediaSize } from './NcodePrint/PrintDataTypes';
 import { ColorConvertMethod } from './NcodeSurface/CanvasColorConverter';
 import { t } from './Locales/i18n';
-import { g_defaultPrintOption } from "./NcodePrint/DefaultOption";
+import { g_defaultPrintOption } from "./DefaultOption";
 
 export * from "./NcodePrint/PrintDataTypes";
 export {

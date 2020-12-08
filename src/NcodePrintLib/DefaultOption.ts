@@ -1,10 +1,10 @@
-import { ColorConvertMethod } from "..";
-import { IPrintOption, MediaSize } from "./PrintDataTypes";
+import { ColorConvertMethod } from ".";
+import { IPrintOption, MediaSize } from "./NcodePrint/PrintDataTypes";
 
 export const g_defaultPrintOption: IPrintOption = {
   assignNewCode: true,
 
-  pageInfo: { section: 3, owner: 27, book: 1068, page: 114 },
+  pageInfo: { section: 3, owner: 27, book: 1068, page: 401 },
 
   dotsInACell: 7,  // DO NOT MODIFY
 

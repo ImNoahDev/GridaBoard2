@@ -40,7 +40,7 @@ import {
   NoteserverClient,
 } from "../neosmartpen";
 
-const PDF_URL = "./2020학년도 서울대학교 수시모집 일반전형 면접 및 구술고사 문항.pdf";
+const PDF_URL = "./A4_Pirates-of-the-Caribbean-Hes-a-Pirate-Klaus-Badelt.pdf";
 
 const menuStyle = {
   width: '36px',
