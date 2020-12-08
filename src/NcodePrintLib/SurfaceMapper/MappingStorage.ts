@@ -60,24 +60,26 @@ export default class MappingStorage {
   }
   public saveOnCloud = () => {
 
-    const params = {
+    const params = {"IMappingParams":{
       timeString : "1111", 
       pageInfo : {section : "1", book:"1", owner:"1", page:"1"}, 
-    }
-    const params2 = {
+    }}
+    const params2 = {"IMappingParams" :{
       timeString : "1111", 
       pageInfo : {section : "1", book:"1", owner:"1", page:"2"}, 
-    }
-    const nextCode = {
-      nextCode : {section : "1", book:"1", owner:"1", page:"3"}
+    }}
+    const lastCode = {section : "1", book:"1", owner:"1", page:"2"};
+    const nextCode = {section : "1", book:"1", owner:"1", page:"3"};
+
+    const mappingInfoObj = {
+      "code" : { 
+        "last" : lastCode,
+        "next" : nextCode,
+      },
+      "map" : [params, params2]
     }
 
-    const testArr = [];
-    testArr.push(params);
-    testArr.push(params2);
-    testArr.push(nextCode);
-
-    cloud_util_func.uploadMappingInfo(testArr);
+    cloud_util_func.uploadMappingInfo(mappingInfoObj);
   }
 
   /**

@@ -3,17 +3,6 @@ import '../../styles/buttons.css';
 import Tooltip, { TooltipProps } from '@material-ui/core/Tooltip';
 import { Theme, Typography, withStyles } from '@material-ui/core';
 
-import icon_ratio_n from "../../icons/icon_ratio_n.png";
-import icon_ratio_p from "../../icons/icon_ratio_p.png";
-import icon_fit_width_n from "../../icons/icon_fit_width_n.png";
-import icon_fit_width_p from "../../icons/icon_fit_width_p.png";
-import icon_fit_height_n from "../../icons/icon_fit_height_n.png";
-import icon_fit_height_p from "../../icons/icon_fit_height_p.png";
-import icon_fit_canvas_n from "../../icons/icon_fit_canvas_n.png";
-import icon_fit_canvas_p from "../../icons/icon_fit_canvas_p.png";
-import icon_fit_paper_n from "../../icons/icon_fit_paper_n.png";
-import icon_fit_paper_p from "../../icons/icon_fit_paper_p.png";
-
 const FitTooltip = withStyles((theme: Theme) => ({
   tooltip: {
       backgroundColor: '#f5f5f9',

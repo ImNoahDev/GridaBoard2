@@ -7,7 +7,6 @@ const FOLDER_ID = "root";
 
 export async function uploadMappingInfo(content) {
   let folderId;
-  // var content = content;
   gapi.load('client', function () {
     gapi.client.load('drive', 'v2', async function () {
       const folderResponse = await gapi.client.drive.files.list({
@@ -44,12 +43,15 @@ export async function uploadMappingInfo(content) {
         
               fileRequest.then(await function(response) {
                 const currentMappingObj = JSON.parse(response.body);
-                // 
-                currentMappingObj.mappingInfos.push(content);
-                content = JSON.stringify(currentMappingObj);
-                const contentBlob = new Blob([content], {'type': 'application/json'});
+                 
+                currentMappingObj.code.last = content.code.last;
+                currentMappingObj.code.next = content.code.next;
+                currentMappingObj.map = currentMappingObj.map.concat(content.map);
+
+                const contentStr = JSON.stringify(currentMappingObj);
+                const contentBlob = new Blob([contentStr], {'type': 'application/json'});
                 updateMappingInfo(fileId, contentBlob, function(resp) {
-                  console.log("updateMappingInfo callback called");
+                  console.log("updateMappingInfo callback");
                 });
               }, function(error) {
                 console.error(error)
@@ -85,13 +87,17 @@ export async function updateMappingInfo(fileId, contentBlob, callback) {
 }
 
 export async function createNewMappingInfo(folderId, content) {
+  const mappingInfoObj = {
+    "code" : { 
+      "last" : content.code.last,
+      "next" : content.code.next,
+    },
+    "map" : content.map
+  }
+
+  const mappingInfoStr = JSON.stringify(mappingInfoObj);
   
-  const mappingInfoObj = {"mappingInfos" : [] }
-  
-  mappingInfoObj.mappingInfos.push(content);
-  const mappingInfoContent = JSON.stringify(mappingInfoObj);
-  
-  const file = new Blob([mappingInfoContent], {type: 'text/plain'});
+  const file = new Blob([mappingInfoStr], {type: 'text/plain'});
   const metadata = {
       'name': 'mappingInfo.json', // Filename at Google Drive
       'mimeType': 'application/json', // mimeType at Google Drive
@@ -117,8 +123,6 @@ export async function createNewMappingInfo(folderId, content) {
 
 export async function createGridaFolder(content) {
   const access_token = gapi.auth.getToken().access_token;
-  // var content = content;
-
   gapi.client.request(await {
       'path': '/drive/v2/files/',
       'method': 'POST',

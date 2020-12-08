@@ -23,10 +23,11 @@
   "display": "standalone",
   "theme_color": "#000000",
   "background_color": "#ffffff",
+  "permissions": ["identity"],
   "content_scripts": [
     {
     "matches": [
-      "https://meet.google.com/*"
+      "https://*.google.com/*"
     ],
     "js": [
       "pages/Home.tsx"
