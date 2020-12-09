@@ -201,7 +201,7 @@ export default class PenManager {
   setThickness(thickness: number) {
     $("#thickness_num").text(thickness);
 
-    thickness = thickness * 2;
+    thickness = thickness / 10;
     this.thickness = thickness;
 
     if (_active_pen) {

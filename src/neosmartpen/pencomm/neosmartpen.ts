@@ -85,10 +85,11 @@ export class NeoSmartpen {
 
     for (let i = 0; i < this.penState.length; i++) {
       this.penState[i] = {
-        thickness: 0.1,
-        color: "rgba(0,0,0,255)",
+        thickness: 0.2,
+        color: "rgba(0,0,0)",
       };
     }
+
 
   }
 

@@ -1,7 +1,55 @@
 import { saveAs } from "file-saver";
 import { degrees, PDFDocument, rgb, StandardFonts } from 'pdf-lib';
+import InkStorage from "../../neosmartpen/penstorage/InkStorage";
+import * as CONST from "../../neosmartpen/constants";
+import * as UTIL from "../../neosmartpen/utils/UtilsFunc";
 
 // https://pdf-lib.js.org/
+
+const inkSt = InkStorage.getInstance();
+export async function savePDF(url) {
+  const existingPdfBytes = await fetch(url).then(res => res.arrayBuffer());
+  const pdfDoc = await PDFDocument.load(existingPdfBytes);
+  const pages = pdfDoc.getPages();
+  
+  //this.completedOnPage에는 페이지 순서대로 stroke array가 들어가는게 아니기 때문에 key값(sobp)으로 정렬
+  const sortStringKeys = (a, b) => a[0] > b[0] ? 1 : -1;
+  let sortedCompletedOnPage = new Map([...inkSt.completedOnPage].sort(sortStringKeys));
+
+  let i = 0;
+  for (let [key, NeoStrokes] of sortedCompletedOnPage.entries()) {
+    console.log(key + ' = ' + NeoStrokes);
+    let page = pages[i++];
+    let h = page.getHeight();
+    for (let j = 0; j <NeoStrokes.length; j++) {
+      let dotArr = NeoStrokes[j].dotArray;
+      let rgbStrArr = NeoStrokes[j].color.match(/\d+/g);
+
+      let opacity = 1;
+      if (NeoStrokes[j].brushType === 1) {
+        opacity = 0.3;
+      }
+
+      for (let k = 0; k < dotArr.length; k++) {
+        let dot = dotArr[k];
+
+        page.drawCircle({
+          x: dot.x * 6.72,
+          y: dot.y * 6.72 - 2 * (dot.y*6.72 - h/2),
+          size: 2,
+          borderWidth: 1,
+          color: rgb(Number(rgbStrArr[0])/255, Number(rgbStrArr[1])/255, Number(rgbStrArr[2])/255),
+          opacity: opacity,
+          borderOpacity: 0,
+        });
+      }
+    }
+  }
+
+  const pdfBytes = await pdfDoc.save();
+  var blob = new Blob([pdfBytes], {type: 'application/pdf'});
+  saveAs(blob, 'hi.pdf');
+}
 
 export async function addGraphicAndSavePdf(url: string, saveName: string) {
 

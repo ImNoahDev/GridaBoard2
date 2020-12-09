@@ -23,6 +23,7 @@ import PrintButton from '../components/navbar/PrintButton';
 import FileLoad from '../components/navbar/FileLoad';
 import ManualCalibration from '../components/navbar/CalibrationMenual';
 import UpperNav from '../components/navbar/UpperNav';
+import * as SavePdf from '../NcodePrintLib/Save/SavePdf';
 
 import {
   g_defaultPrintOption,
@@ -87,6 +88,7 @@ const Home = () => {
   const [num_pens, setNumPens] = useState(0);
   const [pens, setPens] = useState(new Array(0));
   const [pdfUrl, setUrl] = useState(PDF_URL);
+  const [isRotate, setRotate] = useState();
 
   const onPenLinkChanged = e => {
     const pen = e.pen;
@@ -192,7 +194,9 @@ const Home = () => {
 
           <Upload />
           <div style={{ flex: 1 }}> </div>
-
+          <button id="read_mapping_info" onClick={() => SavePdf.savePDF(pdfUrl)}>
+            Save PDF on Local
+          </button>
           <GoogleBtn />
           <div style={{ flex: 11 }}> </div>
         </div>
