@@ -195,7 +195,7 @@ const Home = () => {
 
           <Upload />
           <div style={{ flex: 1 }}> </div>
-          <button id="read_mapping_info" onClick={() => SavePdf.savePDF(pdfUrl)}>
+          <button id="read_mapping_info" onClick={() => SavePdf.savePDF(pdfUrl, 'hello.pdf')}>
             Save PDF on Local
           </button>
           <GoogleBtn />
