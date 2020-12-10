@@ -1,13 +1,16 @@
 import { saveAs } from "file-saver";
 import { degrees, PDFDocument, rgb, StandardFonts } from 'pdf-lib';
 import InkStorage from "../../neosmartpen/penstorage/InkStorage";
+import { drawPath } from "../../neosmartpen/renderer/pageviewer/DrawCurves";
 import * as CONST from "../../neosmartpen/constants";
 import * as UTIL from "../../neosmartpen/utils/UtilsFunc";
+
+const PDF_TO_SCREEN_SCALE = 6.72; // (56/600)*72
 
 // https://pdf-lib.js.org/
 
 const inkSt = InkStorage.getInstance();
-export async function savePDF(url) {
+export async function savePDF(url: string, saveName: string) {
   const existingPdfBytes = await fetch(url).then(res => res.arrayBuffer());
   const pdfDoc = await PDFDocument.load(existingPdfBytes);
   const pages = pdfDoc.getPages();
@@ -20,8 +23,10 @@ export async function savePDF(url) {
   for (let [key, NeoStrokes] of sortedCompletedOnPage.entries()) {
     console.log(key + ' = ' + NeoStrokes);
     let page = pages[i++];
-    let h = page.getHeight();
+    let pageHeight = page.getHeight();
+
     for (let j = 0; j <NeoStrokes.length; j++) {
+      let thickness = NeoStrokes[j].thickness;
       let dotArr = NeoStrokes[j].dotArray;
       let rgbStrArr = NeoStrokes[j].color.match(/\d+/g);
 
@@ -30,25 +35,33 @@ export async function savePDF(url) {
         opacity = 0.3;
       }
 
+      let pointArray = [];
       for (let k = 0; k < dotArr.length; k++) {
         let dot = dotArr[k];
+        let x = dot.x * PDF_TO_SCREEN_SCALE;
+        let y = dot.y * PDF_TO_SCREEN_SCALE;
 
-        page.drawCircle({
-          x: dot.x * 6.72,
-          y: dot.y * 6.72 - 2 * (dot.y*6.72 - h/2),
-          size: 2,
-          borderWidth: 1,
-          color: rgb(Number(rgbStrArr[0])/255, Number(rgbStrArr[1])/255, Number(rgbStrArr[2])/255),
-          opacity: opacity,
-          borderOpacity: 0,
-        });
+        pointArray.push({x, y, f: dot.f});
       }
+      const strokeThickness = thickness/64;
+      const pathData = drawPath(pointArray, strokeThickness);
+
+      page.moveTo(0, pageHeight);
+      page.drawSvgPath(pathData, { 
+        color: rgb(
+            Number(rgbStrArr[0])/255, 
+            Number(rgbStrArr[1])/255, 
+            Number(rgbStrArr[2])/255
+        ),
+        opacity : opacity,
+        scale: 1 
+      });
     }
   }
 
   const pdfBytes = await pdfDoc.save();
   var blob = new Blob([pdfBytes], {type: 'application/pdf'});
-  saveAs(blob, 'hi.pdf');
+  saveAs(blob, saveName);
 }
 
 export async function addGraphicAndSavePdf(url: string, saveName: string) {
@@ -76,17 +89,8 @@ export async function addGraphicAndSavePdf(url: string, saveName: string) {
 
   firstPage.moveTo(100, firstPage.getHeight() - 5)
 
-  firstPage.moveDown(25)
   firstPage.drawSvgPath(svgPath)
 
-  firstPage.moveDown(200)
-  firstPage.drawSvgPath(svgPath, { borderColor: rgb(0, 1, 0), borderWidth: 5 })
-
-  firstPage.moveDown(200)
-  firstPage.drawSvgPath(svgPath, { color: rgb(1, 0, 0) })
-
-  firstPage.moveDown(200)
-  firstPage.drawSvgPath(svgPath, { scale: 0.5 })
 
 
   const pdfBytes = await pdfDoc.save();
