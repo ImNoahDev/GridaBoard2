@@ -24,6 +24,13 @@ import FileLoad from '../components/navbar/FileLoad';
 import ManualCalibration from '../components/navbar/CalibrationMenual';
 import UpperNav from '../components/navbar/UpperNav';
 import * as SavePdf from '../NcodePrintLib/Save/SavePdf';
+import PrintOptionDialog from '../NcodePrintLib/NcodePrint/Modal/PrintOptionDialog';
+
+import PUIController from '../components/PUIController';
+import KeyBoardShortCut from '../components/KeyBoardShortCut';
+
+import Tooltip, { TooltipProps } from '@material-ui/core/Tooltip';
+import { Theme, Typography, withStyles } from '@material-ui/core';
 
 import {
   g_defaultPrintOption,
@@ -51,6 +58,26 @@ const menuStyle = {
   padding: '4px'
 }
 
+const HideAndShowTooltip = withStyles((theme: Theme) => ({
+  tooltip: {
+    backgroundColor: '#f5f5f9',
+    color: 'rgba(0, 0, 0, 0.87)',
+    maxWidth: 240,
+    fontSize: theme.typography.pxToRem(12),
+    border: '1px solid #dadde9',
+  },
+}))(Tooltip);
+
+const TrashTooltip = withStyles((theme: Theme) => ({
+  tooltip: {
+    backgroundColor: '#f5f5f9',
+    color: 'rgba(0, 0, 0, 0.87)',
+    maxWidth: 240,
+    fontSize: theme.typography.pxToRem(12),
+    border: '1px solid #dadde9',
+  },
+}))(Tooltip);
+
 function hideAndShowFnc() {
   const colorMenu = document.getElementById('color_bar');
   const leftMenu = document.getElementById('leftmenu');
@@ -72,7 +99,21 @@ function hideAndShowFnc() {
 
 }
 
+declare global {
+  interface Window {
+    _pui: any;
+  }
+}
+(function (window) {
+  var pui = new PUIController('./note_1116.nproj');
+  // var pui2 = new puiItem('../nproj/note_1116.nproj');
 
+  window._pui = [];
+  window._pui.push(pui);
+  console.log(window._pui);
+})(window);
+
+window.addEventListener("keydown", KeyBoardShortCut);
 
 const getNoteInfo = (event) => {
   // let url = "http://nbs.neolab.net/v1/notebooks/attributes?device=android";
@@ -198,6 +239,10 @@ const Home = () => {
           </div>
           <div style={{ flex: 1 }}> </div>
 
+          <div style={{ fontSize: "14px" }}>
+            <PrintOptionDialog />
+          </div>
+
           <div style={{ fontSize: "20px", fontWeight: "bold" }}>
             Pen Connected: {num_pens}
           </div>
@@ -217,11 +262,20 @@ const Home = () => {
         <nav id="colornav" className="navbar fixed-bottom navbar-light bg-transparent">
           {/* <div className="d-inline-flex p-2 bd-highlight"> */}
           <div className="navbar-menu d-flex justify-content-start align-items-end neo_shadow ">
-            <button id="btn_menu" type="button" className="btn btn-neo " title="Open a menu" onClick={hideAndShowFnc}>
-              <div className="c2">
-                <img style={menuStyle} src='../icons/all_menu.png' className="normal-image" alt=""></img>
-                <img style={menuStyle} src='../icons/all_menu.png' className="hover-image" alt=""></img>
-              </div>
+            <button id="btn_menu" type="button" className="btn btn-neo " onClick={hideAndShowFnc}>
+              <HideAndShowTooltip placement="top-end" title={
+                <React.Fragment>
+                  <Typography color="inherit">Hide And Show</Typography>
+                  <em>{"전체 메뉴를 숨기고 보여줍니다."}</em>
+                  <br></br>
+                  <b>{"키보드 버튼 1로 선택 가능합니다"}</b>
+                </React.Fragment>
+              }>
+                <div className="c2">
+                  <img style={menuStyle} src='../icons/all_menu.png' className="normal-image" alt=""></img>
+                  <img style={menuStyle} src='../icons/all_menu.png' className="hover-image" alt=""></img>
+                </div>
+              </HideAndShowTooltip>
             </button>
             <div id="color_bar" className="color_bar neo_shadow float-left bottom_text color_bar">
               <ColorButtons />
@@ -263,12 +317,21 @@ const Home = () => {
                     </div>
 
                     {/* Trash Button  */}
-                    <button id="btn_trash" type="button" title="Clear" className="btn btn-neo btn-neo-dropdown"
+                    <button id="btn_trash" type="button" className="btn btn-neo btn-neo-dropdown"
                       onClick={() => handleTrashBtn()}>
-                      <div className="c2">
-                        <img src='../icons/icon_trash_n.png' className="normal-image"></img>
-                        <img src='../icons/icon_trash_p.png' className="hover-image"></img>
-                      </div>
+                      <TrashTooltip placement="left" title={
+                        <React.Fragment>
+                          <Typography color="inherit">Clear</Typography>
+                          <em>{"화면의 글자를 모두 지우는 버튼입니다."}</em>
+                          <br></br>
+                          <b>{"키보드 버튼 1로 선택 가능합니다"}</b>
+                        </React.Fragment>
+                      }>
+                        <div className="c2">
+                          <img src='../icons/icon_trash_n.png' className="normal-image"></img>
+                          <img src='../icons/icon_trash_p.png' className="hover-image"></img>
+                        </div>
+                      </TrashTooltip>
                     </button>
 
                     <RotateButton /><BackgroundButton />
@@ -287,7 +350,7 @@ const Home = () => {
 
         <MixedPageView pdfUrl={pdfUrl} pageNo={1} scale={1} playState={PLAYSTATE.live} pens={pens} ref={pageRef} />
       </div >
-    </div>
+    </div >
   );
 };
 

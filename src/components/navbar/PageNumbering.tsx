@@ -18,7 +18,7 @@ class pageNumbering extends React.Component {
     return (
       // <div className="navbar-menu d-flex justify-content-center align-items-center neo_shadow">
       <React.Fragment>
-        <button id="btn_prevpage" type="button" className="btn btn-neo " title="Previous page">
+        <button id="btn_prevpage" type="button" className="btn btn-neo ">
           <PageTooltip placement="top" title={
             <React.Fragment>
                 <Typography color="inherit">Pre Page</Typography>
@@ -39,7 +39,7 @@ class pageNumbering extends React.Component {
             placeholder=".form-control-sm" value=" " />
         <input id="page_count" type="text" className="form-control-plaintext form-control-sm neo-form-pdf-number"
             placeholder=".form-control-sm" value="/" readOnly />
-        <button id="btn_nextpage" type="button" className="btn btn-neo " title="Next page">
+        <button id="btn_nextpage" type="button" className="btn btn-neo ">
         <PageTooltip placement="top" title={
           <React.Fragment>
                 <Typography color="inherit">Next Page</Typography>

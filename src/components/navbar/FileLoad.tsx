@@ -17,7 +17,7 @@ class fileLoad extends React.Component {
   render() {
     return (
       <React.Fragment>
-        <button id="btn_file_open" type="button" className="btn btn-neo " title="Open a file">
+        <button id="btn_file_open" type="button" className="btn btn-neo">
           <PdfFileTooltip placement="top" title={
             <React.Fragment>
                 <Typography color="inherit">PDF File Open</Typography>

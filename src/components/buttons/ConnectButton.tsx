@@ -45,7 +45,7 @@ const ConnectButton = (props: Props) => {
 
   return (
     <div className="btn-group-vertical neo_shadow" style={{ marginBottom: 10 }}>
-      <button id="btn_connect" type="button" className="btn btn-neo btn-neo-vertical" title="Connect">
+      <button id="btn_connect" type="button" className="btn btn-neo btn-neo-vertical">
         <ConnectTooltip placement="left" title={
           <React.Fragment>
             <Typography color="inherit">Pen Connect</Typography>
