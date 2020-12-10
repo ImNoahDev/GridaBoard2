@@ -91,7 +91,7 @@ export default class CoordinateTanslater {
 
   constructor(arg: CoordinateTanslater | IMappingParams = null) {
     if (arg) {
-      if (arg.hasOwnProperty("_mappingParams")) {
+      if (Object.prototype.hasOwnProperty.call(arg, "_mappingParams")) {
         const trans = arg as CoordinateTanslater;
         const json = JSON.stringify(trans._mappingParams);
         this._mappingParams = JSON.parse(json);

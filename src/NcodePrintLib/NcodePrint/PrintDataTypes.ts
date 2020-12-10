@@ -16,7 +16,7 @@ export interface IPrintingReport {
   numPagesPrepared?: number,
 
   /** 인쇄할 총 페이지 수 */
-  numPagesToPrint? : number,
+  numPagesToPrint?: number,
 
   /** 준비된 시트 단위 (용지) 수 */
   numSheetsPrepared?: number,
@@ -25,7 +25,7 @@ export interface IPrintingReport {
   completion?: number,
 
   /** 인쇄할 당시의 인쇄 옵션 */
-  printOption?: IPrintOption, 
+  printOption?: IPrintOption,
 
 }
 
@@ -38,6 +38,8 @@ export interface IFileBrowserReturn {
 
 
 export interface IPrintOption {
+  url: string;
+
   codeDensity: number;      // 1 dot, 2dots, 3dots
   printDpi: number;         // 600 DPI, 300 DPI
   pdfRenderingDpi: number,    // 200DPI 또는 300DPI가 적당
@@ -77,7 +79,19 @@ export interface IPrintOption {
   hasToPutNcode: boolean,
 
   /** 색 농도 최대치, (최대값은 1.0) */
-  luminanceMaxRatio: number;
+  luminanceMaxRatio: number,
+
+  /** 십자가 표시를 그릴지 안 그릴지 */
+  drawCalibrationMark: boolean,
+
+  /** 십자가 표시가 표시되는 영역, width에 대한 ratio, typically 0.1 (1 = 100%) */
+  drawMarkRatio: number,
+
+  /** 테두리를 그릴지 안 그릴지 */
+  drawFrame: boolean,
+
+  /** 상하좌우 여백  mm 단위*/
+  padding: number,     // mm 단위
 
 }
 
@@ -93,6 +107,15 @@ export const CSS_DPI = 96.0;
  * height: mm unit
  */
 export const MediaSize: { [key: string]: IPaperSize } = {
+
+  /** 10mm씩 줄인 것 */
+  // A4: { unit: "mm", width: 200, height: 287 },
+  // A3: { unit: "mm", width: 297, height: 410 },
+  // B4: { unit: "mm", width: 240, height: 343 },
+  // B5: { unit: "mm", width: 166, height: 240 },
+  // Letter: { unit: "mm", width: 206, height: 270 },
+
+  /** 정상적인 것 */
   A4: { unit: "mm", width: 210, height: 297 },
   A3: { unit: "mm", width: 297, height: 420 },
   B4: { unit: "mm", width: 250, height: 353 },

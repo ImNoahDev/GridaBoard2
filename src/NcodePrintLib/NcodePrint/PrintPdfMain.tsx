@@ -5,8 +5,9 @@ import ReactToPrint from 'react-to-print';
 import { IPrintingReport, IPrintOption } from "./PrintDataTypes";
 import { compareObject } from "./UtilFunc";
 import { getCellMatrixShape } from "../NcodeSurface/SurfaceSplitter";
-import { LandscapeOrientation, PortraitOrientation } from "./PageOrientation";
+import PageOrientation, { LandscapeOrientation, PortraitOrientation } from "./PageOrientation";
 import NeoPdfDocument from "../NeoPdf/NeoPdfDocument";
+import "./print.css";
 
 // let globalPagesCnt = 0;
 interface Props {
@@ -40,7 +41,7 @@ export class PrintPdfMain extends React.Component<Props, State> {
   printRef: ReactToPrint;
   onAfterPrint: Function;
 
-  title: string = "";
+  title = "";
 
 
   renderedSheets: number[];
@@ -249,7 +250,8 @@ export class PrintPdfMain extends React.Component<Props, State> {
         { shouldPrint ?
           (
             <div style={{ display: "none" }}>
-              { isLandscape ? (<LandscapeOrientation />) : (<PortraitOrientation />)}
+              <PageOrientation orientation={ isLandscape ? "landscape": "portrait"} />
+              {/* { isLandscape ? (<LandscapeOrientation />) : (<PortraitOrientation />)} */}
 
               <ReactToPrint
                 // key={`action-${pdf.fingerprint}-${globalPagesCnt}`}

@@ -1,23 +1,25 @@
-.relativeCSS {
-  /* border: solid 1px #ff0000; */
+.pdfSheet {
   display: "none";
 }
 
-.testclass {
-  background: rgba(76, 175, 80, 0.3);
-}
-
-.indicator {
-  font-size: 2rem;
-  color: #ff0000;
-  font-weight: 700;
-}
-
 @media print {
-  .relativeCSS {
+  .pdfSheet {
     /* border: solid 1px #ff0000; */
     display: "block";
-    
+    /* page-break-after: always; */
+    /* page-break-inside: avoid; */
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+  }
+
+  html,
+  body {
+    background-color: #fff;
+    height: 100%;
+    width: 100%;
   }
 
   @page {
@@ -31,14 +33,16 @@
     /* size: 21cm 29.7cm; */
     /* size: 210mm 297mm; */
 
-    /* size: A4; */
-    /* size: B5; */
+    /* size: a4; */
+    /* size: b5; */
     /* size: letter; */
 
-    /* size: A4 portrait; */
-    /* size: A4 landscape; */
-    size: A4 landscape;
+    /* size: a4 portrait; */
+    /* size: a4 landscape; */
+    /* size: a4 landscape; */
 
+    /* margin: 0; */
+    size: a4 portrait;
     margin: 0;
   }
 }

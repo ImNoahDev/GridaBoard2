@@ -8,7 +8,7 @@ import { getNPaperInfo, isSamePage } from "./SurfaceInfo";
  * Class
  */
 export default class NcodeFetcher {
-  private codeText: string = "";
+  private codeText = "";
   private fetchPromise: Promise<string> = Promise.resolve("");
   pageInfo: IPageSOBP;
 

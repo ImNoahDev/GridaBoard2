@@ -6,7 +6,7 @@ export enum DeviceTypeEnum {
   STYLUS = "stylus",
   FSIR = "fsir",
   NONE = "none",
-};
+}
 
 
 
@@ -18,7 +18,7 @@ export enum PEN_STATE {
   PEN_UP = 9,
 
   HOVER_MOVE = 101,
-};
+}
 
 
 
@@ -37,7 +37,7 @@ export enum PenEventName {
   ON_DISCONNECTED = "disconnected",
 
   ON_UPGRADE_NEEDED = "fw_up",
-};
+}
 
 
 
@@ -50,5 +50,5 @@ export enum IBrushType {
   ERASER = 3,
   BRUSH = 4,
   FOUNTAINPEN = 5,
-};
+}
 

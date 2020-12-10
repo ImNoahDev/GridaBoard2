@@ -1,4 +1,4 @@
-export function compareObject(curr: Object, next: Object, header: string = "") {
+export function compareObject(curr: Object, next: Object, header = "") {
   for (const [key, value] of Object.entries(next)) {
     if (curr[key] !== value) {
       console.log(`[${header}] state[${key}] was changed, from "${curr[key]} to "${value}"`);

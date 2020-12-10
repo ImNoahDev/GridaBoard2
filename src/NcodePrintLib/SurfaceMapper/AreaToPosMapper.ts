@@ -23,14 +23,14 @@ export class AreaToPosMapper {
     // ray-casting algorithm based on
     // http://www.ecse.rpi.edu/Homepages/wrf/Research/Short_Notes/pnpoly.html
 
-    let x = pt.x, y = pt.y;
+    const x = pt.x, y = pt.y;
 
     let inside = false;
     for (let i = 0, j = ploygon.length - 1; i < ploygon.length; j = i++) {
-      let xi = ploygon[i][0], yi = ploygon[i][1];
-      let xj = ploygon[j][0], yj = ploygon[j][1];
+      const xi = ploygon[i][0], yi = ploygon[i][1];
+      const xj = ploygon[j][0], yj = ploygon[j][1];
 
-      let intersect = ((yi > y) !== (yj > y))
+      const intersect = ((yi > y) !== (yj > y))
         && (x < (xj - xi) * (y - yi) / (yj - yi) + xi);
       if (intersect) inside = !inside;
     }
@@ -73,16 +73,16 @@ export class AreaToPosMapper {
     const { section, owner, book, page } = pageInfo;
 
     const db = this.ncodeToPdfStorage;
-    if (!db.hasOwnProperty(section)) return null;
+    if (!Object.prototype.hasOwnProperty.call(db, "section")) return null;
 
     const sectionObj = db[section];
-    if (!sectionObj.hasOwnProperty(owner)) return null;
+    if (!Object.prototype.hasOwnProperty.call(sectionObj, "owner")) return null;
 
     const ownerObj = sectionObj[owner];
-    if (!ownerObj.hasOwnProperty(book)) return null;
+    if (!Object.prototype.hasOwnProperty.call(ownerObj, "book")) return null;
 
     const bookObj = ownerObj[owner];
-    if (!bookObj.hasOwnProperty(page)) return null;
+    if (!Object.prototype.hasOwnProperty.call(bookObj, "page")) return null;
 
     const pageObj = bookObj[page];
     return pageObj;
@@ -97,16 +97,16 @@ export class AreaToPosMapper {
     const { section, owner, book, page } = pageInfo;
 
     const db = this.ncodeToPdfStorage;
-    if (!db.hasOwnProperty(section)) db[section] = {};
+    if (!Object.prototype.hasOwnProperty.call(db, "section")) db[section] = {};
 
     const sectionObj = db[section];
-    if (!sectionObj.hasOwnProperty(owner)) sectionObj[owner] = {};
+    if (!Object.prototype.hasOwnProperty.call(sectionObj, "owner")) sectionObj[owner] = {};
 
     const ownerObj = sectionObj[owner];
-    if (!ownerObj.hasOwnProperty(book)) ownerObj[book] = {};
+    if (!Object.prototype.hasOwnProperty.call(ownerObj, "book")) ownerObj[book] = {};
 
     const bookObj = ownerObj[owner];
-    if (!bookObj.hasOwnProperty(page)) bookObj[page] = { areas: [] };
+    if (!Object.prototype.hasOwnProperty.call(bookObj, "page")) bookObj[page] = { areas: [] };
 
     const pageObj = bookObj[page];
     return pageObj;

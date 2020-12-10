@@ -8,7 +8,7 @@ interface Props {
 }
 
 interface State {
-
+  name: string,
 }
 
 // https://react-bootstrap.github.io/components/modal/#modals-live

@@ -105,7 +105,6 @@ export class PagesForPrint extends React.Component<Props, State> {
 
 
     return (
-      // <div className="relativeCSS">
       <div>
         {renderState === "ready" ? pageNumsInSheet.map(
           (v, i) => {

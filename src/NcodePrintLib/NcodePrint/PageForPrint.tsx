@@ -9,6 +9,7 @@ import { getCellMatrixShape } from '../NcodeSurface/SurfaceSplitter';
 import { IPdfPageCanvasDesc } from '../NeoPdf/NeoPdfPage';
 import NeoPdfDocument from '../NeoPdf/NeoPdfDocument';
 import { uuidv4 } from './UtilFunc';
+import "./print.css";
 
 let debug = 0;
 
@@ -254,7 +255,7 @@ export class PageForPrint extends Component<Props, State> {
 
         // const str = r + "." + g + "." + b + "." + a;
         const str = a + ".";
-        if (!m.hasOwnProperty(str)) {
+        if (!Object.prototype.hasOwnProperty.call(m, str)) {
           console.log(`found rgba=(${r}, ${g}, ${b}, ${a})`);
           m[str] = 0;
         }
@@ -268,7 +269,7 @@ export class PageForPrint extends Component<Props, State> {
   private prepareSplittedNcodePlane = async (pageNums: number[], printOption: IPrintOption) => {
 
     // 분할된 Ncode plane을 준비
-    const { pagesPerSheet, debugMode, printDpi, direction, mediaSize, hasToPutNcode } = printOption;
+    const { padding, drawFrame, drawMarkRatio, drawCalibrationMark, pagesPerSheet, debugMode, printDpi, direction, mediaSize, hasToPutNcode } = printOption;
     const pageInfos: IPageSOBP[] = [];
 
     // const pageNums: number[] = [];
@@ -290,6 +291,10 @@ export class PageForPrint extends Component<Props, State> {
       debugMode,
       pageInfos,
       hasToPutNcode,
+      drawCalibrationMark,
+      drawMarkRatio,
+      drawFrame,
+      padding,
     };
 
     const rasterizer = new NcodeRasterizer(printOption);
@@ -371,9 +376,9 @@ export class PageForPrint extends Component<Props, State> {
       console.log("main canvas is null");
       return;
     }
-    const { printDpi: dpi, pagesPerSheet, direction } = printOption;
+    const { printDpi: dpi, pagesPerSheet, direction, mediaSize, padding } = printOption;
 
-    const { width: width_css, height: height_css } = getSurfaceSize_css(printOption.mediaSize);
+    const { width: width_css, height: height_css } = getSurfaceSize_css(mediaSize, false, padding );
     // const { width: width_dpi, height: height_dpi } = getSurfaceSize_dpi(printOption.mediaSize, dpi);
 
     const width_dpi = width_css * dpi / CSS_DPI;
@@ -480,7 +485,7 @@ export class PageForPrint extends Component<Props, State> {
 
 
     return (
-      <div className={`pdf-sheet-${sheetIndex}${this.uuid} ${status}`} style={style} >
+      <div className="pdfSheet" id={`pdf-sheet-${sheetIndex}${this.uuid} ${status}`} style={style} >
         {/* <PortraitOrientation /> */}
         <canvas ref={this.setCanvasRef} style={{ imageRendering: "pixelated", width, height }} />
       </div >

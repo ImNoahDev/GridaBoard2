@@ -2,9 +2,15 @@ import { ColorConvertMethod } from ".";
 import { IPrintOption, MediaSize } from "./NcodePrint/PrintDataTypes";
 
 export const g_defaultPrintOption: IPrintOption = {
+  url: "./landscape, 그리다보드_테스트.pdf",
+  // url: "./A4_Pirates-of-the-Caribbean-Hes-a-Pirate-Klaus-Badelt.pdf",
+  // url: "./Portrait, 초등학교 4학년 4P.pdf",
+  // url: "./A4_Pirates-of-the-Caribbean-Hes-a-Pirate-Klaus-Badelt.pdf",
+
+
   assignNewCode: true,
 
-  pageInfo: { section: 3, owner: 27, book: 1068, page: 401 },
+  pageInfo: { section: 3, owner: 27, book: 1068, page: 114 },
 
   dotsInACell: 7,  // DO NOT MODIFY
 
@@ -29,9 +35,15 @@ export const g_defaultPrintOption: IPrintOption = {
   marginTop_nu: -1,
 
   targetPages: [],
-  pagesPerSheet: 2,
 
   debugMode: 0,
   hasToPutNcode: true,
   luminanceMaxRatio: 0.8,
+  drawCalibrationMark: true,
+  drawMarkRatio: 0.1,
+  drawFrame: false,
+
+  pagesPerSheet: 1,
+
+  padding: 10,     // mm 단위
 };

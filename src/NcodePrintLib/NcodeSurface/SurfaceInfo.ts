@@ -51,7 +51,7 @@ export function isPUI(pageInfo: INcodeSOBPxy): boolean {
 function getNPaperSize_nu(item: IPageSOBP | INcodeSurfaceDesc): ISize {
   let desc = item as INcodeSurfaceDesc;
 
-  if (!item.hasOwnProperty("margin")) {
+  if (!Object.prototype.hasOwnProperty.call(item, "margin")) {
     const pageInfo = item as IPageSOBP;
     desc = getNPaperInfo(pageInfo);
   }
@@ -130,12 +130,19 @@ export function getNPaperInfo(pageInfo: IPageSOBP): INcodeSurfaceDesc {
 
 
 
-export function getSurfaceSize_dpi(size: IPaperSize, dpi: number, isLandscape = false) {
+export function getSurfaceSize_dpi(size: IPaperSize, dpi: number, isLandscape, padding = 0) {
+
+  /** numerator of converting to INCH */
   const numerator = UNIT_TO_DPI[size.unit];
+  const mm_numerator = UNIT_TO_DPI["mm"];
   const ratio = 1.0;
 
   let width = size.width * ratio * dpi / numerator;
   let height = size.height * ratio * dpi / numerator;
+
+  padding = padding * ratio * dpi / mm_numerator;
+  width -= padding;
+  height -= padding;
 
   width = Math.floor(width);
   height = Math.floor(height);
@@ -154,25 +161,25 @@ export function getSurfaceSize_dpi(size: IPaperSize, dpi: number, isLandscape = 
 }
 
 
-export function getSurfaceSize_px_600dpi(size: IPaperSize, isLandscape = false) {
-  return getSurfaceSize_dpi(size, UNIT_TO_DPI["600dpi"], isLandscape);
+export function getSurfaceSize_px_600dpi(size: IPaperSize, isLandscape, padding = 0) {
+  return getSurfaceSize_dpi(size, UNIT_TO_DPI["600dpi"], isLandscape, padding);
 }
 
-export function getSurfaceSize_inch(size: IPaperSize, isLandscape = false) {
-  return getSurfaceSize_dpi(size, 1, isLandscape);
+export function getSurfaceSize_inch(size: IPaperSize, isLandscape, padding = 0) {
+  return getSurfaceSize_dpi(size, 1, isLandscape, padding);
 }
 
-export function getSurfaceSize_mm(size: IPaperSize, isLandscape = false) {
-  return getSurfaceSize_dpi(size, UNIT_TO_DPI["mm"], isLandscape);
+export function getSurfaceSize_mm(size: IPaperSize, isLandscape, padding = 0) {
+  return getSurfaceSize_dpi(size, UNIT_TO_DPI["mm"], isLandscape, padding);
 }
 
-export function getSurfaceSize_css(size: IPaperSize, isLandscape = false) {
-  return getSurfaceSize_dpi(size, UNIT_TO_DPI["css"], isLandscape);
+export function getSurfaceSize_css(size: IPaperSize, isLandscape, padding = 0) {
+  return getSurfaceSize_dpi(size, UNIT_TO_DPI["css"], isLandscape, padding);
 }
 
 
-export function getSurfaceSize_pu(size: IPaperSize, isLandscape = false) {
-  return getSurfaceSize_dpi(size, UNIT_TO_DPI["pu"], isLandscape);
+export function getSurfaceSize_pu(size: IPaperSize, isLandscape, padding = 0) {
+  return getSurfaceSize_dpi(size, UNIT_TO_DPI["pu"], isLandscape, padding);
 }
 
 export function isPortrait(size: ISize) {

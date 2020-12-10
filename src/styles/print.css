@@ -25,7 +25,7 @@ div.print_center > img {
     @page {
         /* size: auto; auto is the initial value */
         /* size: 21cm 29.7cm;  */
-        size: a4;
+        /* size: a4; */
         margin: 0;
         /* margin-left: 10mm; */
         /* margin-right: 10mm; */

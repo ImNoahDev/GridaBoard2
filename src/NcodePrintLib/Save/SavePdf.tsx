@@ -14,16 +14,16 @@ export async function savePDF(url) {
   
   //this.completedOnPage에는 페이지 순서대로 stroke array가 들어가는게 아니기 때문에 key값(sobp)으로 정렬
   const sortStringKeys = (a, b) => a[0] > b[0] ? 1 : -1;
-  let sortedCompletedOnPage = new Map([...inkSt.completedOnPage].sort(sortStringKeys));
+  const sortedCompletedOnPage = new Map([...inkSt.completedOnPage].sort(sortStringKeys));
 
   let i = 0;
-  for (let [key, NeoStrokes] of sortedCompletedOnPage.entries()) {
+  for (const [key, NeoStrokes] of sortedCompletedOnPage.entries()) {
     console.log(key + ' = ' + NeoStrokes);
-    let page = pages[i++];
-    let h = page.getHeight();
+    const page = pages[i++];
+    const h = page.getHeight();
     for (let j = 0; j <NeoStrokes.length; j++) {
-      let dotArr = NeoStrokes[j].dotArray;
-      let rgbStrArr = NeoStrokes[j].color.match(/\d+/g);
+      const dotArr = NeoStrokes[j].dotArray;
+      const rgbStrArr = NeoStrokes[j].color.match(/\d+/g);
 
       let opacity = 1;
       if (NeoStrokes[j].brushType === 1) {
@@ -31,7 +31,7 @@ export async function savePDF(url) {
       }
 
       for (let k = 0; k < dotArr.length; k++) {
-        let dot = dotArr[k];
+        const dot = dotArr[k];
 
         page.drawCircle({
           x: dot.x * 6.72,
@@ -47,7 +47,7 @@ export async function savePDF(url) {
   }
 
   const pdfBytes = await pdfDoc.save();
-  var blob = new Blob([pdfBytes], {type: 'application/pdf'});
+  const blob = new Blob([pdfBytes], {type: 'application/pdf'});
   saveAs(blob, 'hi.pdf');
 }
 

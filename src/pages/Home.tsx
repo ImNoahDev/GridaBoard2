@@ -41,7 +41,8 @@ import {
   NoteserverClient,
 } from "../neosmartpen";
 
-const PDF_URL = "./A4_Pirates-of-the-Caribbean-Hes-a-Pirate-Klaus-Badelt.pdf";
+// const PDF_URL = "./A4_Pirates-of-the-Caribbean-Hes-a-Pirate-Klaus-Badelt.pdf";
+const PDF_URL = g_defaultPrintOption.url;
 
 const menuStyle = {
   width: '36px',

@@ -118,7 +118,17 @@ export interface IPrepareSurfaceParam {
 
   hasToPutNcode: boolean,
 
+  drawCalibrationMark: boolean,
+
+  drawMarkRatio: number, // typically 0.1 ( 1 = 100% )
+
+  /** border를 그릴지 안그릴지 */
+  drawFrame: boolean,
+
   debugMode: 0 | 1 | 2 | 3,
+
+  /** 상하좌우 여백, mm 단위 */
+  padding: number,
 }
 
 /**
@@ -179,7 +189,7 @@ export default class NcodeRasterizer {
    * @param srcDirection
    */
   public prepareNcodePlane = async (options: IPrepareSurfaceParam): Promise<ICellsOnSheetDesc> => {
-    const { mediaSize, srcDirection, numItems, pageInfos, hasToPutNcode } = options;
+    const { padding, drawFrame, drawMarkRatio, drawCalibrationMark, mediaSize, srcDirection, numItems, pageInfos, hasToPutNcode } = options;
     let dpi = options.dpi;
     dpi = 600;  // kitty  2020/11/29, 코드 제네레이터는 600 dpi로 고정
 
@@ -189,7 +199,7 @@ export default class NcodeRasterizer {
     let isLandscape = (srcDirection === "landscape");
     const isRotationNeeded = getCellMatrixShape(numItems, srcDirection).rotation === 90;
     if (isRotationNeeded) isLandscape = !isLandscape;
-    const size = getSurfaceSize_dpi(mediaSize, dpi, isLandscape);
+    const size = getSurfaceSize_dpi(mediaSize, dpi, isLandscape, padding);
     // let logicalSize = { ...size };
 
 
@@ -233,9 +243,13 @@ export default class NcodeRasterizer {
         this.drawAreaArrow(ctx, area);
       }
 
+      if (drawFrame) {
+        this.drawFrame(drawingContext, null);
+      }
+
       // Calibration 십자가를 그린다.
-      if (numItems === 1) {
-        this.drawCrossMark(drawingContext, null);
+      if (drawCalibrationMark && numItems < 24) {
+        this.drawCrossMark(drawingContext, drawMarkRatio, null);
       }
 
       // 코드를 그린다
@@ -273,28 +287,28 @@ export default class NcodeRasterizer {
     return result;
   }
 
-  public putCode = async (context: ICanvasContextForCodeDraw, pageInfo: IPageSOBP): Promise<any> => {
-    // return new Promise( (resolve) => resolve() );   // kitty
-    // this.rotation = rotation;
+  // public putCode = async (context: ICanvasContextForCodeDraw, pageInfo: IPageSOBP): Promise<any> => {
+  //   // return new Promise( (resolve) => resolve() );   // kitty
+  //   // this.rotation = rotation;
 
-    // 코드 정보를 받아온다
-    // 코드 정보를 받아올 때 나중에는 x margin, y margin도 서버에서 받아오게 해야 한다
-    this.fetcher = new NcodeFetcher(pageInfo);
-    const ncodeSurfaceDesc = await this.fetcher.getNcodeData(pageInfo);
-    // this.ncodeSurfaceDesc = result;
+  //   // 코드 정보를 받아온다
+  //   // 코드 정보를 받아올 때 나중에는 x margin, y margin도 서버에서 받아오게 해야 한다
+  //   this.fetcher = new NcodeFetcher(pageInfo);
+  //   const ncodeSurfaceDesc = await this.fetcher.getNcodeData(pageInfo);
+  //   // this.ncodeSurfaceDesc = result;
 
-    // (left, top) margin을 세팅
-    if (this.printOption.marginLeft_nu === -1) {
-      this.printOption.marginLeft_nu = ncodeSurfaceDesc.margin.Xmin;
-    }
+  //   // (left, top) margin을 세팅
+  //   if (this.printOption.marginLeft_nu === -1) {
+  //     this.printOption.marginLeft_nu = ncodeSurfaceDesc.margin.Xmin;
+  //   }
 
-    if (this.printOption.marginTop_nu === -1) {
-      this.printOption.marginTop_nu = ncodeSurfaceDesc.margin.Ymin;
-    }
+  //   if (this.printOption.marginTop_nu === -1) {
+  //     this.printOption.marginTop_nu = ncodeSurfaceDesc.margin.Ymin;
+  //   }
 
-    // 코드를 그린다
-    await this.drawNcode(context, ncodeSurfaceDesc, 600);
-  }
+  //   // 코드를 그린다
+  //   await this.drawNcode(context, ncodeSurfaceDesc, 600);
+  // }
 
   private drawSingleCrossMark = (context: ICanvasContextForCodeDraw, x: number, y: number) => {
     const ctx = context.ctx;
@@ -318,14 +332,36 @@ export default class NcodeRasterizer {
     ctx.restore();
   }
 
-  public drawCrossMark = (context: ICanvasContextForCodeDraw, srcMapped: IPdfPixelArea = null) => {
+
+  private drawFrame = (context: ICanvasContextForCodeDraw, srcMapped: IPdfPixelArea = null) => {
 
     // 이전 버전과 호환성을 위해
     if (srcMapped === null) {
-      srcMapped = { dx: 0, dy: 0, dw: context.width, dh: context.height };
+      srcMapped = { dx: context.x, dy: context.y, dw: context.width, dh: context.height };
     }
 
-    const ratio = 0.1;
+    const x0 = srcMapped.dx
+    const y0 = srcMapped.dy
+    const x1 = srcMapped.dx + srcMapped.dw;
+    const y1 = srcMapped.dy + srcMapped.dh;
+
+    const ctx = context.ctx;
+    ctx.strokeStyle = "rgb(0, 0, 255)";
+    ctx.save();
+    ctx.lineWidth = 1;
+    ctx.strokeRect(srcMapped.dx, srcMapped.dy, srcMapped.dw, srcMapped.dh);
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  public drawCrossMark = (context: ICanvasContextForCodeDraw, drawMarkRatio: number, srcMapped: IPdfPixelArea = null) => {
+
+    // 이전 버전과 호환성을 위해
+    if (srcMapped === null) {
+      srcMapped = { dx: context.x, dy: context.y, dw: context.width, dh: context.height };
+    }
+
+    const ratio = drawMarkRatio;
     const d = srcMapped.dw * ratio;
     const x0 = srcMapped.dx + d;
     const y0 = srcMapped.dy + d;
@@ -346,7 +382,7 @@ export default class NcodeRasterizer {
    * @param y
    * @param fullOfGlyphs - for debugging
    */
-  private drawNcodeSingleLine = (context: ICanvasContextForCodeDraw, code_txt: string, y: number, width: number, fullOfGlyphs= true): Promise<void> => {
+  private drawNcodeSingleLine = (context: ICanvasContextForCodeDraw, code_txt: string, y: number, width: number, fullOfGlyphs = true): Promise<void> => {
     // if (this.printOption.codeDensity > 2) {
     //   return this.drawNcodeSingleLine_BOLD(context, code_txt, y, fullOfGlyphs);
     // }
