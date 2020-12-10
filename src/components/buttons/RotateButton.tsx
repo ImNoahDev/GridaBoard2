@@ -1,11 +1,7 @@
-import React from "react";
-import { useSelector, useDispatch } from 'react-redux';
+import React, { Component, useState } from "react";
 import '../../styles/buttons.css';
 import Tooltip, { TooltipProps } from '@material-ui/core/Tooltip';
 import { Theme, Typography, withStyles } from '@material-ui/core';
-import { RootState } from '../../store/rootReducer';
-import { setRotate } from '../../store/reducers/rotate';
-import $ from "jquery";
 
 const RotateTooltip = withStyles((theme: Theme) => ({
   tooltip: {
@@ -17,45 +13,28 @@ const RotateTooltip = withStyles((theme: Theme) => ({
   },
 }))(Tooltip);
 
-const setEnable = () => {
-  var $elem = $("#btn_rotate").find(".c2");
-  if ($elem.hasClass("checked")) {
-      $elem.removeClass("checked");
-  } else {
-      $elem.addClass("checked");
+export default class RotateButton extends React.Component {
+  render() {
+    return (
+      <div className="btn-group dropright" role="group">
+      <button type="button" id="btn_rotate" className="btn btn-neo btn-neo-vertical">
+        <RotateTooltip placement="left" title={
+            <React.Fragment>
+                <Typography color="inherit">Rotate</Typography>
+                <em>{"종이 또는 스마트 플레이트의 입력이 회전되어 반영될지 아닐지를 선택합니다."}</em>
+                <br></br>
+                <b>{"TAB 가로쓰기/세로쓰기 전환"}</b>
+            </React.Fragment>
+                }>
+            <div className="c2">
+              <img src="../../icons/icon_portrait_n.png" className="toggle-off normal-image"></img>
+              <img src="../../icons/icon_portrait_p.png" className="toggle-off hover-image"></img>
+              <img src="../../icons/icon_landscape_n.png" className="toggle-on normal-image"></img>
+              <img src="../../icons/icon_landscape_p.png" className="toggle-on hover-image"></img>
+            </div>
+        </RotateTooltip>
+      </button>
+    </div>
+      );
   }
 }
-
-const RotateButton = () => {
-  const isRotate = useSelector((state:RootState) => state.rotate.isRotate)
-  const dispatch = useDispatch();
-
-  const onToggleRotate = () => {
-    dispatch(setRotate(!isRotate));
-    setEnable();
-  }
-
-  return (
-    <div className="btn-group dropright" role="group">
-    <button type="button" id="btn_rotate" title="Rotate" className="btn btn-neo btn-neo-vertical"
-    onClick = {() => onToggleRotate()}>
-      <RotateTooltip placement="left" title={
-          <React.Fragment>
-              <Typography color="inherit">Rotate</Typography>
-              <em>{"종이 또는 스마트 플레이트의 입력이 회전되어 반영될지 아닐지를 선택합니다."}</em>
-              <br></br>
-              <b>{"TAB 가로쓰기/세로쓰기 전환"}</b>
-          </React.Fragment>
-              }>
-          <div className="c2">
-            <img src="../../icons/icon_portrait_n.png" className="toggle-off normal-image"></img>
-            <img src="../../icons/icon_portrait_p.png" className="toggle-off hover-image"></img>
-            <img src="../../icons/icon_landscape_n.png" className="toggle-on normal-image"></img>
-            <img src="../../icons/icon_landscape_p.png" className="toggle-on hover-image"></img>
-          </div>
-      </RotateTooltip>
-    </button>
-  </div>
-    );
-}
-export default RotateButton;

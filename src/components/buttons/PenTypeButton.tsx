@@ -25,7 +25,7 @@ export default class PenTypeButton extends React.Component {
   render() {
     return (
       <React.Fragment>
-            <button id="btn_brush" disabled type="button" title="Pen type"
+            <button id="btn_brush" disabled type="button"
                 className="bind-popover btn btn-neo btn-neo-vertical" data-toggle="dropdown" aria-haspopup="true"
                 aria-expanded="false">
                 <PenTypeTooltip placement="left" title={
@@ -58,10 +58,10 @@ export default class PenTypeButton extends React.Component {
                     onClick={() => manager.setPenRendererType(IBrushType.PEN)}>
                     <PenTypeTooltip placement="left" title={
                         <React.Fragment>
-                            <Typography color="inherit">Pen Type</Typography>
-                            <em>{"펜과 형광펜, 지우개 중 하나를 선택하는 버튼입니다."}</em>
+                            <Typography color="inherit">Pen Type[Pen]</Typography>
+                            <em>{"펜을 선택하는 버튼입니다."}</em>
                             <br></br>
-                            <b>{"Q 펜, W 형광펜, E 지우개, A~G 굵기 선택"}</b>
+                            <b>{"단축키 Q로 선택가능합니다."}</b>
                         </React.Fragment>
                             }>
                         <div className="c2">
@@ -74,10 +74,10 @@ export default class PenTypeButton extends React.Component {
                     onClick={() => manager.setPenRendererType(IBrushType.MARKER)}>
                         <PenTypeTooltip placement="left" title={
                             <React.Fragment>
-                                <Typography color="inherit">Pen Type</Typography>
-                                <em>{"펜과 형광펜, 지우개 중 하나를 선택하는 버튼입니다."}</em>
+                                <Typography color="inherit">Pen Type[Marker]</Typography>
+                                <em>{"형광펜을 선택하는 버튼입니다."}</em>
                                 <br></br>
-                                <b>{"Q 펜, W 형광펜, E 지우개, A~G 굵기 선택"}</b>
+                                <b>{"단축키 W로 선택가능합니다."}</b>
                             </React.Fragment>
                                 }>
                             <div className="c2">
@@ -90,10 +90,10 @@ export default class PenTypeButton extends React.Component {
                     onClick={() => manager.setPenRendererType(IBrushType.ERASER)}>
                         <PenTypeTooltip placement="left" title={
                             <React.Fragment>
-                                <Typography color="inherit">Pen Type</Typography>
-                                <em>{"펜과 형광펜, 지우개 중 하나를 선택하는 버튼입니다."}</em>
+                                <Typography color="inherit">Pen Type[Eraser]</Typography>
+                                <em>{"지우개를 선택하는 버튼입니다."}</em>
                                 <br></br>
-                                <b>{"Q 펜, W 형광펜, E 지우개, A~G 굵기 선택"}</b>
+                                <b>{"단축키 E로 선택가능합니다."}</b>
                             </React.Fragment>
                                 }>
                             <div className="c2">
@@ -108,79 +108,22 @@ export default class PenTypeButton extends React.Component {
                 <div className="dropdown-divider"></div>
                 <div className="btn-group">
                     <button id="btn_thick_1" type="button" className="btn btn-neo btn-neo-dropdown" onClick={() => manager.setThickness(1)}>
-                        <PenTypeTooltip placement="left" title={
-                            <React.Fragment>
-                                <Typography color="inherit">Pen Type</Typography>
-                                <em>{"펜과 형광펜, 지우개 중 하나를 선택하는 버튼입니다."}</em>
-                                <br></br>
-                                <b>{"Q 펜, W 형광펜, E 지우개, A~G 굵기 선택"}</b>
-                            </React.Fragment>
-                                }>
-                            <div className="c2">
-                                <img src = "../../icons/icon_thickness_01_n.png" className="normal-image"></img>
-                                <img src = "../../icons/icon_thickness_01_p.png" className="hover-image"></img>
-                            </div>
-                        </PenTypeTooltip>
+                        <div className="c2">
+                            <img src = "../../icons/icon_thickness_01_n.png" className="normal-image"></img>
+                            <img src = "../../icons/icon_thickness_01_p.png" className="hover-image"></img>
+                        </div>
                     </button>
                     <button id="btn_thick_2" type="button" className="btn btn-neo btn-neo-dropdown" onClick={() => manager.setThickness(2)}>
-                        <PenTypeTooltip placement="left" title={
-                            <React.Fragment>
-                                <Typography color="inherit">Pen Type</Typography>
-                                <em>{"펜과 형광펜, 지우개 중 하나를 선택하는 버튼입니다."}</em>
-                                <br></br>
-                                <b>{"Q 펜, W 형광펜, E 지우개, A~G 굵기 선택"}</b>
-                            </React.Fragment>
-                                }>
-                            <div className="c2">
-                                <img src = "../../icons/icon_thickness_02_n.png" className="normal-image"></img>
-                                <img src = "../../icons/icon_thickness_02_p.png" className="hover-image"></img>
-                            </div>
-                        </PenTypeTooltip> 
+                        <div className="c2">
+                            <img src = "../../icons/icon_thickness_02_n.png" className="normal-image"></img>
+                            <img src = "../../icons/icon_thickness_02_p.png" className="hover-image"></img>
+                        </div>
                     </button>
                     <button id="btn_thick_3" type="button" className="btn btn-neo btn-neo-dropdown" onClick={() => manager.setThickness(3)}>
-                        <PenTypeTooltip placement="left" title={
-                            <React.Fragment>
-                                <Typography color="inherit">Pen Type</Typography>
-                                <em>{"펜과 형광펜, 지우개 중 하나를 선택하는 버튼입니다."}</em>
-                                <br></br>
-                                <b>{"Q 펜, W 형광펜, E 지우개, A~G 굵기 선택"}</b>
-                            </React.Fragment>
-                                }>
-                            <div className="c2">
-                                <img src = "../../icons/icon_thickness_03_n.png" className="normal-image"></img>
-                                <img src = "../../icons/icon_thickness_03_p.png" className="hover-image"></img>
-                            </div>
-                        </PenTypeTooltip> 
-                    </button>
-                    <button id="btn_thick_4" type="button" className="btn btn-neo btn-neo-dropdown" onClick={() => manager.setThickness(4)}>
-                        <PenTypeTooltip placement="left" title={
-                            <React.Fragment>
-                                <Typography color="inherit">Pen Type</Typography>
-                                <em>{"펜과 형광펜, 지우개 중 하나를 선택하는 버튼입니다."}</em>
-                                <br></br>
-                                <b>{"Q 펜, W 형광펜, E 지우개, A~G 굵기 선택"}</b>
-                            </React.Fragment>
-                                }>
-                            <div className="c2">
-                                <img src = "../../icons/icon_thickness_04_n.png" className="normal-image"></img>
-                                <img src = "../../icons/icon_thickness_04_p.png" className="hover-image"></img>
-                            </div>
-                        </PenTypeTooltip> 
-                    </button>
-                    <button id="btn_thick_5" type="button" className="btn btn-neo btn-neo-dropdown" onClick={() => manager.setThickness(5)}>
-                        <PenTypeTooltip placement="left" title={
-                            <React.Fragment>
-                                <Typography color="inherit">Pen Type</Typography>
-                                <em>{"펜과 형광펜, 지우개 중 하나를 선택하는 버튼입니다."}</em>
-                                <br></br>
-                                <b>{"Q 펜, W 형광펜, E 지우개, A~G 굵기 선택"}</b>
-                            </React.Fragment>
-                                }>
-                            <div className="c2">
-                                <img src = "../../icons/icon_thickness_05_n.png" className="normal-image"></img>
-                                <img src = "../../icons/icon_thickness_05_p.png" className="hover-image"></img>
-                            </div>
-                        </PenTypeTooltip> 
+                        <div className="c2">
+                            <img src = "../../icons/icon_thickness_03_n.png" className="normal-image"></img>
+                            <img src = "../../icons/icon_thickness_03_p.png" className="hover-image"></img>
+                        </div>
                     </button>
                 </div>
             </div>

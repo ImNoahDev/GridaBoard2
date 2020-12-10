@@ -22,7 +22,7 @@ const ColorButtons = () => {
         // <div className="color_bar neo_shadow float-left bottom_text color_bar">
         <React.Fragment>
           <div className="btn-group">
-              <button id="clr_1" type="button" className="btn btn-neo color_btn othercolors" title="color 1" 
+              <button id="clr_1" type="button" className="btn btn-neo color_btn othercolors"
                 onClick={() => manager.setColor(1)}>
                   <PenColorTooltip placement="top" title={
                         <React.Fragment>
@@ -37,7 +37,7 @@ const ColorButtons = () => {
                     </PenColorTooltip>
               </button>
 
-              <button id="clr_2" type="button" className="btn btn-neo color_btn" title="Pen color"
+              <button id="clr_2" type="button" className="btn btn-neo color_btn"
                 onClick={() => manager.setColor(2)}>
                   <PenColorTooltip placement="top" title={
                         <React.Fragment>
@@ -51,7 +51,7 @@ const ColorButtons = () => {
                         </div>
                     </PenColorTooltip>
               </button>
-              <button id="clr_3" type="button" className="btn btn-neo color_btn othercolors" title="color 3"
+              <button id="clr_3" type="button" className="btn btn-neo color_btn othercolors"
                 onClick={() => manager.setColor(3)}>
                   <PenColorTooltip placement="top" title={
                         <React.Fragment>
@@ -65,7 +65,7 @@ const ColorButtons = () => {
                         </div>
                     </PenColorTooltip>
               </button>
-              <button id="clr_4" type="button" className="btn btn-neo color_btn othercolors" title="color 4"
+              <button id="clr_4" type="button" className="btn btn-neo color_btn othercolors"
                 onClick={() => manager.setColor(4)}>
                   <PenColorTooltip placement="top" title={
                         <React.Fragment>
@@ -79,7 +79,7 @@ const ColorButtons = () => {
                         </div>
                     </PenColorTooltip>
               </button>
-              <button id="clr_5" type="button" className="btn btn-neo  color_btn othercolors" title="color 5"
+              <button id="clr_5" type="button" className="btn btn-neo  color_btn othercolors"
                 onClick={() => manager.setColor(5)}>
                   <PenColorTooltip placement="top" title={
                         <React.Fragment>
@@ -93,7 +93,7 @@ const ColorButtons = () => {
                         </div>
                     </PenColorTooltip>
               </button>
-              <button id="clr_6" type="button" className="btn btn-neo  color_btn othercolors" title="color 6"
+              <button id="clr_6" type="button" className="btn btn-neo  color_btn othercolors"
                 onClick={() => manager.setColor(6)}>
                   <PenColorTooltip placement="top" title={
                         <React.Fragment>
@@ -107,7 +107,7 @@ const ColorButtons = () => {
                         </div>
                     </PenColorTooltip>
               </button>
-              <button id="clr_7" type="button" className="btn btn-neo  color_btn othercolors" title="color 7"
+              <button id="clr_7" type="button" className="btn btn-neo  color_btn othercolors"
                 onClick={() => manager.setColor(7)}>
                   <PenColorTooltip placement="top" title={
                         <React.Fragment>
@@ -121,7 +121,7 @@ const ColorButtons = () => {
                         </div>
                     </PenColorTooltip>
               </button>
-              <button id="clr_8" type="button" className="btn btn-neo  color_btn othercolors" title="color 8"
+              <button id="clr_8" type="button" className="btn btn-neo  color_btn othercolors"
                 onClick={() => manager.setColor(8)}>
                   <PenColorTooltip placement="top" title={
                         <React.Fragment>
@@ -135,7 +135,7 @@ const ColorButtons = () => {
                         </div>
                     </PenColorTooltip>
               </button>
-              <button id="clr_9" type="button" className="btn btn-neo  color_btn othercolors" title="color 9"
+              <button id="clr_9" type="button" className="btn btn-neo  color_btn othercolors"
                 onClick={() => manager.setColor(9)}>
                   <PenColorTooltip placement="top" title={
                         <React.Fragment>
@@ -149,7 +149,7 @@ const ColorButtons = () => {
                         </div>
                     </PenColorTooltip>
               </button>
-              <button id="clr_0" type="button" className="btn btn-neo color_btn othercolors" title="color 0"
+              <button id="clr_0" type="button" className="btn btn-neo color_btn othercolors"
                 onClick={() => manager.setColor(0)}>
                   <PenColorTooltip placement="top" title={
                         <React.Fragment>

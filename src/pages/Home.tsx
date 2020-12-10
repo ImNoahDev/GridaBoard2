@@ -24,6 +24,13 @@ import FileLoad from '../components/navbar/FileLoad';
 import ManualCalibration from '../components/navbar/CalibrationMenual';
 import UpperNav from '../components/navbar/UpperNav';
 import * as SavePdf from '../NcodePrintLib/Save/SavePdf';
+import PrintOptionDialog from '../NcodePrintLib/NcodePrint/Modal/PrintOptionDialog';
+
+import PUIController from '../components/PUIController';
+import KeyBoardShortCut from '../components/KeyBoardShortCut';
+
+import Tooltip, { TooltipProps } from '@material-ui/core/Tooltip';
+import { Theme, Typography, withStyles } from '@material-ui/core';
 
 import {
   g_defaultPrintOption,
@@ -50,6 +57,26 @@ const menuStyle = {
   padding: '4px'
 }
 
+const HideAndShowTooltip = withStyles((theme: Theme) => ({
+  tooltip: {
+      backgroundColor: '#f5f5f9',
+      color: 'rgba(0, 0, 0, 0.87)',
+      maxWidth: 240,
+      fontSize: theme.typography.pxToRem(12),
+      border: '1px solid #dadde9',
+  },
+}))(Tooltip);
+
+const TrashTooltip = withStyles((theme: Theme) => ({
+  tooltip: {
+      backgroundColor: '#f5f5f9',
+      color: 'rgba(0, 0, 0, 0.87)',
+      maxWidth: 240,
+      fontSize: theme.typography.pxToRem(12),
+      border: '1px solid #dadde9',
+  },
+}))(Tooltip);
+
 function hideAndShowFnc() {
   const colorMenu = document.getElementById('color_bar');
   const leftMenu = document.getElementById('leftmenu');
@@ -71,7 +98,21 @@ function hideAndShowFnc() {
 
 }
 
+declare global {
+  interface Window {
+    _pui : any;
+  }
+}
+(function (window) {
+  var pui = new PUIController('./note_1116.nproj');
+  // var pui2 = new puiItem('../nproj/note_1116.nproj');
 
+  window._pui = [];
+  window._pui.push(pui);
+  console.log(window._pui);
+})(window);
+
+window.addEventListener("keydown", KeyBoardShortCut);
 
 const getNoteInfo = (event) => {
   // let url = "http://nbs.neolab.net/v1/notebooks/attributes?device=android";

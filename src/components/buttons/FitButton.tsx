@@ -18,7 +18,7 @@ export default class FitButton extends React.Component {
     return (
     <React.Fragment>
       <div className="btn-group dropright" role="group">
-          <button type="button" id="btn_fit" title="Fit" className="btn btn-neo btn-neo-vertical" data-toggle="dropdown"
+          <button type="button" id="btn_fit" className="btn btn-neo btn-neo-vertical" data-toggle="dropdown"
               aria-haspopup="true" aria-expanded="false">
               <FitTooltip placement="left" title={
                 <React.Fragment>

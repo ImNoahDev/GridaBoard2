@@ -10,7 +10,7 @@ import { IWritingSurfaceInfo } from "../DataStructure/Structures";
 import NeoDot from "../DataStructure/NeoDot";
 import { IBrushType } from "../DataStructure/Enums"
 import { fabric } from "fabric";
-import GridaController from '../../components/GridaController';
+import PUIController from "../../components/PUIController";
 
 interface IPenMovement {
   downEvent: IPenEvent,
@@ -256,9 +256,6 @@ export class NeoSmartpen {
    * @param hover
    */
   onPageInfo = (event: IPenEvent, hover: boolean) => {
-    if (event.section === 3 && event.owner === 1013 && event.book === 1116) {
-      GridaController.loadXMLDoc();
-    }
     // console.log(event);
     this.lastInfoEvent = event;
 
@@ -388,6 +385,32 @@ export class NeoSmartpen {
     const strokeKey = stroke.key;
     this.storage.appendDot(strokeKey, dot);
     const pen = this;
+
+    if(event.owner === 1013 && event.book === 1116 && event.page === 1) {
+      console.log("asdfasdfasfa");
+      console.log(event.isFirstDot);
+      event.isFirstDot = true;
+      if (event.isFirstDot) {
+        console.log("===================================");
+        // var puis = window._pui;
+        var puis = window._pui
+        console.log(puis);
+        var i;
+        for (i = 0; i < puis.length; i++) {
+          var pui = puis[i];
+          console.log(pui);
+          var cmd = pui.getCommand(event.owner, event.book, event.page, dot.x, dot.y);
+          console.log(cmd);
+          
+          if(cmd) {
+            console.log(`PUI EXECUTE ==> ${cmd}`);
+
+            PUIController.executeCommand(cmd);
+            break;
+          }
+        }
+      }
+    }
 
     // hand the event
     this.dispatcher.dispatch(PenEventName.ON_PEN_MOVE, { strokeKey, mac: stroke.mac, stroke, dot, pen });
