@@ -252,11 +252,20 @@ const Home = () => {
         <nav id="colornav" className="navbar fixed-bottom navbar-light bg-transparent">
           {/* <div className="d-inline-flex p-2 bd-highlight"> */}
             <div className="navbar-menu d-flex justify-content-start align-items-end neo_shadow ">
-              <button id="btn_menu" type="button" className="btn btn-neo " title="Open a menu" onClick={hideAndShowFnc}>
-                <div className="c2">
-                  <img style={menuStyle} src='../icons/all_menu.png' className="normal-image" alt=""></img>
-                  <img style={menuStyle} src='../icons/all_menu.png' className="hover-image" alt=""></img>
-                </div>
+              <button id="btn_menu" type="button" className="btn btn-neo " onClick={hideAndShowFnc}>
+                <HideAndShowTooltip placement="top-end" title={
+                    <React.Fragment>
+                        <Typography color="inherit">Hide And Show</Typography>
+                        <em>{"전체 메뉴를 숨기고 보여줍니다."}</em>
+                        <br></br>
+                        <b>{"키보드 버튼 1로 선택 가능합니다"}</b>
+                    </React.Fragment>
+                }>
+                  <div className="c2">
+                    <img style={menuStyle} src='../icons/all_menu.png' className="normal-image" alt=""></img>
+                    <img style={menuStyle} src='../icons/all_menu.png' className="hover-image" alt=""></img>
+                  </div>
+                </HideAndShowTooltip>
               </button>
               <div id="color_bar" className="color_bar neo_shadow float-left bottom_text color_bar">
                 <ColorButtons />
@@ -298,12 +307,21 @@ const Home = () => {
                     </div>
 
                     {/* Trash Button  */}
-                    <button id="btn_trash" type="button" title="Clear" className="btn btn-neo btn-neo-dropdown"
+                    <button id="btn_trash" type="button" className="btn btn-neo btn-neo-dropdown"
                       onClick={() => handleTrashBtn()}>
-                      <div className="c2">
-                        <img src='../icons/icon_trash_n.png' className="normal-image"></img>
-                        <img src='../icons/icon_trash_p.png' className="hover-image"></img>
-                      </div>
+                      <TrashTooltip placement="left" title={
+                        <React.Fragment>
+                            <Typography color="inherit">Clear</Typography>
+                            <em>{"화면의 글자를 모두 지우는 버튼입니다."}</em>
+                            <br></br>
+                            <b>{"키보드 버튼 1로 선택 가능합니다"}</b>
+                        </React.Fragment>
+                      }>
+                        <div className="c2">
+                          <img src='../icons/icon_trash_n.png' className="normal-image"></img>
+                          <img src='../icons/icon_trash_p.png' className="hover-image"></img>
+                        </div>
+                      </TrashTooltip>
                     </button>
 
                     <RotateButton /><BackgroundButton />

@@ -93,7 +93,6 @@ function getFunctionName() {
   return stack[3];
 }
 
-
 window.onload = function() {
   on("#nomalPaper", "change", onNormalPaper, window);
   on("#ncodePaper", "change", onNcodePaper, window);
