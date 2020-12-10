@@ -229,6 +229,10 @@ const Home = () => {
           </div>
           <div style={{ flex: 1 }}> </div>
 
+          <div style={{ fontSize: "14px" }}>
+            <PrintOptionDialog />
+          </div>
+
           <div style={{ fontSize: "20px", fontWeight: "bold" }}>
             Pen Connected: {num_pens}
           </div>

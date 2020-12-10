@@ -84,7 +84,7 @@ class MuiVirtualizedTable extends React.PureComponent<MuiVirtualizedTableProps> 
     const { columns, classes, rowHeight, onRowClick } = this.props;
     return (
       <TableCell
-        component="div"
+        // component="div"
         className={clsx(classes.tableCell, classes.flexContainer, {
           [classes.noClick]: onRowClick == null,
         })}
@@ -102,7 +102,7 @@ class MuiVirtualizedTable extends React.PureComponent<MuiVirtualizedTableProps> 
 
     return (
       <TableCell
-        component="div"
+        // component="div"
         className={clsx(classes.tableCell, classes.flexContainer, classes.noClick)}
         variant="head"
         style={{ height: headerHeight }}
