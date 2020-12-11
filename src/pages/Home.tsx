@@ -105,7 +105,6 @@ declare global {
 }
 (function (window) {
   var pui = new PUIController('./note_1116.nproj');
-  // var pui2 = new puiItem('../nproj/note_1116.nproj');
 
   window._pui = [];
   window._pui.push(pui);
@@ -289,12 +288,12 @@ const Home = () => {
 
 
         <div style={{
-          // position: "absolute",
-          left: "0px", top: "0px",
+          position: "absolute",
+          left: "-0.8%", top: "10%",
           flexDirection: "row-reverse", display: "flex",
           width: "5%", height: "80%",
           alignItems: "center",
-          zIndex: 100,
+          zIndex: 1030,
         }}>
           <div className="d-flex flex-column h-100">
             <div id="leftmenu" className="main-container flex-grow-1">
