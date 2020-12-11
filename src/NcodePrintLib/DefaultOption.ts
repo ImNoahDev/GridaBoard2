@@ -2,9 +2,9 @@ import { ColorConvertMethod } from ".";
 import { IPrintOption, MediaSize } from "./NcodePrint/PrintDataTypes";
 
 export const g_defaultPrintOption: IPrintOption = {
-  url: "./landscape, 그리다보드_테스트.pdf",
+  // url: "./landscape, 그리다보드_테스트.pdf",
   // url: "./A4_Pirates-of-the-Caribbean-Hes-a-Pirate-Klaus-Badelt.pdf",
-  // url: "./Portrait, 초등학교 4학년 4P.pdf",
+  url: "./Portrait, 초등학교 4학년 4P.pdf",
   // url: "./A4_Pirates-of-the-Caribbean-Hes-a-Pirate-Klaus-Badelt.pdf",
 
 

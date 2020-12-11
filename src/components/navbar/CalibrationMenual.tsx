@@ -25,8 +25,8 @@ class ManualCalibration extends React.Component {
           <button id="btn_start_calibration" disabled type="button" className="btn btn-neo">
             <CalibrationMenualTooltip placement="left-end" title={
               <React.Fragment>
-                  <Typography color="inherit">Calibration Menual</Typography>
-                  <em>{"화면 페이지를 지정해주는 설명서 버튼입니다."}</em>
+                  <Typography color="inherit">인쇄된 페이지 수동 등록</Typography>
+                  <em>{"Ncode A4에 인쇄된 페이지를 프로그램에 수동 등록합니다."}</em>
                   <br></br>
                   <b>{"단축키 Q로 선택가능합니다."}</b>
               </React.Fragment>

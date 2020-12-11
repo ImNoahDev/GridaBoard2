@@ -37,7 +37,8 @@ import {
   IFileBrowserReturn,
   IPrintingReport,
   PrintPdfButton,
-  FileBrowserButton
+  FileBrowserButton,
+  IPrintOption,
 } from "../NcodePrintLib";
 
 import GoogleBtn from '../components/GoogleBtn';
@@ -59,21 +60,21 @@ const menuStyle = {
 
 const HideAndShowTooltip = withStyles((theme: Theme) => ({
   tooltip: {
-      backgroundColor: '#f5f5f9',
-      color: 'rgba(0, 0, 0, 0.87)',
-      maxWidth: 240,
-      fontSize: theme.typography.pxToRem(12),
-      border: '1px solid #dadde9',
+    backgroundColor: '#f5f5f9',
+    color: 'rgba(0, 0, 0, 0.87)',
+    maxWidth: 240,
+    fontSize: theme.typography.pxToRem(12),
+    border: '1px solid #dadde9',
   },
 }))(Tooltip);
 
 const TrashTooltip = withStyles((theme: Theme) => ({
   tooltip: {
-      backgroundColor: '#f5f5f9',
-      color: 'rgba(0, 0, 0, 0.87)',
-      maxWidth: 240,
-      fontSize: theme.typography.pxToRem(12),
-      border: '1px solid #dadde9',
+    backgroundColor: '#f5f5f9',
+    color: 'rgba(0, 0, 0, 0.87)',
+    maxWidth: 240,
+    fontSize: theme.typography.pxToRem(12),
+    border: '1px solid #dadde9',
   },
 }))(Tooltip);
 
@@ -100,7 +101,7 @@ function hideAndShowFnc() {
 
 declare global {
   interface Window {
-    _pui : any;
+    _pui: any;
   }
 }
 (function (window) {
@@ -184,6 +185,14 @@ const Home = () => {
     console.log(`Completed percent : ${arg.completion}%`);
   };
 
+
+  // 여기서 인쇄의 실행 정도 퍼센트를 표시하도록 한다
+  const printOptionCallback = (arg: IPrintOption): IPrintOption => {
+    console.log("open dialog here to set print option");
+
+    return arg;
+  };
+
   const printOption = g_defaultPrintOption;
 
   return (
@@ -222,7 +231,8 @@ const Home = () => {
           <div style={{ flex: 1 }}> </div>
 
           <div style={{ fontSize: "20px", fontWeight: "bold" }}>
-            <PrintPdfButton variant="contained" color="primary" url={pdfUrl} printOption={printOption} reportProgress={onReportProgress}>
+            <PrintPdfButton variant="contained" color="primary" url={pdfUrl} printOption={printOption}
+              reportProgress={onReportProgress} printOptionCallback={printOptionCallback}>
               <Box fontSize={14} fontWeight="fontWeightBold" >인쇄 시험 (인쇄 옵션 창을 띄울것)</Box>
             </PrintPdfButton>
           </div>
@@ -250,38 +260,38 @@ const Home = () => {
 
         <nav id="colornav" className="navbar fixed-bottom navbar-light bg-transparent">
           {/* <div className="d-inline-flex p-2 bd-highlight"> */}
-            <div className="navbar-menu d-flex justify-content-start align-items-end neo_shadow ">
-              <button id="btn_menu" type="button" className="btn btn-neo " onClick={hideAndShowFnc}>
-                <HideAndShowTooltip placement="top-end" title={
-                    <React.Fragment>
-                        <Typography color="inherit">Hide And Show</Typography>
-                        <em>{"전체 메뉴를 숨기고 보여줍니다."}</em>
-                        <br></br>
-                        <b>{"키보드 버튼 1로 선택 가능합니다"}</b>
-                    </React.Fragment>
-                }>
-                  <div className="c2">
-                    <img style={menuStyle} src='../icons/all_menu.png' className="normal-image" alt=""></img>
-                    <img style={menuStyle} src='../icons/all_menu.png' className="hover-image" alt=""></img>
-                  </div>
-                </HideAndShowTooltip>
-              </button>
-              <div id="color_bar" className="color_bar neo_shadow float-left bottom_text color_bar">
-                <ColorButtons />
-              </div>
+          <div className="navbar-menu d-flex justify-content-start align-items-end neo_shadow ">
+            <button id="btn_menu" type="button" className="btn btn-neo " onClick={hideAndShowFnc}>
+              <HideAndShowTooltip placement="top-end" title={
+                <React.Fragment>
+                  <Typography color="inherit">Hide And Show</Typography>
+                  <em>{"전체 메뉴를 숨기고 보여줍니다."}</em>
+                  <br></br>
+                  <b>{"키보드 버튼 1로 선택 가능합니다"}</b>
+                </React.Fragment>
+              }>
+                <div className="c2">
+                  <img style={menuStyle} src='../icons/all_menu.png' className="normal-image" alt=""></img>
+                  <img style={menuStyle} src='../icons/all_menu.png' className="hover-image" alt=""></img>
+                </div>
+              </HideAndShowTooltip>
+            </button>
+            <div id="color_bar" className="color_bar neo_shadow float-left bottom_text color_bar">
+              <ColorButtons />
             </div>
-            
-            <div id="navbar_center">
-              <div className="navbar-menu d-flex justify-content-center align-items-center neo_shadow">
-                <PageNumbering /><PrintButton /><FileBrowserButton onFileOpen={onFileOpen} />
-              </div>
-            </div>
+          </div>
 
-            <div id="navbar_end">
-              <div className="navbar-menu d-flex justify-content-end align-items-end neo_shadow">
-                <ManualCalibration />
-              </div>
+          <div id="navbar_center">
+            <div className="navbar-menu d-flex justify-content-center align-items-center neo_shadow">
+              <PageNumbering /><PrintButton /><FileBrowserButton onFileOpen={onFileOpen} />
             </div>
+          </div>
+
+          <div id="navbar_end">
+            <div className="navbar-menu d-flex justify-content-end align-items-end neo_shadow">
+              <ManualCalibration />
+            </div>
+          </div>
 
           {/* </div> */}
         </nav>
@@ -310,10 +320,10 @@ const Home = () => {
                       onClick={() => handleTrashBtn()}>
                       <TrashTooltip placement="left" title={
                         <React.Fragment>
-                            <Typography color="inherit">Clear</Typography>
-                            <em>{"화면의 글자를 모두 지우는 버튼입니다."}</em>
-                            <br></br>
-                            <b>{"키보드 버튼 1로 선택 가능합니다"}</b>
+                          <Typography color="inherit">Clear</Typography>
+                          <em>{"화면의 글자를 모두 지우는 버튼입니다."}</em>
+                          <br></br>
+                          <b>{"키보드 버튼 1로 선택 가능합니다"}</b>
                         </React.Fragment>
                       }>
                         <div className="c2">
@@ -339,7 +349,7 @@ const Home = () => {
 
         <MixedPageView pdfUrl={pdfUrl} pageNo={1} scale={1} playState={PLAYSTATE.live} pens={pens} ref={pageRef} />
       </div >
-    </div>
+    </div >
   );
 };
 

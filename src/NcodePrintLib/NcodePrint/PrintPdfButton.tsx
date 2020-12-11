@@ -13,11 +13,20 @@ import { IPageOverview } from "./PagesForPrint";
 // var CMAP_URL = "./cmaps/";
 // var CMAP_PACKED = true;
 
-type Props = {
+export type IPrintPdfButtonProps = {
+  /** 인쇄될 문서의 url, printOption.url로 들어간다. */
   url: string,
+
+  /** 인쇄 준비 상태를 업데이트하는 콜백 함수 */
   reportProgress: (arg: IPrintingReport) => void,
+
+  /** 기본값의 IPrintOption을 받아서, dialog를 처리하고 다시 돌려주는 콜백 함수 */
+  printOptionCallback: (arg: IPrintOption) => IPrintOption,
+
+  /** 초기 인쇄 옵션, 다이얼로그가 떠서, 이걸 세팅해도 좋고, printOptionCallback에서 처리해도 좋다 */
   printOption: IPrintOption,
 
+  /** 버튼과 관련된 properties, 상속 받은 것으로 해야하는데... 2020/12/10 */
   children?: React.ReactNode;
   color?: any;
   disabled?: boolean;
@@ -65,7 +74,7 @@ interface State {
 /**
  * Class
  */
-export default class PrintPdfButton extends React.Component<Props, State> {
+export default class PrintPdfButton extends React.Component<IPrintPdfButtonProps, State> {
   // static displayName = "WholePageViewer";
 
   // static defaultProps = {
@@ -98,7 +107,7 @@ export default class PrintPdfButton extends React.Component<Props, State> {
   pagesOverview: IPageOverview[];
 
 
-  constructor(props: Props) {
+  constructor(props: IPrintPdfButtonProps) {
     super(props);
     const { printOption } = props;
     if (printOption) this.printOption = { ...printOption };
@@ -108,7 +117,7 @@ export default class PrintPdfButton extends React.Component<Props, State> {
     this.loadPdf(this.props.url);
   }
 
-  shouldComponentUpdate(nextProps: Props) {
+  shouldComponentUpdate(nextProps: IPrintPdfButtonProps) {
     if (this.props.url !== nextProps.url) {
       this.loadPdf(nextProps.url);
       return true;
@@ -165,13 +174,14 @@ export default class PrintPdfButton extends React.Component<Props, State> {
     loadingPromise.then(
       async (pdf) => {
         // console.log(`[yyy] setPageOverview called`);
+        this.printOption.url = this.props.url;
 
         await this.setPageOverview(pdf);
 
         // 디버깅용 화면 디스플레이를 위해
         const numTotalPages = pdf.numPages;
         console.log(`[NumPage] PDF page: ${url} - ${numTotalPages}`)
-        this.printOption.targetPages = Array.from({ length: numTotalPages }, (_, i) => i + 1);
+        // this.printOption.targetPages = Array.from({ length: numTotalPages }, (_, i) => i + 1);
         // 여기까지
 
         this.setState({ pdf, numTotalPages });
@@ -196,6 +206,13 @@ export default class PrintPdfButton extends React.Component<Props, State> {
     if (this.printOption.targetPages.length < 1) {
       // 모든 페이지를 인쇄
       this.printOption.targetPages = Array.from({ length: numPages }, (_, i) => i + 1);
+    }
+
+    if (this.props.printOptionCallback){
+      const result = this.props.printOptionCallback(this.printOption);
+      if ( result ) {
+        this.printOption = result;
+      }
     }
 
     // 1,2 페이지만 인쇄
@@ -269,7 +286,6 @@ export default class PrintPdfButton extends React.Component<Props, State> {
 
   render() {
     const { pdf, printTrigger } = this.state;
-    const printOption = this.printOption;
 
     return (
       <div className="pdf-context">
@@ -282,7 +298,7 @@ export default class PrintPdfButton extends React.Component<Props, State> {
             pdf={pdf}
             pagesOverview={this.pagesOverview}
             printTrigger={printTrigger}
-            printOption={printOption}
+            printOption={this.printOption}
             onAfterPrint={this.onAfterPrint}
             updatePrintProgress={this.updatePrintProgress} />
           : ""}

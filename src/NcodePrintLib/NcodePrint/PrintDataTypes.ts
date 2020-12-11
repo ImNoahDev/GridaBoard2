@@ -46,7 +46,7 @@ export interface IPrintOption {
   putCalibrationMark: boolean;
   printNcode: boolean;
 
-  dotsInACell: number;   // 7, 바꾸지 말것!
+  readonly dotsInACell: number;   // 7, 바꾸지 말것!
   mediaSize: IPaperSize;
 
   /** 문서 전체의 방향, 실제 출력되는 방향은 pages per sheet에 의해 달라짐 (2, 8, 18, 32 등) */
