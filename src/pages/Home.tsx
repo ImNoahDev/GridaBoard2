@@ -299,11 +299,12 @@ const Home = () => {
 
         <div style={{
           position: "absolute",
-          left: "-0.8%", top: "10%",
+          left: "0%", top: "10%",
           flexDirection: "row-reverse", display: "flex",
-          width: "5%", height: "80%",
+          height: "80%",
           alignItems: "center",
           zIndex: 1030,
+          marginLeft: "-1px",
         }}>
           <div className="d-flex flex-column h-100">
             <div id="leftmenu" className="main-container flex-grow-1">
