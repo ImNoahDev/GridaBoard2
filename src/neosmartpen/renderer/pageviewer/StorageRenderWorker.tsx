@@ -44,7 +44,7 @@ export default class StorageRenderWorker {
   /** @type {InkStorage} */
   storage;
 
-  base_scale = NCODE_TO_SCREEN_SCALE;
+  nu_to_css_scale = NCODE_TO_SCREEN_SCALE;
   offset_x = 0;
   offset_y = 0;
 
@@ -146,7 +146,7 @@ export default class StorageRenderWorker {
     /** @type {number} */
     // this.ncode_to_screen_scale = NCODE_TO_SCREEN_SCALE;
 
-    this.base_scale = NCODE_TO_SCREEN_SCALE;
+    this.nu_to_css_scale = NCODE_TO_SCREEN_SCALE;
     this.offset_x = 0;
     this.offset_y = 0;
 
@@ -292,11 +292,11 @@ export default class StorageRenderWorker {
     const paperHeight = this.surfaceInfo.Ymax - this.surfaceInfo.Ymin;
 
     const size = {
-      width: paperWidth * this.base_scale,
-      height: paperHeight * this.base_scale,
+      width: paperWidth * this.nu_to_css_scale,
+      height: paperHeight * this.nu_to_css_scale,
     };
 
-    // console.log(`Grid: scale=${this.base_scale} (width, height)=(${size.width}, ${size.height})`);
+    // console.log(`Grid: scale=${this.nu_to_css_scale} (width, height)=(${size.width}, ${size.height})`);
 
     const ratio = 1;
 
@@ -348,8 +348,8 @@ export default class StorageRenderWorker {
   }
 
   /**
-   * 
-   * @param {Object} opt 
+   *
+   * @param {Object} opt
    */
   onCanvasMouseDown = (opt) => {
     const canvas = this.canvas;
@@ -364,8 +364,8 @@ export default class StorageRenderWorker {
   }
 
   /**
-   * 
-   * @param {Object} opt 
+   *
+   * @param {Object} opt
    */
   onCanvasMouseMove = (opt) => {
     const canvas = this.canvas;
@@ -391,8 +391,8 @@ export default class StorageRenderWorker {
 
 
   /**
-   * 
-   * @param {Object} opt 
+   *
+   * @param {Object} opt
    */
   onCanvasMousUp = (opt) => {
     const canvas = this.canvas;
@@ -410,8 +410,8 @@ export default class StorageRenderWorker {
   }
 
   /**
-   * 
-   * @param {Object} opt 
+   *
+   * @param {Object} opt
    */
   onCanvasMouseWheel = (opt) => {
     const canvas = this.canvas;
@@ -454,7 +454,7 @@ export default class StorageRenderWorker {
 
   /**
    * @param {number} zoom
-   * @param {Object} opt 
+   * @param {Object} opt
    */
   setCanvasZoom = (zoom, opt) => {
     const canvas = this.canvas;
@@ -473,8 +473,8 @@ export default class StorageRenderWorker {
 
 
   /**
-   * 
-   * @param {{x:number, y:number}} dot 
+   *
+   * @param {{x:number, y:number}} dot
    */
   focusToDot = (dot) => {
     const margin_to_go_ratio = 0.25;
@@ -527,8 +527,8 @@ export default class StorageRenderWorker {
   }
 
   /**
-   * 
-   * @param {{x:number, y:number}} point 
+   *
+   * @param {{x:number, y:number}} point
    * @param {boolean} animate
    */
   scrollCanvasToPoint = (point, animate) => {
@@ -578,14 +578,14 @@ export default class StorageRenderWorker {
 
 
   /**
-   * 
-   * @param {{x:number, y:number, f?:number}} ncodeXY 
+   *
+   * @param {{x:number, y:number, f?:number}} ncodeXY
    */
   getCanvasXY = (ncodeXY) => {
     const { x, y, f } = ncodeXY;
     const { Xmin, Ymin } = this.surfaceInfo;
 
-    const scale = this.base_scale;
+    const scale = this.nu_to_css_scale;
 
     const cx = (x - Xmin) * scale + this.offset_x;
     const cy = (y - Ymin) * scale + this.offset_y;
@@ -595,14 +595,14 @@ export default class StorageRenderWorker {
 
 
   /**
- * 
- * @param {{x:number, y:number, f?:number}} ncodeXY 
+ *
+ * @param {{x:number, y:number, f?:number}} ncodeXY
  */
   getCanvasXY_scaled = (ncodeXY) => {
     const { x, y, f } = ncodeXY;
     const { Xmin, Ymin } = this.surfaceInfo;
 
-    const scale = this.base_scale;
+    const scale = this.nu_to_css_scale;
 
     let cx = (x - Xmin) * scale + this.offset_x;
     let cy = (y - Ymin) * scale + this.offset_y;
@@ -614,8 +614,8 @@ export default class StorageRenderWorker {
   }
 
   /**
-   * 
-   * @param {{x:number, y:number}} canvasXY 
+   *
+   * @param {{x:number, y:number}} canvasXY
    */
   getScreenXY = (canvasXY) => {
     const { x, y } = canvasXY;
@@ -636,13 +636,13 @@ export default class StorageRenderWorker {
 
 
   /**
-   * 
-   * @param {{x:number, y:number}} screenXY 
+   *
+   * @param {{x:number, y:number}} screenXY
    */
   getNcodeXY = (screenXY) => {
     const { x, y } = screenXY;
 
-    const scale = this.base_scale;
+    const scale = this.nu_to_css_scale;
 
     const nx = (x - this.offset_x) / scale;
     const ny = (y - this.offset_y) / scale;
@@ -681,9 +681,9 @@ export default class StorageRenderWorker {
   }
 
   /**
-   * 
-   * @param {ZoomFitEnum} mode 
-   * @param {{width:number, height:number}} szPaper 
+   *
+   * @param {ZoomFitEnum} mode
+   * @param {{width:number, height:number}} szPaper
    * @param {number} currViewFit
    */
   calcScaleFactor(mode, szPaper, currViewFit) {
@@ -718,7 +718,7 @@ export default class StorageRenderWorker {
 
 
   /**
-   * 
+   *
    * @param {number} section
    * @param {number} owner
    * @param {number} book
@@ -746,7 +746,7 @@ export default class StorageRenderWorker {
 
     }
     const szPaper = paperInfo.getPaperSize({ section, owner, book, page });
-    this.base_scale = this.calcScaleFactor(this.viewFit, szPaper, this.base_scale);
+    this.nu_to_css_scale = this.calcScaleFactor(this.viewFit, szPaper, this.nu_to_css_scale);
 
 
     // 현재 모든 stroke를 지운다.
@@ -766,19 +766,19 @@ export default class StorageRenderWorker {
   }
 
   /**
-   * Pen Down이 들어왔다. 그러나 아직 page 정보가 들어오지 않아서, 
+   * Pen Down이 들어왔다. 그러나 아직 page 정보가 들어오지 않아서,
    * 이 페이지에 붙여야 할 것인가 아니면, 새로운 페이지에 붙여야 할 것인가를 모른다.
-   * 
+   *
    * 렌더러 처리 순서
    * 1) Pen Down: live stroke의 path를 생성
    * 2) Page Info: 페이지를 전환하고, 잉크 스토리지에 있는 이전의 스트로크를 path로 등록한다.
-   * 3) Pen Move: 
+   * 3) Pen Move:
    *      3-1) live stroke path의 처음 나오는 점이면, path를 canvas에 등록한다.
    *      3-2) 두번째 점부터는 path에 append 한다.
    * 4) Pen Up: Live stroke path는 없애고, 잉크스토리지에 2) 이후의 stroke를 받아 path에 추가 등록한다.
-   * 
-   * @public 
-   * @param {{strokeKey:string, mac:string, time:number, stroke:NeoStroke}} event 
+   *
+   * @public
+   * @param {{strokeKey:string, mac:string, time:number, stroke:NeoStroke}} event
    */
   createLiveStroke = (event) => {
     this.livePaths[event.strokeKey] = {
@@ -788,8 +788,8 @@ export default class StorageRenderWorker {
   }
 
   /**
-   * 
-   * @param {{strokeKey:string, mac:string, stroke:NeoStroke, dot:NeoDot}} event 
+   *
+   * @param {{strokeKey:string, mac:string, stroke:NeoStroke, dot:NeoDot}} event
    */
   pushLiveDot = (event) => {
     const pathData = this.livePaths[event.strokeKey];
@@ -816,8 +816,8 @@ export default class StorageRenderWorker {
   }
 
   /**
-   * 
-   * @param {{strokeKey:string, mac:string, stroke, section:number, owner:number, book:number, page:number}} event 
+   *
+   * @param {{strokeKey:string, mac:string, stroke, section:number, owner:number, book:number, page:number}} event
    */
   closeLiveStroke = (event) => {
     const pathData = this.livePaths[event.strokeKey];
@@ -981,7 +981,7 @@ export default class StorageRenderWorker {
 
   // Draw Dot from Pen
   createPathFromDots = (dots, color, thickness) => {
-    // let scale = this.base_scale;
+    // let scale = this.nu_to_css_scale;
 
     // console.log("dot Count", dots.length);
     // let rect = this.rect;
@@ -1022,10 +1022,10 @@ export default class StorageRenderWorker {
       // selectable: false,
       // evented: true,
 
-      // base_scale: scale,
+      // nu_to_css_scale: scale,
     };
 
-    const strokeThickness = this.base_scale * thickness;
+    const strokeThickness = this.nu_to_css_scale * thickness;
     // console.log(strokeThickness);
     // if ( strokeThickness < 0.5 ) strokeThickness = 0.5;
     const pathData = drawPath(pointArray, strokeThickness);
@@ -1113,7 +1113,7 @@ export default class StorageRenderWorker {
         //   path.stroke = INVISIBLE_STROKE_COLOR;
 
         //   this.drawIncompletedPath(path, time_abs);
-        // } 
+        // }
         else {
           path.fill = path.color;
           path.stroke = path.color;
@@ -1151,7 +1151,7 @@ export default class StorageRenderWorker {
   //  */
   // drawIncompletedPath = (path, t) => {
   //   let dots = path.dots;
-  //   let scale = path.base_scale;
+  //   let scale = path.nu_to_css_scale;
 
   //   // console.log("dot Count", dots.length);
   //   let rect = this.rect;

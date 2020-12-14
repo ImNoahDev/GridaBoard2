@@ -56,7 +56,7 @@ export default class InkStorage {
   }
 
   /**
-   * 
+   *
    */
   static getInstance(): InkStorage {
     if (_storage_instance) return _storage_instance;
@@ -66,10 +66,10 @@ export default class InkStorage {
   }
 
   /**
-   * 
-   * @param eventName 
-   * @param listener 
-   * @param filter 
+   *
+   * @param eventName
+   * @param listener
+   * @param filter
    */
   public addEventListener(eventName: string, listener: EventCallbackType, filter: any) {
     this.dispatcher.on(eventName, listener, filter);
@@ -77,21 +77,21 @@ export default class InkStorage {
   }
 
   /**
-   * 
-   * @param eventName 
-   * @param listener 
+   *
+   * @param eventName
+   * @param listener
    */
   public removeEventListener(eventName: string, listener: EventCallbackType) {
     this.dispatcher.off(eventName, listener);
   }
 
   /**
-   * 
-   * @param pageInfo 
+   *
+   * @param pageInfo
    */
   public getPageStrokes(pageInfo: IPageSOBP): NeoStroke[] {
     const { section, book, owner, page } = pageInfo;
-    const pageId = InkStorage.getPageId({ section, book, owner, page });
+    const pageId = InkStorage.makeNPageIdStr({ section, book, owner, page });
 
     const completed = this.completedOnPage;
     const arr = completed.get(pageId);
@@ -102,18 +102,18 @@ export default class InkStorage {
 
   public removeStrokeFromPage(pageInfo: IPageSOBP) {
     const { section, book, owner, page } = pageInfo;
-    const pageId = InkStorage.getPageId({ section, book, owner, page });
+    const pageId = InkStorage.makeNPageIdStr({ section, book, owner, page });
 
     const completed = this.completedOnPage;
     completed.delete(pageId);
   }
   /**
-   * 
-   * @param pageInfo 
+   *
+   * @param pageInfo
    */
   public getPageStrokes_live(pageInfo: IPageSOBP): NeoStroke[] {
     const { section, book, owner, page } = pageInfo;
-    const pageId = InkStorage.getPageId({ section, book, owner, page });
+    const pageId = InkStorage.makeNPageIdStr({ section, book, owner, page });
 
 
     /** @type {Map.<string, Map>} - (pageId) ==> (strokeKey ==> NeoStroke) */
@@ -136,19 +136,19 @@ export default class InkStorage {
   }
 
   /**
-   * 
+   *
    */
   public getLastPageInfo(): IPageSOBP {
     return this.lastPageInfo;
   }
 
   /**
-   * 
-   * @param stroke 
+   *
+   * @param stroke
    */
   private addCompletedToPage(stroke: NeoStroke) {
     const { section, book, owner, page } = stroke;
-    const pageId = InkStorage.getPageId({ section, book, owner, page });
+    const pageId = InkStorage.makeNPageIdStr({ section, book, owner, page });
     // console.log( `add completed: ${mac},  ${pageId} = ${section}.${book}.${owner}.${page} `);
 
     // stroke에 점이 하나라도 있어야 옮긴다.
@@ -172,12 +172,12 @@ export default class InkStorage {
   }
 
   /**
-   * 
-   * @param stroke 
+   *
+   * @param stroke
    */
   private addRealtimeToPage(stroke: NeoStroke) {
     const { section, book, owner, page, key } = stroke;
-    const pageId = InkStorage.getPageId({ section, book, owner, page });
+    const pageId = InkStorage.makeNPageIdStr({ section, book, owner, page });
 
 
     /** @type {Map.<string, Map>} - (pageId) ==> (strokeKey ==> NeoStroke) */
@@ -192,12 +192,12 @@ export default class InkStorage {
   }
 
   /**
-   * 
-   * @param stroke 
+   *
+   * @param stroke
    */
   private removeFromRealtime(stroke: NeoStroke) {
     const { section, book, owner, page, key } = stroke;
-    const pageId = InkStorage.getPageId({ section, book, owner, page });
+    const pageId = InkStorage.makeNPageIdStr({ section, book, owner, page });
 
     /** @type {Map.<string, Map>} - (pageId) ==> (strokeKey ==> NeoStroke) */
     const realtime = this.realtimeOnPage;
@@ -214,10 +214,10 @@ export default class InkStorage {
 
 
   /**
-   * 
-   * @param info 
+   *
+   * @param info
    */
-  static getPageId(info: IPageSOBP): string {
+  static makeNPageIdStr(info: IPageSOBP): string {
     const { section, book, owner, page } = info;
     return `${section}.${book}.${owner}.${page}`;
   }
@@ -225,7 +225,7 @@ export default class InkStorage {
   static getPageSOBP( pageId: string ) : IPageSOBP {
     const arr = pageId.split(".");
     if ( arr.length !== 4 ) {
-      return { 
+      return {
         section: -1,
         owner:-1,
         book:-1,
@@ -245,11 +245,11 @@ export default class InkStorage {
 
   /**
    * create realtime stroke, wait for "appendDot", ..., "closeStroke"
-   * @param mac 
-   * @param time 
-   * @param penTipMode 
-   * @param penColor 
-   * @param thickness 
+   * @param mac
+   * @param time
+   * @param penTipMode
+   * @param penColor
+   * @param thickness
    */
 
   public openStroke(args: IOpenStrokeArg): NeoStroke {
@@ -287,12 +287,12 @@ export default class InkStorage {
 
   /**
    * create realtime stroke, wait for "appendDot", ..., "closeStroke"
-   * @param strokeKey 
-   * @param section 
-   * @param owner 
-   * @param book 
-   * @param page 
-   * @param time 
+   * @param strokeKey
+   * @param section
+   * @param owner
+   * @param book
+   * @param page
+   * @param time
    */
   public setStrokeInfo(strokeKey: string, section: number, owner: number, book: number, page: number, time: number) {
     const stroke = this.realtime[strokeKey];
@@ -308,8 +308,8 @@ export default class InkStorage {
   }
 
   /**
-   * 
-   * @param strokeKey 
+   *
+   * @param strokeKey
    */
   public getRealTimeStroke(strokeKey: string): NeoStroke {
     /** @type {NeoStroke} */
@@ -325,8 +325,8 @@ export default class InkStorage {
 
   /**
    * add dot to the stroke opened
-   * @param strokeKey 
-   * @param dot 
+   * @param strokeKey
+   * @param dot
    */
   public appendDot(strokeKey: string, dot: NeoDot) {
     /** @type {NeoStroke} */
@@ -346,7 +346,7 @@ export default class InkStorage {
 
   /**
    * close stroke to move to "completed"
-   * @param strokeKey 
+   * @param strokeKey
    */
   public closeStroke(strokeKey: string) {
     /** @type {NeoStroke} */

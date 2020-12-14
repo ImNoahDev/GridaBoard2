@@ -14,11 +14,11 @@ body,
 html {
     height: 100%;
     background-color: rgb(255, 229, 237);
-    background-image: -o-linear-gradient(bottom, rgb(255, 229, 237) 0%, rgb(224, 255, 233) 100%);
-    background-image: -moz-linear-gradient(bottom, rgb(255, 229, 237) 0%, rgb(224, 255, 233) 100%);
-    background-image: -webkit-linear-gradient(bottom, rgb(255, 229, 237) 0%, rgb(224, 255, 233) 100%);
-    background-image: -ms-linear-gradient(bottom, rgb(255, 229, 237) 0%, rgb(224, 255, 233) 100%);
-    background-image: linear-gradient(bottom, rgb(255, 229, 237) 0%, rgb(224, 255, 233) 100%);
+    background-image: -o-linear-gradient("to bottom", rgb(255, 229, 237) 0%, rgb(224, 255, 233) 100%);
+    background-image: -moz-linear-gradient("to bottom", rgb(255, 229, 237) 0%, rgb(224, 255, 233) 100%);
+    background-image: -webkit-linear-gradient("to bottom", rgb(255, 229, 237) 0%, rgb(224, 255, 233) 100%);
+    background-image: -ms-linear-gradient("to bottom", rgb(255, 229, 237) 0%, rgb(224, 255, 233) 100%);
+    /* background-image: linear-gradient("to bottom", rgb(255, 229, 237) 0%, rgb(224, 255, 233) 100%); */
     background-repeat: space;
     z-index: -20000;
     --gridaboard_cyan: rgba(0, 227, 234, 1);

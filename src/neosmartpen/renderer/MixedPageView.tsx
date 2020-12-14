@@ -8,11 +8,15 @@ import * as PdfJs from "pdfjs-dist";
 interface Props {
   pageInfo?: IPageSOBP;
   pdfUrl: string;
+  filename: string,
   pageNo: number;
   pens: NeoSmartpen[];
 
   scale: number,
   playState: PLAYSTATE;
+
+  /** canvas view rotation, 0: portrait, 90: landscape */
+  rotation: number;
 }
 
 interface State {
@@ -26,20 +30,13 @@ interface State {
   renderCount: number;
 }
 
-const tempStyle: CSSProperties = {
-  position: "absolute",
-  // height: "100%",
-  // width: "100%",
-  left: "0px",
-  top: "0px",
-  overflow: "hidden",
-}
 
 export default class MixedPageView extends React.Component<Props, State> {
   waitingForFirstStroke = true;
   pdf: PdfJs.PDFDocumentProxy;
   rendererRef: React.RefObject<PenBasedRenderer> = React.createRef();
 
+  filename: string;
 
   constructor(props: Props) {
     super(props);
@@ -93,6 +90,11 @@ export default class MixedPageView extends React.Component<Props, State> {
       this.setState({ pdfUrl: nextProps.pdfUrl });
       return false;
     }
+
+    if (nextProps.filename !== this.props.filename) {
+      this.filename = nextProps.filename;
+      return false;
+    }
     // console.log("update requested");
     return true;
   }
@@ -100,31 +102,41 @@ export default class MixedPageView extends React.Component<Props, State> {
   render() {
     const pdfCanvas: CSSProperties = {
       position: "absolute",
-      // height: "100%",
-      // width: "100%",
+      height: "0px",
+      width: "0px",
       left: this.state.canvasPosition.offsetX + "px",
       top: this.state.canvasPosition.offsetY + "px",
       // zoom: this.state.canvasPosition.zoom,
-      overflow: "hidden",
+      overflow: "visible",
     }
+
+    const inkCanvas: CSSProperties = {
+      position: "absolute",
+      height: "100%",
+      width: "100%",
+      left: "0px",
+      top: "0px",
+      overflow: "visible",
+    }
+
 
     // console.log(this.state.canvasPosition);
     return (
       <div id={"mixed_view"} style={{
-        // position: "absolute",
+        position: "absolute",
         left: "0px", top: "0px",
-        flexDirection: "row-reverse", display: "flex",
+        // flexDirection: "row-reverse", display: "flex",
         width: "100%", height: "100%",
         alignItems: "center",
         zIndex: 1,
       }}>
-        <div id={"pdf_layer"} style={pdfCanvas}>
+        <div id={"pdf_layer"} style={pdfCanvas} >
           <NeoPdfViewer
             url={this.state.pdfUrl} pageNo={this.state.pageNo} onReportPdfInfo={this.onReportPdfInfo}
             position={this.state.canvasPosition}
           />
         </div>
-        <div id={"ink_layer"} style={tempStyle}>
+        <div id={"ink_layer"} style={inkCanvas}>
           <PenBasedRenderer
             scale={1}
             pageInfo={{ section: 0, owner: 0, book: 0, page: 0 }}
@@ -132,6 +144,7 @@ export default class MixedPageView extends React.Component<Props, State> {
             onNcodePageChanged={this.onNcodePageChanged}
             onCanvasShapeChanged={this.onCanvasShapeChanged}
             ref={this.rendererRef}
+            rotation={this.props.rotation}
           />
         </div>
       </div>

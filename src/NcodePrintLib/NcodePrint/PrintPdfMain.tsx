@@ -1,19 +1,23 @@
 import * as React from "react";
+import "./print.css";
 
 import { IPageOverview, PagesForPrint } from "./PagesForPrint";
 import ReactToPrint from 'react-to-print';
-import { IPrintingReport, IPrintOption } from "./PrintDataTypes";
-import { compareObject } from "./UtilFunc";
+import { IPrintingEvent, IPrintingReport, IPrintOption } from "./PrintDataTypes";
 import { getCellMatrixShape } from "../NcodeSurface/SurfaceSplitter";
-import PageOrientation, { LandscapeOrientation, PortraitOrientation } from "./PageOrientation";
+import PageOrientation, { ForceOverflow, LandscapeOrientation, PortraitOrientation } from "./PageOrientation";
 import NeoPdfDocument from "../NeoPdf/NeoPdfDocument";
-import "./print.css";
+import { MappingStorage, PdfDocMapper } from "../SurfaceMapper";
+
+import * as Util from "../UtilFunc";
 
 // let globalPagesCnt = 0;
 interface Props {
+  filename: string,
+
   pdf: NeoPdfDocument,
   printOption: IPrintOption,
-  updatePrintProgress: Function,
+  updatePrintProgress: (event: IPrintingReport) => void,
 
   /** 숫자가 바뀌면, 프린트한다 */
   printTrigger: number,
@@ -21,7 +25,7 @@ interface Props {
   pagesOverview: IPageOverview[],
 
   /** 인쇄가 끝나고 나면 부를 콜백 */
-  onAfterPrint?: Function,
+  onAfterPrint?: (mapping: PdfDocMapper) => void,
 }
 
 interface State {
@@ -47,7 +51,7 @@ export class PrintPdfMain extends React.Component<Props, State> {
   renderedSheets: number[];
   renderedPages: number[];
 
-
+  mapping: PdfDocMapper;
   constructor(props: Props) {
     super(props);
 
@@ -67,12 +71,15 @@ export class PrintPdfMain extends React.Component<Props, State> {
   private clearRenderedPagesArray = () => {
     this.renderedSheets = [];
     this.renderedPages = [];
+    this.mapping = new PdfDocMapper(this.props.filename, this.props.printOption.pagesPerSheet);
   }
 
   handleAfterPrint = () => {
     console.log("[PrintPdfMain] onAfterPrint called"); // tslint:disable-line no-console
-    this.onAfterPrint();
 
+
+
+    this.onAfterPrint(this.mapping);
   }
 
   handleBeforePrint = () => {
@@ -111,31 +118,44 @@ export class PrintPdfMain extends React.Component<Props, State> {
       return true;
     }
 
+
+    if (this.state.renderingCompleted !== nextState.renderingCompleted) {
+      return true;
+    }
+
+    if (this.state.text !== nextState.text) {
+      return true;
+    }
+
+
     console.log("[PrintPdfMain] CHECK START props");
-    compareObject(this.props, nextProps, "PrintPdfMain");
+    Util.compareObject(this.props, nextProps, "PrintPdfMain");
 
     console.log("[PrintPdfMain] CHECK START state");
-    compareObject(this.state, nextState, "PrintPdfMain");
+    Util.compareObject(this.state, nextState, "PrintPdfMain");
 
     return false;
   }
 
-  public OnPagePrepared = (event: { sheetIndex: number, pageNums: number[], completion: number }) => {
+  public OnPagePrepared = (event: IPrintingEvent) => {
     const { sheetIndex, pageNums, completion } = event;
-
     const { targetPages, pagesPerSheet } = this.props.printOption;
 
+
+    /** 해당의 sheet 인쇄가 100% 이면 */
     if (completion === 100) {
+      /** 임시 매핑 정보를 추가해서 넣는다, afterPrint에서 쓰인다. */
+      this.mapping.append(event.mappingItems);
+
+      /** 인쇄된 시트 수와 페이지 번호들을 정리해서 넣는다 */
       if (this.renderedSheets.indexOf(sheetIndex) < 0) {
         this.renderedSheets.push(sheetIndex);
       }
-
       this.renderedPages.push(...pageNums);
     }
-
     const numCompleted = Object.keys(this.renderedSheets).length;
 
-    /** callback을 불러준다 */
+    /**callback을 불러준다 */
     if (this.props.updatePrintProgress) {
       const event: IPrintingReport = {
         status: "progress",
@@ -197,7 +217,7 @@ export class PrintPdfMain extends React.Component<Props, State> {
 
   onPageRenderCompleted = () => {
     this.setState({
-      text: "Rendering Completed",
+      text: "completed",
       renderingCompleted: true,
     });
   }
@@ -250,7 +270,7 @@ export class PrintPdfMain extends React.Component<Props, State> {
         { shouldPrint ?
           (
             <div style={{ display: "none" }}>
-              <PageOrientation orientation={ isLandscape ? "landscape": "portrait"} />
+              <PageOrientation orientation={isLandscape ? "landscape" : "portrait"} />
               {/* { isLandscape ? (<LandscapeOrientation />) : (<PortraitOrientation />)} */}
 
               <ReactToPrint
@@ -264,6 +284,7 @@ export class PrintPdfMain extends React.Component<Props, State> {
                 removeAfterPrint
               // trigger={this.reactToPrintTrigger}
               />
+
               <PagesForPrint ref={this.setComponentRef} text={this.state.text}
                 // key={`print-${pdf.fingerprint}-${globalPagesCnt}`}
                 pdf={pdf}
@@ -277,14 +298,19 @@ export class PrintPdfMain extends React.Component<Props, State> {
         }
 
         { printOption.debugMode > 0 ?
-          <PagesForPrint ref={this.setComponentRef} text={this.state.text}
-            // key={`screen-${pdf.fingerprint}-${globalPagesCnt}`}
-            pdf={pdf}
-            pagesOverview={pagesOverview}
-            shouldRenderPage={shouldRenderPage}
-            OnPagePrepared={null}
-            printOption={printOption}
-          />
+          <div style={{ position: "absolute", left: "0px", top: "1500px", overflow: "visible" }}>
+            <ForceOverflow overflow={"visible"} />
+            <div style={{ position: "relative", left: "0px", top: "0px", overflow: "visible" }}>
+              <PagesForPrint ref={this.setComponentRef} text={this.state.text}
+                // key={`screen-${pdf.fingerprint}-${globalPagesCnt}`}
+                pdf={pdf}
+                pagesOverview={pagesOverview}
+                shouldRenderPage={shouldRenderPage}
+                OnPagePrepared={null}
+                printOption={printOption}
+              />
+            </div>
+          </div>
           : <></>}
       </div>
     );

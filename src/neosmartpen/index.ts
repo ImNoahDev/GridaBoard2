@@ -42,7 +42,7 @@ export {
   SINGLE_CODE_SIZE_PER_INCH,
   NCODE_TO_MM_SCALE,
   NCODE_TO_INCH_SCALE,
-  NCODE_TO_SCREEN_SCALE, 
+  NCODE_TO_SCREEN_SCALE,
   INCH_TO_MM,
 
   DEFAULT_SECTION,
@@ -53,7 +53,7 @@ export {
   DISPLAY_DEFAULT_DPI,
 
   MixedPageView,
-  PLAYSTATE, 
+  PLAYSTATE,
   uuidv4,
   pdfSizeToDIsplayPixel,
 };

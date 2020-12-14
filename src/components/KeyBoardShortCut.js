@@ -11,13 +11,13 @@ export default function KeyBoardShortCut(evt) {
         ensureViewerFocused = false;
     const cmd = (evt.ctrlKey ? 1 : 0) | (evt.altKey ? 2 : 0) | (evt.shiftKey ? 4 : 0) | (evt.metaKey ? 8 : 0);
 
-    console.log(`keyCode = ${evt.keyCode}`);
+    // console.log(`keyCode = ${evt.keyCode}`);
 
     if (cmd == 0) {
         switch (true) {
             case 0x30 <= evt.keyCode && evt.keyCode <= 0x39: // '1'
                 {
-                    var color_num = evt.keyCode - 0x30;
+                    const color_num = evt.keyCode - 0x30;
                     PenManager.getInstance().setColor(color_num);
                     // setPenColor(color_num);
                     // toggleColorRadioButton( color_num );

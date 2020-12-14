@@ -1,15 +1,19 @@
 import React, { Component } from 'react';
+
+import "./print.css";
 import * as PdfJs from 'pdfjs-dist';
 import { IPageSOBP, ISize, ICssSize, IRectDpi, } from '../DataStructure/Structures';
 import NcodeRasterizer, { IPagesPerSheetNumbers, IPrepareSurfaceParam, drawArrow, IAreasDesc, } from "../NcodeSurface/NcodeRasterizer";
-import { CSS_DPI, IPrintOption } from './PrintDataTypes';
+import { CSS_DPI, IPrintingEvent, IPrintOption } from './PrintDataTypes';
 import { IPageOverview } from './PagesForPrint';
-import { getSurfaceSize_css } from '../NcodeSurface';
+
 import { getCellMatrixShape } from '../NcodeSurface/SurfaceSplitter';
 import { IPdfPageCanvasDesc } from '../NeoPdf/NeoPdfPage';
 import NeoPdfDocument from '../NeoPdf/NeoPdfDocument';
-import { uuidv4 } from './UtilFunc';
-import "./print.css";
+
+import { getSurfaceSize_css } from '../NcodeSurface/SurfaceInfo';
+import * as Util from "../UtilFunc";
+import { makeNPageIdStr } from '../UtilFunc';
 
 let debug = 0;
 
@@ -36,7 +40,8 @@ interface Props {
   pdf: NeoPdfDocument,
 
   /** null이면 화면 전용 */
-  OnPagePrepared: Function,
+  OnPagePrepared: (event: IPrintingEvent) => void,
+
   printOption: IPrintOption,
   pageNums: number[],
   pagesOverview: IPageOverview[],
@@ -77,7 +82,7 @@ export class PageForPrint extends Component<Props, State> {
   constructor(props: Props) {
     super(props);
 
-    this.uuid = uuidv4();
+    this.uuid = Util.uuidv4();
     // this.pageImageDescs = new Array(props.printOption.pagesPerSheet);
   }
 
@@ -183,8 +188,6 @@ export class PageForPrint extends Component<Props, State> {
       pageImagesDesc[i].pdfPageInfo.id = pdf.id;
     }
 
-    pdf.registerMappingItem(pageImagesDesc, ncodePlane, printOption.assignNewCode);
-
 
     // 캔버스의 색상 값 디버깅용, debug level 3 이상
     this.debugCheckColorValues(mainCanvas, ctx, printOption);
@@ -193,7 +196,10 @@ export class PageForPrint extends Component<Props, State> {
     const { width: css_width, height: css_height } = canvasDesc.css;
     this.setState({ status: 'rendered', width: css_width, height: css_height });
 
-    this.reportProgress({ sheetIndex, pageNums, completion: 100 });
+    // 보고를 위해 code mapping item을 가져온다
+    const array = pdf.generateMappingItems(pageImagesDesc, ncodePlane, printOption.assignNewCode);
+
+    this.reportProgress({ sheetIndex, pageNums, completion: 100, mappingItems: array });
   }
 
   private drawDebugLines = (mainCanvas, ctx, printOption: IPrintOption) => {
@@ -228,10 +234,9 @@ export class PageForPrint extends Component<Props, State> {
     ctx.restore();
   }
 
-  private reportProgress = (arg: { sheetIndex: number, pageNums: number[], completion: number }) => {
+  private reportProgress = (event: IPrintingEvent) => {
     const OnPagePrepared = this.props.OnPagePrepared;
-    if (OnPagePrepared) OnPagePrepared(arg);
-
+    if (OnPagePrepared) OnPagePrepared(event);
   }
 
 
@@ -299,6 +304,8 @@ export class PageForPrint extends Component<Props, State> {
 
     const rasterizer = new NcodeRasterizer(printOption);
     const ncodePlane = await rasterizer.prepareNcodePlane(options);
+
+    console.log(`[mapping] return ncodePlane = ${makeNPageIdStr(ncodePlane.ncodeAreas[0].pageInfo)}`);
 
     return ncodePlane;
   }
@@ -378,7 +385,7 @@ export class PageForPrint extends Component<Props, State> {
     }
     const { printDpi: dpi, pagesPerSheet, direction, mediaSize, padding } = printOption;
 
-    const { width: width_css, height: height_css } = getSurfaceSize_css(mediaSize, false, padding );
+    const { width: width_css, height: height_css } = getSurfaceSize_css(mediaSize, false, padding);
     // const { width: width_dpi, height: height_dpi } = getSurfaceSize_dpi(printOption.mediaSize, dpi);
 
     const width_dpi = width_css * dpi / CSS_DPI;

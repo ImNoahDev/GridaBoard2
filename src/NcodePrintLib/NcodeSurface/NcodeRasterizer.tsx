@@ -8,6 +8,8 @@ import { getSurfaceSize_dpi } from "./SurfaceInfo";
 import { devideSurfaceAreaTo, getCellMatrixShape } from "./SurfaceSplitter";
 import { IPrintOption } from "../NcodePrint/PrintDataTypes";
 import { NCODE_CLASS6_NUM_DOTS } from "./NcodeConstans";
+import NcodeFetcherPool from "./NcodeFetcherPool";
+import { makeNPageIdStr } from "../UtilFunc";
 
 // import { PrintContextConsumer } from "react-to-print";
 
@@ -255,7 +257,9 @@ export default class NcodeRasterizer {
       // 코드를 그린다
       if (hasToPutNcode && i < pageInfos.length) {
         const pageInfo = pageInfos[i];
-        const fetcher = new NcodeFetcher(pageInfo);
+
+        const fetcher = NcodeFetcherPool.getInstance();
+        // const fetcher = new NcodeFetcher(pageInfo);
         const ncodeSurfaceDesc = await fetcher.getNcodeData(pageInfos[i]);
 
         // (left, top) margin을 세팅
@@ -272,6 +276,7 @@ export default class NcodeRasterizer {
         // ctx.lineWidth = 70;
         // ctx.strokeRect(0, 0, canvas.width, canvas.height);
         const ncodeArea = await this.drawNcode(drawingContext, ncodeSurfaceDesc, dpi);
+        console.log(`[mapping] push Page Info = ${makeNPageIdStr(ncodeSurfaceDesc.pageInfo)}`);
         ncodeAreas.push(ncodeArea);
 
       }
@@ -524,7 +529,7 @@ export default class NcodeRasterizer {
       pixelsPerDot: glyphDistancePx_canvas,
       dotsPerCell: NCODE_CLASS6_NUM_DOTS,
 
-      pageInfo: { section: -1, owner: -1, book: -1, page: -1 },
+      pageInfo: { ...surfaceDesc.pageInfo },
 
       rect: {
         unit: "nu",

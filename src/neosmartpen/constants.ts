@@ -22,3 +22,8 @@ export const DEFAULT_OWNER = 27;
 
 export const DEFAULT_BOOK = 168;
 
+
+/** 그리다보드 뷰의 확대 최소 값 */
+export const PDFVIEW_ZOOM_MIN = 0.1;
+/** 그리다보드 뷰의 확대 최대 값 */
+export const PDFVIEW_ZOOM_MAX = 5.0;

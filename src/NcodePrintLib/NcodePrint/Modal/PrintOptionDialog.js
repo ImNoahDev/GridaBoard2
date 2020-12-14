@@ -31,7 +31,7 @@ import CheckBox from '@material-ui/core/Checkbox';
 // 2020-12-10 printDialog까지 완성 (인쇄하는 부분으로 값들 전달하는 것 완성시키기)
 
 const displayOption = () => {
-  var subOption = document.getElementById('subOption');
+  const subOption = document.getElementById('subOption');
   if (subOption.style.display === 'none') {
     subOption.style.display = 'block';
   } else {
@@ -39,14 +39,14 @@ const displayOption = () => {
   }
 }
 
-var _ncodePrint = $("#ncodePaper").prop("defaultChecked");
-var _bluePrint = $("#bluePrint").prop("defaultChecked");
-var _calibrationMark = $("#calibrationMark").prop("defaultChecked");
-var _oldCalibrationMark = $("#calibrationMark").prop("defaultChecked");
-var _printNcode = $("#printNcode").prop("defaultChecked");
-var _ni = null;
-var _ni_new = null;
-var arrCallback = [];
+const _ncodePrint = $("#ncodePaper").prop("defaultChecked");
+let _bluePrint = $("#bluePrint").prop("defaultChecked");
+const _calibrationMark = $("#calibrationMark").prop("defaultChecked");
+let _oldCalibrationMark = $("#calibrationMark").prop("defaultChecked");
+let _printNcode = $("#printNcode").prop("defaultChecked");
+const _ni = null;
+const _ni_new = null;
+const arrCallback = [];
 
 function on(select_target, message, _func, bindObj) {
   // if (typeof obj == "object") {
@@ -55,13 +55,13 @@ function on(select_target, message, _func, bindObj) {
   $(select_target).on(message, _func.bind(bindObj));
 
   // 나중에 dump할 것을 위해서 아래와 같이 배열에 추가
-  var callbackItem = getCallbackItem("jQuery", select_target, message, _func, bindObj);
+  const callbackItem = getCallbackItem("jQuery", select_target, message, _func, bindObj);
   arrCallback.push(callbackItem);
   // this.dumpAll();
 }
 
 function getCallbackItem(receiver, select_target, message, _func, obj) {
-  var obj_name = "window";
+  let obj_name = "window";
   if (obj) {
       if (obj.name) {
           obj_name = obj.name;
@@ -78,12 +78,12 @@ function getCallbackItem(receiver, select_target, message, _func, obj) {
       class: obj_name,
       assignedAt: getFunctionName(),
   };
-};
+}
 
 function getFunctionName() {
   // https://kjwsx23.tistory.com/285/
-  let stack_msg = new Error().stack || "";
-  var stack = stack_msg.split("\n").map(function (line) {
+  const stack_msg = new Error().stack || "";
+  const stack = stack_msg.split("\n").map(function (line) {
       return line.trim();
   });
   if (stack[0].indexOf("Error") > -1) {
@@ -107,7 +107,7 @@ function onNormalPaper() {
   } else {
     $("#nomalPaper").prop("checked", false);
   }
-  var isForSmartpen = $("#nomalPaper").prop("checked");
+  const isForSmartpen = $("#nomalPaper").prop("checked");
   console.log(isForSmartpen);
   onModeChange(isForSmartpen);
 }
@@ -119,21 +119,21 @@ function onNcodePaper() {
   } else {
     $("#nomalPaper").prop("checked", true);
   }
-  var isForBlueprintOnly = $("#ncodePaper").prop("checked");
+  const isForBlueprintOnly = $("#ncodePaper").prop("checked");
   console.log(isForBlueprintOnly);
   onModeChange(!isForBlueprintOnly);
 }
 
 function onQualitySelectChanged() {
-  var value = $("#dropDownQualityState").val();
-  var print_ncode = $("#printNcode").prop("checked");
+  let value = $("#dropDownQualityState").val();
+  const print_ncode = $("#printNcode").prop("checked");
 
   if (print_ncode) value = 4;
   setPrintQuality(value);
 }
 
 function onModeChange(isForSmartpen) {
-  var code_txt2 = "";
+  const code_txt2 = "";
   if (isForSmartpen) {
       // pop previous values
       $("#bluePrint").prop("defaultChecked", _bluePrint);
@@ -195,7 +195,7 @@ function onModeChange(isForSmartpen) {
 }
 
 function onChangePrintNcode() {
-  var print_ncode = $("#printNcode").prop("defaultChecked");
+  const print_ncode = $("#printNcode").prop("defaultChecked");
 
   if (print_ncode) {
       $("#calibrationMark").prop("defaultChecked", _oldCalibrationMark);
@@ -213,15 +213,15 @@ function onChangePrintNcode() {
 }
 
 function setPrintQuality(value) {
-  var index = parseInt(value);
+  const index = parseInt(value);
   $("#dropDownQualityState").val(index);
-  var dpi = resolutionIndexToDpiNumber(index);
+  const dpi = resolutionIndexToDpiNumber(index);
 
   $("#qualityDpiText").text(`${dpi} DPI`);
 }
 
 function resolutionIndexToDpiNumber(index) {
-  var val = 300;
+  let val = 300;
   switch (index) {
       case 1:
           val = 150;
@@ -269,7 +269,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 export default function PrintOptionDialog () {
-  
+
   const classes = useStyles();
   const [open, setOpen] = useState(false);
   const [checked, setChecked] = React.useState(true);
@@ -370,17 +370,17 @@ export default function PrintOptionDialog () {
               <input id="ncodePaper" type="checkbox" onClick={onNcodePaper} style={{display: "inline", marginRight: "10px"}}></input>
               <label>Ncode A4에 인쇄</label>
             </p>
-          </div>  
+          </div>
           {/* </form> */}
           <Button onClick={displayOption} style={{border: "1px solid black", width: "450px"}}>고급 설정</Button>
-          
+
           <div id="subOption" style={{marginTop: "20px", display: "none"}}>
             <p style={{float: "left", marginRight: "40px"}}>
               <input id="calibrationMark" type="checkbox" defaultChecked style={{display: "inline", marginRight: "10px"}}></input>
               <label>위치 보정용 마크 인쇄</label>
             </p>
             {/* 색변환(블루프린트) */}
-            <input id="bluePrint" style={{display: "none"}}></input> 
+            <input id="bluePrint" style={{display: "none"}}></input>
             {/* Ncode 인쇄 여부 */}
             <input id="printNcode" style={{display: "none"}} disabled></input>
             <p>

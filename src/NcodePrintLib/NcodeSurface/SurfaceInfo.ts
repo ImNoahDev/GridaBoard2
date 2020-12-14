@@ -5,6 +5,28 @@ import { IPageSOBP, INcodeSOBPxy, ISize, UNIT_TO_DPI } from "../DataStructure/St
 import { INCH_TO_MM_SCALE, NCODE_TO_INCH_SCALE, PDF_DEFAULT_DPI } from "./NcodeConstans";
 
 
+// kitty, Ncode SDK를 읽고 다음의 페이지수를 채워 넣을 것
+// 2020/12/13
+export const g_availablePagesInSection = {
+  0: 512,
+  1: 512,
+  2: 512,
+  3: 512,
+  4: 512,
+  5: 512,
+  6: 512,
+  7: 512,
+  8: 512,
+  9: 512,
+  10: 512,
+  11: 512,
+  12: 512,
+  13: 512,
+  14: 512,
+  15: 512,
+}
+
+
 /**
  *
  * @param pageInfo
@@ -191,10 +213,3 @@ export function getCssDpi() {
 }
 
 
-
-export function isSamePage(pg1: IPageSOBP, pg2: IPageSOBP): boolean {
-  if (pg1.page !== pg2.page || pg1.book !== pg2.book || pg1.owner !== pg2.owner || pg1.section !== pg2.section) {
-    return false;
-  }
-  return true;
-}

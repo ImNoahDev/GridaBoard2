@@ -48,9 +48,12 @@ import {
   //PenEvent,
   NoteserverClient,
 } from "../neosmartpen";
+import ClearLocalMappingButton from "../NcodePrintLib/Buttons/ClearLocalMappingButton";
+import { g_debugFilename, g_debugURL } from "../NcodePrintLib/DefaultOption";
 
 // const PDF_URL = "./A4_Pirates-of-the-Caribbean-Hes-a-Pirate-Klaus-Badelt.pdf";
-const PDF_URL = g_defaultPrintOption.url;
+const PDF_URL = g_debugURL;
+const PDF_FILENAME = g_debugFilename;
 
 const menuStyle = {
   width: '36px',
@@ -130,6 +133,7 @@ const Home = () => {
   const [num_pens, setNumPens] = useState(0);
   const [pens, setPens] = useState(new Array(0));
   const [pdfUrl, setUrl] = useState(PDF_URL);
+  const [pdfFilename, setFilename] = useState(PDF_FILENAME);
   const [isRotate, setRotate] = useState();
 
   const onPenLinkChanged = e => {
@@ -171,6 +175,7 @@ const Home = () => {
     console.log(event.url)
     if (event.result === "success") {
       setUrl(event.url);
+      setFilename(event.fileDesc.name);
     }
   };
 
@@ -194,6 +199,38 @@ const Home = () => {
   };
 
   const printOption = g_defaultPrintOption;
+  const buttonDivStyle = {
+    position: "absolute",
+    display: "flex",
+    flexDirection: "row-reverse",
+    alignItems: "center",
+    left: "0px", top: "0px",
+    width: "100%", height: "40px",
+    zIndex: 100,
+  } as React.CSSProperties;
+
+  const homeDivStyle = {
+    position: "absolute",
+    left: "0px", top: "0px",
+    flexDirection: "row-reverse",
+    display: "flex",
+    width: "100%", height: "100%",
+    alignItems: "center",
+    zIndex: 1,
+  } as React.CSSProperties;;
+
+  const mainFrameStyle = {
+    position: "absolute",
+    left: "0%", top: "10%",
+    flexDirection: "row-reverse",
+    display: "flex",
+    height: "80%",
+    alignItems: "center",
+    zIndex: 1030,
+    marginLeft: "-1px",
+  } as React.CSSProperties;
+
+  const printBtnId = "printTestButton";
 
   return (
     <div>
@@ -205,24 +242,11 @@ const Home = () => {
         </a>
       </nav>
 
-      <div id={"home_div"} style={{
-        position: "absolute",
-        left: "0px", top: "0px",
-        flexDirection: "row-reverse", display: "flex",
-        width: "100%", height: "100%",
-        alignItems: "center",
-        zIndex: 1,
-      }}>
-        <div id={"button_div"} style={{
-          position: "absolute",
-          display: "flex", flexDirection: "row-reverse",
-          alignItems: "center",
-          left: "0px", top: "0px",
-          width: "100%", height: "40px",
-          zIndex: 100,
-        }}>
+      <div id={"home_div"} style={homeDivStyle}>
+        <div id={"button_div"} style={buttonDivStyle}>
           <div style={{ flex: 1 }}> </div>
 
+          {/* 공책 정보 가져오기 테스트 버튼 */}
           <div style={{ fontSize: "20px", fontWeight: "bold" }}>
             <Button variant="outlined" color="primary" onClick={(event) => getNoteInfo(event)} >
               <Box fontSize={14} fontWeight="fontWeightBold" >공책 정보 받아오기(현재 실패)</Box>
@@ -230,14 +254,31 @@ const Home = () => {
           </div>
           <div style={{ flex: 1 }}> </div>
 
+          {/* 인쇄 테스트 버튼 */}
           <div style={{ fontSize: "20px", fontWeight: "bold" }}>
-            <PrintPdfButton variant="contained" color="primary" url={pdfUrl} printOption={printOption}
+            <PrintPdfButton variant="contained" color="primary"
+              id={printBtnId}
+              url={pdfUrl}
+              filename={pdfFilename}
+              printOption={printOption}
               reportProgress={onReportProgress} printOptionCallback={printOptionCallback}>
               <Box fontSize={14} fontWeight="fontWeightBold" >인쇄 시험 (인쇄 옵션 창을 띄울것)</Box>
             </PrintPdfButton>
           </div>
           <div style={{ flex: 1 }}> </div>
 
+
+
+          {/* 매핑 정보 지우기 버튼 */}
+          <div style={{ fontSize: "20px", fontWeight: "bold" }}>
+            <ClearLocalMappingButton variant="contained" color="primary" >
+              <Box fontSize={14} fontWeight="fontWeightBold" >매핑정보 지우기</Box>
+            </ClearLocalMappingButton>
+          </div>
+          <div style={{ flex: 1 }}> </div>
+
+
+          {/* 인쇄 옵션 다이얼로그 테스트 버튼 */}
           <div style={{ fontSize: "14px" }}>
             <PrintOptionDialog />
           </div>
@@ -247,6 +288,7 @@ const Home = () => {
           </div>
           <div style={{ flex: 1 }}> </div>
 
+          {/* 구글 업로드 테스트 버튼 */}
           <Upload />
           <div style={{ flex: 1 }}> </div>
           <button id="read_mapping_info" onClick={() => SavePdf.savePDF(pdfUrl, 'hello.pdf')}>
@@ -255,8 +297,6 @@ const Home = () => {
           <GoogleBtn />
           <div style={{ flex: 11 }}> </div>
         </div>
-
-
 
         <nav id="colornav" className="navbar fixed-bottom navbar-light bg-transparent">
           {/* <div className="d-inline-flex p-2 bd-highlight"> */}
@@ -283,7 +323,9 @@ const Home = () => {
 
           <div id="navbar_center">
             <div className="navbar-menu d-flex justify-content-center align-items-center neo_shadow">
-              <PageNumbering /><PrintButton /><FileBrowserButton onFileOpen={onFileOpen} />
+              <PageNumbering />
+              <PrintButton targetId={printBtnId} />
+              <FileBrowserButton onFileOpen={onFileOpen} />
             </div>
           </div>
 
@@ -297,15 +339,7 @@ const Home = () => {
         </nav>
 
 
-        <div style={{
-          position: "absolute",
-          left: "0%", top: "10%",
-          flexDirection: "row-reverse", display: "flex",
-          height: "80%",
-          alignItems: "center",
-          zIndex: 1030,
-          marginLeft: "-1px",
-        }}>
+        <div id="mainFrame" style={mainFrameStyle}>
           <div className="d-flex flex-column h-100">
             <div id="leftmenu" className="main-container flex-grow-1">
               <div id="menu-wide" className="d-flex menu-container float-left h-100">
@@ -348,7 +382,7 @@ const Home = () => {
           </div>
         </div>
 
-        <MixedPageView pdfUrl={pdfUrl} pageNo={1} scale={1} playState={PLAYSTATE.live} pens={pens} ref={pageRef} />
+        <MixedPageView pdfUrl={pdfUrl} filename={pdfFilename} pageNo={1} scale={1} playState={PLAYSTATE.live} pens={pens} ref={pageRef} rotation={0} />
       </div >
     </div >
   );

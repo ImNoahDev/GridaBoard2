@@ -1,12 +1,20 @@
-import { ColorConvertMethod } from ".";
+import { IPageSOBP } from "./DataStructure/Structures";
 import { IPrintOption, MediaSize } from "./NcodePrint/PrintDataTypes";
+import { ColorConvertMethod } from "./NcodeSurface/CanvasColorConverter";
+
+// export const g_debugURL = "./Portrait, 초등학교 4학년 4P.pdf";
+// export const g_debugFilename = "./Portrait, 초등학교 4학년 4P.pdf";
+
+export const g_debugURL = "./2P_test.pdf";
+export const g_debugFilename = "./2P_test.pdf";
 
 export const g_defaultPrintOption: IPrintOption = {
   // url: "./landscape, 그리다보드_테스트.pdf",
   // url: "./A4_Pirates-of-the-Caribbean-Hes-a-Pirate-Klaus-Badelt.pdf",
-  url: "./Portrait, 초등학교 4학년 4P.pdf",
+  url: undefined,
   // url: "./A4_Pirates-of-the-Caribbean-Hes-a-Pirate-Klaus-Badelt.pdf",
 
+  filename: undefined,
 
   assignNewCode: true,
 
@@ -36,14 +44,24 @@ export const g_defaultPrintOption: IPrintOption = {
 
   targetPages: [],
 
-  debugMode: 0,
   hasToPutNcode: true,
   luminanceMaxRatio: 0.8,
   drawCalibrationMark: true,
   drawMarkRatio: 0.1,
   drawFrame: false,
 
-  pagesPerSheet: 1,
+  pagesPerSheet: 2,
 
   padding: 10,     // mm 단위
+
+
+
+  debugMode: 1
 };
+
+export const g_defaultNcode: IPageSOBP = {
+  section: 3,
+  owner: 27,
+  book: 1068,
+  page: 0,
+}

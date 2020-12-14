@@ -4,9 +4,23 @@
 import { IPageSOBP } from "../DataStructure/Structures";
 import { IPaperSize } from "../NcodeSurface/SurfaceDataTypes";
 import { ColorConvertMethod } from "../NcodeSurface/CanvasColorConverter";
+import { CoordinateTanslater, IPdfMappingDesc } from "../Coordinates";
 
 
 
+export interface IPrintingEvent {
+  /** 인쇄한 종이 번호 */
+  sheetIndex: number,
+
+  /** 인쇄된 페이지들 */
+  pageNums: number[],
+
+  /** 0% ~ 100% (0~100) */
+  completion: number,
+
+  /** code mapping 정보 */
+  mappingItems?: CoordinateTanslater[],
+}
 
 export interface IPrintingReport {
   status: "progress" | "completed",
@@ -33,12 +47,14 @@ export interface IPrintingReport {
 export interface IFileBrowserReturn {
   result: "success" | "canceled" | "failed",
   url: string,
-  file: any,
+  fileDesc: any,
 }
 
 
 export interface IPrintOption {
   url: string;
+
+  filename: string,
 
   codeDensity: number;      // 1 dot, 2dots, 3dots
   printDpi: number;         // 600 DPI, 300 DPI
@@ -93,6 +109,7 @@ export interface IPrintOption {
   /** 상하좌우 여백  mm 단위*/
   padding: number,     // mm 단위
 
+  pdfMappingDesc?: IPdfMappingDesc;
 }
 
 /**

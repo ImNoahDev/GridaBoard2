@@ -393,15 +393,15 @@ export class NeoSmartpen {
       if (event.isFirstDot) {
         console.log("===================================");
         // var puis = window._pui;
-        var puis = window._pui
+        const puis = window._pui
         console.log(puis);
-        var i;
+        let i;
         for (i = 0; i < puis.length; i++) {
-          var pui = puis[i];
+          const pui = puis[i];
           console.log(pui);
-          var cmd = pui.getCommand(event.owner, event.book, event.page, dot.x, dot.y);
+          const cmd = pui.getCommand(event.owner, event.book, event.page, dot.x, dot.y);
           console.log(cmd);
-          
+
           if(cmd) {
             console.log(`PUI EXECUTE ==> ${cmd}`);
 

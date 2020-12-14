@@ -144,6 +144,7 @@ class Page extends Component<PageProps> {
 
   _update = (pdf: PdfJs.PDFDocumentProxy) => {
     if (pdf) {
+      this.backPlane.inited = false;
       this._loadPage(pdf);
     } else {
       this.setState({ status: 'loading' });
@@ -244,7 +245,7 @@ class Page extends Component<PageProps> {
     const ret = this.scaleCanvas(canvas, displaySize.width, displaySize.height, zoom);
     const { px_width, px_height } = this.backPlane.size;
 
-    console.log(sprintf("back plane = zoom(%.1f) (%d, %d)", zoom, px_width, px_height));
+    // console.log(sprintf("back plane = zoom(%.1f) (%d, %d)", zoom, px_width, px_height));
 
     const ctx = canvas.getContext('2d');
     const dw = ret.px.width / ret.ratio;
@@ -268,7 +269,7 @@ class Page extends Component<PageProps> {
         this.backPlane.size = { ...result };
 
         const { px_width, px_height } = result;
-        console.log(sprintf("LAZY plane = zoom(%.1f) (%d, %d)", zoom, px_width, px_height));
+        // console.log(sprintf("LAZY plane = zoom(%.1f) (%d, %d)", zoom, px_width, px_height));
         ctx.drawImage(this.backPlane.canvas, 0, 0, px_width, px_height, 0, 0, dw, dh);
 
         const renderCount = this.state.renderCount + 1;
@@ -278,6 +279,8 @@ class Page extends Component<PageProps> {
         console.log(`lazy back plane CANCELLED`)
       }
     }
+    this.setState({ status: 'rendered' });
+
   }
 
 

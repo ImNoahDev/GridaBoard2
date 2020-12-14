@@ -3,14 +3,14 @@ import React from 'react';
 import { gapi } from 'gapi-script';
 import { GoogleLogin } from 'react-google-login';
 import * as PdfJs from "pdfjs-dist";
-import MappingStorage from "../../NcodePrintLib/SurfaceMapper/MappingStorage";
+import { MappingStorage } from "../../NcodePrintLib/SurfaceMapper";
 import { resolve } from 'path';
 
 const st = MappingStorage.getInstance()
 const FOLDER_ID = "root";
 
 export default class Upload extends React.Component {
-  
+
   mappingInfoUploadProcess = async () => {
     const self = this;
     let folderId;
@@ -58,9 +58,9 @@ export default class Upload extends React.Component {
                   const newMappingObj = JSON.parse(content);
 
                   currentMappingObj.mapping_info.push(newMappingObj);
-                  
+
                   content = JSON.stringify(currentMappingObj);
-                  
+
                   const contentBlob = new Blob([content], {'type': 'application/json'});
                   self.updateMappingInfo(fileId, contentBlob, function(resp) {
                     console.log("updateMappingInfo callback called");
@@ -70,7 +70,7 @@ export default class Upload extends React.Component {
                 })
                 isMappingFileExist = true;
                 break;
-              } 
+              }
               if (!isMappingFileExist) {
                 self.createNewMappingInfo(folderId);
               }
@@ -111,13 +111,13 @@ export default class Upload extends React.Component {
         'mimeType': 'application/json', // mimeType at Google Drive
         'parents': [folderId], // Folder ID at Google Drive
     };
-    
+
     const accessToken = gapi.auth.getToken().access_token; // Here gapi is used for retrieving the access token.
 
     const form = new FormData();
     form.append('metadata', new Blob([JSON.stringify(metadata)], {type: 'application/json'}));
     form.append('file', file);
-    
+
     const xhr = new XMLHttpRequest();
     xhr.open('post', 'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id');
     xhr.setRequestHeader('Authorization', 'Bearer ' + accessToken);
@@ -138,7 +138,7 @@ export default class Upload extends React.Component {
         'method': 'POST',
         'headers': {
             'Content-Type': 'application/json',
-            'Authorization': 'Bearer ' + access_token,             
+            'Authorization': 'Bearer ' + access_token,
         },
         'body':{
             "title" : "Grida",
@@ -146,7 +146,7 @@ export default class Upload extends React.Component {
         }
     });
 
-    request.execute(await function(resp) { 
+    request.execute(await function(resp) {
       self.createNewMappingInfo(resp.id);
     });
   }
@@ -164,7 +164,7 @@ export default class Upload extends React.Component {
           console.log(response);
           const files = response.result.items;
           console.log(response.result.items);
-    
+
           if (files && files.length > 0) {
             for (let i = 0; i < files.length; i++) {
               const file = files[i];

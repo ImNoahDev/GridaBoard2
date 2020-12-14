@@ -33,7 +33,10 @@ type Props = {
   viewFit?: ZoomFitEnum;
 
   onNcodePageChanged: (arg: IPageSOBP) => void;
-  onCanvasShapeChanged: (arg: { offsetX, offsetY, zoom }) => void;
+  onCanvasShapeChanged: (arg: { offsetX: number, offsetY: number, zoom: number }) => void;
+
+  /** canvas rotation, 0: portrait, 90: landscape */
+  rotation: number;
 }
 
 
@@ -99,18 +102,27 @@ export default class PenBasedRenderer extends React.Component<Props, State> {
   propsSize: { scale: number, width: number, height: number } = { scale: 1, width: 0, height: 0 };
   size: ISize = { width: 0, height: 0 };
 
+  mainDiv: HTMLDivElement = null;
+  canvasDiv: HTMLDivElement = null;
   canvasId = "";
-  canvasRef: React.RefObject<HTMLCanvasElement> = null;
-  myRef: React.RefObject<HTMLDivElement> = null;
+  canvas: HTMLCanvasElement = null;
 
   inkStorage: InkStorage = null;
   curr_pens: NeoSmartpen[] = new Array(0);
+  setDivRef = (div: HTMLDivElement) => {
+    this.canvasDiv = div;
+  };
+
+  setMainDivRef = (div: HTMLDivElement) => {
+    this.mainDiv = div;
+  };
+
+  setCanvasRef = (canvas: HTMLCanvasElement) => {
+    this.canvas = canvas;
+  }
 
   constructor(props: Props) {
     super(props);
-    // kitty
-    this.canvasRef = React.createRef();
-    this.myRef = React.createRef();
 
     const { pageInfo, inkStorage, scale, playState, width, height, pens, viewFit } = props;
     this.inkStorage = inkStorage ? inkStorage : InkStorage.getInstance();
@@ -162,8 +174,8 @@ export default class PenBasedRenderer extends React.Component<Props, State> {
     const { pens } = this.props;
     let { width, height } = this.propsSize;
 
-    const node = this.myRef.current;
-    if (node) {
+    if (this.mainDiv) {
+      const node = this.mainDiv;
       const parentHeight = node.offsetHeight;
       const parentWidth = node.offsetWidth;
 
@@ -202,6 +214,66 @@ export default class PenBasedRenderer extends React.Component<Props, State> {
   }
 
 
+  initRenderer(size: { width: number, height: number }) {
+    /** @type {{width:number, height:number}} */
+    const { width, height } = size;
+
+    // const rect = { x: 0, y: 0, width, height };
+    // const { rect } = this.state;
+    // const page = pages.filter((p) => p.pageNumber === pageId)[0];
+
+    // const inkStorage = this.inkStorage;
+    const options: IRenderWorkerOption = {
+      canvasId: this.canvasId,
+      canvas: this.canvas,
+      width,
+      height,
+      viewFit: this.state.viewFit,
+      onCanvasShapeChanged: this.props.onCanvasShapeChanged,
+      rotation: this.props.rotation,
+    };
+
+    const renderer = new PenBasedRenderWorker(options);
+    this.setState({ renderer: renderer });
+  }
+
+
+  resizeListener = (e) => {
+    this.setState({ sizeUpdate: this.state.sizeUpdate + 1 });
+
+    // const { classes, scaleType, scale } = this.props;
+
+    let { scale, width, height } = this.propsSize;
+
+    const node = this.mainDiv;
+
+    if (node) {
+      const parentHeight = node.offsetHeight;
+      const parentWidth = node.offsetWidth;
+
+      width = parentWidth;
+      height = parentHeight;
+
+      // console.log(`boundary check, Parent window (width, height) = (${parentWidth}, ${parentHeight})`);
+    }
+
+    // width = window.innerWidth;
+    // height = window.innerHeight;
+
+    const rect = { x: 0, y: 0, width, height };
+    // const { rect } = this.state;
+    // const { penEventCount } = this.state;
+    this.size = this.getSize(scale, rect);
+
+    if (this.state.renderer) {
+      // console.log("render resize", this.size)
+      this.state.renderer.resize(this.size);
+    }
+  };
+
+
+
+
   /**
    * @override
    * @public
@@ -230,6 +302,11 @@ export default class PenBasedRenderer extends React.Component<Props, State> {
       ret_val = true;
     }
 
+    if (nextProps.rotation !== this.props.rotation) {
+      this.state.renderer.setRotation(nextProps.rotation);
+      ret_val = false;
+    }
+
     return ret_val;
   }
 
@@ -251,48 +328,6 @@ export default class PenBasedRenderer extends React.Component<Props, State> {
   }
 
 
-  resizeListener = () => {
-    this.setState({ sizeUpdate: this.state.sizeUpdate + 1 });
-
-    // const { classes, scaleType, scale } = this.props;
-
-    const { scale, width, height } = this.propsSize;
-
-
-    const rect = { x: 0, y: 0, width, height };
-    // const { rect } = this.state;
-    // const { penEventCount } = this.state;
-    this.size = this.getSize(scale, rect);
-
-    if (this.state.renderer) {
-      // console.log("render resize", this.size)
-      this.state.renderer.resize(this.size);
-    }
-  };
-
-
-
-  initRenderer(size: { width: number, height: number }) {
-    /** @type {{width:number, height:number}} */
-    const { width, height } = size;
-
-    // const rect = { x: 0, y: 0, width, height };
-    // const { rect } = this.state;
-    // const page = pages.filter((p) => p.pageNumber === pageId)[0];
-
-    // const inkStorage = this.inkStorage;
-    const options: IRenderWorkerOption = {
-      canvasId: this.canvasId,
-      canvasRef: this.canvasRef,
-      width,
-      height,
-      viewFit: this.state.viewFit,
-      onCanvasShapeChanged: this.props.onCanvasShapeChanged,
-    };
-
-    const renderer = new PenBasedRenderWorker(options);
-    this.setState({ renderer: renderer });
-  }
 
 
 
@@ -408,6 +443,7 @@ export default class PenBasedRenderer extends React.Component<Props, State> {
     return size;
   };
 
+
   render() {
     // const { classes, scaleType, scale } = this.props;
     const { pens } = this.props;
@@ -429,15 +465,12 @@ export default class PenBasedRenderer extends React.Component<Props, State> {
     // const aWidth2 = document.body.scrollWidth;
     const aHeight = windowHeight;
 
+
     const statusBarHeight = 400;
 
     return (
-      <div id="replayContainer" ref={this.myRef} style={{ position: "relative" }}>
-        <div style={{
-          zIndex: 99,
-          display: "flex", flexDirection: "column",
-        }}>
-
+      <div id="replayContainer" ref={this.setMainDivRef} style={{ width: "100%", height: "100%" }}>
+        <div style={{ zIndex: 99, display: "flex", flexDirection: "column", }}>
           <div style={{
             height: statusBarHeight + "px",
             display: "flex", flexDirection: "column",
@@ -455,18 +488,17 @@ export default class PenBasedRenderer extends React.Component<Props, State> {
               PenBasedRenderer{section}.{owner}.{book}.{page}:{penEventCount}
             </div>
           </div>
-
         </div>
 
 
         <div style={{
-          zIndex: 5,
+          zIndex: 5, width: "100%", height: "100%",
           position: "relative",
           left: "0px",
           top: -statusBarHeight + "px",
-        }}>
+        }} ref={this.setDivRef}>
           {/* <Paper style={{ height: this.size.height, width: this.size.width }}> */}
-          <canvas id={this.canvasId} ref={this.canvasRef}
+          <canvas id={this.canvasId} ref={this.setCanvasRef}
             style={{
               width: width ? width : aWidth,
               height: height ? height : aHeight

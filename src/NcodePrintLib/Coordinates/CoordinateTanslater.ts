@@ -1,7 +1,7 @@
 import { IPoint } from "../DataStructure/Structures";
 import * as Solve from "./SolveTransform";
 import { TransformPoints, TransformPointPairs, TransformParameters, IMappingParams } from "./DataTypes";
-import { MappingItem } from "../SurfaceMapper/MappingItem";
+import { MappingItem } from "../SurfaceMapper";
 import { sprintf } from "sprintf-js";
 
 const solveAffine = Solve.solveAffine;
@@ -88,6 +88,7 @@ export default class CoordinateTanslater {
   // private _paramsReverse: TransformParameters = null;
 
   private _mappingParams: IMappingParams = null;
+  public name = "CoordinateTanslater";
 
   constructor(arg: CoordinateTanslater | IMappingParams = null) {
     if (arg) {

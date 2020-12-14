@@ -71,7 +71,7 @@ export type INcodePageArea = IPageSOBP & IPolygonArea;
 /**
  * 좌표계 매핑을 위한 PDF 페이지 주소
  */
-export type IPdfPageDesc = {
+export interface IPdfPageDesc {
   /** PDF url */
   url: string,
 
@@ -86,9 +86,32 @@ export type IPdfPageDesc = {
 
   /** pdf page number, starting from 1 */
   pageNo: number,
-};
+}
 
+export type IPdfMappingDesc = {
+  /** PDF url */
+  url: string,
 
+  /** for local file */
+  filename: string,
+
+  /** PDF fingerprint */
+  fingerprint: string,
+
+  /** POD id = fingerprint + "/" + pagesPerSheet */
+  id: string,
+
+  /** total pages in pdf file */
+  numPages: number,
+
+  /** NCode pageInfo of the 1st page (physical first page, not the printed first page) */
+  nPageStart?: IPageSOBP,
+
+  /** mapping 정보가 생성된 시각 */
+  timeString?: string,
+
+  params?: IMappingParams[],
+}
 
 
 /**

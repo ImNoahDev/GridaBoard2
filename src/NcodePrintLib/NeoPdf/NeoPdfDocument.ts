@@ -1,13 +1,13 @@
 import * as PdfJs from "pdfjs-dist";
-import { CoordinateTanslater, IPolygonArea } from "../Coordinates";
+import { CoordinateTanslater, IPdfMappingDesc, IPolygonArea } from "../Coordinates";
 import { stringToDpiNum, } from "../DataStructure/Structures";
-import { getDocumentId, } from "../NcodePrint";
 import { IPageOverview } from "../NcodePrint/PagesForPrint";
 import { ColorConvertMethod } from "../NcodeSurface/CanvasColorConverter";
 import { getNcodeAtCanvasPixel, getNcodeRectAtCanvasPixel, ICellsOnSheetDesc } from "../NcodeSurface/NcodeRasterizer";
-import { MappingItem } from "../SurfaceMapper/MappingItem";
-import MappingStorage from "../SurfaceMapper/MappingStorage";
+import { MappingItem, MappingStorage } from "../SurfaceMapper";
 import NeoPdfPage, { IPdfPageCanvasDesc, PDF_VIEWPORT_DESC } from "./NeoPdfPage";
+
+import * as Util from "../UtilFunc";
 
 PdfJs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${PdfJs.version}/pdf.worker.js`;
 const CMAP_URL = "./cmaps/";
@@ -20,24 +20,9 @@ export type IGetDocumentOptions = {
   cMapPacked?: boolean,
 }
 
-export type IPdfDocDesc = {
-  /** PDF url */
-  url: string,
-
-  /** PDF finger print */
-  fingerprint: string,
-
-  /** POD id = fingerprint + "/" + pagesPerSheet */
-  id: string,
-
-  /** total pages in pdf file */
-  numPages: number,
-};
-
-
-
-
 export default class NeoPdfDocument {
+  _mappingInfo: IPdfMappingDesc;
+
   _pdfDoc: PdfJs.PDFDocumentProxy = null;
 
   _ready: PdfJs.PDFLoadingTask<PdfJs.PDFDocumentProxy>;
@@ -171,7 +156,9 @@ export default class NeoPdfDocument {
   }
 
 
-  registerMappingItem = (pageImagesDesc: IPdfPageCanvasDesc[], ncodePlane: ICellsOnSheetDesc, assignNewCode: boolean) => {
+  generateMappingItems = (pageImagesDesc: IPdfPageCanvasDesc[], ncodePlane: ICellsOnSheetDesc, assignNewCode: boolean) => {
+    const array: CoordinateTanslater[] = [];
+
     for (let i = 0; i < ncodePlane.ncodeAreas.length; i++) {
       const desc = pageImagesDesc[i];
       const pdfRect = desc.drawnRect;
@@ -218,27 +205,25 @@ export default class NeoPdfDocument {
 
       const trans = new CoordinateTanslater();
       trans.calc(mapData);
-      const pageNo = desc.pdfPageInfo.pageNo;
-      const page = this.getPage(pageNo);
-      page.setTranslater(trans);
+      array.push(trans);
 
-      if (assignNewCode) {
-        const st = MappingStorage.getInstance();
-        st.register(trans);
+      // const pageNo = desc.pdfPageInfo.pageNo;
+      // const page = this.getPage(pageNo);
+      // page.setTranslater(trans);
 
-
-      }
+      // if (assignNewCode) {
+      //   const st = MappingStorage.getInstance();
+      //   st.register(trans);
+      // }
       // trans.dump(`[dump-${this._url}]-${i} `);
     }
 
-    if (assignNewCode) {
-      const st = MappingStorage.getInstance();
-      // st.dump("MAP");
-    }
+    return array;
+
   }
 
   setDocumentId = (pagesPerSheet: number) => {
-    this._id = getDocumentId(this._fingerprint, pagesPerSheet);
+    this._id = Util.makePdfId({ fingerprint: this._fingerprint, pagesPerSheet });
   }
 
   get id() {

@@ -70,8 +70,6 @@ export function ncodeToDisplayPixel(n: number): number {
   return n * CONST.NCODE_TO_INCH_SCALE * CONST.DISPLAY_DEFAULT_DPI * getDisplayRatio();
 }
 
-
-
 export function pdfSizeUnitToInch(n: number): number {
   // 72 DPI
   return n * CONST.PDF_SCALE_TO_INCH;

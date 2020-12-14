@@ -4,7 +4,7 @@ import { PageForPrint } from "./PageForPrint";
 import "./print.css";
 
 import { ISize } from "../DataStructure/Structures";
-import { IPrintOption } from "./PrintDataTypes";
+import { IPrintingEvent, IPrintOption } from "./PrintDataTypes";
 import NeoPdfDocument from "../NeoPdf/NeoPdfDocument";
 import { PDF_VIEWPORT_DESC } from "../NeoPdf/NeoPdfPage";
 
@@ -13,7 +13,7 @@ interface Props { // tslint:disable-line interface-over-type-literal
   pdf: NeoPdfDocument,
   shouldRenderPage: boolean,
   /** null이면 화면 전용 */
-  OnPagePrepared: Function,
+  OnPagePrepared: (event: IPrintingEvent) => void,
 
   printOption: IPrintOption,
 

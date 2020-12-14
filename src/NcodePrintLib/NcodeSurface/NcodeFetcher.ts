@@ -1,7 +1,9 @@
 import { IPageSOBP } from "../DataStructure/Structures";
 import * as Zlib from "zlib";
 import { INcodeSurfaceDesc } from "./SurfaceDataTypes";
-import { getNPaperInfo, isSamePage } from "./SurfaceInfo";
+import { getNPaperInfo } from "./SurfaceInfo";
+import * as Util from "../UtilFunc";
+import { makeNPageIdStr } from "../UtilFunc";
 
 
 /**
@@ -12,10 +14,17 @@ export default class NcodeFetcher {
   private fetchPromise: Promise<string> = Promise.resolve("");
   pageInfo: IPageSOBP;
 
+
   constructor(pageInfo: IPageSOBP) {
     this.pageInfo = pageInfo;
-    this.fetchPromise = this.fetchNcodeData(pageInfo);
-    this.fetchPromise.then(txt => this.codeText = txt);
+    console.log(`[fetch] CONSTRUCTOR, Download NCODE: ${makeNPageIdStr(pageInfo)}`);
+    const pr = this.fetchNcodeData(pageInfo);
+    this.fetchPromise = pr;
+
+    pr.then(txt => {
+      console.log(`[fetch] CONSTRUCTOR, Download completed: ${makeNPageIdStr(pageInfo)}`);
+      this.codeText = txt;
+    });
   }
 
 
@@ -26,23 +35,26 @@ export default class NcodeFetcher {
    */
   public getNcodeData = async (pageInfo: IPageSOBP): Promise<INcodeSurfaceDesc> => {
     // glyph text를 받아 온다.
-    if (isSamePage(this.pageInfo, pageInfo)) {
-      console.log("reuse downloaded glyph data file");
-      const txt = await this.fetchPromise;
-      this.codeText = txt;
+    let code_txt = "";
+    if (Util.isSamePage(this.pageInfo, pageInfo)) {
+      console.log(`[fetch] wait for: ${makeNPageIdStr(pageInfo)}`);
+      code_txt = await this.fetchPromise;
+      console.log(`[fetch] download completed: ${makeNPageIdStr(pageInfo)} len=${code_txt.length}`);
+      // this.codeText = txt;
     }
     else {
-      console.log("download glyph data file");
+      console.log(`[fetch] Download new NCODE: ${makeNPageIdStr(pageInfo)}`);
       const promise = this.fetchNcodeData(pageInfo);
       this.fetchPromise = promise;
-      const txt = await this.fetchPromise;
+      code_txt = await this.fetchPromise;
+      console.log(`[fetch] download NEW completed: ${makeNPageIdStr(pageInfo)} len=${code_txt.length}`);
 
       this.pageInfo = pageInfo;
-      this.codeText = txt;
+      // this.codeText = txt;
     }
 
     const result: INcodeSurfaceDesc = getNPaperInfo(pageInfo);
-    result.glyphData = this.codeText;
+    result.glyphData = code_txt;
 
     return result;
   }

@@ -1,6 +1,6 @@
-import { uuidv4 } from "../NcodePrint";
+import * as Util from "../UtilFunc";
 
-export const _uuid: string = uuidv4();
+export const _uuid: string = Util.uuidv4();
 const _fileInputId = _uuid;
 
 let _fileOpenPromise: Promise<IFileBrowserResult> = null;

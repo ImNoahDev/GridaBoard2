@@ -54,8 +54,8 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
 
 
   /**
-   * 
-   * @param options 
+   *
+   * @param options
    */
   constructor(options: IRenderWorkerOption) {
     super(options);
@@ -229,7 +229,7 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
         this.canvasFb.remove(path);
 
         const { section, book, owner, page } = stroke;
-        const pageId = InkStorage.getPageId({ section, book, owner, page });
+        const pageId = InkStorage.makeNPageIdStr({ section, book, owner, page });
 
         this.storage.completed = this.storage.completedOnPage.get(pageId)
         const idx = this.storage.completed.findIndex(ns => ns.key === path.key);
@@ -314,37 +314,13 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
   }
 
 
-  /**
-   *
-   * @param {number} section
-   * @param {number} owner
-   * @param {number} book
-   * @param {number} page
-   * @param {boolean} forceToRefresh
-   */
-  changePage = (section: number, owner: number, book: number, page: number, forceToRefresh: boolean) => {
-    console.log("changePage");
-    const currPage = this.surfaceInfo;
 
-    if ((!forceToRefresh)
-      && (section === currPage.section
-        && owner === currPage.owner
-        && book === currPage.book
-        && page === currPage.page)) return;
+  changePage = (section: number, owner: number, book: number, page: number, forceToRefresh: boolean): boolean => {
+    console.log("changePage WORKER");
+    if (!super.changePage(section, owner, book, page, forceToRefresh))
+      return false;
 
-
-    // 페이지 정보와 scale을 조정한다.
-    const info = paperInfo.getPaperInfo({ section, owner, book, page });
-    if (info) {
-      this.surfaceInfo = {
-        section, owner, book, page,
-        Xmin: info.Xmin, Ymin: info.Ymin, Xmax: info.Xmax, Ymax: info.Ymax,
-        Mag: info.Mag
-      };
-
-    }
     const szPaper = paperInfo.getPaperSize({ section, owner, book, page });
-    this.scale = this.calcScaleFactor(this.viewFit, szPaper, this.base_scale);
 
     // 현재 모든 stroke를 지운다.
     this.removeAllCanvasObject();
@@ -366,6 +342,8 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
 
     // page refresh
     this.canvasFb.requestRenderAll();
+
+    return true;
   }
 
   private generateDotForTest(x: number, y: number): NeoDot {

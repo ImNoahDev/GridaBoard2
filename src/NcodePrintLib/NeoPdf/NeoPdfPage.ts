@@ -1,11 +1,11 @@
 import * as PdfJs from "pdfjs-dist";
 import { CoordinateTanslater, IPdfPageDesc } from "../Coordinates";
 import { IRectDpi, } from "../DataStructure/Structures";
-import { uuidv4 } from "../NcodePrint";
-import { CanvasColorConverter } from "../NcodeSurface";
-import { ColorConvertMethod } from "../NcodeSurface/CanvasColorConverter";
+import CanvasColorConverter, { ColorConvertMethod } from "../NcodeSurface/CanvasColorConverter";
 import { PDF_DEFAULT_DPI } from "../NcodeSurface/NcodeConstans";
 import NeoPdfDocument from "./NeoPdfDocument";
+import * as Util from "../UtilFunc";
+
 export type PDF_VIEWPORT_DESC = PdfJs.ViewportParameters & PdfJs.PDFPageViewport;
 
 
@@ -90,7 +90,7 @@ export default class NeoPdfPage {
     const pageNo = this._pageNo;
     const scratchCanvas = document.createElement("canvas");
     const canvas = scratchCanvas;
-    const uuid = uuidv4();
+    const uuid = Util.uuidv4();
     canvas.id = `scratchCanvas-${pageNo}-${uuid}`;
 
     const page = this._pdfPage;

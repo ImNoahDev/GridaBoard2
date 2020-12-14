@@ -60,16 +60,16 @@ export default class NeoPdfViewer extends React.Component<Props, State> {
     loadingTask.promise.then(
       (pdf: PdfJs.PDFDocumentProxy) => {
         self.props.onReportPdfInfo(pdf);
-        // console.log(pdf);
         this.setState({ pdf });
         this.setState({ status: "loaded" });
 
-        console.log("pdf loaded");
+        // console.log("pdf loaded");
       });
   }
 
   shouldComponentUpdate(nextProps: Props, nextState: State) {
     if (nextProps.url !== this.props.url) {
+      this.setState({ status: "loading" });
       this.loadDocument(nextProps.url);
       return false;
     }

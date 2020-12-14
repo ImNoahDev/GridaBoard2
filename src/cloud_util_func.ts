@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 import { gapi } from 'gapi-script';
 import * as PdfJs from "pdfjs-dist";
-import MappingStorage from "./NcodePrintLib/SurfaceMapper/MappingStorage";
+import { MappingStorage } from "./NcodePrintLib/SurfaceMapper";
 
 const FOLDER_ID = "root";
 
@@ -40,10 +40,10 @@ export async function uploadMappingInfo(content) {
                 fileId: fileId,
                 alt: 'media'
               })
-        
+
               fileRequest.then(await function(response) {
                 const currentMappingObj = JSON.parse(response.body);
-                 
+
                 currentMappingObj.code.last = content.code.last;
                 currentMappingObj.code.next = content.code.next;
                 currentMappingObj.map = currentMappingObj.map.concat(content.map);
@@ -58,7 +58,7 @@ export async function uploadMappingInfo(content) {
               })
               isMappingFileExist = true;
               break;
-            } 
+            }
             if (!isMappingFileExist) {
               createNewMappingInfo(folderId, content);
             }
@@ -88,7 +88,7 @@ export async function updateMappingInfo(fileId, contentBlob, callback) {
 
 export async function createNewMappingInfo(folderId, content) {
   const mappingInfoObj = {
-    "code" : { 
+    "code" : {
       "last" : content.code.last,
       "next" : content.code.next,
     },
@@ -96,20 +96,20 @@ export async function createNewMappingInfo(folderId, content) {
   }
 
   const mappingInfoStr = JSON.stringify(mappingInfoObj);
-  
+
   const file = new Blob([mappingInfoStr], {type: 'text/plain'});
   const metadata = {
       'name': 'mappingInfo.json', // Filename at Google Drive
       'mimeType': 'application/json', // mimeType at Google Drive
       'parents': [folderId], // Folder ID at Google Drive
   };
-  
+
   const accessToken = gapi.auth.getToken().access_token; // Here gapi is used for retrieving the access token.
 
   const form = new FormData();
   form.append('metadata', new Blob([JSON.stringify(metadata)], {type: 'application/json'}));
   form.append('file', file);
-  
+
   const xhr = new XMLHttpRequest();
   xhr.open('post', 'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id');
   xhr.setRequestHeader('Authorization', 'Bearer ' + accessToken);
@@ -128,7 +128,7 @@ export async function createGridaFolder(content) {
       'method': 'POST',
       'headers': {
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer ' + access_token,             
+          'Authorization': 'Bearer ' + access_token,
       },
       'body':{
           "title" : "Grida",

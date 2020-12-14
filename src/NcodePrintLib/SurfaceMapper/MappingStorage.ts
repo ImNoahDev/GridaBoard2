@@ -1,14 +1,26 @@
-import { CoordinateTanslater, IMappingParams } from "../Coordinates";
+import { CoordinateTanslater, IMappingParams, IPdfMappingDesc } from "../Coordinates";
 import { INcodeSOBPxy, IPageSOBP } from "../DataStructure/Structures";
-import { isSamePage } from "../NcodeSurface";
+import PdfDocMapper from "./PdfDocMapper";
 import * as cloud_util_func from "../../cloud_util_func";
+import { g_defaultNcode } from "../DefaultOption";
+import { isSamePage } from "../../neosmartpen/utils/UtilsFunc";
+import * as Util from "../UtilFunc";
+import { isObject } from "util";
 
 let _instance: MappingStorage = null;
 const LOCAL_STORAGE_ID = "GridaBoard_codeMappingInfo_v2";
 
+type IMappingData = {
+  nextIssuable: IPageSOBP;
+  arrDocMap: IPdfMappingDesc[];
+}
+
 export default class MappingStorage {
-  _arrMapped: IMappingParams[] = [];
-  _nextIssuableNcode: IPageSOBP = { section: -1, owner: -1, book: -1, page: -1 };
+  _data: IMappingData = {
+    nextIssuable: { section: -1, owner: -1, book: -1, page: -1 },
+    arrDocMap: []
+  };
+
   _testStorage;
   private constructor() {
     if (_instance) return _instance;
@@ -22,34 +34,46 @@ export default class MappingStorage {
   }
 
 
-  public issueNcode = (nPagesNeeded:number ) : IPageSOBP[] => {
-    // this._nextIssuableNcode를 참조해서 
+  public issueNcode = (options: IPdfMappingDesc): IPdfMappingDesc => {
+    const { numPages } = options;
 
-    // 임시
-    const nextNcode: IPageSOBP = { section: -1, owner: -1, book: -1, page: -1 };
-    return [nextNcode];
+    // this._nextIssuableNcode를 참조해서
+    if (this._data.nextIssuable.section === -1) {
+      this._data.nextIssuable = { ...g_defaultNcode } as IPageSOBP;
+    }
+
+    const pages: IPageSOBP[] = [];
+    for (let i = 0; i < numPages; i++) {
+      const pi = Util.getNextNcodePage(this._data.nextIssuable, i);
+      pages.push(pi);
+    }
+
+    this._data.nextIssuable = { ...Util.getNextNcodePage(this._data.nextIssuable, numPages) };
+    options.nPageStart = pages[0];
+    return options;
   }
 
-  private getNowTimeStr = () => {
-    const now = new Date();
-    const timeStr =
-      `${addZeros(now.getFullYear(), 2)}/` +
-      `${addZeros(now.getMonth() + 1, 2)}/` +
-      `${addZeros(now.getDate(), 2)} ` +
-      `${addZeros(now.getHours(), 2)}:` +
-      `${addZeros(now.getMinutes(), 2)}:` +
-      `${addZeros(now.getSeconds(), 2)}.` +
-      `${addZeros(now.getMilliseconds(), 4)}`;
+  register = (mapper: PdfDocMapper) => {
+    mapper.makeSummary();
 
-    return timeStr;
-  }
-  register = (item: CoordinateTanslater) => {
-    const params = item.mappingParams;
+    const docMap: IPdfMappingDesc = Util.cloneObj(mapper.docMap);
+    docMap.timeString = Util.getNowTimeStr();
+    this._data.arrDocMap.push(docMap);
 
-    const timeStr = this.getNowTimeStr();
-    params.timeString = timeStr; // JSON.stringify(new Date());
-    this._arrMapped.push(params);
+    this.storeMappingInfo();
+
+    this.dump("mapping");
   }
+
+  clear = () => {
+    this._data = {
+      nextIssuable: { section: -1, owner: -1, book: -1, page: -1 },
+      arrDocMap: []
+    };
+    this.storeMappingInfo();
+    console.log("Mapping information cleared");
+  }
+
   public getCloudData() {
     cloud_util_func.readMappingInfo();
   }
@@ -60,23 +84,27 @@ export default class MappingStorage {
   }
   public saveOnCloud = () => {
 
-    const params = {"IMappingParams":{
-      timeString : "1111", 
-      pageInfo : {section : "1", book:"1", owner:"1", page:"1"}, 
-    }}
-    const params2 = {"IMappingParams" :{
-      timeString : "1111", 
-      pageInfo : {section : "1", book:"1", owner:"1", page:"2"}, 
-    }}
-    const lastCode = {section : "1", book:"1", owner:"1", page:"2"};
-    const nextCode = {section : "1", book:"1", owner:"1", page:"3"};
+    const params = {
+      "IMappingParams": {
+        timeString: "1111",
+        pageInfo: { section: "1", book: "1", owner: "1", page: "1" },
+      }
+    }
+    const params2 = {
+      "IMappingParams": {
+        timeString: "1111",
+        pageInfo: { section: "1", book: "1", owner: "1", page: "2" },
+      }
+    }
+    const lastCode = { section: "1", book: "1", owner: "1", page: "2" };
+    const nextCode = { section: "1", book: "1", owner: "1", page: "3" };
 
     const mappingInfoObj = {
-      "code" : { 
-        "last" : lastCode,
-        "next" : nextCode,
+      "code": {
+        "last": lastCode,
+        "next": nextCode,
       },
-      "map" : [params, params2]
+      "map": [params, params2]
     }
 
     cloud_util_func.uploadMappingInfo(mappingInfoObj);
@@ -98,37 +126,57 @@ export default class MappingStorage {
     //   }
     // }
 
+    const found = this._data.arrDocMap.find(m => Util.isPageInRange(ncodeXy, m.nPageStart, m.numPages));
+    if (found) {
+      /** 원래는 폴리곤에 속했는지 점검해야 하지만, 현재는 같은 페이지인지만 점검한다  2020/12/06 */
+      const pageMap = found.params.find(param => isSamePage(ncodeXy, param.pageInfo));
+      return pageMap;
+    }
 
-    /** 원래는 폴리곤에 속했는지 점검해야 하지만, 현재는 같은 페이지인지만 점검한다  2020/12/06 */
-    const found = this._arrMapped.find(trans => isSamePage(ncodeXy, trans.pageInfo));
-    return found;
+    return undefined;
   }
 
   /**
    * Ncode가 발행된 적이 있는지를 점검하기 위해서 쓰인다.
    */
-  findMappedNcode = (pdfId: string) => {
-    const found = this._arrMapped.find(trans => pdfId === trans.pdfDesc.id);
-    return found;
+  findNcodeRange = (pdfId: string) => {
+    const found = this._data.arrDocMap.find(m => pdfId === m.id);
+    if (found) {
+      return found;
+    }
+    // const found = this._arrMapped.find(trans => pdfId === trans.pdfDesc.id);
+    return undefined;
   }
 
   dump = (prefix: string) => {
-    console.log(`[${prefix}]----------------------------------------------------------------------`);
-    const str = JSON.stringify(this._arrMapped, null, "  ");
+    console.log(`[${prefix}]==============================================================================================================================`);
+    this.dumpJson(prefix, this._data.nextIssuable);
+    console.log(`[${prefix}]..............................................................................................................................`);
+
+    for (let i = 0; i < this._data.arrDocMap.length; i++) {
+      const item = this._data.arrDocMap[i];
+      const clone = Util.cloneObj(item);
+      clone.params = null;
+      this.dumpJson(prefix, clone);
+      console.log(`[${prefix}]..............................................................................................................................`);
+    }
+    console.log(`[${prefix}]==============================================================================================================================`);
+  }
+
+  dumpJson = (prefix: string, obj) => {
+    const str = JSON.stringify(obj, null, "  ");
     const arr = str.split("\n");
 
     for (let i = 0; i < arr.length; i++) {
       console.log(`[${prefix}] ${arr[i]}`);
     }
-    console.log(`[${prefix}]----------------------------------------------------------------------`);
   }
-
 
 
   storeMappingInfo = () => {
     if (storageAvailable("localStorage")) {
       const key = LOCAL_STORAGE_ID;
-      const value = JSON.stringify(this._arrMapped);
+      const value = JSON.stringify(this._data);
       // console.log(`Pdf Ncode Info Saved   ${key}: ${value}`);
       localStorage.setItem(key, value);
 
@@ -150,14 +198,15 @@ export default class MappingStorage {
       const value = localStorage.getItem(key);
 
       if (value) {
-        this._arrMapped = JSON.parse(value);
+        this._data = JSON.parse(value);
 
-        this._arrMapped.sort(function (a, b) {
+        this._data.arrDocMap.sort(function (a, b) {
           if (a.timeString < b.timeString) return 1;
           else if (a.timeString > b.timeString) return -1;
           else return 0;
         });
 
+        this.dump("loading");
         // const debug = JSON.stringify(this._arrMapped);
         // console.log(`Pdf Ncode Info Loaded   ${key}: ${debug}`);
         return true;
@@ -197,14 +246,30 @@ function storageAvailable(type) {
 }
 
 
-function addZeros(num, digit) {
-  // 자릿수 맞춰주기
-  let zero = "";
-  num = num.toString();
-  if (num.length < digit) {
-    for (let i = 0; i < digit - num.length; i++) {
-      zero += "0";
-    }
-  }
-  return zero + num;
-}
+// https://www.bsidesoft.com/1426 , [js] localStorage 키별 용량 제약 처리
+// 이것 참고해서 더 수정할 것
+
+(function () {
+  const instance = MappingStorage.getInstance();
+  instance.loadMappingInfo();
+
+  // https://developer.chrome.com/docs/apps/offline_storage/#query ==> enter
+
+  // https://stackoverflow.com/questions/26257183/detecting-available-storage-with-indexeddb/38905723#38905723 ==> right!
+  // https://storage.spec.whatwg.org/#dom-storagemanager-estimate ==> this one, also.
+  navigator.storage.estimate().then((data) => {
+    console.log(data);
+  }); // Object { quota: 2147483648, usage: 0 }
+
+  // navigator.webkitTemporaryStorage.queryUsageAndQuota(
+  //   function (usedBytes, grantedBytes) {
+  //     console.log('we are using ', usedBytes, ' of ', grantedBytes, 'bytes');
+  //   },
+  //   function (e) { console.log('Error', e); }
+  // );
+
+})();
+
+
+
+

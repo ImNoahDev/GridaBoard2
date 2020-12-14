@@ -89,5 +89,15 @@ export const LandscapeOrientation = (props: { size?: string }) => {
 }
 
 
+export const ForceOverflow = (props: { overflow: "visible" | "hidden" }) => {
+  return (
+    <style type="text/css">
+      { " html, body" +
+        "{" +
+            "overflow: "} {props.overflow} {";" +
+        "}"};
+    </style>
+  );
+}
 
 export default PageOrientation;
