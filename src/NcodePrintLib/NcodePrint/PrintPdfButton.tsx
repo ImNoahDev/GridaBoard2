@@ -1,5 +1,5 @@
 import React from "react";
-import { Button, } from "@material-ui/core";
+import { Button, ButtonProps, } from "@material-ui/core";
 
 import { PrintPdfMain } from "./PrintPdfMain";
 import { IPrintingReport, IPrintOption, } from "./PrintDataTypes";
@@ -13,38 +13,26 @@ import { MappingStorage, PdfDocMapper } from "../SurfaceMapper";
 
 import * as Util from "../UtilFunc";
 import { diffPropsAndState } from "../UtilFunc";
+import { g_defaultPrintOption } from "../DefaultOption";
+import ProgressDialog from "./ProgressDialog";
 
 // PdfJs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${PdfJs.version}/pdf.worker.js`;
 // var CMAP_URL = "./cmaps/";
 // var CMAP_PACKED = true;
 
-export interface IPrintPdfButtonProps {
+export interface IPrintPdfButtonProps extends ButtonProps {
   /** 인쇄될 문서의 url, printOption.url로 들어간다. */
   url: string,
   filename: string,
 
   /** 인쇄 준비 상태를 업데이트하는 콜백 함수 */
-  reportProgress: (arg: IPrintingReport) => void,
+  reportProgress?: (arg: IPrintingReport) => void,
 
   /** 기본값의 IPrintOption을 받아서, dialog를 처리하고 다시 돌려주는 콜백 함수 */
-  printOptionCallback: (arg: IPrintOption) => IPrintOption,
+  printOptionCallback?: (arg: IPrintOption) => IPrintOption,
 
   /** 초기 인쇄 옵션, 다이얼로그가 떠서, 이걸 세팅해도 좋고, printOptionCallback에서 처리해도 좋다 */
-  printOption: IPrintOption,
-
-  /** 버튼과 관련된 properties, 상속 받은 것으로 해야하는데... 2020/12/10 */
-  children?: React.ReactNode;
-  color?: any;
-  disabled?: boolean;
-  disableElevation?: boolean;
-  disableFocusRipple?: boolean;
-  endIcon?: React.ReactNode;
-  fullWidth?: boolean;
-  href?: string;
-  size?: 'small' | 'medium' | 'large';
-  startIcon?: React.ReactNode;
-  id?: string;
-  variant?: 'text' | 'outlined' | 'contained';
+  printOption?: IPrintOption,
 }
 
 
@@ -56,24 +44,9 @@ interface State {
   pdf: NeoPdfDocument,
   printTrigger: number,
   /** 여기까지 */
+  status: "ready" | "printing" | "prepared" | "progress" | "completed",
 
-  /** Sample 코드를 위한 것 */
-  numTotalPages: number,
-
-  /** 인쇄 준비된 페이지 수 */
-  numPagesPrepared: number,
-  /** 인쇄 준비된 종이 장 수 */
-  numSheetsPrepared: number,
-
-  /** 세부 단계 */
-  completion: number,
-
-  /** 인쇄되는 종이 장 수 */
-  numSheetsToPrint: number,
-  /** 인쇄 대상 페이지 수 */
-  numPagesToPrint: number,
-
-  status: string,
+  progressPercent: number,
 }
 
 /**
@@ -92,15 +65,9 @@ export default class PrintPdfButton extends React.Component<IPrintPdfButtonProps
     // scale: 1.0,
     printTrigger: 0,
 
-    /** Sample 코드를 위한 것 */
-    numTotalPages: 0,
-    numPagesPrepared: 0,
-    numSheetsPrepared: 0,
-    completion: 0,
-    numSheetsToPrint: 0,
-    numPagesToPrint: 0,
-
     status: "ready",
+
+    progressPercent: 0,
   };
 
   // numPages: number = 0;
@@ -110,23 +77,27 @@ export default class PrintPdfButton extends React.Component<IPrintPdfButtonProps
 
   pagesOverview: IPageOverview[];
 
-  // printStatus = {
-  //   /** Sample 코드를 위한 것 */
-  //   numTotalPages: 0,
+  printStatus = {
+    /** Sample 코드를 위한 것 */
+    numTotalPages: 0,
 
-  //   /** 인쇄 준비된 페이지 수 */
-  //   numPagesPrepared: 0,
-  //   /** 인쇄 준비된 종이 장 수 */
-  //   numSheetsPrepared: 0,
+    /** 인쇄 준비된 페이지 수 */
+    numPagesPrepared: 0,
+    /** 인쇄 준비된 종이 장 수 */
+    numSheetsPrepared: 0,
 
-  //   /** 세부 단계 */
-  //   completion: 0,
+    /** 세부 단계 */
+    totalCompletion: 0,
 
-  //   /** 인쇄되는 종이 장 수 */
-  //   numSheetsToPrint: 0,
-  //   /** 인쇄 대상 페이지 수 */
-  //   numPagesToPrint: 0,
-  // }
+    /** 인쇄되는 종이 장 수 */
+    numSheetsToPrint: 0,
+
+    /** 인쇄 대상 페이지 수 */
+    numPagesToPrint: 0,
+
+    /** 인쇄 과정의 카운트, 프로그레스에서 쓰려고 */
+    numEventCount: 0,
+  }
 
   fileInfoBuffer = {
     url: false,
@@ -136,7 +107,12 @@ export default class PrintPdfButton extends React.Component<IPrintPdfButtonProps
   constructor(props: IPrintPdfButtonProps) {
     super(props);
     const { printOption } = props;
-    if (printOption) this.printOption = { ...printOption };
+    if (printOption) {
+      this.printOption = Util.cloneObj(printOption);
+    }
+    else {
+      this.printOption = Util.cloneObj(g_defaultPrintOption);
+    }
   }
 
   componentDidMount() {
@@ -185,41 +161,17 @@ export default class PrintPdfButton extends React.Component<IPrintPdfButtonProps
 
 
   resetPrintStatus = () => {
-    this.setState({
-      /** Sample 코드를 위한 것 */
+    this.printStatus = {
       numTotalPages: 0,
-
-      /** 인쇄 준비된 페이지 수 */
       numPagesPrepared: 0,
-      /** 인쇄 준비된 종이 장 수 */
       numSheetsPrepared: 0,
-
-      /** 세부 단계 */
-      completion: 0,
-
-      /** 인쇄되는 종이 장 수 */
+      totalCompletion: 0,
       numSheetsToPrint: 0,
-      /** 인쇄 대상 페이지 수 */
       numPagesToPrint: 0,
-    });
+      numEventCount: 0
+    };
 
-    // this.printStatus = {
-    //   /** Sample 코드를 위한 것 */
-    //   numTotalPages: 0,
-
-    //   /** 인쇄 준비된 페이지 수 */
-    //   numPagesPrepared: 0,
-    //   /** 인쇄 준비된 종이 장 수 */
-    //   numSheetsPrepared: 0,
-
-    //   /** 세부 단계 */
-    //   completion: 0,
-
-    //   /** 인쇄되는 종이 장 수 */
-    //   numSheetsToPrint: 0,
-    //   /** 인쇄 대상 페이지 수 */
-    //   numPagesToPrint: 0,
-    // };
+    this.setState({ progressPercent: 0 });
   }
 
   /**
@@ -262,6 +214,8 @@ export default class PrintPdfButton extends React.Component<IPrintPdfButtonProps
   }
 
   loadPdf = (url: string, filename: string) => {
+    if (url === undefined) return;
+
     const loadingPromise = NeoPdfManager.getDocument({ url });
     // console.log(`[yyy] `);
     // console.log(`[yyy] LOAIND: ${url}`);
@@ -279,11 +233,11 @@ export default class PrintPdfButton extends React.Component<IPrintPdfButtonProps
         await this.setPageOverview(pdf);
 
 
-        // this.printStatus = {
-        //   ...this.printStatus,
-        //   numTotalPages
-        // }
-        this.setState({ pdf, numTotalPages });
+        this.printStatus = {
+          ...this.printStatus,
+          numTotalPages
+        }
+        this.setState({ pdf });
       });
 
   }
@@ -376,6 +330,7 @@ export default class PrintPdfButton extends React.Component<IPrintPdfButtonProps
     if (this.state.status === "printing") return;
 
     this.resetPrintStatus();
+    this.printOption.progressCallback = this.progressCallback;
 
     /** PrintPdfMain의 printTrigger를 +1 해 주면, 인쇄가 시작된다.*/
     const { printTrigger, pdf } = this.state;
@@ -402,43 +357,59 @@ export default class PrintPdfButton extends React.Component<IPrintPdfButtonProps
     const numPagesToPrint = targetPages.length;
     const numSheetsToPrint = Math.ceil(numPagesToPrint / pagesPerSheet);
 
-    // this.printStatus = {
-    //   ...this.printStatus,
-    //   numPagesPrepared: 0,
-    //   numSheetsPrepared: 0,
-    //   completion: 0,
-    //   numSheetsToPrint,
-    //   numPagesToPrint,
-    // };
+    this.printStatus = {
+      ...this.printStatus,
+      numPagesPrepared: 0,
+      numSheetsPrepared: 0,
+      totalCompletion: 0,
+      numSheetsToPrint,
+      numPagesToPrint,
+    };
 
     this.setState({
       printTrigger: printTrigger + 1,
       status: "printing",
-      numPagesPrepared: 0,
-      numSheetsPrepared: 0,
-      completion: 0,
-      numSheetsToPrint,
-      numPagesToPrint,
     });
   }
 
+  progressCallback = (event?: { status: string }) => {
+    /** Event 카운트를 증가 */
+    this.printStatus.numEventCount++;
+    const { targetPages, pagesPerSheet } = this.printOption;
+    const numPages = targetPages.length;
+    const numSheets = Math.ceil(numPages / pagesPerSheet);
+
+    const maxCount = (numPages * 4) + (numSheets * 4);
+    const progressPercent = (this.printStatus.numEventCount / maxCount) * 100;
+
+    if (event && event.status === "completed") {
+      console.log(`[COUNT] count=${this.printStatus.numEventCount - 1}/${maxCount} numPages=${numPages} numSheets=${numSheets}`);
+      this.setState({ progressPercent: 100 });
+    }
+    else {
+      this.setState({ progressPercent });
+    }
+  }
+
+
   updatePrintProgress = (event: IPrintingReport) => {
-    const { preparedPages, numSheetsPrepared, completion } = event;
+    const { preparedPages, numSheetsPrepared, pageCompletion, totalCompletion } = event;
     const numPagesPrepared = preparedPages.length;
 
-    // this.printStatus = {
-    //   ...this.printStatus,
-    //   numPagesPrepared,
-    //   numSheetsPrepared,
-    //   completion,
-    // };
-
-    this.setState({
+    this.printStatus = {
+      ...this.printStatus,
       numPagesPrepared,
       numSheetsPrepared,
-      completion,
-    });
+      totalCompletion,
+    };
 
+    console.log(`[PRINTING] ${totalCompletion}`);
+    if (totalCompletion > 99) {
+      this.setState({
+        status: "prepared",
+        progressPercent: 100,
+      });
+    }
 
     if (this.props.reportProgress) {
       this.props.reportProgress({
@@ -447,7 +418,8 @@ export default class PrintPdfButton extends React.Component<IPrintPdfButtonProps
         numPagesToPrint: this.printOption.targetPages.length,
         numPagesPrepared,
         numSheetsPrepared,
-        completion,
+        pageCompletion,
+        totalCompletion,
       })
     }
   }
@@ -470,21 +442,25 @@ export default class PrintPdfButton extends React.Component<IPrintPdfButtonProps
     if (this.props.reportProgress) {
       this.props.reportProgress({
         status: "completed",
-        completion: 100,
+        totalCompletion: 100,
       })
     }
   }
 
+  onCancelPrint = () => {
+    console.log( "cancel")
+  }
 
   render() {
-    const { pdf, printTrigger } = this.state;
+    const { pdf, printTrigger, status } = this.state;
     const filename = this.props.filename;
 
+    const nowPrinting = status === "printing" || status === "progress" || status === "prepared";
     return (
       <div className="pdf-context">
-        <Button {...this.props} onClick={this.startPrint}>
+        <button {...this.props} onClick={this.startPrint} >
           {this.props.children}
-        </Button>
+        </button>
 
         { pdf ?
           <PrintPdfMain
@@ -496,6 +472,11 @@ export default class PrintPdfButton extends React.Component<IPrintPdfButtonProps
             onAfterPrint={this.onAfterPrint}
             updatePrintProgress={this.updatePrintProgress} />
           : ""}
+
+        <ProgressDialog
+          progress={this.state.progressPercent}
+          open={nowPrinting}
+          cancelCallback={this.onCancelPrint} />
         <hr />
       </div>
     );

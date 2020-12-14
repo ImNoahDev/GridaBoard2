@@ -16,7 +16,7 @@ const PdfFileTooltip = withStyles((theme: Theme) => ({
 }))(Tooltip);
 
 type Props = {
-  onFileOpen: (event:IFileBrowserReturn) => void,
+  onFileOpen: (event: IFileBrowserReturn) => void,
 
   children?: React.ReactNode;
   color?: any;
@@ -81,6 +81,7 @@ const FileBrowserButton = (props: Props) => {
         </PdfFileTooltip>
         {props.children}
       </button>
+
       <input type="file" id={_uuid}
         onChange={onSuccess}
         onClick={onOpenClicked}

@@ -46,7 +46,8 @@ export default class NeoPdfViewer extends React.Component<Props, State> {
 
   loadDocument = (url: string) => {
     // const { documentZoom } = this.state;
-
+    if (url === undefined) return;
+    
     const loadingTask = PdfJs.getDocument({
       url,
       cMapUrl: CMAP_URL,

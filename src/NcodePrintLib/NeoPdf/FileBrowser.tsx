@@ -96,7 +96,7 @@ function handleFocusBack(e) {
       console.log('Cancel clicked');
       _resolveFunc("");
     }
-  }, 300);
+  }, 500);
 
   document.body.onfocus = null;
   // window.removeEventListener('focus', handleFocusBack);

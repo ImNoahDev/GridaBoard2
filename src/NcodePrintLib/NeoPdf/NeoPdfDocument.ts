@@ -8,6 +8,7 @@ import { MappingItem, MappingStorage } from "../SurfaceMapper";
 import NeoPdfPage, { IPdfPageCanvasDesc, PDF_VIEWPORT_DESC } from "./NeoPdfPage";
 
 import * as Util from "../UtilFunc";
+import { IPrintOption } from "../NcodePrint/PrintDataTypes";
 
 PdfJs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${PdfJs.version}/pdf.worker.js`;
 const CMAP_URL = "./cmaps/";
@@ -120,16 +121,22 @@ export default class NeoPdfDocument {
     return this._pdfDoc.getMetadata();
   }
 
-  public renderPages_dpi = async (pageNums: number[], dpi: number, colorConvertMode: ColorConvertMethod, luminanceMaxRatio: number)
+  public renderPages_dpi = async (pageNums: number[], dpi: number, printOption: IPrintOption)
     : Promise<IPdfPageCanvasDesc[]> => {
+    const { colorMode, luminanceMaxRatio } = printOption;
     const pdfDpi = dpi;
 
     const promises: Promise<IPdfPageCanvasDesc>[] = [];
     for (let i = 0; i < pageNums.length; i++) {
       const pageNo = pageNums[i];
       const neoPage = await this.getPageAsync(pageNo);
+      if (printOption.progressCallback) printOption.progressCallback();
+
       const pr = neoPage.render_dpi(i, pdfDpi).then(async (canvasDesc) => {
-        return await neoPage.convertColor(canvasDesc, colorConvertMode, luminanceMaxRatio);
+        const convertResult = await neoPage.convertColor(canvasDesc, colorMode, luminanceMaxRatio);
+        if (printOption.progressCallback) printOption.progressCallback();
+        
+        return convertResult;
       })
       promises.push(pr);
     }

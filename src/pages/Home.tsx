@@ -51,6 +51,9 @@ import {
 import ClearLocalMappingButton from "../NcodePrintLib/Buttons/ClearLocalMappingButton";
 import { g_debugFilename, g_debugURL } from "../NcodePrintLib/DefaultOption";
 
+import { connect, useSelector } from "react-redux";
+import { setUrlAndFilename } from "../store/reducers/activePdfReducer";
+
 // const PDF_URL = "./A4_Pirates-of-the-Caribbean-Hes-a-Pirate-Klaus-Badelt.pdf";
 const PDF_URL = g_debugURL;
 const PDF_FILENAME = g_debugFilename;
@@ -132,9 +135,30 @@ const Home = () => {
   const pageRef: React.RefObject<MixedPageView> = useRef();
   const [num_pens, setNumPens] = useState(0);
   const [pens, setPens] = useState(new Array(0));
-  const [pdfUrl, setUrl] = useState(PDF_URL);
-  const [pdfFilename, setFilename] = useState(PDF_FILENAME);
   const [isRotate, setRotate] = useState();
+
+
+  // 이 함수에서 pdf를 연다
+  const onFileOpen = async (event: IFileBrowserReturn) => {
+    console.log(event.url)
+    if (event.result === "success") {
+      await setUrlAndFilename(event.url, event.fileDesc.name);
+      // setUrl(event.url);
+      // setFilename(event.fileDesc.name);
+    }
+  };
+
+  // const [pdfUrl, setUrl] = useState(PDF_URL);
+  // const [pdfFilename, setFilename] = useState(PDF_FILENAME);
+  const pdfUrl = useSelector((state) => {
+    console.log(state.pdfInfo);
+    return state.pdfInfo.url;
+  });
+  const pdfFilename = useSelector((state) => {
+    console.log(state.pdfInfo);
+    return state.pdfInfo.filename;
+  });
+
 
   const onPenLinkChanged = e => {
     const pen = e.pen;
@@ -170,14 +194,6 @@ const Home = () => {
 
 
 
-  // 이 함수에서 pdf를 연다
-  const onFileOpen = (event: IFileBrowserReturn) => {
-    console.log(event.url)
-    if (event.result === "success") {
-      setUrl(event.url);
-      setFilename(event.fileDesc.name);
-    }
-  };
 
 
   // 여기서 인쇄의 실행 정도 퍼센트를 표시하도록 한다
@@ -187,7 +203,7 @@ const Home = () => {
     console.log(arg.status);
     console.log(`Pages prepared : ${arg.numPagesPrepared} / ${numPagesToPrint}`);
     console.log(`Sheets prepared : ${arg.numSheetsPrepared}`);
-    console.log(`Completed percent : ${arg.completion}%`);
+    console.log(`Completed percent : ${arg.totalCompletion}%`);
   };
 
 
@@ -231,6 +247,9 @@ const Home = () => {
   } as React.CSSProperties;
 
   const printBtnId = "printTestButton";
+
+
+
 
   return (
     <div>
@@ -324,7 +343,7 @@ const Home = () => {
           <div id="navbar_center">
             <div className="navbar-menu d-flex justify-content-center align-items-center neo_shadow">
               <PageNumbering />
-              <PrintButton targetId={printBtnId} />
+              <PrintButton targetId={printBtnId} url={pdfUrl} filename={pdfFilename} />
               <FileBrowserButton onFileOpen={onFileOpen} />
             </div>
           </div>
@@ -387,5 +406,21 @@ const Home = () => {
     </div >
   );
 };
+
+
+// const mapStateToProps = (state) => {
+//   const ret = {
+//     fil: state.pdfInfo.filename,
+//   };
+//   return ret;
+// };
+
+// const mapDispatchToProps = (dispatch) => ({
+//   increment: () => dispatch(incrementAction()),
+//   decrement: () => dispatch(decrementAction())
+// });
+
+
+// export default connect(mapStateToProps)(Home);
 
 export default Home;

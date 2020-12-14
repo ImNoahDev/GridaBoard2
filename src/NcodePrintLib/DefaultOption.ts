@@ -56,7 +56,7 @@ export const g_defaultPrintOption: IPrintOption = {
 
 
 
-  debugMode: 1
+  debugMode: 0
 };
 
 export const g_defaultNcode: IPageSOBP = {

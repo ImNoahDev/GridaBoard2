@@ -190,7 +190,7 @@ export default class NcodeRasterizer {
    * @param numItems
    * @param srcDirection
    */
-  public prepareNcodePlane = async (options: IPrepareSurfaceParam): Promise<ICellsOnSheetDesc> => {
+  public prepareNcodePlane = async (options: IPrepareSurfaceParam ): Promise<ICellsOnSheetDesc> => {
     const { padding, drawFrame, drawMarkRatio, drawCalibrationMark, mediaSize, srcDirection, numItems, pageInfos, hasToPutNcode } = options;
     let dpi = options.dpi;
     dpi = 600;  // kitty  2020/11/29, 코드 제네레이터는 600 dpi로 고정
@@ -261,6 +261,7 @@ export default class NcodeRasterizer {
         const fetcher = NcodeFetcherPool.getInstance();
         // const fetcher = new NcodeFetcher(pageInfo);
         const ncodeSurfaceDesc = await fetcher.getNcodeData(pageInfos[i]);
+        if (this.printOption.progressCallback) this.printOption.progressCallback();
 
         // (left, top) margin을 세팅
         if (this.printOption.marginLeft_nu === -1) {
@@ -276,6 +277,8 @@ export default class NcodeRasterizer {
         // ctx.lineWidth = 70;
         // ctx.strokeRect(0, 0, canvas.width, canvas.height);
         const ncodeArea = await this.drawNcode(drawingContext, ncodeSurfaceDesc, dpi);
+        if (this.printOption.progressCallback) this.printOption.progressCallback();
+
         console.log(`[mapping] push Page Info = ${makeNPageIdStr(ncodeSurfaceDesc.pageInfo)}`);
         ncodeAreas.push(ncodeArea);
 

@@ -36,11 +36,12 @@ export interface IPrintingReport {
   numSheetsPrepared?: number,
 
   /** 100 = 100% */
-  completion?: number,
+  pageCompletion?: number,
 
   /** 인쇄할 당시의 인쇄 옵션 */
   printOption?: IPrintOption,
 
+  totalCompletion: number,
 }
 
 
@@ -110,6 +111,22 @@ export interface IPrintOption {
   padding: number,     // mm 단위
 
   pdfMappingDesc?: IPdfMappingDesc;
+
+  /**
+   * 인쇄할 페이지에서 4씩 카운트가 증가되는 call back,
+   * 100% = (numPages * 4) +(numSheets * 3)
+   * 
+   * 
+   * 이 카운트를 받아서, 누적한 값을 countAcc라고 하면,
+   * 
+   *  const { targetPages, pagesPerSheet } = this.printOption;
+   *  const numPages = targetPages.length;
+   *  const numSheets = Math.ceil(numPages / pagesPerSheet);
+   *  const maxCount = (numPages * 4) + (numSheets * 3);
+   *  const progressPercent = (countAcc / maxCount)*100;
+   * 
+   **/
+  progressCallback?: (event?: { status: string }) => void;
 }
 
 /**

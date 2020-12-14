@@ -41,7 +41,7 @@ interface State {
  * Class
  */
 export class PrintPdfMain extends React.Component<Props, State> {
-  componentRef: PagesForPrint | null = null;
+  componentRef = null;
   printRef: ReactToPrint;
   onAfterPrint: Function;
 
@@ -154,6 +154,7 @@ export class PrintPdfMain extends React.Component<Props, State> {
       this.renderedPages.push(...pageNums);
     }
     const numCompleted = Object.keys(this.renderedSheets).length;
+    const numSheets = Math.ceil(targetPages.length / pagesPerSheet);
 
     /**callback을 불러준다 */
     if (this.props.updatePrintProgress) {
@@ -162,13 +163,14 @@ export class PrintPdfMain extends React.Component<Props, State> {
         preparedPages: [...this.renderedPages],
         numPagesPrepared: this.renderedPages.length,
         numSheetsPrepared: numCompleted,
-        completion,
+        pageCompletion: completion,
+        totalCompletion: (numCompleted / numSheets) * 100,
+        printOption: this.props.printOption,
       }
       this.props.updatePrintProgress(event);
     }
 
     /** 모든 페이지의 렌더링이 끝났는지 확인한다.  */
-    const numSheets = Math.ceil(targetPages.length / pagesPerSheet);
     const pageNo = targetPages[sheetIndex];
 
     // const numPages = endPage - startPage + 1;
@@ -182,7 +184,7 @@ export class PrintPdfMain extends React.Component<Props, State> {
 
 
 
-  setComponentRef = (ref: PagesForPrint) => {
+  setComponentRef = (ref: any) => {
     this.componentRef = ref;
   }
 
@@ -242,6 +244,11 @@ export class PrintPdfMain extends React.Component<Props, State> {
    */
   startPrintOnRenderCompleted = () => {
     if (this.printRef) {
+      const printOption = this.props.printOption;
+      if (printOption.progressCallback) {
+        printOption.progressCallback({ status: "completed" });
+      }
+
       this.printRef.handlePrint();
       this.setState({
         text: "Print started",
@@ -285,14 +292,17 @@ export class PrintPdfMain extends React.Component<Props, State> {
               // trigger={this.reactToPrintTrigger}
               />
 
-              <PagesForPrint ref={this.setComponentRef} text={this.state.text}
+              {/* <div  style={{ position: "relative", left: "0px", top: "0px", overflow: "visible" }}> */}
+              <PagesForPrint text={this.state.text}
                 // key={`print-${pdf.fingerprint}-${globalPagesCnt}`}
+                ref={this.setComponentRef}
                 pdf={pdf}
                 pagesOverview={pagesOverview}
                 shouldRenderPage={shouldRenderPage}
                 OnPagePrepared={this.OnPagePrepared}
                 printOption={printOption}
               />
+              {/* </div> */}
             </div>
           ) : (<></>)
         }

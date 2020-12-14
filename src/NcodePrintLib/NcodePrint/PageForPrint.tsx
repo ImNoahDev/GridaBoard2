@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 
-import "./print.css";
 import * as PdfJs from 'pdfjs-dist';
 import { IPageSOBP, ISize, ICssSize, IRectDpi, } from '../DataStructure/Structures';
 import NcodeRasterizer, { IPagesPerSheetNumbers, IPrepareSurfaceParam, drawArrow, IAreasDesc, } from "../NcodeSurface/NcodeRasterizer";
@@ -158,8 +157,10 @@ export class PageForPrint extends Component<Props, State> {
 
     // 분할된 Ncode plane을 준비
     const ncodePlane = await this.prepareSplittedNcodePlane(pageNums, printOption);
+    if (printOption.progressCallback) printOption.progressCallback();
+
+
     const { canvas: codeCanvas, canvasAreas, } = ncodePlane;
-    this.reportProgress({ sheetIndex, pageNums, completion: 50 });
 
     // main canvas를 준비
     const mainCanvas = this.canvas;
@@ -172,14 +173,14 @@ export class PageForPrint extends Component<Props, State> {
 
     // main canvas에 PDF 이미지를 조합
     pageImagesDesc = this.putPdfPageImagesOnMainCanvas(ctx, canvasAreas, pageImagesDesc);
-    this.reportProgress({ sheetIndex, pageNums, completion: 70 });
+    if (printOption.progressCallback) printOption.progressCallback();
 
     // 필요하면 debugging용 화살표를, debig level 1 이상
     this.drawDebugLines(mainCanvas, ctx, printOption);
 
     // main canvas에 Ncode 이미지를 오버레이
     this.overlayNcodePlaneOnMainCanvas(ctx, codeCanvas, printOption);
-    this.reportProgress({ sheetIndex, pageNums, completion: 90 });
+    if (printOption.progressCallback) printOption.progressCallback();
 
     // PDF와 ncode의 mapping table에 추가
     const pagesPerSheet = printOption.pagesPerSheet as number;
@@ -187,7 +188,6 @@ export class PageForPrint extends Component<Props, State> {
     for (let i = 0; i < pageImagesDesc.length; i++) {
       pageImagesDesc[i].pdfPageInfo.id = pdf.id;
     }
-
 
     // 캔버스의 색상 값 디버깅용, debug level 3 이상
     this.debugCheckColorValues(mainCanvas, ctx, printOption);
@@ -198,6 +198,7 @@ export class PageForPrint extends Component<Props, State> {
 
     // 보고를 위해 code mapping item을 가져온다
     const array = pdf.generateMappingItems(pageImagesDesc, ncodePlane, printOption.assignNewCode);
+    if (printOption.progressCallback) printOption.progressCallback();
 
     this.reportProgress({ sheetIndex, pageNums, completion: 100, mappingItems: array });
   }
@@ -471,7 +472,7 @@ export class PageForPrint extends Component<Props, State> {
     const { pagesPerSheet, pdfRenderingDpi } = printOption;
 
     const pdfDpi = pdfRenderingDpi / pagesPerSheet;
-    const descs = await pdf.renderPages_dpi(pageNums, pdfDpi, printOption.colorMode, printOption.luminanceMaxRatio);
+    const descs = await pdf.renderPages_dpi(pageNums, pdfDpi, printOption);
     this.entireRotation = descs[0].rotation;
 
     return descs;

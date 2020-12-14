@@ -1,8 +1,6 @@
 import React from "react";
 
 import { PageForPrint } from "./PageForPrint";
-import "./print.css";
-
 import { ISize } from "../DataStructure/Structures";
 import { IPrintingEvent, IPrintOption } from "./PrintDataTypes";
 import NeoPdfDocument from "../NeoPdf/NeoPdfDocument";
