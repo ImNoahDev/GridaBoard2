@@ -1,6 +1,6 @@
 import { store } from "../../client/Root";
 //[Define Action Types
-const ActionGroup = "TOP_TAB";
+const ActionGroup = "ACTIVE_PDF";
 
 const UrlActionType = Object.freeze({
   SET: `${ActionGroup}.SET`,

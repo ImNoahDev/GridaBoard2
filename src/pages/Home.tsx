@@ -53,6 +53,7 @@ import { g_debugFilename, g_debugURL } from "../NcodePrintLib/DefaultOption";
 
 import { connect, useSelector } from "react-redux";
 import { setUrlAndFilename } from "../store/reducers/activePdfReducer";
+import { CalibrationButton } from "../components/dialogs/CalibrationDialog";
 
 // const PDF_URL = "./A4_Pirates-of-the-Caribbean-Hes-a-Pirate-Klaus-Badelt.pdf";
 const PDF_URL = g_debugURL;
@@ -286,6 +287,10 @@ const Home = () => {
           </div>
           <div style={{ flex: 1 }}> </div>
 
+          {/* 칼리브레이션 */}
+          <CalibrationButton url={pdfUrl} filename={pdfFilename} printOption={printOption} cancelCallback={undefined}>
+            <Box fontSize={14} fontWeight="fontWeightBold" >Calibration</Box>
+          </CalibrationButton>
 
 
           {/* 매핑 정보 지우기 버튼 */}

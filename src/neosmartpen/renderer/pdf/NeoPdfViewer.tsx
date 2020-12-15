@@ -2,6 +2,9 @@ import React, { CSSProperties } from "react";
 // import PropTypes from "prop-types";
 import { Page } from './Page';
 import * as PdfJs from "pdfjs-dist";
+import { connect } from 'react-redux';
+import { hideUIProgressBackdrop, showUIProgressBackdrop } from "../../../store/reducers/ui";
+
 
 PdfJs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${PdfJs.version}/pdf.worker.js`;
 // const PDF_URL = 'https://mozilla.github.io/pdf.js/web/compressed.tracemonkey-pldi-09.pdf';
@@ -15,6 +18,8 @@ interface Props {
   pageNo: number,
   onReportPdfInfo: Function,
   position: { offsetX: number, offsetY: number, zoom: number },
+
+  progressDlgTitle?: string;
 }
 
 interface State {
@@ -24,7 +29,7 @@ interface State {
   status: string,
 }
 
-export default class NeoPdfViewer extends React.Component<Props, State> {
+class NeoPdfViewer extends React.Component<Props, State> {
   static displayName = "Viewer";
   documentContainer = React.createRef();
   document = React.createRef();
@@ -47,7 +52,9 @@ export default class NeoPdfViewer extends React.Component<Props, State> {
   loadDocument = (url: string) => {
     // const { documentZoom } = this.state;
     if (url === undefined) return;
-    
+
+    // kitty, 나중에는 분리할 것
+    showUIProgressBackdrop();
     const loadingTask = PdfJs.getDocument({
       url,
       cMapUrl: CMAP_URL,
@@ -64,6 +71,7 @@ export default class NeoPdfViewer extends React.Component<Props, State> {
         this.setState({ pdf });
         this.setState({ status: "loaded" });
 
+        hideUIProgressBackdrop();
         // console.log("pdf loaded");
       });
   }
@@ -111,4 +119,13 @@ export default class NeoPdfViewer extends React.Component<Props, State> {
   }
 }
 
+
+
+
+
+const mapStateToProps = (state) => ({
+  progressDlgTitle: state.progress.title,
+});
+
+export default connect(mapStateToProps)(NeoPdfViewer);
 

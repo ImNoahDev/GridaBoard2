@@ -6,16 +6,8 @@ import authorizationReducer from './reducers/authorization';
 import pointerTracer from './reducers/pointerTracer';
 import rotate from './reducers/rotate';
 import uiReducer from './reducers/ui';
-
-
-type ICombinedRecuders = {
-  auth: typeof authorizationReducer,
-  ui: typeof uiReducer,
-
-  pointerTracer: typeof pointerTracer,
-  rotate: typeof rotate,
-  pdfInfo: typeof activePdfReducer,
-};
+import progressDlgReducer from "./reducers/progressDlgReducer";
+import calibrationReducer from "./reducers/calibrationReducer";
 
 
 const rootReducer = combineReducers({
@@ -24,7 +16,10 @@ const rootReducer = combineReducers({
   pointerTracer,
   rotate,
   pdfInfo: activePdfReducer,
-} as ICombinedRecuders);
+  progress: progressDlgReducer,
+
+  calibration: calibrationReducer,
+});
 
 export default rootReducer;
 

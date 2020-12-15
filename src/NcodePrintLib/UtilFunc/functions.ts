@@ -1,3 +1,5 @@
+/// util functions, UTIL, utils
+
 import { sprintf } from "sprintf-js";
 import { isObject } from "util";
 import { IPageSOBP } from "../DataStructure/Structures";
@@ -149,3 +151,59 @@ export function diffPropsAndState(prefix, obj, nextProps, nextState = undefined)
   console.log(`[${prefix}]==============================================================================================================================`);
 }
 
+
+export function clearCanvas(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D = undefined, color = "rgb(255,255,255)") {
+  if (!ctx) ctx = canvas.getContext("2d");
+
+  ctx.save();
+  ctx.fillStyle = color;
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.restore();
+}
+
+
+export function drawSingleCrossMark(ctx: CanvasRenderingContext2D, x: number, y: number, len: number) {
+  const line_width = 4;
+  const line_len = len;
+
+  ctx.strokeStyle = "rgb(255, 0, 0)";
+  ctx.save();
+
+  ctx.beginPath();
+  ctx.lineWidth = line_width;
+  // 2020/08/31 kitty
+  // canvas_context.arc(x, y, r, r, 0, Math.PI * 2, true); // Outer circle
+  ctx.moveTo(x, y - line_len);
+  ctx.lineTo(x, y + line_len);
+  ctx.moveTo(x - line_len, y);
+  ctx.lineTo(x + line_len, y);
+  ctx.stroke();
+
+  ctx.restore();
+}
+
+export function drawCrossMark(
+  arg: {
+    ctx: CanvasRenderingContext2D, drawMarkRatio: number, markPos: number,
+    x: number, y: number, w: number, h: number
+  }) {
+  const ratio = arg.drawMarkRatio;
+  const d = arg.w * ratio;
+  const x = new Array(3) as number[];
+  const y = new Array(3) as number[];
+
+  x[0] = arg.x + d;
+  y[0] = arg.y + d;
+
+  x[1] = arg.x + arg.w - d;
+  y[1] = arg.y + arg.h - d;
+
+  x[2] = arg.x + arg.w / 2;
+  y[2] = arg.y + arg.h / 2;
+
+  const markPos = arg.markPos < 3 ? arg.markPos : 2;
+  const len = arg.w * 0.04;
+  drawSingleCrossMark(arg.ctx, x[markPos], y[markPos], len);
+
+  return { x: x[markPos], y: y[markPos] };
+}

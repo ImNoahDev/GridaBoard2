@@ -1,0 +1,56 @@
+/*
+ * animate touching marks pen
+ *
+ */
+
+.pentouch_anim {
+  animation-name: pentouch_anim;
+  -moz-animation-name: pentouch_anim;
+  /* -webkit-animation-name: pentouch_anim; */
+
+  -moz-animation-duration: 1s;
+  -webkit-animation-duration: 1s;
+  animation-duration: 1s;
+  -moz-animation-iteration-count: infinite;
+  -webkit-animation-iteration-count: infinite;
+  animation-iteration-count: infinite;
+  -moz-animation-direction: alternate-reverse;
+  -webkit-animation-direction: alternate-reverse;
+  animation-direction: alternate-reverse;
+}
+
+@-moz-keyframes pentouch_anim {
+  from {
+    transform: rotate(0deg);
+    transform-origin: center;
+  }
+
+  to {
+    transform: rotate(30deg);
+    transform-origin: center;
+  }
+}
+
+@-webkit-keyframes pentouch_anim {
+  from {
+    transform: rotate(0deg);
+    transform-origin: center;
+  }
+
+  to {
+    transform: rotate(30deg);
+    transform-origin: center;
+  }
+}
+
+@keyframes pentouch_anim {
+  from {
+    transform: rotate(-20deg);
+    transform-origin: 100% 100%;
+  }
+
+  to {
+    transform: rotate(20deg);
+    transform-origin: 100% 100%;
+  }
+}

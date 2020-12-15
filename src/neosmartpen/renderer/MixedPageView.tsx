@@ -17,6 +17,7 @@ interface Props {
 
   /** canvas view rotation, 0: portrait, 90: landscape */
   rotation: number;
+
 }
 
 interface State {

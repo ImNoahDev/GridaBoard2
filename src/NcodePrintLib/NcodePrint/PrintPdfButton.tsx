@@ -448,7 +448,7 @@ export default class PrintPdfButton extends React.Component<IPrintPdfButtonProps
   }
 
   onCancelPrint = () => {
-    console.log( "cancel")
+    console.log("cancel")
   }
 
   render() {
@@ -456,6 +456,10 @@ export default class PrintPdfButton extends React.Component<IPrintPdfButtonProps
     const filename = this.props.filename;
 
     const nowPrinting = status === "printing" || status === "progress" || status === "prepared";
+
+    let dialogTitle = this.state.status === "prepared" ? "인쇄 종료 대기 중" : "인쇄 준비 중";
+    dialogTitle =this.state.status === "completed" ? "완료" : dialogTitle;
+
     return (
       <div className="pdf-context">
         <button {...this.props} onClick={this.startPrint} >
@@ -475,6 +479,7 @@ export default class PrintPdfButton extends React.Component<IPrintPdfButtonProps
 
         <ProgressDialog
           progress={this.state.progressPercent}
+          title={dialogTitle}
           open={nowPrinting}
           cancelCallback={this.onCancelPrint} />
         <hr />

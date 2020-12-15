@@ -1,6 +1,6 @@
 import React, { Component, useState } from "react";
 import '../../styles/buttons.css';
-import { connect, useSelector, useDispatch } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { setPointerTracer } from '../../store/reducers/pointerTracer';
 import $ from "jquery";
 import { RootState } from '../../store/rootReducer';

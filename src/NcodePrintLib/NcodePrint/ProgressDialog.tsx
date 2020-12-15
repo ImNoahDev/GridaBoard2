@@ -13,6 +13,8 @@ type Props = {
 
   open: boolean,
 
+  title: string,
+
   cancelCallback: (e) => void,
 }
 
@@ -56,9 +58,9 @@ export default function ProgressDialog(props: Props) {
   const buffered = Math.ceil(progress / 10) * 10;
 
   return (
-    <Dialog open={props.open} onClose={handleClose} aria-labelledby="form-dialog-title" style={{ boxShadow: "5px 5px" }}>
+    <Dialog open={props.open} {...props} onClose={handleClose} >
       <DialogTitle id="form-dialog-title" style={{ float: "left", width: "500px" }}>
-        <Box fontSize={20} fontWeight="fontWeightBold" >인쇄 중</Box>
+        <Box fontSize={20} fontWeight="fontWeightBold" >{props.title}</Box>
       </DialogTitle>
 
       <DialogContent>

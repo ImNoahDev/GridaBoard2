@@ -5,7 +5,7 @@ import { IPageOverview } from "../NcodePrint/PagesForPrint";
 import { ColorConvertMethod } from "../NcodeSurface/CanvasColorConverter";
 import { getNcodeAtCanvasPixel, getNcodeRectAtCanvasPixel, ICellsOnSheetDesc } from "../NcodeSurface/NcodeRasterizer";
 import { MappingItem, MappingStorage } from "../SurfaceMapper";
-import NeoPdfPage, { IPdfPageCanvasDesc, PDF_VIEWPORT_DESC } from "./NeoPdfPage";
+import NeoPdfPage, { IPdfPageCanvasDesc, IThumbnailDesc, PDF_VIEWPORT_DESC } from "./NeoPdfPage";
 
 import * as Util from "../UtilFunc";
 import { IPrintOption } from "../NcodePrint/PrintDataTypes";
@@ -121,6 +121,24 @@ export default class NeoPdfDocument {
     return this._pdfDoc.getMetadata();
   }
 
+  public getPageThumbnailUrl = async (
+    pageNo: number, width: number, height: number,
+    bgColor = "rgba(255,255,255,0)", drawCalibrationMark = false, markPos = 2) => {
+    if (pageNo < 1 || pageNo > this.numPages) {
+      console.error(`getPageThumbnailUrl failed, page number is ${pageNo} of total pages(${this.numPages})`);
+      return NeoPdfPage.getDummyThumbnail();
+    }
+    const neoPage = await this.getPageAsync(pageNo);
+    return neoPage.getThumbnailUrl(width, height, bgColor, drawCalibrationMark, markPos);
+  }
+
+  public generatePageThumbnails = async (width: number, height: number, bgColor: string, drawCalibrationMark: boolean) => {
+    const numPages = this.numPages;
+    for (let i = 1; i <= (numPages > 1 ? 2 : 1); i++) {
+      await this.getPageThumbnailUrl(i, width, height, bgColor, drawCalibrationMark);
+    }
+  }
+
   public renderPages_dpi = async (pageNums: number[], dpi: number, printOption: IPrintOption)
     : Promise<IPdfPageCanvasDesc[]> => {
     const { colorMode, luminanceMaxRatio } = printOption;
@@ -135,7 +153,7 @@ export default class NeoPdfDocument {
       const pr = neoPage.render_dpi(i, pdfDpi).then(async (canvasDesc) => {
         const convertResult = await neoPage.convertColor(canvasDesc, colorMode, luminanceMaxRatio);
         if (printOption.progressCallback) printOption.progressCallback();
-        
+
         return convertResult;
       })
       promises.push(pr);

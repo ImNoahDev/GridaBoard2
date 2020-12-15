@@ -1,4 +1,4 @@
-import {store} from "../../client/Root";
+import { store } from "../../client/Root";
 
 //[Define Action Types
 const ActionGroup = 'UI';
@@ -10,64 +10,70 @@ export const UIActionTypes = Object.freeze({
   HIDE_TOAST_MESSAGE: `${ActionGroup}.HIDE_TOAST_MESSAGE`,
   SHOW_DIALOG: `${ActionGroup}.SHOW_DIALOG`,
   HIDE_DIALOG: `${ActionGroup}.HIDE_DIALOG`,
-  RESET_DIALOG: `${ActionGroup}.RESET_DIALOG`
+  RESET_DIALOG: `${ActionGroup}.RESET_DIALOG`,
+  SHOW_PROGRESS_DIALOG: `${ActionGroup}.SHOW_PROGRESS_DIALOG`,
+  HIDE_PROGRESS_DIALOG: `${ActionGroup}.HIDE_PROGRESS_DIALOG`,
+  UPDATE_PROGRESS_DIALOG: `${ActionGroup}.UPDATE_PROGRESS_DIALOG`,
 });
 //]
 
 //[Action Methods
-export const ShowUIProgressBackdrop = () => {
+export const showUIProgressBackdrop = () => {
   store.dispatch({
     type: UIActionTypes.SHOW_UI_PROGRESS
   });
 };
-export const HideUIProgressBackdrop = () => {
+export const hideUIProgressBackdrop = () => {
   store.dispatch({
     type: UIActionTypes.HIDE_UI_PROGRESS
   });
 };
 
-export const ShowErrorToast = (message) => {
+export const showErrorToast = (message) => {
   store.dispatch({
     type: UIActionTypes.SHOW_TOAST_MESSAGE,
     message: message,
     toastType: 'error'
   });
 };
-export const ShowWarningToast = (message) => {
+export const showWarningToast = (message) => {
   store.dispatch({
     type: UIActionTypes.SHOW_TOAST_MESSAGE,
     message: message,
     toastType: 'warning'
   });
 };
-export const ShowInfoToast = (message) => {
+export const showInfoToast = (message) => {
   store.dispatch({
     type: UIActionTypes.SHOW_TOAST_MESSAGE,
     message: message,
     toastType: 'info'
   });
 };
-export const ShowSuccessToast = (message) => {
+export const showSuccessToast = (message) => {
   store.dispatch({
     type: UIActionTypes.SHOW_TOAST_MESSAGE,
     message: message,
     toastType: 'success'
   });
 };
-export const ShowMessageToast = (message) => {
+export const showMessageToast = (message) => {
   store.dispatch({
     type: UIActionTypes.SHOW_TOAST_MESSAGE,
     message: message,
     toastType: ''
   });
 };
-export const HideToastMessage = () => {
+export const hideToastMessage = () => {
   store.dispatch({
     type: UIActionTypes.HIDE_TOAST_MESSAGE
   });
 };
 
-export const ShowDialog = (title, message, confirmBtnText, cancelBtnText, isModal, didCloseCallback) => {
+
+
+export const showDialog = (options: { title, message, confirmBtnText, cancelBtnText, isModal, didCloseCallback }) => {
+  const { title, message, confirmBtnText, cancelBtnText, isModal, didCloseCallback } = options;
   store.dispatch({
     type: UIActionTypes.SHOW_DIALOG,
     title: title,
@@ -78,21 +84,42 @@ export const ShowDialog = (title, message, confirmBtnText, cancelBtnText, isModa
     didCloseCallback: didCloseCallback
   });
 };
-export const HideDialog = () => {
+export const hideDialog = () => {
   store.dispatch({
     type: UIActionTypes.HIDE_DIALOG
   });
 };
-export const ResetDialogConfig = () => {
+export const resetDialogConfig = () => {
   store.dispatch({
     type: UIActionTypes.RESET_DIALOG
   });
 };
+
+
+export const showProgressDlg = async (option: { title: string, messages: string }) => {
+  store.dispatch({
+    type: UIActionTypes.SHOW_PROGRESS_DIALOG,
+    title: option.title,
+  });
+};
+
+export const hideProgressDlg = async () => {
+  store.dispatch({
+    type: UIActionTypes.HIDE_PROGRESS_DIALOG,
+  });
+};
+
+export const updateProgressDlg = async (option: { progress: number }) => {
+  store.dispatch({
+    type: UIActionTypes.UPDATE_PROGRESS_DIALOG,
+    progress: option.progress,
+  });
+}
 //]
 
-//[Reducer
-export default (state={
-  progress: {
+
+const initialState = {
+  waiting: {
     circular: false
   },
   toast: {
@@ -109,8 +136,17 @@ export default (state={
     okButtonText: '',
     isModal: false,
     didCloseCallback: null
+  },
+  progress: {
+    show: false,
+    title: '',
+    message: '',
+    progress: 0,
   }
-}, action) => {
+}
+
+//[Reducer
+export default (state = initialState, action) => {
   switch (action.type) {
     case UIActionTypes.SHOW_UI_PROGRESS: {
       return {
