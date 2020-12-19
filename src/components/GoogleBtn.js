@@ -24,11 +24,11 @@ class GoogleBtn extends Component {
 
   componentDidMount() {
     // var self = this;
-    // gapi.load('auth2', function() { 
+    // gapi.load('auth2', function() {
     //   var gauth = gapi.auth2.init({
     //       client_id: {CLIENT_ID}
     //   });
-      
+
     //   gauth.then(function(){
     //     console.log('gauth init success');
     //       if (gauth.isSignedIn.get()) {
@@ -80,7 +80,7 @@ class GoogleBtn extends Component {
       });
     });
   }
-  
+
   login (resp) {
     if(resp.accessToken) {
       this.setState(state => ({
@@ -96,7 +96,7 @@ class GoogleBtn extends Component {
       accessToken: ''
     }));
 
-    var auth2 = gapi.auth2.getAuthInstance();
+    const auth2 = gapi.auth2.getAuthInstance();
     auth2.signOut().then(function () {
       console.log('user log out ');
     });
@@ -119,8 +119,8 @@ class GoogleBtn extends Component {
           buttonText = 'Logout'
           onLogoutSuccess={this.logout}
           onFailure={this.handleLogoutFailure}
-          ></GoogleLogout>: 
-          <GoogleLogin 
+          ></GoogleLogout>:
+          <GoogleLogin
             clientId = {CLIENT_ID}
             buttonText="Login"
             onSuccess={this.login}

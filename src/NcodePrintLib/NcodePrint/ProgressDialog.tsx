@@ -29,6 +29,8 @@ export function useForceUpdate() {
 
 
 export default function ProgressDialog(props: Props) {
+  const { progress: propsProgress, open: propsOpen, title, cancelCallback, ...rest } = props;
+
   const classes = useStyles();
   const [progress, setProgress] = useState(props.progress);
   const [open, setOpen] = useState(props.open);
@@ -56,7 +58,7 @@ export default function ProgressDialog(props: Props) {
   }, [progress]);
 
   return (
-    <Dialog open={open} {...props} onClose={handleClose} >
+    <Dialog open={open} {...rest} onClose={handleClose} >
       <DialogTitle id="form-dialog-title" style={{ float: "left", width: "500px" }}>
         <Box fontSize={20} fontWeight="fontWeightBold" >{props.title}</Box>
       </DialogTitle>

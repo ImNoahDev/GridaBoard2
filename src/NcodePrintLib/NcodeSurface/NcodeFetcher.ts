@@ -36,11 +36,11 @@ export default class NcodeFetcher {
   public getNcodeData = async (pageInfo: IPageSOBP): Promise<INcodeSurfaceDesc> => {
     // glyph text를 받아 온다.
     let code_txt = "";
-    if (Util.isSamePage(this.pageInfo, pageInfo)) {
+    if (Util.isSamePage(this.pageInfo, pageInfo) && this.codeText.length > 0) {
       console.log(`[fetch] wait for: ${makeNPageIdStr(pageInfo)}`);
       code_txt = await this.fetchPromise;
       console.log(`[fetch] download completed: ${makeNPageIdStr(pageInfo)} len=${code_txt.length}`);
-      // this.codeText = txt;
+      this.codeText = code_txt;
     }
     else {
       console.log(`[fetch] Download new NCODE: ${makeNPageIdStr(pageInfo)}`);
@@ -50,7 +50,7 @@ export default class NcodeFetcher {
       console.log(`[fetch] download NEW completed: ${makeNPageIdStr(pageInfo)} len=${code_txt.length}`);
 
       this.pageInfo = pageInfo;
-      // this.codeText = txt;
+      this.codeText = code_txt;
     }
 
     const result: INcodeSurfaceDesc = getNPaperInfo(pageInfo);
@@ -61,19 +61,15 @@ export default class NcodeFetcher {
 
 
   private fetchNcodeData = async (pageInfo: IPageSOBP): Promise<string> => {
-    return new Promise(async (resolve, reject) => {
-      // console.log(`[fetch] ${pageInfo.section}.${pageInfo.owner}.${pageInfo.book}.${pageInfo.page}`);
-      const url = this.getRawCodeDataUrl(pageInfo);
+    // console.log(`[fetch] ${pageInfo.section}.${pageInfo.owner}.${pageInfo.book}.${pageInfo.page}`);
+    const url = this.getRawCodeDataUrl(pageInfo);
+    const blob = await fetch(url).then(res => res.blob());
 
-      const blob = await fetch(url).then((r) => {
+    if (!blob) return "";
+    const buffer = await blob.arrayBuffer();
+    const u8buf = new Uint8Array(buffer);
 
-        if (r.ok) {
-          return r.blob();
-        }
-
-        resolve("");
-      });
-
+    return new Promise((resolve, reject) => {
       function gunzipCallback(decompressed) {
         // console.log(decompressed);
         const txt = new TextDecoder("utf-8").decode(decompressed);
@@ -82,8 +78,6 @@ export default class NcodeFetcher {
 
       if (blob != null) {
         try {
-          const buffer = await blob.arrayBuffer();
-          const u8buf = new Uint8Array(buffer);
           // eslint-disable-next-line
           const gunzip = new Zlib.gunzip(u8buf, (err, result) => {
             // console.error(err);
@@ -99,6 +93,46 @@ export default class NcodeFetcher {
       }
     });
   }
+
+  // private fetchNcodeData = async (pageInfo: IPageSOBP): Promise<string> => {
+  //   return new Promise(async (resolve, reject) => {
+  //     // console.log(`[fetch] ${pageInfo.section}.${pageInfo.owner}.${pageInfo.book}.${pageInfo.page}`);
+  //     const url = this.getRawCodeDataUrl(pageInfo);
+
+  //     const blob = await fetch(url).then((r) => {
+
+  //       if (r.ok) {
+  //         return r.blob();
+  //       }
+
+  //       resolve("");
+  //     });
+
+  //     function gunzipCallback(decompressed) {
+  //       // console.log(decompressed);
+  //       const txt = new TextDecoder("utf-8").decode(decompressed);
+  //       resolve(txt);
+  //     }
+
+  //     if (blob != null) {
+  //       try {
+  //         const buffer = await blob.arrayBuffer();
+  //         const u8buf = new Uint8Array(buffer);
+  //         // eslint-disable-next-line
+  //         const gunzip = new Zlib.gunzip(u8buf, (err, result) => {
+  //           // console.error(err);
+  //           if (err) {
+  //             console.log(err);
+  //             resolve("");
+  //           }
+  //           gunzipCallback(result);
+  //         });
+  //       } catch (e) {
+  //         resolve("");
+  //       }
+  //     }
+  //   });
+  // }
 
 
 

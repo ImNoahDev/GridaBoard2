@@ -102,7 +102,7 @@ export default class PUIController {
         error: function (error) {
           resolve(false);
         },
-        complete: function () { },
+        // complete: function () { },
       });
     });
   }

@@ -24,12 +24,18 @@ class pageNumbering extends React.Component {
             </div>
           </GridaToolTip>
         </button>
-        <input type="text" className="form-control-plaintext form-control-sm neo-form-pdf-number" placeholder=".form-control-sm"
-          value="Page:" readOnly />
+        <input type="text" className="form-control-plaintext form-control-sm neo-form-pdf-number"
+          placeholder=".form-control-sm" readOnly
+          defaultValue="Page:" />
+
         <input id="curr_page_num" type="text" className="form-control form-control-sm neo-form-pdf-number"
-          placeholder=".form-control-sm" value=" " />
+          placeholder=".form-control-sm"
+          defaultValue=" " />
+
         <input id="page_count" type="text" className="form-control-plaintext form-control-sm neo-form-pdf-number"
-          placeholder=".form-control-sm" value="/" readOnly />
+          placeholder=".form-control-sm" readOnly
+          defaultValue="/" />
+
         <button id="btn_nextpage" type="button" className="btn btn-neo ">
           <GridaToolTip placement="top" title={
             <React.Fragment>

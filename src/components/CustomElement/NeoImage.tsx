@@ -22,7 +22,7 @@ function convertColor(c: HTMLCanvasElement, color: string) {
   const id = ctx.getImageData(0, 0, width, height);
   const data = id.data;
   const { r: rr, g: gg, b: bb } = hex2ColorObject(color);
-  console.log(`rgb = ${rr}, ${gg}, ${bb}`);
+  // console.log(`rgb = ${rr}, ${gg}, ${bb}`);
 
   for (let y = 0; y < width; y++) {
     let addr = y * width * 4;
@@ -76,7 +76,7 @@ function getImageIndex(hoverOn: boolean, checked: boolean, disabled: boolean) {
   const checkIndex = checked ? 1 : 0;
   const disabledIndex = disabled ? 1 : 0;
 
-  if (disabled) { return 4 + hoverIndex };
+  if (disabled) { return 4 + hoverIndex }
   const imgIndex = checkIndex * 2 + hoverIndex;
   return imgIndex;
 }

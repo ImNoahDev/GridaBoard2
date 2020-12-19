@@ -24,7 +24,7 @@ import FileLoad from '../components/navbar/FileLoad';
 import ManualCalibration from '../components/navbar/ManualCalibration';
 import UpperNav from '../components/navbar/UpperNav';
 import * as SavePdf from '../NcodePrintLib/Save/SavePdf';
-import PrintOptionDialog from '../NcodePrintLib/NcodePrint/Modal/PrintOptionDialog';
+import PrintOptionDialog from '../NcodePrintLib/NcodePrint/Dialogs/PrintOptionDialog';
 
 import PUIController from '../components/PUIController';
 import KeyBoardShortCut from '../components/KeyBoardShortCut';
@@ -53,10 +53,11 @@ import { g_debugFilename, g_debugURL } from "../NcodePrintLib/DefaultOption";
 
 import { connect, useSelector } from "react-redux";
 import { setUrlAndFilename } from "../store/reducers/activePdfReducer";
-import CalibrationButton from "../components/dialogs/CalibrationDialog";
+import CalibrationButton from "../NcodePrintLib/NcodePrint/Dialogs/CalibrationDialog";
 import PrintNcodedPdfButton from "../NcodePrintLib/NcodePrint/PrintNcodedPdfButton";
 import { NeoImage } from "../components/CustomElement/NeoImage";
 import GridaToolTip from "../styles/GridaToolTip";
+import OptionDialogButton from "../NcodePrintLib/NcodePrint/Dialogs/OptionDialog";
 
 // const PDF_URL = "./A4_Pirates-of-the-Caribbean-Hes-a-Pirate-Klaus-Badelt.pdf";
 const PDF_URL = g_debugURL;
@@ -302,6 +303,13 @@ const Home = () => {
           </div>
           <div style={{ flex: 1 }}> </div>
 
+          {/* [신] 인쇄 옵션 다이얼로그 테스트 버튼 */}
+          <div style={{ fontSize: "14px" }}>
+            <OptionDialogButton printOption={printOption} >
+              <Box fontSize={14} fontWeight="fontWeightBold" >신규, 인쇄옵션</Box>
+            </OptionDialogButton>
+          </div>
+
 
           {/* 인쇄 옵션 다이얼로그 테스트 버튼 */}
           <div style={{ fontSize: "14px" }}>
@@ -356,7 +364,7 @@ const Home = () => {
 
           <div id="navbar_end">
             <div className="navbar-menu d-flex justify-content-end align-items-end neo_shadow">
-              <ManualCalibration url={pdfUrl} filename={pdfFilename} printOption={printOption} cancelCallback={undefined} />
+              <ManualCalibration url={pdfUrl} filename={pdfFilename} printOption={printOption} />
             </div>
           </div>
 

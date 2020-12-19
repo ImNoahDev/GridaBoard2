@@ -2,15 +2,15 @@ import React, { useEffect, useRef, useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import { Box, Button, ButtonProps, Dialog, DialogActions, DialogContent, DialogTitle, LinearProgress } from '@material-ui/core';
 import { useSelector, useDispatch } from 'react-redux';
-import { RootState } from '../../store/rootReducer';
-import { hideCalibrationDialog, showCalibrationDialog, updateCalibrationDialog } from '../../store/reducers/calibrationReducer';
-import { IPrintOption } from '../../NcodePrintLib';
-import NeoPdfDocument, { IGetDocumentOptions } from '../../NcodePrintLib/NeoPdf/NeoPdfDocument';
-import { IThumbnailDesc } from "../../NcodePrintLib/NeoPdf/NeoPdfPage";
-import NeoPdfManager from '../../NcodePrintLib/NeoPdf/NeoPdfManager';
-import { theme } from '../../styles/theme';
+import { RootState } from '../../../store/rootReducer';
+import { hideCalibrationDialog, showCalibrationDialog, updateCalibrationDialog } from '../../../store/reducers/calibrationReducer';
+import { IPrintOption } from '../..';
+import NeoPdfDocument, { IGetDocumentOptions } from '../../NeoPdf/NeoPdfDocument';
+import { IThumbnailDesc } from "../../NeoPdf/NeoPdfPage";
+import NeoPdfManager from '../../NeoPdf/NeoPdfManager';
+import { theme } from '../../../styles/theme';
 import "./pen_touch.css";
-import { hideUIProgressBackdrop, showUIProgressBackdrop } from '../../store/reducers/ui';
+import { hideUIProgressBackdrop, showUIProgressBackdrop } from '../../../store/reducers/ui';
 
 const _penImageUrl = "./icons/image_calibration.png";
 
@@ -127,14 +127,14 @@ function CalibrationDialog(props: IDialogProps) {
           const w = imgWidth * imgDensity;
           const h = imgHeight * imgDensity;
           // loadedPdf.generatePageThumbnails(w, h, "rgb(220,220,220)", true).then(() => {
-            setPdf(loadedPdf);
-            const t = Array.from({ length: loadedPdf.numPages }, (_, i) => i + 1);
-            setTargetPages(t);
-            console.log(`calibration: pdf loaded, pages=${t}`)
-            setNumPages(t.length);
+          setPdf(loadedPdf);
+          const t = Array.from({ length: loadedPdf.numPages }, (_, i) => i + 1);
+          setTargetPages(t);
+          console.log(`calibration: pdf loaded, pages=${t}`)
+          setNumPages(t.length);
 
-            updateCalibrationDialog(0);
-            setStatus("progress");
+          updateCalibrationDialog(0);
+          setStatus("progress");
           // })
         }
       });
@@ -178,10 +178,15 @@ function CalibrationDialog(props: IDialogProps) {
 
   const open = show && (pdf !== undefined);
   console.log(`testing: render  imgSrc=${imgSrc.length}`);
+
+
+
+  const { url: propsUrl, filename: propsFilename, printOption: propsPrintOption, cancelCallback: propsCancelCallback, ...rest } = props;
+
   return (
     <React.Fragment>
       { imgSrc.length > 4 ?
-        <Dialog open={open} {...props} onClose={handleClose}>
+        <Dialog open={open} {...rest} onClose={handleClose}>
           <img className={"pentouch_anim"} style={{ width: "60px", height: "70px", position: "absolute", left: x, top: y }} src={_penImageUrl} />
 
           <DialogTitle id="form-dialog-title" style={{ float: "left", width: "500px" }}>
@@ -236,6 +241,7 @@ interface Props extends ButtonProps {
 
 
 export default function CalibrationButton(props: Props) {
+  const { url, filename, printOption, cancelCallback, ...rest } = props;
   // console.log(`calibration: ${props.url}`)
   const startCalibration = (e) => {
     if (props.url) {
@@ -251,7 +257,7 @@ export default function CalibrationButton(props: Props) {
 
   return (
     <React.Fragment>
-      <button {...props} onClick={startCalibration} >
+      <button {...rest} onClick={startCalibration} >
         {props.children}
       </button>
 

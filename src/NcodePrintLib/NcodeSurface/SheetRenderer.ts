@@ -65,7 +65,7 @@ export class SheetRenderer {
   _ready: Promise<IPrintingSheetDesc>;
 
   progressCallback: IProgressCallbackFunction;
-  reportCount: number = 0;
+  reportCount = 0;
 
   _rendered: {
     rendered: boolean,

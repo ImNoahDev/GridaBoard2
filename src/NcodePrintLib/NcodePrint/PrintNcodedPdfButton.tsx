@@ -21,6 +21,7 @@ interface Props extends ButtonProps {
  * Class
  */
 export default function PrintNcodedPdfButton(props: Props) {
+  const { url, filename, reportProgress, printOptionCallback, ...rest } = props;
 
   const [progressPercent, setProgressPercent] = useState(0);
   const [status, setStatus] = useState("N/A");
@@ -64,7 +65,7 @@ export default function PrintNcodedPdfButton(props: Props) {
 
   return (
     <React.Fragment>
-      <button {...props} onClick={startPrint} >
+      <button {...rest} onClick={startPrint} >
         {props.children}
       </button>
 

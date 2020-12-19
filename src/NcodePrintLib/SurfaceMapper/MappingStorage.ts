@@ -44,6 +44,10 @@ export default class MappingStorage {
     return pages;
   }
 
+  public getNextIssuableNcodeInfo = () => {
+    return this._data.nextIssuable;
+  }
+
   public issueNcode = (options: IPdfMappingDesc): IPdfMappingDesc => {
     const { numPages } = options;
 
@@ -231,7 +235,9 @@ export default class MappingStorage {
           else return 0;
         });
 
-        this.dump("loading");
+        // this.dump("loading");
+
+
         // const debug = JSON.stringify(this._arrMapped);
         // console.log(`Pdf Ncode Info Loaded   ${key}: ${debug}`);
         return true;

@@ -2,7 +2,7 @@ import React from 'react';
 import '../../styles/main.css';
 import Tooltip, { TooltipProps } from '@material-ui/core/Tooltip';
 import { Theme, Typography, withStyles } from '@material-ui/core';
-import CalibrationButton from '../dialogs/CalibrationDialog';
+import CalibrationButton from '../../NcodePrintLib/NcodePrint/Dialogs/CalibrationDialog';
 import { IPrintOption } from '../../NcodePrintLib';
 import { NeoImage } from '../CustomElement/NeoImage';
 import GridaToolTip from '../../styles/GridaToolTip';
@@ -17,14 +17,14 @@ type Props = {
   url: string,
   filename: string,
   printOption: IPrintOption,
-  cancelCallback: (e) => void,
+  cancelCallback?: (e) => void,
 }
 
 const ManualCalibration = (props: Props) => {
-  const { ...rest } = props;
+  const { url, filename, printOption, cancelCallback, ...rest } = props;
 
   return (
-    <CalibrationButton {...rest} id="btn_start_calibration" type="button" className="btn btn-neo" >
+    <CalibrationButton {...props} cancelCallback={cancelCallback} id="btn_start_calibration" type="button" className="btn btn-neo" >
       <GridaToolTip placement="left-end" title={
         <React.Fragment>
           <Typography color="inherit">인쇄된 페이지 수동 등록</Typography>

@@ -1,6 +1,6 @@
 import PrintPdfButton from "./NcodePrint/HtmlRenderPrint/PrintPdfButton";
 import FileBrowserButton from './NeoPdf/FileBrowserButton';
-import PrintOptionDialog from './NcodePrint/Modal/PrintOptionDialog';
+import PrintOptionDialog from './NcodePrint/Dialogs/PrintOptionDialog';
 
 import { addGraphicAndSavePdf } from "./Save/SavePdf";
 import { MediaSize } from './NcodePrint/PrintDataTypes';

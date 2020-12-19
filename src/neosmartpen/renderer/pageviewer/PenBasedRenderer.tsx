@@ -243,7 +243,8 @@ export default class PenBasedRenderer extends React.Component<Props, State> {
 
     // const { classes, scaleType, scale } = this.props;
 
-    let { scale, width, height } = this.propsSize;
+    let { width, height } = this.propsSize;
+    const scale = this.propsSize.scale;
 
     const node = this.mainDiv;
 

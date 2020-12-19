@@ -457,8 +457,8 @@ export default class PrintPdfButton extends React.Component<IPrintPdfButtonProps
   }
 
   render() {
+    const { url, filename, reportProgress, printOption, printOptionCallback, ...rest } = this.props;
     const { pdf, printTrigger, status } = this.state;
-    const filename = this.props.filename;
 
     const nowPrinting = status === "printing" || status === "progress" || status === "prepared";
 
@@ -467,7 +467,7 @@ export default class PrintPdfButton extends React.Component<IPrintPdfButtonProps
 
     return (
       <div className="pdf-context">
-        <button {...this.props} onClick={this.startPrint} >
+        <button {...rest} onClick={this.startPrint} >
           {this.props.children}
         </button>
 

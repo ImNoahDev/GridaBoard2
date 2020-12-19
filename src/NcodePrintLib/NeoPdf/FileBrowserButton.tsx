@@ -1,4 +1,4 @@
-import { Button } from '@material-ui/core';
+import { Button, ButtonProps } from '@material-ui/core';
 import React, { useRef } from 'react';
 import { onSuccess, _uuid, onOpenClicked, openFileBrowser } from "./FileBrowser";
 import { Theme, Typography, withStyles } from '@material-ui/core';
@@ -7,25 +7,13 @@ import { IFileBrowserReturn } from '../NcodePrint/PrintDataTypes';
 import GridaToolTip from '../../styles/GridaToolTip';
 
 
-type Props = {
+interface Props extends ButtonProps {
   onFileOpen: (event: IFileBrowserReturn) => void,
-
-  children?: React.ReactNode;
-  color?: any;
-  disabled?: boolean;
-  disableElevation?: boolean;
-  disableFocusRipple?: boolean;
-  endIcon?: React.ReactNode;
-  fullWidth?: boolean;
-  href?: string;
-  size?: 'small' | 'medium' | 'large';
-  startIcon?: React.ReactNode;
-  variant?: 'text' | 'outlined' | 'contained';
 }
 
 
 const FileBrowserButton = (props: Props) => {
-  const { onFileOpen } = props;
+  const { onFileOpen, ...rest } = props;
   const _fileInput = useRef();
 
   async function fileOpen() {
@@ -57,7 +45,7 @@ const FileBrowserButton = (props: Props) => {
 
   return (
     <React.Fragment>
-      <button {...props} onClick={fileOpen} id="btn_file_open" type="button" className="btn btn-neo " title="Open a file" >
+      <button {...rest} onClick={fileOpen} id="btn_file_open" type="button" className="btn btn-neo " title="Open a file" >
         <GridaToolTip placement="top" title={
           <React.Fragment>
             <Typography color="inherit">PDF File Open</Typography>
