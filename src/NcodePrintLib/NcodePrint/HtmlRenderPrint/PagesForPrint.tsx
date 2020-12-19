@@ -1,17 +1,17 @@
 import React from "react";
 
 import { PageForPrint } from "./PageForPrint";
-import { ISize } from "../DataStructure/Structures";
-import { IPrintingEvent, IPrintOption } from "./PrintDataTypes";
-import NeoPdfDocument from "../NeoPdf/NeoPdfDocument";
-import { PDF_VIEWPORT_DESC } from "../NeoPdf/NeoPdfPage";
+import { ISize } from "../../DataStructure/Structures";
+import { IPrintingEvent, IPrintOption } from "../PrintDataTypes";
+import NeoPdfDocument from "../../NeoPdf/NeoPdfDocument";
+import { PDF_VIEWPORT_DESC } from "../../NeoPdf/NeoPdfPage";
 
 interface Props { // tslint:disable-line interface-over-type-literal
   text: string,
   pdf: NeoPdfDocument,
   shouldRenderPage: boolean,
   /** null이면 화면 전용 */
-  OnPagePrepared: (event: IPrintingEvent) => void,
+  onPagePrepared: (event: IPrintingEvent) => void,
 
   printOption: IPrintOption,
 
@@ -82,7 +82,7 @@ export class PagesForPrint extends React.Component<Props, State> {
 
   public render() {
     const { renderState } = this.state;
-    const { pdf, OnPagePrepared, pagesOverview } = this.props;
+    const { pdf, onPagePrepared, pagesOverview } = this.props;
 
     const printOption = this.printOption;
     const { pagesPerSheet, targetPages, } = printOption;
@@ -114,7 +114,7 @@ export class PagesForPrint extends React.Component<Props, State> {
                   key={`page-${pdf.fingerprint}-${i}`}
                   sheetIndex={i}
                   name={`page-${pdf.fingerprint}-${i}`}
-                  OnPagePrepared={OnPagePrepared}
+                  onPagePrepared={onPagePrepared}
                   printOption={printOption}
                   pageNums={pageNumsInSheet[i]}
                   pagesOverview={pagesOverview}

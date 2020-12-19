@@ -9,23 +9,28 @@ export const g_debugURL = "./2P_test.pdf";
 export const g_debugFilename = "./2P_test.pdf";
 
 export const g_defaultPrintOption: IPrintOption = {
+  /** DO NOT MODIFY */
+  dotsInACell: 7,  // DO NOT MODIFY
+
+  /** DO NOT MODIFY */
+  maxPagesPerSheetToDrawMark: 1,    // DO NOT MODIFY
+
   // url: "./landscape, 그리다보드_테스트.pdf",
   // url: "./A4_Pirates-of-the-Caribbean-Hes-a-Pirate-Klaus-Badelt.pdf",
-  url: undefined,
   // url: "./A4_Pirates-of-the-Caribbean-Hes-a-Pirate-Klaus-Badelt.pdf",
-
+  url: undefined,
   filename: undefined,
 
-  assignNewCode: true,
-
+  needToIssueCode: true,
+  forceToIssueNewCode: false,
   pageInfo: { section: 3, owner: 27, book: 1068, page: 114 },
-
-  dotsInACell: 7,  // DO NOT MODIFY
 
   codeDensity: 2,
   printDpi: 600,
   pdfRenderingDpi: 300,
   putCalibrationMark: true,
+
+
   printNcode: true,
   mediaSize: MediaSize.A4,
 
@@ -50,11 +55,12 @@ export const g_defaultPrintOption: IPrintOption = {
   drawMarkRatio: 0.1,
   drawFrame: false,
 
-  pagesPerSheet: 2,
+  pagesPerSheet: 4,
 
-  padding: 10,     // mm 단위
+  /** 코드 출력물의 상하좌우 여백, mm단위 */
+  padding: 15,     // mm 단위
 
-
+  cancel: false,
 
   debugMode: 0
 };

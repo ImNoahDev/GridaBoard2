@@ -14,7 +14,7 @@ export async function savePDF(url: string, saveName: string) {
   const existingPdfBytes = await fetch(url).then(res => res.arrayBuffer());
   const pdfDoc = await PDFDocument.load(existingPdfBytes);
   const pages = pdfDoc.getPages();
-  
+
   //this.completedOnPage에는 페이지 순서대로 stroke array가 들어가는게 아니기 때문에 key값(sobp)으로 정렬
   const sortStringKeys = (a, b) => a[0] > b[0] ? 1 : -1;
   const sortedCompletedOnPage = new Map([...inkSt.completedOnPage].sort(sortStringKeys));
@@ -47,14 +47,14 @@ export async function savePDF(url: string, saveName: string) {
       const pathData = drawPath(pointArray, strokeThickness);
 
       page.moveTo(0, pageHeight);
-      page.drawSvgPath(pathData, { 
+      page.drawSvgPath(pathData, {
         color: rgb(
-            Number(rgbStrArr[0])/255, 
-            Number(rgbStrArr[1])/255, 
+            Number(rgbStrArr[0])/255,
+            Number(rgbStrArr[1])/255,
             Number(rgbStrArr[2])/255
         ),
         opacity : opacity,
-        scale: 1 
+        scale: 1
       });
     }
   }

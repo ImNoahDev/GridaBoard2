@@ -5,6 +5,7 @@ import { IPageSOBP } from "../DataStructure/Structures";
 import { IPaperSize } from "../NcodeSurface/SurfaceDataTypes";
 import { ColorConvertMethod } from "../NcodeSurface/CanvasColorConverter";
 import { CoordinateTanslater, IPdfMappingDesc } from "../Coordinates";
+import { IPrintingSheetDesc } from "../NcodeSurface/SheetRenderer";
 
 
 
@@ -20,10 +21,13 @@ export interface IPrintingEvent {
 
   /** code mapping 정보 */
   mappingItems?: CoordinateTanslater[],
+
+  /** sheet의 image */
+  sheetDesc?: IPrintingSheetDesc,
 }
 
 export interface IPrintingReport {
-  status: "progress" | "completed",
+  status: string,
   /** 준비된 페이지들 */
   preparedPages?: number[],
   /** 준비된 페이지 수 */
@@ -82,11 +86,21 @@ export interface IPrintOption {
 
   /** 첫 페이지에 발행된 ncode, Ncode는 pageInfo ~ pageInfo.page + (numPages-1) */
   pageInfo: IPageSOBP;
-  assignNewCode: boolean;
+
+  /** 문서 전체에 발행된 코드들, 페이지수 만큼 있다. start page = 0 */
+  issuedNcodes?: IPageSOBP[];
+
+  needToIssueCode: boolean;
+
+  forceToIssueNewCode: boolean;
 
   /** 그리다보드와의 호환성을 위해 */
   magnification: number,
+
+  /** SOBP에 해당되는 페이지에 할당된 인쇄 마진 */
   marginLeft_nu: number,
+
+  /** SOBP에 해당되는 페이지에 할당된 인쇄 마진 */
   marginTop_nu: number,
 
 
@@ -101,10 +115,13 @@ export interface IPrintOption {
   /** 십자가 표시를 그릴지 안 그릴지 */
   drawCalibrationMark: boolean,
 
+  /** 마크를 그릴 분할 면의 최대 갯수, default: 1 */
+  maxPagesPerSheetToDrawMark: number,
+
   /** 십자가 표시가 표시되는 영역, width에 대한 ratio, typically 0.1 (1 = 100%) */
   drawMarkRatio: number,
 
-  /** 테두리를 그릴지 안 그릴지 */
+  /** 페이지의 테두리를 그릴지 안 그릴지 */
   drawFrame: boolean,
 
   /** 상하좌우 여백  mm 단위*/
@@ -115,19 +132,25 @@ export interface IPrintOption {
   /**
    * 인쇄할 페이지에서 4씩 카운트가 증가되는 call back,
    * 100% = (numPages * 4) +(numSheets * 3)
-   * 
-   * 
+   *
+   *
    * 이 카운트를 받아서, 누적한 값을 countAcc라고 하면,
-   * 
+   *
    *  const { targetPages, pagesPerSheet } = this.printOption;
    *  const numPages = targetPages.length;
    *  const numSheets = Math.ceil(numPages / pagesPerSheet);
    *  const maxCount = (numPages * 4) + (numSheets * 3);
    *  const progressPercent = (countAcc / maxCount)*100;
-   * 
+   *
    **/
-  progressCallback?: (event?: { status: string }) => void;
+  progressCallback?: IProgressCallbackFunction;
+
+
+  /** cancel trigger */
+  cancel: boolean;
 }
+
+export type IProgressCallbackFunction = (event?: { status: string }) => void;
 
 /**
  * Page.js
@@ -158,6 +181,7 @@ export const MediaSize: { [key: string]: IPaperSize } = {
 };
 
 
+export type IUnitString = "mm" | "pt" | "pu" | "css" | "px" | "in" | "cm" | "pc" | "em" | "ex";
 
 
 

@@ -1,4 +1,4 @@
-import PrintPdfButton from "./NcodePrint/PrintPdfButton";
+import PrintPdfButton from "./NcodePrint/HtmlRenderPrint/PrintPdfButton";
 import FileBrowserButton from './NeoPdf/FileBrowserButton';
 import { CalibrationButton } from './SurfaceMapper';
 import PrintOptionDialog from './NcodePrint/Modal/PrintOptionDialog';
@@ -10,7 +10,7 @@ import { t } from './Locales/i18n';
 import { g_defaultPrintOption } from "./DefaultOption";
 
 export * from "./NcodePrint/PrintDataTypes";
-export * from "./NcodePrint/PrintPdfButton";
+export * from "./NcodePrint/HtmlRenderPrint/PrintPdfButton";
 
 export {
   g_defaultPrintOption,

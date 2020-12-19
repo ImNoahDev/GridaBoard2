@@ -7,6 +7,7 @@ import { isSamePage } from "../../neosmartpen/utils/UtilsFunc";
 import * as Util from "../UtilFunc";
 import { isObject } from "util";
 
+const _debug = false;
 let _instance: MappingStorage = null;
 const LOCAL_STORAGE_ID = "GridaBoard_codeMappingInfo_v2";
 
@@ -33,6 +34,15 @@ export default class MappingStorage {
     return _instance;
   }
 
+  static makeAssignedNcodeArray = (startPage: IPageSOBP, numPages: number) => {
+    const pages: IPageSOBP[] = [];
+    for (let i = 0; i < numPages; i++) {
+      const pi = Util.getNextNcodePage(startPage, i);
+      pages.push(pi);
+    }
+
+    return pages;
+  }
 
   public issueNcode = (options: IPdfMappingDesc): IPdfMappingDesc => {
     const { numPages } = options;
@@ -62,7 +72,7 @@ export default class MappingStorage {
 
     this.storeMappingInfo();
 
-    this.dump("mapping");
+    if (_debug) this.dump("mapping");
   }
 
   clear = () => {
@@ -142,9 +152,24 @@ export default class MappingStorage {
   findNcodeRange = (pdfId: string) => {
     const found = this._data.arrDocMap.find(m => pdfId === m.id);
     if (found) {
+
       return found;
     }
     // const found = this._arrMapped.find(trans => pdfId === trans.pdfDesc.id);
+    return undefined;
+  }
+
+  /**
+   * Ncode가 발행된 적이 있는지를 점검하기 위해서 쓰인다.
+   */
+  findAssociatedNcode = (fingerprint: string, pagesPerSheet: number) => {
+    const id = Util.makePdfId(fingerprint, pagesPerSheet as number);
+    const mapped = this.findNcodeRange(id);
+
+    if (mapped && mapped.nPageStart.section !== -1) {
+      return mapped;
+    }
+
     return undefined;
   }
 

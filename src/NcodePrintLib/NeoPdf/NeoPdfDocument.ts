@@ -1,21 +1,23 @@
 import * as PdfJs from "pdfjs-dist";
 import { CoordinateTanslater, IPdfMappingDesc, IPolygonArea } from "../Coordinates";
-import { stringToDpiNum, } from "../DataStructure/Structures";
-import { IPageOverview } from "../NcodePrint/PagesForPrint";
+import { IPageSOBP, stringToDpiNum, } from "../DataStructure/Structures";
+import { IPageOverview } from "../NcodePrint/HtmlRenderPrint/PagesForPrint";
 import { ColorConvertMethod } from "../NcodeSurface/CanvasColorConverter";
 import { getNcodeAtCanvasPixel, getNcodeRectAtCanvasPixel, ICellsOnSheetDesc } from "../NcodeSurface/NcodeRasterizer";
 import { MappingItem, MappingStorage } from "../SurfaceMapper";
 import NeoPdfPage, { IPdfPageCanvasDesc, IThumbnailDesc, PDF_VIEWPORT_DESC } from "./NeoPdfPage";
 
 import * as Util from "../UtilFunc";
-import { IPrintOption } from "../NcodePrint/PrintDataTypes";
+import { IPrintOption, IProgressCallbackFunction } from "../NcodePrint/PrintDataTypes";
 
 PdfJs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${PdfJs.version}/pdf.worker.js`;
 const CMAP_URL = "./cmaps/";
 const CMAP_PACKED = true;
 
 export type IGetDocumentOptions = {
-  url?: string,
+  url: string,
+  filename?: string,
+
   fingerprint?: string,
   cMapUrl?: string,
   cMapPacked?: boolean,
@@ -34,9 +36,20 @@ export default class NeoPdfDocument {
 
   _id: string;
 
+  private _title: string;
+
+  get title() {
+    return this._title;
+  }
+
   private _pages: NeoPdfPage[];
 
-  pagesOverview: IPageOverview[];
+
+  /** starting from 0 (page 1 ==> 0) */
+  _pagesOverview: IPageOverview[];
+
+  /** starting from 0 (page 1 ==> 0) */
+  _ncodeAssigned: IPageSOBP[];
 
   direction: "portrait" | "landscape";
 
@@ -64,7 +77,7 @@ export default class NeoPdfDocument {
       this._pages.push(neoPage);
     }
 
-    await this.setPageOverview(this);
+    await this.setPageOverview();
     return this;
   }
 
@@ -87,6 +100,9 @@ export default class NeoPdfDocument {
     const pdfDoc = await this._ready.promise;
     this._pdfDoc = pdfDoc;
     this._fingerprint = pdfDoc.fingerprint;
+
+    const meta = await pdfDoc.getMetadata();
+    this._title = meta.info.title ? meta.info.title : "";
 
     return this;
   }
@@ -139,7 +155,7 @@ export default class NeoPdfDocument {
     }
   }
 
-  public renderPages_dpi = async (pageNums: number[], dpi: number, printOption: IPrintOption)
+  public renderPages_dpi = async (pageNums: number[], dpi: number, printOption: IPrintOption, progressCallback: IProgressCallbackFunction)
     : Promise<IPdfPageCanvasDesc[]> => {
     const { colorMode, luminanceMaxRatio } = printOption;
     const pdfDpi = dpi;
@@ -148,11 +164,11 @@ export default class NeoPdfDocument {
     for (let i = 0; i < pageNums.length; i++) {
       const pageNo = pageNums[i];
       const neoPage = await this.getPageAsync(pageNo);
-      if (printOption.progressCallback) printOption.progressCallback();
+      if (progressCallback) progressCallback();
 
       const pr = neoPage.render_dpi(i, pdfDpi).then(async (canvasDesc) => {
         const convertResult = await neoPage.convertColor(canvasDesc, colorMode, luminanceMaxRatio);
-        if (printOption.progressCallback) printOption.progressCallback();
+        if (progressCallback) progressCallback();
 
         return convertResult;
       })
@@ -181,7 +197,7 @@ export default class NeoPdfDocument {
   }
 
 
-  generateMappingItems = (pageImagesDesc: IPdfPageCanvasDesc[], ncodePlane: ICellsOnSheetDesc, assignNewCode: boolean) => {
+  generateMappingItems = (pageImagesDesc: IPdfPageCanvasDesc[], ncodePlane: ICellsOnSheetDesc, needToIssueCode: boolean) => {
     const array: CoordinateTanslater[] = [];
 
     for (let i = 0; i < ncodePlane.ncodeAreas.length; i++) {
@@ -236,7 +252,7 @@ export default class NeoPdfDocument {
       // const page = this.getPage(pageNo);
       // page.setTranslater(trans);
 
-      // if (assignNewCode) {
+      // if (needToIssueCode) {
       //   const st = MappingStorage.getInstance();
       //   st.register(trans);
       // }
@@ -248,16 +264,18 @@ export default class NeoPdfDocument {
   }
 
   setDocumentId = (pagesPerSheet: number) => {
-    this._id = Util.makePdfId({ fingerprint: this._fingerprint, pagesPerSheet });
+    this._id = Util.makePdfId(this._fingerprint, pagesPerSheet);
   }
 
   get id() {
     return this._id;
   }
 
-  setPageOverview = async (pdf) => {
+  setPageOverview = async () => {
+    const pdf = this;
+
     // const pdf = this.props.pdf;
-    this.pagesOverview = new Array(pdf.numPages + 1);
+    this._pagesOverview = new Array(pdf.numPages);
     // const { pagesPerSheet } = this.printOption;
 
     let numPortraitPages = 0;
@@ -276,9 +294,8 @@ export default class NeoPdfDocument {
         landscape,
         sizePu: { width, height },
       }
-      this.pagesOverview[i] = pageOverview;
+      this._pagesOverview[i] = pageOverview;
     }
-
 
     if (numPortraitPages >= numLandscapePages) {
       this.direction = "portrait";
@@ -287,5 +304,21 @@ export default class NeoPdfDocument {
     }
 
     return this.direction;
+  }
+
+  setNcodeAssigned = (pdfMapDesc: IPdfMappingDesc) => {
+    this._ncodeAssigned = MappingStorage.makeAssignedNcodeArray(pdfMapDesc.nPageStart, this.numPages);
+  }
+
+  getPageNcode = (pageNo: number) => {
+    if (!pageNo || pageNo < 1 || pageNo > this.numPages) {
+      throw "Page number range error";
+    }
+
+    return this._ncodeAssigned[pageNo - 1];
+  }
+
+  get pagesOverview() {
+    return this._pagesOverview;
   }
 }

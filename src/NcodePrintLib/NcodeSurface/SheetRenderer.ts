@@ -1,10 +1,8 @@
-import React, { Component } from 'react';
-
-import * as PdfJs from 'pdfjs-dist';
 import { IPageSOBP, ISize, ICssSize, IRectDpi, } from '../DataStructure/Structures';
-import NcodeRasterizer, { IPagesPerSheetNumbers, IPrepareSurfaceParam, drawArrow, IAreasDesc, } from "../NcodeSurface/NcodeRasterizer";
-import { CSS_DPI, IPrintingEvent, IPrintOption } from './PrintDataTypes';
-import { IPageOverview } from './PagesForPrint';
+import NcodeRasterizer, { IPagesPerSheetNumbers, IRasterizeOption, drawArrow, IAreasDesc, } from "../NcodeSurface/NcodeRasterizer";
+import { CSS_DPI, IPrintingEvent, IPrintOption, IProgressCallbackFunction } from "../NcodePrint/PrintDataTypes";
+
+import { IPageOverview } from '../NcodePrint/HtmlRenderPrint/PagesForPrint';
 
 import { getCellMatrixShape } from '../NcodeSurface/SurfaceSplitter';
 import { IPdfPageCanvasDesc } from '../NeoPdf/NeoPdfPage';
@@ -12,11 +10,14 @@ import NeoPdfDocument from '../NeoPdf/NeoPdfDocument';
 
 import { getSurfaceSize_css } from '../NcodeSurface/SurfaceInfo';
 import * as Util from "../UtilFunc";
-import { makeNPageIdStr } from '../UtilFunc';
+import { isSameObject, makeNPageIdStr } from '../UtilFunc';
+import { SignalCellularNullOutlined } from '@material-ui/icons';
+import { createElement } from 'react';
+import { CoordinateTanslater } from '../Coordinates';
 
 let debug = 0;
 
-type ICanvasShapeDesc = {
+export type ICanvasShapeDesc = {
   /** before applying rotation */
   originalPixel: ISize,
 
@@ -31,38 +32,18 @@ type ICanvasShapeDesc = {
   isLandscape: boolean,
 }
 
+export type IOnPagePreparedFunction = (event: IPrintingEvent) => void;
 
-
-interface Props {
-  /** start from 0 */
-  sheetIndex: number,
-  pdf: NeoPdfDocument,
-
-  /** null이면 화면 전용 */
-  OnPagePrepared: (event: IPrintingEvent) => void,
-
-  printOption: IPrintOption,
-  pageNums: number[],
-  pagesOverview: IPageOverview[],
-
-  name: string,
+export type IPrintingSheetDesc = {
+  canvas: HTMLCanvasElement;
+  canvasDesc: ICanvasShapeDesc,
+  mappingItems: CoordinateTanslater[];
 }
-
-
-interface State {
-  status: string,
-  page: PdfJs.PDFPageProxy,
-  width: string,
-  height: string,
-
-  isLandscape: boolean,
-}
-
 
 /**
  * Class
  */
-export class PageForPrint extends Component<Props, State> {
+export class SheetRenderer {
   canvas: HTMLCanvasElement = null;
   // pageImageDescs: IPdfPageCanvasDesc[] = [];
   entireRotation = 0;
@@ -78,86 +59,126 @@ export class PageForPrint extends Component<Props, State> {
     height: "0px",
     isLandscape: false,
   };
-  constructor(props: Props) {
-    super(props);
 
+  printOption: IPrintOption;
+
+  _ready: Promise<IPrintingSheetDesc>;
+
+  progressCallback: IProgressCallbackFunction;
+  reportCount: number = 0;
+
+  _rendered: {
+    rendered: boolean,
+    pdf: NeoPdfDocument,
+    pageNums: number[],
+    printOption: IPrintOption
+  }
+
+  constructor(printOption: IPrintOption, progressCallback: IProgressCallbackFunction) {
+
+    const canvas = document.createElement("canvas");
     this.uuid = Util.uuidv4();
-    // this.pageImageDescs = new Array(props.printOption.pagesPerSheet);
-  }
+    canvas.id = this.uuid;
 
-  /**
-   *
-   * @param canvas
-   */
-  setCanvasRef = (canvas: HTMLCanvasElement) => {
     this.canvas = canvas;
-  };
+    // this.printOption = { ...printOption };
+    this.printOption = Util.cloneObj(printOption);
+    this.progressCallback = progressCallback;
 
-  shouldComponentUpdate(nextProps: Props, nextState: State) {
-    // let shoudUpdate = true;
-    return this.props.pdf !== nextProps.pdf || this.state.status !== nextState.status;
+    this.reset();
   }
 
-  componentDidUpdate(nextProps: Props, nextState: State) {
-    // this._update(nextProps.pdf, nextProps.printOption);
-
-    // console.log("[test updated] CHECK START");
-    // for (const [key, value] of Object.entries(nextProps)) {
-    //   if (this.props[key] !== value) {
-    //     console.log(`[test updated] property[${key}] was changed, from "${this.props[key]} to "${value}"`);
-    //   }
-    // }
-
-    // for (const [key, value] of Object.entries(nextState)) {
-    //   if (this.state[key] !== value) {
-    //     console.log(`[test updated] state[${key}] was changed, from "${this.state[key]} to "${value}"`);
-    //   }
-    // }
-    // console.log("[test updated] CHECK END");
-
-    this._update(nextProps.pdf, nextProps.printOption);
+  reset = () => {
+    this._ready = undefined;
+    this._rendered = {
+      rendered: false,
+      pdf: undefined,
+      pageNums: [],
+      printOption: undefined,
+    };
   }
 
-  componentDidMount() {
-    const { pdf, printOption } = this.props;
-    this._update(pdf, printOption);
+  reportProgress = (event?: { status: string }) => {
+    this.reportCount++;
+    if (this.progressCallback) {
+      this.progressCallback(event)
+    }
   }
+
+  public getPreparedSheet = async (pdf: NeoPdfDocument, pageNums: number[], printOption: IPrintOption, progressCallback: IProgressCallbackFunction) => {
+    this.progressCallback = progressCallback;
+    this.reportCount = 0;
+
+    if (!this.isSameSheet(pdf, pageNums, printOption) || !this._ready) {
+      this.reset();
+      this._ready = this.prepareSheet(pdf, pageNums, printOption, this.reportProgress);
+    }
+
+    const retCanvas = await this._ready;
+
+    // 그냥 빠져 나가는 경우에, 아래와 같이 report한다
+    if (this._rendered.rendered && progressCallback) {
+      const numPages = pageNums.length;
+      const numSheets = 1;
+      const maxCount = (numPages * 4) + (numSheets * 4);
+      // const progressPercent = (this.printStatus.numEventCount / maxCount) * 100;
+      for (let i = 0; i < maxCount; i++) progressCallback();
+    }
+
+    this._rendered = {
+      rendered: true,
+      pdf,
+      pageNums: [...pageNums],
+      // printOption: { ...printOption },
+      printOption: Util.cloneObj(printOption),
+    };
+
+    return retCanvas;
+  }
+
+  private setState = (state) => {
+    this.state = { ...this.state, ...state };
+  }
+
+  private isSameSheet = (pdf: NeoPdfDocument, pageNums: number[], printOption: IPrintOption) => {
+    const rendered = this._rendered;
+    if (!rendered) return false;
+
+    if (pdf !== rendered.pdf || !isSameObject(pageNums, rendered.pageNums) || !isSameObject(printOption, this.printOption)) {
+      return false;
+    }
+    return true;
+  }
+
 
   /**
    *
    * @param pdf
+   * @param sheetIndex -
+   * @param pageNums - 렌더링할 페이지 번호들
+   * @param printOption
    */
-  _update = (pdf: NeoPdfDocument, printOption: IPrintOption) => {
-    if (pdf) {
-      this.prepareSheet(pdf, printOption);
-    } else {
-      this.setState({ status: 'loading' });
-    }
-  };
 
+  private prepareSheet = async (pdf: NeoPdfDocument, pageNums: number[], printOption: IPrintOption, progressCallback: IProgressCallbackFunction) => {
 
-  prepareSheet = async (pdf: NeoPdfDocument, printOption: IPrintOption) => {
     if (!this.canvas) return;
 
     // console.log("[xxx] PageForPrint loadPage");
     const status = this.state.status;
-    const { sheetIndex } = this.props;
     if (status === 'rendering' || status === 'rendered' || this.state.page !== null) return;
 
     this.setState({ status: 'rendering' });
 
-    // 렌더링할 페이지 번호들
-    const pageNums = this.props.pageNums;
 
     // Main canvas를 준비
-    const canvasDesc = await this.prepareMainCanvas(printOption);
+    const canvasDesc = await this.prepareMainCanvas();
 
     // PDF 이미지를 canvas버퍼에 넣어 둔다.
-    let pageImagesDesc = await this.preparePdfPageImages(pdf, pageNums, printOption);    // this.pageImageDescs
+    let pageImagesDesc = await this.preparePdfPageImages(pdf, pageNums, progressCallback);    // this.pageImageDescs
 
     // 분할된 Ncode plane을 준비
-    const ncodePlane = await this.prepareSplittedNcodePlane(pageNums, printOption);
-    if (printOption.progressCallback) printOption.progressCallback();
+    const ncodePlane = await this.prepareSplittedNcodePlane(pageNums, progressCallback);
+    if (progressCallback) progressCallback();
 
 
     const { canvas: codeCanvas, canvasAreas, } = ncodePlane;
@@ -173,14 +194,14 @@ export class PageForPrint extends Component<Props, State> {
 
     // main canvas에 PDF 이미지를 조합
     pageImagesDesc = this.putPdfPageImagesOnMainCanvas(ctx, canvasAreas, pageImagesDesc);
-    if (printOption.progressCallback) printOption.progressCallback();
+    if (progressCallback) progressCallback();
 
     // 필요하면 debugging용 화살표를, debig level 1 이상
-    this.drawDebugLines(mainCanvas, ctx, printOption);
+    this.drawDebugLines(mainCanvas, ctx);
 
     // main canvas에 Ncode 이미지를 오버레이
-    this.overlayNcodePlaneOnMainCanvas(ctx, codeCanvas, printOption);
-    if (printOption.progressCallback) printOption.progressCallback();
+    this.overlayNcodePlaneOnMainCanvas(ctx, codeCanvas);
+    if (progressCallback) progressCallback();
 
     // PDF와 ncode의 mapping table에 추가
     const pagesPerSheet = printOption.pagesPerSheet as number;
@@ -190,20 +211,28 @@ export class PageForPrint extends Component<Props, State> {
     }
 
     // 캔버스의 색상 값 디버깅용, debug level 3 이상
-    this.debugCheckColorValues(mainCanvas, ctx, printOption);
+    this.debugCheckColorValues(mainCanvas, ctx);
     ctx.restore();
 
     const { width: css_width, height: css_height } = canvasDesc.css;
     this.setState({ status: 'rendered', width: css_width, height: css_height });
 
     // 보고를 위해 code mapping item을 가져온다
-    const array = pdf.generateMappingItems(pageImagesDesc, ncodePlane, printOption.assignNewCode);
-    if (printOption.progressCallback) printOption.progressCallback();
+    const array = pdf.generateMappingItems(pageImagesDesc, ncodePlane, printOption.needToIssueCode);
+    if (progressCallback) progressCallback();
 
-    this.reportProgress({ sheetIndex, pageNums, completion: 100, mappingItems: array });
+    const ret: IPrintingSheetDesc = {
+      canvas: this.canvas,
+      canvasDesc,
+      mappingItems: array,
+    }
+
+    return ret;
   }
 
-  private drawDebugLines = (mainCanvas, ctx, printOption: IPrintOption) => {
+
+  private drawDebugLines = (mainCanvas, ctx) => {
+    const printOption = this.printOption;
     if (printOption.debugMode < 1) return;
 
     ctx.save();
@@ -235,13 +264,9 @@ export class PageForPrint extends Component<Props, State> {
     ctx.restore();
   }
 
-  private reportProgress = (event: IPrintingEvent) => {
-    const OnPagePrepared = this.props.OnPagePrepared;
-    if (OnPagePrepared) OnPagePrepared(event);
-  }
+  private debugCheckColorValues = (mainCanvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D) => {
+    const printOption = this.printOption;
 
-
-  private debugCheckColorValues = (mainCanvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, printOption: IPrintOption) => {
     if (!printOption.debugMode || printOption.debugMode < 3) return;
 
     debug++;
@@ -272,39 +297,40 @@ export class PageForPrint extends Component<Props, State> {
     }
   }
 
-  private prepareSplittedNcodePlane = async (pageNums: number[], printOption: IPrintOption) => {
+  private prepareSplittedNcodePlane = async (pageNums: number[], progressCallback: IProgressCallbackFunction) => {
+    const printOption = this.printOption;
 
     // 분할된 Ncode plane을 준비
-    const { padding, drawFrame, drawMarkRatio, drawCalibrationMark, pagesPerSheet, debugMode, printDpi, direction, mediaSize, hasToPutNcode } = printOption;
+    // const { padding, drawFrame, drawMarkRatio, drawCalibrationMark, maxPagesPerSheetToDrawMark, pagesPerSheet, debugMode, printDpi, direction, mediaSize, hasToPutNcode } = printOption;
+    const { direction } = printOption;
     const pageInfos: IPageSOBP[] = [];
 
-    // const pageNums: number[] = [];
+    // 페이지에 코드를 할당하는 부분인데, 이게 이상하다.
+    console.log(`[code assign] ${pageNums}`);
     for (let i = 0; i < pageNums.length; i++) {
       const pageNo = pageNums[i];
-
-      const p: IPageSOBP = {
-        ...printOption.pageInfo,
-        page: printOption.pageInfo.page + pageNo - 1,
-      }
+      const assignedCode = printOption.issuedNcodes[pageNo - 1];
+      const p: IPageSOBP = { ...assignedCode };
+      console.log(`[code assign]    ${makeNPageIdStr(p)}`);
       pageInfos.push(p);
     }
 
-    const options: IPrepareSurfaceParam = {
-      numItems: pagesPerSheet as IPagesPerSheetNumbers,
+    const options: IRasterizeOption = {
       srcDirection: direction,
-      dpi: printDpi,
-      mediaSize,
-      debugMode,
       pageInfos,
-      hasToPutNcode,
-      drawCalibrationMark,
-      drawMarkRatio,
-      drawFrame,
-      padding,
+      printOption,
+      // mediaSize,
+      // debugMode,
+      // hasToPutNcode,
+      // maxPagesPerSheetToDrawMark,
+      // drawCalibrationMark,
+      // drawMarkRatio,
+      // drawFrame,
+      // padding,
     };
 
     const rasterizer = new NcodeRasterizer(printOption);
-    const ncodePlane = await rasterizer.prepareNcodePlane(options);
+    const ncodePlane = await rasterizer.prepareNcodePlane(options, progressCallback);
 
     console.log(`[mapping] return ncodePlane = ${makeNPageIdStr(ncodePlane.ncodeAreas[0].pageInfo)}`);
 
@@ -350,7 +376,9 @@ export class PageForPrint extends Component<Props, State> {
 
   }
 
-  private overlayNcodePlaneOnMainCanvas = (ctx: CanvasRenderingContext2D, codeCanvas: HTMLCanvasElement, printOption: IPrintOption) => {
+  private overlayNcodePlaneOnMainCanvas = (ctx: CanvasRenderingContext2D, codeCanvas: HTMLCanvasElement) => {
+    const printOption = this.printOption;
+
     if (printOption.codeDensity === 3) {
       ctx.drawImage(codeCanvas, 0, 0);
       ctx.drawImage(codeCanvas, 1, 0);
@@ -375,46 +403,29 @@ export class PageForPrint extends Component<Props, State> {
 
 
 
-  prepareMainCanvas = async (printOption: IPrintOption): Promise<ICanvasShapeDesc> => {
-    /** Prepare main canvas */
-
+  prepareMainCanvas = async (): Promise<ICanvasShapeDesc> => {
     const mainCanvas = this.canvas;
 
     if (!mainCanvas) {
       console.log("main canvas is null");
       return;
     }
-    const { printDpi: dpi, pagesPerSheet, direction, mediaSize, padding } = printOption;
 
+    const printOption = this.printOption;
+    const { printDpi: dpi, pagesPerSheet, direction, mediaSize, padding } = printOption;
     const { width: width_css, height: height_css } = getSurfaceSize_css(mediaSize, false, padding);
-    // const { width: width_dpi, height: height_dpi } = getSurfaceSize_dpi(printOption.mediaSize, dpi);
 
     const width_dpi = width_css * dpi / CSS_DPI;
     const height_dpi = height_css * dpi / CSS_DPI;
-
-
-    /** 가로 세로의 비율을 원래대로 지키는 것이 아주 중요, 그렇지 않으면 프린터가 점을 깬다 */
-    // const dpi_css_scale_width = width_dpi / width_css;
-    // const dpi_css_scale_height = height_dpi / height_css;
-
-    // const toAvoidPageBreak = 1;
-    // let mediaCssWidth = Math.floor(width_css);
-    // let mediaCssHeight = Math.floor(height_css);
     const mediaCssWidth = width_css;
     const mediaCssHeight = height_css;
-
-    /** 이렇게 css의 크기를 변경해 주면, pixel의 크기도 변경해야 한다. 그때 가로 세로의 원래 비율을 유지하는 것이 굉장히 중요 */
-    // mediaCssWidth -= toAvoidPageBreak;
-    // mediaCssHeight -= toAvoidPageBreak;
 
     let isLandscape = (direction === "landscape");
 
     const { rotation } = getCellMatrixShape(pagesPerSheet, direction);
-    // console.log(`[yyy] prepareMainCanvas -${printOption.direction}, rotation=${rotation}`);
 
     const isRotationNeeded = rotation === 90;
     if (isRotationNeeded) isLandscape = !isLandscape;
-
 
     /** 그래픽 크기와 상관 없이, rotation이 들어가 있는 경우 */
     let canvasDesc: ICanvasShapeDesc = {
@@ -466,37 +477,18 @@ export class PageForPrint extends Component<Props, State> {
   /**
    * this.pdfCanvasDescs에 canvasDesc들을 넣어 둔다.
    */
-  private preparePdfPageImages = async (pdf: NeoPdfDocument, pageNums: number[], printOption: IPrintOption)
+  private preparePdfPageImages = async (pdf: NeoPdfDocument, pageNums: number[], progressCallback: IProgressCallbackFunction)
     : Promise<IPdfPageCanvasDesc[]> => {
+
+    const printOption = this.printOption;
 
     const { pagesPerSheet, pdfRenderingDpi } = printOption;
 
-    const pdfDpi = pdfRenderingDpi / pagesPerSheet;
-    const descs = await pdf.renderPages_dpi(pageNums, pdfDpi, printOption);
+    // const pdfDpi = pdfRenderingDpi / pagesPerSheet;
+    const pdfDpi = Math.round(pdfRenderingDpi / Math.sqrt(Math.sqrt(pagesPerSheet)));
+    const descs = await pdf.renderPages_dpi(pageNums, pdfDpi, printOption, progressCallback);
     this.entireRotation = descs[0].rotation;
 
     return descs;
-  }
-
-
-  /** imageRendering: "pixelated"가 굉장히 중요 */
-  render() {
-    const { sheetIndex } = this.props;
-    const { width, height, status } = this.state;
-    // console.log(`status [${status}],  Page orientation: ${isLandscape ? "LandscapeOrientation" : "PortraitOrientation"}`);
-    const style = {
-      // width, height,
-      // transform: `rotate(${-rotation}deg)`,
-      // WebkitTransform: `rotate(${-rotation}deg)`,
-      // msTransform: `rotate(${-rotation}deg)`,
-    };
-
-
-    return (
-      <div className="pdfSheet" id={`pdf-sheet-${sheetIndex}${this.uuid} ${status}`} style={style} >
-        {/* <PortraitOrientation /> */}
-        <canvas ref={this.setCanvasRef} style={{ imageRendering: "pixelated", width, height }} />
-      </div >
-    );
   }
 }

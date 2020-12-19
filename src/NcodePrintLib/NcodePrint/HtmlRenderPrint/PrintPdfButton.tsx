@@ -2,19 +2,19 @@ import React from "react";
 import { Button, ButtonProps, } from "@material-ui/core";
 
 import { PrintPdfMain } from "./PrintPdfMain";
-import { IPrintingReport, IPrintOption, } from "./PrintDataTypes";
+import { IPrintingReport, IPrintOption, } from "../PrintDataTypes";
 
-import NeoPdfDocument from "../NeoPdf/NeoPdfDocument";
-import NeoPdfManager from "../NeoPdf/NeoPdfManager";
-import { PDF_VIEWPORT_DESC } from "../NeoPdf/NeoPdfPage";
+import NeoPdfDocument from "../../NeoPdf/NeoPdfDocument";
+import NeoPdfManager from "../../NeoPdf/NeoPdfManager";
+import { PDF_VIEWPORT_DESC } from "../../NeoPdf/NeoPdfPage";
 import { IPageOverview } from "./PagesForPrint";
-import { IPdfMappingDesc } from "../Coordinates";
-import { MappingStorage, PdfDocMapper } from "../SurfaceMapper";
+import { IPdfMappingDesc } from "../../Coordinates";
+import { MappingStorage, PdfDocMapper } from "../../SurfaceMapper";
 
-import * as Util from "../UtilFunc";
-import { diffPropsAndState } from "../UtilFunc";
-import { g_defaultPrintOption } from "../DefaultOption";
-import ProgressDialog from "./ProgressDialog";
+import * as Util from "../../UtilFunc";
+import { diffPropsAndState } from "../../UtilFunc";
+import { g_defaultPrintOption } from "../../DefaultOption";
+import ProgressDialog from "../ProgressDialog";
 
 // PdfJs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${PdfJs.version}/pdf.worker.js`;
 // var CMAP_URL = "./cmaps/";
@@ -75,7 +75,7 @@ export default class PrintPdfButton extends React.Component<IPrintPdfButtonProps
   printOption: IPrintOption = null;
 
 
-  pagesOverview: IPageOverview[];
+  // pagesOverview: IPageOverview[];
 
   printStatus = {
     /** Sample 코드를 위한 것 */
@@ -178,37 +178,41 @@ export default class PrintPdfButton extends React.Component<IPrintPdfButtonProps
    * NeoPdfDocument에 있는 setPageOverview의 결과를 쓰도록 하자
    * 2020/12/06
    */
-  setPageOverview = async (pdf) => {
-    // const pdf = this.props.pdf;
-    this.pagesOverview = new Array(pdf.numPages + 1);
-    // const { pagesPerSheet } = this.printOption;
-
-    let numPortraitPages = 0;
-    let numLandscapePages = 0;
-
-    for (let i = 0; i < pdf.numPages; i++) {
-      const page = await pdf.getPageAsync(i + 1);
-      const vpt: PDF_VIEWPORT_DESC = page.getViewport({ scale: 1, rotation: 0 });
-      const { width, height } = vpt;
-
-      const landscape = width > height;
-      landscape ? numLandscapePages++ : numPortraitPages++;
-
-      const pageOverview = {
-        rotation: vpt.rotation,
-        landscape,
-        sizePu: { width, height },
-      }
-      this.pagesOverview[i] = pageOverview;
-    }
+  setPageOverview = async (pdf: NeoPdfDocument) => {
 
     const printOption = this.printOption;
+    printOption.direction = pdf.direction;
 
-    if (numPortraitPages >= numLandscapePages) {
-      printOption.direction = "portrait";
-    } else {
-      printOption.direction = "landscape";
-    }
+    // // const pdf = this.props.pdf;
+    // this.pagesOverview = new Array(pdf.numPages + 1);
+    // // const { pagesPerSheet } = this.printOption;
+
+    // let numPortraitPages = 0;
+    // let numLandscapePages = 0;
+
+    // for (let i = 0; i < pdf.numPages; i++) {
+    //   const page = await pdf.getPageAsync(i + 1);
+    //   const vpt: PDF_VIEWPORT_DESC = page.getViewport({ scale: 1, rotation: 0 });
+    //   const { width, height } = vpt;
+
+    //   const landscape = width > height;
+    //   landscape ? numLandscapePages++ : numPortraitPages++;
+
+    //   const pageOverview = {
+    //     rotation: vpt.rotation,
+    //     landscape,
+    //     sizePu: { width, height },
+    //   }
+    //   this.pagesOverview[i] = pageOverview;
+    // }
+
+    // const printOption = this.printOption;
+
+    // if (numPortraitPages >= numLandscapePages) {
+    //   printOption.direction = "portrait";
+    // } else {
+    //   printOption.direction = "landscape";
+    // }
 
     console.log(`[yyy] setPageOverview - ${printOption.direction}`);
   }
@@ -243,12 +247,12 @@ export default class PrintPdfButton extends React.Component<IPrintPdfButtonProps
   }
 
 
-  getPreviousMappingItem = (printOption: IPrintOption) => {
+  getAssociatedMappingInfo = (printOption: IPrintOption) => {
     const { pdf } = this.state;
     const { pagesPerSheet } = printOption;
 
     const fingerprint = pdf.fingerprint;
-    const id = Util.makePdfId({ fingerprint, pagesPerSheet: pagesPerSheet as number });
+    const id = Util.makePdfId(fingerprint, pagesPerSheet as number);
 
     const instance = MappingStorage.getInstance();
     const mapped = instance.findNcodeRange(id);
@@ -279,21 +283,21 @@ export default class PrintPdfButton extends React.Component<IPrintPdfButtonProps
    */
   setPrintOption = (printOption: IPrintOption, pdf: NeoPdfDocument) => {
     /** 코드 할당에 대한 기본 값을 써 주자 */
-    const mapped = this.getPreviousMappingItem(printOption);
+    const pdfMapDesc = this.getAssociatedMappingInfo(printOption);
 
     /** 코드 할당에 대한 기본값 설정 */
-    if (mapped && mapped.nPageStart.section !== -1) {
-      const pageInfo = mapped.nPageStart;
+    if (pdfMapDesc && pdfMapDesc.nPageStart.section !== -1) {
+      const pageInfo = pdfMapDesc.nPageStart;
       printOption.pageInfo = { ...pageInfo };
-      printOption.assignNewCode = false;
+      printOption.needToIssueCode = false;
     }
     else {
-      printOption.assignNewCode = true;
+      printOption.needToIssueCode = true;
     }
 
     /** 그리다보드 v1.0에서 만들어진 파일을 데모용으로 썼었다, 그걸 인쇄하기 위한 것 */
     if (this.setOptionForTest(printOption)) {
-      printOption.assignNewCode = false;
+      printOption.needToIssueCode = false;
     }
 
     /** 기본 값으로는 모든 페이지를 인쇄하도록 */
@@ -304,7 +308,7 @@ export default class PrintPdfButton extends React.Component<IPrintPdfButtonProps
     // this.printOption.targetPages = Array.from({ length: 2 }, (_, i) => i + 1);
     // this.printOption.debugMode = 0;
 
-    return mapped;
+    return pdfMapDesc;
   }
 
   issueCodeAndSetOption = (printOption: IPrintOption) => {
@@ -315,7 +319,7 @@ export default class PrintPdfButton extends React.Component<IPrintPdfButtonProps
       url,
       filename,
       fingerprint: pdf.fingerprint,
-      id: Util.makePdfId({ fingerprint: pdf.fingerprint, pagesPerSheet: pagesPerSheet as number }),
+      id: Util.makePdfId(pdf.fingerprint, pagesPerSheet as number),
       numPages: pdf.numPages,
     }
     const instance = MappingStorage.getInstance();
@@ -334,7 +338,7 @@ export default class PrintPdfButton extends React.Component<IPrintPdfButtonProps
 
     /** PrintPdfMain의 printTrigger를 +1 해 주면, 인쇄가 시작된다.*/
     const { printTrigger, pdf } = this.state;
-    const pdfMapDesc = this.setPrintOption(this.printOption, this.state.pdf);
+    let pdfMapDesc = this.setPrintOption(this.printOption, this.state.pdf);
     this.printOption.pdfMappingDesc = pdfMapDesc;
 
     /** dialog를 띄운다든지 하는 callback 함수를 부른다 */
@@ -346,12 +350,13 @@ export default class PrintPdfButton extends React.Component<IPrintPdfButtonProps
     }
 
     /** Ncode가 필요하면 코드를 받아 온다, 여기서 받아오는 ncode page 수는 전체 PDF의 페이지 수*/
-    const { targetPages, pagesPerSheet, assignNewCode, url, filename } = this.printOption;
-    if (assignNewCode) {
-      const newPdfMapDesc = this.issueCodeAndSetOption(this.printOption);
-      this.printOption.pdfMappingDesc = newPdfMapDesc;
+    const { targetPages, pagesPerSheet, needToIssueCode, url, filename } = this.printOption;
+    if (needToIssueCode) {
+      pdfMapDesc = this.issueCodeAndSetOption(this.printOption);
+      this.printOption.pdfMappingDesc = pdfMapDesc;
+      this.printOption.pageInfo = { ...pdfMapDesc.nPageStart };
     }
-
+    this.printOption.issuedNcodes = MappingStorage.makeAssignedNcodeArray(pdfMapDesc.nPageStart, pdf.numPages);
 
     /** state가 바뀌면, 인쇄를 시작한다. printTrigger에 의해 */
     const numPagesToPrint = targetPages.length;
@@ -428,7 +433,7 @@ export default class PrintPdfButton extends React.Component<IPrintPdfButtonProps
     console.log("END OF PRINT");
 
     /** mapping 정보를 등록 */
-    if (this.printOption.assignNewCode) {
+    if (this.printOption.needToIssueCode) {
       const storage = MappingStorage.getInstance();
       storage.register(mapping);
     }
@@ -458,7 +463,7 @@ export default class PrintPdfButton extends React.Component<IPrintPdfButtonProps
     const nowPrinting = status === "printing" || status === "progress" || status === "prepared";
 
     let dialogTitle = this.state.status === "prepared" ? "인쇄 종료 대기 중" : "인쇄 준비 중";
-    dialogTitle =this.state.status === "completed" ? "완료" : dialogTitle;
+    dialogTitle = this.state.status === "completed" ? "완료" : dialogTitle;
 
     return (
       <div className="pdf-context">
@@ -470,7 +475,7 @@ export default class PrintPdfButton extends React.Component<IPrintPdfButtonProps
           <PrintPdfMain
             pdf={pdf}
             filename={filename}
-            pagesOverview={this.pagesOverview}
+            pagesOverview={pdf.pagesOverview}
             printTrigger={printTrigger}
             printOption={this.printOption}
             onAfterPrint={this.onAfterPrint}

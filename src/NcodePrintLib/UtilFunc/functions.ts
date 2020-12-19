@@ -3,6 +3,7 @@
 import { sprintf } from "sprintf-js";
 import { isObject } from "util";
 import { IPageSOBP } from "../DataStructure/Structures";
+import { IUnitString } from "../NcodePrint/PrintDataTypes";
 import { g_availablePagesInSection } from "../NcodeSurface/SurfaceInfo";
 
 export function compareObject(curr: Object, next: Object, header = "") {
@@ -24,10 +25,8 @@ export function uuidv4(): string {
 }
 
 
-export function makePdfId(arg: {
-  fingerprint: string, pagesPerSheet: number
-}): string {
-  return arg.fingerprint + "/" + arg.pagesPerSheet.toString();
+export function makePdfId(fingerprint: string, pagesPerSheet: number) {
+  return fingerprint + "/" + pagesPerSheet.toString();
 }
 
 
@@ -43,6 +42,20 @@ export function makeNPageIdStr(info: IPageSOBP) {
 
 export function cloneObj(obj) {
   return JSON.parse(JSON.stringify(obj));
+}
+
+export function isSameObject(a: any, b: any) {
+  if (a === b) return true;
+  for (const key in a) {
+    if (typeof a[key] === "object") {
+      if (!isSameObject(a[key], b[key])) return false;
+    }
+    else if (a[key] !== b[key]) {
+      console.log(`[printOption diff] key=${key} values="${a[key]}", "${b[key]}`);
+      return false;
+    }
+  }
+  return true;
 }
 
 
@@ -206,4 +219,70 @@ export function drawCrossMark(
   drawSingleCrossMark(arg.ctx, x[markPos], y[markPos], len);
 
   return { x: x[markPos], y: y[markPos] };
+}
+
+
+function convertUnitToPt(unit: IUnitString, value: number) {
+  let multiplier: number;
+
+  switch (unit) {
+    case 'pt': multiplier = 1; break;
+    case 'mm': multiplier = 72 / 25.4; break;
+    case 'cm': multiplier = 72 / 2.54; break;
+    case 'in': multiplier = 72; break;
+    case 'px': multiplier = 96 / 72; break;
+    case 'css': multiplier = 72 / 96; break;
+    case 'pc': multiplier = 12; break;
+    case 'em': multiplier = 12; break;
+    case 'ex': multiplier = 6; break;
+    default:
+      throw ('Invalid unit: ' + unit);
+  }
+
+  return value * multiplier;
+}
+
+export function convertUnit(fromUnit: IUnitString, value: number, toUnit: IUnitString) {
+  const points = convertUnitToPt(fromUnit, value);
+
+  let multiplier: number;
+  switch (toUnit) {
+    case 'pt': multiplier = 1; break;
+    case 'mm': multiplier = 25.4 / 72; break;
+    case 'cm': multiplier = 2.54 / 72; break;
+    case 'in': multiplier = 1 / 72; break;
+    case 'px': multiplier = 72 / 96; break;
+    case 'css': multiplier = 96 / 72; break;
+    case 'pc': multiplier = 1 / 12; break;
+    case 'em': multiplier = 1 / 12; break;
+    case 'ex': multiplier = 1 / 6; break;
+    default:
+      throw ('Invalid unit: ' + toUnit);
+  }
+
+  return points * multiplier;
+}
+
+
+export function getFilenameOnly(str: string) {
+  const ext = getExtensionName(str);
+  let name = str.split('/').pop().replace("." + ext, '');
+  name = name.split('\\').pop().replace("." + ext, '');
+  return name;
+}
+
+export function getExtensionName(str: string) {
+  const re = /(?:\.([^.]+))?$/;
+
+  const ext = re.exec(str)[1];   // "txt"
+  return ext;
+}
+
+
+export function getNcodedPdfName(filename: string, pageInfo: IPageSOBP, pagesPerSheet: number) {
+  const name = getFilenameOnly(filename);
+  const { section, owner, book, page } = pageInfo;
+  const fn = `${name}_${pagesPerSheet}(${section}_${owner}_${book}_${page})_ncoded.pdf`;
+
+  return fn;
 }

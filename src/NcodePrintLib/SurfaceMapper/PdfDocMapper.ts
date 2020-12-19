@@ -110,7 +110,7 @@ export default class PdfDocMapper {
     /** 파일 전체의 매핑 정보를 기록해 둔다 */
     const head = this._arrMapped[0];
     const { url, fingerprint, numPages } = head.pdfDesc;
-    const id = Util.makePdfId({ fingerprint, pagesPerSheet: this._pagesPerSheet });
+    const id = Util.makePdfId(fingerprint, this._pagesPerSheet);
 
 
     this._docMap = {

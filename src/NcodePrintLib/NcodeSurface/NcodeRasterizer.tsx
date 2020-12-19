@@ -6,10 +6,12 @@ import { INcodeSurfaceDesc, IPaperSize } from "./SurfaceDataTypes";
 // import expect from "expect.js";
 import { getSurfaceSize_dpi } from "./SurfaceInfo";
 import { devideSurfaceAreaTo, getCellMatrixShape } from "./SurfaceSplitter";
-import { IPrintOption } from "../NcodePrint/PrintDataTypes";
+import { IPrintOption, IProgressCallbackFunction } from "../NcodePrint/PrintDataTypes";
 import { NCODE_CLASS6_NUM_DOTS } from "./NcodeConstans";
 import NcodeFetcherPool from "./NcodeFetcherPool";
 import { makeNPageIdStr } from "../UtilFunc";
+import * as Util from "../UtilFunc";
+
 
 // import { PrintContextConsumer } from "react-to-print";
 
@@ -99,7 +101,7 @@ export type ICellsOnSheetDesc = {
   ncodeAreas: INcodeAreaDesc[];
 }
 
-export type ICanvasContextForCodeDraw = {
+export type INcodeDrawContext = {
   ctx: CanvasRenderingContext2D,
   x: number,
   y: number,
@@ -111,26 +113,13 @@ export type IPagesPerSheetNumbers = 1 | 4 | 9 | 16 | 25 | 2 | 8 | 18 | 32;
 /**
  * srcDirection은, PDF 파일 전체의 landscape/portrait를 넣어야 한다.
  */
-export interface IPrepareSurfaceParam {
-  mediaSize: IPaperSize,
+export interface IRasterizeOption {
+
   srcDirection: "auto" | "portrait" | "landscape",
-  dpi: number,
-  numItems: IPagesPerSheetNumbers
+
   pageInfos: IPageSOBP[],
 
-  hasToPutNcode: boolean,
-
-  drawCalibrationMark: boolean,
-
-  drawMarkRatio: number, // typically 0.1 ( 1 = 100% )
-
-  /** border를 그릴지 안그릴지 */
-  drawFrame: boolean,
-
-  debugMode: 0 | 1 | 2 | 3,
-
-  /** 상하좌우 여백, mm 단위 */
-  padding: number,
+  printOption: IPrintOption,
 }
 
 /**
@@ -150,7 +139,7 @@ export default class NcodeRasterizer {
 
 
   constructor(printOption: IPrintOption) {
-    this.printOption = { ...printOption };
+    this.printOption = Util.cloneObj(printOption);
   }
 
   private drawAreaArrow = (ctx, area) => {
@@ -185,21 +174,19 @@ export default class NcodeRasterizer {
 
   /**
    * 이 함수 내부에서 쓰이는 모든 단위는 600dpi 인쇄를 기준으로 한 pixel 값
-   *
-   * @param mediaSize
-   * @param numItems
-   * @param srcDirection
    */
-  public prepareNcodePlane = async (options: IPrepareSurfaceParam ): Promise<ICellsOnSheetDesc> => {
-    const { padding, drawFrame, drawMarkRatio, drawCalibrationMark, mediaSize, srcDirection, numItems, pageInfos, hasToPutNcode } = options;
-    let dpi = options.dpi;
+  public prepareNcodePlane = async (options: IRasterizeOption, progressCallback: IProgressCallbackFunction) => {
+    const { srcDirection, pageInfos } = options;
+    const { pagesPerSheet, printDpi, padding, drawFrame, drawMarkRatio, maxPagesPerSheetToDrawMark, drawCalibrationMark, mediaSize, hasToPutNcode, debugMode } = options.printOption;
+
+    let dpi = printDpi;
     dpi = 600;  // kitty  2020/11/29, 코드 제네레이터는 600 dpi로 고정
 
-    // expect(pageInfos.length).to.be(numItems);
+    // expect(pageInfos.length).to.be(pagesPerSheet);
 
     // temp canvas size를 구한다.
     let isLandscape = (srcDirection === "landscape");
-    const isRotationNeeded = getCellMatrixShape(numItems, srcDirection).rotation === 90;
+    const isRotationNeeded = getCellMatrixShape(pagesPerSheet, srcDirection).rotation === 90;
     if (isRotationNeeded) isLandscape = !isLandscape;
     const size = getSurfaceSize_dpi(mediaSize, dpi, isLandscape, padding);
     // let logicalSize = { ...size };
@@ -208,7 +195,7 @@ export default class NcodeRasterizer {
 
     // sheet의 면을 cell로 나누고,
     const entireRect = { x: 0, y: 0, ...size };
-    const canvasAreas = devideSurfaceAreaTo(this.printOption, entireRect, numItems);
+    const canvasAreas = devideSurfaceAreaTo(this.printOption, entireRect, pagesPerSheet);
     const { areas } = canvasAreas;
 
     // 캔버스를 준비
@@ -222,46 +209,41 @@ export default class NcodeRasterizer {
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
 
-    if (options.debugMode > 0) {
+    if (debugMode > 0) {
       ctx.strokeStyle = "rgba(0, 255, 0, 255)";     // 외곽
       ctx.lineWidth = 70;
       ctx.strokeRect(0, 0, canvas.width, canvas.height);
     }
 
-    // 좌표계의 논리적 회전이 필요하면 회전, when numItems === 2 | 8 | 18 | 32
+    // 좌표계의 논리적 회전이 필요하면 회전, when pagesPerSheet === 2 | 8 | 18 | 32
     // if (canvasAreas.rotation === 90) {
     //   ctx.translate(canvas.width, 0);
     //   ctx.rotate(Math.PI / 2);
     // }
 
 
-    // 출력할 페이지/시트의 실제 출력 대상의 페이지 수 보다 적을 수 있다
+    // 최종적으로 그려진 Ncode 영역의 페이지 정보와 ncode 영역의 크기
     const ncodeAreas = [];
+
+    // pagesPerSheet에 따라 필요한 영역을 그린다. 단, areas.length <= pagesPerSheet, 항상 같을 수는 없다.
     for (let i = 0; i < areas.length; i++) {
-      // 디버깅용 화살표를 그린다. debug mode 1이상
-      const drawingContext: ICanvasContextForCodeDraw = { ctx, ...areas[i], };
+      const drawingContext: INcodeDrawContext = { ...areas[i], ctx };
       const area = areas[i];
-      if (this.printOption.debugMode > 0) {
-        this.drawAreaArrow(ctx, area);
-      }
 
-      if (drawFrame) {
-        this.drawFrame(drawingContext, null);
-      }
+      // 디버깅용 화살표를 그린다. debug mode 1이상
+      if (this.printOption.debugMode > 0) this.drawAreaArrow(ctx, area);
 
-      // Calibration 십자가를 그린다.
-      if (drawCalibrationMark && numItems < 24) {
-        this.drawCrossMark(drawingContext, drawMarkRatio, null);
-      }
+      // 페이지 영역의 사각형 틀을 필요하면 그린다
+      if (drawFrame) this.drawFrame(drawingContext, null);
 
-      // 코드를 그린다
+      // 코드 영역에 필요한 것을 그린다
       if (hasToPutNcode && i < pageInfos.length) {
-        const pageInfo = pageInfos[i];
+        const assignedNcode = pageInfos[i];
 
         const fetcher = NcodeFetcherPool.getInstance();
         // const fetcher = new NcodeFetcher(pageInfo);
-        const ncodeSurfaceDesc = await fetcher.getNcodeData(pageInfos[i]);
-        if (this.printOption.progressCallback) this.printOption.progressCallback();
+        const ncodeSurfaceDesc = await fetcher.getNcodeData(assignedNcode);
+        if (progressCallback) progressCallback();
 
         // (left, top) margin을 세팅
         if (this.printOption.marginLeft_nu === -1) {
@@ -271,13 +253,18 @@ export default class NcodeRasterizer {
         if (this.printOption.marginTop_nu === -1) {
           this.printOption.marginTop_nu = ncodeSurfaceDesc.margin.Ymin;
         }
-        // 코드를 그린다
 
-        // ctx.strokeStyle = "rgba(0, 255, 0, 255)";     // 투명 캔버스
-        // ctx.lineWidth = 70;
-        // ctx.strokeRect(0, 0, canvas.width, canvas.height);
+        // Calibration 십자가를 그린다.
+        if (drawCalibrationMark && pagesPerSheet <= maxPagesPerSheetToDrawMark) {
+          this.drawCrossMark(drawingContext, drawMarkRatio, null);
+        }
+
+        // 코드 정보를 넣는다
+        this.putNcodeInfo(drawingContext, assignedNcode);
+
+        // 코드 점을 찍는다
         const ncodeArea = await this.drawNcode(drawingContext, ncodeSurfaceDesc, dpi);
-        if (this.printOption.progressCallback) this.printOption.progressCallback();
+        if (progressCallback) progressCallback();
 
         console.log(`[mapping] push Page Info = ${makeNPageIdStr(ncodeSurfaceDesc.pageInfo)}`);
         ncodeAreas.push(ncodeArea);
@@ -295,7 +282,7 @@ export default class NcodeRasterizer {
     return result;
   }
 
-  // public putCode = async (context: ICanvasContextForCodeDraw, pageInfo: IPageSOBP): Promise<any> => {
+  // public putCode = async (context: INcodeDrawContext, pageInfo: IPageSOBP): Promise<any> => {
   //   // return new Promise( (resolve) => resolve() );   // kitty
   //   // this.rotation = rotation;
 
@@ -318,10 +305,9 @@ export default class NcodeRasterizer {
   //   await this.drawNcode(context, ncodeSurfaceDesc, 600);
   // }
 
-  private drawSingleCrossMark = (context: ICanvasContextForCodeDraw, x: number, y: number) => {
+  private drawSingleCrossMark = (context: INcodeDrawContext, x: number, y: number, line_len: number) => {
     const ctx = context.ctx;
     const line_width = 5;
-    const line_len = 100;
 
 
     ctx.strokeStyle = "rgb(255, 0, 0)";
@@ -341,7 +327,7 @@ export default class NcodeRasterizer {
   }
 
 
-  private drawFrame = (context: ICanvasContextForCodeDraw, srcMapped: IPdfPixelArea = null) => {
+  private drawFrame = (context: INcodeDrawContext, srcMapped: IPdfPixelArea = null) => {
 
     // 이전 버전과 호환성을 위해
     if (srcMapped === null) {
@@ -362,7 +348,24 @@ export default class NcodeRasterizer {
     ctx.restore();
   }
 
-  public drawCrossMark = (context: ICanvasContextForCodeDraw, drawMarkRatio: number, srcMapped: IPdfPixelArea = null) => {
+  private putNcodeInfo = (context: INcodeDrawContext, pageInfo: IPageSOBP) => {
+    const { x, y, width, height } = context;
+
+    const code_str = makeNPageIdStr(pageInfo);
+    const ctx = context.ctx;
+    ctx.save();
+    // ctx.translate(x, y);
+    ctx.translate(x, y);
+    ctx.rotate(-Math.PI / 2);
+
+    ctx.fillStyle = "#0000ff";
+    ctx.font = "50px Arial";
+    ctx.textBaseline = "bottom";
+    ctx.fillText(code_str,  -height + 30, width - 20);
+    ctx.restore();
+  }
+
+  private drawCrossMark = (context: INcodeDrawContext, drawMarkRatio: number, srcMapped: IPdfPixelArea = null) => {
 
     // 이전 버전과 호환성을 위해
     if (srcMapped === null) {
@@ -375,10 +378,12 @@ export default class NcodeRasterizer {
     const y0 = srcMapped.dy + d;
     const x1 = srcMapped.dx + srcMapped.dw - d;
     const y1 = srcMapped.dy + srcMapped.dh - d;
+    let line_len = srcMapped.dw * 0.05;
+    if (line_len > 100) line_len = 100;
 
-    this.drawSingleCrossMark(context, x0, y0);
+    this.drawSingleCrossMark(context, x0, y0, line_len);
     // this.drawSingleCrossMark(canvas, x0, y1);
-    this.drawSingleCrossMark(context, x1, y1);
+    this.drawSingleCrossMark(context, x1, y1, line_len);
     // this.drawSingleCrossMark(canvas, x1, y0);
   }
 
@@ -390,7 +395,7 @@ export default class NcodeRasterizer {
    * @param y
    * @param fullOfGlyphs - for debugging
    */
-  private drawNcodeSingleLine = (context: ICanvasContextForCodeDraw, code_txt: string, y: number, width: number, fullOfGlyphs = true): Promise<void> => {
+  private drawNcodeSingleLine = (context: INcodeDrawContext, code_txt: string, y: number, width: number, fullOfGlyphs = true): Promise<void> => {
     // if (this.printOption.codeDensity > 2) {
     //   return this.drawNcodeSingleLine_BOLD(context, code_txt, y, fullOfGlyphs);
     // }
@@ -401,7 +406,7 @@ export default class NcodeRasterizer {
     return this.drawNcodeSingleLine_DOT(context, code_txt, y, width, fullOfGlyphs);
   }
 
-  private drawNcodeSingleLine_DOT = (context: ICanvasContextForCodeDraw, code_txt: string, y: number, width: number, fullOfGlyphs = true): Promise<void> => {
+  private drawNcodeSingleLine_DOT = (context: INcodeDrawContext, code_txt: string, y: number, width: number, fullOfGlyphs = true): Promise<void> => {
     const { ctx, x: baseX, y: baseY } = context;
 
     const glyphStringSkipLeft = Math.round(this.printOption.marginLeft_nu * NCODE_CLASS6_NUM_DOTS);
@@ -435,7 +440,7 @@ export default class NcodeRasterizer {
     });
   }
 
-  private drawNcodeSingleLine_NORMAL = (context: ICanvasContextForCodeDraw, code_txt: string, y: number, width: number, fullOfGlyphs = true): Promise<void> => {
+  private drawNcodeSingleLine_NORMAL = (context: INcodeDrawContext, code_txt: string, y: number, width: number, fullOfGlyphs = true): Promise<void> => {
     const { ctx, x: baseX, y: baseY } = context;
 
     const glyphStringSkipLeft = Math.round(this.printOption.marginLeft_nu * NCODE_CLASS6_NUM_DOTS);
@@ -473,7 +478,7 @@ export default class NcodeRasterizer {
     });
   }
 
-  private drawNcodeSingleLine_BOLD = (context: ICanvasContextForCodeDraw, code_txt: string, y: number, width: number, fullOfGlyphs = true): Promise<void> => {
+  private drawNcodeSingleLine_BOLD = (context: INcodeDrawContext, code_txt: string, y: number, width: number, fullOfGlyphs = true): Promise<void> => {
     const { ctx, x: baseX, y: baseY } = context;
 
     const glyphStringSkipLeft = Math.round(this.printOption.marginLeft_nu * NCODE_CLASS6_NUM_DOTS);
@@ -511,11 +516,7 @@ export default class NcodeRasterizer {
   }
 
 
-  private drawNcode = (
-    context: ICanvasContextForCodeDraw,
-    surfaceDesc: INcodeSurfaceDesc,
-    dpi: number)
-    : Promise<INcodeAreaDesc> => {
+  private drawNcode = async (context: INcodeDrawContext, surfaceDesc: INcodeSurfaceDesc, dpi: number) => {
 
     // kitty
     const DEBUG_MODE = this.printOption.debugMode;
@@ -540,10 +541,9 @@ export default class NcodeRasterizer {
       }
     };
 
-
     if (glyphData.length < 1) {
       console.log("ERROR: no ncode data given");
-      return Promise.resolve(result);
+      return result;
     }
 
     const ctx = context.ctx;
@@ -551,16 +551,14 @@ export default class NcodeRasterizer {
     ctx.fillStyle = "rgba(0,0,0,255)";
 
 
+    const glyphStrings = glyphData.split("\r\n");
+    if (glyphStrings.length < 7) {
+      return result;
+    }
+    //  const glyph_y = codePaperInfo.Ymin * dotsInACell;
+    let glyph_y = glyphStringSkipTop;
+
     try {
-      // const PRINT_RESOLUTION = getPrintResolution();
-
-      const glyphStrings = glyphData.split("\r\n");
-      if (glyphStrings.length < 7) {
-        return Promise.resolve(result);
-      }
-      //  const glyph_y = codePaperInfo.Ymin * dotsInACell;
-      let glyph_y = glyphStringSkipTop;
-
       let y = 0;
       for (y = 0; y < debugNcode_h; y += glyphDistancePx_canvas) {
         if (glyph_y >= 0) {
@@ -579,35 +577,28 @@ export default class NcodeRasterizer {
         }
         glyph_y++;
       }
-
       ctx.restore();
-
     } catch (e) {
       ctx.restore();
-
       console.error(e);
-      return Promise.resolve(result);
+      return result;
     }
 
-    return new Promise(resolve => {
-      Promise.all(codeDrawingPromises).then(() => {
-        result.success = true;
-        result.dpi = dpi;
-        result.pixelsPerDot = glyphDistancePx_canvas;
-        result.dotsPerCell = NCODE_CLASS6_NUM_DOTS;
+    await Promise.all(codeDrawingPromises);
+    const successResult: INcodeAreaDesc = {
+      ...result,
+      success: true,
+      rect: {
+        unit: "nu",
 
-        result.pageInfo = { ...surfaceDesc.pageInfo };
-        result.rect.unit = "nu";
-        result.rect.x = this.printOption.marginLeft_nu;
-        result.rect.y = this.printOption.marginTop_nu;
-        result.rect.width = Math.ceil(width / (NCODE_CLASS6_NUM_DOTS * glyphDistancePx_canvas));
-        result.rect.height = Math.ceil(height / (NCODE_CLASS6_NUM_DOTS * glyphDistancePx_canvas));
-
-        resolve(result);
-      });
-    });
+        x: this.printOption.marginLeft_nu,
+        y: this.printOption.marginTop_nu,
+        width: Math.ceil(width / (NCODE_CLASS6_NUM_DOTS * glyphDistancePx_canvas)),
+        height: Math.ceil(height / (NCODE_CLASS6_NUM_DOTS * glyphDistancePx_canvas)),
+      },
+    }
+    return successResult;
   }
-
 }
 
 function isPtInRect(x: number, y: number, rect: IRectDpi) {

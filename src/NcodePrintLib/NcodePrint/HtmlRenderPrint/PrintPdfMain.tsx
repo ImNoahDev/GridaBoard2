@@ -3,13 +3,13 @@ import "./print.css";
 
 import { IPageOverview, PagesForPrint } from "./PagesForPrint";
 import ReactToPrint from 'react-to-print';
-import { IPrintingEvent, IPrintingReport, IPrintOption } from "./PrintDataTypes";
-import { getCellMatrixShape } from "../NcodeSurface/SurfaceSplitter";
+import { IPrintingEvent, IPrintingReport, IPrintOption, IProgressCallbackFunction } from "../PrintDataTypes";
+import { getCellMatrixShape } from "../../NcodeSurface/SurfaceSplitter";
 import PageOrientation, { ForceOverflow, LandscapeOrientation, PortraitOrientation } from "./PageOrientation";
-import NeoPdfDocument from "../NeoPdf/NeoPdfDocument";
-import { MappingStorage, PdfDocMapper } from "../SurfaceMapper";
+import NeoPdfDocument from "../../NeoPdf/NeoPdfDocument";
+import { MappingStorage, PdfDocMapper } from "../../SurfaceMapper";
 
-import * as Util from "../UtilFunc";
+import * as Util from "../../UtilFunc";
 
 // let globalPagesCnt = 0;
 interface Props {
@@ -137,7 +137,7 @@ export class PrintPdfMain extends React.Component<Props, State> {
     return false;
   }
 
-  public OnPagePrepared = (event: IPrintingEvent) => {
+  public onPagePrepared = (event: IPrintingEvent) => {
     const { sheetIndex, pageNums, completion } = event;
     const { targetPages, pagesPerSheet } = this.props.printOption;
 
@@ -235,19 +235,17 @@ export class PrintPdfMain extends React.Component<Props, State> {
         text: "Print start",
         renderingCompleted: false,
       });
-      this.startPrintOnRenderCompleted();
+      this.startPrintOnRenderCompleted(this.props.printOption.progressCallback);
     }
   }
 
   /**
    * 페이지 렌더링이 끝나고 나면 ReactToPrint Component에 handlePrint를 부른다
    */
-  startPrintOnRenderCompleted = () => {
+  startPrintOnRenderCompleted = (progressCallback: IProgressCallbackFunction) => {
     if (this.printRef) {
       const printOption = this.props.printOption;
-      if (printOption.progressCallback) {
-        printOption.progressCallback({ status: "completed" });
-      }
+      if (progressCallback) progressCallback({ status: "completed" });
 
       this.printRef.handlePrint();
       this.setState({
@@ -299,7 +297,7 @@ export class PrintPdfMain extends React.Component<Props, State> {
                 pdf={pdf}
                 pagesOverview={pagesOverview}
                 shouldRenderPage={shouldRenderPage}
-                OnPagePrepared={this.OnPagePrepared}
+                onPagePrepared={this.onPagePrepared}
                 printOption={printOption}
               />
               {/* </div> */}
@@ -316,7 +314,7 @@ export class PrintPdfMain extends React.Component<Props, State> {
                 pdf={pdf}
                 pagesOverview={pagesOverview}
                 shouldRenderPage={shouldRenderPage}
-                OnPagePrepared={null}
+                onPagePrepared={null}
                 printOption={printOption}
               />
             </div>

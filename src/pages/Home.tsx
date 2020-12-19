@@ -54,6 +54,7 @@ import { g_debugFilename, g_debugURL } from "../NcodePrintLib/DefaultOption";
 import { connect, useSelector } from "react-redux";
 import { setUrlAndFilename } from "../store/reducers/activePdfReducer";
 import { CalibrationButton } from "../components/dialogs/CalibrationDialog";
+import PrintNcodedPdfButton from "../NcodePrintLib/NcodePrint/PrintNcodedPdfButton";
 
 // const PDF_URL = "./A4_Pirates-of-the-Caribbean-Hes-a-Pirate-Klaus-Badelt.pdf";
 const PDF_URL = g_debugURL;
@@ -112,7 +113,7 @@ declare global {
   }
 }
 (function (window) {
-  var pui = new PUIController('./note_1116.nproj');
+  const pui = new PUIController('./note_1116.nproj');
 
   window._pui = [];
   window._pui.push(pui);
@@ -234,7 +235,7 @@ const Home = () => {
     width: "100%", height: "100%",
     alignItems: "center",
     zIndex: 1,
-  } as React.CSSProperties;;
+  } as React.CSSProperties;
 
   const mainFrameStyle = {
     position: "absolute",
@@ -286,6 +287,21 @@ const Home = () => {
             </PrintPdfButton>
           </div>
           <div style={{ flex: 1 }}> </div>
+
+
+          {/* Ncode PDF 다운로드 테스트 버튼 */}
+          <div style={{ fontSize: "20px", fontWeight: "bold" }}>
+            <PrintNcodedPdfButton variant="contained" color="primary"
+              id={printBtnId}
+              url={pdfUrl}
+              filename={pdfFilename}
+              printOption={printOption}
+              reportProgress={onReportProgress} printOptionCallback={printOptionCallback}>
+              <Box fontSize={14} fontWeight="fontWeightBold" >Ncode PDF</Box>
+            </PrintNcodedPdfButton>
+          </div>
+          <div style={{ flex: 1 }}> </div>
+
 
           {/* 칼리브레이션 */}
           <CalibrationButton url={pdfUrl} filename={pdfFilename} printOption={printOption} cancelCallback={undefined}>
