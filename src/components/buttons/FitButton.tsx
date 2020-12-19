@@ -2,16 +2,7 @@ import React, { Component, useState } from "react";
 import '../../styles/buttons.css';
 import Tooltip, { TooltipProps } from '@material-ui/core/Tooltip';
 import { Theme, Typography, withStyles } from '@material-ui/core';
-
-const FitTooltip = withStyles((theme: Theme) => ({
-  tooltip: {
-      backgroundColor: '#f5f5f9',
-      color: 'rgba(0, 0, 0, 0.87)',
-      maxWidth: 240,
-      fontSize: theme.typography.pxToRem(12),
-      border: '1px solid #dadde9',
-  },
-}))(Tooltip);
+import GridaToolTip from "../../styles/GridaToolTip";
 
 export default class FitButton extends React.Component {
   render() {
@@ -20,7 +11,7 @@ export default class FitButton extends React.Component {
       <div className="btn-group dropright" role="group">
           <button type="button" id="btn_fit" className="btn btn-neo btn-neo-vertical" data-toggle="dropdown"
               aria-haspopup="true" aria-expanded="false">
-              <FitTooltip placement="left" title={
+              <GridaToolTip placement="left" title={
                 <React.Fragment>
                     <Typography color="inherit">Fit</Typography>
                     <em>{"용지의 크기를 맞추는 여러 옵션 중 하나를 선택합니다."}</em>
@@ -32,7 +23,7 @@ export default class FitButton extends React.Component {
                   <img src="../../icons/icon_ratio_n.png" className="normal-image"></img>
                   <img src="../../icons/icon_ratio_p.png" className="hover-image"></img>
                 </div>
-            </FitTooltip>
+            </GridaToolTip>
           </button>
           <div className="dropdown-menu p-0 border border-0 " aria-labelledby="btn_eraser">
               <a id="btn_fit_width" className="dropdown-item" href="#">

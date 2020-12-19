@@ -246,12 +246,12 @@ export default class NcodeRasterizer {
         if (progressCallback) progressCallback();
 
         // (left, top) margin을 세팅
-        if (this.printOption.marginLeft_nu === -1) {
-          this.printOption.marginLeft_nu = ncodeSurfaceDesc.margin.Xmin;
+        if (this.printOption.ncodeMargin.left === -1) {
+          this.printOption.ncodeMargin.left = ncodeSurfaceDesc.margin.Xmin;
         }
 
-        if (this.printOption.marginTop_nu === -1) {
-          this.printOption.marginTop_nu = ncodeSurfaceDesc.margin.Ymin;
+        if (this.printOption.ncodeMargin.top === -1) {
+          this.printOption.ncodeMargin.top = ncodeSurfaceDesc.margin.Ymin;
         }
 
         // Calibration 십자가를 그린다.
@@ -293,12 +293,12 @@ export default class NcodeRasterizer {
   //   // this.ncodeSurfaceDesc = result;
 
   //   // (left, top) margin을 세팅
-  //   if (this.printOption.marginLeft_nu === -1) {
-  //     this.printOption.marginLeft_nu = ncodeSurfaceDesc.margin.Xmin;
+  //   if (this.printOption.ncodeMargin.left === -1) {
+  //     this.printOption.ncodeMargin.left = ncodeSurfaceDesc.margin.Xmin;
   //   }
 
-  //   if (this.printOption.marginTop_nu === -1) {
-  //     this.printOption.marginTop_nu = ncodeSurfaceDesc.margin.Ymin;
+  //   if (this.printOption.ncodeMargin.top === -1) {
+  //     this.printOption.ncodeMargin.top = ncodeSurfaceDesc.margin.Ymin;
   //   }
 
   //   // 코드를 그린다
@@ -409,7 +409,7 @@ export default class NcodeRasterizer {
   private drawNcodeSingleLine_DOT = (context: INcodeDrawContext, code_txt: string, y: number, width: number, fullOfGlyphs = true): Promise<void> => {
     const { ctx, x: baseX, y: baseY } = context;
 
-    const glyphStringSkipLeft = Math.round(this.printOption.marginLeft_nu * NCODE_CLASS6_NUM_DOTS);
+    const glyphStringSkipLeft = Math.round(this.printOption.ncodeMargin.left * NCODE_CLASS6_NUM_DOTS);
 
     return new Promise(resolve => {
       const glyphDistancePx_canvas = this.glyphDistancePx_canvas;
@@ -443,7 +443,7 @@ export default class NcodeRasterizer {
   private drawNcodeSingleLine_NORMAL = (context: INcodeDrawContext, code_txt: string, y: number, width: number, fullOfGlyphs = true): Promise<void> => {
     const { ctx, x: baseX, y: baseY } = context;
 
-    const glyphStringSkipLeft = Math.round(this.printOption.marginLeft_nu * NCODE_CLASS6_NUM_DOTS);
+    const glyphStringSkipLeft = Math.round(this.printOption.ncodeMargin.left * NCODE_CLASS6_NUM_DOTS);
 
     return new Promise(resolve => {
       const glyphDistancePx_canvas = this.glyphDistancePx_canvas;
@@ -481,7 +481,7 @@ export default class NcodeRasterizer {
   private drawNcodeSingleLine_BOLD = (context: INcodeDrawContext, code_txt: string, y: number, width: number, fullOfGlyphs = true): Promise<void> => {
     const { ctx, x: baseX, y: baseY } = context;
 
-    const glyphStringSkipLeft = Math.round(this.printOption.marginLeft_nu * NCODE_CLASS6_NUM_DOTS);
+    const glyphStringSkipLeft = Math.round(this.printOption.ncodeMargin.left * NCODE_CLASS6_NUM_DOTS);
 
     return new Promise(resolve => {
       const glyphDistancePx_canvas = this.glyphDistancePx_canvas;
@@ -524,7 +524,7 @@ export default class NcodeRasterizer {
     const { glyphData } = surfaceDesc;
     const { width, height } = context;
     const glyphDistancePx_canvas = Math.round(dpi * 8 / 600);
-    const glyphStringSkipTop = Math.round(this.printOption.marginTop_nu * NCODE_CLASS6_NUM_DOTS);
+    const glyphStringSkipTop = Math.round(this.printOption.ncodeMargin.top * NCODE_CLASS6_NUM_DOTS);
     const codeDrawingPromises = new Array(0);
 
     const result: INcodeAreaDesc = {
@@ -591,8 +591,8 @@ export default class NcodeRasterizer {
       rect: {
         unit: "nu",
 
-        x: this.printOption.marginLeft_nu,
-        y: this.printOption.marginTop_nu,
+        x: this.printOption.ncodeMargin.left,
+        y: this.printOption.ncodeMargin.top,
         width: Math.ceil(width / (NCODE_CLASS6_NUM_DOTS * glyphDistancePx_canvas)),
         height: Math.ceil(height / (NCODE_CLASS6_NUM_DOTS * glyphDistancePx_canvas)),
       },

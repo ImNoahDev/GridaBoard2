@@ -4,16 +4,8 @@ import { onSuccess, _uuid, onOpenClicked, openFileBrowser } from "./FileBrowser"
 import { Theme, Typography, withStyles } from '@material-ui/core';
 import Tooltip, { TooltipProps } from '@material-ui/core/Tooltip';
 import { IFileBrowserReturn } from '../NcodePrint/PrintDataTypes';
+import GridaToolTip from '../../styles/GridaToolTip';
 
-const PdfFileTooltip = withStyles((theme: Theme) => ({
-  tooltip: {
-    backgroundColor: '#f5f5f9',
-    color: 'rgba(0, 0, 0, 0.87)',
-    maxWidth: 240,
-    fontSize: theme.typography.pxToRem(12),
-    border: '1px solid #dadde9',
-  },
-}))(Tooltip);
 
 type Props = {
   onFileOpen: (event: IFileBrowserReturn) => void,
@@ -66,7 +58,7 @@ const FileBrowserButton = (props: Props) => {
   return (
     <React.Fragment>
       <button {...props} onClick={fileOpen} id="btn_file_open" type="button" className="btn btn-neo " title="Open a file" >
-        <PdfFileTooltip placement="top" title={
+        <GridaToolTip placement="top" title={
           <React.Fragment>
             <Typography color="inherit">PDF File Open</Typography>
             <em>{"배경으로 쓸 PDF 파일을 엽니다. 스마트 플레이트로 조작하거나, 인쇄하여 덧필기할 수 있습니다."}</em>
@@ -78,7 +70,7 @@ const FileBrowserButton = (props: Props) => {
             <img src='../../icons/icon_file_n.png' className="normal-image"></img>
             <img src='../../icons/icon_file_p.png' className="hover-image"></img>
           </div>
-        </PdfFileTooltip>
+        </GridaToolTip>
         {props.children}
       </button>
 

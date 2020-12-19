@@ -87,6 +87,8 @@ export interface IPrintOption {
   /** 첫 페이지에 발행된 ncode, Ncode는 pageInfo ~ pageInfo.page + (numPages-1) */
   pageInfo: IPageSOBP;
 
+  /** SOBP에 해당되는 페이지에 할당된 인쇄 마진 */
+  ncodeMargin: { left: number, top: number },
   /** 문서 전체에 발행된 코드들, 페이지수 만큼 있다. start page = 0 */
   issuedNcodes?: IPageSOBP[];
 
@@ -94,14 +96,10 @@ export interface IPrintOption {
 
   forceToIssueNewCode: boolean;
 
+  downloadNcodedPdf: boolean;
+
   /** 그리다보드와의 호환성을 위해 */
   magnification: number,
-
-  /** SOBP에 해당되는 페이지에 할당된 인쇄 마진 */
-  marginLeft_nu: number,
-
-  /** SOBP에 해당되는 페이지에 할당된 인쇄 마진 */
-  marginTop_nu: number,
 
 
   /** 0: no debug mode, 1: draw lines, 2: draw Ncode debugging info, 3: canvas 색상 값 점검 */

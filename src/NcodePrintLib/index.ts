@@ -1,6 +1,5 @@
 import PrintPdfButton from "./NcodePrint/HtmlRenderPrint/PrintPdfButton";
 import FileBrowserButton from './NeoPdf/FileBrowserButton';
-import { CalibrationButton } from './SurfaceMapper';
 import PrintOptionDialog from './NcodePrint/Modal/PrintOptionDialog';
 
 import { addGraphicAndSavePdf } from "./Save/SavePdf";
@@ -11,6 +10,7 @@ import { g_defaultPrintOption } from "./DefaultOption";
 
 export * from "./NcodePrint/PrintDataTypes";
 export * from "./NcodePrint/HtmlRenderPrint/PrintPdfButton";
+export * from "./UtilFunc";
 
 export {
   g_defaultPrintOption,
@@ -19,7 +19,6 @@ export {
   FileBrowserButton,
   MediaSize,
   ColorConvertMethod,
-  CalibrationButton,
   t,
   PrintOptionDialog,
 };

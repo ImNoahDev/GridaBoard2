@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, LinearProgress } from '@material-ui/core';
 
@@ -18,11 +18,20 @@ type Props = {
   cancelCallback: (e) => void,
 }
 
+
+export function useForceUpdate() {
+  const [, setTick] = useState(0);
+  const update = useCallback(() => {
+    setTick(tick => tick + 1);
+  }, [])
+  return update;
+}
+
+
 export default function ProgressDialog(props: Props) {
   const classes = useStyles();
-  const { progress } = props;
+  const [progress, setProgress] = useState(props.progress);
   const [open, setOpen] = useState(props.open);
-  const progressRef = React.useRef(() => { });
 
   const handleClose = (e) => {
     setOpen(false);
@@ -30,45 +39,34 @@ export default function ProgressDialog(props: Props) {
       props.cancelCallback(e);
     }
   }
+  const forceUpdate = useForceUpdate();
 
-  // useEffect(() => {
-  //   progressRef.current = () => {
-  //     if (progress > 100) {
-  //       setProgress(0);
-  //       setBuffer(10);
-  //     } else {
-  //       const diff = Math.random() * 10;
-  //       const diff2 = Math.random() * 10;
-  //       setProgress(progress + diff);
-  //       setBuffer(progress + diff + diff2);
-  //     }
-  //   };
-  // });
 
-  // useEffect(() => {
-  //   const timer = setInterval(() => {
-  //     progressRef.current();
-  //   }, 500);
+  useEffect(() => {
+    setProgress(props.progress);
+    forceUpdate();
+    // forceUpdate();
+  }, [props.progress]);
 
-  //   return () => {
-  //     clearInterval(timer);
-  //   };
-  // }, []);
   const percent = Math.ceil(progress);
   const buffered = Math.ceil(progress / 10) * 10;
 
+  useEffect(() => {
+    console.log(`dlg progress >> ${progress}, percent=${percent}, buffered=${buffered}`)
+  }, [progress]);
+
   return (
-    <Dialog open={props.open} {...props} onClose={handleClose} >
+    <Dialog open={open} {...props} onClose={handleClose} >
       <DialogTitle id="form-dialog-title" style={{ float: "left", width: "500px" }}>
         <Box fontSize={20} fontWeight="fontWeightBold" >{props.title}</Box>
       </DialogTitle>
 
       <DialogContent>
         <div className={classes.root}>
-          <Box fontSize={16} fontWeight="fontWeightRegular" >Processing... {percent}%</Box>
+          <LinearProgress variant="buffer" value={percent} valueBuffer={buffered} />
         </div>
         <div className={classes.root}>
-          <LinearProgress variant="buffer" value={percent} valueBuffer={buffered} />
+          <Box fontSize={16} fontWeight="fontWeightRegular" >Processing... {percent}%</Box>
         </div>
       </DialogContent>
 

@@ -24,12 +24,14 @@ export const g_defaultPrintOption: IPrintOption = {
   needToIssueCode: true,
   forceToIssueNewCode: false,
   pageInfo: { section: 3, owner: 27, book: 1068, page: 114 },
+  ncodeMargin: { left: -1, top: -1 },
 
   codeDensity: 2,
   printDpi: 600,
   pdfRenderingDpi: 300,
   putCalibrationMark: true,
 
+  downloadNcodedPdf: true,
 
   printNcode: true,
   mediaSize: MediaSize.A4,
@@ -44,8 +46,6 @@ export const g_defaultPrintOption: IPrintOption = {
   scaleDownToMedia: false,
 
   magnification: 1,
-  marginLeft_nu: -1,
-  marginTop_nu: -1,
 
   targetPages: [],
 

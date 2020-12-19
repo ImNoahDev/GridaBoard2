@@ -6,16 +6,7 @@ import $ from "jquery";
 import { RootState } from '../../store/rootReducer';
 import Tooltip, { TooltipProps } from '@material-ui/core/Tooltip';
 import { Theme, Typography, withStyles } from '@material-ui/core';
-
-const TracePointTooltip = withStyles((theme: Theme) => ({
-  tooltip: {
-      backgroundColor: '#f5f5f9',
-      color: 'rgba(0, 0, 0, 0.87)',
-      maxWidth: 240,
-      fontSize: theme.typography.pxToRem(12),
-      border: '1px solid #dadde9',
-  },
-}))(Tooltip);
+import GridaToolTip from "../../styles/GridaToolTip";
 
 const TracePointButton = () => {
   const isTrace = useSelector((state:RootState) => state.pointerTracer.isTrace)
@@ -31,7 +22,7 @@ const TracePointButton = () => {
         $elem.removeClass("checked");
     }
   }
-  
+
   const onTogglePointerTracer = () => {
     dispatch(setPointerTracer(!isTrace));
     setEnable("btn_tracepoint", isTrace);
@@ -40,7 +31,7 @@ const TracePointButton = () => {
     return (
       <button id="btn_tracepoint" type="button" className="btn btn-neo btn-neo-vertical"
       onClick = {() => onTogglePointerTracer()}>
-        <TracePointTooltip placement="left" title={
+        <GridaToolTip placement="left" title={
           <React.Fragment>
               <Typography color="inherit">Trace Point</Typography>
               <em>{"펜의 위치를 화면에 보여주는 버튼입니다."}</em>
@@ -54,7 +45,7 @@ const TracePointButton = () => {
               <img src="../../icons/icon_point_n.png" className="toggle-on normal-image"></img>
               <img src="../../icons/icon_point_p.png" className="toggle-on hover-image"></img>
           </div>
-        </TracePointTooltip>
+        </GridaToolTip>
       </button>
     );
 }

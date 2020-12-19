@@ -286,3 +286,36 @@ export function getNcodedPdfName(filename: string, pageInfo: IPageSOBP, pagesPer
 
   return fn;
 }
+
+export function sleep(ms: number) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+
+
+function rgb2Hex(rgb) {
+  const splitted = rgb.match(/^rgba?[\s+]?\([\s+]?(\d+)[\s+]?,[\s+]?(\d+)[\s+]?,[\s+]?(\d+)[\s+]?/i);
+  return (splitted && splitted.length === 4) ? "#" +
+    ("0" + parseInt(splitted[1], 10).toString(16)).slice(-2) +
+    ("0" + parseInt(splitted[2], 10).toString(16)).slice(-2) +
+    ("0" + parseInt(splitted[3], 10).toString(16)).slice(-2) : '';
+}
+
+export function hex2ColorObject(hex) {
+  if (hex.length !== 7 && hex.length !== 4) hex = rgb2Hex(hex);
+
+  let c;
+  if (/^#([A-Fa-f0-9]{3}){1,2}$/.test(hex)) {
+    c = hex.substring(1).split('');
+    if (c.length == 3) {
+      c = [c[0], c[0], c[1], c[1], c[2], c[2]];
+    }
+
+    c = '0x' + c.join('');
+    const r = (c >> 16) & 255;
+    const g = (c >> 8) & 255;
+    const b = c & 255;
+    return { r, g, b };
+  }
+  throw new Error('Bad Hex');
+}

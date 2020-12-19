@@ -21,7 +21,7 @@ import ColorButtons from '../components/navbar/ColorButtons';
 import PageNumbering from '../components/navbar/PageNumbering';
 import PrintButton from '../components/navbar/PrintButton';
 import FileLoad from '../components/navbar/FileLoad';
-import ManualCalibration from '../components/navbar/CalibrationMenual';
+import ManualCalibration from '../components/navbar/ManualCalibration';
 import UpperNav from '../components/navbar/UpperNav';
 import * as SavePdf from '../NcodePrintLib/Save/SavePdf';
 import PrintOptionDialog from '../NcodePrintLib/NcodePrint/Modal/PrintOptionDialog';
@@ -53,8 +53,10 @@ import { g_debugFilename, g_debugURL } from "../NcodePrintLib/DefaultOption";
 
 import { connect, useSelector } from "react-redux";
 import { setUrlAndFilename } from "../store/reducers/activePdfReducer";
-import { CalibrationButton } from "../components/dialogs/CalibrationDialog";
+import CalibrationButton from "../components/dialogs/CalibrationDialog";
 import PrintNcodedPdfButton from "../NcodePrintLib/NcodePrint/PrintNcodedPdfButton";
+import { NeoImage } from "../components/CustomElement/NeoImage";
+import GridaToolTip from "../styles/GridaToolTip";
 
 // const PDF_URL = "./A4_Pirates-of-the-Caribbean-Hes-a-Pirate-Klaus-Badelt.pdf";
 const PDF_URL = g_debugURL;
@@ -65,26 +67,6 @@ const menuStyle = {
   height: '36px',
   padding: '4px'
 }
-
-const HideAndShowTooltip = withStyles((theme: Theme) => ({
-  tooltip: {
-    backgroundColor: '#f5f5f9',
-    color: 'rgba(0, 0, 0, 0.87)',
-    maxWidth: 240,
-    fontSize: theme.typography.pxToRem(12),
-    border: '1px solid #dadde9',
-  },
-}))(Tooltip);
-
-const TrashTooltip = withStyles((theme: Theme) => ({
-  tooltip: {
-    backgroundColor: '#f5f5f9',
-    color: 'rgba(0, 0, 0, 0.87)',
-    maxWidth: 240,
-    fontSize: theme.typography.pxToRem(12),
-    border: '1px solid #dadde9',
-  },
-}))(Tooltip);
 
 function hideAndShowFnc() {
   const colorMenu = document.getElementById('color_bar');
@@ -275,6 +257,9 @@ const Home = () => {
           </div>
           <div style={{ flex: 1 }}> </div>
 
+          {/* 이미지 버튼 테스트 */}
+          <NeoImage src="./icons/icon_trash_n.png" />
+
           {/* 인쇄 테스트 버튼 */}
           <div style={{ fontSize: "20px", fontWeight: "bold" }}>
             <PrintPdfButton variant="contained" color="primary"
@@ -289,13 +274,13 @@ const Home = () => {
           <div style={{ flex: 1 }}> </div>
 
 
-          {/* Ncode PDF 다운로드 테스트 버튼 */}
+          {/* High-speed 인쇄 테스트 버튼 */}
           <div style={{ fontSize: "20px", fontWeight: "bold" }}>
             <PrintNcodedPdfButton variant="contained" color="primary"
               id={printBtnId}
               url={pdfUrl}
               filename={pdfFilename}
-              printOption={printOption}
+              // printOption={printOption}
               reportProgress={onReportProgress} printOptionCallback={printOptionCallback}>
               <Box fontSize={14} fontWeight="fontWeightBold" >Ncode PDF</Box>
             </PrintNcodedPdfButton>
@@ -342,7 +327,7 @@ const Home = () => {
           {/* <div className="d-inline-flex p-2 bd-highlight"> */}
           <div className="navbar-menu d-flex justify-content-start align-items-end neo_shadow ">
             <button id="btn_menu" type="button" className="btn btn-neo " onClick={hideAndShowFnc}>
-              <HideAndShowTooltip placement="top-end" title={
+              <GridaToolTip placement="top-end" title={
                 <React.Fragment>
                   <Typography color="inherit">Hide And Show</Typography>
                   <em>{"전체 메뉴를 숨기고 보여줍니다."}</em>
@@ -354,7 +339,7 @@ const Home = () => {
                   <img style={menuStyle} src='../icons/all_menu.png' className="normal-image" alt=""></img>
                   <img style={menuStyle} src='../icons/all_menu.png' className="hover-image" alt=""></img>
                 </div>
-              </HideAndShowTooltip>
+              </GridaToolTip>
             </button>
             <div id="color_bar" className="color_bar neo_shadow float-left bottom_text color_bar">
               <ColorButtons />
@@ -371,7 +356,7 @@ const Home = () => {
 
           <div id="navbar_end">
             <div className="navbar-menu d-flex justify-content-end align-items-end neo_shadow">
-              <ManualCalibration />
+              <ManualCalibration url={pdfUrl} filename={pdfFilename} printOption={printOption} cancelCallback={undefined} />
             </div>
           </div>
 
@@ -393,7 +378,7 @@ const Home = () => {
                     {/* Trash Button  */}
                     <button id="btn_trash" type="button" className="btn btn-neo btn-neo-dropdown"
                       onClick={() => handleTrashBtn()}>
-                      <TrashTooltip placement="left" title={
+                      <GridaToolTip placement="left" title={
                         <React.Fragment>
                           <Typography color="inherit">Clear</Typography>
                           <em>{"화면의 글자를 모두 지우는 버튼입니다."}</em>
@@ -405,7 +390,7 @@ const Home = () => {
                           <img src='../icons/icon_trash_n.png' className="normal-image"></img>
                           <img src='../icons/icon_trash_p.png' className="hover-image"></img>
                         </div>
-                      </TrashTooltip>
+                      </GridaToolTip>
                     </button>
 
                     <RotateButton /><BackgroundButton />

@@ -9,11 +9,12 @@ import { MappingStorage, PdfDocMapper } from "../SurfaceMapper";
 
 import { SheetRendererManager } from "../NcodeSurface/SheetRendererManager";
 import { IPrintingSheetDesc } from "../NcodeSurface/SheetRenderer";
-import { convertUnit, getExtensionName, getFilenameOnly, getNcodedPdfName, makeNPageIdStr, makePdfId, uuidv4 } from "../UtilFunc";
+import { convertUnit, getExtensionName, getFilenameOnly, getNcodedPdfName, makeNPageIdStr, makePdfId, sleep, uuidv4 } from "../UtilFunc";
 import { PageSizes, PDFDict, PDFDocument, PDFHexString, PDFName } from "pdf-lib";
 import { saveAs } from "file-saver";
 import printJS from "print-js";
 import { _app_name, _lib_name, _version } from "../Version";
+import { g_defaultPrintOption } from "../DefaultOption";
 
 
 // https://stackoverflow.com/questions/9616426/javascript-print-iframe-contents-only/9616706
@@ -31,9 +32,6 @@ interface Props {
   /** 인쇄 준비 상태를 업데이트하는 콜백 함수 */
   /** 기본값의 IPrintOption을 받아서, dialog를 처리하고 다시 돌려주는 콜백 함수 */
   printOptionCallback?: (arg: IPrintOption) => IPrintOption,
-
-  /** 초기 인쇄 옵션, 다이얼로그가 떠서, 이걸 세팅해도 좋고, printOptionCallback에서 처리해도 좋다 */
-  printOption?: IPrintOption,
 }
 
 
@@ -63,7 +61,7 @@ export default class PrintNcodedPdfWorker {
   private printOptionCallback?: (arg: IPrintOption) => IPrintOption;
 
   constructor(props: Props, reportProgress?: (arg: IPrintingReport) => void) {
-    this.printOption = props.printOption;
+    this.printOption = g_defaultPrintOption;
     this.url = props.url;
     this.filename = props.filename;
     this.reportProgress = reportProgress;
@@ -112,9 +110,11 @@ export default class PrintNcodedPdfWorker {
 
     this.setStatus("configuring");
     // 프로그레스 보고를 위한 초기화
+    const progressCallback = this.progressCallback;
+
     const printOption = this.printOption;
     printOption.cancel = false;
-    printOption.progressCallback = this.progressCallback;
+    printOption.progressCallback = progressCallback;
     this.numReports = 0;
 
     // PrintPdfMain의 printTrigger를 +1 해 주면, 인쇄가 시작된다
@@ -174,36 +174,43 @@ export default class PrintNcodedPdfWorker {
 
     // 캔버스 오브젝트로 그려진 객체를 각각의 PDF 페이지로 만든다.
     const pdfDoc = await this.createPdfDocument(printOption, sheets, printOption.progressCallback);
+    if (progressCallback) progressCallback();
+    await sleep(10);
+
     await this.setMetaData(pdfDoc, pdf, printOption);
+    await sleep(10);
     const pdfBytes = await pdfDoc.save()
 
     // 저장 가능한 바이너리 구조를 만들어서
     const blob = new Blob([pdfBytes], { type: 'application/pdf' });
     // const base64DataUri = await pdfDoc.saveAsBase64({ dataUri: true })
-    if (!blob || printOption.cancel) return;
-
-    // 파일 이름을 변경하고
-    const fn = getNcodedPdfName(filename, printOption.pdfMappingDesc.nPageStart, pagesPerSheet);
-    saveAs(blob, fn);
-
+    await sleep(10);
     if (printOption.cancel) return;
 
     // 인쇄를 시작한다.
     const urlCreator = window.URL || window.webkitURL;
-    const ncodedUrl = urlCreator.createObjectURL(blob);
+    const ncodedUrl = await new Promise(resolve => {
+      const ret = urlCreator.createObjectURL(blob); resolve(ret);
+    }) as string;
     this.printByPrintJs(ncodedUrl);
+
+    // 저장 옵션이 켜져 있으면 저장한다
+    if (this.printOption.downloadNcodedPdf) {
+      // 파일 이름을 변경하고
+      const fn = getNcodedPdfName(filename, printOption.pdfMappingDesc.nPageStart, pagesPerSheet);
+      saveAs(blob, fn);
+    }
 
     // completed
     console.log("[PrintPdfMain] Print!!!");
+    this.setStatus("completed");
 
     // mapping 정보를 등록
-    if (printOption.cancel) return;
     if (this.printOption.needToIssueCode) {
       const storage = MappingStorage.getInstance();
       storage.register(tempMapping);
     }
 
-    this.setStatus("completed");
     return;
   }
 
@@ -220,8 +227,9 @@ export default class PrintNcodedPdfWorker {
       if (printOption.cancel) return undefined;
 
       const sheet = sheets[i];
-      await this.addSheetToPdfPage(pdfDoc, sheet, paperWidth_pt, paperHeight_pt);
       if (progressCallback) progressCallback();
+      await sleep(10);
+      await this.addSheetToPdfPage(pdfDoc, sheet, paperWidth_pt, paperHeight_pt);
 
       console.log(`doc add image = ${i + 1}/${numSheets}`);
     }
@@ -334,8 +342,8 @@ export default class PrintNcodedPdfWorker {
     pdfDoc.setCreationDate(new Date());
     pdfDoc.setModificationDate(new Date());
 
-    pdfDoc.setKeywords(['Gridaboard', 'Ncode', 'Neo smartpen', 'NeoLAB',
-      `${pagesPerSheet} pages per sheet`,
+    pdfDoc.setKeywords(['Gridaboard', 'Ncode', 'Neosmartpen', 'NeoLAB', "Smartpen",
+      `${pagesPerSheet}_pagesPerSheet`,
       `${makeNPageIdStr(printOption.pdfMappingDesc.nPageStart)}`]);
 
     this.setMetaInfoValue(pdfDoc, "mappingID", `${makePdfId(pdf.fingerprint, pagesPerSheet as number)}`);
@@ -455,7 +463,7 @@ export default class PrintNcodedPdfWorker {
     const numPages = targetPages.length;
     const numSheets = Math.ceil(numPages / pagesPerSheet);
 
-    const maxCount = (numPages * 4) + (numSheets * 4) + numSheets;
+    const maxCount = (numPages * 4) + (numSheets * 4) + numSheets + 1;
     // const percent = (eventCount / maxCount) * 100;
     let percent = (this.numReports / maxCount) * 100;
 

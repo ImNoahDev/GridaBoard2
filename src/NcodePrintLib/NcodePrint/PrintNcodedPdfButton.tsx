@@ -15,27 +15,27 @@ interface Props extends ButtonProps {
 
   /** 기본값의 IPrintOption을 받아서, dialog를 처리하고 다시 돌려주는 콜백 함수 */
   printOptionCallback?: (arg: IPrintOption) => IPrintOption,
-
-  /** 초기 인쇄 옵션, 다이얼로그가 떠서, 이걸 세팅해도 좋고, printOptionCallback에서 처리해도 좋다 */
-  printOption?: IPrintOption,
 }
 
 /**
  * Class
  */
-export default function PrintPrintNcodedPdfButton(props: Props) {
+export default function PrintNcodedPdfButton(props: Props) {
 
   const [progressPercent, setProgressPercent] = useState(0);
   const [status, setStatus] = useState("N/A");
   const [dialogOn, setDialogOn] = useState(false);
 
   const startPrint = async () => {
-    // setStart(true);
-    const worker = new PrintNcodedPdfWorker(props, onProgress);
-    setDialogOn(true);
-    setProgressPercent(0);
-    await worker.startPrint(props.url, props.filename);
-    setDialogOn(false);
+    if (props.url && props.filename) {
+      // setStart(true);
+      const worker = new PrintNcodedPdfWorker(props, onProgress);
+      setDialogOn(true);
+      setProgressPercent(0);
+      await worker.startPrint(props.url, props.filename);
+      setDialogOn(false);
+
+    }
   }
 
   const onProgress = (arg: IPrintingReport) => {
@@ -63,7 +63,7 @@ export default function PrintPrintNcodedPdfButton(props: Props) {
   dialogTitle = status === "completed" ? "완료" : dialogTitle;
 
   return (
-    <div className="pdf-context">
+    <React.Fragment>
       <button {...props} onClick={startPrint} >
         {props.children}
       </button>
@@ -74,7 +74,7 @@ export default function PrintPrintNcodedPdfButton(props: Props) {
         open={dialogOn}
         cancelCallback={onCancelPrint} />
       <hr />
-    </div>
+    </React.Fragment>
   );
 }
 

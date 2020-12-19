@@ -10,6 +10,7 @@ import { IThumbnailDesc } from "../../NcodePrintLib/NeoPdf/NeoPdfPage";
 import NeoPdfManager from '../../NcodePrintLib/NeoPdf/NeoPdfManager';
 import { theme } from '../../styles/theme';
 import "./pen_touch.css";
+import { hideUIProgressBackdrop, showUIProgressBackdrop } from '../../store/reducers/ui';
 
 const _penImageUrl = "./icons/image_calibration.png";
 
@@ -43,15 +44,29 @@ function CalibrationDialog(props: IDialogProps) {
   let numProgresses = numPages + 1;
 
   const progress = useSelector((state: RootState) => state.calibration.progress);
+  console.log(`calibration: loaded ${progress}`)
+
   const show = useSelector((state: RootState) => state.calibration.show);
 
   const percent = Math.ceil(progress / numProgresses * 100);
   const imageRef = useRef(null);
   const dialogRef = useRef(null);
 
+  const initState = () => {
+    setPdf(undefined);
+    setNumPages(0);
+    setTargetPages(props.printOption.targetPages);
+    setMarkPosRatio({ xr: 0, yr: 0 });
+    setImgSrc("//:0");
+    setStatus("inited");
+  }
+
   const handleClose = (e) => {
     // hideCalibrationDialog();
     console.log("testing: closing");
+    initState();
+
+
   }
 
 
@@ -64,34 +79,34 @@ function CalibrationDialog(props: IDialogProps) {
   }
 
   const handlePrevious = (e) => {
-    const prev = progress > 0 ? progress - 1 : 0;
-    updateCalibrationDialog(prev);
+    const nextProgress = progress > 0 ? progress - 1 : 0;
+    updateCalibrationDialog(nextProgress);
   }
 
   const handleNext = (e) => {
-    const prev = progress < numPages ? progress + 1 : numPages;
-    updateCalibrationDialog(prev);
+    const nextProgress = progress < numPages ? progress + 1 : numPages;
+    updateCalibrationDialog(nextProgress);
   }
 
 
-  useEffect(() => {
-    NeoPdfManager.getDocument({ url: props.url }).then(loadedPdf => {
-      if (loadedPdf) {
-        const w = imgWidth * imgDensity;
-        const h = imgHeight * imgDensity;
-        loadedPdf.generatePageThumbnails(w, h, "rgb(220,220,220)", true).then(() => {
-          setPdf(loadedPdf);
-          const t = Array.from({ length: loadedPdf.numPages }, (_, i) => i + 1);
-          setTargetPages(t);
-          console.log(`testing: pdf loaded, pages=${t}`)
-          setNumPages(t.length);
-        })
-      }
-    });
-  }, [props.url]);
+  // useEffect(() => {
+  //   NeoPdfManager.getDocument({ url: props.url }).then(loadedPdf => {
+  //     if (loadedPdf) {
+  //       const w = imgWidth * imgDensity;
+  //       const h = imgHeight * imgDensity;
+  //       loadedPdf.generatePageThumbnails(w, h, "rgb(220,220,220)", true).then(() => {
+  //         setPdf(loadedPdf);
+  //         const t = Array.from({ length: loadedPdf.numPages }, (_, i) => i + 1);
+  //         setTargetPages(t);
+  //         console.log(`testing: pdf loaded, pages=${t}`)
+  //         setNumPages(t.length);
+  //       })
+  //     }
+  //   });
+  // }, [props.url]);
 
   useEffect(() => {
-    console.log(`testing: progress`)
+    console.log(`calibration: progress`)
     if (pdf && targetPages.length > 0) {
       const w = imgWidth * imgDensity;
       const h = imgHeight * imgDensity;
@@ -100,13 +115,48 @@ function CalibrationDialog(props: IDialogProps) {
         setImgSrc(thumbnail.url);
         setMarkPosRatio({ xr: thumbnail.markPos.x / thumbnail.canvas.w, yr: thumbnail.markPos.y / thumbnail.canvas.h });
       });
+
+
     }
-  }, [progress, show]);
+  }, [progress, status]);
+
+  useEffect(() => {
+    if (show) {
+      NeoPdfManager.getDocument({ url: props.url }).then(loadedPdf => {
+        if (loadedPdf) {
+          const w = imgWidth * imgDensity;
+          const h = imgHeight * imgDensity;
+          // loadedPdf.generatePageThumbnails(w, h, "rgb(220,220,220)", true).then(() => {
+            setPdf(loadedPdf);
+            const t = Array.from({ length: loadedPdf.numPages }, (_, i) => i + 1);
+            setTargetPages(t);
+            console.log(`calibration: pdf loaded, pages=${t}`)
+            setNumPages(t.length);
+
+            updateCalibrationDialog(0);
+            setStatus("progress");
+          // })
+        }
+      });
+    }
+    else {
+      initState();
+    }
+  }, [show]);
+
+
+  useEffect(() => {
+    if (pdf) {
+      console.log("calibration: pdf loaded");
+    }
+  }, [pdf]);
+
+
 
   // useEffect(() => {
   //   console.log(`testing: imageRef  current=${imageRef.current}`)
   // }, [imgSrc]);
-
+  if (!pdf) return (<></>);
 
   if (pdf && targetPages.length > 0) {
     pageNo = progress > 0 ? targetPages[progress - 1] : targetPages[0];
@@ -177,7 +227,7 @@ function CalibrationDialog(props: IDialogProps) {
 
 
 
-interface IButtonProps extends ButtonProps {
+interface Props extends ButtonProps {
   url: string,
   filename: string,
   printOption: IPrintOption,
@@ -185,15 +235,18 @@ interface IButtonProps extends ButtonProps {
 }
 
 
-export function CalibrationButton(props: IButtonProps) {
+export default function CalibrationButton(props: Props) {
+  // console.log(`calibration: ${props.url}`)
   const startCalibration = (e) => {
-    const option = {
-      show: true,
-      targetPages: props.printOption.targetPages,
-      progress: 0,
-    };
+    if (props.url) {
+      const option = {
+        show: true,
+        targetPages: props.printOption.targetPages,
+        progress: 0,
+      };
 
-    showCalibrationDialog(option);
+      showCalibrationDialog(option);
+    }
   }
 
   return (

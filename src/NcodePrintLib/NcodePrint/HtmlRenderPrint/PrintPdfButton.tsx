@@ -268,8 +268,8 @@ export default class PrintPdfButton extends React.Component<IPrintPdfButtonProps
     if (printOption.filename.indexOf("초등학교 4학년 4P.pdf") > -1) {
       /** 그리다 보드와 맞추기 위한 것, for 초등학교 4학년 4P.pdf */
       printOption.magnification = 0.9158249158249159;
-      printOption.marginLeft_nu = 1.3;
-      printOption.marginTop_nu = -0.5;
+
+      printOption.ncodeMargin = { left: 1.3, top: -0.5 };
       printOption.pageInfo = { section: 3, owner: 27, book: 1068, page: 114 };
 
       return true;
