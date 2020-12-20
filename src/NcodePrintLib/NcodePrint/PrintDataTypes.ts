@@ -64,7 +64,6 @@ export interface IPrintOption {
   codeDensity: number;      // 1 dot, 2dots, 3dots
   printDpi: number;         // 600 DPI, 300 DPI
   pdfRenderingDpi: number,    // 200DPI 또는 300DPI가 적당
-  putCalibrationMark: boolean;
   printNcode: boolean;
 
   readonly dotsInACell: number;   // 7, 바꾸지 말것!
@@ -110,14 +109,17 @@ export interface IPrintOption {
   /** 색 농도 최대치, (최대값은 1.0) */
   luminanceMaxRatio: number,
 
-  /** 십자가 표시를 그릴지 안 그릴지 */
-  drawCalibrationMark: boolean,
 
   /** 마크를 그릴 분할 면의 최대 갯수, default: 1 */
   maxPagesPerSheetToDrawMark: number,
 
   /** 십자가 표시가 표시되는 영역, width에 대한 ratio, typically 0.1 (1 = 100%) */
   drawMarkRatio: number,
+
+  /** 십자가 표시를 그릴지 안 그릴지 */
+  drawCalibrationMark: boolean,
+  // putCalibrationMark: boolean;
+
 
   /** 페이지의 테두리를 그릴지 안 그릴지 */
   drawFrame: boolean,
@@ -142,10 +144,12 @@ export interface IPrintOption {
    *
    **/
   progressCallback?: IProgressCallbackFunction;
-
+  completedCallback?: IProgressCallbackFunction;
 
   /** cancel trigger */
   cancel: boolean;
+
+  showTooltip: boolean;
 }
 
 export type IProgressCallbackFunction = (event?: { status: string }) => void;

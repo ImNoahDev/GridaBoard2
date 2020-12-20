@@ -11,7 +11,8 @@ const useStyles = makeStyles({
     width: '100%',
   },
   scrollPaper: {
-    alignItems: 'baseline'  // default center
+    alignItems: 'baseline',  // default center
+    width: "100%"
   }
 });
 
@@ -27,7 +28,7 @@ interface IDialogProps extends DialogProps {
 }
 
 
-function OptionDialog(props: IDialogProps) {
+export function OptionDialog(props: IDialogProps) {
   const { printOption, cancelCallback, okCallback, ...rest } = props;
   // const [open, setOpen] = useState(props.open);
   const classes = useStyles();
@@ -79,11 +80,9 @@ function OptionDialog(props: IDialogProps) {
       {
         console.log(open)
       }
-      <Dialog open={open} {...rest} onClose={handleClose}
-        classes={{ scrollPaper: classes.scrollPaper }}
-      >
+      <Dialog open={open} {...rest} onClose={handleClose} classes={{ scrollPaper: classes.scrollPaper }} >
 
-        <DialogTitle id="form-dialog-title" style={{ float: "left", width: "500px" }}>
+        <DialogTitle id="form-dialog-title" style={{ float: "left", width: "600px" }}>
           <Box fontSize={20} fontWeight="fontWeightBold" >
             인쇄 옵션
         </Box>

@@ -50,6 +50,10 @@ export default function ProgressDialog(props: Props) {
     // forceUpdate();
   }, [props.progress]);
 
+  useEffect(() => {
+    setOpen(propsOpen);
+  }, [propsOpen]);
+
   const percent = Math.ceil(progress);
   const buffered = Math.ceil(progress / 10) * 10;
 

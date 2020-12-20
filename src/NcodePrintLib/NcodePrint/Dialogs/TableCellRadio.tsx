@@ -1,6 +1,6 @@
 import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import { Box, createStyles, FormControl, FormControlLabel, FormLabel, Grid, Paper, Radio, RadioGroup, Table, TableBody, TableCell, TableCellProps, TableContainer, TableRow, Theme, Typography, useTheme } from '@material-ui/core';
+import { Box, Checkbox, createStyles, FormControl, FormControlLabel, FormLabel, Grid, Paper, Radio, RadioGroup, Table, TableBody, TableCell, TableCellProps, TableContainer, TableRow, Theme, Typography, useTheme } from '@material-ui/core';
 import { IPrintOption } from '../..';
 import GridaToolTip from '../../../styles/GridaToolTip';
 import { MappingStorage } from '../../SurfaceMapper';
@@ -9,12 +9,12 @@ import { cellRadioStyle } from './OptionLevel_1';
 
 
 interface ICellRadio extends TableCellProps {
-  selectedValue, value, handleChange, color, name, children, toolTip?: { title: string, msg: string, footer: string, }
+  checked, handleChange, color, name, children, showHelp, toolTip?: { title: string, msg: string, footer: string, }
 }
 export function TableCellRadio(props: ICellRadio) {
 
-  const { selectedValue, value, handleChange, color, name, children, toolTip, ...rest } = props;
-  const upper = value.toUpperCase();
+  const { checked, handleChange, color, name, children, toolTip, showHelp, ...rest } = props;
+  // const upper = value.toUpperCase();
 
   return (
     <TableCell {...rest} style={cellRadioStyle}>
@@ -29,13 +29,11 @@ export function TableCellRadio(props: ICellRadio) {
         </React.Fragment>
       }>
         <Typography variant="subtitle1" component="h5">
-          <Radio style={{ paddingTop: 0, paddingBottom: 0, paddingLeft: 0, paddingRight: 6 }}
-            checked={selectedValue === value}
+          <Checkbox style={{ paddingTop: 0, paddingBottom: 0, paddingLeft: 0, paddingRight: 6 }}
+            checked={checked}
             onChange={handleChange}
-            value={value}
             color={color}
             name={name}
-            inputProps={{ 'aria-label': upper }}
           />
           {children}
         </Typography>

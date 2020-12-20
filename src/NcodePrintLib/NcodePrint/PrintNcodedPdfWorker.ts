@@ -14,7 +14,7 @@ import { PageSizes, PDFDict, PDFDocument, PDFHexString, PDFName } from "pdf-lib"
 import { saveAs } from "file-saver";
 import printJS from "print-js";
 import { _app_name, _lib_name, _version } from "../Version";
-import { g_defaultPrintOption } from "../DefaultOption";
+import { g_defaultPageInfo, g_defaultPrintOption } from "../DefaultOption";
 
 
 // https://stackoverflow.com/questions/9616426/javascript-print-iframe-contents-only/9616706
@@ -24,6 +24,10 @@ import { g_defaultPrintOption } from "../DefaultOption";
 // var CMAP_URL = "./cmaps/";
 // var CMAP_PACKED = true;
 
+type IPrintOptionCallbackType = (arg: IPrintOption) => Promise<IPrintOption>;
+
+
+
 interface Props {
   /** 인쇄될 문서의 url, printOption.url로 들어간다. */
   url: string,
@@ -31,7 +35,6 @@ interface Props {
 
   /** 인쇄 준비 상태를 업데이트하는 콜백 함수 */
   /** 기본값의 IPrintOption을 받아서, dialog를 처리하고 다시 돌려주는 콜백 함수 */
-  printOptionCallback?: (arg: IPrintOption) => IPrintOption,
 }
 
 
@@ -57,15 +60,16 @@ export default class PrintNcodedPdfWorker {
   /** 인쇄 준비 상태를 업데이트하는 콜백 함수 */
   private reportProgress?: (arg: IPrintingReport) => void;
 
-  /** 기본값의 IPrintOption을 받아서, dialog를 처리하고 다시 돌려주는 콜백 함수 */
-  private printOptionCallback?: (arg: IPrintOption) => IPrintOption;
-
   constructor(props: Props, reportProgress?: (arg: IPrintingReport) => void) {
-    this.printOption = g_defaultPrintOption;
+    this.printOption = this.setDefaultPrintOption(g_defaultPrintOption);
     this.url = props.url;
     this.filename = props.filename;
     this.reportProgress = reportProgress;
-    this.printOptionCallback = props.printOptionCallback;
+  }
+
+  private setDefaultPrintOption = (printOption: IPrintOption) => {
+    printOption.pageInfo = { ...g_defaultPageInfo };
+    return printOption;
   }
 
   private setStatus = (status: string) => {
@@ -100,11 +104,15 @@ export default class PrintNcodedPdfWorker {
     return loaded;
   }
 
-  public startPrint = async (url: string, filename: string) => {
+
+  public startPrint = async (url: string, filename: string, printOptionCallback: IPrintOptionCallbackType) => {
     this.setStatus("loading");
+    const printOption = this.printOption;
+
     const pdf = await this.loadPdf(url, filename);
     if (!pdf) {
       this.setStatus("canceled. loading failed.");
+      if (printOption.completedCallback) printOption.completedCallback();
       return;
     }
 
@@ -112,7 +120,6 @@ export default class PrintNcodedPdfWorker {
     // 프로그레스 보고를 위한 초기화
     const progressCallback = this.progressCallback;
 
-    const printOption = this.printOption;
     printOption.cancel = false;
     printOption.progressCallback = progressCallback;
     this.numReports = 0;
@@ -125,12 +132,14 @@ export default class PrintNcodedPdfWorker {
     printOption.targetPages = Array.from({ length: pdf.numPages }, (_, i) => i + 1);
 
     // 기본 인쇄 옵션 외의 옵션을 이용자로부터 받는다
-    if (this.printOptionCallback) {
-      const result = this.printOptionCallback(printOption);
+    if (printOptionCallback) {
+      const result = await printOptionCallback(printOption);
       if (result) this.printOption = result;
+      else {
+        if (printOption.completedCallback) printOption.completedCallback();
+        return;
+      }
     }
-
-    if (printOption.cancel) return;
 
     // Ncode가 필요하면 코드를 받아 온다, 여기서 받아오는 ncode page 수는 전체 PDF의 페이지 수
     printOption.needToIssueCode = printOption.needToIssueCode || printOption.forceToIssueNewCode;
@@ -157,7 +166,10 @@ export default class PrintNcodedPdfWorker {
     this.setStatus("printing");
     const promises = [];
     for (let i = 0; i < numSheets; i++) {
-      if (printOption.cancel) return;
+      if (printOption.cancel) {
+        if (printOption.completedCallback) printOption.completedCallback();
+        return;
+      }
 
       const pr = this.prepareSheet(i, pageNumsInSheets[i]);
       promises.push(pr);
@@ -185,7 +197,10 @@ export default class PrintNcodedPdfWorker {
     const blob = new Blob([pdfBytes], { type: 'application/pdf' });
     // const base64DataUri = await pdfDoc.saveAsBase64({ dataUri: true })
     await sleep(10);
-    if (printOption.cancel) return;
+    if (printOption.cancel) {
+      if (printOption.completedCallback) printOption.completedCallback();
+      return;
+    }
 
     // 인쇄를 시작한다.
     const urlCreator = window.URL || window.webkitURL;
@@ -211,6 +226,7 @@ export default class PrintNcodedPdfWorker {
       storage.register(tempMapping);
     }
 
+    if (printOption.completedCallback) printOption.completedCallback();
     return;
   }
 

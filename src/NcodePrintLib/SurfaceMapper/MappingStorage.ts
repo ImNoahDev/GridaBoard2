@@ -235,7 +235,7 @@ export default class MappingStorage {
           else return 0;
         });
 
-        // this.dump("loading");
+        this.dump("loading");
 
 
         // const debug = JSON.stringify(this._arrMapped);

@@ -8,6 +8,8 @@ import { ColorConvertMethod } from "./NcodeSurface/CanvasColorConverter";
 export const g_debugURL = "./2P_test.pdf";
 export const g_debugFilename = "./2P_test.pdf";
 
+export const g_defaultPageInfo = { section: -1, owner: -1, book: -1, page: -1 };
+
 export const g_defaultPrintOption: IPrintOption = {
   /** DO NOT MODIFY */
   dotsInACell: 7,  // DO NOT MODIFY
@@ -23,14 +25,12 @@ export const g_defaultPrintOption: IPrintOption = {
 
   needToIssueCode: true,
   forceToIssueNewCode: false,
-  pageInfo: { section: 3, owner: 27, book: 1068, page: 114 },
+  pageInfo: { ...g_defaultPageInfo },
   ncodeMargin: { left: -1, top: -1 },
 
   codeDensity: 2,
   printDpi: 600,
   pdfRenderingDpi: 300,
-  putCalibrationMark: true,
-
   downloadNcodedPdf: true,
 
   printNcode: true,
@@ -61,6 +61,7 @@ export const g_defaultPrintOption: IPrintOption = {
   padding: 15,     // mm 단위
 
   cancel: false,
+  showTooltip: true,
 
   debugMode: 0
 };
