@@ -16,7 +16,7 @@ const CMAP_PACKED = true;
 
 export type IGetDocumentOptions = {
   url: string,
-  filename?: string,
+  filename: string,
 
   fingerprint?: string,
   cMapUrl?: string,
@@ -31,6 +31,8 @@ export default class NeoPdfDocument {
   _ready: PdfJs.PDFLoadingTask<PdfJs.PDFDocumentProxy>;
 
   _url: string;
+
+  _filename: string;
 
   _fingerprint: string;
 
@@ -87,9 +89,10 @@ export default class NeoPdfDocument {
   }
 
   justLoad = async (options: IGetDocumentOptions) => {
-    const { url, cMapUrl, cMapPacked } = options;
+    const { url, filename, cMapUrl, cMapPacked } = options;
 
     this._url = url;
+    this._filename = filename;
     this._ready = PdfJs.getDocument(
       {
         url: url,
@@ -113,6 +116,10 @@ export default class NeoPdfDocument {
 
   get url() {
     return this._url;
+  }
+
+  get filename() {
+    return this._filename;
   }
 
   get fingerprint() {

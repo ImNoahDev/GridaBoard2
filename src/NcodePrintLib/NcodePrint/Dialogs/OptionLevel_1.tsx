@@ -66,7 +66,7 @@ export interface ILeveledDialogProps {
 
 function LineBreak(props) {
   return (
-    <TableRow style={{ height: `${lineBreak}px` }}> </TableRow>
+    <TableRow style={{ height: `${lineBreak}px` }}><TableCell></TableCell> </TableRow>
   )
 
 }
@@ -110,7 +110,7 @@ function OptionLevel_1(props: ILeveledDialogProps) {
     const name = event.target.name;
     const value = event.target.value;
     const checked = event.target.checked;
-    console.log( `event target=${name}, value=${value} checked=${checked}`);
+    console.log(`event target=${name}, value=${value} checked=${checked}`);
 
     switch (name) {
       case "hasToPutNcode":
@@ -216,7 +216,7 @@ function OptionLevel_1(props: ILeveledDialogProps) {
 
           <TableRow className={classes.tr}>
             <TableCellRadio showHelp={help} colSpan={2} checked={false} handleChange={handleChange2} color="secondary" name="targetPages">
-              인쇄 범위 ({printOption.targetPages}페이지), 대상: {JSON.stringify(printOption.targetPages)}
+              인쇄 범위 ({printOption.targetPages.length}페이지), 대상: {JSON.stringify(printOption.targetPages)}
             </TableCellRadio >
           </TableRow>
 

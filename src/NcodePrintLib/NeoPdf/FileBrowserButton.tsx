@@ -1,6 +1,6 @@
 import { Button, ButtonProps } from '@material-ui/core';
 import React, { useRef } from 'react';
-import { onSuccess, _uuid, onOpenClicked, openFileBrowser } from "./FileBrowser";
+import { onFileInputChanged, onFileInputClicked, g_hiddenFileInputBtnId, openFileBrowser } from "./FileBrowser";
 import { Theme, Typography, withStyles } from '@material-ui/core';
 import Tooltip, { TooltipProps } from '@material-ui/core/Tooltip';
 import { IFileBrowserReturn } from '../NcodePrint/PrintDataTypes';
@@ -14,8 +14,6 @@ interface Props extends ButtonProps {
 
 const FileBrowserButton = (props: Props) => {
   const { onFileOpen, ...rest } = props;
-  const _fileInput = useRef();
-
   async function fileOpen() {
 
     const result = await openFileBrowser();
@@ -62,12 +60,7 @@ const FileBrowserButton = (props: Props) => {
         {props.children}
       </button>
 
-      <input type="file" id={_uuid}
-        onChange={onSuccess}
-        onClick={onOpenClicked}
-        ref={_fileInput}
-        style={{ display: "none" }} name="pdf" accept="application/pdf"
-      />
+
     </React.Fragment>
   );
 }

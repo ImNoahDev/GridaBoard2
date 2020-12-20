@@ -8,7 +8,7 @@ import { ColorConvertMethod } from "./NcodeSurface/CanvasColorConverter";
 export const g_debugURL = "./2P_test.pdf";
 export const g_debugFilename = "./2P_test.pdf";
 
-export const g_defaultPageInfo = { section: -1, owner: -1, book: -1, page: -1 };
+export const g_nullNcode = { section: -1, owner: -1, book: -1, page: -1 };
 
 export const g_defaultPrintOption: IPrintOption = {
   /** DO NOT MODIFY */
@@ -25,7 +25,7 @@ export const g_defaultPrintOption: IPrintOption = {
 
   needToIssueCode: true,
   forceToIssueNewCode: false,
-  pageInfo: { ...g_defaultPageInfo },
+  pageInfo: { ...g_nullNcode },
   ncodeMargin: { left: -1, top: -1 },
 
   codeDensity: 2,

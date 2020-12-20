@@ -24,6 +24,7 @@ import CloseIcon from "@material-ui/icons/Close";
 import configureStore from "../store/configureStore";
 import { RootState } from '../store/rootReducer';
 import { useSelector } from "react-redux";
+import { g_hiddenFileInputBtnId, onFileInputChanged, onFileInputClicked } from "../NcodePrintLib/NeoPdf/FileBrowser";
 
 // const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 // export const store = createStore(rootReducer, composeEnhancers(applyMiddleware(thunk)));
@@ -115,10 +116,29 @@ const Root = () => {
           <CircularProgress color="inherit" />
         </Backdrop>
 
+        <input type="file" id={g_hiddenFileInputBtnId} onChange={onFileInputChanged} onClick={onFileInputClicked} style={{ display: "none" }} name="pdf" accept="application/pdf" />
+
         {renderToastMessage()}
       </MuiThemeProvider>
     </Provider>
   );
 }
+
+
+const onTest = (e) => {
+  console.log(e);
+}
+
+const onChange = (e) => {
+  console.log(e);
+}
+
+
+(function () {
+  const elem = document.getElementById("pdf_file_append") as HTMLInputElement;
+  elem.addEventListener("click", onTest);
+  elem.addEventListener("change", onChange);
+})();
+
 
 export default Root;

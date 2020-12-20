@@ -75,6 +75,8 @@ export interface IPdfPageDesc {
   /** PDF url */
   url: string,
 
+  filename: string,
+
   /** PDF fingerprint */
   fingerprint: string,
 

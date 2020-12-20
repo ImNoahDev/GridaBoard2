@@ -14,7 +14,7 @@ import { PageSizes, PDFDict, PDFDocument, PDFHexString, PDFName } from "pdf-lib"
 import { saveAs } from "file-saver";
 import printJS from "print-js";
 import { _app_name, _lib_name, _version } from "../Version";
-import { g_defaultPageInfo, g_defaultPrintOption } from "../DefaultOption";
+import { g_nullNcode, g_defaultPrintOption } from "../DefaultOption";
 
 
 // https://stackoverflow.com/questions/9616426/javascript-print-iframe-contents-only/9616706
@@ -47,7 +47,7 @@ export default class PrintNcodedPdfWorker {
   private progressPercent = 0;
   private pdf = undefined as NeoPdfDocument;
   // pagesOverview = [] as IPageOverview[];
-  private mapping = undefined as PdfDocMapper;
+  private tempMapper = undefined as PdfDocMapper;
   private printOption: IPrintOption;
   private status = "N/A";
 
@@ -68,7 +68,7 @@ export default class PrintNcodedPdfWorker {
   }
 
   private setDefaultPrintOption = (printOption: IPrintOption) => {
-    printOption.pageInfo = { ...g_defaultPageInfo };
+    printOption.pageInfo = { ...g_nullNcode };
     return printOption;
   }
 
@@ -127,6 +127,10 @@ export default class PrintNcodedPdfWorker {
     // PrintPdfMain의 printTrigger를 +1 해 주면, 인쇄가 시작된다
     let pdfMapDesc = this.getAssociatedMappingInfo(printOption, pdf);
     printOption.needToIssueCode = !pdfMapDesc;
+    if (printOption.needToIssueCode) {
+      const mapper = MappingStorage.getInstance();
+      printOption.pageInfo = { ...mapper.getNextIssuableNcodeInfo() };
+    }
 
     // 기본 값으로는 모든 페이지를 인쇄하도록
     printOption.targetPages = Array.from({ length: pdf.numPages }, (_, i) => i + 1);
@@ -220,7 +224,7 @@ export default class PrintNcodedPdfWorker {
     console.log("[PrintPdfMain] Print!!!");
     this.setStatus("completed");
 
-    // mapping 정보를 등록
+    // tempMapper 정보를 등록
     if (this.printOption.needToIssueCode) {
       const storage = MappingStorage.getInstance();
       storage.register(tempMapping);
@@ -465,10 +469,10 @@ export default class PrintNcodedPdfWorker {
   resetPrintStatus = () => {
     const { filename, printOption } = this;
     this.setProgressPercent(0);
-    const map = new PdfDocMapper(filename, printOption.pagesPerSheet);
-    this.mapping = map;
+    const tempMapping = new PdfDocMapper(filename, printOption.pagesPerSheet);
+    this.tempMapper = tempMapping;
 
-    return map;
+    return tempMapping;
   }
 
   progressCallback = (event?: { status: string }) => {

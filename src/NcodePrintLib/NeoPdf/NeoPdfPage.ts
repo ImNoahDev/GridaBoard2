@@ -234,6 +234,7 @@ export default class NeoPdfPage {
     const result: IPdfPageCanvasDesc = {
       pdfPageInfo: {
         url: doc.url,
+        filename: doc.filename,
         fingerprint: doc.fingerprint,
         numPages: doc.numPages,
         pageNo: this._pageNo,

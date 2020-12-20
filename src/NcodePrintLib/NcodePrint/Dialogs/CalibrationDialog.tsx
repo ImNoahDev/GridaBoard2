@@ -122,7 +122,7 @@ function CalibrationDialog(props: IDialogProps) {
 
   useEffect(() => {
     if (show) {
-      NeoPdfManager.getDocument({ url: props.url }).then(loadedPdf => {
+      NeoPdfManager.getDocument({ url: props.url, filename: props.filename }).then(loadedPdf => {
         if (loadedPdf) {
           const w = imgWidth * imgDensity;
           const h = imgHeight * imgDensity;

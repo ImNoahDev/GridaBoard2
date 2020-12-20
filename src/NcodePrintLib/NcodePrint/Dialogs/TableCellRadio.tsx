@@ -14,30 +14,48 @@ interface ICellRadio extends TableCellProps {
 export function TableCellRadio(props: ICellRadio) {
 
   const { checked, handleChange, color, name, children, toolTip, showHelp, ...rest } = props;
+
   // const upper = value.toUpperCase();
 
   return (
     <TableCell {...rest} style={cellRadioStyle}>
       {/* <FormControlLabel style={cellRadioStyle} value={1} control={<Radio />} label="Ncode A4에 인쇄" /> */}
-      <GridaToolTip placement="left" title={
-        <React.Fragment>
-          <Typography color="inherit">Background</Typography>
-          <br />
-          {"화면의 배경색을 선택합니다."}
-          <br />
-          <b>{"키보드 버튼 1로 선택 가능합니다"}</b>
-        </React.Fragment>
-      }>
-        <Typography variant="subtitle1" component="h5">
-          <Checkbox style={{ paddingTop: 0, paddingBottom: 0, paddingLeft: 0, paddingRight: 6 }}
-            checked={checked}
-            onChange={handleChange}
-            color={color}
-            name={name}
-          />
-          {children}
-        </Typography>
-      </GridaToolTip>
+      {showHelp ? (
+        <GridaToolTip
+          placement="left" title={
+            <React.Fragment>
+              <Typography color="inherit">Background</Typography>
+              <br />
+              {"화면의 배경색을 선택합니다."}
+              <br />
+              <b>{"키보드 버튼 1로 선택 가능합니다"}</b>
+            </React.Fragment>
+          }>
+          <Typography variant="subtitle1" component="h5">
+            <Checkbox style={{ paddingTop: 0, paddingBottom: 0, paddingLeft: 0, paddingRight: 6 }}
+              checked={checked}
+              onChange={handleChange}
+              color={color}
+              name={name}
+            />
+            {children}
+
+          </Typography>
+        </GridaToolTip>
+
+      ) : (
+          <Typography variant="subtitle1" component="h5">
+            <Checkbox style={{ paddingTop: 0, paddingBottom: 0, paddingLeft: 0, paddingRight: 6 }}
+              checked={checked}
+              onChange={handleChange}
+              color={color}
+              name={name}
+            />
+            {children}
+
+          </Typography>
+
+        )}
     </TableCell>);
 }
 

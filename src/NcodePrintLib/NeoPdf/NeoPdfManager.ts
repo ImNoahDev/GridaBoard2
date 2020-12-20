@@ -18,7 +18,7 @@ export default class NeoPdfManager {
 
       if (status.result === "success") {
         const doc = new NeoPdfDocument();
-        return await doc.load({ url: status.url });
+        return await doc.load({ url: status.url, filename: status.file.name });
       }
 
       if (status.result === "not match") {
@@ -43,16 +43,16 @@ export default class NeoPdfManager {
     console.log(result.result);
 
     if (result.result === "success") {
-      const url = result.url;
+      const { url, file } = result;
       console.log(url);
-      const isSame = NeoPdfManager.checkFingerprint({ url }, fingerprint);
+      const isSame = NeoPdfManager.checkFingerprint({ url, filename: file.name }, fingerprint);
       if (isSame)
-        return { result: "success", url };
-      return { result: "not match", url, file: result.file };
+        return { result: "success", url, file };
+      return { result: "not match", url, file };
     }
     else {
       alert("파일 열기를 취소 했습니다");
-      return { result: "canceled", url: null };
+      return { result: "canceled", url: null, file: null };
 
       // alert("파일 열기가 실패했습니다");
       // return { result: "failed", url: null };

@@ -15,6 +15,9 @@ const CMAP_PACKED = true;
 
 interface Props {
   url: string,
+
+  filename: string,
+
   pageNo: number,
   onReportPdfInfo: Function,
   position: { offsetX: number, offsetY: number, zoom: number },

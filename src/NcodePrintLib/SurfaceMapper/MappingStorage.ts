@@ -18,7 +18,7 @@ type IMappingData = {
 
 export default class MappingStorage {
   _data: IMappingData = {
-    nextIssuable: { section: -1, owner: -1, book: -1, page: -1 },
+    nextIssuable: { ...g_defaultNcode },
     arrDocMap: []
   };
 
@@ -42,6 +42,12 @@ export default class MappingStorage {
     }
 
     return pages;
+  }
+  public reset = () => {
+    this._data = {
+      nextIssuable: { ...g_defaultNcode },
+      arrDocMap: [],
+    };
   }
 
   public getNextIssuableNcodeInfo = () => {
@@ -80,10 +86,7 @@ export default class MappingStorage {
   }
 
   clear = () => {
-    this._data = {
-      nextIssuable: { section: -1, owner: -1, book: -1, page: -1 },
-      arrDocMap: []
-    };
+    this.reset();
     this.storeMappingInfo();
     console.log("Mapping information cleared");
   }
@@ -144,7 +147,7 @@ export default class MappingStorage {
     if (found) {
       /** 원래는 폴리곤에 속했는지 점검해야 하지만, 현재는 같은 페이지인지만 점검한다  2020/12/06 */
       const pageMap = found.params.find(param => isSamePage(ncodeXy, param.pageInfo));
-      return pageMap;
+      return { pdf: found, page: pageMap };
     }
 
     return undefined;
