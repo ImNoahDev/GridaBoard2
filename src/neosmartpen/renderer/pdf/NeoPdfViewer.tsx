@@ -1,17 +1,17 @@
 import React, { CSSProperties } from "react";
 // import PropTypes from "prop-types";
 import { Page } from './Page';
-import * as PdfJs from "pdfjs-dist";
+// import * as PdfJs from "pdfjs-dist";
 import { connect } from 'react-redux';
 import { hideUIProgressBackdrop, showUIProgressBackdrop } from "../../../store/reducers/ui";
+import NeoPdfDocument from "../../../NcodePrintLib/NeoPdf/NeoPdfDocument";
+import NeoPdfManager from "../../../NcodePrintLib/NeoPdf/NeoPdfManager";
+import { TransformParameters } from "../../../NcodePrintLib/Coordinates";
 
 
-PdfJs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${PdfJs.version}/pdf.worker.js`;
-// const PDF_URL = 'https://mozilla.github.io/pdf.js/web/compressed.tracemonkey-pldi-09.pdf';
-// const PDF_URL = "./2020학년도 서울대학교 수시모집 일반전형 면접 및 구술고사 문항.pdf";
-// const PDF_URL = "https://uploads.codesandbox.io/uploads/user/faa4155a-f802-458d-81ad-90b4709d0cf8/4ETB-10.1.1.324.5566.pdf";
-const CMAP_URL = "./cmaps/";
-const CMAP_PACKED = true;
+// PdfJs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${PdfJs.version}/pdf.worker.js`;
+// const CMAP_URL = "./cmaps/";
+// const CMAP_PACKED = true;
 
 interface Props {
   url: string,
@@ -23,10 +23,14 @@ interface Props {
   position: { offsetX: number, offsetY: number, zoom: number },
 
   progressDlgTitle?: string;
+
+
 }
 
 interface State {
-  pdf: PdfJs.PDFDocumentProxy,
+  // pdf: PdfJs.PDFDocumentProxy,
+  pdf: NeoPdfDocument,
+
   scale: number,
   documentZoom: number,
   status: string,
@@ -49,40 +53,33 @@ class NeoPdfViewer extends React.Component<Props, State> {
   }
 
   componentDidMount() {
-    this.loadDocument(this.props.url);
+    this.loadDocument(this.props.url, this.props.filename);
   }
 
-  loadDocument = (url: string) => {
+  loadDocument = async (url: string, filename: string) => {
     // const { documentZoom } = this.state;
     if (url === undefined) return;
 
     // kitty, 나중에는 분리할 것
     showUIProgressBackdrop();
-    const loadingTask = PdfJs.getDocument({
-      url,
-      cMapUrl: CMAP_URL,
-      cMapPacked: CMAP_PACKED,
-    }
-    );
+    const loadingTask = NeoPdfManager.getDocument({ url, filename })
 
     const self = this;
     this.setState({ status: "loading" });
+    const pdf = await loadingTask;
 
-    loadingTask.promise.then(
-      (pdf: PdfJs.PDFDocumentProxy) => {
-        self.props.onReportPdfInfo(pdf);
-        this.setState({ pdf });
-        this.setState({ status: "loaded" });
+    this.props.onReportPdfInfo(pdf);
+    this.setState({ pdf });
+    this.setState({ status: "loaded" });
 
-        hideUIProgressBackdrop();
-        // console.log("pdf loaded");
-      });
+    hideUIProgressBackdrop();
+    // console.log("pdf loaded");
   }
 
   shouldComponentUpdate(nextProps: Props, nextState: State) {
     if (nextProps.url !== this.props.url) {
       this.setState({ status: "loading" });
-      this.loadDocument(nextProps.url);
+      this.loadDocument(nextProps.url, nextProps.filename);
       return false;
     }
     return true;

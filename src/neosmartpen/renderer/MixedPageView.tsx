@@ -5,7 +5,7 @@ import { INcodeSOBPxy, IPageSOBP } from "../DataStructure/Structures";
 import { NeoSmartpen } from "../pencomm/neosmartpen";
 import * as PdfJs from "pdfjs-dist";
 import { MappingStorage } from "../../NcodePrintLib/SurfaceMapper";
-import { IMappingParams, IPdfMappingDesc, IPdfPageDesc } from "../../NcodePrintLib/Coordinates";
+import { IMappingParams, IPdfMappingDesc, IPdfPageDesc, TransformParameters } from "../../NcodePrintLib/Coordinates";
 import { IFileBrowserReturn, isSameObject, openFileBrowser2 } from "../../NcodePrintLib";
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from "@material-ui/core";
 
@@ -36,13 +36,16 @@ interface State {
 
   renderCount: number;
 
-  dialogOpen: boolean;
+  showFileOpenDlg: boolean;
+  showCancelConfirmDlg: boolean;
+
+
+  h: TransformParameters;
 
 }
 
 
 export default class MixedPageView extends React.Component<Props, State> {
-  waitingForFirstStroke = true;
   pdf: PdfJs.PDFDocumentProxy;
   rendererRef: React.RefObject<PenBasedRenderer> = React.createRef();
 
@@ -63,15 +66,35 @@ export default class MixedPageView extends React.Component<Props, State> {
     }
 
     const canvasPosition = { offsetX: 0, offsetY: 0, zoom: 1 };
-    this.state = { pageInfo, pdfUrl, pdfFilename: filename, pageNo, canvasPosition, renderCount: 0, dialogOpen: false };
+    this.state = {
+      pdfUrl,
+      pdfFilename: filename,
+      pageNo,
+
+      pageInfo,
+
+      canvasPosition,
+      renderCount: 0,
+
+      showFileOpenDlg: false,
+      showCancelConfirmDlg: false,
+
+      h: undefined,
+    };
   }
 
   onReportPdfInfo = (pdf: PdfJs.PDFDocumentProxy) => {
     this.pdf = pdf;
+
+    // 이미 로드되어 있고 같은 파일이라면, 페이지를 전환한다.
+    if (this.pdf) {
+      const newPageInfo = { ...this.state.pageInfo };
+      this.setState({ pageInfo: newPageInfo });
+    }
   }
 
   onFileSelect = async () => {
-    this.setState({ dialogOpen: false });
+    this.setState({ showFileOpenDlg: false });
 
     const coupledDoc = this._fileToLoad;
 
@@ -97,6 +120,11 @@ export default class MixedPageView extends React.Component<Props, State> {
           fileDesc: selectedFile.file,
         }
       } else {
+        // reset homography
+        const h = undefined;
+        console.log(`MixedViewer: pagechanged Set h, h=${JSON.stringify(h)}`);
+        this.setState({ h });
+
         const retVal: IFileBrowserReturn = {
           result: "canceled",
           url: null,
@@ -110,36 +138,38 @@ export default class MixedPageView extends React.Component<Props, State> {
     // 페이지를 찾자
     const mapper = MappingStorage.getInstance();
     const ncodeXy: INcodeSOBPxy = { ...pageInfo, x: 0, y: 0 };
+    this.setState({ pageInfo: { ...pageInfo } });
+
+    // 인쇄된 적이 없는 파일이라면 PDF 관련의 오퍼레이션을 하지 않는다.
     const coupledDoc = mapper.findPdfPage(ncodeXy);
     console.log(coupledDoc.page);
+    if (!coupledDoc) return;
 
-    if (coupledDoc) {
-      if (!this.coupledDoc || !isSameObject(this.coupledDoc.pdf, coupledDoc.pdf)) {
+    console.log(`MixedViewer: pagechanged Set h, h=${JSON.stringify(coupledDoc.page.h)}`);
+    this.setState({ h: coupledDoc.page.h });
+
+    // 파일을 로드해야 한다면, 로컬이든 클라우드든 로드하도록 한다.
+    if (!this.pdf || this.pdf.fingerprint !== coupledDoc.pdf.fingerprint) {
+      const url = coupledDoc.pdf.url;
+      if (url.indexOf("blob:http") > -1) {
         this._fileToLoad = coupledDoc;
-        this.setState({ dialogOpen: true });
-
-      }
-    }
-
-    if (this.pdf) {
-      const numPages = this.pdf.numPages;
-
-      let pageDelta = 0;
-      if (this.waitingForFirstStroke) {
-        pageDelta = 0;
-        this.waitingForFirstStroke = false;
-        this.setState({ pageInfo });
+        this.setState({ showFileOpenDlg: true });
       }
       else {
-        pageDelta = pageInfo.page - this.state.pageInfo.page;
-        pageDelta += numPages;
-        pageDelta = pageDelta % numPages;
+        // 구글 드라이브에서 파일을 불러오자
       }
-      this.setState({ pageNo: pageDelta + 1 });
 
+      return;
     }
-    /** 여기까지 임시 내용 */
+
+
+    // 이미 로드되어 있고 같은 파일이라면, 페이지를 전환한다.
+    if (this.pdf) {
+      const pageNo = coupledDoc.page.pdfDesc.pageNo;
+      this.setState({ pageNo });
+    }
   }
+
 
   onCanvasShapeChanged = (arg: { offsetX: number, offsetY: number, zoom: number }) => {
     // console.log(arg);
@@ -150,6 +180,8 @@ export default class MixedPageView extends React.Component<Props, State> {
   }
 
   shouldComponentUpdate(nextProps: Props, nextState: State) {
+    let ret = false;
+
     if (nextProps.pdfUrl !== this.props.pdfUrl) {
       this.setState({ pdfUrl: nextProps.pdfUrl });
       return false;
@@ -159,12 +191,27 @@ export default class MixedPageView extends React.Component<Props, State> {
       this.filename = nextProps.filename;
       return false;
     }
+
+    if (nextState.pageInfo !== this.state.pageInfo) {
+      const ncodeXy: INcodeSOBPxy = { ...nextState.pageInfo, x: 0, y: 0 };
+
+      // 인쇄된 적이 없는 파일이라면 PDF 관련의 오퍼레이션을 하지 않는다.
+      const mapper = MappingStorage.getInstance();
+      const coupledDoc = mapper.findPdfPage(ncodeXy);
+      if (!coupledDoc) {
+        console.log(`MixedViewer: Set h, h=${JSON.stringify(coupledDoc.page.h)}`);
+
+        this.setState({ h: coupledDoc.page.h });
+      }
+
+      ret = ret || true;
+    }
     // console.log("update requested");
     return true;
   }
 
   handleClose = () => {
-    this.setState({ dialogOpen: false });
+    this.setState({ showFileOpenDlg: false });
   };
 
 
@@ -188,7 +235,7 @@ export default class MixedPageView extends React.Component<Props, State> {
       overflow: "visible",
     }
 
-
+    console.log(`MixedViewer: rendering, h=${JSON.stringify(this.state.h)}`);
     // console.log(this.state.canvasPosition);
     return (
       <div>
@@ -217,13 +264,14 @@ export default class MixedPageView extends React.Component<Props, State> {
               onCanvasShapeChanged={this.onCanvasShapeChanged}
               ref={this.rendererRef}
               rotation={this.props.rotation}
+              h={this.state.h}
             />
           </div>
 
         </div>
-        <Dialog open={this.state.dialogOpen} onClose={this.handleClose} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description" >
+        <Dialog open={this.state.showFileOpenDlg} onClose={this.handleClose} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description" >
           <DialogTitle id="alert-dialog-title">
-            PDF 파일을 로드
+            파일 불러오기
           </DialogTitle>
           <DialogContent>
             <DialogContentText id="alert-dialog-description">
@@ -240,6 +288,27 @@ export default class MixedPageView extends React.Component<Props, State> {
           </Button>
           </DialogActions>
         </Dialog>
+
+
+        <Dialog open={this.state.showCancelConfirmDlg} onClose={this.handleClose} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description" >
+          <DialogTitle id="alert-dialog-title">
+            파일 불러오기를 취소
+          </DialogTitle>
+          <DialogContent>
+            <DialogContentText id="alert-dialog-description">
+              선택한 파일을 이전에 인쇄했던 파일과 다른 파일입니다. 다시 한번 파일을 선택하고 로드하겠습니까?
+          </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={this.handleClose} color="primary" >
+              아니오, 빈화면에 쓰겠습니다.
+          </Button>
+            <Button onClick={this.onFileSelect} color="primary" autoFocus>
+              예, 다시 한번 선택합니다.
+          </Button>
+          </DialogActions>
+        </Dialog>
+
       </div>
     );
   }

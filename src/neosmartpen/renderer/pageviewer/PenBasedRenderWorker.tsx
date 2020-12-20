@@ -133,7 +133,7 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
 
 
     //지우개 구현
-    const canvas_xy = this.getCanvasXY(dot);
+    const canvas_xy = this.getPdfXY(dot);
     const screen_xy = this.getScreenXY(canvas_xy);
     const pen = event.pen;
     if (pen.penRendererType === IBrushType.ERASER) {
@@ -182,7 +182,7 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
 
   movePenTracker = (event: any) => {
     const dot = event.dot;
-    const canvas_xy = this.getCanvasXY(dot);
+    const canvas_xy = this.getPdfXY(dot);
     const screen_xy = this.getScreenXY(canvas_xy);
     const penTracker = event.pen.pathPenTracker;
 
@@ -259,7 +259,7 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
     }
 
     const dot = { x: e.event.x, y: e.event.y }
-    const canvas_xy = this.getCanvasXY(dot);
+    const canvas_xy = this.getPdfXY(dot);
 
     for (let i = NUM_HOVER_POINTERS - 1; i > 0; i--) {
       e.pen.pathHoverPoints[i].left = e.pen.pathHoverPoints[i - 1].left;
@@ -457,7 +457,7 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
 
     const pointArray = [];
     dotArray.forEach((dot) => {
-      const pt = this.getCanvasXY_scaled(dot);
+      const pt = this.getPdfXY_scaled(dot);
       pointArray.push(pt);
     });
 

@@ -4,10 +4,11 @@ import { InkStorage } from "../..";
 import { PATH_THICKNESS_SCALE } from "./DrawCurves";
 import { PDFVIEW_ZOOM_MAX, PDFVIEW_ZOOM_MIN } from "../../constants";
 import { IWritingSurfaceInfo, ISize } from "../../DataStructure/Structures";
-import { ncodeToDisplayPixel } from "../../utils/UtilsFunc";
+import { ncodeToPdfPoint } from "../../utils/UtilsFunc";
 import { ZoomFitEnum } from "./StorageRenderWorker";
 import { Point } from "fabric/fabric-impl";
 import { paperInfo } from "../../noteserver/PaperInfo";
+import { TransformParameters } from "../../../NcodePrintLib/Coordinates";
 // import { paperInfo } from "../../noteserver/PaperInfo";
 // import { plugToRequest } from "react-cookies";
 // import { scaleCanvas } from "../../utils/UtilsFunc";
@@ -125,7 +126,7 @@ export default class RenderWorkerBase {
   };
 
   /** Ncode to Screen scale */
-  nu_to_css_scale: number;
+  nu_to_pu_scale: number;
 
   /** logical zoom in/out */
   // scale = 1;
@@ -142,7 +143,9 @@ export default class RenderWorkerBase {
   zoomAnimateTimer: number = null;
   options: IRenderWorkerOption;
 
+  h: TransformParameters;
 
+  getPdfXY: (ncodeXY: { x: number, y: number, f?: number }) => { x: number, y: number, f: number };
 
   /**
    *
@@ -150,6 +153,7 @@ export default class RenderWorkerBase {
    */
   constructor(options: IRenderWorkerOption) {
     const { canvasId, canvas, width, height, bgColor, mouseAction, viewFit, shouldDisplayGrid } = options;
+    this.getPdfXY = this.getPdfXY_default;
 
     this.name = "RenderWorkerBase";
 
@@ -163,7 +167,7 @@ export default class RenderWorkerBase {
     this.initialSize = { width, height };
     this.viewSize = { width, height };
 
-    this.nu_to_css_scale = ncodeToDisplayPixel(1);
+    this.nu_to_pu_scale = ncodeToPdfPoint(1);
     // this.scale = 1;
 
     this.canvasFb = null;
@@ -220,13 +224,13 @@ export default class RenderWorkerBase {
     this.drawPageLayout();
   }
 
-  getPaperSize_Css = (): ISize => {
+  getPaperSize_pu = (): ISize => {
     const { Xmin, Xmax, Ymin, Ymax, rotation } = this.surfaceInfo;
     const ncode_width = Xmax - Xmin;
     const ncode_height = Ymax - Ymin;
 
-    const actual_width = ncodeToDisplayPixel(ncode_width);
-    const actual_height = ncodeToDisplayPixel(ncode_height);
+    const actual_width = ncodeToPdfPoint(ncode_width);
+    const actual_height = ncodeToPdfPoint(ncode_height);
     const s: ISize = {
       width: actual_width,
       height: actual_height,
@@ -284,10 +288,10 @@ export default class RenderWorkerBase {
     }
 
     // 그리기
-    const size = this.getPaperSize_Css();
+    const size = this.getPaperSize_pu();
     console.log(`drawPageLayout: ${size.width}, ${size.height}`);
 
-    // console.log(`Grid: scale=${this.nu_to_css_scale} (width, height)=(${size.width}, ${size.height})`);
+    // console.log(`Grid: scale=${this.nu_to_pu_scale} (width, height)=(${size.width}, ${size.height})`);
 
     const ratio = 1;
 
@@ -491,14 +495,14 @@ export default class RenderWorkerBase {
     const { section, owner, book, page } = this.surfaceInfo;
     const szPaper = paperInfo.getPaperSize({ section, owner, book, page });
 
-    const cssSize = {
-      width: szPaper.width * this.nu_to_css_scale,
-      height: szPaper.height * this.nu_to_css_scale,
+    const size_pu = {
+      width: szPaper.width * this.nu_to_pu_scale,
+      height: szPaper.height * this.nu_to_pu_scale,
     }
 
     const canvasZoom = canvasFb.getZoom();
-    const canvasWidth = Math.round(cssSize.width * canvasZoom);
-    const canvasHeight = Math.round(cssSize.height * canvasZoom);
+    const canvasWidth = Math.round(size_pu.width * canvasZoom);
+    const canvasHeight = Math.round(size_pu.height * canvasZoom);
     let shouldReset = false;
 
     if (this.viewSize.width > canvasWidth) {
@@ -653,16 +657,28 @@ export default class RenderWorkerBase {
    * @protected
    * @param {{x:number, y:number, f?:number}} ncodeXY
    */
-  protected getCanvasXY = (ncodeXY: { x: number, y: number, f?: number }) => {
+  protected getPdfXY_default = (ncodeXY: { x: number, y: number, f?: number }) => {
     const { x, y, f } = ncodeXY;
     const { Xmin, Ymin } = this.surfaceInfo;
 
-    const scale = this.nu_to_css_scale;
+    const nu_to_pu_scale = this.nu_to_pu_scale;
 
-    const cx = (x - Xmin) * scale + this.offset.x;
-    const cy = (y - Ymin) * scale + this.offset.y;
+    const px = (x - Xmin) * nu_to_pu_scale;
+    const py = (y - Ymin) * nu_to_pu_scale;
 
-    return { x: cx, y: cy, f };
+    return { x: px, y: py, f };
+  }
+
+
+  protected getPdfXY_homography = (ncodeXY: { x: number, y: number, f?: number }) => {
+    const { x, y } = ncodeXY;
+    const { a, b, c, d, e, f, g, h } = this.h;
+
+    const nominator = g * x + h * y + 1;
+    const px = (a * x + b * y + c) / nominator;
+    const py = (d * x + e * y + f) / nominator;
+
+    return { x: px, y: py, f: ncodeXY.f };
   }
 
 
@@ -670,27 +686,19 @@ export default class RenderWorkerBase {
    * @protected
    * @param {{x:number, y:number, f?:number}} ncodeXY
    */
-  protected getCanvasXY_scaled = (ncodeXY: { x: number, y: number, f?: number }) => {
-    const { x, y, f } = ncodeXY;
-    const { Xmin, Ymin } = this.surfaceInfo;
+  protected getPdfXY_scaled = (ncodeXY: { x: number, y: number, f?: number }) => {
+    const ret = this.getPdfXY(ncodeXY);
+    const { x, y, f } = ret;
 
-    const scale = this.nu_to_css_scale;
-
-    let cx = (x - Xmin) * scale + this.offset.x;
-    let cy = (y - Ymin) * scale + this.offset.y;
-
-    cx *= PATH_THICKNESS_SCALE;
-    cy *= PATH_THICKNESS_SCALE;
-
-    return { x: cx, y: cy, f };
+    return { x: x * PATH_THICKNESS_SCALE, y: y * PATH_THICKNESS_SCALE, f };
   }
 
   /**
    * @protected
-   * @param {{x:number, y:number}} canvasXY
+   * @param {{x:number, y:number}} pdfXY
    */
-  protected getScreenXY = (canvasXY: { x: number, y: number }) => {
-    const { x, y } = canvasXY;
+  protected getScreenXY = (pdfXY: { x: number, y: number }) => {
+    const { x, y } = pdfXY;
 
     const canvasFb = this.canvasFb;
     const vpt = canvasFb.viewportTransform;
@@ -706,23 +714,6 @@ export default class RenderWorkerBase {
     return { x: sx, y: sy };
   }
 
-
-  /**
-   * @protected
-   * @param {{x:number, y:number}} screenXY
-   */
-  protected getNcodeXY = (screenXY: { x: number, y: number }) => {
-    const { x, y } = screenXY;
-
-    const scale_det = 1 / this.nu_to_css_scale;
-
-    const nx = (x - this.offset.x) * scale_det;
-    const ny = (y - this.offset.y) * scale_det;
-
-    return { x: nx, y: ny };
-  }
-
-
   /**
    *
    * @param mode
@@ -731,8 +722,8 @@ export default class RenderWorkerBase {
    */
   protected calcScaleFactor(mode: ZoomFitEnum, szPaper: { width: number, height: number }, currScale: number): number {
 
-    const actual_width = szPaper.width * this.nu_to_css_scale;
-    const actual_height = szPaper.height * this.nu_to_css_scale;
+    const actual_width = szPaper.width * this.nu_to_pu_scale;
+    const actual_height = szPaper.height * this.nu_to_pu_scale;
 
     const szCanvas = this.viewSize;
     let scale = 1;
@@ -773,7 +764,7 @@ export default class RenderWorkerBase {
   protected focusToDot = (dot: { x: number, y: number }) => {
     if (!this.autoFocus) return;
     const margin_to_go_ratio = 0.25;
-    const canvas_xy = this.getCanvasXY(dot);
+    const canvas_xy = this.getPdfXY(dot);
     const screen_xy = this.getScreenXY(canvas_xy);
 
     let dx = 0, dy = 0;
@@ -894,5 +885,16 @@ export default class RenderWorkerBase {
   setRotation = (rotation: number) => {
     console.log(`RenderWorkerBase: setRotation to ${rotation}`);
     this.surfaceInfo.rotation = rotation;
+  }
+
+  setTransformParameters = (h: TransformParameters) => {
+    this.h = { ...h };
+
+    if (h) {
+      this.getPdfXY = this.getPdfXY_homography;
+    }
+    else {
+      this.getPdfXY = this.getPdfXY_default;
+    }
   }
 }

@@ -75,11 +75,14 @@ export default class NeoPdfPage {
     return this._pdfPage;
   }
 
-  render = async (params: PdfJs.PDFRenderParams) => {
-    await this._ready;
+  render = (params: PdfJs.PDFRenderParams) => {
+    // await this._ready;
+    // const renderTask: PdfJs.PDFRenderTask = this._pdfPage.render(params);
+    // const ret = await renderTask.promise;
+    // return ret;
+
     const renderTask: PdfJs.PDFRenderTask = this._pdfPage.render(params);
-    const ret = await renderTask.promise;
-    return ret;
+    return renderTask;
   }
 
   public get viewport(): PDF_VIEWPORT_DESC {

@@ -12,6 +12,7 @@ import * as UTIL from "../../utils/UtilsFunc";
 
 import { IPageSOBP, ISize } from "../../DataStructure/Structures";
 import { ZoomFitEnum } from "./StorageRenderWorker";
+import { TransformParameters } from "../../../NcodePrintLib/Coordinates";
 // import { Util } from "pdfjs-dist";
 
 export { PLAYSTATE };
@@ -37,6 +38,11 @@ type Props = {
 
   /** canvas rotation, 0: portrait, 90: landscape */
   rotation: number;
+
+
+  /** transform matrix it can be undefined */
+  h: TransformParameters;
+
 }
 
 
@@ -305,6 +311,11 @@ export default class PenBasedRenderer extends React.Component<Props, State> {
 
     if (nextProps.rotation !== this.props.rotation) {
       this.state.renderer.setRotation(nextProps.rotation);
+      ret_val = false;
+    }
+
+    if (nextProps.h !== this.props.h) {
+      this.state.renderer.setTransformParameters(nextProps.h);
       ret_val = false;
     }
 

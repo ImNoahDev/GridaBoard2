@@ -51,8 +51,8 @@ export function scaleCanvas(canvas: HTMLCanvasElement) {
   }
   else {
     // this is a normal 1:1 device; just scale it simply
-    canvas.width = width;
     canvas.height = height;
+    canvas.width = width;
     canvas.style.width = '';
     canvas.style.height = '';
   }
@@ -66,10 +66,9 @@ export function ncodeToInch(n: number): number {
   return n * CONST.NCODE_TO_INCH_SCALE;
 }
 
-export function ncodeToDisplayPixel(n: number): number {
-  return n * CONST.NCODE_TO_INCH_SCALE * CONST.DISPLAY_DEFAULT_DPI * getDisplayRatio();
+export function ncodeToPdfPoint(n: number): number {
+  return n * CONST.NCODE_TO_INCH_SCALE * CONST.PDF_DEFAULT_DPI;
 }
-
 export function pdfSizeUnitToInch(n: number): number {
   // 72 DPI
   return n * CONST.PDF_SCALE_TO_INCH;

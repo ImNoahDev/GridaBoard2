@@ -44,7 +44,7 @@ export default class StorageRenderWorker {
   /** @type {InkStorage} */
   storage;
 
-  nu_to_css_scale = NCODE_TO_SCREEN_SCALE;
+  nu_to_pu_scale = NCODE_TO_SCREEN_SCALE;
   offset_x = 0;
   offset_y = 0;
 
@@ -146,7 +146,7 @@ export default class StorageRenderWorker {
     /** @type {number} */
     // this.ncode_to_screen_scale = NCODE_TO_SCREEN_SCALE;
 
-    this.nu_to_css_scale = NCODE_TO_SCREEN_SCALE;
+    this.nu_to_pu_scale = NCODE_TO_SCREEN_SCALE;
     this.offset_x = 0;
     this.offset_y = 0;
 
@@ -292,11 +292,11 @@ export default class StorageRenderWorker {
     const paperHeight = this.surfaceInfo.Ymax - this.surfaceInfo.Ymin;
 
     const size = {
-      width: paperWidth * this.nu_to_css_scale,
-      height: paperHeight * this.nu_to_css_scale,
+      width: paperWidth * this.nu_to_pu_scale,
+      height: paperHeight * this.nu_to_pu_scale,
     };
 
-    // console.log(`Grid: scale=${this.nu_to_css_scale} (width, height)=(${size.width}, ${size.height})`);
+    // console.log(`Grid: scale=${this.nu_to_pu_scale} (width, height)=(${size.width}, ${size.height})`);
 
     const ratio = 1;
 
@@ -478,7 +478,7 @@ export default class StorageRenderWorker {
    */
   focusToDot = (dot) => {
     const margin_to_go_ratio = 0.25;
-    const canvas_xy = this.getCanvasXY(dot);
+    const canvas_xy = this.getPdfXY(dot);
     const screen_xy = this.getScreenXY(canvas_xy);
 
     let dx = 0, dy = 0;
@@ -581,11 +581,11 @@ export default class StorageRenderWorker {
    *
    * @param {{x:number, y:number, f?:number}} ncodeXY
    */
-  getCanvasXY = (ncodeXY) => {
+  getPdfXY = (ncodeXY) => {
     const { x, y, f } = ncodeXY;
     const { Xmin, Ymin } = this.surfaceInfo;
 
-    const scale = this.nu_to_css_scale;
+    const scale = this.nu_to_pu_scale;
 
     const cx = (x - Xmin) * scale + this.offset_x;
     const cy = (y - Ymin) * scale + this.offset_y;
@@ -598,11 +598,11 @@ export default class StorageRenderWorker {
  *
  * @param {{x:number, y:number, f?:number}} ncodeXY
  */
-  getCanvasXY_scaled = (ncodeXY) => {
+  getPdfXY_scaled = (ncodeXY) => {
     const { x, y, f } = ncodeXY;
     const { Xmin, Ymin } = this.surfaceInfo;
 
-    const scale = this.nu_to_css_scale;
+    const scale = this.nu_to_pu_scale;
 
     let cx = (x - Xmin) * scale + this.offset_x;
     let cy = (y - Ymin) * scale + this.offset_y;
@@ -615,10 +615,10 @@ export default class StorageRenderWorker {
 
   /**
    *
-   * @param {{x:number, y:number}} canvasXY
+   * @param {{x:number, y:number}} pdfXY
    */
-  getScreenXY = (canvasXY) => {
-    const { x, y } = canvasXY;
+  getScreenXY = (pdfXY) => {
+    const { x, y } = pdfXY;
 
     const canvas = this.canvas;
     const vpt = canvas.viewportTransform;
@@ -642,7 +642,7 @@ export default class StorageRenderWorker {
   getNcodeXY = (screenXY) => {
     const { x, y } = screenXY;
 
-    const scale = this.nu_to_css_scale;
+    const scale = this.nu_to_pu_scale;
 
     const nx = (x - this.offset_x) / scale;
     const ny = (y - this.offset_y) / scale;
@@ -746,7 +746,7 @@ export default class StorageRenderWorker {
 
     }
     const szPaper = paperInfo.getPaperSize({ section, owner, book, page });
-    this.nu_to_css_scale = this.calcScaleFactor(this.viewFit, szPaper, this.nu_to_css_scale);
+    this.nu_to_pu_scale = this.calcScaleFactor(this.viewFit, szPaper, this.nu_to_pu_scale);
 
 
     // 현재 모든 stroke를 지운다.
@@ -981,7 +981,7 @@ export default class StorageRenderWorker {
 
   // Draw Dot from Pen
   createPathFromDots = (dots, color, thickness) => {
-    // let scale = this.nu_to_css_scale;
+    // let scale = this.nu_to_pu_scale;
 
     // console.log("dot Count", dots.length);
     // let rect = this.rect;
@@ -989,7 +989,7 @@ export default class StorageRenderWorker {
 
     const pointArray = [];
     dots.forEach((dot) => {
-      const pt = this.getCanvasXY_scaled(dot);
+      const pt = this.getPdfXY_scaled(dot);
       pointArray.push(pt);
     });
 
@@ -1022,10 +1022,10 @@ export default class StorageRenderWorker {
       // selectable: false,
       // evented: true,
 
-      // nu_to_css_scale: scale,
+      // nu_to_pu_scale: scale,
     };
 
-    const strokeThickness = this.nu_to_css_scale * thickness;
+    const strokeThickness = this.nu_to_pu_scale * thickness;
     // console.log(strokeThickness);
     // if ( strokeThickness < 0.5 ) strokeThickness = 0.5;
     const pathData = drawPath(pointArray, strokeThickness);
@@ -1151,7 +1151,7 @@ export default class StorageRenderWorker {
   //  */
   // drawIncompletedPath = (path, t) => {
   //   let dots = path.dots;
-  //   let scale = path.nu_to_css_scale;
+  //   let scale = path.nu_to_pu_scale;
 
   //   // console.log("dot Count", dots.length);
   //   let rect = this.rect;

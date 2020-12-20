@@ -1,10 +1,12 @@
 import React, { Component } from 'react';
 import { pdfSizeToDIsplayPixel, pdfSizeToDIsplayPixel_int } from "../../utils/UtilsFunc";
 
-import "pdfjs-dist";
-import * as PdfJs from "pdfjs-dist";
+// import "pdfjs-dist";
+// import * as PdfJs from "pdfjs-dist";
 import { PDF_DEFAULT_DPI } from '../../constants';
 import { sprintf } from 'sprintf-js';
+import NeoPdfDocument from '../../../NcodePrintLib/NeoPdf/NeoPdfDocument';
+import NeoPdfPage from '../../../NcodePrintLib/NeoPdf/NeoPdfPage';
 
 /**
  * Page.js
@@ -12,7 +14,8 @@ import { sprintf } from 'sprintf-js';
  **/
 
 interface PageProps {
-  pdf: PdfJs.PDFDocumentProxy,
+  // pdf: PdfJs.PDFDocumentProxy,
+  pdf: NeoPdfDocument,
   index: number,
   scale?: number,
   position: { offsetX: number, offsetY: number, zoom: number },
@@ -20,7 +23,8 @@ interface PageProps {
 
 interface PageState {
   status: string,
-  page: PdfJs.PDFPageProxy | null,
+  // page: PdfJs.PDFPageProxy | null,
+  page: NeoPdfPage,
   width: number,
   height: number,
   imgSrc: string,
@@ -51,7 +55,8 @@ class Page extends Component<PageProps> {
 
   inRendering = false;
 
-  renderTask: PdfJs.PDFRenderTask = null;
+  // renderTask: PdfJs.PDFRenderTask = null;
+  renderTask: any = null;
 
   backPlane = {
     canvas: document.createElement("canvas"),
@@ -142,7 +147,7 @@ class Page extends Component<PageProps> {
     this.canvas = canvas;
   };
 
-  _update = (pdf: PdfJs.PDFDocumentProxy) => {
+  _update = (pdf: NeoPdfDocument) => {
     if (pdf) {
       this.backPlane.inited = false;
       this._loadPage(pdf);
@@ -151,10 +156,10 @@ class Page extends Component<PageProps> {
     }
   };
 
-  _loadPage = (pdf: PdfJs.PDFDocumentProxy) => {
+  _loadPage = (pdf: NeoPdfDocument) => {
     if (this.state.status === 'rendering') return;
 
-    pdf.getPage(this.props.index).then(
+    pdf.getPageAsync(this.props.index).then(
       (page) => {
         this.backPlane.inited = false;
         this.setState({ page, status: 'rendering' });
@@ -163,7 +168,7 @@ class Page extends Component<PageProps> {
     );
   }
 
-  renderToCanvasSafe = async (page: PdfJs.PDFPageProxy, zoom: number) => {
+  renderToCanvasSafe = async (page: NeoPdfPage, zoom: number) => {
     if (this.backPlane.nowRendering && this.renderTask) {
       const renderTask = this.renderTask;
       renderTask.cancel();
@@ -172,7 +177,7 @@ class Page extends Component<PageProps> {
     return this.renderToCanvas(page, zoom);
   }
 
-  renderToCanvas = async (page: PdfJs.PDFPageProxy, zoom: number): Promise<IBackRenderedStatus> => {
+  renderToCanvas = async (page: NeoPdfPage, zoom: number): Promise<IBackRenderedStatus> => {
     const canvas = document.createElement("canvas");
 
     const PRINT_RESOLUTION = 96 * 2 * zoom;
@@ -226,7 +231,7 @@ class Page extends Component<PageProps> {
     return { ...this.backPlane.size };
   }
 
-  renderPage = async (page: PdfJs.PDFPageProxy, zoom: number) => {
+  renderPage = async (page: NeoPdfPage, zoom: number) => {
     if (!this.backPlane.inited) {
       // console.log(`[yyy] DRAWING`)
       const result = await this.renderToCanvasSafe(page, zoom);
