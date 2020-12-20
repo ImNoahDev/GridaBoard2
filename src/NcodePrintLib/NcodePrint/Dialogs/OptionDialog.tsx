@@ -5,6 +5,7 @@ import { IPrintOption } from '../..';
 import OptionLevel_debug from "./OptionLevel_debug";
 import OptionLevel_1 from "./OptionLevel_1";
 import OptionLevel_2 from "./OptionLevel_2";
+import * as Util from "../../UtilFunc";
 
 const useStyles = makeStyles({
   root: {
@@ -27,6 +28,7 @@ interface IDialogProps extends DialogProps {
   okCallback: (e) => void,
 }
 
+let _printOption: IPrintOption;
 
 export function OptionDialog(props: IDialogProps) {
   const { printOption, cancelCallback, okCallback, ...rest } = props;
@@ -35,6 +37,17 @@ export function OptionDialog(props: IDialogProps) {
   const theme = useTheme();
   const dialogRef = useRef(null);
   const [optionLevel, setOptionLevel] = useState(0);
+  const isInitialMount = useRef(true);
+
+
+  useEffect(() => {
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      _printOption = Util.cloneObj(printOption);
+    } else {
+      // Your useEffect code here to be run on update
+    }
+  });
 
   const handleClose = (e) => {
     if (props.cancelCallback) {
@@ -171,7 +184,7 @@ export default function OptionDialogButton(props: Props) {
         {props.children}
       </button>
 
-      { show ? <OptionDialog open={show} cancelCallback={onCancel} okCallback={onOK} printOption={printOption} /> : ""}
+      { show ? <OptionDialog open={show} cancelCallback={onCancel} okCallback={onOK} printOption={_printOption} /> : ""}
     </React.Fragment>
   );
 }

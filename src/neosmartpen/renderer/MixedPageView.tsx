@@ -198,9 +198,8 @@ export default class MixedPageView extends React.Component<Props, State> {
       // 인쇄된 적이 없는 파일이라면 PDF 관련의 오퍼레이션을 하지 않는다.
       const mapper = MappingStorage.getInstance();
       const coupledDoc = mapper.findPdfPage(ncodeXy);
-      if (!coupledDoc) {
+      if (coupledDoc) {
         console.log(`MixedViewer: Set h, h=${JSON.stringify(coupledDoc.page.h)}`);
-
         this.setState({ h: coupledDoc.page.h });
       }
 

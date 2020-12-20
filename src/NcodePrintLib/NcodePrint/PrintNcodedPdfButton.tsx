@@ -5,6 +5,7 @@ import { IPrintingReport, IPrintOption } from "./PrintDataTypes";
 import ProgressDialog from "./ProgressDialog";
 import PrintNcodedPdfWorker from "./PrintNcodedPdfWorker";
 import { OptionDialog } from "./Dialogs/OptionDialog";
+import * as Util from "../UtilFunc";
 
 interface Props extends ButtonProps {
   /** 인쇄될 문서의 url, printOption.url로 들어간다. */
@@ -45,15 +46,22 @@ export default function PrintNcodedPdfButton(props: Props) {
   }
 
   const showOptionDialog = (printOption: IPrintOption): Promise<IPrintOption> => {
-    _printOption = printOption;
-    _printOption.completedCallback = onAfterPrint;
-    openOptionDialog();
-
+    // 리턴값을 준비
     const promise = new Promise((resolve) => {
       _resolve = resolve;
     }) as Promise<IPrintOption>;
-
     _promise = promise;
+
+    // 취소 버튼을 대비
+    _printOption = Util.cloneObj(printOption);
+
+    // 완료시 콜백
+    _printOption.completedCallback = onAfterPrint;
+
+    // 다이얼로그를 열어 놓고
+    openOptionDialog();
+
+    // promise가 종료되지 않은 상태로 리턴, onAfterPrint 등에서 promise를 resolve
     return promise;
   }
 
@@ -70,15 +78,23 @@ export default function PrintNcodedPdfButton(props: Props) {
   }, [status, progressPercent]);
 
   const onOK = () => {
+    // 디이얼로그를 닫고, 프로그레스 바를 보여준다.
     closeOptionDialog();
     setProgressOn(true);
+
+    // _printOption을 돌려 줘서 세팅 값을 반환한다.
     _resolve(_printOption);
     console.log("onOK");
   }
 
   const onCancel = () => {
+    // 디이얼로그를 닫고, 프로그레스 바를 열지 않는다.
     closeOptionDialog();
+
     console.log("onCancel");
+
+    // _printOption이 세팅되지 않았음을 전한다.
+    // 받는 곳에서는 undefined가 되어 있는지 확인해야 한다.
     _resolve(undefined);
   }
 
