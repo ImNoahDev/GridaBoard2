@@ -7,5 +7,6 @@
   "prettier.jsxBracketSameLine": true,
   "prettier.endOfLine": "auto",
   "prettier.tabWidth": 2,
-  "typescript.tsdk": "node_modules\\typescript\\lib"
+  "typescript.tsdk": "node_modules\\typescript\\lib",
+  "typescript.implementationsCodeLens.enabled": true
 }

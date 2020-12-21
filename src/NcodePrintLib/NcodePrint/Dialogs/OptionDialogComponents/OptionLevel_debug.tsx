@@ -1,8 +1,7 @@
 import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import { Box, useTheme } from '@material-ui/core';
-import { IPrintOption } from '../..';
-import { ILeveledDialogProps } from './OptionLevel_1';
+import { ILeveledDialogProps } from './OptionLevel_0';
 
 
 const useStyles = makeStyles({
@@ -14,7 +13,7 @@ const useStyles = makeStyles({
   }
 });
 
-function OptionLevel_2(props: ILeveledDialogProps) {
+const OptionLevel_debug = (props: ILeveledDialogProps) => {
   const { optionLevel } = props;
 
   const theme = useTheme();
@@ -50,6 +49,4 @@ function OptionLevel_2(props: ILeveledDialogProps) {
 }
 
 
-
-
-export default OptionLevel_2;
+export default OptionLevel_debug;

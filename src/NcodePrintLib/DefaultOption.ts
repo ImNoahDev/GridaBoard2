@@ -47,6 +47,7 @@ export const g_defaultPrintOption: IPrintOption = {
 
   magnification: 1,
 
+  docNumPages: 0,
   targetPages: [],
 
   hasToPutNcode: true,
@@ -60,9 +61,9 @@ export const g_defaultPrintOption: IPrintOption = {
   /** 코드 출력물의 상하좌우 여백, mm단위 */
   padding: 15,     // mm 단위
 
-  cancel: false,
   showTooltip: true,
 
+  numThreads: 10,
   debugMode: 0
 };
 

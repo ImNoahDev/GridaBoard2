@@ -79,7 +79,7 @@ export default class PrintPdfButton extends React.Component<IPrintPdfButtonProps
 
   printStatus = {
     /** Sample 코드를 위한 것 */
-    numTotalPages: 0,
+    docNumPages: 0,
 
     /** 인쇄 준비된 페이지 수 */
     numPagesPrepared: 0,
@@ -151,8 +151,9 @@ export default class PrintPdfButton extends React.Component<IPrintPdfButtonProps
       this.printOption = { ...nextProps.printOption };
 
       const { pdf } = this.state;
-      const numTotalPages = pdf.numPages;
-      this.printOption.targetPages = Array.from({ length: numTotalPages }, (_, i) => i + 1);
+      const docNumPages = pdf.numPages;
+      this.printOption.docNumPages = docNumPages;
+      this.printOption.targetPages = Array.from({ length: docNumPages }, (_, i) => i + 1);
       return true;
     }
 
@@ -162,7 +163,7 @@ export default class PrintPdfButton extends React.Component<IPrintPdfButtonProps
 
   resetPrintStatus = () => {
     this.printStatus = {
-      numTotalPages: 0,
+      docNumPages: 0,
       numPagesPrepared: 0,
       numSheetsPrepared: 0,
       totalCompletion: 0,
@@ -230,16 +231,17 @@ export default class PrintPdfButton extends React.Component<IPrintPdfButtonProps
         this.printOption.filename = filename;
 
         // 디버깅용 화면 디스플레이를 위해
-        const numTotalPages = pdf.numPages;
-        console.log(`[NumPage] PDF page: ${url} - ${numTotalPages}`)
-        this.printOption.targetPages = Array.from({ length: numTotalPages }, (_, i) => i + 1);
+        const docNumPages = pdf.numPages;
+        console.log(`[NumPage] PDF page: ${url} - ${docNumPages}`)
+        this.printOption.docNumPages = docNumPages;
+        this.printOption.targetPages = Array.from({ length: docNumPages }, (_, i) => i + 1);
         // 여기까지
         await this.setPageOverview(pdf);
 
 
         this.printStatus = {
           ...this.printStatus,
-          numTotalPages
+          docNumPages
         }
         this.setState({ pdf });
       });
@@ -302,6 +304,7 @@ export default class PrintPdfButton extends React.Component<IPrintPdfButtonProps
 
     /** 기본 값으로는 모든 페이지를 인쇄하도록 */
     const numPages = pdf.numPages;
+    printOption.docNumPages = numPages;
     this.printOption.targetPages = Array.from({ length: numPages }, (_, i) => i + 1);
 
     // 1,2 페이지만 인쇄

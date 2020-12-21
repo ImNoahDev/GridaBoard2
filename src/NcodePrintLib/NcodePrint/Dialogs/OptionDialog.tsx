@@ -1,11 +1,14 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import { Box, Button, ButtonProps, Dialog, DialogActions, DialogContent, DialogProps, DialogTitle, Grid, useTheme } from '@material-ui/core';
-import { IPrintOption } from '../..';
-import OptionLevel_debug from "./OptionLevel_debug";
-import OptionLevel_1 from "./OptionLevel_1";
-import OptionLevel_2 from "./OptionLevel_2";
+import { IPrintOption, MediaSize } from '../..';
+import OptionLevel_debug from "./OptionDialogComponents/OptionLevel_debug";
+import OptionLevel_0 from "./OptionDialogComponents/OptionLevel_0";
+import OptionLevel_1 from "./OptionDialogComponents/OptionLevel_1";
+import OptionLevel_2 from "./OptionDialogComponents/OptionLevel_2";
 import * as Util from "../../UtilFunc";
+import { turnOnGlobalKeyShortCut } from '../../../GridaBoard/GlobalFunctions';
+import { convertStringToArray } from './OptionDialogComponents/PageRangeField';
 
 const useStyles = makeStyles({
   root: {
@@ -18,14 +21,13 @@ const useStyles = makeStyles({
 });
 
 
-
-
+export let MAX_PRINTOPTION_LEVEL = 1;    // 2: debug mode
 
 interface IDialogProps extends DialogProps {
-
+  open: boolean,
   printOption: IPrintOption,
-  cancelCallback: (e) => void,
-  okCallback: (e) => void,
+  cancelCallback: (printOption) => void,
+  okCallback: (printOption) => void,
 }
 
 let _printOption: IPrintOption;
@@ -39,6 +41,12 @@ export function OptionDialog(props: IDialogProps) {
   const [optionLevel, setOptionLevel] = useState(0);
   const isInitialMount = useRef(true);
 
+  /** force to rerender */
+  const [value, setValue] = React.useState(0);
+  const forceToRender = () => {
+    setValue(value + 1);
+  }
+
 
   useEffect(() => {
     if (isInitialMount.current) {
@@ -49,29 +57,55 @@ export function OptionDialog(props: IDialogProps) {
     }
   });
 
-  const handleClose = (e) => {
-    if (props.cancelCallback) {
-      props.cancelCallback(e);
+  useEffect(() => {
+    if (props.open) {
+      turnOnGlobalKeyShortCut(false);
     }
+    else {
+      turnOnGlobalKeyShortCut(true);
+    }
+
+  }, [props.open]);
+
+
+  const setInputFileds = () => {
+    const elems = document.getElementsByName("targetPages") as any;
+    elems.forEach((elem) => {
+      if (elem.value.length > 0) {
+        printOption["targetPages"] = convertStringToArray(elem.value);
+      }
+    });
+  }
+
+  const handleClose = (e) => {
+    setInputFileds();
+
+    // if (props.cancelCallback) {
+    //   props.cancelCallback(printOption);
+    // }
     console.log("testing: closing");
+  }
+
+
+  const handleCancel = (e) => {
+    console.log("testing: closing");
+    setInputFileds();
+
+    // setOpen(false);
+    if (props.cancelCallback) {
+      props.cancelCallback(printOption);
+    }
   }
 
   const handleOK = (e) => {
     console.log("testing: closing");
-    // setOpen(false);
+    setInputFileds();
 
     if (props.okCallback) {
-      props.okCallback(e);
+      props.okCallback(printOption);
     }
   }
 
-  const handleCancel = (e) => {
-    console.log("testing: closing");
-    // setOpen(false);
-    if (props.cancelCallback) {
-      props.cancelCallback(e);
-    }
-  }
 
   const onLevelChanged = (level: number) => {
     setOptionLevel(level);
@@ -80,13 +114,105 @@ export function OptionDialog(props: IDialogProps) {
 
   const handleLevel = (e) => {
     let level = optionLevel + 1;
-    level %= 3;
+    level %= MAX_PRINTOPTION_LEVEL + 1;
     setOptionLevel(level);
   }
 
 
+
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = (event.target as HTMLInputElement).value;
+    console.log(value);
+    setValue(parseInt(value));
+  };
+
+
+
+  const handleChange2 = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const name = event.target.name;
+    const value = event.target.value;
+    const checked = event.target.checked;
+    console.log(`event target=${name}, value=${value} checked=${checked}`);
+
+    switch (name) {
+      case "hasToPutNcode":
+        printOption[name] = checked;
+        break;
+
+      case "useNA4":
+        printOption["hasToPutNcode"] = !checked;
+        break;
+
+      case "targetPages":
+        printOption[name] = convertStringToArray(value);
+        break;
+
+      case "pagesPerSheet":
+        printOption[name] = parseInt(value) as 1 | 2 | 4 | 8 | 9 | 16 | 18 | 25 | 32;
+        break;
+
+      case "showTooltip":
+      case "forceToIssueNewCode":
+      case "needToIssueCode":
+      case "downloadNcodedPdf":
+      case "drawCalibrationMark":
+      case "drawFrame":
+        printOption[name] = checked;
+        break;
+
+      case "sameCode":
+        printOption["needToIssueCode"] = !checked;
+        break;
+
+      case "newNcode":
+        printOption["needToIssueCode"] = checked;
+        break;
+
+
+      case "mediaSize":
+        printOption[name] = MediaSize[value];
+        break;
+
+
+      // case "drawMarkRatio":
+      //   printOption[name] = true;
+      //   break;
+
+      // case "colorMode":
+      //   printOption[name] = true;
+      //   break;
+
+      // case "luminanceMaxRatio":
+      //   printOption[name] = true;
+      //   break;
+
+      case "codeDensity":
+        printOption[name] = value === "보통" ? 2 : (value === "연하게" ? 1 : 3);
+        break;
+
+      // case "padding":
+      //   printOption[name] = true;
+      //   break;
+
+      // case "maxPagesPerSheetToDrawMark":
+      //   printOption[name] = true;
+      //   break;
+
+      // case "debugMode":
+      //   printOption[name] = true;
+      //   break;
+
+      default:
+        break;
+    }
+    forceToRender();
+  };
+
+  const levelButtonText = ["상세 설정 보기", "전문가 설정 보기", "간단 설정으로"];
+
   console.log(`default: level=${optionLevel}`);
-  const msg = ["상세 설정", "전문가 설정", "기본 설정"][optionLevel];
+  let msg = levelButtonText[optionLevel];
+  if (optionLevel === MAX_PRINTOPTION_LEVEL) msg = levelButtonText[levelButtonText.length - 1];
 
   return (
     <React.Fragment>
@@ -102,45 +228,45 @@ export function OptionDialog(props: IDialogProps) {
         </DialogTitle>
 
         <DialogContent ref={dialogRef}>
-          <Box component="div" className={classes.root}>
-            <Box fontSize={16} fontWeight="fontWeightRegular" >Processing... </Box>
-          </Box>
+          <OptionLevel_0  {...props} color={"primary"} levelCallback={onLevelChanged} handleChange2={handleChange2} optionLevel={optionLevel} />
 
-          <Box component="div" className={classes.root} style={{ display: "flex", justifyContent: "center" }}>
-            <Box borderColor={theme.palette.primary.main} border={1}>
-            </Box>
-          </Box>
-
-          {optionLevel > 0 ? <OptionLevel_1 {...props} levelCallback={onLevelChanged} optionLevel={optionLevel} /> : ""}
-          {optionLevel > 1 ? <OptionLevel_2 {...props} levelCallback={onLevelChanged} optionLevel={optionLevel} /> : ""}
-          {optionLevel > 2 ? <OptionLevel_debug {...props} levelCallback={onLevelChanged} optionLevel={optionLevel} /> : ""}
+          {optionLevel > 0 ? <OptionLevel_1 {...props} color={"primary"} levelCallback={onLevelChanged} handleChange2={handleChange2} optionLevel={optionLevel} /> : ""}
+          {optionLevel > 1 ? <OptionLevel_2 {...props} color={"primary"} levelCallback={onLevelChanged} handleChange2={handleChange2} optionLevel={optionLevel} /> : ""}
+          {optionLevel > 2 ? <OptionLevel_debug {...props} color={"primary"} levelCallback={onLevelChanged} handleChange2={handleChange2} optionLevel={optionLevel} /> : ""}
 
         </DialogContent>
 
         <DialogActions>
 
           <Grid item xs={12} sm={4}>
+            <Button onClick={handleLevel} color="primary">
+              {msg}
+            </Button>
+          </Grid>
+
+          <Grid item xs={12} sm={7}>
+          </Grid>
+
+          <Grid item xs={12} sm={2}>
+            <Button style={{
+              backgroundColor: theme.palette.primary.main,
+              color: theme.palette.info.contrastText,
+              boxShadow: "4px 4px 10px rgba(0, 0, 0, 0.3)",
+            }} onClick={handleOK} color="primary" autoFocus>
+              확인
+          </Button>
+          </Grid>
+
+          <Grid item xs={12} sm={2}>
             <Button style={{
               backgroundColor: theme.palette.info.main,
               color: theme.palette.info.contrastText,
               boxShadow: "4px 4px 10px rgba(0, 0, 0, 0.3)",
-            }} onClick={handleLevel} color="primary">
-              {msg}
-            </Button>
-          </Grid>
-          <Grid item xs={12} sm={3}>
-          </Grid>
-          <Grid item xs={12} sm={2}>
-            <Button onClick={handleOK} color="primary">
-              OK
+            }}
+              onClick={handleCancel} color="secondary">
+              취소
           </Button>
           </Grid>
-          <Grid item xs={12} sm={2}>
-            <Button onClick={handleCancel} color="primary">
-              Cancel
-          </Button>
-          </Grid>
-
 
         </DialogActions>
       </Dialog>
@@ -165,16 +291,20 @@ export default function OptionDialogButton(props: Props) {
   const [show, setShow] = useState(false);
 
   const openDialog = () => {
+    turnOnGlobalKeyShortCut(false);
+
     setShow(true);
   }
 
   const onCancel = () => {
     setShow(false);
+    turnOnGlobalKeyShortCut(true);
     console.log("onCancel");
   }
 
   const onOK = () => {
     setShow(false);
+    turnOnGlobalKeyShortCut(true);
     console.log("onOK");
   }
 

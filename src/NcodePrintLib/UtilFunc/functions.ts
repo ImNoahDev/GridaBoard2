@@ -4,6 +4,7 @@ import { sprintf } from "sprintf-js";
 import { isObject } from "util";
 import { IPageSOBP } from "../DataStructure/Structures";
 import { IUnitString } from "../NcodePrint/PrintDataTypes";
+import { IPaperSize } from "../NcodeSurface/SurfaceDataTypes";
 import { g_availablePagesInSection } from "../NcodeSurface/SurfaceInfo";
 
 export function compareObject(curr: Object, next: Object, header = "") {
@@ -30,13 +31,13 @@ export function makePdfId(fingerprint: string, pagesPerSheet: number) {
 }
 
 
-export function makeNPageId(pi: IPageSOBP) {
-  const nPageId = (pi.section << 48) + (pi.owner << 32) + (pi.book << 16) + pi.page;
+export function makeNPageId(pageInfo: IPageSOBP) {
+  const nPageId = (pageInfo.section << 48) + (pageInfo.owner << 32) + (pageInfo.book << 16) + pageInfo.page;
   return nPageId;
 }
 
-export function makeNPageIdStr(info: IPageSOBP) {
-  const { section, book, owner, page } = info;
+export function makeNPageIdStr(pageInfo: IPageSOBP) {
+  const { section, book, owner, page } = pageInfo;
   return `${section}.${book}.${owner}.${page}`;
 }
 
@@ -319,3 +320,4 @@ export function hex2ColorObject(hex) {
   }
   throw new Error('Bad Hex');
 }
+

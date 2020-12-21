@@ -217,8 +217,8 @@ export default class InkStorage {
    *
    * @param info
    */
-  static makeNPageIdStr(info: IPageSOBP): string {
-    const { section, book, owner, page } = info;
+  static makeNPageIdStr(pageInfo: IPageSOBP): string {
+    const { section, book, owner, page } = pageInfo;
     return `${section}.${book}.${owner}.${page}`;
   }
 

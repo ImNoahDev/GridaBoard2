@@ -29,6 +29,7 @@ import { IPageSOBP } from "../DataStructure/Structures";
  */
 export type IPaperSize = {
   unit: "mm" | "inch" | "pu" | "nu" | "css" | "600dpi",     // pu = points, css = px
+  name: string,
   width: number,
   height: number
 };

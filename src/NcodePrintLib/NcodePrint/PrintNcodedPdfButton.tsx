@@ -6,6 +6,7 @@ import ProgressDialog from "./ProgressDialog";
 import PrintNcodedPdfWorker from "./PrintNcodedPdfWorker";
 import { OptionDialog } from "./Dialogs/OptionDialog";
 import * as Util from "../UtilFunc";
+import CancelWaitingDialog from "./CancelWaitingDialog";
 
 interface Props extends ButtonProps {
   /** 인쇄될 문서의 url, printOption.url로 들어간다. */
@@ -33,15 +34,20 @@ export default function PrintNcodedPdfButton(props: Props) {
   const [status, setStatus] = useState("N/A");
   const [progressOn, setProgressOn] = useState(false);
   const [optionOn, setOptionOn] = useState(false);
+  const [worker, setWorker] = useState(undefined as PrintNcodedPdfWorker);
+  const [waitingOn, setWaitingOn] = useState(false);
 
   const startPrint = async () => {
     if (props.url && props.filename) {
       // setStart(true);
       const worker = new PrintNcodedPdfWorker(props, onProgress);
+      setWorker(worker);
 
       setProgressPercent(0);
       await worker.startPrint(props.url, props.filename, showOptionDialog);
+      console.log("CANCEL, worker canceled");
       setProgressOn(false);
+      setWaitingOn(false);
     }
   }
 
@@ -77,17 +83,17 @@ export default function PrintNcodedPdfButton(props: Props) {
     console.log(`status = ${status}, progress=${progressPercent}`);
   }, [status, progressPercent]);
 
-  const onOK = () => {
+  const onOK = (printOption: IPrintOption) => {
     // 디이얼로그를 닫고, 프로그레스 바를 보여준다.
     closeOptionDialog();
     setProgressOn(true);
 
     // _printOption을 돌려 줘서 세팅 값을 반환한다.
-    _resolve(_printOption);
+    _resolve(printOption);
     console.log("onOK");
   }
 
-  const onCancel = () => {
+  const onCancel = (printOption: IPrintOption) => {
     // 디이얼로그를 닫고, 프로그레스 바를 열지 않는다.
     closeOptionDialog();
 
@@ -99,15 +105,19 @@ export default function PrintNcodedPdfButton(props: Props) {
   }
 
   const onAfterPrint = () => {
-    // setProgressOn(false);
+    setProgressOn(false);
+    setWaitingOn(false);
 
     _printOption = undefined;
     _resolve = undefined;
     console.log("END OF PRINT");
+    console.log("CANCEL, END OF PRINT");
+
   }
 
   const onCancelPrint = () => {
-    console.log("cancel")
+    setWaitingOn(true);
+    worker.cancelPrint();
   }
 
 
@@ -126,6 +136,7 @@ export default function PrintNcodedPdfButton(props: Props) {
         ? <OptionDialog open={optionOn} cancelCallback={onCancel} okCallback={onOK} printOption={_printOption} />
         : <ProgressDialog progress={progressPercent} title={dialogTitle} open={progressOn} cancelCallback={onCancelPrint} />
       }
+      <CancelWaitingDialog open={waitingOn} />
     </React.Fragment>
   );
 }

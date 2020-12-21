@@ -80,6 +80,8 @@ export interface IPrintOption {
   /* 출력할 종이보다 큰 경우에는 축소할 것 */
   scaleDownToMedia: boolean,
 
+  docNumPages: number,
+
   targetPages: number[],
   pagesPerSheet: 1 | 2 | 4 | 8 | 9 | 16 | 18 | 25 | 32,
 
@@ -99,10 +101,6 @@ export interface IPrintOption {
 
   /** 그리다보드와의 호환성을 위해 */
   magnification: number,
-
-
-  /** 0: no debug mode, 1: draw lines, 2: draw Ncode debugging info, 3: canvas 색상 값 점검 */
-  debugMode: 0 | 1 | 2 | 3,
 
   hasToPutNcode: boolean,
 
@@ -146,10 +144,18 @@ export interface IPrintOption {
   progressCallback?: IProgressCallbackFunction;
   completedCallback?: IProgressCallbackFunction;
 
-  /** cancel trigger */
-  cancel: boolean;
-
   showTooltip: boolean;
+
+
+
+  
+  /** 0: no debug mode, 1: draw lines, 2: draw Ncode debugging info, 3: canvas 색상 값 점검 */
+  debugMode: 0 | 1 | 2 | 3,
+
+
+  /** 프린팅 시트 렌더러 promise 최대 개수 */
+  numThreads: number,
+
 }
 
 export type IProgressCallbackFunction = (event?: { status: string }) => void;
@@ -175,11 +181,11 @@ export const MediaSize: { [key: string]: IPaperSize } = {
   // Letter: { unit: "mm", width: 206, height: 270 },
 
   /** 정상적인 것 */
-  A4: { unit: "mm", width: 210, height: 297 },
-  A3: { unit: "mm", width: 297, height: 420 },
-  B4: { unit: "mm", width: 250, height: 353 },
-  B5: { unit: "mm", width: 176, height: 250 },
-  Letter: { unit: "mm", width: 216, height: 280 },
+  A4: { unit: "mm", name: "A4", width: 210, height: 297 },
+  A3: { unit: "mm", name: "A3", width: 297, height: 420 },
+  B4: { unit: "mm", name: "B4", width: 250, height: 353 },
+  B5: { unit: "mm", name: "B5", width: 176, height: 250 },
+  Letter: { unit: "mm", name: "Letter", width: 216, height: 280 },
 };
 
 

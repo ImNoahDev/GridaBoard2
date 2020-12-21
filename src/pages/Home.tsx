@@ -27,7 +27,7 @@ import * as SavePdf from '../NcodePrintLib/Save/SavePdf';
 import PrintOptionDialog from '../NcodePrintLib/NcodePrint/Dialogs/PrintOptionDialog';
 
 import PUIController from '../components/PUIController';
-import KeyBoardShortCut from '../components/KeyBoardShortCut';
+import KeyBoardShortCut from '../GridaBoard/KeyBoardShortCut';
 
 import Tooltip, { TooltipProps } from '@material-ui/core/Tooltip';
 import { Theme, Typography, withStyles } from '@material-ui/core';
@@ -58,6 +58,7 @@ import PrintNcodedPdfButton from "../NcodePrintLib/NcodePrint/PrintNcodedPdfButt
 import { NeoImage } from "../components/CustomElement/NeoImage";
 import GridaToolTip from "../styles/GridaToolTip";
 import OptionDialogButton from "../NcodePrintLib/NcodePrint/Dialogs/OptionDialog";
+import { turnOnGlobalKeyShortCut } from "../GridaBoard/GlobalFunctions";
 
 // const PDF_URL = "./A4_Pirates-of-the-Caribbean-Hes-a-Pirate-Klaus-Badelt.pdf";
 const PDF_URL = g_debugURL;
@@ -101,9 +102,10 @@ declare global {
   window._pui = [];
   window._pui.push(pui);
   console.log(window._pui);
-})(window);
 
-window.addEventListener("keydown", KeyBoardShortCut);
+  turnOnGlobalKeyShortCut(true);
+  
+})(window);
 
 const getNoteInfo = (event) => {
   // let url = "http://nbs.neolab.net/v1/notebooks/attributes?device=android";

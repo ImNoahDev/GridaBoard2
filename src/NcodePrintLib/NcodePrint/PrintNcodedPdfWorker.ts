@@ -26,7 +26,7 @@ import { g_nullNcode, g_defaultPrintOption } from "../DefaultOption";
 
 type IPrintOptionCallbackType = (arg: IPrintOption) => Promise<IPrintOption>;
 
-
+let g_printCancelFired = false;
 
 interface Props {
   /** 인쇄될 문서의 url, printOption.url로 들어간다. */
@@ -92,11 +92,12 @@ export default class PrintNcodedPdfWorker {
       printOption.filename = filename;
 
       // 디버깅용 화면 디스플레이를 위해
-      const numTotalPages = loaded.numPages;
+      const docNumPages = loaded.numPages;
       printOption.direction = loaded.direction;
 
-      console.log(`[NumPage] PDF page: ${url} - ${numTotalPages}`)
-      printOption.targetPages = Array.from({ length: numTotalPages }, (_, i) => i + 1);
+      console.log(`[NumPage] PDF page: ${url} - ${docNumPages}`)
+      printOption.docNumPages = docNumPages;
+      printOption.targetPages = Array.from({ length: docNumPages }, (_, i) => i + 1);
 
       this.pdf = loaded;
     }
@@ -107,7 +108,7 @@ export default class PrintNcodedPdfWorker {
 
   public startPrint = async (url: string, filename: string, printOptionCallback: IPrintOptionCallbackType) => {
     this.setStatus("loading");
-    const printOption = this.printOption;
+    let printOption = this.printOption;
 
     const pdf = await this.loadPdf(url, filename, printOption);
     if (!pdf) {
@@ -117,34 +118,43 @@ export default class PrintNcodedPdfWorker {
     }
 
     this.setStatus("configuring");
-    // 프로그레스 보고를 위한 초기화
-    const progressCallback = this.progressCallback;
-
-    printOption.cancel = false;
-    printOption.progressCallback = progressCallback;
-    this.numReports = 0;
 
     // PrintPdfMain의 printTrigger를 +1 해 주면, 인쇄가 시작된다
     let pdfMapDesc = this.getAssociatedMappingInfo(printOption, pdf);
     printOption.needToIssueCode = !pdfMapDesc;
     if (printOption.needToIssueCode) {
-      const mapper = MappingStorage.getInstance();
-      printOption.pageInfo = { ...mapper.getNextIssuableNcodeInfo() };
+      // const mapper = MappingStorage.getInstance();
+      // printOption.pageInfo = { ...mapper.getNextIssuableNcodeInfo() };
+      printOption.pageInfo = { ...g_nullNcode };
+
     }
 
     // 기본 값으로는 모든 페이지를 인쇄하도록
+    printOption.docNumPages = pdf.numPages;
     printOption.targetPages = Array.from({ length: pdf.numPages }, (_, i) => i + 1);
 
     // 기본 인쇄 옵션 외의 옵션을 이용자로부터 받는다
     if (printOptionCallback) {
       const result = await printOptionCallback(printOption);
-      if (result)
+      if (result) {
         this.printOption = result;
+        printOption = result;
+      }
       else {
-        if (printOption.completedCallback) printOption.completedCallback();
+        // 옵션 설정에서 취소를 눌렀다.
+        if (printOption.completedCallback)
+          printOption.completedCallback();
         return;
       }
     }
+
+    // 프로그레스 보고를 위한 초기화
+    const progressCallback = this.progressCallback;
+
+    g_printCancelFired = false;
+    printOption.progressCallback = progressCallback;
+    this.numReports = 0;
+
 
     // Ncode가 필요하면 코드를 받아 온다, 여기서 받아오는 ncode page 수는 전체 PDF의 페이지 수
     printOption.needToIssueCode = printOption.needToIssueCode || printOption.forceToIssueNewCode;
@@ -170,28 +180,36 @@ export default class PrintNcodedPdfWorker {
 
     // 본격적으로 각 시트의 이미지를 만들어 놓는다
     this.setStatus("printing");
-    const promises = [];
-    for (let i = 0; i < numSheets; i++) {
-      if (printOption.cancel) {
+
+    const maxThread = printOption.numThreads;
+    for (let s = 0; s < numSheets; s += maxThread) {
+      const promises = [];
+      for (let i = 0; i < maxThread && (s + i) < numSheets; i++) {
+        const pr = this.prepareSheet(s + i, pageNumsInSheets[s + i]);
+
+        promises.push(pr);
+        pr.then(sheet => {
+          // sheets.push(sheet.sheetDesc);
+          sheets[sheet.sheetIndex] = sheet.sheetDesc;
+
+          // 임시 매핑 정보를 추가해서 넣는다, afterPrint에서 쓰인다
+          tempMapping.append(sheet.mappingItems);
+        });
+      }
+      await Promise.all(promises);
+      if (g_printCancelFired) {
         if (printOption.completedCallback) printOption.completedCallback();
         return;
       }
-
-      const pr = this.prepareSheet(i, pageNumsInSheets[i]);
-      promises.push(pr);
-      pr.then(sheet => {
-        // sheets.push(sheet.sheetDesc);
-        sheets[sheet.sheetIndex] = sheet.sheetDesc;
-
-        // 임시 매핑 정보를 추가해서 넣는다, afterPrint에서 쓰인다
-        tempMapping.append(sheet.mappingItems);
-      });
     }
-
-    await Promise.all(promises);
 
     // 캔버스 오브젝트로 그려진 객체를 각각의 PDF 페이지로 만든다.
     const pdfDoc = await this.createPdfDocument(printOption, sheets, printOption.progressCallback);
+    if (pdfDoc === undefined) {
+      if (printOption.completedCallback) printOption.completedCallback();
+      return;
+    }
+
     if (progressCallback) progressCallback();
     await sleep(10);
 
@@ -203,7 +221,7 @@ export default class PrintNcodedPdfWorker {
     const blob = new Blob([pdfBytes], { type: 'application/pdf' });
     // const base64DataUri = await pdfDoc.saveAsBase64({ dataUri: true })
     await sleep(10);
-    if (printOption.cancel) {
+    if (g_printCancelFired) {
       if (printOption.completedCallback) printOption.completedCallback();
       return;
     }
@@ -246,7 +264,9 @@ export default class PrintNcodedPdfWorker {
 
     const numSheets = sheets.length;
     for (let i = 0; i < numSheets; i++) {
-      if (printOption.cancel) return undefined;
+      if (g_printCancelFired) {
+        return undefined;
+      }
 
       const sheet = sheets[i];
       if (progressCallback) progressCallback();
@@ -275,6 +295,7 @@ export default class PrintNcodedPdfWorker {
 
     /** 기본 값으로는 모든 페이지를 인쇄하도록 */
     const numPages = pdf.numPages;
+    printOption.docNumPages = numPages;
     printOption.targetPages = Array.from({ length: numPages }, (_, i) => i + 1);
 
     // 1,2 페이지만 인쇄
@@ -505,7 +526,7 @@ export default class PrintNcodedPdfWorker {
 
 
   cancelPrint = () => {
-    this.printOption.cancel = true;
+    g_printCancelFired = true;
     console.log("cancel signaled");
   }
 }
