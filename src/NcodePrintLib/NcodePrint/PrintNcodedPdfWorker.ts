@@ -48,11 +48,12 @@ export default class PrintNcodedPdfWorker {
   private pdf = undefined as NeoPdfDocument;
   // pagesOverview = [] as IPageOverview[];
   private tempMapper = undefined as PdfDocMapper;
-  private printOption: IPrintOption;
+  // private printOption: IPrintOption;
   private status = "N/A";
 
   private numReports = 0;
 
+  private printOption: IPrintOption;
 
   private url: string;
   private filename: string;
@@ -81,10 +82,9 @@ export default class PrintNcodedPdfWorker {
   }
 
 
-  private loadPdf = async (url: string, filename: string) => {
+  private loadPdf = async (url: string, filename: string, printOption: IPrintOption) => {
     if (url === undefined) return;
 
-    const { printOption } = this;
     const loaded = await NeoPdfManager.getDocument({ url, filename });
     if (loaded) {
       // console.log(`[yyy] setPageOverview called`);
@@ -109,7 +109,7 @@ export default class PrintNcodedPdfWorker {
     this.setStatus("loading");
     const printOption = this.printOption;
 
-    const pdf = await this.loadPdf(url, filename);
+    const pdf = await this.loadPdf(url, filename, printOption);
     if (!pdf) {
       this.setStatus("canceled. loading failed.");
       if (printOption.completedCallback) printOption.completedCallback();
@@ -138,7 +138,8 @@ export default class PrintNcodedPdfWorker {
     // 기본 인쇄 옵션 외의 옵션을 이용자로부터 받는다
     if (printOptionCallback) {
       const result = await printOptionCallback(printOption);
-      if (result) this.printOption = result;
+      if (result)
+        this.printOption = result;
       else {
         if (printOption.completedCallback) printOption.completedCallback();
         return;
@@ -157,12 +158,13 @@ export default class PrintNcodedPdfWorker {
     printOption.pageInfo = { ...pdfMapDesc.nPageStart };
     printOption.issuedNcodes = MappingStorage.makeAssignedNcodeArray(pdfMapDesc.nPageStart, pdf.numPages);
 
+    this.printOption = printOption;
 
     // sheet에 해당하는 페이 번호들을 세팅하고
     this.setStatus("progress");
     const { targetPages, pagesPerSheet } = printOption;
     const pageNumsInSheets = this.genaratePageNumsInSheets(targetPages, pagesPerSheet);
-    const tempMapping = this.resetPrintStatus();
+    const tempMapping = this.resetPrintStatus(printOption);
     const numSheets = pageNumsInSheets.length;
     const sheets: IPrintingSheetDesc[] = new Array(numSheets);
 
@@ -214,7 +216,7 @@ export default class PrintNcodedPdfWorker {
     this.printByPrintJs(ncodedUrl);
 
     // 저장 옵션이 켜져 있으면 저장한다
-    if (this.printOption.downloadNcodedPdf) {
+    if (printOption.downloadNcodedPdf) {
       // 파일 이름을 변경하고
       const fn = getNcodedPdfName(filename, printOption.pdfMappingDesc.nPageStart, pagesPerSheet);
       saveAs(blob, fn);
@@ -225,7 +227,7 @@ export default class PrintNcodedPdfWorker {
     this.setStatus("completed");
 
     // tempMapper 정보를 등록
-    if (this.printOption.needToIssueCode) {
+    if (printOption.needToIssueCode) {
       const storage = MappingStorage.getInstance();
       storage.register(tempMapping);
     }
@@ -466,8 +468,8 @@ export default class PrintNcodedPdfWorker {
   }
 
 
-  resetPrintStatus = () => {
-    const { filename, printOption } = this;
+  resetPrintStatus = (printOption: IPrintOption) => {
+    const { filename } = this;
     this.setProgressPercent(0);
     const tempMapping = new PdfDocMapper(filename, printOption.pagesPerSheet);
     this.tempMapper = tempMapping;

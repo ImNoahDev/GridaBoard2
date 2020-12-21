@@ -7,12 +7,14 @@ import { PDF_DEFAULT_DPI } from '../../constants';
 import { sprintf } from 'sprintf-js';
 import NeoPdfDocument from '../../../NcodePrintLib/NeoPdf/NeoPdfDocument';
 import NeoPdfPage from '../../../NcodePrintLib/NeoPdf/NeoPdfPage';
-import { CSS_DPI } from '../../../NcodePrintLib';
+import { MAX_RENDERER_PIXELS } from "../Constants";
 
 /**
  * Page.js
  * Component rendering page of PDF
  **/
+
+
 
 interface PageProps {
   // pdf: PdfJs.PDFDocumentProxy,
@@ -89,10 +91,17 @@ class Page extends Component<PageProps> {
 
     // determine the actual ratio we want to draw at
     const pdfCssRatio = 96 / 72;
-    const ratio = devicePixelRatio * pdfCssRatio * zoom / backingStoreRatio;
+    let ratio = devicePixelRatio * pdfCssRatio * zoom / backingStoreRatio;
+
+    // 최대값을 설정하자
+    if (width * height * ratio * ratio > MAX_RENDERER_PIXELS) {
+      ratio = Math.sqrt(MAX_RENDERER_PIXELS / width / height);
+    }
 
     const px_width = Math.floor(width * ratio);
     const px_height = Math.floor(height * ratio);
+
+
 
     if (devicePixelRatio !== backingStoreRatio) {
       // set the 'real' canvas size to the higher width/height

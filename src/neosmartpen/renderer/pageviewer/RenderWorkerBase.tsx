@@ -2,7 +2,7 @@ import "../../types";
 import { fabric } from "fabric";
 import { InkStorage } from "../..";
 import { PATH_THICKNESS_SCALE } from "./DrawCurves";
-import { PDFVIEW_ZOOM_MAX, PDFVIEW_ZOOM_MIN } from "../../constants";
+import { PDFVIEW_ZOOM_MAX, PDFVIEW_ZOOM_MIN } from "../Constants";
 import { IWritingSurfaceInfo, ISize } from "../../DataStructure/Structures";
 import { ncodeToPdfPoint } from "../../utils/UtilsFunc";
 import { ZoomFitEnum } from "./StorageRenderWorker";
