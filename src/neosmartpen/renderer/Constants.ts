@@ -1,0 +1,1 @@
+export const GLOBAL_ZOOM = 2;

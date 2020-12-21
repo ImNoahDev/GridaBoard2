@@ -7,6 +7,7 @@ import { PDF_DEFAULT_DPI } from '../../constants';
 import { sprintf } from 'sprintf-js';
 import NeoPdfDocument from '../../../NcodePrintLib/NeoPdf/NeoPdfDocument';
 import NeoPdfPage from '../../../NcodePrintLib/NeoPdf/NeoPdfPage';
+import { CSS_DPI } from '../../../NcodePrintLib';
 
 /**
  * Page.js
@@ -87,7 +88,8 @@ class Page extends Component<PageProps> {
     // );
 
     // determine the actual ratio we want to draw at
-    const ratio = devicePixelRatio * zoom / backingStoreRatio;
+    const pdfCssRatio = 96 / 72;
+    const ratio = devicePixelRatio * pdfCssRatio * zoom / backingStoreRatio;
 
     const px_width = Math.floor(width * ratio);
     const px_height = Math.floor(height * ratio);
@@ -168,19 +170,19 @@ class Page extends Component<PageProps> {
     );
   }
 
-  renderToCanvasSafe = async (page: NeoPdfPage, zoom: number) => {
+  renderToCanvasSafe = async (page: NeoPdfPage, dpi: number, zoom: number) => {
     if (this.backPlane.nowRendering && this.renderTask) {
       const renderTask = this.renderTask;
       renderTask.cancel();
       await renderTask;
     }
-    return this.renderToCanvas(page, zoom);
+    return this.renderToCanvas(page, dpi, zoom);
   }
 
-  renderToCanvas = async (page: NeoPdfPage, zoom: number): Promise<IBackRenderedStatus> => {
+  renderToCanvas = async (page: NeoPdfPage, dpi: number, zoom: number): Promise<IBackRenderedStatus> => {
     const canvas = document.createElement("canvas");
 
-    const PRINT_RESOLUTION = 96 * 2 * zoom;
+    const PRINT_RESOLUTION = dpi * zoom;
     const PRINT_UNITS = PRINT_RESOLUTION / PDF_DEFAULT_DPI;
     const viewport: any = page.getViewport({ scale: 1 });
 
@@ -232,23 +234,28 @@ class Page extends Component<PageProps> {
   }
 
   renderPage = async (page: NeoPdfPage, zoom: number) => {
+    const viewport: any = page.getViewport({ scale: 1 });
+    const { width, height } = viewport;
+    const canvas = this.canvas;
+    const size = { width, height };
+    const ret = this.scaleCanvas(canvas, size.width, size.height, zoom);
+    const dpi = canvas.width / zoom / size.width * 72;
+
     if (!this.backPlane.inited) {
       // console.log(`[yyy] DRAWING`)
-      const result = await this.renderToCanvasSafe(page, zoom);
+      const result = await this.renderToCanvasSafe(page, dpi, zoom);
       this.backPlane.inited = result.result;
       this.backPlane.size = { ...result };
     }
 
-    const viewport: any = page.getViewport({ scale: 1 });
-    const { width, height } = viewport;
-    const canvas = this.canvas;
 
-    const size = { width, height };
-    const displaySize = pdfSizeToDIsplayPixel_int(size);
+    // const displaySize = pdfSizeToDIsplayPixel_int(size);
+    const displaySize = { width, height };
+    const { px_width, px_height } = this.backPlane.size;
+
+
     // const new_scale = displaySize.width / viewport.width;
     // viewport = page.getViewport({ scale: new_scale });
-    const ret = this.scaleCanvas(canvas, displaySize.width, displaySize.height, zoom);
-    const { px_width, px_height } = this.backPlane.size;
 
     // console.log(sprintf("back plane = zoom(%.1f) (%d, %d)", zoom, px_width, px_height));
 
@@ -268,7 +275,7 @@ class Page extends Component<PageProps> {
         return;
       }
 
-      const result = await this.renderToCanvasSafe(page, zoom);
+      const result = await this.renderToCanvasSafe(page, dpi, zoom);
       if (result.result) {
         this.backPlane.prevZoom = zoom;
         this.backPlane.size = { ...result };
