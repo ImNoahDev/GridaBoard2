@@ -174,33 +174,33 @@ export function OptionDialog(props: IDialogProps) {
         break;
 
 
-      // case "drawMarkRatio":
-      //   printOption[name] = true;
-      //   break;
+      case "drawMarkRatio":
+        printOption[name] = parseInt(value) / 100;
+        break;
 
-      // case "colorMode":
-      //   printOption[name] = true;
-      //   break;
+      case "colorMode":
+        printOption[name] = value === "Blue" ? 0 : (value === "Vivid" ? 1 : 2);
+        break;
 
-      // case "luminanceMaxRatio":
-      //   printOption[name] = true;
-      //   break;
+      case "luminanceMaxRatio":
+        printOption[name] = parseInt(value) / 100;
+        break;
 
       case "codeDensity":
         printOption[name] = value === "보통" ? 2 : (value === "연하게" ? 1 : 3);
         break;
 
-      // case "padding":
-      //   printOption[name] = true;
-      //   break;
+      case "padding":
+        printOption[name] = isNaN(parseInt(value)) ? 0 : parseInt(value);
+        break;
 
-      // case "maxPagesPerSheetToDrawMark":
-      //   printOption[name] = true;
-      //   break;
+      case "maxPagesPerSheetToDrawMark":
+        printOption[name] = isNaN(parseInt(value)) ? 65536 : parseInt(value);
+        break;
 
-      // case "debugMode":
-      //   printOption[name] = true;
-      //   break;
+      case "debugMode":
+        printOption[name] = parseInt(value) as 0 | 1 | 2 | 3;
+        break;
 
       default:
         break;

@@ -490,7 +490,7 @@ export default class PrintPdfButton extends React.Component<IPrintPdfButtonProps
           title={dialogTitle}
           open={nowPrinting}
           cancelCallback={this.onCancelPrint} />
-        <hr />
+        {/* <hr /> */}
       </div>
     );
   }

@@ -7,6 +7,7 @@ import PrintNcodedPdfWorker from "./PrintNcodedPdfWorker";
 import { OptionDialog } from "./Dialogs/OptionDialog";
 import * as Util from "../UtilFunc";
 import CancelWaitingDialog from "./CancelWaitingDialog";
+import { g_defaultPrintOption } from "../DefaultOption";
 
 interface Props extends ButtonProps {
   /** 인쇄될 문서의 url, printOption.url로 들어간다. */
@@ -23,8 +24,18 @@ interface Props extends ButtonProps {
 /**
  * locally global variables
  */
-let _printOption: IPrintOption;
+
+
+/** default print option의 포인터 */
+let _printOptionPointer: IPrintOption;
+
+/** dialog에서 임시로 쓰는 option */
+let _workingOption: IPrintOption;
+
+/** modal dialog를 async/await 함수에서 쓰도록 한 것 */
 let _promise: Promise<IPrintOption>;
+
+/** _promise의 resolve callback */
 let _resolve;
 
 
@@ -95,10 +106,11 @@ export default function PrintNcodedPdfButton(props: Props) {
     _promise = promise;
 
     // 취소 버튼을 대비
-    _printOption = Util.cloneObj(printOption);
+    _printOptionPointer = printOption;
+    _workingOption = Util.cloneObj(printOption);
 
     // 완료시 콜백
-    _printOption.completedCallback = onAfterPrint;
+    _workingOption.completedCallback = onAfterPrint;
 
     // 다이얼로그를 열어 놓고
     openOptionDialog();
@@ -116,9 +128,11 @@ export default function PrintNcodedPdfButton(props: Props) {
     closeOptionDialog();
     setProgressOn(true);
 
+    // default option으로 저장해 둔다.
+    _printOptionPointer = printOption;
+
     // _printOption을 돌려 줘서 세팅 값을 반환한다.
-    _printOption = Util.cloneObj(printOption);
-    _resolve(printOption);
+    if (_resolve) _resolve(printOption);
     console.log("onOK");
   }
 
@@ -134,7 +148,7 @@ export default function PrintNcodedPdfButton(props: Props) {
 
     // _printOption이 세팅되지 않았음을 전한다.
     // 받는 곳에서는 undefined가 되어 있는지 확인해야 한다.
-    _resolve(undefined);
+    if (_resolve) _resolve(undefined);
   }
 
 
@@ -160,7 +174,7 @@ export default function PrintNcodedPdfButton(props: Props) {
     setProgressOn(false);
     setWaitingOn(false);
 
-    _printOption = undefined;
+    _workingOption = undefined;
     _resolve = undefined;
     console.log("END OF PRINT");
     console.log("CANCEL, END OF PRINT");
@@ -185,14 +199,17 @@ export default function PrintNcodedPdfButton(props: Props) {
 
   // console.log(`PRT, option dialog on=${optionOn}, progress on=${progressOn}`);
 
+  const optionDialogOn = optionOn;
+  // const optionDialogOn = true;
+  // _workingOption = g_defaultPrintOption;
   return (
     <React.Fragment>
       <button {...rest} onClick={startPrint} >
         {props.children}
       </button>
 
-      { optionOn
-        ? <OptionDialog open={optionOn} cancelCallback={onCancel} okCallback={onOK} printOption={_printOption} />
+      { optionDialogOn
+        ? <OptionDialog open={optionDialogOn} cancelCallback={onCancel} okCallback={onOK} printOption={_workingOption} />
         : <ProgressDialog progress={progressPercent} title={dialogTitle} open={progressOn} cancelCallback={cancelPrint} />
       }
       <CancelWaitingDialog open={waitingOn} />

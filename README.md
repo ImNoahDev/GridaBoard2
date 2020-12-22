@@ -1,3 +1,13 @@
+# Gridaboard v2
+
+### 한글 문자열을 i18n해야 한다
+
+문자열 찾기에서 정규식 표현으로 다음을 넣고 한글 문자열을 찾은 다음, localization을 해야.
+```["'].[ㄱ-ㅎㅏ-ㅣ가-힣]+.*[."]```
+
+
+
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts
@@ -66,4 +76,4 @@ This section has moved here: https://facebook.github.io/create-react-app/docs/de
 ### `yarn build` fails to minify
 
 This section has moved here: https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify
-# PenComponent
+# Gridaboard v2

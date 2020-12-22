@@ -94,7 +94,7 @@ function OptionLevel_0(props: ILeveledDialogProps) {
     else level = 1;
     props.levelCallback(level);
   }
-makeNPageIdStr
+  makeNPageIdStr
   // console.log(`OptionLevel1: level=${optionLevel}`);
   const msg = optionLevel > 0 ? "고급 설정 닫기" : "고급 설정 열기";
 
@@ -118,17 +118,17 @@ makeNPageIdStr
 
           <TableRow className={classes.tr}>
             <TableCell colSpan={1} style={cellRadioStyle}>
-<RadioField showHelp={help} checked={printOption.hasToPutNcode ? printOption.hasToPutNcode : false}
-              handleChange={handleChange2} color={color} name="hasToPutNcode">
-              일반 복사 용지에 인쇄
+              <RadioField showHelp={help} checked={printOption.hasToPutNcode ? printOption.hasToPutNcode : false}
+                handleChange={handleChange2} color={color} name="hasToPutNcode">
+                일반 복사 용지에 인쇄
             </RadioField >
-</TableCell>
+            </TableCell>
 
             <TableCell colSpan={1} style={cellRadioStyle}>
-<RadioField showHelp={help} checked={!printOption.hasToPutNcode} handleChange={handleChange2} color={color} name="useNA4">
-              Ncode A4에 인쇄
+              <RadioField showHelp={help} checked={!printOption.hasToPutNcode} handleChange={handleChange2} color={color} name="useNA4">
+                Ncode A4에 인쇄
             </RadioField >
-</TableCell>
+            </TableCell>
           </TableRow>
 
 
@@ -142,16 +142,23 @@ makeNPageIdStr
             </TableCell>
 
             <TableCell colSpan={1} style={cellRadioStyle}>
-<RadioField showHelp={help} colSpan={1} checked={printOption.showTooltip} handleChange={handleChange2} color={color} name="showTooltip">
-              도움말 표시: {printOption.showTooltip ? "true" : "false"}
-            </RadioField >
-</TableCell>
+              <RadioField showHelp={help} colSpan={1} checked={printOption.showTooltip} handleChange={handleChange2} color={color} name="showTooltip">
+                도움말 표시: {printOption.showTooltip ? "true" : "false"}
+              </RadioField >
+            </TableCell>
           </TableRow>
 
+          <TableRow className={classes.tr}>
+            <TableCell colSpan={1} style={cellRadioStyle} align={"right"}>
+              <RadioField showHelp={help} checked={printOption.downloadNcodedPdf} handleChange={handleChange2} color={color} name="downloadNcodedPdf">
+                PDF로 저장
+            </RadioField >
+            </TableCell>
+          </TableRow>
 
           <TableRow style={{ height: "24px" }}>
             <TableCell colSpan={2} style={cellRadioStyle}>
-              <hr />
+              {/* <hr /> */}
             </TableCell>
           </TableRow>
 

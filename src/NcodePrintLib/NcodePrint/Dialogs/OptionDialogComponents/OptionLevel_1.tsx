@@ -47,7 +47,7 @@ function OptionLevel_1(props: ILeveledDialogProps) {
     <React.Fragment>
       <Table style={{ borderCollapse: "collapse", border: "0" }}>
         <TableRow style={{ height: "24px" }}><TableCell colSpan={2} style={cellRadioStyle}>
-          <hr />
+          {/* <hr /> */}
         </TableCell> </TableRow>
       </Table>
 
@@ -57,7 +57,7 @@ function OptionLevel_1(props: ILeveledDialogProps) {
         <TableBody>
           <TableRow className={classes.tr}>
             <TableCell style={cellRadioStyle} colSpan={2}>
-              <Typography variant="subtitle1" component="h5"> <b> 용지 크기와 자동 등록 코드 발행 </b> </Typography>
+              <Typography variant="subtitle1" component="h5"> <b> 용지 크기와 여백 </b> </Typography>
             </TableCell>
           </TableRow>
 
@@ -71,11 +71,16 @@ function OptionLevel_1(props: ILeveledDialogProps) {
               </SelectField >
             </TableCell>
 
-            <TableCell colSpan={1} style={cellRadioStyle} align={"right"}>
-              <RadioField showHelp={help} checked={printOption.downloadNcodedPdf} handleChange={handleChange2} color={color} name="downloadNcodedPdf">
-                별도 인쇄용 PDF파일 다운로드
-            </RadioField >
+            <TableCell colSpan={1} style={cellRadioStyle}>
+              <SelectField showHelp={help} colSpan={2} handleChange={handleChange2}
+                candidates={["없음", "5mm", "10mm", "15mm", "20mm", "25mm", "30mm"]}
+                value={`${printOption.padding === 0 ? "없음" : printOption.padding + "mm"}`}
+                color={color} name="padding">
+                인쇄 여백: 
+              </SelectField >
+
             </TableCell>
+
           </TableRow>
 
 
@@ -85,7 +90,7 @@ function OptionLevel_1(props: ILeveledDialogProps) {
 
       <Table style={{ borderCollapse: "collapse", border: "0" }}>
         <TableRow style={{ height: "24px" }}><TableCell colSpan={2} style={cellRadioStyle}>
-          <hr />
+          {/* <hr /> */}
         </TableCell> </TableRow>
       </Table>
 
@@ -101,34 +106,27 @@ function OptionLevel_1(props: ILeveledDialogProps) {
 
           <TableRow className={classes.tr}>
             <TableCell colSpan={1} style={cellRadioStyle}>
-              <RadioField showHelp={help} checked={false} handleChange={handleChange2} color={color} name="padding">
-                인쇄 여백: {printOption.padding}mm
-            </RadioField >
-            </TableCell>
-
-            <TableCell colSpan={1} style={cellRadioStyle}>
-              <RadioField showHelp={help} checked={printOption.drawFrame} handleChange={handleChange2} color={color} name="drawFrame">
-                페이지 윤곽 표시: {printOption.drawFrame ? "true" : "false"}
-              </RadioField >
-            </TableCell>
-          </TableRow>
-
-          <TableRow className={classes.tr} >
-            <TableCell colSpan={1} style={cellRadioStyle}>
               <SelectField showHelp={help} colSpan={2} handleChange={handleChange2}
                 candidates={["연하게", "보통", "진하게"]}
                 value={(printOption.codeDensity === 2 ? "보통" : "진하게")}
                 color={color} name="codeDensity">
-                Ncode 인쇄 농도:
+                Ncode 농도:
               </SelectField >
             </TableCell>
+
+            <TableCell colSpan={1} style={cellRadioStyle}>
+              <RadioField showHelp={help} checked={printOption.drawFrame} handleChange={handleChange2} color={color} name="drawFrame">
+                페이지 윤곽 표시
+              </RadioField >
+            </TableCell>
+
           </TableRow>
 
           <LineBreak />
           <TableRow className={classes.tr} >
             <TableCell colSpan={2} style={cellRadioStyle}>
-              <RadioField showHelp={help} colSpan={2} disabled={newCodeOnly || ncodeA4} checked={!newCodeWillUsed} handleChange={handleChange2} color={color} 
-              name="sameCode">
+              <RadioField showHelp={help} colSpan={2} disabled={newCodeOnly || ncodeA4} checked={!newCodeWillUsed} handleChange={handleChange2} color={color}
+                name="sameCode">
                 이전 인쇄물과 같은 페이지로 인쇄: {makeNPageIdStr(printOption.pageInfo)}
               </RadioField >
             </TableCell>
