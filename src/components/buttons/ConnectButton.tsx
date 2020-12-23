@@ -52,7 +52,7 @@ const ConnectButton = (props: Props) => {
             <img src='../../icons/icon_smartpen_connected_n.png' className="toggle-on normal-image"></img>
             <img src='../../icons/icon_smartpen_disconnected_p.png' className="toggle-on hover-image"></img>
 
-            <span id="pen_id" className="pen-badge badge badge-pill badge-light">0/0</span>
+            <span id="pen_id" className="pen-badge badge badge-pill badge-light">0</span>
           </div>
         </GridaToolTip>
       </button>
