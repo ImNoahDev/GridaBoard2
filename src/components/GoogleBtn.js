@@ -127,6 +127,7 @@ class GoogleBtn extends Component {
             onFailure={this.handleLoginFailure}
             cookiePolicy={'single_host_origin'}
             responseType='code,token'
+            prompt='select_account'
           />
         }
       </div>
