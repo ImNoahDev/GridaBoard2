@@ -183,7 +183,6 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
   movePenTracker = (event: any) => {
     const dot = event.dot;
     const canvas_xy = this.getPdfXY(dot);
-    const screen_xy = this.getScreenXY(canvas_xy);
     const penTracker = event.pen.pathPenTracker;
 
     const objects = this.canvasFb.getObjects();
@@ -195,7 +194,7 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
 
     const radius = penTracker.radius;
     penTracker.visible = true;
-    penTracker.set({ left: screen_xy.x - radius, top: screen_xy.y - radius });
+    penTracker.set({ left: canvas_xy.x - radius, top: canvas_xy.y - radius });
     penTracker.setCoords();
     this.canvasFb.renderAll();
 
