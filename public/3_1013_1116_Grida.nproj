@@ -22,7 +22,7 @@
         <section>3</section>
         <owner>1013</owner>
         <code>1116</code>
-        <revision>5</revision>
+        <revision>7</revision>
         <scale>0.001</scale>
         <start_page side="">1</start_page>
         <dot_is_line_segment>false</dot_is_line_segment>
@@ -37,7 +37,7 @@
         <path></path>
     </ticket>
     <pdf>
-        <path>note_1116.pdf</path>
+        <path>3_1013_1116_Grida.pdf</path>
     </pdf>
     <config>
         <resource_mapping_mode>NORMAL</resource_mapping_mode>
@@ -220,7 +220,7 @@
         <symbol page="0" page_name="001" type="Rectangle" x="217.016" y="274.661" width="27.494" height="26.2788" lock="1" xylock="0">
             <name></name>
             <id>{01ec0f65-4849-4e7f-8899-0587a3810676}</id>
-            <command name="" action="Custom" param="menu_grida"/>
+            <command name="" action="Custom" param="full"/>
             <language_resources>
                 <language resource_country="korean" resource_type="" resource_id=""/>
                 <language resource_country="english" resource_type="" resource_id=""/>
@@ -496,7 +496,7 @@
         <symbol page="0" page_name="001" type="Rectangle" x="514.181" y="274.661" width="27.494" height="26.2788" lock="1" xylock="0">
             <name></name>
             <id>{07f3f405-264b-4f7b-93d1-5688efcb786c}</id>
-            <command name="" action="Custom" param="menu_grida"/>
+            <command name="" action="Custom" param="full"/>
             <language_resources>
                 <language resource_country="korean" resource_type="" resource_id=""/>
                 <language resource_country="english" resource_type="" resource_id=""/>
@@ -880,7 +880,7 @@
         <symbol page="0" page_name="001" type="Rectangle" x="216.392" y="700.43" width="27.494" height="26.2788" lock="1" xylock="0">
             <name></name>
             <id>{a96a2c6b-b2e7-4f7f-b6e4-9aa0a74e6ad8}</id>
-            <command name="" action="Custom" param="menu_grida"/>
+            <command name="" action="Custom" param="full"/>
             <language_resources>
                 <language resource_country="korean" resource_type="" resource_id=""/>
                 <language resource_country="english" resource_type="" resource_id=""/>
@@ -1156,7 +1156,7 @@
         <symbol page="0" page_name="001" type="Rectangle" x="513.557" y="700.43" width="27.494" height="26.2788" lock="1" xylock="0">
             <name></name>
             <id>{add8fb70-0228-48f1-9b3b-4d5e7b126c66}</id>
-            <command name="" action="Custom" param="menu_grida"/>
+            <command name="" action="Custom" param="full"/>
             <language_resources>
                 <language resource_country="korean" resource_type="" resource_id=""/>
                 <language resource_country="english" resource_type="" resource_id=""/>

@@ -150,8 +150,8 @@ export default class PenManager {
       $elem = $(e.target);
     }
     if ($elem.hasClass("color_icon")) {
-      $(".color_icon").each(function (item) {
-        $(item).removeClass("pressed");
+      $(".color_icon").each(function () {
+        $(this).removeClass("pressed");
       });
       $elem.addClass("pressed");
     }
