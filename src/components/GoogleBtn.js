@@ -4,7 +4,10 @@ import { gapi } from 'gapi-script';
 import { GoogleLogin, GoogleLogout } from 'react-google-login';
 // import MappingStorage from "../NcodePrintLib/SurfaceMapper/MappingStorage";
 
+const API_KEY = "AIzaSyCaphl32v2wLhrjuoWJjD_gXmhPTOWLZvs";
 const CLIENT_ID = '169738066451-5u100n2i6rko17jhmtpvq0bnjuedj7g4.apps.googleusercontent.com';
+const SCOPE = "https://www.googleapis.com/auth/drive";
+const DISCOVERY = "https://www.googleapis.com/discovery/v1/apis/drive/v3/rest";
 
 class GoogleBtn extends Component {
 
@@ -42,6 +45,18 @@ class GoogleBtn extends Component {
     //     console.error('gauth init fail');
     //   });
     // });
+
+    // google api client init
+    gapi.load("client:auth2", () => {
+      gapi.client.init({
+        apiKey: API_KEY,
+        clientId: CLIENT_ID,
+        scope: SCOPE,
+        discoveryDocs: [DISCOVERY],
+      }).then(
+        console.log("google api client init complite")
+      );
+    });
   }
 
   componentDidUpdate() {
@@ -127,6 +142,7 @@ class GoogleBtn extends Component {
             onFailure={this.handleLoginFailure}
             cookiePolicy={'single_host_origin'}
             responseType='code,token'
+            prompt='select_account'
           />
         }
       </div>
