@@ -3,10 +3,10 @@ import { CSSProperties } from "@material-ui/core/styles/withStyles";
 import { uuidv4 } from "../NcodePrintLib";
 import { IMappingParams, IPdfPageDesc } from "../NcodePrintLib/Coordinates";
 import { IPageSOBP, ISizeDpi } from "../NcodePrintLib/DataStructure/Structures";
-import { PenBasedRenderer } from "../neosmartpen";
 import { IRenderWorkerOption, PLAYSTATE } from "../neosmartpen/renderer/pageviewer/RenderWorkerBase";
 import NeoPdfViewer from "../neosmartpen/renderer/pdf/NeoPdfViewer";
 import { Page } from "../neosmartpen/renderer/pdf/Page";
+import PenBasedRenderer from "../neosmartpen/renderer/pageviewer/PenBasedRenderer";
 
 interface Props {
   pdfUrl: string,
@@ -28,12 +28,12 @@ export default class GridaPage extends Component<Props, State> {
   mappingInfo: IMappingParams;
   pdfPage: Page;
 
-  penPage: PenBasedRenderer;
+  penPage: typeof PenBasedRenderer;
 
   size: ISizeDpi;
 
   canvasId = uuidv4();
-  inkCanvasRef: React.RefObject<PenBasedRenderer> = React.createRef();
+  inkCanvasRef: React.RefObject<typeof PenBasedRenderer> = React.createRef();
 
   // setCanvasRef = (canvas: HTMLCanvasElement) => this.canvas = canvas;
   // setInkCanvasRef = (canvas: HTMLCanvasElement) => this.canvas = canvas;

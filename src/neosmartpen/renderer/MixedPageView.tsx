@@ -9,6 +9,13 @@ import { IMappingParams, IPdfMappingDesc, IPdfPageDesc, TransformParameters } fr
 import { IFileBrowserReturn, isSameObject, openFileBrowser2 } from "../../NcodePrintLib";
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from "@material-ui/core";
 
+export const ZINDEX_INK_LAYER = 3;
+export const ZINDEX_PDF_LAYER = 2;
+
+export const ZINDEX_DRAWER = 100;
+export const ZINDEX_DRAWER_ICON = 11199;
+
+
 interface Props {
   pageInfo?: IPageSOBP;
   pdfUrl: string;
@@ -47,7 +54,7 @@ interface State {
 
 export default class MixedPageView extends React.Component<Props, State> {
   pdf: PdfJs.PDFDocumentProxy;
-  rendererRef: React.RefObject<PenBasedRenderer> = React.createRef();
+  rendererRef: React.RefObject<typeof PenBasedRenderer> = React.createRef();
 
   filename: string;
 
@@ -217,32 +224,53 @@ export default class MixedPageView extends React.Component<Props, State> {
   render() {
     const pdfCanvas: CSSProperties = {
       position: "absolute",
-      height: "0px",
-      width: "0px",
-      left: this.state.canvasPosition.offsetX + "px",
-      top: this.state.canvasPosition.offsetY + "px",
+      // height: "0px",
+      // width: "0px",
+      // left: this.state.canvasPosition.offsetX + "px",
+      // top: this.state.canvasPosition.offsetY + "px",
+
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+
       // zoom: this.state.canvasPosition.zoom,
       overflow: "visible",
     }
 
     const inkCanvas: CSSProperties = {
       position: "absolute",
-      height: "100%",
-      width: "100%",
-      left: "0px",
-      top: "0px",
+      // height: "100%",
+      // width: "100%",
+      // left: "0px",
+      // top: "0px",
+
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+
       overflow: "visible",
     }
 
     console.log(`MixedViewer: rendering, h=${JSON.stringify(this.state.h)}`);
     // console.log(this.state.canvasPosition);
     return (
-      <div>
+      <div style={{
+        position: "absolute",
+        left: 0,
+        top: 0,
+        bottom: 0,
+        right: 0,
+        alignItems: "center",
+        zIndex: 1,
+      }}>
         <div id={"mixed_view"} style={{
           position: "absolute",
-          left: "0px", top: "0px",
-          // flexDirection: "row-reverse", display: "flex",
-          width: "100%", height: "100%",
+          left: 0,
+          top: 0,
+          bottom: 0,
+          right: 0,
           alignItems: "center",
           zIndex: 1,
         }}>
@@ -254,7 +282,7 @@ export default class MixedPageView extends React.Component<Props, State> {
               position={this.state.canvasPosition}
             />
           </div>
-          <div id={"ink_layer"} style={inkCanvas}>
+          <div id={"ink_layer"} style={inkCanvas} >
             <PenBasedRenderer
               scale={1}
               pageInfo={{ section: 0, owner: 0, book: 0, page: 0 }}

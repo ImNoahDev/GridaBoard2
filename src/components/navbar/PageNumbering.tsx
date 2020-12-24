@@ -4,7 +4,7 @@ import Tooltip, { TooltipProps } from '@material-ui/core/Tooltip';
 import { Theme, Typography, withStyles } from '@material-ui/core';
 import GridaToolTip from '../../styles/GridaToolTip';
 
-class pageNumbering extends React.Component {
+class PageNumbering extends React.Component {
   render() {
     return (
       // <div className="navbar-menu d-flex justify-content-center align-items-center neo_shadow">
@@ -50,4 +50,4 @@ class pageNumbering extends React.Component {
   }
 }
 
-export default pageNumbering;
+export default PageNumbering;

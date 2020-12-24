@@ -13,7 +13,8 @@ import * as UTIL from "../../utils/UtilsFunc";
 import { IPageSOBP, ISize } from "../../DataStructure/Structures";
 import { ZoomFitEnum } from "./StorageRenderWorker";
 import { TransformParameters } from "../../../NcodePrintLib/Coordinates";
-// import { Util } from "pdfjs-dist";
+import { withResizeDetector } from 'react-resize-detector';
+import { ZINDEX_INK_LAYER } from "../MixedPageView";
 
 export { PLAYSTATE };
 
@@ -28,8 +29,8 @@ type Props = {
   pens?: NeoSmartpen[],
 
   scale?: number,
-  width?: number;
-  height?: number;
+  width?: number,
+  height?: number,
 
   viewFit?: ZoomFitEnum;
 
@@ -79,7 +80,7 @@ interface State {
  *    1)  Pen에서 Event를 받아 실시간 rendering만 하는 component로 만들것
  *
  */
-export default class PenBasedRenderer extends React.Component<Props, State> {
+class PenBasedRenderer_module extends React.Component<Props, State> {
   state: State = {
     renderer: null,
     sizeUpdate: 0,
@@ -218,6 +219,20 @@ export default class PenBasedRenderer extends React.Component<Props, State> {
       this.subscribePenEvent(pen)
     });
   }
+
+  componentDidUpdate(prevProps) {
+    const { width, height } = this.props;
+
+    console.log(`size updated = ${this.mainDiv.offsetWidth} x ${this.mainDiv.offsetHeight}`);
+    console.log(`size updated = curr width ${width} prev width ${prevProps.width} `);
+    console.log(`size updated = curr height ${height} prev width ${prevProps.height} `);
+
+    if (width !== prevProps.width) {
+      console.log(`width changed: ${width}`);
+    }
+  }
+
+
 
 
   initRenderer(size: { width: number, height: number }) {
@@ -481,33 +496,37 @@ export default class PenBasedRenderer extends React.Component<Props, State> {
     const statusBarHeight = 400;
 
     return (
-      <div id="replayContainer" ref={this.setMainDivRef} style={{ width: "100%", height: "100%" }}>
-        <div style={{ zIndex: 99, display: "flex", flexDirection: "column", }}>
-          <div style={{
-            height: statusBarHeight + "px",
-            display: "flex", flexDirection: "column",
-            justifyContent: "flex-start",
-            alignItems: "flex-start",
-          }}>
-            <div>
-              <ul>
-                {pens.map((pen, i) => (
-                  <li key={i}>{pen.mac}</li>
-                ))}
-              </ul>
-            </div>
-            <div style={{ fontSize: "20px", fontWeight: "bold", color: "rgba(255,0,0,255)" }}>
-              PenBasedRenderer{section}.{owner}.{book}.{page}:{penEventCount}
-            </div>
+      <div id="replayContainer" ref={this.setMainDivRef} style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0 }}>
+        <div style={{
+          position: "absolute",
+          left: 0,
+          top: 0,
+          right: 0,
+          bottom: 0,
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "flex-start",
+          alignItems: "flex-start",
+        }}>
+          <div>
+            <ul>
+              {pens.map((pen, i) => (
+                <li key={i}>{pen.mac}</li>
+              ))}
+            </ul>
+          </div>
+          <div style={{ fontSize: "20px", fontWeight: "bold", color: "rgba(255,0,0,255)" }}>
+            PenBasedRenderer{section}.{owner}.{book}.{page}:{penEventCount}
           </div>
         </div>
 
-
         <div style={{
-          zIndex: 5, width: "100%", height: "100%",
-          position: "relative",
-          left: "0px",
-          top: -statusBarHeight + "px",
+          zIndex: ZINDEX_INK_LAYER,
+          position: "absolute",
+          left: 0,
+          top: 0,
+          right: 0,
+          bottom: 0,
         }} ref={this.setDivRef}>
           {/* <Paper style={{ height: this.size.height, width: this.size.width }}> */}
           <canvas id={this.canvasId} ref={this.setCanvasRef}
@@ -522,3 +541,22 @@ export default class PenBasedRenderer extends React.Component<Props, State> {
   }
 }
 
+const AdaptiveWithDetector = withResizeDetector(PenBasedRenderer_module);
+
+const PenBasedRenderer = (props) => {
+  return (
+    <div style={{
+      position: "absolute",
+      left: 0,
+      top: 0,
+      bottom: 0,
+      right: 0,
+      alignItems: "center",
+      zIndex: 1,
+    }}>
+      <AdaptiveWithDetector {...props} />
+    </div>
+  )
+}
+
+export default PenBasedRenderer;

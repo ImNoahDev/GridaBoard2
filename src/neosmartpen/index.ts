@@ -4,7 +4,7 @@ import { PenEventName } from "./DataStructure";
 import { InkStorage } from "./penstorage";
 // import KerisMain from "./renderer/KerisMain";
 import StorageRenderer from "./renderer/pageviewer/StorageRenderer";
-import PenBasedRenderer from "./renderer/pageviewer/PenBasedRenderer";
+
 
 import NoteserverClient from "./noteserver/NoteserverClient";
 import { paperInfo } from "./noteserver/PaperInfo";
@@ -36,7 +36,6 @@ export {
   paperInfo, NoteserverClient,
   PenManager,
 
-  PenBasedRenderer,
   StorageRenderer,
 
   SINGLE_CODE_SIZE_PER_INCH,
