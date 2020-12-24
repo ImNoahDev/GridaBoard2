@@ -337,13 +337,11 @@ const Home = () => {
           {/* <div className="d-inline-flex p-2 bd-highlight"> */}
           <div className="navbar-menu d-flex justify-content-start align-items-end neo_shadow ">
             <button id="btn_menu" type="button" className="btn btn-neo " onClick={hideAndShowFnc}>
-              <GridaToolTip open={true} placement="top-end"
-                tip={{
+              <GridaToolTip open={true} placement="top-end" tip={{
                   head: "Hide And Show",
                   msg: "전체 메뉴를 숨기고 보여줍니다.",
                   tail: "키보드 버튼 1로 선택 가능합니다"
-                }}
-                title={undefined}>
+                }} title={undefined}>
                 <div className="c2">
                   <img style={menuStyle} src='../icons/all_menu.png' className="normal-image" alt=""></img>
                   <img style={menuStyle} src='../icons/all_menu.png' className="hover-image" alt=""></img>
@@ -387,13 +385,11 @@ const Home = () => {
                     {/* Trash Button  */}
                     <button id="btn_trash" type="button" className="btn btn-neo btn-neo-dropdown"
                       onClick={() => handleTrashBtn()}>
-                      <GridaToolTip open={true} placement="left"
-                        tip={{
+                      <GridaToolTip open={true} placement="left" tip={{
                           head: "Clear",
                           msg: "화면의 글자를 모두 지우는 버튼입니다.",
                           tail: "키보드 버튼 1로 선택 가능합니다"
-                        }}
-                        title={undefined}>
+                        }} title={undefined}>
                         <div className="c2">
                           <img src='../icons/icon_trash_n.png' className="normal-image"></img>
                           <img src='../icons/icon_trash_p.png' className="hover-image"></img>

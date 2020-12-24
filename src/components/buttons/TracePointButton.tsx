@@ -31,13 +31,11 @@ const TracePointButton = () => {
   return (
     <button id="btn_tracepoint" type="button" className="btn btn-neo btn-neo-vertical"
       onClick={() => onTogglePointerTracer()}>
-      <GridaToolTip open={true} placement="left"
-        tip={{
+      <GridaToolTip open={true} placement="left" tip={{
           head: "Trace Point",
           msg: "펜의 위치를 화면에 보여주는 버튼입니다.",
           tail: "단축키 Q로 선택가능합니다."
-        }}
-        title={undefined}>
+        }} title={undefined}>
         <div className="c2 checked">
           <img src="../../icons/icon_point_d.png" className="toggle-off normal-image"></img>
           <img src="../../icons/icon_point_p.png" className="toggle-off hover-image"></img>

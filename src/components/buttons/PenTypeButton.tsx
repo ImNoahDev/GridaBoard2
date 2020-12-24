@@ -20,13 +20,11 @@ export default class PenTypeButton extends React.Component {
         <button id="btn_brush" disabled type="button"
           className="bind-popover btn btn-neo btn-neo-vertical" data-toggle="dropdown" aria-haspopup="true"
           aria-expanded="false">
-          <GridaToolTip open={true} placement="left"
-            tip={{
+          <GridaToolTip open={true} placement="left" tip={{
               head: "Pen Type",
               msg: "펜과 형광펜, 지우개 중 하나를 선택하는 버튼입니다.",
               tail: "Q 펜, W 형광펜, E 지우개, A~G 굵기 선택"
-            }}
-            title={undefined}>
+            }} title={undefined}>
             <div className="c2 disabled state_0">
               <img src="../../icons/icon_pen_n.png" className="state_0 normal-image"></img>
               <img src="../../icons/icon_pen_p.png" className="state_0 hover-image"></img>
@@ -47,13 +45,11 @@ export default class PenTypeButton extends React.Component {
           <div className="btn-group">
             <button id="btn_pen" type="button" className="btn btn-neo btn-neo-dropdown"
               onClick={() => manager.setPenRendererType(IBrushType.PEN)}>
-              <GridaToolTip open={true} placement="left"
-                tip={{
+              <GridaToolTip open={true} placement="left" tip={{
                   head: "Pen Type[Pen]",
                   msg: "펜을 선택하는 버튼입니다.",
                   tail: "단축키 Q로 선택가능합니다."
-                }}
-                title={undefined}>
+                }} title={undefined}>
                 <div className="c2">
                   <img src="../../icons/icon_pen_n.png" className="normal-image"></img>
                   <img src="../../icons/icon_pen_p.png" className="hover-image"></img>
@@ -62,13 +58,11 @@ export default class PenTypeButton extends React.Component {
             </button>
             <button id="btn_marker" type="button" className="btn btn-neo btn-neo-dropdown"
               onClick={() => manager.setPenRendererType(IBrushType.MARKER)}>
-              <GridaToolTip open={true} placement="left"
-                tip={{
+              <GridaToolTip open={true} placement="left" tip={{
                   head: "Pen Type[Marker]",
                   msg: "형광펜을 선택하는 버튼입니다.",
                   tail: "단축키 W로 선택가능합니다."
-                }}
-                title={undefined}>
+                }} title={undefined}>
                 <div className="c2">
                   <img src="../../icons/icon_highlight_n.png" className="normal-image"></img>
                   <img src="../../icons/icon_highlight_p.png" className="hover-image"></img>
@@ -77,13 +71,11 @@ export default class PenTypeButton extends React.Component {
             </button>
             <button id="btn_eraser" type="button" className="btn btn-neo btn-neo-dropdown"
               onClick={() => manager.setPenRendererType(IBrushType.ERASER)}>
-              <GridaToolTip open={true} placement="left"
-                tip={{
+              <GridaToolTip open={true} placement="left" tip={{
                   head: "Pen Type[Eraser]",
                   msg: "지우개를 선택하는 버튼입니다.",
                   tail: "단축키 E로 선택가능합니다."
-                }}
-                title={undefined}>
+                }} title={undefined}>
                 <div className="c2">
                   <img src="../../icons/icon_eraser_n.png" className="normal-image"></img>
                   <img src="../../icons/icon_eraser_p.png" className="hover-image"></img>

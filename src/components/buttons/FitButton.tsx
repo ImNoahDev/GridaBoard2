@@ -11,13 +11,11 @@ export default class FitButton extends React.Component {
         <div className="btn-group dropright" role="group">
           <button type="button" id="btn_fit" className="btn btn-neo btn-neo-vertical" data-toggle="dropdown"
             aria-haspopup="true" aria-expanded="false">
-            <GridaToolTip open={true} placement="left"
-              tip={{
+            <GridaToolTip open={true} placement="left" tip={{
                 head: "Fit",
                 msg: "용지의 크기를 맞추는 여러 옵션 중 하나를 선택합니다.",
                 tail: "Z 폭 맞춤, X 높이 맞춤, C 전체 페이지, V 100%"
-              }}
-              title={undefined}>
+              }} title={undefined}>
               <div className="c2">
                 <img src="../../icons/icon_ratio_n.png" className="normal-image"></img>
                 <img src="../../icons/icon_ratio_p.png" className="hover-image"></img>
