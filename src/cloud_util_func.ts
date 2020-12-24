@@ -143,12 +143,12 @@ export async function readMappingInfo() {
   gapi.load('client', function () {
     gapi.client.load('drive', 'v2', async function () {
       const fileResponse = await gapi.client.drive.files.list();
-      const files = fileResponse.result.items;
+      const files = fileResponse.result.files;
 
       if (files && files.length > 0) {
         for (let i = 0; i < files.length; i++) {
           const file = files[i];
-          if (file.title === 'mappingInfo.json') {
+          if (file.name === 'mappingInfo.json') {
             const fileId = file.id;
             const fileRequest = gapi.client.drive.files.get({
               fileId: fileId,
