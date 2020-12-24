@@ -14,7 +14,6 @@ import { IPageSOBP, ISize } from "../../DataStructure/Structures";
 import { ZoomFitEnum } from "./StorageRenderWorker";
 import { TransformParameters } from "../../../NcodePrintLib/Coordinates";
 import { withResizeDetector } from 'react-resize-detector';
-import { ZINDEX_INK_LAYER } from "../MixedPageView";
 
 export { PLAYSTATE };
 
@@ -521,7 +520,7 @@ class PenBasedRenderer_module extends React.Component<Props, State> {
         </div>
 
         <div style={{
-          zIndex: ZINDEX_INK_LAYER,
+          zIndex: 3,
           position: "absolute",
           left: 0,
           top: 0,

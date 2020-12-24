@@ -17,7 +17,59 @@ import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import InboxIcon from '@material-ui/icons/MoveToInbox';
 import MailIcon from '@material-ui/icons/Mail';
-import { ZINDEX_DRAWER } from '../neosmartpen/renderer/MixedPageView';
+
+
+
+const useStyles_HOME_TSX = makeStyles((theme: Theme) =>
+  createStyles({
+    root: {
+      display: "flex"
+    },
+    appBar: {
+      transition: theme.transitions.create(['margin', 'width'], {
+        easing: theme.transitions.easing.sharp,
+        duration: theme.transitions.duration.leavingScreen,
+      }),
+    },
+    appBarShift: {
+      width: `calc(100% - ${g_drawerWidth}px)`,
+      transition: theme.transitions.create(['margin', 'width'], {
+        easing: theme.transitions.easing.easeOut,
+        duration: theme.transitions.duration.enteringScreen,
+      }),
+      marginRight: `calc( ${g_drawerWidth}`,
+    },
+    toolbar: theme.mixins.toolbar,
+    content: {
+      flexGrow: 1,
+      padding: theme.spacing(3),
+      transition: theme.transitions.create('margin', {
+        easing: theme.transitions.easing.sharp,
+        duration: theme.transitions.duration.leavingScreen,
+      }),
+      marginRight: `calc(${-g_drawerWidth}`,
+    },
+    drawerHeader: {
+      display: 'flex',
+      alignItems: 'center',
+      padding: theme.spacing(0, 1),
+      // necessary for content to be below app bar
+      ...theme.mixins.toolbar,
+      justifyContent: 'flex-start',
+    },
+    contentShift: {
+      transition: theme.transitions.create('margin', {
+        easing: theme.transitions.easing.easeOut,
+        duration: theme.transitions.duration.enteringScreen,
+      }),
+      marginRight: 0,
+    },
+    hide: {
+      display: 'none',
+    },
+  }),
+);
+
 
 // https://codesandbox.io/s/resizable-drawer-34ife?from-embed=&file=/src/CustomDrawer.js:649-948
 
@@ -69,7 +121,7 @@ const useStyles = makeStyles((theme: Theme) =>
       left: 0,
       // right:0,
       bottom: 0,
-      zIndex: ZINDEX_DRAWER,
+      zIndex: 100,
       // backgroundColor: "#f4f7f9"
       backgroundColor: "#ff0000"
     }

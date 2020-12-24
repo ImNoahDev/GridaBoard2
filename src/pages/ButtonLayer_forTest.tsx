@@ -17,9 +17,11 @@ const buttonDivStyle = {
   display: "flex",
   flexDirection: "row-reverse",
   alignItems: "center",
-  left: "0px", top: "0px",
-  width: "100%", height: "40px",
-  zIndex: 99999,
+  left: 0,
+  top: 0,
+  right: 50,
+  height: "40px",
+  zIndex: 3,
 } as React.CSSProperties;
 
 
@@ -29,7 +31,7 @@ const printOption = g_defaultPrintOption;
 const getNoteInfo = (event) => {
   // let url = "http://nbs.neolab.net/v1/notebooks/attributes?device=android";
   const note_info = new NoteserverClient();
-  note_info.getNoteInfo({});
+  // note_info.getNoteInfo({});
 };
 
 
