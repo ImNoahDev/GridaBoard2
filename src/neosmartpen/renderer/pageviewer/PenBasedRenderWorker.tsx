@@ -130,16 +130,15 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
       this.canvasFb.remove(path);
     }
 
-
-
     //지우개 구현
-    const canvas_xy = this.getPdfXY(dot);
+    const canvas_xy = this.getPdfXY_scaled(dot);
     const screen_xy = this.getScreenXY(canvas_xy);
     const pen = event.pen;
     if (pen.penRendererType === IBrushType.ERASER) {
       console.log('ERASE');
-      if (Object.keys(pen.eraserLastPoint).length) {
-        this.eraseOnLine(pen.eraserLastPoint.x, pen.eraserLastPoint.y, screen_xy.x, screen_xy.y, stroke);
+      if (pen.eraserLastPoint !== null) {
+        this.eraseOnLine(pen.eraserLastPoint.x, pen.eraserLastPoint.y, 
+          screen_xy.x, screen_xy.y, stroke);
       }
 
       pen.eraserLastPoint = { x: screen_xy.x, y: screen_xy.y };
@@ -215,16 +214,22 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
   }
 
   eraseOnLine(ink_x0, ink_y0, ink_x1, ink_y1, stroke) {
-    const pathData = 'M ' + ink_x0 + ' ' + ink_y0 + ' L ' + ink_x1 + ' ' + ink_y1;
-    const eraserPath = new fabric.Path(pathData);
-    eraserPath.set({ left: ink_x0, top: ink_y0, opacity: 0 });
+    const pathData = 'M ' + ink_x0 + ' ' + ink_y0 + ' L ' + ink_x1 + ' ' + ink_y1 + 'z';
+    const pathOption = {
+      strokeWidth: 5, 
+      opacity: 0, 
+      originX: 'left',
+      originY: 'top',
+    }
+    const eraserPath = new fabric.Path(pathData, pathOption);
+    // eraserPath.set({ left: ink_x0, top: ink_y0 });
 
     const paths = this.canvasFb.getObjects().filter(obj => obj.data === 'ns');
 
     for (let i = 0; i < this.localPathArray.length; i++) {
       const path = this.localPathArray[i];
 
-      if (path.intersectsWithObject(eraserPath)) {
+      if (eraserPath.intersectsWithObject(path)) {
         this.canvasFb.remove(path);
 
         const { section, book, owner, page } = stroke;
@@ -333,8 +338,8 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
     const strokes = this.storage.getPageStrokes(pageInfo);
 
     //test
-    const testStroke = this.generateA4CornerStrokeForTest(pageInfo);
-    strokes.push(testStroke);
+    // const testStroke = this.generateA4CornerStrokeForTest(pageInfo);
+    // strokes.push(testStroke);
 
     // 페이지의 stroke를 fabric.Path로 바꾼다.
     this.addStrokePaths(strokes);
