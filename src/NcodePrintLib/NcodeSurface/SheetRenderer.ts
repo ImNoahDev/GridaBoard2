@@ -412,8 +412,8 @@ export class SheetRenderer {
     }
 
     const printOption = this.printOption;
-    const { printDpi: dpi, pagesPerSheet, direction, mediaSize, padding } = printOption;
-    const { width: width_css, height: height_css } = getSurfaceSize_css(mediaSize, false, padding);
+    const { printDpi: dpi, pagesPerSheet, direction, mediaSize, imagePadding } = printOption;
+    const { width: width_css, height: height_css } = getSurfaceSize_css(mediaSize, false, imagePadding);
 
     const width_dpi = width_css * dpi / CSS_DPI;
     const height_dpi = height_css * dpi / CSS_DPI;

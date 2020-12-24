@@ -13,14 +13,13 @@ export default class BackgroundButton extends React.Component {
       <div className="btn-group dropright" role="group">
         <button type="button" id="btn_background" className="btn btn-neo btn-neo-vertical"
           data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-          <GridaToolTip placement="left" title={
-            <React.Fragment>
-              <Typography color="inherit">Background</Typography>
-              <em>{"화면의 배경색을 선택합니다."}</em>
-              <br></br>
-              <b>{"키보드 버튼 1로 선택 가능합니다"}</b>
-            </React.Fragment>
-          }>
+          <GridaToolTip open={true} placement="left"
+            tip={{
+              head: "Background",
+              msg: "화면의 배경색을 선택합니다.",
+              tail: "키보드 버튼 1로 선택 가능합니다"
+            }}
+            title={undefined}>
             <div className="c2">
               <img src="../../icons/icon_background_n.png" className="normal-image"></img>
               <img src="../../icons/icon_background_p.png" className="hover-image"></img>

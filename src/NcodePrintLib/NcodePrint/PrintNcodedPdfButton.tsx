@@ -197,8 +197,6 @@ export default function PrintNcodedPdfButton(props: Props) {
   let dialogTitle = status === "prepared" ? "인쇄 종료 대기 중" : "인쇄 준비 중";
   dialogTitle = status === "completed" ? "완료" : dialogTitle;
 
-  // console.log(`PRT, option dialog on=${optionOn}, progress on=${progressOn}`);
-
   const optionDialogOn = optionOn;
   // const optionDialogOn = true;
   // _workingOption = g_defaultPrintOption;

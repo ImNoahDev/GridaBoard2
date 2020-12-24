@@ -41,7 +41,8 @@ function OptionLevel_2(props: ILeveledDialogProps) {
   }
 
   const newCodeWillUsed = printOption.needToIssueCode || printOption.forceToIssueNewCode;
-
+  const pageMarginArray = Array.from({ length: 21 }, (_, i) => `${i} mm`);
+  const imgMarginArray = Array.from({ length: 21 }, (_, i) => `${i} mm`);
   return (
     <React.Fragment>
 
@@ -53,7 +54,7 @@ function OptionLevel_2(props: ILeveledDialogProps) {
 
           <TableRow className={classes.tr}>
             <TableCell style={cellRadioStyle} colSpan={2}>
-              <Typography variant="subtitle1" component="h5" color={localColor}> <b> 상세 설정 </b> </Typography>
+              <Typography variant="subtitle1" component="h5" color={localColor}> <b> 프린트 엔진 설정 </b> </Typography>
             </TableCell>
           </TableRow>
 
@@ -75,7 +76,6 @@ function OptionLevel_2(props: ILeveledDialogProps) {
           </TableRow>
 
 
-
           <TableRow className={classes.tr} >
             <TableCell colSpan={1} style={cellRadioStyle}>
               <SelectField showHelp={help} colSpan={2} handleChange={handleChange2}
@@ -84,9 +84,7 @@ function OptionLevel_2(props: ILeveledDialogProps) {
                 color={color} name="colorMode">
                 색변환 방법 선택:
               </SelectField >
-
             </TableCell>
-
 
             <TableCell colSpan={1} style={cellRadioStyle}>
               <SelectField showHelp={help} colSpan={2} handleChange={handleChange2}
@@ -97,6 +95,30 @@ function OptionLevel_2(props: ILeveledDialogProps) {
               </SelectField >
             </TableCell>
           </TableRow>
+
+
+
+          <TableRow className={classes.tr}>
+            <TableCell colSpan={1} style={cellRadioStyle}>
+              <SelectField showHelp={help} colSpan={2} handleChange={handleChange2}
+                candidates={pageMarginArray}
+                value={`${printOption.pdfPagePadding} mm`}
+                color={color} name="pdfPagePadding">
+                페이지 여백:
+              </SelectField >
+            </TableCell>
+
+            <TableCell colSpan={1} style={cellRadioStyle}>
+              <SelectField showHelp={help} colSpan={2} handleChange={handleChange2}
+                candidates={imgMarginArray}
+                value={`${printOption.imagePadding - printOption.pdfPagePadding} mm`}
+                color={color} name="imagePadding">
+                페이지 내 코드 여백:
+              </SelectField >
+            </TableCell>
+          </TableRow>
+
+
 
           <TableRow className={classes.tr}>
             <TableCell colSpan={1} style={cellRadioStyle}>
@@ -132,9 +154,9 @@ function OptionLevel_2(props: ILeveledDialogProps) {
 
               <SelectField showHelp={help} colSpan={2} handleChange={handleChange2}
                 candidates={["1", "무제한"]}
-                value={printOption.maxPagesPerSheetToDrawMark===1 ? 1 : "무제한"}
+                value={printOption.maxPagesPerSheetToDrawMark === 1 ? 1 : "무제한"}
                 color={color} name="maxPagesPerSheetToDrawMark">
-                Ncode A4 인쇄 가능 페이지/장의 최대값: 
+                Ncode A4 인쇄 가능 페이지/장의 최대값:
               </SelectField >
 
             </TableCell>

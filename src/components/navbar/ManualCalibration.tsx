@@ -25,14 +25,13 @@ const ManualCalibration = (props: Props) => {
 
   return (
     <CalibrationButton {...props} cancelCallback={cancelCallback} id="btn_start_calibration" type="button" className="btn btn-neo" >
-      <GridaToolTip placement="left-end" title={
-        <React.Fragment>
-          <Typography color="inherit">인쇄된 페이지 수동 등록</Typography>
-          <em>{"Ncode A4에 인쇄된 페이지를 프로그램에 수동 등록합니다."}</em>
-          <br></br>
-          <b>{"단축키 Q로 선택가능합니다."}</b>
-        </React.Fragment>
-      }>
+      <GridaToolTip open={true} placement="left-end"
+        tip={{
+          head: "인쇄된 페이지 수동 등록",
+          msg: "Ncode A4에 인쇄된 페이지를 프로그램에 수동 등록합니다.",
+          tail: "단축키 Q로 선택가능합니다."
+        }}
+        title={undefined}>
         <div><NeoImage style={style} src='../../icons/icon_calibration_n.png' /></div>
         {/* <div className="c2">
           <img style={style} src='../../icons/icon_calibration_n.png' className="normal-image"></img>

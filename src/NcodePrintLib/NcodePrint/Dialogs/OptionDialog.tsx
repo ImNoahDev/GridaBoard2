@@ -190,8 +190,13 @@ export function OptionDialog(props: IDialogProps) {
         printOption[name] = value === "보통" ? 2 : (value === "연하게" ? 1 : 3);
         break;
 
-      case "padding":
-        printOption[name] = isNaN(parseInt(value)) ? 0 : parseInt(value);
+      case "imagePadding":
+        printOption.imagePadding = parseInt(value) + printOption.pdfPagePadding;
+        break;
+
+      case "pdfPagePadding":
+        printOption.imagePadding = parseInt(value) + printOption.imagePadding - printOption.pdfPagePadding;
+        printOption[name] = parseInt(value);
         break;
 
       case "maxPagesPerSheetToDrawMark":

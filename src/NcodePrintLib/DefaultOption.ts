@@ -1,5 +1,5 @@
 import { IPageSOBP } from "./DataStructure/Structures";
-import { IPrintOption, MediaSize } from "./NcodePrint/PrintDataTypes";
+import { IPrintOption, MediaSize, NcodePdfScaleMode } from "./NcodePrint/PrintDataTypes";
 import { ColorConvertMethod } from "./NcodeSurface/CanvasColorConverter";
 
 // export const g_debugURL = "./Portrait, 초등학교 4학년 4P.pdf";
@@ -31,7 +31,7 @@ export const g_defaultPrintOption: IPrintOption = {
   codeDensity: 2,
   printDpi: 600,
   pdfRenderingDpi: 300,
-  downloadNcodedPdf: true,
+  downloadNcodedPdf: false,
 
   printNcode: true,
   mediaSize: MediaSize.A4,
@@ -56,10 +56,14 @@ export const g_defaultPrintOption: IPrintOption = {
   drawMarkRatio: 0.1,
   drawFrame: false,
 
-  pagesPerSheet: 4,
+  pagesPerSheet: 1,
 
   /** 코드 출력물의 상하좌우 여백, mm단위 */
-  padding: 15,     // mm 단위
+
+  // 이것 손 볼 것, kitty 2020/12/22
+  imagePadding: 16,     // mm 단위
+  drawImageOnPdfMode: NcodePdfScaleMode.IMAGE_SIZE_UP_TO_PAGE_PADDING,
+  pdfPagePadding: 8,
 
   showTooltip: true,
 

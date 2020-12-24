@@ -1,5 +1,6 @@
 import React from 'react';
-import { Theme, Tooltip, Typography, withStyles } from "@material-ui/core";
+import { Theme, Tooltip, TooltipProps, Typography, withStyles } from "@material-ui/core";
+import { ITipType } from '../NcodePrintLib/NcodePrint/Dialogs/OptionDialogComponents/RadioField';
 
 const GridaToolTipPopup = withStyles((theme: Theme) => ({
   tooltip: {
@@ -11,34 +12,59 @@ const GridaToolTipPopup = withStyles((theme: Theme) => ({
   },
 }))(Tooltip);
 
-export default function GridaToolTip(props) {
-  const { children, tip, open, ...rest } = props;
+interface Props extends TooltipProps {
+  open?: boolean,
+  tip?: ITipType,
+
+  title: NonNullable<React.ReactNode>;
+}
+
+export default function GridaToolTip(props: Props) {
+  const { children, tip, open, title, ...rest } = props;
+  let { title: titleDefault } = props;
+
   let show = open;
 
-  let title = "", msg = "", tail = "";
+  if (titleDefault !== undefined) {
+    console.log(`title default show=${title}`);
+  }
+
+  let head = "", msg = "", tail = "";
   if (tip) {
-    title = tip.title;
+    head = tip.head;
     msg = tip.msg;
     tail = tip.tail;
   }
-  else { show = false; }
+  else if (!title) { show = false; }
+
+  const renderTitle = (title, tip) => {
+    if (tip) {
+      return (
+        <React.Fragment>
+          <Typography color="primary"><b> {head}</b></Typography>
+          <br />
+          {msg}
+          <br />
+          <br />
+          <b>{tail}</b>
+        </React.Fragment>
+      );
+    }
+    else {
+      return (
+        <React.Fragment>
+          {title}
+        </React.Fragment>
+      );
+    }
+  }
 
 
   if (show) {
     return (
       <GridaToolTipPopup
-        placement="left" title={
-          <React.Fragment>
-            <Typography color="primary"><b> {title}</b></Typography>
-            <br />
-            {msg}
-            <br />
-            <br />
-            <b>{tail}</b>
-          </React.Fragment>
-        }>
+        placement="left" title={renderTitle(title, tip)}>
         {children}
-
       </GridaToolTipPopup>
     );
   }

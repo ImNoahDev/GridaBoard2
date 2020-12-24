@@ -1,6 +1,6 @@
 
 
-import { IPrintingEvent, IPrintingReport, IPrintOption, IUnitString, IProgressCallbackFunction } from "./PrintDataTypes";
+import { IPrintingEvent, NcodePdfScaleMode, IPrintingReport, IPrintOption, IUnitString, IProgressCallbackFunction } from "./PrintDataTypes";
 
 import NeoPdfDocument from "../NeoPdf/NeoPdfDocument";
 import NeoPdfManager from "../NeoPdf/NeoPdfManager";
@@ -204,7 +204,7 @@ export default class PrintNcodedPdfWorker {
     }
 
     // 캔버스 오브젝트로 그려진 객체를 각각의 PDF 페이지로 만든다.
-    const pdfDoc = await this.createPdfDocument(printOption, sheets, printOption.progressCallback);
+    const pdfDoc = await this.generateNcodePdf(printOption, sheets, printOption.progressCallback);
     if (pdfDoc === undefined) {
       if (printOption.completedCallback) printOption.completedCallback();
       return;
@@ -255,10 +255,8 @@ export default class PrintNcodedPdfWorker {
   }
 
 
-  private createPdfDocument = async (printOption: IPrintOption, sheets: IPrintingSheetDesc[], progressCallback: IProgressCallbackFunction) => {
-    const media = printOption.mediaSize;
-    const paperWidth_pt = convertUnit(media.unit as IUnitString, media.width, "pt");
-    const paperHeight_pt = convertUnit(media.unit as IUnitString, media.height, "pt");
+  private generateNcodePdf = async (printOption: IPrintOption, sheets: IPrintingSheetDesc[], progressCallback: IProgressCallbackFunction) => {
+
 
     const pdfDoc = await PDFDocument.create();
 
@@ -271,7 +269,7 @@ export default class PrintNcodedPdfWorker {
       const sheet = sheets[i];
       if (progressCallback) progressCallback();
       await sleep(10);
-      await this.addSheetToPdfPage(pdfDoc, sheet, paperWidth_pt, paperHeight_pt);
+      await this.addSheetToPdfPage(pdfDoc, sheet, printOption);
 
       console.log(`doc add image = ${i + 1}/${numSheets}`);
     }
@@ -340,18 +338,47 @@ export default class PrintNcodedPdfWorker {
     return pdfMappingDesc;
   }
 
-  private addSheetToPdfPage = async (pdfDoc, sheet, paperWidth_pt, paperHeight_pt) => {
+  private addSheetToPdfPage = async (pdfDoc: PDFDocument, sheet, printOption: IPrintOption) => {
+
     const cssStringToNumber = (css: string) => {
       return parseInt(css.substr(0, css.indexOf("px")));
     }
 
-    const w = convertUnit("css" as IUnitString, cssStringToNumber(sheet.canvasDesc.css.width), "pt");
-    const h = convertUnit("css" as IUnitString, cssStringToNumber(sheet.canvasDesc.css.height), "pt");
+    let w = convertUnit("css" as IUnitString, cssStringToNumber(sheet.canvasDesc.css.width), "pt");
+    let h = convertUnit("css" as IUnitString, cssStringToNumber(sheet.canvasDesc.css.height), "pt");
     const isLandscape = w > h;
 
     let pw, ph;
+    const media = printOption.mediaSize;
+    const paperWidth_pt = convertUnit(media.unit as IUnitString, media.width, "pt");
+    const paperHeight_pt = convertUnit(media.unit as IUnitString, media.height, "pt");
+
     if (isLandscape) { pw = paperHeight_pt; ph = paperWidth_pt; }
     else { pw = paperWidth_pt; ph = paperHeight_pt; }
+
+    // kitty 2020/12/22 인쇄 영역 안에 들어가는 작은 사이즈 PDF를 만들기 위해
+    const { drawImageOnPdfMode } = printOption;
+
+    if (drawImageOnPdfMode === NcodePdfScaleMode.PAGE_SIZE_DOWN_TO_IMAGE) {
+      // A4 기준으로, Chrome에서 용지 맞춤, 인쇄 가능 영역에서 출력 잘 됨 (기본과 100%에서는 출력 안됨)
+      pw = w; ph = h;
+    }
+
+    if (drawImageOnPdfMode === NcodePdfScaleMode.IMAGE_SIZE_UP_TO_PAGE_PADDING) {
+      // A4 기준으로, Chrome, imagePadding만 10에서 모두 OK
+      const padding_delta_pt = convertUnit("mm" as IUnitString, (printOption.imagePadding - printOption.pdfPagePadding), "pt");
+
+      const scale = (w + padding_delta_pt) / w;
+      w = w * scale;
+      h = h * scale;
+
+      pw = w; ph = h;
+    }
+
+
+    // A4 기준으로, Chrome에서 용지에 맞춤만 출력됨 (100%, 인쇄 가능 영역, 기본 옵션으로 출력 안됨)
+    // pw = pw - (pw - w) / 2;
+    // ph = ph - (ph - h) / 2;
 
     const x = (pw - w) / 2;
     const y = (ph - h) / 2;
@@ -363,10 +390,21 @@ export default class PrintNcodedPdfWorker {
 
     // const page = pdfDoc.addPage(PageSizes.A7);
     const page = pdfDoc.addPage([pw, ph]);
-    page.drawImage(pngImage, {
-      x, y, width: w, height: h,
-      opacity: 1,
-    })
+
+    if (drawImageOnPdfMode === NcodePdfScaleMode.IMAGE_SIZE_UP_TO_PAGE) {
+      page.drawImage(pngImage, {
+        x: 0, y: 0, width: pw, height: ph,      // 2020
+        opacity: 1,
+      })
+    }
+    else if (drawImageOnPdfMode === NcodePdfScaleMode.PAGE_SIZE_DOWN_TO_IMAGE
+      || drawImageOnPdfMode === NcodePdfScaleMode.NO_SCALE
+      || drawImageOnPdfMode === NcodePdfScaleMode.IMAGE_SIZE_UP_TO_PAGE_PADDING) {
+      page.drawImage(pngImage, {
+        x, y, width: w, height: h,
+        opacity: 1,
+      })
+    }
   }
 
   private setMetaData = async (pdfDoc: PDFDocument, pdf: NeoPdfDocument, printOption: IPrintOption) => {

@@ -10,14 +10,13 @@ class pageNumbering extends React.Component {
       // <div className="navbar-menu d-flex justify-content-center align-items-center neo_shadow">
       <React.Fragment>
         <button id="btn_prevpage" type="button" className="btn btn-neo ">
-          <GridaToolTip placement="top" title={
-            <React.Fragment>
-              <Typography color="inherit">Pre Page</Typography>
-              <em>{"현재 필기 중인 페이지를, 앞쪽 페이지로 이동시킵니다."}</em>
-              <br></br>
-              <b>{"키보드 버튼 Page Up으로 이동 가능합니다"}</b>
-            </React.Fragment>
-          }>
+          <GridaToolTip open={true} placement="top"
+            tip={{
+              head: "Pre Page",
+              msg: "현재 필기 중인 페이지를, 앞쪽 페이지로 이동시킵니다.",
+              tail: "키보드 버튼 Page Up으로 이동 가능합니다"
+            }}
+            title={undefined}>
             <div className="c2">
               <img src='../../icons/icon_prev_n.png' className="normal-image"></img>
               <img src='../../icons/icon_prev_p.png' className="hover-image"></img>
@@ -37,14 +36,13 @@ class pageNumbering extends React.Component {
           defaultValue="/" />
 
         <button id="btn_nextpage" type="button" className="btn btn-neo ">
-          <GridaToolTip placement="top" title={
-            <React.Fragment>
-              <Typography color="inherit">Next Page</Typography>
-              <em>{"현재 필기 중인 페이지를, 뒤쪽 페이지로 이동시킵니다."}</em>
-              <br></br>
-              <b>{"키보드 버튼 Page Down으로 이동 가능합니다"}</b>
-            </React.Fragment>
-          }>
+          <GridaToolTip open={true} placement="top"
+            tip={{
+              head: "Next Page",
+              msg: "현재 필기 중인 페이지를, 뒤쪽 페이지로 이동시킵니다.",
+              tail: "키보드 버튼 Page Down으로 이동 가능합니다"
+            }}
+            title={undefined}>
             <div className="c2">
               <img src='../../icons/icon_next_n.png' className="normal-image"></img>
               <img src='../../icons/icon_next_p.png' className="hover-image"></img>

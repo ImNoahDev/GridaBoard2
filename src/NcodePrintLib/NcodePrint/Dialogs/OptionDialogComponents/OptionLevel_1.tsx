@@ -42,7 +42,6 @@ function OptionLevel_1(props: ILeveledDialogProps) {
   const newCodeWillUsed = printOption.needToIssueCode || printOption.forceToIssueNewCode;
 
   const mediaNames = Object.keys(MediaSize);
-
   return (
     <React.Fragment>
       <Table style={{ borderCollapse: "collapse", border: "0" }}>
@@ -57,12 +56,12 @@ function OptionLevel_1(props: ILeveledDialogProps) {
         <TableBody>
           <TableRow className={classes.tr}>
             <TableCell style={cellRadioStyle} colSpan={2}>
-              <Typography variant="subtitle1" component="h5"> <b> 용지 크기와 여백 </b> </Typography>
+              <Typography variant="subtitle1" component="h5"> <b> 용지 크기와 농도 </b> </Typography>
             </TableCell>
           </TableRow>
 
           <TableRow className={classes.tr}>
-            <TableCell colSpan={1} style={cellRadioStyle}>
+            <TableCell colSpan={2} style={cellRadioStyle}>
               <SelectField showHelp={help} colSpan={2} handleChange={handleChange2}
                 candidates={mediaNames}
                 value={printOption.mediaSize.name}
@@ -70,39 +69,9 @@ function OptionLevel_1(props: ILeveledDialogProps) {
                 용지 크기:
               </SelectField >
             </TableCell>
-
-            <TableCell colSpan={1} style={cellRadioStyle}>
-              <SelectField showHelp={help} colSpan={2} handleChange={handleChange2}
-                candidates={["없음", "5mm", "10mm", "15mm", "20mm", "25mm", "30mm"]}
-                value={`${printOption.padding === 0 ? "없음" : printOption.padding + "mm"}`}
-                color={color} name="padding">
-                인쇄 여백: 
-              </SelectField >
-
-            </TableCell>
-
           </TableRow>
 
 
-        </TableBody>
-      </Table>
-
-
-      <Table style={{ borderCollapse: "collapse", border: "0" }}>
-        <TableRow style={{ height: "24px" }}><TableCell colSpan={2} style={cellRadioStyle}>
-          {/* <hr /> */}
-        </TableCell> </TableRow>
-      </Table>
-
-
-
-      <Table style={{ borderCollapse: "collapse", border: "0" }}>
-        <TableBody>
-          <TableRow className={classes.tr}>
-            <TableCell style={cellRadioStyle} colSpan={2}>
-              <Typography variant="subtitle1" component="h5"> <b> 상세 인쇄 방법 </b> </Typography>
-            </TableCell>
-          </TableRow>
 
           <TableRow className={classes.tr}>
             <TableCell colSpan={1} style={cellRadioStyle}>
@@ -122,7 +91,26 @@ function OptionLevel_1(props: ILeveledDialogProps) {
 
           </TableRow>
 
-          <LineBreak />
+        </TableBody>
+      </Table>
+
+
+      <Table style={{ borderCollapse: "collapse", border: "0" }}>
+        <TableRow style={{ height: "24px" }}><TableCell colSpan={2} style={cellRadioStyle}>
+          {/* <hr /> */}
+        </TableCell> </TableRow>
+      </Table>
+
+
+
+      <Table style={{ borderCollapse: "collapse", border: "0" }}>
+        <TableBody>
+          <TableRow className={classes.tr}>
+            <TableCell style={cellRadioStyle} colSpan={2}>
+              <Typography variant="subtitle1" component="h5"> <b> Ncode 할당 정보 </b> </Typography>
+            </TableCell>
+          </TableRow>
+
           <TableRow className={classes.tr} >
             <TableCell colSpan={2} style={cellRadioStyle}>
               <RadioField showHelp={help} colSpan={2} disabled={newCodeOnly || ncodeA4} checked={!newCodeWillUsed} handleChange={handleChange2} color={color}

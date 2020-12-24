@@ -113,7 +113,7 @@ export function SelectField(props: Props) {
   return (
     <div>
       {/* <FormControlLabel style={cellRadioStyle} value={1} control={<Radio />} label="Ncode A4에 인쇄" /> */}
-      <GridaToolTip open={showHelp} placement="left" tip={autoTip}>
+      <GridaToolTip open={showHelp} placement="left" tip={autoTip} title={undefined}> 
         <Typography variant="subtitle1" component="h5">
           <SelectFieldSub  {...props} />
         </Typography>

@@ -5,6 +5,8 @@ import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle } from '
 
 type Props = {
   open: boolean,
+  onClose?,
+
 }
 
 
@@ -14,7 +16,7 @@ const useStyles = makeStyles({
   },
 });
 
-function SimpleDialog(props) {
+function SimpleDialog(props: Props) {
   const classes = useStyles();
   const { onClose, open } = props;
 

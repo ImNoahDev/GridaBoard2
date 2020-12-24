@@ -6,11 +6,12 @@ import { INcodeSurfaceDesc, IPaperSize } from "./SurfaceDataTypes";
 // import expect from "expect.js";
 import { getSurfaceSize_dpi } from "./SurfaceInfo";
 import { devideSurfaceAreaTo, getCellMatrixShape } from "./SurfaceSplitter";
-import { IPrintOption, IProgressCallbackFunction } from "../NcodePrint/PrintDataTypes";
+import { IPrintOption, IProgressCallbackFunction, NcodePdfScaleMode } from "../NcodePrint/PrintDataTypes";
 import { NCODE_CLASS6_NUM_DOTS } from "./NcodeConstans";
 import NcodeFetcherPool from "./NcodeFetcherPool";
 import { makeNPageIdStr } from "../UtilFunc";
 import * as Util from "../UtilFunc";
+import { sprintf } from "sprintf-js";
 
 
 // import { PrintContextConsumer } from "react-to-print";
@@ -177,7 +178,7 @@ export default class NcodeRasterizer {
    */
   public prepareNcodePlane = async (options: IRasterizeOption, progressCallback: IProgressCallbackFunction) => {
     const { srcDirection, pageInfos } = options;
-    const { pagesPerSheet, printDpi, padding, drawFrame, drawMarkRatio, maxPagesPerSheetToDrawMark, drawCalibrationMark, mediaSize, hasToPutNcode, debugMode } = options.printOption;
+    const { pagesPerSheet, printDpi, imagePadding, drawFrame, drawMarkRatio, maxPagesPerSheetToDrawMark, drawCalibrationMark, mediaSize, hasToPutNcode, debugMode } = options.printOption;
 
     let dpi = printDpi;
     dpi = 600;  // kitty  2020/11/29, 코드 제네레이터는 600 dpi로 고정
@@ -188,7 +189,7 @@ export default class NcodeRasterizer {
     let isLandscape = (srcDirection === "landscape");
     const isRotationNeeded = getCellMatrixShape(pagesPerSheet, srcDirection).rotation === 90;
     if (isRotationNeeded) isLandscape = !isLandscape;
-    const size = getSurfaceSize_dpi(mediaSize, dpi, isLandscape, padding);
+    const size = getSurfaceSize_dpi(mediaSize, dpi, isLandscape, imagePadding);
     // let logicalSize = { ...size };
 
 
@@ -260,7 +261,7 @@ export default class NcodeRasterizer {
         }
 
         // 코드 정보를 넣는다
-        this.putNcodeInfo(drawingContext, assignedNcode);
+        this.putNcodeInfo(drawingContext, assignedNcode, options.printOption);
 
         // 코드 점을 찍는다
         const ncodeArea = await this.drawNcode(drawingContext, ncodeSurfaceDesc, dpi);
@@ -348,10 +349,38 @@ export default class NcodeRasterizer {
     ctx.restore();
   }
 
-  private putNcodeInfo = (context: INcodeDrawContext, pageInfo: IPageSOBP) => {
+  private putNcodeInfo = (context: INcodeDrawContext, pageInfo: IPageSOBP, printOption: IPrintOption) => {
     const { x, y, width, height } = context;
 
     const code_str = makeNPageIdStr(pageInfo);
+    let modeStr = "";
+    switch (printOption.drawImageOnPdfMode ) {
+      case NcodePdfScaleMode.IMAGE_SIZE_UP_TO_PAGE: 
+        modeStr = "image scale up";
+        break;
+
+      case NcodePdfScaleMode.PAGE_SIZE_DOWN_TO_IMAGE: 
+        modeStr = "page scale down";
+        break;
+
+      case NcodePdfScaleMode.NO_SCALE: 
+        modeStr = "no scale";
+        break;
+
+      case NcodePdfScaleMode.IMAGE_SIZE_UP_TO_PAGE_PADDING: 
+        modeStr = "page down, image up";
+        break;
+
+      default: 
+        modeStr = "none";
+        break;
+    }
+
+    const info_str = sprintf("%s, mode=%s, sheet mrgn=%d, page mrgn=%d", 
+      code_str, 
+      modeStr,
+      printOption.imagePadding, 
+      printOption.pdfPagePadding);
     const ctx = context.ctx;
     ctx.save();
     // ctx.translate(x, y);
@@ -361,7 +390,7 @@ export default class NcodeRasterizer {
     ctx.fillStyle = "#0000ff";
     ctx.font = "50px Arial";
     ctx.textBaseline = "bottom";
-    ctx.fillText(code_str,  -height + 30, width - 20);
+    ctx.fillText(info_str, -height + 30, width - 20);
     ctx.restore();
   }
 

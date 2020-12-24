@@ -37,14 +37,13 @@ const ConnectButton = (props: Props) => {
   return (
     <div className="btn-group-vertical neo_shadow" style={{ marginBottom: 10 }}>
       <button id="btn_connect" type="button" className="btn btn-neo btn-neo-vertical">
-        <GridaToolTip placement="left" title={
-          <React.Fragment>
-            <Typography color="inherit">Pen Connect</Typography>
-            <em>{"블루투스를 통해 펜을 연결합니다. 블루투스 통신이 가능한 환경에서만 동작합니다."}</em>
-            <br></br>
-            <b>{"Shift + 1~7 각 펜의 내용을 감추기/보이기, P 모든 펜의 획을 감추기/보이기"}</b>
-          </React.Fragment>
-        } onClick={() => handleConnectPen()}>
+        <GridaToolTip open={true} placement="left"
+          tip={{
+            head: "Pen Connect",
+            msg: "블루투스를 통해 펜을 연결합니다. 블루투스 통신이 가능한 환경에서만 동작합니다.",
+            tail: "Shift + 1~7 각 펜의 내용을 감추기/보이기, P 모든 펜의 획을 감추기/보이기"
+          }}
+          title={undefined}>
           <div className="c2 ">
             <img src='../../icons/icon_smartpen_connected_p.png' className="toggle-off hover-image"></img>
             <img src='../../icons/icon_smartpen_disconnected_n.png' className="toggle-off normal-image"></img>

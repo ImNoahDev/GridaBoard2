@@ -56,6 +56,17 @@ export interface IFileBrowserReturn {
 }
 
 
+
+export enum NcodePdfScaleMode {
+  IMAGE_SIZE_UP_TO_PAGE,
+  PAGE_SIZE_DOWN_TO_IMAGE,
+  NO_SCALE,
+
+  IMAGE_SIZE_UP_TO_PAGE_PADDING,
+}
+
+
+
 export interface IPrintOption {
   url: string;
 
@@ -122,8 +133,36 @@ export interface IPrintOption {
   /** 페이지의 테두리를 그릴지 안 그릴지 */
   drawFrame: boolean,
 
-  /** 상하좌우 여백  mm 단위*/
-  padding: number,     // mm 단위
+  /** 용지 크기에서 이미지를 배치할 때, 상하좌우 여백  mm 단위*/
+  imagePadding: number,     // mm 단위
+
+  /** 
+   * 0: scale up image size to papersize,     (default: O, fit printable area: O, fit paper: O, 100%: O) 
+   * 1: Size down PDF page size to Ncode sheet     (default: X, fit printable area: O, fit paper: O, 100%: X) 
+   * 2: keep original image size              (default: X, fit printable area: O, fit paper: O, 100%: X) 
+   * 3: scale down image, and finally scale up image size to paperSize at creating PDF 
+   * */
+  drawImageOnPdfMode: NcodePdfScaleMode,
+  
+  /** 
+   * 생성할 PDF에서 용지 크기에서, 상하좌우 여백 
+   * 
+   *    +------------------------+
+   *    |                        |<------- physical paper size
+   *    |     +-----------+      |
+   *    |     |  +----+   |<-------------- pdfPage size
+   *    |     |  |    |<-------------------Ncoded sheet image size
+   *    |     |  |    |   |      |
+   *    |     |  |    |~~~~~~~~~~|  <== imagePadding (mm)
+   *    |     |  +----+   |~~~~~~|  <== pdfPagePadding (mm)
+   *    |     +-----------+      |
+   *    |                        |
+   *    +------------------------+
+   * 
+   *  pdfPagePadding should be smaller than imagePadding
+   */
+  pdfPagePadding: number, // mm단위
+  
 
   pdfMappingDesc?: IPdfMappingDesc;
 
@@ -155,6 +194,7 @@ export interface IPrintOption {
 
   /** 프린팅 시트 렌더러 promise 최대 개수 */
   numThreads: number,
+
 
 }
 

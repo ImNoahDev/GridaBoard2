@@ -295,6 +295,36 @@ function storageAvailable(type) {
     console.log(data);
   }); // Object { quota: 2147483648, usage: 0 }
 
+  for (let i = 0; i < 4 * 1024; i++) {
+    const key = `storage_test_${i}`;
+    localStorage.removeItem(key);
+  }
+
+  // let acc = 0;
+  // for (let i = 0; i < 4 * 1024; i++) {
+
+  //   const key = `storage_test_${i}`;
+  //   const value = { key: Array.from({ length: 1024 * 65 }) };
+  //   const json = JSON.stringify(value);
+  //   const size = json.length;
+  //   acc += size;
+  //   localStorage.setItem(key, json);
+  //   console.log( `acc = ${acc} ${size}`);
+
+  //   const ret = localStorage.getItem(key);
+  //   const confirmJson = JSON.parse(ret);
+  //   const confirm = JSON.stringify(confirmJson);
+
+  //   if (ret.length < 10) {
+  //     console.log(`storing #${i} chunk FAILED`);
+  //   }
+  //   else {
+  //     console.log(`storing #${i} chunk success`);
+
+  //   }
+
+  // }
+
   // navigator.webkitTemporaryStorage.queryUsageAndQuota(
   //   function (usedBytes, grantedBytes) {
   //     console.log('we are using ', usedBytes, ' of ', grantedBytes, 'bytes');

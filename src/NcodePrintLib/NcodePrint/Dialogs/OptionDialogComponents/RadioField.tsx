@@ -4,7 +4,7 @@ import GridaToolTip from '../../../../styles/GridaToolTip';
 import { printOptionTip } from './ToolTips';
 import { cellRadioStyle } from "./OptionLevel_0";
 
-export type ITipType = { title: string, msg: string, tail: string };
+export type ITipType = { head: string, msg: string, tail: string };
 
 interface Props extends TableCellProps {
   checked, handleChange, color, name, children, showHelp, tip?: ITipType,
@@ -40,7 +40,7 @@ export function RadioField(props: Props) {
     autoTip = printOptionTip[name];
   }
   return (
-    < GridaToolTip open={showHelp} placement="left" tip={autoTip} >
+    < GridaToolTip open={showHelp} placement="left" tip={autoTip} title={undefined}>
       <Typography variant="subtitle1" component="h5">
         <TableCellRadioSub {...props} />
       </Typography>
