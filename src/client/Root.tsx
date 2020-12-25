@@ -117,7 +117,7 @@ const Root = () => {
         </Backdrop>
 
 
-        {/* {renderToastMessage()} */}
+        {renderToastMessage()}
       </MuiThemeProvider>
     </Provider>
   );

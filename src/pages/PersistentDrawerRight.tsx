@@ -166,7 +166,7 @@ export default function PersistentDrawerRight(props) {
 
   return (
     <div className={classes.root}>
-      <CssBaseline />
+      {/* <CssBaseline /> */}
 
       <Drawer
         className={classes.drawer}
