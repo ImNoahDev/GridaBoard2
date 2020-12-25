@@ -1,6 +1,6 @@
 import "../../types";
 import { fabric } from "fabric";
-import { PLAYSTATE } from "./RenderWorkerBase";
+import { PLAYSTATE, ZoomFitEnum } from "./RenderWorkerBase";
 import { InkStorage } from "../..";
 import { PATH_THICKNESS_SCALE, drawPath } from "./DrawCurves";
 import { NCODE_TO_SCREEN_SCALE } from "../../constants";
@@ -15,20 +15,7 @@ const DISABLED_STROKE_COLOR = "rgba(0, 0, 0, 0.1)";
 
 
 
-/**
- * @enum {string}
- */
 
-export enum ZoomFitEnum {
-  // eslint-disable-next-line no-unused-vars
-  ACTUAL,
-  // eslint-disable-next-line no-unused-vars
-  WIDTH,
-  // eslint-disable-next-line no-unused-vars
-  HEIGHT,
-  // eslint-disable-next-line no-unused-vars
-  FULL,
-}
 
 const STROKE_OBJECT_ID = "ns";
 const GRID_OBJECT_ID = "g";

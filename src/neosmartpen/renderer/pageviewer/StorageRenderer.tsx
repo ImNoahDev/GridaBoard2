@@ -1,11 +1,12 @@
 import React from "react";
 import { InkStorage, PenEventName, } from "../..";
 
-import StorageRenderWorker, { ZoomFitEnum } from "./StorageRenderWorker";
+import StorageRenderWorker from "./StorageRenderWorker";
 // import { Paper } from "@material-ui/core";
 import { PenManager } from "../../index";
 import { uuidv4 } from "../../utils/UtilsFunc";
 import { IPageSOBP } from "../../../NcodePrintLib/DataStructure/Structures";
+import { ZoomFitEnum } from "./RenderWorkerBase";
 
 
 type Props = {

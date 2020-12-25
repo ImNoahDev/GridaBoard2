@@ -8,6 +8,7 @@ import { MappingStorage } from "../../NcodePrintLib/SurfaceMapper";
 import { IMappingParams, IPdfMappingDesc, IPdfPageDesc, TransformParameters } from "../../NcodePrintLib/Coordinates";
 import { IFileBrowserReturn, isSameObject, openFileBrowser2 } from "../../NcodePrintLib";
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from "@material-ui/core";
+import { ZoomFitEnum } from "./pageviewer/RenderWorkerBase";
 
 export const ZINDEX_INK_LAYER = 3;
 export const ZINDEX_PDF_LAYER = 2;
@@ -253,7 +254,7 @@ export default class MixedPageView extends React.Component<Props, State> {
       overflow: "visible",
     }
 
-    console.log(`MixedViewer: rendering, h=${JSON.stringify(this.state.h)}`);
+    // console.log(`MixedViewer: rendering, h=${JSON.stringify(this.state.h)}`);
     // console.log(this.state.canvasPosition);
     return (
       <div style={{
@@ -284,12 +285,15 @@ export default class MixedPageView extends React.Component<Props, State> {
           </div>
           <div id={"ink_layer"} style={inkCanvas} >
             <PenBasedRenderer
-              scale={1}
+              baseScale={1}
+              viewFit={ZoomFitEnum.FULL}
+              fitMargin={100}
+              position={this.state.canvasPosition}
+              pdfSize={{ width: 210 / 25.4 * 72, height: 297 / 25.4 * 72 }}
               pageInfo={{ section: 0, owner: 0, book: 0, page: 0 }}
               playState={PLAYSTATE.live} pens={this.props.pens}
               onNcodePageChanged={this.onNcodePageChanged}
               onCanvasShapeChanged={this.onCanvasShapeChanged}
-              ref={this.rendererRef}
               rotation={this.props.rotation}
               h={this.state.h}
             />

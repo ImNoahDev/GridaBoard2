@@ -5,7 +5,6 @@ import { PATH_THICKNESS_SCALE } from "./DrawCurves";
 import { PDFVIEW_ZOOM_MAX, PDFVIEW_ZOOM_MIN } from "../Constants";
 import { IWritingSurfaceInfo, ISize } from "../../DataStructure/Structures";
 import { ncodeToPdfPoint } from "../../utils/UtilsFunc";
-import { ZoomFitEnum } from "./StorageRenderWorker";
 import { Point } from "fabric/fabric-impl";
 import { paperInfo } from "../../noteserver/PaperInfo";
 import { TransformParameters } from "../../../NcodePrintLib/Coordinates";
@@ -20,6 +19,23 @@ import { TransformParameters } from "../../../NcodePrintLib/Coordinates";
 // const INCOMPLETE_STROKE_COLOR = "rgba(255, 0, 255, 0.4)";
 // const CURRENT_POINT_STROKE_COLOR = "rgba(255, 255, 255, 1)";
 
+
+/**
+ * @enum {string}
+ */
+
+export enum ZoomFitEnum {
+  // eslint-disable-next-line no-unused-vars
+  ACTUAL,
+  // eslint-disable-next-line no-unused-vars
+  WIDTH,
+  // eslint-disable-next-line no-unused-vars
+  HEIGHT,
+  // eslint-disable-next-line no-unused-vars
+  FULL,
+
+  FREE,
+}
 
 export enum PLAYSTATE {
   live,
@@ -39,8 +55,9 @@ export interface IRenderWorkerOption {
   width: number,
   height: number,
   viewFit: ZoomFitEnum,
+  fitMargin: number,
   bgColor?: string,
-  mouseAction?: boolean,
+  mouseAction: boolean,
   shouldDisplayGrid?: boolean,
   storage?: InkStorage,
 
@@ -80,11 +97,14 @@ export default class RenderWorkerBase {
   /** background color */
   bgColor = "rgba(255,255,255,0)";
 
-  /** the size when first initied */
-  initialSize: { width: number, height: number } = { width: 0, height: 0 };
+  /** PdfSize */
+  pageSize: { width: number, height: number } = { width: 0, height: 0 };
 
-  /** the size after resize */
+  /** parent element size */
   viewSize: { width: number, height: number } = { width: 0, height: 0 };
+
+  /** <canvas>내의 drawing canvas(fabric canvas)의 offset, 현재는 안 씀 - 2020/11/08*/
+  offset: { x: number, y: number, zoom: number } = { x: 0, y: 0, zoom: 1 };
 
   /** FabricJs canvas */
   canvasFb: fabric.Canvas = null;
@@ -105,8 +125,7 @@ export default class RenderWorkerBase {
   /** pen stroke에 따라 자동 focus를 맞추도록 */
   autoFocus = true;
 
-  /** <canvas>내의 drawing canvas(fabric canvas)의 offset, 현재는 안 씀 - 2020/11/08*/
-  offset: { x: number, y: number, zoom: number } = { x: 0, y: 0, zoom: 1 };
+
 
   /** 종이 정보 */
   surfaceInfo: IWritingSurfaceInfo & { rotation: number } = {
@@ -147,12 +166,14 @@ export default class RenderWorkerBase {
 
   getPdfXY: (ncodeXY: { x: number, y: number, f?: number }) => { x: number, y: number, f: number };
 
+  fitMargin = 0;
+
   /**
    *
    * @param {RenderWorkerOption} options
    */
   constructor(options: IRenderWorkerOption) {
-    const { canvasId, canvas, width, height, bgColor, mouseAction, viewFit, shouldDisplayGrid } = options;
+    const { canvasId, canvas, width, height, bgColor, fitMargin, mouseAction, viewFit, shouldDisplayGrid } = options;
     this.getPdfXY = this.getPdfXY_default;
 
     this.name = "RenderWorkerBase";
@@ -163,25 +184,14 @@ export default class RenderWorkerBase {
 
     this.canvasId = canvasId;
     this.canvas = canvas;
-
-    this.initialSize = { width, height };
-    this.viewSize = { width, height };
-
+    this.pageSize = { width, height };
     this.nu_to_pu_scale = ncodeToPdfPoint(1);
-    // this.scale = 1;
-
     this.canvasFb = null;
 
     if (bgColor !== undefined) this.bgColor = bgColor;
+    if (viewFit) this.viewFit = viewFit;
+    if (fitMargin) this.fitMargin = fitMargin;
     if (typeof (mouseAction) === "boolean") this.mouseAction = mouseAction;
-
-    if (viewFit) {
-      this.viewFit = viewFit;
-    }
-    else {
-      this.viewFit = ZoomFitEnum.ACTUAL;
-    }
-
     if (typeof (shouldDisplayGrid) === "boolean") this.shouldDisplayGrid = shouldDisplayGrid;
 
     this.options = options;
@@ -192,7 +202,7 @@ export default class RenderWorkerBase {
    * @protected
    */
   init = () => {
-    const size = this.viewSize;
+    const size = this.pageSize;
 
     // let HtmlCanvas = this.canvas.current;
     // const dpr = getDisplayRatio();
@@ -202,7 +212,6 @@ export default class RenderWorkerBase {
     console.log(`Fabric canvas inited: size(${size.width}, ${size.height})`);
 
     this.canvasFb = new fabric.Canvas(this.canvasId, {
-
       backgroundColor: this.bgColor ? this.bgColor : "rgba(255,255,0,0.5)",
       selection: false,
       controlsAboveOverlay: false,
@@ -222,6 +231,7 @@ export default class RenderWorkerBase {
     }
 
     this.drawPageLayout();
+    this.scrollBoundaryCheck();
   }
 
   getPaperSize_pu = (): ISize => {
@@ -265,8 +275,15 @@ export default class RenderWorkerBase {
         Xmin: info.Xmin, Ymin: info.Ymin, Xmax: info.Xmax, Ymax: info.Ymax,
         Mag: info.Mag,
         rotation: this.options.rotation,
-
       };
+
+      const width_pu = (info.Xmax - info.Xmin) * 6.72;
+      const height_pu = (info.Ymax - info.Ymin) * 6.72;
+
+      this.viewSize = {
+        width: width_pu,
+        height: height_pu,
+      }
     }
 
     return true;
@@ -409,21 +426,17 @@ export default class RenderWorkerBase {
 
     if (this.pan.isDragging) {
       const e: MouseEvent = opt.e;
+
+
       // console.log(`Point ${e.clientX}, ${e.clientY}`);
-      const vpt = canvasFb.viewportTransform;
-      vpt[4] += e.clientX - this.pan.lastPosX;
-      vpt[5] += e.clientY - this.pan.lastPosY;
+      // const vpt = canvasFb.viewportTransform;
+      this.offset.x += e.clientX - this.pan.lastPosX;
+      this.offset.y += e.clientY - this.pan.lastPosY;
 
       this.scrollBoundaryCheck();
 
-      // event 전달
-      const offsetX = vpt[4];
-      const offsetY = vpt[5];
-      const zoom = canvasFb.getZoom();
-
-      this.reportCanvasChanged(offsetX, offsetY, zoom);
       // canvasFb.setViewportTransform(vpt);
-      canvasFb.requestRenderAll();
+      // canvasFb.requestRenderAll();
 
       this.pan.lastPosX = e.clientX;
       this.pan.lastPosY = e.clientY;
@@ -434,13 +447,8 @@ export default class RenderWorkerBase {
     }
   }
 
-  reportCanvasChanged = (offsetX: number, offsetY: number, zoom: number) => {
-    // const canvasFb = this.canvasFb;
-    // const vpt = canvasFb.viewportTransform;
-    // const offsetX = vpt[4];
-    // const offsetY = vpt[5];
-    // const zoom = canvasFb.getZoom();
-    this.offset = { x: offsetX, y: offsetY, zoom };
+  reportCanvasChanged = () => {
+    const { x: offsetX, y: offsetY, zoom } = this.offset;
     this.options.onCanvasShapeChanged({ offsetX, offsetY, zoom });
   }
 
@@ -450,13 +458,12 @@ export default class RenderWorkerBase {
    */
   onCanvasMousUp = (opt: any = undefined) => {
     const canvasFb = this.canvasFb;
-
-
-    // on mouse up we want to recalculate new interaction
-    // for all objects, so we call setViewportTransform
-    canvasFb.setViewportTransform(canvasFb.viewportTransform);
-    this.pan.isDragging = false;
     canvasFb.selection = false;
+
+    // // on mouse up we want to recalculate new interaction
+    // // for all objects, so we call setViewportTransform
+    // canvasFb.setViewportTransform(canvasFb.viewportTransform);
+    this.pan.isDragging = false;
 
 
     // let vpt = canvasFb.viewportTransform;
@@ -468,12 +475,12 @@ export default class RenderWorkerBase {
    * @param {Object} opt
    */
   onCanvasMouseWheel = (opt: any) => {
+
+    this.viewFit = ZoomFitEnum.FREE;
+    
     const evt: MouseEvent = opt.e;
     if ((!this.zoomCtrlKey) || (this.zoomCtrlKey === true && evt.ctrlKey === true)) {
-      const canvasFb = this.canvasFb;
-
       const delta = opt.e.deltaY;
-      // let zoom = canvasFb.getZoom();
       let zoom = this.offset.zoom;
       zoom *= 0.9985 ** delta;
 
@@ -481,97 +488,81 @@ export default class RenderWorkerBase {
     }
   }
 
-  /**
-   * @protected
-   */
+
   scrollBoundaryCheck = () => {
     // http://fabricjs.com/fabric-intro-part-5#pan_zoom
 
-    const canvasFb = this.canvasFb;
-    const vpt = canvasFb.viewportTransform;
-    let offsetX = vpt[4];
-    let offsetY = vpt[5];
-
-    const { section, owner, book, page } = this.surfaceInfo;
-    const szPaper = paperInfo.getPaperSize({ section, owner, book, page });
-
-    const size_pu = {
-      width: szPaper.width * this.nu_to_pu_scale,
-      height: szPaper.height * this.nu_to_pu_scale,
-    }
-
-    const canvasZoom = canvasFb.getZoom();
-    const canvasWidth = Math.round(size_pu.width * canvasZoom);
-    const canvasHeight = Math.round(size_pu.height * canvasZoom);
-    let shouldReset = false;
-
-    if (this.viewSize.width > canvasWidth) {
-      offsetX = Math.round((this.viewSize.width - canvasWidth) / 2);
-      shouldReset = true;
+    const zoom = this.calcScaleFactor(this.viewFit, this.offset.zoom);
+    if (zoom === 0) {
+      this.reportCanvasChanged();
+      return false;
     }
     else {
-      if (offsetX > 0) {
-        offsetX = 0;
+      if (zoom !== this.offset.zoom) {
+        this.offset.zoom = zoom;
+        this.zoomToPoint(undefined, zoom);
+      }
+
+      let offsetX = this.offset.x;
+      let offsetY = this.offset.y;
+
+      // const { section, owner, book, page } = this.surfaceInfo;
+      // const szPaper = paperInfo.getPaperSize({ section, owner, book, page });
+
+      // const size_pu = {
+      //   width: szPaper.width * this.nu_to_pu_scale,
+      //   height: szPaper.height * this.nu_to_pu_scale,
+      // }
+
+
+      const pageSize = {
+        width: this.pageSize.width * zoom,
+        height: this.pageSize.height * zoom
+      };
+
+      let shouldReset = false;
+
+      if (pageSize.width <= this.viewSize.width) {
+        offsetX = Math.round((this.viewSize.width - pageSize.width) / 2);
         shouldReset = true;
       }
-      else if (offsetX + canvasWidth < this.viewSize.width) {
-        offsetX = this.viewSize.width - canvasWidth;
+      else {
+        if (offsetX > 0) {
+          offsetX = 0;
+          shouldReset = true;
+        }
+        else if (offsetX + pageSize.width < this.viewSize.width) {
+          offsetX = this.viewSize.width - pageSize.width;
+          shouldReset = true;
+        }
+      }
+
+      if (pageSize.height <= this.viewSize.height) {
+        offsetY = Math.round((this.viewSize.height - pageSize.height) / 2);
         shouldReset = true;
       }
-    }
 
-    if (this.viewSize.height > canvasHeight) {
-      offsetY = Math.round((this.viewSize.height - canvasHeight) / 2);
-      shouldReset = true;
-    }
-
-    else {
-      if (offsetY > 0) {
-        offsetY = 0;
-        shouldReset = true;
+      else {
+        if (offsetY > 0) {
+          offsetY = 0;
+          shouldReset = true;
+        }
+        else if (offsetY + pageSize.height < this.viewSize.height) {
+          offsetY = this.viewSize.height - pageSize.height;
+          shouldReset = true;
+        }
       }
-      else if (offsetY + canvasHeight < this.viewSize.height) {
-        offsetY = this.viewSize.height - canvasHeight;
-        shouldReset = true;
+
+      if (shouldReset) {
+        this.offset.x = offsetX;
+        this.offset.y = offsetY;
       }
+      this.reportCanvasChanged();
+      return shouldReset;
     }
-
-    // console.log(`boundary check, size(${this.viewSize.width}, ${this.viewSize.height}) canvasFb=(${canvasWidth}, ${canvasHeight}) x=${offsetX} y=${offsetY} zoom=${canvasZoom}`)
-
-    if (shouldReset) {
-      vpt[4] = offsetX;
-      vpt[5] = offsetY;
-      // canvasFb.requestRenderAll();
-      this.reportCanvasChanged(offsetX, offsetY, canvasZoom);
-    }
-
-    return shouldReset;
-
-
-    // const canvasFb = this.canvasFb;
-    // const zoom = canvasFb.getZoom();
-
-    // let vpt = canvasFb.viewportTransform;
-
-    // if (vpt[4] >= 0) {
-    //   vpt[4] = 0;
-    // }
-    // else if (vpt[4] < canvasFb.getWidth() - this.viewSize.width * zoom) {
-    //   vpt[4] = canvasFb.getWidth() - this.viewSize.width * zoom;
-    // }
-
-    // if (vpt[5] >= 0) {
-    //   vpt[5] = 0;
-    // }
-    // else if (vpt[5] < canvasFb.getHeight() - this.viewSize.height * zoom) {
-    //   vpt[5] = canvasFb.getHeight() - this.viewSize.height * zoom;
-    // }
-
-    // if (zoom < 1) {
-    //   vpt[4] = (this.viewSize.width - this.viewSize.width * zoom) / 2;
-    //   vpt[5] = (this.viewSize.height - this.viewSize.height * zoom) / 2;
-    // }
   }
+
+
 
   /**
    * @protected
@@ -598,60 +589,32 @@ export default class RenderWorkerBase {
     opt.e.stopPropagation();
   }
 
-
   zoomToPoint = (pt: Point, zoom: number, animate = true) => {
-    const canvasFb = this.canvasFb;
 
-    if (!animate) {
-      if (pt) canvasFb.zoomToPoint(pt, zoom);
-      else canvasFb.setZoom(zoom);
+    let x1 = this.offset.x;
+    let y1 = this.offset.y;
 
-      const ret = this.scrollBoundaryCheck();
+    if (pt) {
+      const z0 = this.offset.zoom;
+      const z1 = zoom;
 
-      // event 전달
-      const vpt = canvasFb.viewportTransform;
-      const offsetX = vpt[4];
-      const offsetY = vpt[5];
-      const newZoom = canvasFb.getZoom();
-      if (!ret) this.reportCanvasChanged(offsetX, offsetY, newZoom);
+      const x0 = this.offset.x;
+      const y0 = this.offset.y;
+      x1 = pt.x * (z0 - z1) / z0 + x0;
+      y1 = pt.y * (z0 - z1) / z0 + y0;
     }
-    else {
-      if (this.zoomAnimateTimer) {
-        window.clearInterval(this.zoomAnimateTimer);
-        this.zoomAnimateTimer = null;
-      }
 
-      /** 5 단계 */
-      const div = 3;
-      const step = (zoom - this.offset.zoom) / div;
-      let zoom_curr = this.offset.zoom;
-      let count = 0;
+    this.offset.x = x1;
+    this.offset.y = y1;
+    this.offset.zoom = zoom;
+    this.canvasFb.setZoom(zoom);
+    this.canvasFb.setWidth(this.pageSize.width * zoom);
+    this.canvasFb.setHeight(this.pageSize.height * zoom);
 
-      this.zoomAnimateTimer = window.setInterval(() => {
-        zoom_curr += step;
-        if (pt) canvasFb.zoomToPoint(pt, zoom);
-        else canvasFb.setZoom(zoom);
-
-        canvasFb.requestRenderAll();
-
-        const ret = this.scrollBoundaryCheck();
-
-        // event 전달
-        const vpt = canvasFb.viewportTransform;
-        const offsetX = vpt[4];
-        const offsetY = vpt[5];
-        const newZoom = canvasFb.getZoom();
-        if (!ret) this.reportCanvasChanged(offsetX, offsetY, newZoom);
-
-        count++;
-        if (count === div) {
-          window.clearInterval(this.zoomAnimateTimer);
-          this.zoomAnimateTimer = null;
-          canvasFb.setViewportTransform(canvasFb.viewportTransform);
-        }
-      }, 10);
-    }
+    this.scrollBoundaryCheck();
   }
+
+
 
   /**
    * @protected
@@ -720,12 +683,16 @@ export default class RenderWorkerBase {
    * @param szPaper
    * @param currScale
    */
-  protected calcScaleFactor(mode: ZoomFitEnum, szPaper: { width: number, height: number }, currScale: number): number {
+  protected calcScaleFactor(mode: ZoomFitEnum, currScale: number) {
+    const szPaper = this.pageSize;
 
-    const actual_width = szPaper.width * this.nu_to_pu_scale;
-    const actual_height = szPaper.height * this.nu_to_pu_scale;
+    const actual_width = szPaper.width;
+    const actual_height = szPaper.height;
 
-    const szCanvas = this.viewSize;
+    const szCanvas = { ... this.viewSize };
+    szCanvas.width -= this.fitMargin;
+    szCanvas.height -= this.fitMargin;
+
     let scale = 1;
     switch (mode) {
       case ZoomFitEnum.WIDTH:
@@ -819,15 +786,14 @@ export default class RenderWorkerBase {
    */
   protected scrollCanvasToPoint = (point: { x: number, y: number }, animate: boolean) => {
     const canvasFb = this.canvasFb;
-    const vpt = canvasFb.viewportTransform;
 
     if (animate) {
       if (this.scrollAnimateTimer) {
         window.clearInterval(this.scrollAnimateTimer);
         this.scrollAnimateTimer = null;
       }
-      let x0 = vpt[4];
-      let y0 = vpt[5];
+      let x0 = this.offset.x;
+      let y0 = this.offset.y;
       const x1 = point.x;
       const y1 = point.y;
 
@@ -840,8 +806,9 @@ export default class RenderWorkerBase {
       this.scrollAnimateTimer = window.setInterval(() => {
         x0 += step_x;
         y0 += step_y;
-        vpt[4] = x0;
-        vpt[5] = y0;
+        this.offset.x = x0;
+        this.offset.y = y0;
+        this.scrollBoundaryCheck();
         canvasFb.requestRenderAll();
 
         count++;
@@ -853,8 +820,8 @@ export default class RenderWorkerBase {
       }, 20);
     }
     else {
-      vpt[4] = point.x;
-      vpt[5] = point.y;
+      this.offset.x = point.x;
+      this.offset.y = point.y;
       this.scrollBoundaryCheck();
       canvasFb.requestRenderAll();
       canvasFb.setViewportTransform(canvasFb.viewportTransform);
@@ -862,25 +829,12 @@ export default class RenderWorkerBase {
 
   }
 
-
-  /**
-   * @public
-   * @param {{width:number, height:number}} size
-   */
-  resize = (size: { width: number, height: number }) => {
-    console.log(`RenderWorkerBase: resized window ${size.width}, ${size.height}`);
-
-    // const zoom = size.width / this.initialSize.width;
-    this.viewSize = { ...size };
-
-    this.canvasFb.setHeight(size.height);
-    this.canvasFb.setWidth(size.width);
-
+  onViewSizeChanged = (width: number, height: number) => {
+    this.viewSize = { width, height };
     this.scrollBoundaryCheck();
-    // this.canvasFb.setZoom(zoom);
+  }
 
 
-  };
 
   setRotation = (rotation: number) => {
     console.log(`RenderWorkerBase: setRotation to ${rotation}`);

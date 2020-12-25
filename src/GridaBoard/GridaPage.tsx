@@ -33,7 +33,6 @@ export default class GridaPage extends Component<Props, State> {
   size: ISizeDpi;
 
   canvasId = uuidv4();
-  inkCanvasRef: React.RefObject<typeof PenBasedRenderer> = React.createRef();
 
   // setCanvasRef = (canvas: HTMLCanvasElement) => this.canvas = canvas;
   // setInkCanvasRef = (canvas: HTMLCanvasElement) => this.canvas = canvas;
@@ -82,12 +81,13 @@ export default class GridaPage extends Component<Props, State> {
         </div>
         < div id={"ink_layer"} style={inkCanvas} >
           <PenBasedRenderer
-            scale={1}
+            baseScale={1}
+            position={undefined}
+            pdfSize={{ width: 210 / 25.4 * 72, height: 297 / 25.4 * 72 }}
             pageInfo={this.props.pageInfo}
             playState={PLAYSTATE.live} pens={[]}
             onNcodePageChanged={undefined}
             onCanvasShapeChanged={undefined}
-            ref={this.inkCanvasRef}
             rotation={this.props.rotation}
             h={this.props.mapping.h}
           />

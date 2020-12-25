@@ -8,20 +8,18 @@ import { sprintf } from 'sprintf-js';
 import NeoPdfDocument from '../../../NcodePrintLib/NeoPdf/NeoPdfDocument';
 import NeoPdfPage from '../../../NcodePrintLib/NeoPdf/NeoPdfPage';
 import { MAX_RENDERER_PIXELS } from "../Constants";
-
-/**
- * Page.js
- * Component rendering page of PDF
- **/
+import { CSSProperties } from '@material-ui/core/styles/withStyles';
+import { BoxProps } from '@material-ui/core';
 
 
-
-interface PageProps {
+interface PageProps extends BoxProps {
   // pdf: PdfJs.PDFDocumentProxy,
   pdf: NeoPdfDocument,
   index: number,
   scale?: number,
   position: { offsetX: number, offsetY: number, zoom: number },
+  // pdfCanvas: CSSProperties,
+
 }
 
 interface PageState {
@@ -297,7 +295,7 @@ class Page extends Component<PageProps> {
         this.zoomQueue = [];
       }
       else {
-        console.log(`lazy back plane CANCELLED`)
+        // console.log(`lazy back plane CANCELLED`)
       }
     }
     this.setState({ status: 'rendered' });
@@ -307,8 +305,17 @@ class Page extends Component<PageProps> {
 
   render = () => {
     const { status } = this.state;
+    const { pdf, index, scale, position, ...rest} = this.props;
+
+    const zoom = this.props.position.zoom;
+    const pageCanvas: CSSProperties = {
+      position: "absolute",
+      zoom: 1,
+      left: 0,
+      top: 0,
+    }
     return (
-      <div className={`pdf-page ${status}`} >
+      <div style={pageCanvas} id={`pdf-page ${status}`} >
         <canvas ref={this.setCanvasRef} />
       </div>
     );

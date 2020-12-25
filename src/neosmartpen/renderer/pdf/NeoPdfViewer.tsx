@@ -96,19 +96,24 @@ class NeoPdfViewer extends React.Component<Props, State> {
   render() {
     const { pdf } = this.state;
     // console.log("Pdf Viewer Renderer");
-    // console.log(this.props.position);
+// console.log(this.props.position);
 
+
+    const zoom = this.props.position.zoom;
     const pdfCanvas: CSSProperties = {
-      zoom: this.props.position.zoom,
+      position: "absolute",
+      zoom: zoom,
+      left: this.props.position.offsetX/zoom,
+      top:this.props.position.offsetY/zoom,
     }
 
     if (pdf) {
       return (
-        <div className="pdf-viewer" style={pdfCanvas}>
+        <div id="pdf-viewer" style={pdfCanvas}>
           <Page
             pdf={pdf} index={this.props.pageNo}
             key={`document-page-${this.props.pageNo}`}
-
+            style={pdfCanvas}
             position={this.props.position}
           />
         </div>

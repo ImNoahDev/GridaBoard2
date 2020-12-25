@@ -26,13 +26,6 @@ const NUM_HOVER_POINTERS = 6;
 const REMOVE_HOVER_POINTS_INTERVAL = 50; // 50ms
 const REMOVE_HOVER_POINTS_WAIT = 20; // 20 * 50ms = 1sec
 
-/** @enum {string}  */
-export const ZoomFitEnum = {
-  WIDTH: "width",
-  HEIGHT: "height",
-  FULL: "full",
-  ACTUAL: "100%",
-}
 
 const STROKE_OBJECT_ID = "ns";
 // const GRID_OBJECT_ID = "g";
@@ -75,16 +68,8 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
     this.changePage(section, owner, book, page, true);
 
     console.log(`constructor size ${options.width}, ${options.height}`)
-    this.resize({ width: options.width, height: options.height });
+    // this.resize({ width: options.width, height: options.height });
   }
-
-  // /**
-  //  * @override
-  //  */
-  // init = () => {
-  //   super.init();
-  // }
-
 
   /**
    * Pen Down이 들어왔다. 그러나 아직 page 정보가 들어오지 않아서,
@@ -137,7 +122,7 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
     if (pen.penRendererType === IBrushType.ERASER) {
       console.log('ERASE');
       if (pen.eraserLastPoint !== null) {
-        this.eraseOnLine(pen.eraserLastPoint.x, pen.eraserLastPoint.y, 
+        this.eraseOnLine(pen.eraserLastPoint.x, pen.eraserLastPoint.y,
           screen_xy.x, screen_xy.y, stroke);
       }
 
@@ -216,8 +201,8 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
   eraseOnLine(ink_x0, ink_y0, ink_x1, ink_y1, stroke) {
     const pathData = 'M ' + ink_x0 + ' ' + ink_y0 + ' L ' + ink_x1 + ' ' + ink_y1 + 'z';
     const pathOption = {
-      strokeWidth: 5, 
-      opacity: 0, 
+      strokeWidth: 5,
+      opacity: 0,
       originX: 'left',
       originY: 'top',
     }

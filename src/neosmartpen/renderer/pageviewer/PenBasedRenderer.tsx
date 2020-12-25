@@ -3,7 +3,7 @@ import React from "react";
 // import PropTypes from "prop-types";
 import { InkStorage, PenEventName } from "../..";
 
-import { PLAYSTATE, IRenderWorkerOption } from "./RenderWorkerBase";
+import { PLAYSTATE, IRenderWorkerOption, ZoomFitEnum } from "./RenderWorkerBase";
 import PenBasedRenderWorker from "./PenBasedRenderWorker";
 // import { Paper } from "@material-ui/core";
 import { NeoSmartpen, PenManager } from "../../index";
@@ -11,9 +11,10 @@ import * as UTIL from "../../utils/UtilsFunc";
 
 
 import { IPageSOBP, ISize } from "../../DataStructure/Structures";
-import { ZoomFitEnum } from "./StorageRenderWorker";
 import { TransformParameters } from "../../../NcodePrintLib/Coordinates";
 import { withResizeDetector } from 'react-resize-detector';
+import { CSSProperties } from "@material-ui/core/styles/withStyles";
+import { BoxProps } from "@material-ui/core";
 
 export { PLAYSTATE };
 
@@ -21,17 +22,23 @@ export { PLAYSTATE };
 /**
  * Properties
  */
-type Props = {
+interface Props extends BoxProps {
   pageInfo: IPageSOBP,
   inkStorage?: InkStorage,
   playState?: PLAYSTATE,
   pens?: NeoSmartpen[],
 
-  scale?: number,
+  baseScale?: number,
   width?: number,
   height?: number,
 
   viewFit?: ZoomFitEnum;
+
+  /** viewFit을 맞출 때의 마진 pixel 단위 */
+  fitMargin?: number,
+  fixed?,
+
+  pdfSize: { width: number, height: number };
 
   onNcodePageChanged: (arg: IPageSOBP) => void;
   onCanvasShapeChanged: (arg: { offsetX: number, offsetY: number, zoom: number }) => void;
@@ -42,6 +49,7 @@ type Props = {
 
   /** transform matrix it can be undefined */
   h: TransformParameters;
+  position: { offsetX: number, offsetY: number, zoom: number },
 
 }
 
@@ -66,8 +74,6 @@ interface State {
 
   viewFit: ZoomFitEnum,
   pens: NeoSmartpen[],
-
-  scale: number,
   playState: PLAYSTATE,
 
   renderCount: number,
@@ -98,7 +104,6 @@ class PenBasedRenderer_module extends React.Component<Props, State> {
 
     /** @type {Array.<NeoSmartpen>} */
     pens: [],
-    scale: 1,
 
     playState: PLAYSTATE.live,
 
@@ -109,15 +114,14 @@ class PenBasedRenderer_module extends React.Component<Props, State> {
   size: ISize = { width: 0, height: 0 };
 
   mainDiv: HTMLDivElement = null;
-  canvasDiv: HTMLDivElement = null;
   canvasId = "";
   canvas: HTMLCanvasElement = null;
 
   inkStorage: InkStorage = null;
   curr_pens: NeoSmartpen[] = new Array(0);
-  setDivRef = (div: HTMLDivElement) => {
-    this.canvasDiv = div;
-  };
+
+  fitMargin = 0;
+  fixed = false;
 
   setMainDivRef = (div: HTMLDivElement) => {
     this.mainDiv = div;
@@ -130,18 +134,21 @@ class PenBasedRenderer_module extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
 
-    const { pageInfo, inkStorage, scale, playState, width, height, pens, viewFit } = props;
+    const { pageInfo, inkStorage, baseScale, playState, fitMargin, width, height, fixed, pens, pdfSize, viewFit } = props;
     this.inkStorage = inkStorage ? inkStorage : InkStorage.getInstance();
 
-    this.state.pageInfo = pageInfo ? pageInfo : this.state.pageInfo;
-    this.state.scale = scale ? scale : this.state.scale;
-    this.state.playState = playState ? playState : this.state.playState;
-    this.state.viewFit = viewFit ? viewFit : this.state.viewFit;
-
     this.canvasId = UTIL.uuidv4();
+    this.canvasId = "fabric canvas";
 
     this.curr_pens = pens;
-    this.propsSize = { scale, width, height };
+    this.propsSize = { scale: baseScale, ...pdfSize };
+    
+    if (fixed !== undefined) this.fixed = fixed;
+    if (fitMargin !== undefined) this.fitMargin = fitMargin;
+    if (pageInfo !== undefined) this.state.pageInfo = pageInfo;
+    if (playState !== undefined) this.state.playState = playState;
+    if (viewFit !== undefined) this.state.viewFit = viewFit;
+
   }
 
 
@@ -178,24 +185,24 @@ class PenBasedRenderer_module extends React.Component<Props, State> {
    */
   componentDidMount() {
     const { pens } = this.props;
-    let { width, height } = this.propsSize;
+    // let { width, height } = this.propsSize;
 
-    if (this.mainDiv) {
-      const node = this.mainDiv;
-      const parentHeight = node.offsetHeight;
-      const parentWidth = node.offsetWidth;
+    // if (this.mainDiv) {
+    //   const node = this.mainDiv;
+    //   const parentHeight = node.offsetHeight;
+    //   const parentWidth = node.offsetWidth;
 
-      console.log(`Parent window (width, height) = (${parentWidth}, ${parentHeight})`);
+    //   console.log(`Parent window (width, height) = (${parentWidth}, ${parentHeight})`);
 
-      if (!width || !height) {
-        width = parentWidth;
-        height = parentHeight;
-        this.propsSize = { width, height, scale: this.propsSize.scale };
+    //   if (!width || !height) {
+    //     width = parentWidth;
+    //     height = parentHeight;
+    //     this.propsSize = { width, height, scale: this.propsSize.scale };
 
-        const renderCount = this.state.renderCount;
-        this.setState({ renderCount: renderCount + 1 });
-      }
-    }
+    //     const renderCount = this.state.renderCount;
+    //     this.setState({ renderCount: renderCount + 1 });
+    //   }
+    // }
 
     // let size = this.size;
 
@@ -210,7 +217,7 @@ class PenBasedRenderer_module extends React.Component<Props, State> {
 
     console.log("Renderer Inited");
     this.initRenderer(this.propsSize);
-    window.addEventListener("resize", this.resizeListener);
+    // window.addEventListener("resize", this.resizeListener);
 
     // subscribe all event from pen
     pens.forEach(pen => {
@@ -218,81 +225,6 @@ class PenBasedRenderer_module extends React.Component<Props, State> {
       this.subscribePenEvent(pen)
     });
   }
-
-  componentDidUpdate(prevProps) {
-    const { width, height } = this.props;
-
-    console.log(`size updated = ${this.mainDiv.offsetWidth} x ${this.mainDiv.offsetHeight}`);
-    console.log(`size updated = curr width ${width} prev width ${prevProps.width} `);
-    console.log(`size updated = curr height ${height} prev width ${prevProps.height} `);
-
-    if (width !== prevProps.width) {
-      console.log(`width changed: ${width}`);
-    }
-  }
-
-
-
-
-  initRenderer(size: { width: number, height: number }) {
-    /** @type {{width:number, height:number}} */
-    const { width, height } = size;
-
-    // const rect = { x: 0, y: 0, width, height };
-    // const { rect } = this.state;
-    // const page = pages.filter((p) => p.pageNumber === pageId)[0];
-
-    // const inkStorage = this.inkStorage;
-    const options: IRenderWorkerOption = {
-      canvasId: this.canvasId,
-      canvas: this.canvas,
-      width,
-      height,
-      viewFit: this.state.viewFit,
-      onCanvasShapeChanged: this.props.onCanvasShapeChanged,
-      rotation: this.props.rotation,
-    };
-
-    const renderer = new PenBasedRenderWorker(options);
-    this.setState({ renderer: renderer });
-  }
-
-
-  resizeListener = (e) => {
-    this.setState({ sizeUpdate: this.state.sizeUpdate + 1 });
-
-    // const { classes, scaleType, scale } = this.props;
-
-    let { width, height } = this.propsSize;
-    const scale = this.propsSize.scale;
-
-    const node = this.mainDiv;
-
-    if (node) {
-      const parentHeight = node.offsetHeight;
-      const parentWidth = node.offsetWidth;
-
-      width = parentWidth;
-      height = parentHeight;
-
-      // console.log(`boundary check, Parent window (width, height) = (${parentWidth}, ${parentHeight})`);
-    }
-
-    // width = window.innerWidth;
-    // height = window.innerHeight;
-
-    const rect = { x: 0, y: 0, width, height };
-    // const { rect } = this.state;
-    // const { penEventCount } = this.state;
-    this.size = this.getSize(scale, rect);
-
-    if (this.state.renderer) {
-      // console.log("render resize", this.size)
-      this.state.renderer.resize(this.size);
-    }
-  };
-
-
 
 
   /**
@@ -333,8 +265,72 @@ class PenBasedRenderer_module extends React.Component<Props, State> {
       ret_val = false;
     }
 
+
+    if (nextProps.width !== this.props.width || nextProps.height !== this.props.height) {
+      this.onResized({ width: nextProps.width, height: nextProps.height });
+      ret_val = true;
+    }
+
+
     return ret_val;
   }
+
+  initRenderer(size: { width: number, height: number }) {
+    /** @type {{width:number, height:number}} */
+    const { width, height } = size;
+
+    const options: IRenderWorkerOption = {
+      canvasId: this.canvasId,
+      canvas: this.canvas,
+      width,
+      height,
+      mouseAction: !this.fixed,
+      viewFit: this.state.viewFit,
+      fitMargin: this.fitMargin,
+      onCanvasShapeChanged: this.props.onCanvasShapeChanged,
+      rotation: this.props.rotation,
+    };
+
+    const renderer = new PenBasedRenderWorker(options);
+    this.setState({ renderer: renderer });
+  }
+
+  onResized = ({ width, height }) => {
+    const rect = { x: 0, y: 0, width, height };
+    const scale = this.propsSize.scale;
+
+    // this.size = this.getSize(scale, rect);
+
+    if (this.state.renderer) {
+      this.state.renderer.onViewSizeChanged(width, height);
+    }
+  }
+
+
+  resizeListener = (e) => {
+    this.setState({ sizeUpdate: this.state.sizeUpdate + 1 });
+
+    // const { classes, scaleType, scale } = this.props;
+
+    let { width, height } = this.propsSize;
+
+    const node = this.mainDiv;
+
+    if (node) {
+      const parentHeight = node.offsetHeight;
+      const parentWidth = node.offsetWidth;
+
+      width = parentWidth;
+      height = parentHeight;
+
+      // console.log(`boundary check, Parent window (width, height) = (${parentWidth}, ${parentHeight})`);
+    }
+    this.onResized({ width, height });
+  };
+
+
+
+
 
   /**
    * @override
@@ -475,6 +471,7 @@ class PenBasedRenderer_module extends React.Component<Props, State> {
     const { pens } = this.props;
     const { scale, width, height } = this.propsSize;
     const { section, owner, book, page } = this.state.pageInfo;
+    let { zoom } = this.props.position;
 
     const rect = { x: 0, y: 0, width, height };
     // const { rect } = this.state;
@@ -484,18 +481,30 @@ class PenBasedRenderer_module extends React.Component<Props, State> {
     // const manager = PenManager.getInstance();
     // let connected_pens = manager.getConnectedPens();
 
-    const dpr = UTIL.getDisplayRatio();
-    // const windowWidth = window.innerWidth / dpr;
-    const windowHeight = window.innerHeight / dpr;
-    const aWidth = document.body.clientWidth;
-    // const aWidth2 = document.body.scrollWidth;
-    const aHeight = windowHeight;
+    const cssWidth = this.props.pdfSize.width * zoom;
+    const cssHeight = this.props.pdfSize.height * zoom;
 
+    zoom = 1;
 
-    const statusBarHeight = 400;
+    const inkContainerDiv: CSSProperties = {
+      position: "absolute",
+      zoom: zoom,
+      left: this.props.position.offsetX / zoom,
+      top: this.props.position.offsetY / zoom,
+      zIndex: 3,
+    }
+
+    const inkCanvas: CSSProperties = {
+      position: "absolute",
+      zoom: 1,
+      left: 0,
+      top: 0,
+      zIndex: 3,
+    }
+
 
     return (
-      <div id="replayContainer" ref={this.setMainDivRef} style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0 }}>
+      <div id="pen-based-renderer" ref={this.setMainDivRef} style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0 }}>
         <div style={{
           position: "absolute",
           left: 0,
@@ -507,7 +516,7 @@ class PenBasedRenderer_module extends React.Component<Props, State> {
           justifyContent: "flex-start",
           alignItems: "flex-start",
         }}>
-          <div>
+          <div id="pen-information">
             <ul>
               {pens.map((pen, i) => (
                 <li key={i}>{pen.mac}</li>
@@ -519,22 +528,11 @@ class PenBasedRenderer_module extends React.Component<Props, State> {
           </div>
         </div>
 
-        <div style={{
-          zIndex: 3,
-          position: "absolute",
-          left: 0,
-          top: 0,
-          right: 0,
-          bottom: 0,
-        }} ref={this.setDivRef}>
-          {/* <Paper style={{ height: this.size.height, width: this.size.width }}> */}
-          <canvas id={this.canvasId} ref={this.setCanvasRef}
-            style={{
-              width: width ? width : aWidth,
-              height: height ? height : aHeight
-            }} />
-          {/* </Paper> */}
+        {/* <Paper style={{ height: this.size.height, width: this.size.width }}> */}
+        <div id="ink-container" style={inkContainerDiv} >
+          <canvas id={this.canvasId} width={cssWidth} height={cssHeight} style={inkCanvas} ref={this.setCanvasRef} />
         </div>
+        {/* </Paper> */}
       </div >
     );
   }
@@ -542,19 +540,11 @@ class PenBasedRenderer_module extends React.Component<Props, State> {
 
 const AdaptiveWithDetector = withResizeDetector(PenBasedRenderer_module);
 
-const PenBasedRenderer = (props) => {
+const PenBasedRenderer = (props: Props) => {
   return (
-    <div style={{
-      position: "absolute",
-      left: 0,
-      top: 0,
-      bottom: 0,
-      right: 0,
-      alignItems: "center",
-      zIndex: 1,
-    }}>
+    <React.Fragment>
       <AdaptiveWithDetector {...props} />
-    </div>
+    </React.Fragment>
   )
 }
 
