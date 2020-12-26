@@ -11,9 +11,10 @@ import { paperInfo } from "../../noteserver/PaperInfo";
 import { NeoDot, NeoStroke } from "../../DataStructure";
 import { IBrushType } from "../../DataStructure/Enums";
 import { INeoStrokeProps } from "../../DataStructure/NeoStroke";
-import { IPageSOBP } from "../../DataStructure/Structures";
+import { IPageSOBP, IPoint } from "../../DataStructure/Structures";
 
 import $ from "jquery";
+import { IPenToViewerEvent, NeoSmartpen } from "../../pencomm/neosmartpen";
 
 
 // const timeTickDuration = 20; // ms
@@ -30,6 +31,20 @@ const REMOVE_HOVER_POINTS_WAIT = 20; // 20 * 50ms = 1sec
 const STROKE_OBJECT_ID = "ns";
 // const GRID_OBJECT_ID = "g";
 
+
+interface IPenHoverCursors {
+
+  visibleHoverPoints: number,
+  // pathHoverPoints: Array<fabric.Circle> = new Array(0);
+  timeOut: number,
+  waitCount: number,
+  eraserLastPoint: IPoint,
+
+  penTracker: fabric.Circle,
+  hoverPoints: fabric.Circle[]
+}
+
+
 export default class PenBasedRenderWorker extends RenderWorkerBase {
 
   /** @type {Array<fabric.Path>} */
@@ -45,6 +60,7 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
   visibleHoverPoints: number = NUM_HOVER_POINTERS;
   pathHoverPoints: Array<fabric.Circle> = new Array(0);
 
+  penCursors: { [key: string]: IPenHoverCursors } = {};
 
   /**
    *
@@ -91,7 +107,7 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
    * @public
    * @param {{strokeKey:string, mac:string, time:number, stroke:NeoStroke}} event
    */
-  createLiveStroke = (event: any) => {
+  createLiveStroke = (event: IPenToViewerEvent) => {
     console.log(`Stroke created = ${event.strokeKey}`);
     this.livePaths[event.strokeKey] = {
       stroke: event.stroke,
@@ -103,7 +119,7 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
    *
    * @param {{strokeKey:string, mac:string, stroke:NeoStroke, dot:NeoDot}} event
    */
-  pushLiveDot = (event: any) => {
+  pushLiveDot = (event: IPenToViewerEvent) => {
     //pen tracker rendering
     this.movePenTracker(event);
 
@@ -145,7 +161,7 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
    *
    * @param {{strokeKey:string, mac:string, stroke, section:number, owner:number, book:number, page:number}} event
    */
-  closeLiveStroke = (event) => {
+  closeLiveStroke = (event: IPenToViewerEvent) => {
     const pathData = this.livePaths[event.strokeKey];
 
     if (!pathData || pathData.path === undefined) {
@@ -164,39 +180,6 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
     delete this.livePaths[event.strokeKey];
   }
 
-  movePenTracker = (event: any) => {
-    const dot = event.dot;
-    const canvas_xy = this.getPdfXY(dot);
-    const penTracker = event.pen.pathPenTracker;
-
-    const objects = this.canvasFb.getObjects();
-    const penTrackerObj = objects.filter(obj => obj.data === 'pt');
-
-    if (penTrackerObj.length === 0) {
-      this.canvasFb.add(event.pen.pathPenTracker);
-    }
-
-    const radius = penTracker.radius;
-    penTracker.visible = true;
-    penTracker.set({ left: canvas_xy.x - radius, top: canvas_xy.y - radius });
-    penTracker.setCoords();
-    this.canvasFb.renderAll();
-
-    const pen = event.pen;
-
-    pen.waitCount = REMOVE_HOVER_POINTS_WAIT;
-    pen.visibleHoverPoints--;
-    if (pen.visibleHoverPoints >= 0) {
-      pen.pathHoverPoints[pen.visibleHoverPoints].visible = false;
-    }
-
-    if (pen.timeOut) {
-      clearInterval(pen.timeOut);
-      pen.timeOut = null;
-    }
-
-
-  }
 
   eraseOnLine(ink_x0, ink_y0, ink_x1, ink_y1, stroke) {
     const pathData = 'M ' + ink_x0 + ' ' + ink_y0 + ' L ' + ink_x1 + ' ' + ink_y1 + 'z';
@@ -227,76 +210,168 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
     }
   }
 
-  addHoverPoints = (e) => {
-    for (let i = 0; i < e.pen.pathHoverPoints.length; i++) {
-      this.canvasFb.add(e.pen.pathHoverPoints[i]);
-    }
+  createHoverCursor = (pen: NeoSmartpen) => {
+    const mac = pen.mac;
 
-    this.canvasFb.add(e.pen.pathPenTracker);
-    console.log('hover points & pen tracker added')
+    if (!Object.prototype.hasOwnProperty.call(this.penCursors, mac)) {
+      for (let i = 0; i < NUM_HOVER_POINTERS; i++) {
+        const hoverPoint = new fabric.Circle({
+          radius: (NUM_HOVER_POINTERS - i),
+          fill: "#ff2222",
+          stroke: "#ff2222",
+          opacity: (NUM_HOVER_POINTERS - i) / NUM_HOVER_POINTERS / 2,
+          left: -30,
+          top: -30,
+          hasControls: false,
+          dirty: true,
+          name: 'hoverPoint',
+          data: 'hps'
+        });
+
+        this.canvasFb.add(hoverPoint);
+      }
+
+      const penTracker = new fabric.Circle({
+        left: -30,
+        top: -30,
+        radius: 5,
+        opacity: 0.3,
+        fill: "#7a7aff",
+        stroke: "#7a7aff",
+        dirty: true,
+        name: 'penTracker',
+        data: 'pt'
+      });
+
+      this.canvasFb.add(penTracker);
+      const objects = this.canvasFb.getObjects();
+      const hoverPointsObj = objects.filter(obj => obj.data === 'hps');
+      const penTrackerObj = objects.filter(obj => obj.data === 'pt');
+
+      this.penCursors[mac] = {
+        visibleHoverPoints: NUM_HOVER_POINTERS,
+        timeOut: 0,
+        waitCount: 0,
+        eraserLastPoint: undefined,
+        penTracker: penTrackerObj[0] as fabric.Circle,
+        hoverPoints: hoverPointsObj as fabric.Circle[],
+      };
+    }
   }
 
-  moveHoverPoint = (e) => {
+  removeHoverCursor = (pen: NeoSmartpen) => {
+    const mac = pen.mac;
 
-    const objects = this.canvasFb.getObjects();
-    const hoverPoints = objects.filter(obj => obj.data === 'hp');
+    if (Object.prototype.hasOwnProperty.call(this.penCursors, mac)) {
+      const cursors = this.penCursors[mac];
+      this.canvasFb.remove(cursors.penTracker);
 
-    if (hoverPoints.length === 0) {
-      for (let i = 0; i < e.pen.pathHoverPoints.length; i++) {
-        this.canvasFb.add(e.pen.pathHoverPoints[i]);
+      for (let i = 0; i < cursors.hoverPoints.length; i++) {
+        const path = cursors.hoverPoints[i];
+        this.canvasFb.remove(path);
+        cursors.hoverPoints[i] = undefined;
       }
+      delete this.penCursors[mac];
     }
+  }
+
+
+  movePenTracker = (event: IPenToViewerEvent) => {
+    const cursor = this.penCursors[event.mac];
+    if (!cursor) {
+      console.log(`ERROR: pen cursor has not been initiated`);
+      return;
+    }
+
+    const dot = event.dot;
+    const canvas_xy = this.getPdfXY(dot);
+
+    const obj = cursor.penTracker;
+    obj.visible = true;
+
+    const radius = obj.radius;
+    obj.set({ left: canvas_xy.x - radius, top: canvas_xy.y - radius });
+    obj.setCoords();
+    this.canvasFb.renderAll();
+
+    const pen = event.pen;
+
+    cursor.waitCount = REMOVE_HOVER_POINTS_WAIT;
+    cursor.visibleHoverPoints--;
+    if (cursor.visibleHoverPoints >= 0) {
+      cursor.hoverPoints[cursor.visibleHoverPoints].visible = false;
+    }
+
+    if (cursor.timeOut) {
+      clearInterval(cursor.timeOut);
+      cursor.timeOut = 0;
+    }
+  }
+
+
+  moveHoverPoint = (e: IPenToViewerEvent) => {
+    const cursor = this.penCursors[e.mac];
+    if (!cursor) {
+      console.log(`ERROR: pen cursor has not been initiated`);
+      return;
+    }
+
+    const hps = cursor.hoverPoints;
+    const isPointerVisible = $("#btn_tracepoint").find(".c2").hasClass("checked");
 
     const dot = { x: e.event.x, y: e.event.y }
     const canvas_xy = this.getPdfXY(dot);
 
+    // hover point를 쉬프트해서 옮겨 놓는다
     for (let i = NUM_HOVER_POINTERS - 1; i > 0; i--) {
-      e.pen.pathHoverPoints[i].left = e.pen.pathHoverPoints[i - 1].left;
-      e.pen.pathHoverPoints[i].top = e.pen.pathHoverPoints[i - 1].top;
-      e.pen.pathHoverPoints[i].setCoords();
-      this.canvasFb.renderAll();
+      hps[i].left = hps[i - 1].left;
+      hps[i].top = hps[i - 1].top;
+      hps[i].setCoords();
     }
 
-    e.pen.pathHoverPoints[0].left = canvas_xy.x;
-    e.pen.pathHoverPoints[0].top = canvas_xy.y;
-    e.pen.pathHoverPoints[0].setCoords();
+    hps[0].left = canvas_xy.x;
+    hps[0].top = canvas_xy.y;
+    hps[0].setCoords();
+
+
+    cursor.visibleHoverPoints = NUM_HOVER_POINTERS;
+    for (let i = 0; i < cursor.visibleHoverPoints; i++) {
+      hps[i].visible = isPointerVisible;
+    }
     this.canvasFb.renderAll();
 
-    const isPointerVisible = $("#btn_tracepoint").find(".c2").hasClass("checked");
-
-    e.pen.visibleHoverPoints = NUM_HOVER_POINTERS;
-
-    for (let i = 0; i < e.pen.visibleHoverPoints; i++) {
-      e.pen.pathHoverPoints[i].visible = isPointerVisible;
-      this.canvasFb.renderAll();
+    if (cursor.timeOut) {
+      clearInterval(cursor.timeOut);
+      cursor.timeOut = null;
     }
-
-    if (e.pen.timeOut) {
-      clearInterval(e.pen.timeOut);
-      e.pen.timeOut = null;
-    }
-    e.pen.waitCount = 0;
-
-    const pen = e.pen;
+    cursor.waitCount = 0;
     const self = this;
 
-    e.pen.timeOut = setInterval(() => {
-      pen.waitCount++;
-      // 1초 뒤
-      if (pen.waitCount > 20) {
-        for (let i = NUM_HOVER_POINTERS - 1; i > 0; i--) {
-          pen.pathHoverPoints[i].left = pen.pathHoverPoints[i - 1].left;
-          pen.pathHoverPoints[i].top = pen.pathHoverPoints[i - 1].top;
-        }
-        pen.pathHoverPoints[0].left = -30;
-        pen.pathHoverPoints[0].top = -30;
+    cursor.timeOut = window.setInterval(() => {
+      const cursor = this.penCursors[e.mac];
+      if (!cursor) {
+        console.log(`ERROR: pen cursor has not been initiated`);
+        clearInterval(cursor.timeOut);
+        return;
+      }
+      const hps = cursor.hoverPoints;
 
-        pen.visibleHoverPoints--;
-        if (pen.visibleHoverPoints >= 0) {
-          pen.pathHoverPoints[pen.visibleHoverPoints].visible = false;
+      cursor.waitCount++;
+      // 1초 뒤
+      if (cursor.waitCount > 20) {
+        for (let i = NUM_HOVER_POINTERS - 1; i > 0; i--) {
+          hps[i].left = hps[i - 1].left;
+          hps[i].top = hps[i - 1].top;
+        }
+        hps[0].left = -30;
+        hps[0].top = -30;
+
+        cursor.visibleHoverPoints--;
+        if (cursor.visibleHoverPoints >= 0) {
+          hps[cursor.visibleHoverPoints].visible = false;
           self.canvasFb.renderAll();
         } else {
-          clearInterval(pen.timeOut);
+          clearInterval(cursor.timeOut);
         }
       }
     }, REMOVE_HOVER_POINTS_INTERVAL);
@@ -420,7 +495,14 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
 
   removeAllCanvasObject = () => {
     if (this.canvasFb) {
-      this.canvasFb.clear();
+      const objects = this.canvasFb.getObjects();
+      const needToClear = objects.filter(obj =>
+        (obj.data !== 'hps' && obj.data !== 'pt')
+      );
+
+      this.canvasFb.remove(...needToClear);
+
+      // this.canvasFb.clear();
     }
   };
 

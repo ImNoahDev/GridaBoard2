@@ -1,3 +1,4 @@
+import { IPoint } from "./../DataStructure/Structures";
 import PenComm, { deviceSelectDlg } from "./pencomm";
 import InkStorage, { IOpenStrokeArg } from "../penstorage/InkStorage";
 import { paperInfo } from "../noteserver/PaperInfo";
@@ -11,6 +12,32 @@ import NeoDot from "../DataStructure/NeoDot";
 import { IBrushType } from "../DataStructure/Enums"
 import { fabric } from "fabric";
 import PUIController from "../../components/PUIController";
+
+
+export type IPenToViewerEvent = {
+  pen: NeoSmartpen,
+
+  mac: string,
+  event: IPenEvent,
+
+  /** ON_PEN_MOVE and ON_PEN_DOWN only */
+  strokeKey?: string,
+  /** ON_PEN_MOVE and ON_PEN_DOWN only */
+  stroke?: NeoStroke,
+  /** ON_PEN_MOVE only */
+  dot?: NeoDot,
+
+  /** PON_PEN_HOVER_PAGEINFO only */
+  section?: number,
+  /** PON_PEN_HOVER_PAGEINFO only */
+  owner?: number,
+  /** PON_PEN_HOVER_PAGEINFO only */
+  book?: number,
+  /** PON_PEN_HOVER_PAGEINFO only */
+  page?: number,
+  /** PON_PEN_HOVER_PAGEINFO only */
+  time?: string,
+}
 
 interface IPenMovement {
   downEvent: IPenEvent,
@@ -61,13 +88,8 @@ export class NeoSmartpen {
   manager: PenManager = PenManager.getInstance();
   dispatcher: Dispatcher = new Dispatcher();
 
-  visibleHoverPoints = NUM_HOVER_POINTERS;
-  pathHoverPoints: Array<fabric.Circle> = new Array(0);
-  timeOut = null;
-  waitCount = 0;
-  eraserLastPoint = {};
+  eraserLastPoint = {} as IPoint;
 
-  pathPenTracker: fabric.Circle;
   /**
    *
    * @param customStorage
@@ -91,38 +113,6 @@ export class NeoSmartpen {
     }
 
 
-  }
-
-  initPenTracker() {
-    this.pathPenTracker = new fabric.Circle({
-      left: -30,
-      top: -30,
-      radius: 5,
-      opacity: 0.3,
-      fill: "#7a7aff",
-      stroke: "#7a7aff",
-      dirty: true,
-      name: 'penTracker',
-      data: 'pt'
-    });
-  }
-
-  initHoverCursor() {
-    for (let i = 0; i < 6; i++) {
-      const path = new fabric.Circle({
-        radius: (NUM_HOVER_POINTERS - i),
-        fill: "#ff2222",
-        stroke: "#ff2222",
-        opacity: (NUM_HOVER_POINTERS - i) / NUM_HOVER_POINTERS / 2,
-        left: -30,
-        top: -30,
-        hasControls: false,
-        dirty: true,
-        name: 'hoverPoint',
-        data: 'hp'
-      });
-      this.pathHoverPoints.push(path);
-    }
   }
 
   /**
@@ -387,7 +377,7 @@ export class NeoSmartpen {
     this.storage.appendDot(strokeKey, dot);
     const pen = this;
 
-    if(event.owner === 1013 && event.book === 1116 && event.page === 1) {
+    if (event.owner === 1013 && event.book === 1116 && event.page === 1) {
       console.log("asdfasdfasfa");
       console.log(event.isFirstDot);
       event.isFirstDot = true;
@@ -403,7 +393,7 @@ export class NeoSmartpen {
           const cmd = pui.getCommand(event.owner, event.book, event.page, dot.x, dot.y);
           console.log(cmd);
 
-          if(cmd) {
+          if (cmd) {
             console.log(`PUI EXECUTE ==> ${cmd}`);
 
             PUIController.executeCommand(cmd);
@@ -414,7 +404,7 @@ export class NeoSmartpen {
     }
 
     // hand the event
-    this.dispatcher.dispatch(PenEventName.ON_PEN_MOVE, { strokeKey, mac: stroke.mac, stroke, dot, pen });
+    this.dispatcher.dispatch(PenEventName.ON_PEN_MOVE, { strokeKey, mac: stroke.mac, stroke, dot, pen, event } as IPenToViewerEvent);
 
     // 이벤트 전달
     // console.log("    -> onPenMove" + event);
@@ -440,7 +430,7 @@ export class NeoSmartpen {
     if (!mac) {
       throw new Error("mac address was not registered");
     }
-    this.dispatcher.dispatch(PenEventName.ON_HOVER_MOVE, { pen: this, mac, event });
+    this.dispatcher.dispatch(PenEventName.ON_HOVER_MOVE, { pen: this, mac, event } as IPenToViewerEvent);
   }
 
   /**
@@ -455,7 +445,7 @@ export class NeoSmartpen {
       throw new Error("mac address was not registered");
     }
 
-    this.dispatcher.dispatch(PenEventName.ON_PEN_HOVER_PAGEINFO, { pen: this, mac, event });
+    this.dispatcher.dispatch(PenEventName.ON_PEN_HOVER_PAGEINFO, { pen: this, mac, event } as IPenToViewerEvent);
   }
 
   /**

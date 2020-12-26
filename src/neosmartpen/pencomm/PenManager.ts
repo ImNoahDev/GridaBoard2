@@ -80,7 +80,7 @@ export default class PenManager {
   /**
    *
    */
-  public createPen = (): NeoSmartpen => {
+  public createPen = () => {
     const pen = new NeoSmartpen();
     return pen;
   }

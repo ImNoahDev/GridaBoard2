@@ -5,7 +5,7 @@ import '../../styles/buttons.css';
 import Tooltip, { TooltipProps } from '@material-ui/core/Tooltip';
 import { Theme, Typography, withStyles } from '@material-ui/core';
 import PenManager from '../../neosmartpen/pencomm/PenManager'
-import { PenEventName, } from '../../neosmartpen';
+import { NeoSmartpen, PenEventName, } from '../../neosmartpen';
 import GridaToolTip from "../../styles/GridaToolTip";
 
 type Props = {
@@ -22,15 +22,11 @@ const ConnectButton = (props: Props) => {
 
   const handleConnectPen = () => {
     const penManager = PenManager.getInstance();
-    const new_pen = penManager.createPen();
+    const new_pen: NeoSmartpen = penManager.createPen();
 
     if (new_pen.connect()) {
       new_pen.addEventListener(PenEventName.ON_CONNECTED, onPenLinkChanged);
       new_pen.addEventListener(PenEventName.ON_DISCONNECTED, onPenLinkChanged);
-
-      //실제 device가 연결되기도 전인 pen 생성자에서 해줄 이유는 없는거 같으니
-      new_pen.initHoverCursor();
-      new_pen.initPenTracker();
     }
   };
 
@@ -39,10 +35,10 @@ const ConnectButton = (props: Props) => {
       <button id="btn_connect" type="button" className="btn btn-neo btn-neo-vertical"
         onClick={() => handleConnectPen()}>
         <GridaToolTip open={true} placement="left" tip={{
-            head: "Pen Connect",
-            msg: "블루투스를 통해 펜을 연결합니다. 블루투스 통신이 가능한 환경에서만 동작합니다.",
-            tail: "Shift + 1~7 각 펜의 내용을 감추기/보이기, P 모든 펜의 획을 감추기/보이기"
-          }} title={undefined}>
+          head: "Pen Connect",
+          msg: "블루투스를 통해 펜을 연결합니다. 블루투스 통신이 가능한 환경에서만 동작합니다.",
+          tail: "Shift + 1~7 각 펜의 내용을 감추기/보이기, P 모든 펜의 획을 감추기/보이기"
+        }} title={undefined}>
           <div className="c2 ">
             <img src='../../icons/icon_smartpen_connected_p.png' className="toggle-off hover-image"></img>
             <img src='../../icons/icon_smartpen_disconnected_n.png' className="toggle-off normal-image"></img>

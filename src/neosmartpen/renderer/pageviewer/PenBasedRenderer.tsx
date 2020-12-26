@@ -15,6 +15,7 @@ import { TransformParameters } from "../../../NcodePrintLib/Coordinates";
 import { withResizeDetector } from 'react-resize-detector';
 import { CSSProperties } from "@material-ui/core/styles/withStyles";
 import { BoxProps } from "@material-ui/core";
+import { IPenToViewerEvent } from "../../pencomm/neosmartpen";
 
 export { PLAYSTATE };
 
@@ -58,7 +59,6 @@ interface Props extends BoxProps {
  * State
  */
 interface State {
-  renderer: PenBasedRenderWorker | null,
 
   sizeUpdate: number,
   penEventCount: number,
@@ -87,7 +87,6 @@ interface State {
  */
 class PenBasedRenderer_module extends React.Component<Props, State> {
   state: State = {
-    renderer: null,
     sizeUpdate: 0,
     penEventCount: 0,
     strokeCount: 0,
@@ -109,6 +108,8 @@ class PenBasedRenderer_module extends React.Component<Props, State> {
 
     renderCount: 0,
   };
+
+  renderer: PenBasedRenderWorker;
 
   propsSize: { scale: number, width: number, height: number } = { scale: 1, width: 0, height: 0 };
   size: ISize = { width: 0, height: 0 };
@@ -165,6 +166,10 @@ class PenBasedRenderer_module extends React.Component<Props, State> {
       pen.addEventListener(PenEventName.ON_PEN_HOVER_PAGEINFO, this.onLiveHoverPageInfo);
 
       this.subscribedPens.push(pen);
+
+      if (this.renderer) {
+        this.renderer.createHoverCursor(pen);
+      }
     }
   }
 
@@ -182,6 +187,10 @@ class PenBasedRenderer_module extends React.Component<Props, State> {
 
       const index = this.subscribedPens.indexOf(pen);
       this.subscribedPens.splice(index, 1);
+
+      if (this.renderer) {
+        this.renderer.removeHoverCursor(pen);
+      }
     }
   }
 
@@ -235,12 +244,12 @@ class PenBasedRenderer_module extends React.Component<Props, State> {
     }
 
     if (nextProps.rotation !== this.props.rotation) {
-      this.state.renderer.setRotation(nextProps.rotation);
+      this.renderer.setRotation(nextProps.rotation);
       ret_val = false;
     }
 
     if (nextProps.h !== this.props.h) {
-      this.state.renderer.setTransformParameters(nextProps.h);
+      this.renderer.setTransformParameters(nextProps.h);
       ret_val = false;
     }
 
@@ -271,7 +280,7 @@ class PenBasedRenderer_module extends React.Component<Props, State> {
     };
 
     const renderer = new PenBasedRenderWorker(options);
-    this.setState({ renderer: renderer });
+    this.renderer = renderer;
   }
 
   onResized = ({ width, height }) => {
@@ -280,8 +289,8 @@ class PenBasedRenderer_module extends React.Component<Props, State> {
 
     // this.size = this.getSize(scale, rect);
 
-    if (this.state.renderer) {
-      this.state.renderer.onViewSizeChanged(width, height);
+    if (this.renderer) {
+      this.renderer.onViewSizeChanged(width, height);
     }
   }
 
@@ -320,7 +329,7 @@ class PenBasedRenderer_module extends React.Component<Props, State> {
     const pens = this.props.pens;
     pens.forEach(pen => this.unsubscribePenEvent(pen));
 
-    // this.state.renderer.stopInterval();
+    // this.renderer.stopInterval();
     window.removeEventListener("resize", this.resizeListener);
 
     // penManager에 연결 해제
@@ -336,10 +345,10 @@ class PenBasedRenderer_module extends React.Component<Props, State> {
    *
    * @param {{strokeKey:string, mac:string, time:number, stroke:NeoStroke}} event
    */
-  onLivePenDown = (event) => {
+  onLivePenDown = (event: IPenToViewerEvent) => {
     // console.log(event);
-    if (this.state.renderer) {
-      this.state.renderer.createLiveStroke(event);
+    if (this.renderer) {
+      this.renderer.createLiveStroke(event);
     }
   }
 
@@ -348,12 +357,12 @@ class PenBasedRenderer_module extends React.Component<Props, State> {
    *
    * @param {{strokeKey:string, mac:string, stroke:NeoStroke, section:number, owner:number, book:number, page:number}} event
    */
-  onLivePenPageInfo = (event) => {
+  onLivePenPageInfo = (event: IPenToViewerEvent) => {
     const { penEventCount } = this.state;
     const { section, owner, book, page } = event;
 
     const prevPageInfo = this.state.pageInfo;
-    if (UTIL.isSamePage(prevPageInfo, event)) {
+    if (UTIL.isSamePage(prevPageInfo, event as IPageSOBP)) {
       return;
     }
 
@@ -366,13 +375,13 @@ class PenBasedRenderer_module extends React.Component<Props, State> {
     /** 테스트용 */
     const inkStorage = this.inkStorage;
     if (inkStorage) {
-      const pageStrokesCount = inkStorage.getPageStrokes(event).length;
+      const pageStrokesCount = inkStorage.getPageStrokes(event as IPageSOBP).length;
       this.setState({ strokeCount: pageStrokesCount });
     }
 
     /** 잉크 렌더러의 페이지를 바꾼다 */
-    if (this.state.renderer) {
-      this.state.renderer.changePage(section, owner, book, page, false);
+    if (this.renderer) {
+      this.renderer.changePage(section, owner, book, page, false);
     }
 
     /** pdf pageNo를 바꿀 수 있게, container에게 전달한다. */
@@ -385,9 +394,9 @@ class PenBasedRenderer_module extends React.Component<Props, State> {
    * @param {{strokeKey:string, mac:string, stroke:NeoStroke, dot:NeoDot}} event
    */
 
-  onLivePenMove = (event) => {
-    if (this.state.renderer) {
-      this.state.renderer.pushLiveDot(event);
+  onLivePenMove = (event: IPenToViewerEvent) => {
+    if (this.renderer) {
+      this.renderer.pushLiveDot(event);
     }
     // const { liveDotCount } = this.state;
 
@@ -399,10 +408,10 @@ class PenBasedRenderer_module extends React.Component<Props, State> {
    *
    * @param {{strokeKey:string, mac:string, stroke, section:number, owner:number, book:number, page:number}} event
    */
-  onLivePenUp = (event) => {
+  onLivePenUp = (event: IPenToViewerEvent) => {
     console.log("Pen Up");
-    if (this.state.renderer) {
-      this.state.renderer.closeLiveStroke(event);
+    if (this.renderer) {
+      this.renderer.closeLiveStroke(event);
     }
 
     // const { penEventCount, inkStorage } = this.state;
@@ -414,9 +423,9 @@ class PenBasedRenderer_module extends React.Component<Props, State> {
     // console.log(event);
   }
 
-  onLiveHoverPageInfo = (event) => {
-    if (this.state.renderer) {
-      this.state.renderer.addHoverPoints(event);
+  onLiveHoverPageInfo = (event: IPenToViewerEvent) => {
+    if (this.renderer) {
+      // this.renderer.addHoverPoints(event);
     }
   }
 
@@ -425,9 +434,9 @@ class PenBasedRenderer_module extends React.Component<Props, State> {
    * @param {{strokeKey:string, mac:string, stroke:NeoStroke, dot:NeoDot}} event
    */
 
-  onLiveHoverMove = (event) => {
-    if (this.state.renderer) {
-      this.state.renderer.moveHoverPoint(event);
+  onLiveHoverMove = (event: IPenToViewerEvent) => {
+    if (this.renderer) {
+      this.renderer.moveHoverPoint(event);
     }
     // const { liveDotCount } = this.state;
 
