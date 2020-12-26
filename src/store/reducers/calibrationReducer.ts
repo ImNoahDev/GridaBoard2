@@ -24,7 +24,7 @@ export const hideCalibrationDialog = async () => {
 };
 
 export const updateCalibrationDialog = async (progress:number) => {
-  
+
   store.dispatch({
     type: ACTION_TYPE.PROGRESS,
     progress,

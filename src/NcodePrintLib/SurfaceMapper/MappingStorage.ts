@@ -11,9 +11,14 @@ const _debug = false;
 let _instance: MappingStorage = null;
 const LOCAL_STORAGE_ID = "GridaBoard_codeMappingInfo_v2";
 
-type IMappingData = {
+export type IMappingData = {
   nextIssuable: IPageSOBP;
   arrDocMap: IPdfMappingDesc[];
+}
+
+export type IAutoLoadDocDesc = {
+  pdf: IPdfMappingDesc,
+  pageMapping: IMappingParams,
 }
 
 export default class MappingStorage {
@@ -147,7 +152,7 @@ export default class MappingStorage {
     if (found) {
       /** 원래는 폴리곤에 속했는지 점검해야 하지만, 현재는 같은 페이지인지만 점검한다  2020/12/06 */
       const pageMap = found.params.find(param => isSamePage(ncodeXy, param.pageInfo));
-      return { pdf: found, page: pageMap };
+      return { pdf: found, pageMapping: pageMap } as IAutoLoadDocDesc;
     }
 
     return undefined;

@@ -19,10 +19,6 @@ function PageRangeSub(props: Props) {
   const [rangeStr, setRangeStr] = useState(convertArrayToString(range));
   const [checked, setChecked] = useState(false);
 
-  useEffect(() => {
-
-  });
-
   const onChange = (event) => {
     const result = hasOnlyRangeCharacters(event.target.value);
     if (event.target.value === '' || result) {
@@ -83,9 +79,8 @@ export function PageRangeField(props: Props) {
 
   const { handleChange, color, range, name, max, children, tip, showHelp, ...rest } = props;
   const [rangeStr, setRangeStr] = useState(convertArrayToString(range));
-  useEffect(() => {
 
-  });
+
   let autoTip = tip;
   // const upper = value.toUpperCase();
   if (autoTip === undefined) {
@@ -96,7 +91,7 @@ export function PageRangeField(props: Props) {
   return (
     <div>
       {/* <FormControlLabel style={cellRadioStyle} value={1} control={<Radio />} label="Ncode A4에 인쇄" /> */}
-      <GridaToolTip open={showHelp} placement="left" tip={autoTip} title={undefined}> 
+      <GridaToolTip open={showHelp} placement="left" tip={autoTip} title={undefined}>
         <Typography variant="subtitle1" component="h5">
           <PageRangeSub  {...props} />
         </Typography>
@@ -160,7 +155,7 @@ function normalizeRange(str: string, numPages: number) {
 
   let arr = trimed.split(/[\s,]+/).flatMap(s => {
     if (!s.includes("-")) {
-      let r = parseInt(s);
+      const r = parseInt(s);
       if (!r) return [];
       if (r < 1 || r > numPages) return [];
 

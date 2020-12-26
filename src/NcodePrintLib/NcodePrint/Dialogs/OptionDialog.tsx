@@ -9,6 +9,8 @@ import OptionLevel_2 from "./OptionDialogComponents/OptionLevel_2";
 import * as Util from "../../UtilFunc";
 import { turnOnGlobalKeyShortCut } from '../../../GridaBoard/GlobalFunctions';
 import { convertStringToArray } from './OptionDialogComponents/PageRangeField';
+import { MappingStorage } from '../../SurfaceMapper';
+import { g_nullNcode } from '../../DefaultOption';
 
 const useStyles = makeStyles({
   root: {
@@ -21,7 +23,7 @@ const useStyles = makeStyles({
 });
 
 
-export let MAX_PRINTOPTION_LEVEL = 1;    // 2: debug mode
+export const MAX_PRINTOPTION_LEVEL = 1;    // 2: debug mode
 
 interface IDialogProps extends DialogProps {
   open: boolean,
@@ -127,6 +129,19 @@ export function OptionDialog(props: IDialogProps) {
   };
 
 
+  const checkAssociatedMappingInfo = () => {
+    // PrintPdfMain의 printTrigger를 +1 해 주면, 인쇄가 시작된다
+    const maps = MappingStorage.getInstance();
+    const pdfMapDesc = maps.findAssociatedNcode(printOption.fingerprint, printOption.pagesPerSheet);
+    printOption.needToIssueCode = !pdfMapDesc;
+    if (printOption.needToIssueCode) {
+      printOption.pageInfo = { ...g_nullNcode };
+    }
+    else {
+      printOption.pageInfo = { ...pdfMapDesc.nPageStart };
+    }
+  }
+
 
   const handleChange2 = (event: React.ChangeEvent<HTMLInputElement>) => {
     const name = event.target.name;
@@ -149,6 +164,7 @@ export function OptionDialog(props: IDialogProps) {
 
       case "pagesPerSheet":
         printOption[name] = parseInt(value) as 1 | 2 | 4 | 8 | 9 | 16 | 18 | 25 | 32;
+        checkAssociatedMappingInfo();
         break;
 
       case "showTooltip":

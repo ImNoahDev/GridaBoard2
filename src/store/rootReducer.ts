@@ -8,6 +8,7 @@ import rotate from './reducers/rotate';
 import uiReducer from './reducers/ui';
 import progressDlgReducer from "./reducers/progressDlgReducer";
 import calibrationReducer from "./reducers/calibrationReducer";
+import appConfigReducer from './reducers/appConfigReducer';
 
 
 const rootReducer = combineReducers({
@@ -19,6 +20,7 @@ const rootReducer = combineReducers({
   progress: progressDlgReducer,
 
   calibration: calibrationReducer,
+  appConfig: appConfigReducer,
 });
 
 export default rootReducer;

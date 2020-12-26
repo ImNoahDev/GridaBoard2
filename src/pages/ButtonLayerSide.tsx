@@ -11,6 +11,10 @@ import FullScreenButton from "../components/buttons/FullScreenButton";
 import TracePointButton from "../components/buttons/TracePointButton";
 import ButtonLayer_forTest from "./ButtonLayer_forTest";
 import ButtonLayerBottom from "./ButtonLayerBottom";
+import { RootState } from "../store/rootReducer";
+import { useSelector } from "react-redux";
+import { setPens } from "../store/reducers/appConfigReducer";
+
 
 const mainFrameStyle = {
   position: "absolute",
@@ -28,11 +32,25 @@ const mainFrameStyle = {
 
 
 /**
- * 
+ *
  */
 const ButtonLayerSide = () => {
   const [num_pens, setNumPens] = useState(0);
-  const [pens, setPens] = useState(new Array(0) as NeoSmartpen[]);
+
+  const handleTrashBtn = () => {
+    // 고쳐야 한다. kitty
+    // const penRendererState = pageRef.current.rendererRef.current.state;
+
+    // penRendererState.renderer.removeAllCanvasObject();
+    // InkStorage.getInstance().removeStrokeFromPage(penRendererState.pageInfo);
+
+    console.log('Handle Trash Btn');
+  }
+
+  const pens = useSelector((state: RootState) => {
+    console.log(state.pdfInfo);
+    return state.appConfig.pens;
+  });
 
   const onPenLinkChanged = e => {
     const pen = e.pen;
@@ -48,23 +66,11 @@ const ButtonLayerSide = () => {
       const index = pens.findIndex(p => p.getMac() === mac);
       if (index > -1) {
         const newPens = pens.splice(index, 1);
-        setPens([...pens]);
+        setPens([...newPens]);
         setNumPens(num_pens - 1);
       }
     }
   }
-
-
-  const handleTrashBtn = () => {
-    // 고쳐야 한다. kitty
-    // const penRendererState = pageRef.current.rendererRef.current.state;
-
-    // penRendererState.renderer.removeAllCanvasObject();
-    // InkStorage.getInstance().removeStrokeFromPage(penRendererState.pageInfo);
-
-    console.log('Handle Trash Btn');
-  }
-
 
   return (
     <div style={{ zIndex: 0 }}>

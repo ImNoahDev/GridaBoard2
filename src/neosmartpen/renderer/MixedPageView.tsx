@@ -9,12 +9,14 @@ import { IMappingParams, IPdfMappingDesc, IPdfPageDesc, TransformParameters } fr
 import { IFileBrowserReturn, isSameObject, openFileBrowser2 } from "../../NcodePrintLib";
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from "@material-ui/core";
 import { ZoomFitEnum } from "./pageviewer/RenderWorkerBase";
+import { IAutoLoadDocDesc } from "../../NcodePrintLib/SurfaceMapper/MappingStorage";
 
 export const ZINDEX_INK_LAYER = 3;
 export const ZINDEX_PDF_LAYER = 2;
 
 export const ZINDEX_DRAWER = 100;
 export const ZINDEX_DRAWER_ICON = 11199;
+
 
 
 interface Props {
@@ -29,6 +31,10 @@ interface Props {
 
   /** canvas view rotation, 0: portrait, 90: landscape */
   rotation: number;
+
+
+  /** 현재 view가 가진 pdf와 다른 code map된 pdf가 감지되면 autoload를 시도한다. undefiled이면 안한다. */
+  onFileLoadNeeded: (doc: IAutoLoadDocDesc ) => void;
 
 }
 
@@ -47,21 +53,21 @@ interface State {
   showFileOpenDlg: boolean;
   showCancelConfirmDlg: boolean;
 
-
   h: TransformParameters;
 
 }
 
 
 export default class MixedPageView extends React.Component<Props, State> {
+
   pdf: PdfJs.PDFDocumentProxy;
   rendererRef: React.RefObject<typeof PenBasedRenderer> = React.createRef();
 
   filename: string;
 
-  coupledDoc: { pdf: IPdfMappingDesc, page: IMappingParams };
+  coupledDoc: IAutoLoadDocDesc;
 
-  _fileToLoad: { pdf: IPdfMappingDesc, page: IMappingParams };
+  _fileToLoad: IAutoLoadDocDesc;
 
   constructor(props: Props) {
     super(props);
@@ -101,48 +107,7 @@ export default class MixedPageView extends React.Component<Props, State> {
     }
   }
 
-  onFileSelect = async () => {
-    this.setState({ showFileOpenDlg: false });
-
-    const coupledDoc = this._fileToLoad;
-
-    let url = coupledDoc.pdf.url;
-    if (url.indexOf("blob:http") > -1) {
-      console.log(`try to load file: ${coupledDoc.pdf.filename}`);
-
-      // 여기서 펜 입력은 버퍼링해야 한다.
-      const selectedFile = await openFileBrowser2();
-      console.log(selectedFile.result);
-
-      if (selectedFile.result === "success") {
-        url = selectedFile.url;
-        const filename = selectedFile.file.name;
-        console.log(url);
-
-        this.setState({ pdfUrl: url, pdfFilename: filename });
-        this.coupledDoc = coupledDoc;
-
-        const retVal: IFileBrowserReturn = {
-          result: "success",
-          url,
-          fileDesc: selectedFile.file,
-        }
-      } else {
-        // reset homography
-        const h = undefined;
-        console.log(`MixedViewer: pagechanged Set h, h=${JSON.stringify(h)}`);
-        this.setState({ h });
-
-        const retVal: IFileBrowserReturn = {
-          result: "canceled",
-          url: null,
-          fileDesc: null,
-        }
-      }
-    }
-  }
-
-  onNcodePageChanged = (pageInfo: IPageSOBP) => {
+  onNcodePageChanged = async (pageInfo: IPageSOBP) => {
     // 페이지를 찾자
     const mapper = MappingStorage.getInstance();
     const ncodeXy: INcodeSOBPxy = { ...pageInfo, x: 0, y: 0 };
@@ -151,29 +116,32 @@ export default class MixedPageView extends React.Component<Props, State> {
     // 인쇄된 적이 없는 파일이라면 PDF 관련의 오퍼레이션을 하지 않는다.
     const coupledDoc = mapper.findPdfPage(ncodeXy);
     if (!coupledDoc) return;
-    console.log(coupledDoc.page);
+    console.log(coupledDoc.pageMapping);
 
-    console.log(`MixedViewer: pagechanged Set h, h=${JSON.stringify(coupledDoc.page.h)}`);
-    this.setState({ h: coupledDoc.page.h });
+    console.log(`MixedViewer: pagechanged Set h, h=${JSON.stringify(coupledDoc.pageMapping.h)}`);
+    this.setState({ h: coupledDoc.pageMapping.h });
 
     // 파일을 로드해야 한다면, 로컬이든 클라우드든 로드하도록 한다.
     if (!this.pdf || this.pdf.fingerprint !== coupledDoc.pdf.fingerprint) {
-      const url = coupledDoc.pdf.url;
-      if (url.indexOf("blob:http") > -1) {
-        this._fileToLoad = coupledDoc;
-        this.setState({ showFileOpenDlg: true });
+      const { onFileLoadNeeded } = this.props;
+      if (onFileLoadNeeded) {
+        onFileLoadNeeded(coupledDoc);
       }
-      else {
-        // 구글 드라이브에서 파일을 불러오자
-      }
+      // const url = coupledDoc.pdf.url;
+      // if (url.indexOf("blob:http") > -1) {
+      //   this._fileToLoad = coupledDoc;
+      //   this.setState({ showFileOpenDlg: true });
+      // }
+      // else {
+      //   // 구글 드라이브에서 파일을 불러오자
+      // }
 
-      return;
+      // return;
     }
-
 
     // 이미 로드되어 있고 같은 파일이라면, 페이지를 전환한다.
     if (this.pdf) {
-      const pageNo = coupledDoc.page.pdfDesc.pageNo;
+      const pageNo = coupledDoc.pageMapping.pdfDesc.pageNo;
       this.setState({ pageNo });
     }
   }
@@ -207,8 +175,8 @@ export default class MixedPageView extends React.Component<Props, State> {
       const mapper = MappingStorage.getInstance();
       const coupledDoc = mapper.findPdfPage(ncodeXy);
       if (coupledDoc) {
-        console.log(`MixedViewer: Set h, h=${JSON.stringify(coupledDoc.page.h)}`);
-        this.setState({ h: coupledDoc.page.h });
+        console.log(`MixedViewer: Set h, h=${JSON.stringify(coupledDoc.pageMapping.h)}`);
+        this.setState({ h: coupledDoc.pageMapping.h });
       }
 
       ret = ret || true;
@@ -291,7 +259,8 @@ export default class MixedPageView extends React.Component<Props, State> {
               position={this.state.canvasPosition}
               pdfSize={{ width: 210 / 25.4 * 72, height: 297 / 25.4 * 72 }}
               pageInfo={{ section: 0, owner: 0, book: 0, page: 0 }}
-              playState={PLAYSTATE.live} pens={this.props.pens}
+              playState={PLAYSTATE.live}
+              pens={this.props.pens}
               onNcodePageChanged={this.onNcodePageChanged}
               onCanvasShapeChanged={this.onCanvasShapeChanged}
               rotation={this.props.rotation}
@@ -300,7 +269,7 @@ export default class MixedPageView extends React.Component<Props, State> {
           </div>
 
         </div>
-        <Dialog open={this.state.showFileOpenDlg} onClose={this.handleClose} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description" >
+        {/* <Dialog open={this.state.showFileOpenDlg} onClose={this.handleClose} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description" >
           <DialogTitle id="alert-dialog-title">
             파일 불러오기
           </DialogTitle>
@@ -338,7 +307,7 @@ export default class MixedPageView extends React.Component<Props, State> {
               예, 다시 한번 선택합니다.
           </Button>
           </DialogActions>
-        </Dialog>
+        </Dialog> */}
 
       </div>
     );

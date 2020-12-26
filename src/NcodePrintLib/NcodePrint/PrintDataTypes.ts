@@ -72,6 +72,8 @@ export interface IPrintOption {
 
   filename: string,
 
+  fingerprint?: string,
+
   codeDensity: number;      // 1 dot, 2dots, 3dots
   printDpi: number;         // 600 DPI, 300 DPI
   pdfRenderingDpi: number,    // 200DPI 또는 300DPI가 적당
@@ -136,17 +138,17 @@ export interface IPrintOption {
   /** 용지 크기에서 이미지를 배치할 때, 상하좌우 여백  mm 단위*/
   imagePadding: number,     // mm 단위
 
-  /** 
-   * 0: scale up image size to papersize,     (default: O, fit printable area: O, fit paper: O, 100%: O) 
-   * 1: Size down PDF page size to Ncode sheet     (default: X, fit printable area: O, fit paper: O, 100%: X) 
-   * 2: keep original image size              (default: X, fit printable area: O, fit paper: O, 100%: X) 
-   * 3: scale down image, and finally scale up image size to paperSize at creating PDF 
+  /**
+   * 0: scale up image size to papersize,     (default: O, fit printable area: O, fit paper: O, 100%: O)
+   * 1: Size down PDF page size to Ncode sheet     (default: X, fit printable area: O, fit paper: O, 100%: X)
+   * 2: keep original image size              (default: X, fit printable area: O, fit paper: O, 100%: X)
+   * 3: scale down image, and finally scale up image size to paperSize at creating PDF
    * */
   drawImageOnPdfMode: NcodePdfScaleMode,
-  
-  /** 
-   * 생성할 PDF에서 용지 크기에서, 상하좌우 여백 
-   * 
+
+  /**
+   * 생성할 PDF에서 용지 크기에서, 상하좌우 여백
+   *
    *    +------------------------+
    *    |                        |<------- physical paper size
    *    |     +-----------+      |
@@ -158,11 +160,11 @@ export interface IPrintOption {
    *    |     +-----------+      |
    *    |                        |
    *    +------------------------+
-   * 
+   *
    *  pdfPagePadding should be smaller than imagePadding
    */
   pdfPagePadding: number, // mm단위
-  
+
 
   pdfMappingDesc?: IPdfMappingDesc;
 
@@ -187,7 +189,7 @@ export interface IPrintOption {
 
 
 
-  
+
   /** 0: no debug mode, 1: draw lines, 2: draw Ncode debugging info, 3: canvas 색상 값 점검 */
   debugMode: 0 | 1 | 2 | 3,
 

@@ -1,7 +1,7 @@
-import { Box, Button } from "@material-ui/core";
+import { Box, Button, Paper } from "@material-ui/core";
 import React, { useState } from "react";
 import { NeoImage } from "../components/CustomElement/NeoImage";
-import { g_defaultPrintOption, PrintOptionDialog, PrintPdfButton } from "../NcodePrintLib";
+import { g_defaultPrintOption, makeNPageIdStr, PrintOptionDialog, PrintPdfButton } from "../NcodePrintLib";
 import ClearLocalMappingButton from "../NcodePrintLib/Buttons/ClearLocalMappingButton";
 import CalibrationButton from "../NcodePrintLib/NcodePrint/Dialogs/CalibrationDialog";
 import OptionDialogButton from "../NcodePrintLib/NcodePrint/Dialogs/OptionDialog";
@@ -11,6 +11,9 @@ import { useSelector } from "react-redux";
 import Upload from "../components/navbar/Upload";
 import GoogleBtn from "../components/GoogleBtn";
 import { savePDF } from "../NcodePrintLib/Save/SavePdf";
+import ReactJson from "react-json-view";
+import { MappingStorage } from "../NcodePrintLib/SurfaceMapper";
+import { IMappingData } from "../NcodePrintLib/SurfaceMapper/MappingStorage";
 
 const buttonDivStyle = {
   position: "absolute",
@@ -37,10 +40,35 @@ const getNoteInfo = (event) => {
 
 
 /**
- * 
+ *
  */
 const ButtonLayer_forTest = () => {
   const [num_pens, setNumPens] = useState(0);
+  const [mapViewDetail, setMapViewDetail] = useState(0);
+
+  let mapJson = {} as any;
+  if (mapViewDetail) {
+    const instance = MappingStorage.getInstance();
+    const data = JSON.parse(JSON.stringify(instance._data));
+    const arrDocMap = data.arrDocMap;
+
+    arrDocMap.forEach(map => {
+      if (mapViewDetail === 1) {
+        const splitted = map.id.match(/^.+\/(.*)$/i);
+        const pagesPerSheet = parseInt(splitted[1]);
+        map["pagesPerSheet"] = pagesPerSheet;
+        map["pageInfo"] = makeNPageIdStr(map.nPageStart) + "    // this is the content of nPageStart";
+        delete map.url;
+        delete map.id;
+        delete map.params;
+        delete map.fingerprint;
+        delete map.nPageStart;
+
+      }
+    });
+
+    mapJson = data;
+  }
 
   const pdfUrl = useSelector((state) => {
     console.log(state.pdfInfo);
@@ -56,6 +84,23 @@ const ButtonLayer_forTest = () => {
     <div id={"button_div"} style={buttonDivStyle}>
 
       <div style={{ flex: 1 }}> </div>
+
+      {/* 매핑 정보 살펴보기 */}
+      <div style={{ fontSize: "20px", fontWeight: "bold" }}>
+        <Button variant="contained" color="primary"
+          onClick={(event) => setMapViewDetail((mapViewDetail + 1) % 3)} >
+          <Box fontSize={14} fontWeight="fontWeightBold" >매핑 테이블 보기</Box>
+        </Button>
+      </div>
+
+      { mapViewDetail
+        ? <Paper style={{ position: "absolute", top: 100, minWidth: 800, maxHeight: 800, overflow: 'auto' }}>
+          <ReactJson src={mapJson}
+            displayDataTypes={false}
+            name={"MappingStorage._data"} collapsed={4} theme="monokai" />
+        </Paper>
+        : ""}
+
 
       {/* 공책 정보 가져오기 테스트 버튼 */}
       <div style={{ fontSize: "20px", fontWeight: "bold" }}>
@@ -104,7 +149,7 @@ const ButtonLayer_forTest = () => {
 
       {/* 매핑 정보 지우기 버튼 */}
       <div style={{ fontSize: "20px", fontWeight: "bold" }}>
-        <ClearLocalMappingButton variant="contained" color="primary" >
+        <ClearLocalMappingButton variant="contained" color="secondary" >
           <Box fontSize={14} fontWeight="fontWeightBold" >매핑정보 지우기</Box>
         </ClearLocalMappingButton>
       </div>

@@ -17,6 +17,7 @@ import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import InboxIcon from '@material-ui/icons/MoveToInbox';
 import MailIcon from '@material-ui/icons/Mail';
+import { BoxProps } from '@material-ui/core';
 
 
 
@@ -134,7 +135,13 @@ const maxDrawerWidth = 1000;
 export let g_drawerWidth = defaultDrawerWidth;
 
 
-export default function PersistentDrawerRight(props) {
+interface Props extends BoxProps {
+  onDrawerResize: (size: number) => void,
+  handleDrawerClose: () => void,
+  open: boolean,
+}
+
+export default function PersistentDrawerRight(props: Props) {
   const classes = useStyles();
   const theme = useTheme();
   const [open, setOpen] = React.useState(props.open);

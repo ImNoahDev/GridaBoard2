@@ -8,5 +8,10 @@
   "prettier.endOfLine": "auto",
   "prettier.tabWidth": 2,
   "typescript.tsdk": "node_modules\\typescript\\lib",
-  "typescript.implementationsCodeLens.enabled": true
+  "typescript.implementationsCodeLens.enabled": true,
+  "javascript.preferences.importModuleSpecifier": "relative",
+  "typescript.preferences.importModuleSpecifier": "relative",
+  "autoimport.doubleQuotes": true,
+  "autoimport.filesToScan": ".src/**",
+  "autoimport.showNotifications": true
 }

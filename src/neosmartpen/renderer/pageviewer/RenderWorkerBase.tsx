@@ -477,7 +477,7 @@ export default class RenderWorkerBase {
   onCanvasMouseWheel = (opt: any) => {
 
     this.viewFit = ZoomFitEnum.FREE;
-    
+
     const evt: MouseEvent = opt.e;
     if ((!this.zoomCtrlKey) || (this.zoomCtrlKey === true && evt.ctrlKey === true)) {
       const delta = opt.e.deltaY;
@@ -775,7 +775,7 @@ export default class RenderWorkerBase {
       const new_offset_x = offset_x + dx;
       const new_offset_y = offset_y + dy;
 
-      this.scrollCanvasToPoint({ x: new_offset_x, y: new_offset_y }, true);
+      this.scrollCanvasToPoint({ x: new_offset_x, y: new_offset_y }, false);
     }
   }
 

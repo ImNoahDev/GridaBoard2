@@ -1,17 +1,19 @@
-import React, { useState, useRef } from "react";
-import { PLAYSTATE, MixedPageView } from "../neosmartpen";
-import { IconButton, makeStyles, createStyles, CssBaseline, Typography, Fade, Paper, Grow } from "@material-ui/core";
+import React, { useState, useRef, useEffect } from "react";
+import { PLAYSTATE, MixedPageView, NeoSmartpen } from "../neosmartpen";
+import { IconButton, makeStyles, createStyles, } from "@material-ui/core";
 import '../styles/main.css'
 import PUIController from '../components/PUIController';
 import { Theme } from '@material-ui/core';
-import clsx from 'clsx';
 import { useSelector } from "react-redux";
 import { turnOnGlobalKeyShortCut } from "../GridaBoard/GlobalFunctions";
-import PersistentDrawerRight, { g_drawerWidth } from "./PersistentDrawerRight";
+import PersistentDrawerRight, { g_drawerWidth } from "../GridaBoard/View/PersistentDrawerRight";
 import MenuIcon from '@material-ui/icons/Menu';
 import ButtonLayer from "./ButtonLayer";
-import { g_hiddenFileInputBtnId, onFileInputChanged, onFileInputClicked } from "../NcodePrintLib/NeoPdf/FileBrowser";
+import { g_hiddenFileInputBtnId, onFileInputChanged, onFileInputClicked, openFileBrowser2 } from "../NcodePrintLib/NeoPdf/FileBrowser";
 import { theme } from "../styles/theme";
+import { IAutoLoadDocDesc } from "../NcodePrintLib/SurfaceMapper/MappingStorage";
+import AutoLoadConfirmDialog from "../GridaBoard/Dialog/AutoLoadConfirmDialog";
+import { RootState } from "../store/rootReducer";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -29,24 +31,42 @@ const useStyles = makeStyles((theme: Theme) =>
 
 const Home = () => {
   const pageRef: React.RefObject<MixedPageView> = useRef();
-  const [num_pens, setNumPens] = useState(0);
-  const [pens, setPens] = useState(new Array(0));
   const [isRotate, setRotate] = useState();
-  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(true);
   const [drawerWidth, setDrawerWidth] = useState(g_drawerWidth);
   const [rightMargin, setRightMargin] = useState(0);
+  const [pens, setPens] = useState([] as NeoSmartpen[]);
 
+  const [autoLoadDoc, setAutoLoadDoc] = useState(undefined as IAutoLoadDocDesc);
+  const [loadConfirmDlgOn, setLoadConfirmDlgOn] = useState(false);
+  const [loadConfirmDlgStep, setLoadConfirmDlgStep] = useState(0);
+  const [pdfUrl, setPdfUrl] = useState(undefined as string);
+  const [pdfFilename, setPdfFilename] = useState(undefined as string);
+  const [noMoreAutoLoad, setNoMoreAutoLoad] = useState(false);
 
-  const pdfUrl = useSelector((state) => {
+  const pdfUrl_store = useSelector((state: RootState) => {
     console.log(state.pdfInfo);
     return state.pdfInfo.url;
   });
-  const pdfFilename = useSelector((state) => {
+  const pdfFilename_store = useSelector((state: RootState) => {
     console.log(state.pdfInfo);
     return state.pdfInfo.filename;
   });
 
+  const pens_store = useSelector((state: RootState) => {
+    console.log(state.pdfInfo);
+    return state.appConfig.pens;
+  });
 
+
+
+
+
+  useEffect(() => {
+    if (pdfUrl_store !== pdfUrl) setPdfUrl(pdfUrl_store);
+    if (pdfFilename_store !== pdfFilename) setPdfFilename(pdfFilename_store);
+    if (pens_store !== pens) setPens(pens_store);
+  }, [pdfUrl_store, pdfFilename_store, pens_store]);
 
   const handleDrawerOpen = () => {
     setDrawerOpen(true);
@@ -56,9 +76,58 @@ const Home = () => {
     setDrawerOpen(false);
   };
 
-  const onDrawerResize = (width) => {
-    setDrawerWidth(width);
+
+
+  const onDrawerResize = (size) => {
+    setDrawerWidth(size);
   }
+
+  const onFileLoadNeeded = async (coupledDoc: IAutoLoadDocDesc) => {
+    const url = coupledDoc.pdf.url;
+    if (url.indexOf("blob:http") > -1) {
+      setAutoLoadDoc(coupledDoc);
+      setLoadConfirmDlgOn(true);
+      setLoadConfirmDlgStep(1);
+    }
+    else {
+      // 구글 드라이브에서 파일을 불러오자
+    }
+
+    return;
+
+  }
+
+  const onNoMoreAutoLoad = () => {
+    setNoMoreAutoLoad(true);
+  }
+
+  const onCancelAutoLoad = () => {
+    setLoadConfirmDlgOn(false);
+  }
+
+  const onLoadFile = async () => {
+    setLoadConfirmDlgOn(false);
+    const coupledDoc = autoLoadDoc;
+
+    let url = coupledDoc.pdf.url;
+    if (url.indexOf("blob:http") > -1) {
+      console.log(`try to load file: ${coupledDoc.pdf.filename}`);
+
+      // 여기서 펜 입력은 버퍼링해야 한다.
+      const selectedFile = await openFileBrowser2();
+      console.log(selectedFile.result);
+
+      if (selectedFile.result === "success") {
+        url = selectedFile.url;
+        const filename = selectedFile.file.name;
+        console.log(url);
+
+        setPdfUrl(url);
+        setPdfFilename(filename);
+      }
+    }
+  }
+
 
   const classes = useStyles();
   console.log(g_drawerWidth);
@@ -113,7 +182,12 @@ const Home = () => {
         </div>
 
         <div style={{ position: "absolute", top: 0, left: 0, bottom: 0, right: drawerOpen ? g_drawerWidth : 0 }}>
-          <MixedPageView pdfUrl={pdfUrl} filename={pdfFilename} pageNo={1} scale={1} playState={PLAYSTATE.live} pens={pens} ref={pageRef} rotation={0} />
+          <MixedPageView
+            pdfUrl={pdfUrl} filename={pdfFilename} pageNo={1} scale={1}
+            playState={PLAYSTATE.live} pens={pens} ref={pageRef}
+            rotation={0}
+            onFileLoadNeeded={noMoreAutoLoad ? undefined : onFileLoadNeeded}
+          />
         </div>
       </main >
 
@@ -133,6 +207,12 @@ const Home = () => {
         </IconButton>
         <PersistentDrawerRight open={drawerOpen} handleDrawerClose={handleDrawerClose} onDrawerResize={onDrawerResize} />
       </div>
+
+      <AutoLoadConfirmDialog open={loadConfirmDlgOn} step={loadConfirmDlgStep}
+        onOk={onLoadFile} onCancel={onCancelAutoLoad} onNoMore={onNoMoreAutoLoad} />
+
+
+      {/* 파일 인풋을 위한 것 */}
       <input type="file" id={g_hiddenFileInputBtnId} onChange={onFileInputChanged} onClick={onFileInputClicked} style={{ display: "none" }} name="pdf" accept="application/pdf" />
       <input type="file" id={"pdf_file_append"} onChange={onFileInputChanged} onClick={onFileInputClicked} style={{ display: "none" }} name="pdf" accept="application/pdf" />
     </div >

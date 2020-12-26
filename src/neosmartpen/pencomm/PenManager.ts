@@ -37,10 +37,10 @@ export default class PenManager {
   ];
 
   marker_colors: string[] = [
-    "rgb(217, 217, 224)", // 0 
-    "rgb(232, 155, 162)", // 1 
-    "rgb(244, 244, 175)", // 2 
-    "rgb(166, 166, 212)", // 3 
+    "rgb(217, 217, 224)", // 0
+    "rgb(232, 155, 162)", // 1
+    "rgb(244, 244, 175)", // 2
+    "rgb(166, 166, 212)", // 3
 
     "rgb(167, 167, 174)", // 4
 
@@ -78,7 +78,7 @@ export default class PenManager {
   }
 
   /**
-   * 
+   *
    */
   public createPen = (): NeoSmartpen => {
     const pen = new NeoSmartpen();
@@ -87,9 +87,9 @@ export default class PenManager {
 
 
   /**
-   * 
-   * @param pen 
-   * @param device 
+   *
+   * @param pen
+   * @param device
    */
   public add = (pen: NeoSmartpen, device: BluetoothDevice) => {
     console.log(device);
@@ -104,8 +104,8 @@ export default class PenManager {
   }
 
   /**
-   * 
-   * @param device 
+   *
+   * @param device
    */
   public isAlreadyConnected = (device: BluetoothDevice): boolean => {
     const index = this.penArray.findIndex(penInfo => penInfo.id === device.id);
@@ -115,8 +115,8 @@ export default class PenManager {
   }
 
   /**
-   * 
-   * @param pen 
+   *
+   * @param pen
    */
   private removePen = (pen: NeoSmartpen) => {
     const btDeviceId = pen.getBtDevice().id;
@@ -224,8 +224,8 @@ export default class PenManager {
 
 
   /**
-   * 
-   * @param opt 
+   *
+   * @param opt
    */
   public onConnected = (opt: { pen: NeoSmartpen, event: IPenEvent }) => {
     const { pen } = opt;
@@ -241,17 +241,17 @@ export default class PenManager {
       this.penArray.push({ id: pen.getBtDevice().id, mac: pen.getMac(), pen, connected: true });
     }
 
-    var $elem = $("#btn_connect").find(".c2");
+    const $elem = $("#btn_connect").find(".c2");
     $elem.addClass("checked");
     $("#pen_id").text(`${this.penArray.length}`);
-    
+
     const themeManager = ThemeManager.getInstance();
     themeManager.enablePenRelatedButtons(true);
   }
 
   /**
-   * 
-   * @param opt 
+   *
+   * @param opt
    */
   public onDisconnected = (opt: { pen: NeoSmartpen, event: IPenEvent }) => {
     const { pen } = opt;
@@ -267,14 +267,14 @@ export default class PenManager {
 
     $("#pen_id").text(`${this.penArray.length}`);
     if (this.penArray.length === 0) {
-      var $elem = $("#btn_connect").find(".c2");
+      const $elem = $("#btn_connect").find(".c2");
       $elem.removeClass("checked");
     }
   }
 
   /**
-   * 
-   * @param opt 
+   *
+   * @param opt
    */
   public onNcodeError = (opt: { pen: NeoSmartpen, event: IPenEvent }) => {
     // const { pen, event } = opt;
@@ -282,7 +282,7 @@ export default class PenManager {
   }
 
   /**
-   * 
+   *
    */
   getConnectedPens = (): NeoSmartpen[] => {
     /** @type {Array<NeoSmartpen>} */

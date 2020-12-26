@@ -118,7 +118,6 @@ class PenBasedRenderer_module extends React.Component<Props, State> {
   canvas: HTMLCanvasElement = null;
 
   inkStorage: InkStorage = null;
-  curr_pens: NeoSmartpen[] = new Array(0);
 
   fitMargin = 0;
   fixed = false;
@@ -131,24 +130,24 @@ class PenBasedRenderer_module extends React.Component<Props, State> {
     this.canvas = canvas;
   }
 
+  subscribedPens = [] as NeoSmartpen[];
+
   constructor(props: Props) {
     super(props);
 
-    const { pageInfo, inkStorage, baseScale, playState, fitMargin, width, height, fixed, pens, pdfSize, viewFit } = props;
+    const { pageInfo, inkStorage, baseScale, playState, fitMargin, width, height, fixed, pdfSize, viewFit } = props;
     this.inkStorage = inkStorage ? inkStorage : InkStorage.getInstance();
 
     this.canvasId = UTIL.uuidv4();
     this.canvasId = "fabric canvas";
 
-    this.curr_pens = pens;
     this.propsSize = { scale: baseScale, ...pdfSize };
-    
+
     if (fixed !== undefined) this.fixed = fixed;
     if (fitMargin !== undefined) this.fitMargin = fitMargin;
     if (pageInfo !== undefined) this.state.pageInfo = pageInfo;
     if (playState !== undefined) this.state.playState = playState;
     if (viewFit !== undefined) this.state.viewFit = viewFit;
-
   }
 
 
@@ -157,12 +156,16 @@ class PenBasedRenderer_module extends React.Component<Props, State> {
    * @param {NeoSmartpen} pen
    */
   private subscribePenEvent = (pen: NeoSmartpen) => {
-    pen.addEventListener(PenEventName.ON_PEN_DOWN, this.onLivePenDown);
-    pen.addEventListener(PenEventName.ON_PEN_PAGEINFO, this.onLivePenPageInfo);
-    pen.addEventListener(PenEventName.ON_PEN_MOVE, this.onLivePenMove);
-    pen.addEventListener(PenEventName.ON_PEN_UP, this.onLivePenUp);
-    pen.addEventListener(PenEventName.ON_HOVER_MOVE, this.onLiveHoverMove);
-    pen.addEventListener(PenEventName.ON_PEN_HOVER_PAGEINFO, this.onLiveHoverPageInfo);
+    if (!this.subscribedPens.includes(pen)) {
+      pen.addEventListener(PenEventName.ON_PEN_DOWN, this.onLivePenDown);
+      pen.addEventListener(PenEventName.ON_PEN_PAGEINFO, this.onLivePenPageInfo);
+      pen.addEventListener(PenEventName.ON_PEN_MOVE, this.onLivePenMove);
+      pen.addEventListener(PenEventName.ON_PEN_UP, this.onLivePenUp);
+      pen.addEventListener(PenEventName.ON_HOVER_MOVE, this.onLiveHoverMove);
+      pen.addEventListener(PenEventName.ON_PEN_HOVER_PAGEINFO, this.onLiveHoverPageInfo);
+
+      this.subscribedPens.push(pen);
+    }
   }
 
   /**
@@ -170,11 +173,36 @@ class PenBasedRenderer_module extends React.Component<Props, State> {
    * @param {NeoSmartpen} pen
    */
   private unsubscribePenEvent = (pen: NeoSmartpen) => {
-    pen.removeEventListener(PenEventName.ON_PEN_DOWN, this.onLivePenDown);
-    pen.removeEventListener(PenEventName.ON_PEN_PAGEINFO, this.onLivePenPageInfo);
-    pen.removeEventListener(PenEventName.ON_PEN_MOVE, this.onLivePenMove);
-    pen.removeEventListener(PenEventName.ON_PEN_UP, this.onLivePenUp);
-    pen.removeEventListener(PenEventName.ON_HOVER_MOVE, this.onLiveHoverMove);
+    if (this.subscribedPens.includes(pen)) {
+      pen.removeEventListener(PenEventName.ON_PEN_DOWN, this.onLivePenDown);
+      pen.removeEventListener(PenEventName.ON_PEN_PAGEINFO, this.onLivePenPageInfo);
+      pen.removeEventListener(PenEventName.ON_PEN_MOVE, this.onLivePenMove);
+      pen.removeEventListener(PenEventName.ON_PEN_UP, this.onLivePenUp);
+      pen.removeEventListener(PenEventName.ON_HOVER_MOVE, this.onLiveHoverMove);
+
+      const index = this.subscribedPens.indexOf(pen);
+      this.subscribedPens.splice(index, 1);
+    }
+  }
+
+  private unsubscribeAllPensEvent = () => {
+    this.subscribedPens.forEach(pen => {
+      this.unsubscribePenEvent(pen);
+    });
+  }
+
+  /** pen array를 제외하고는 event listening을 하지 않도록 */
+  private makeUpPenEvents = (pens: NeoSmartpen[]) => {
+    // 먼저 이벤트 리스닝을 해제할 것은 하고
+    const needToUnsubscribe = this.subscribedPens.filter(pen => !pens.includes(pen));
+    needToUnsubscribe.forEach(pen => {
+      this.unsubscribePenEvent(pen);
+    });
+
+    const needToSubscribe = pens.filter(pen => !this.subscribedPens.includes(pen));
+    needToSubscribe.forEach(pen => {
+      this.subscribePenEvent(pen);
+    });
 
   }
 
@@ -185,45 +213,11 @@ class PenBasedRenderer_module extends React.Component<Props, State> {
    */
   componentDidMount() {
     const { pens } = this.props;
-    // let { width, height } = this.propsSize;
-
-    // if (this.mainDiv) {
-    //   const node = this.mainDiv;
-    //   const parentHeight = node.offsetHeight;
-    //   const parentWidth = node.offsetWidth;
-
-    //   console.log(`Parent window (width, height) = (${parentWidth}, ${parentHeight})`);
-
-    //   if (!width || !height) {
-    //     width = parentWidth;
-    //     height = parentHeight;
-    //     this.propsSize = { width, height, scale: this.propsSize.scale };
-
-    //     const renderCount = this.state.renderCount;
-    //     this.setState({ renderCount: renderCount + 1 });
-    //   }
-    // }
-
-    // let size = this.size;
-
-    /** @type {{pageId:number, width:number, height:number, pens:Array.<NeoSmartpen> }} */
-
-    // let rect = { x: 0, y: 0, width, height };
-
-    // const page = pages.filter((p) => p.pageNumber === pageId)[0];
-    // console.log("Draw Stroke size", pageId, "canvas size", size, "rect", rect);
-
     console.log(`PenBasedRenderer: size ${this.propsSize.width}, ${this.propsSize.height}`);
 
     console.log("Renderer Inited");
     this.initRenderer(this.propsSize);
-    // window.addEventListener("resize", this.resizeListener);
-
-    // subscribe all event from pen
-    pens.forEach(pen => {
-      console.log(`PenBasedRenderer: componentDidMount, EventSubscribing`);
-      this.subscribePenEvent(pen)
-    });
+    this.makeUpPenEvents(pens);
   }
 
 
@@ -234,24 +228,9 @@ class PenBasedRenderer_module extends React.Component<Props, State> {
   shouldComponentUpdate(nextProps: Props, nextState: State) {
     let ret_val = true;
 
-    if (nextProps.pens !== this.curr_pens) {
-      /** @type {Array<NeoSmartpen>} */
-      const new_pens = nextProps.pens;
-
-      /** @type {Array<NeoSmartpen>} */
-      const curr_pens = this.curr_pens;
-
-      // subscribe all event from pen
-      new_pens.forEach(pen => {
-        console.log(`PenBasedRenderer: shouldComponentUpdate, EventSubscribing`);
-        const index = curr_pens.indexOf(pen);
-        if (index < 0) {
-          this.subscribePenEvent(pen)
-        }
-      });
-
-      this.curr_pens = nextProps.pens;
-
+    if (nextProps.pens !== this.props.pens) {
+      console.log(`PenBasedRenderer: shouldComponentUpdate, EventSubscribing`);
+      this.makeUpPenEvents(nextProps.pens);
       ret_val = true;
     }
 

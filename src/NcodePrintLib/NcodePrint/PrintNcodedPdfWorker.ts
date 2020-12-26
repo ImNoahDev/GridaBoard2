@@ -118,6 +118,7 @@ export default class PrintNcodedPdfWorker {
     }
 
     this.setStatus("configuring");
+    printOption.fingerprint = pdf.fingerprint;
 
     // PrintPdfMain의 printTrigger를 +1 해 주면, 인쇄가 시작된다
     let pdfMapDesc = this.getAssociatedMappingInfo(printOption, pdf);
@@ -126,7 +127,9 @@ export default class PrintNcodedPdfWorker {
       // const mapper = MappingStorage.getInstance();
       // printOption.pageInfo = { ...mapper.getNextIssuableNcodeInfo() };
       printOption.pageInfo = { ...g_nullNcode };
-
+    }
+    else {
+      printOption.pageInfo = { ...pdfMapDesc.nPageStart };
     }
 
     // 기본 값으로는 모든 페이지를 인쇄하도록
@@ -139,6 +142,9 @@ export default class PrintNcodedPdfWorker {
       if (result) {
         this.printOption = result;
         printOption = result;
+
+        // pages per sheet가 바뀌었을 가능성이 있어서
+        pdfMapDesc = this.getAssociatedMappingInfo(printOption, pdf);
       }
       else {
         // 옵션 설정에서 취소를 눌렀다.

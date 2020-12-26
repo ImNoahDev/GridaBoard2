@@ -21,7 +21,7 @@ interface Props extends TooltipProps {
 
 export default function GridaToolTip(props: Props) {
   const { children, tip, open, title, ...rest } = props;
-  let { title: titleDefault } = props;
+  const { title: titleDefault } = props;
 
   let show = open;
 

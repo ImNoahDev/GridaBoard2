@@ -36,7 +36,7 @@ export default class NcodeFetcher {
   public getNcodeData = async (pageInfo: IPageSOBP): Promise<INcodeSurfaceDesc> => {
     // glyph text를 받아 온다.
     let code_txt = "";
-    if (Util.isSamePage(this.pageInfo, pageInfo) && this.codeText.length > 0) {
+    if (Util.isSamePage(this.pageInfo, pageInfo)) {
       console.log(`[fetch] wait for: ${makeNPageIdStr(pageInfo)}`);
       code_txt = await this.fetchPromise;
       console.log(`[fetch] download completed: ${makeNPageIdStr(pageInfo)} len=${code_txt.length}`);
@@ -61,9 +61,27 @@ export default class NcodeFetcher {
 
 
   private fetchNcodeData = async (pageInfo: IPageSOBP): Promise<string> => {
-    // console.log(`[fetch] ${pageInfo.section}.${pageInfo.owner}.${pageInfo.book}.${pageInfo.page}`);
     const url = this.getRawCodeDataUrl(pageInfo);
-    const blob = await fetch(url).then(res => res.blob());
+
+    // const res = await axios.get('https://dog.ceo/api/breeds/list/all');
+    // const blob = await res.blob();
+
+    console.log(`[fetch] ${pageInfo.section}.${pageInfo.owner}.${pageInfo.book}.${pageInfo.page} - URL ${url}`);
+    // const blob = await fetch(url).then(res => res.blob()).catch(reason => {
+    //   console.log(reason);
+    // });
+    const response = await fetch(url);
+    let blob = undefined;
+    try {
+       blob = await response.blob();
+    }
+    catch (e) {
+      console.log(response);
+      console.log(e);
+    }
+    // const blob = await fetch(url).then(res => res.blob()).catch(reason => {
+    //   console.log(reason);
+    // });
 
     if (!blob) return "";
     const buffer = await blob.arrayBuffer();
