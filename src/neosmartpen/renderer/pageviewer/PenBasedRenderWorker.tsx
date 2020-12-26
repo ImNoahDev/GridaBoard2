@@ -41,7 +41,8 @@ interface IPenHoverCursors {
   eraserLastPoint: IPoint,
 
   penTracker: fabric.Circle,
-  hoverPoints: fabric.Circle[]
+  hoverPoints: fabric.Circle[],
+
 }
 
 
@@ -135,14 +136,18 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
     const canvas_xy = this.getPdfXY_scaled(dot);
     const screen_xy = this.getScreenXY(canvas_xy);
     const pen = event.pen;
+
+    const cursor = this.penCursors[event.mac];
     if (pen.penRendererType === IBrushType.ERASER) {
       console.log('ERASE');
-      if (pen.eraserLastPoint !== null) {
-        this.eraseOnLine(pen.eraserLastPoint.x, pen.eraserLastPoint.y,
-          screen_xy.x, screen_xy.y, stroke);
+      if (cursor.eraserLastPoint !== undefined) {
+        this.eraseOnLine(
+          cursor.eraserLastPoint.x, cursor.eraserLastPoint.y,
+          screen_xy.x, screen_xy.y, stroke
+        );
       }
 
-      pen.eraserLastPoint = { x: screen_xy.x, y: screen_xy.y };
+      cursor.eraserLastPoint = { x: screen_xy.x, y: screen_xy.y };
     }
     else {
       const new_path = this.createPenPathFromStroke(stroke);

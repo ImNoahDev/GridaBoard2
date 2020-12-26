@@ -10,7 +10,6 @@ import { NeoStroke, PEN_STATE, PenEventName } from "../DataStructure";
 import { IWritingSurfaceInfo } from "../DataStructure/Structures";
 import NeoDot from "../DataStructure/NeoDot";
 import { IBrushType } from "../DataStructure/Enums"
-import { fabric } from "fabric";
 import PUIController from "../../components/PUIController";
 
 
@@ -88,7 +87,6 @@ export class NeoSmartpen {
   manager: PenManager = PenManager.getInstance();
   dispatcher: Dispatcher = new Dispatcher();
 
-  eraserLastPoint = {} as IPoint;
 
   /**
    *
@@ -282,7 +280,6 @@ export class NeoSmartpen {
           const strokeKey = stroke.key;
           this.storage.setStrokeInfo(strokeKey, section, owner, book, page, timeStamp);
 
-          this.eraserLastPoint = null;
           // hand pen page the event
           this.dispatcher.dispatch(PenEventName.ON_PEN_PAGEINFO, {
             strokeKey, mac, stroke, section, owner, book, page,
