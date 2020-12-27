@@ -191,6 +191,25 @@ export class NeoSmartpen {
     p.upEvent = null;
   }
 
+  processPenDown = (event: IPenEvent) => {
+    // pen down 처리
+    const mac = this.mac;
+    const time = event.timeStamp;
+    const openStrokeArg: IOpenStrokeArg = {
+      mac,
+      time,
+      penTipMode: event.penTipMode,
+      brushType: this.penRendererType,
+      thickness: this.penState[this.penRendererType].thickness,
+      color: this.penState[this.penRendererType].color,
+    }
+
+    const stroke = this.storage.openStroke(openStrokeArg);
+    const strokeKey = stroke.key;
+    this.currPenMovement.stroke = stroke;
+
+    return { strokeKey, mac, time, stroke };
+  }
 
   /**
    *
@@ -208,24 +227,24 @@ export class NeoSmartpen {
       console.error("Ink Storage has not been initialized");
     }
 
-    const mac = this.mac;
-    const time = event.timeStamp;
+    const penDownStrokeInfo = this.processPenDown(event);
+    // const mac = this.mac;
+    // const time = event.timeStamp;
+    // const openStrokeArg: IOpenStrokeArg = {
+    //   mac,
+    //   time,
+    //   penTipMode: event.penTipMode,
+    //   brushType: this.penRendererType,
+    //   thickness: this.penState[this.penRendererType].thickness,
+    //   color: this.penState[this.penRendererType].color,
+    // }
 
-    const openStrokeArg: IOpenStrokeArg = {
-      mac,
-      time,
-      penTipMode: event.penTipMode,
-      brushType: this.penRendererType,
-      thickness: this.penState[this.penRendererType].thickness,
-      color: this.penState[this.penRendererType].color,
-    }
-
-    const stroke = this.storage.openStroke(openStrokeArg);
-    const strokeKey = stroke.key;
-    this.currPenMovement.stroke = stroke;
+    // const stroke = this.storage.openStroke(openStrokeArg);
+    // const strokeKey = stroke.key;
+    // this.currPenMovement.stroke = stroke;
 
     console.log(`NeoSmartpen dispatch event ON_PEN_DOWN`);
-    this.dispatcher.dispatch(PenEventName.ON_PEN_DOWN, { strokeKey, mac, time, stroke });
+    this.dispatcher.dispatch(PenEventName.ON_PEN_DOWN, penDownStrokeInfo);
 
     this.manager.setActivePen(event.penId);
     // event 전달
@@ -255,15 +274,6 @@ export class NeoSmartpen {
     // 이전에 펜 down이 있었으면
     if (this.lastState === PEN_STATE.PEN_DOWN) {
       this.currPenMovement.infoEvent = event;
-      // this.currPenMovement.infoEvent = {
-      //   section: event.section,
-      //   owner: event.owner,
-      //   book: event.book,
-      //   page: event.page,
-
-      //   ...event,
-      // };
-
       if (!this.storage) {
         console.error("Ink Storage has not been initialized");
       }
@@ -298,6 +308,53 @@ export class NeoSmartpen {
       // let ph = this.appPen;
       // ph.onPageInfo(event);
     }
+    else if (this.lastState === PEN_STATE.PEN_MOVE) {
+      // 펜 move 중 페이지가 바뀌는 경우
+
+
+      // 1) pen up 처리
+      {
+        const penUpStrokeInfo = this.processPenUp(event);
+        const { mac, section, owner, book, page } = penUpStrokeInfo.stroke;
+
+        console.log(`NeoSmartpen dispatch event VIRTUAL ON_PEN_UP`);
+        this.dispatcher.dispatch(PenEventName.ON_PEN_UP, { ...penUpStrokeInfo, mac, pen: this, section, owner, book, page });
+        this.resetPenStroke();
+
+      }
+
+      // 2) pen down처리
+      {
+        const penDownStrokeInfo = this.processPenDown(event);
+        console.log(`NeoSmartpen dispatch event VIRTUAL ON_PEN_DOWN`);
+        this.dispatcher.dispatch(PenEventName.ON_PEN_DOWN, penDownStrokeInfo);
+      }
+
+      // 3) page Info 처리
+      const { section, owner, book, page, timeStamp } = event;
+      const mac = this.mac;
+
+      if (!hover) {
+        // storage에 저장
+        const stroke = this.currPenMovement.stroke;
+        const strokeKey = stroke.key;
+        this.storage.setStrokeInfo(strokeKey, section, owner, book, page, timeStamp);
+
+        // hand pen page the event
+        this.dispatcher.dispatch(PenEventName.ON_PEN_PAGEINFO, {
+          strokeKey, mac, stroke, section, owner, book, page,
+          time: event.timeStamp
+        });
+      }
+      else {
+        // hand hover page the event
+        this.dispatcher.dispatch(PenEventName.ON_PEN_HOVER_PAGEINFO, {
+          mac, section, owner, book, page, time: event.timeStamp
+        });
+
+      }
+    }
+
 
     if (hover) {
       const { section, owner, book, page, timeStamp } = event;
@@ -315,14 +372,6 @@ export class NeoSmartpen {
     return;
   }
 
-
-
-  private adjustPaperXminYmin = (event: IPenEvent) => {
-    event.x -= this.surfaceInfo.Xmin;
-    event.y -= this.surfaceInfo.Ymin;
-
-    return event;
-  }
 
   /**
    * pen down 상태에서 움직임
@@ -431,9 +480,9 @@ export class NeoSmartpen {
   }
 
   /**
- * hover 상태에서 움직임
- * @param event
- */
+  * hover 상태에서 움직임
+  * @param event
+  */
   onHoverPageInfo = (event: IPenEvent) => {
     this.lastState = PEN_STATE.HOVER_MOVE;
 
@@ -443,6 +492,15 @@ export class NeoSmartpen {
     }
 
     this.dispatcher.dispatch(PenEventName.ON_PEN_HOVER_PAGEINFO, { pen: this, mac, event } as IPenToViewerEvent);
+  }
+
+
+  processPenUp = (event: IPenEvent) => {
+    const stroke = this.currPenMovement.stroke;
+    const strokeKey = stroke.key;
+    this.storage.closeStroke(strokeKey);
+
+    return { strokeKey, stroke };
   }
 
   /**
@@ -459,16 +517,17 @@ export class NeoSmartpen {
       console.error("Ink Storage has not been initialized");
     }
 
-    if (this.penRendererType !== IBrushType.ERASER) {
-      const stroke = this.currPenMovement.stroke;
-      const strokeKey = stroke.key;
-      this.storage.closeStroke(strokeKey);
+    // const stroke = this.currPenMovement.stroke;
+    // const strokeKey = stroke.key;
+    // this.storage.closeStroke(strokeKey);
+    // const { mac, section, owner, book, page } = penUpStrokeInfo.stroke;
+    // this.dispatcher.dispatch(PenEventName.ON_PEN_UP, { strokeKey, mac, pen: this, stroke, section, owner, book, page });
 
-      const { mac, section, owner, book, page } = stroke;
-      this.dispatcher.dispatch(PenEventName.ON_PEN_UP, { strokeKey, mac, pen: this, stroke, section, owner, book, page });
+    const penUpStrokeInfo = this.processPenUp(event);
+    const { mac, section, owner, book, page } = penUpStrokeInfo.stroke;
+    this.dispatcher.dispatch(PenEventName.ON_PEN_UP, { ...penUpStrokeInfo, mac, pen: this, section, owner, book, page });
 
-      this.resetPenStroke();
-    }
+    this.resetPenStroke();
   }
 
   /**

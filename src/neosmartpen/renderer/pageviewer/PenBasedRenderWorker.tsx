@@ -5,12 +5,12 @@ import { fabric } from "fabric";
 
 // import { PLAYSTATE } from "./StorageRenderer";
 import { InkStorage } from "../..";
-import { drawPath } from "./DrawCurves";
+import { drawPath, drawPath_arr } from "./DrawCurves";
 // import { NCODE_TO_SCREEN_SCALE } from "../../constants";
 import { paperInfo } from "../../noteserver/PaperInfo";
 import { NeoDot, NeoStroke } from "../../DataStructure";
 import { IBrushType } from "../../DataStructure/Enums";
-import { INeoStrokeProps } from "../../DataStructure/NeoStroke";
+import { INeoStrokeProps, StrokeStatus } from "../../DataStructure/NeoStroke";
 import { IPageSOBP, IPoint } from "../../DataStructure/Structures";
 
 import $ from "jquery";
@@ -45,22 +45,22 @@ interface IPenHoverCursors {
 
 }
 
+type IExtendedPathType = fabric.Path & {
+  key?: string,
+  color?,
+}
 
 export default class PenBasedRenderWorker extends RenderWorkerBase {
 
-  /** @type {Array<fabric.Path>} */
-  localPathArray = new Array(0);
+  localPathArray: IExtendedPathType[] = [];
 
-
-  /** @type {Object.<string, {stroke:NeoStroke, path:fabric.Path}>} */
-  livePaths = {};
-
+  livePaths: { [key: string]: { stroke: NeoStroke, path: IExtendedPathType } } = {};
 
   storage = InkStorage.getInstance();
 
   visibleHoverPoints: number = NUM_HOVER_POINTERS;
-  pathHoverPoints: Array<fabric.Circle> = new Array(0);
 
+  // pathHoverPoints: fabric.Circle[] = [];
   penCursors: { [key: string]: IPenHoverCursors } = {};
 
   /**
@@ -124,13 +124,8 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
     //pen tracker rendering
     this.movePenTracker(event);
 
-    const pathData = this.livePaths[event.strokeKey];
-    const { path, stroke } = pathData;
+    const live = this.livePaths[event.strokeKey];
     const dot = event.dot;
-
-    if (path) {
-      this.canvasFb.remove(path);
-    }
 
     //지우개 구현
     const canvas_xy = this.getPdfXY_scaled(dot);
@@ -143,20 +138,23 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
       if (cursor.eraserLastPoint !== undefined) {
         this.eraseOnLine(
           cursor.eraserLastPoint.x, cursor.eraserLastPoint.y,
-          screen_xy.x, screen_xy.y, stroke
+          screen_xy.x, screen_xy.y, live.stroke
         );
       }
 
       cursor.eraserLastPoint = { x: screen_xy.x, y: screen_xy.y };
     }
     else {
-      const new_path = this.createPenPathFromStroke(stroke);
-
-      if (this.canvasFb) {
+      if (!live.path) {
+        const new_path = this.createFabricPath(live.stroke, false);
+        live.path = new_path as IExtendedPathType;
         this.canvasFb.add(new_path);
-        pathData.path = new_path;
       }
-
+      else {
+        const pathData = this.createPathData_arr(live.stroke);
+        const obj = live.path as fabric.Path;
+        obj.path = pathData as any;
+      }
 
       this.focusToDot(dot);
     }
@@ -179,7 +177,6 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
       this.localPathArray.push(path);
       path.fill = path.color;
       path.stroke = path.color;
-      // this.canvas.renderAll();
     }
 
     delete this.livePaths[event.strokeKey];
@@ -306,7 +303,7 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
       hps[i].set({ left: canvas_xy.x - r, top: canvas_xy.y - r });
       hps[i].visible = false;
     }
-    this.canvasFb.renderAll();
+    this.canvasFb.requestRenderAll();
 
     if (cursor.intervalHandle) {
       clearInterval(cursor.intervalHandle);
@@ -342,7 +339,7 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
     for (let i = 0; i < cursor.visibleHoverPoints; i++) {
       hps[i].visible = isPointerVisible;
     }
-    this.canvasFb.renderAll();
+    this.canvasFb.requestRenderAll();
 
     if (cursor.intervalHandle) {
       clearInterval(cursor.intervalHandle);
@@ -373,7 +370,7 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
         cursor.visibleHoverPoints--;
         if (cursor.visibleHoverPoints >= 0) {
           hps[cursor.visibleHoverPoints].visible = false;
-          self.canvasFb.renderAll();
+          self.canvasFb.requestRenderAll();
         } else {
           clearInterval(cursor.intervalHandle);
         }
@@ -400,7 +397,8 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
 
     // page에 있는 stroke를 가져온다
     const pageInfo = { section, owner, book, page };
-    const strokes = this.storage.getPageStrokes(pageInfo);
+    const strokesAll = this.storage.getPageStrokes(pageInfo);
+    const strokes = strokesAll.filter(stroke => stroke.brushType !== IBrushType.ERASER);
 
     //test
     // const testStroke = this.generateA4CornerStrokeForTest(pageInfo);
@@ -437,6 +435,7 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
       color: "rgba(0,0,255,255)",
       brushType: IBrushType.PEN,
       thickness: 1,
+      status: StrokeStatus.NORMAL,
     }
     const defaultStroke = new NeoStroke(strokeArg);
 
@@ -528,21 +527,48 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
 
     strokes.forEach((stroke) => {
       if (stroke.dotArray.length > 0) {
-        const path = this.createPenPathFromStroke(stroke);
+        const path = this.createFabricPath(stroke, true);
         this.canvasFb.add(path);
         this.localPathArray.push(path);
       }
     });
   }
 
-  createPenPathFromStroke = (stroke: NeoStroke) => {
-    const { dotArray, color, thickness, brushType, key } = stroke;
+  createPathData_arr = (stroke: NeoStroke) => {
+    const { dotArray, thickness } = stroke;
 
     const pointArray = [];
     dotArray.forEach((dot) => {
       const pt = this.getPdfXY_scaled(dot);
       pointArray.push(pt);
     });
+
+    const strokeThickness = thickness / 64;
+    const pathData_arr = drawPath_arr(pointArray, strokeThickness);
+
+    return pathData_arr;
+  }
+
+
+
+  createPathData = (stroke: NeoStroke) => {
+    const { dotArray, thickness } = stroke;
+
+    const pointArray = [];
+    dotArray.forEach((dot) => {
+      const pt = this.getPdfXY_scaled(dot);
+      pointArray.push(pt);
+    });
+
+    const strokeThickness = thickness / 64;
+    const pathData = drawPath(pointArray, strokeThickness);
+
+    return pathData;
+  }
+
+  createFabricPath = (stroke: NeoStroke, cache: boolean) => {
+    const { color, brushType, key } = stroke;
+    const pathData = this.createPathData(stroke);
 
     let opacity = 0;
     switch (brushType) {
@@ -552,7 +578,6 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
     }
 
     const pathOption = {
-      objectCaching: false,
       stroke: color, //"rgba(0,0,0,255)"
       fill: color, //위에 두놈은 그려지는 순간의 color
       color: color, //얘가 canvas에 저장되는 color
@@ -565,13 +590,10 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
       data: STROKE_OBJECT_ID,    // neostroke
       evented: true,
       key: key,
+      objectCaching: cache,
     };
-
-    const strokeThickness = thickness / 64;
-    const pathData = drawPath(pointArray, strokeThickness);
     const path = new fabric.Path(pathData, pathOption);
 
     return path;
   }
-
 }

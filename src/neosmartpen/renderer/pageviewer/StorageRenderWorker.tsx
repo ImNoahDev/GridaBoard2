@@ -242,23 +242,6 @@ export default class StorageRenderWorker {
     canvas.on('mouse:move', this.onCanvasMouseMove);
     canvas.on('mouse:up', this.onCanvasMousUp);
     canvas.on('mouse:wheel', this.onCanvasMouseWheel);
-
-
-    // // this.canvas.isDrawingMode = true
-    // return new Promise((resolve, reject) => {
-    //   fabric.Image.fromURL( bgurl, (img) => {
-    //       // console.log("bgurl !!!!!!!!!!!!!!!",bgurl);
-    //       img.scaleToWidth(size.width);
-    //       // img.scaleToHeight(size.height)
-    //       this.backgroundImage = img;
-    //       img.selectable = false;
-    //       this.canvas.setBackgroundImage( img, this.canvas.renderAll.bind(this.canvas) );
-    //       // console.log("image size", size, img.width, img.height);
-    //       resolve();
-    //     },
-    //     { crossOrigin: "Anonymous" }
-    //   );
-    // });
   }
 
   drawPageLayout = () => {
@@ -814,7 +797,6 @@ export default class StorageRenderWorker {
       this.pathArray.push(path);
       path.fill = path.color;
       path.stroke = path.color;
-      // this.canvas.renderAll();
     }
 
     delete this.livePaths[event.strokeKey];

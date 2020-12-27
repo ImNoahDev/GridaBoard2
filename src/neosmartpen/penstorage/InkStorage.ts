@@ -3,7 +3,7 @@ import "../types";
 import { NeoStroke, NeoDot, PenEventName, IBrushType } from "../DataStructure";
 import { IPageSOBP } from "../DataStructure/Structures";
 import Dispatcher, { EventCallbackType } from "./EventSystem";
-import { INeoStrokeProps } from "../DataStructure/NeoStroke";
+import { INeoStrokeProps, StrokeStatus } from "../DataStructure/NeoStroke";
 
 /** @type {InkStorage} */
 let _storage_instance = null;
@@ -21,38 +21,34 @@ export interface IOpenStrokeArg {
 
 
 export default class InkStorage {
-  completed: NeoStroke[];
-  realtime: Map<string, NeoStroke>;
-  completedOnPage: Map<string, NeoStroke[]>;
+  completed: NeoStroke[] = [];  // completed strokes
 
-  realtimeOnPage: Map<string, Map<string, NeoStroke>>;
+  /** sourceKey ("uuid" ) ==> Stroke */
+  realtime: Map<string, NeoStroke> = new Map(); // realtime strokes (incompleted strokes)
 
-  _storage_instance: InkStorage;
-  dispatcher: Dispatcher;
+  /** (pageId) ==> ({penId : NeoStroke[]}) */
+  completedOnPage: Map<string, NeoStroke[]> = new Map();
 
-  lastPageInfo: IPageSOBP;
+  /** (pageId) ==> ({strokeKey : NeoStroke}) */
+  realtimeOnPage: Map<string, Map<string, NeoStroke>> = new Map();
+
+  dispatcher: Dispatcher = new Dispatcher();
+
+  lastPageInfo: IPageSOBP = { section: -1, book: -1, owner: -1, page: -1 };
 
 
   /** @type {InkStorage} */
   // static instance;
   constructor() {
     if (_storage_instance) return _storage_instance;
-
-    this.completed = [];            // completed strokes
-
-    /** sourceKey ("uuid" ) ==> Stroke */
-    this.realtime = new Map();    // realtime strokes (incompleted strokes)
-
-    /** (pageId) ==> ({penId : NeoStroke[]}) */
-    this.completedOnPage = new Map();
-
-    /** (pageId) ==> ({strokeKey : NeoStroke}) */
-    this.realtimeOnPage = new Map();
-
     _storage_instance = this;
-    this.dispatcher = new Dispatcher();
-    this.lastPageInfo = { section: -1, book: -1, owner: -1, page: -1 };
 
+    // this.completed = [];            // completed strokes
+    // this.realtime = new Map();    // realtime strokes (incompleted strokes)
+    // this.completedOnPage = new Map();
+    // this.realtimeOnPage = new Map();
+    // this.dispatcher = new Dispatcher();
+    // this.lastPageInfo = { section: -1, book: -1, owner: -1, page: -1 };
   }
 
   /**
@@ -133,6 +129,17 @@ export default class InkStorage {
     }
 
     return [];
+  }
+
+  public collisionTest = (pageInfo: IPageSOBP, line: { x0_nu: number, y0_nu: number, x1_nu: number, y1_nu: number }) => {
+    // 여기서 충돌 테스트를 하고, 결과를 넘겨 줄 것, 구현해야 함
+    const ret: NeoStroke[] = [];
+
+    return ret;
+  }
+
+  public markErased = (stroke: NeoStroke) => {
+    stroke.status = StrokeStatus.ERASED;
   }
 
   /**
@@ -222,18 +229,18 @@ export default class InkStorage {
     return `${section}.${book}.${owner}.${page}`;
   }
 
-  static getPageSOBP( pageId: string ) : IPageSOBP {
+  static getPageSOBP(pageId: string): IPageSOBP {
     const arr = pageId.split(".");
-    if ( arr.length !== 4 ) {
+    if (arr.length !== 4) {
       return {
         section: -1,
-        owner:-1,
-        book:-1,
-        page:-1,
+        owner: -1,
+        book: -1,
+        page: -1,
       };
     }
 
-    const ret : IPageSOBP = {
+    const ret: IPageSOBP = {
       section: parseInt(arr[0]),
       owner: parseInt(arr[1]),
       book: parseInt(arr[2]),
@@ -267,7 +274,9 @@ export default class InkStorage {
       thickness,
       brushType,
       color,
+      status: brushType === IBrushType.ERASER ? StrokeStatus.ERASED : StrokeStatus.NORMAL,
     }
+
     const stroke = new NeoStroke(strokeProps);
     // stroke.thickness = thickness;     // kitty
     stroke.penTipMode = 0;    // kitty

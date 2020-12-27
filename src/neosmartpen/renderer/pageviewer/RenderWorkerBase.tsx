@@ -195,13 +195,13 @@ export default class RenderWorkerBase {
     if (typeof (shouldDisplayGrid) === "boolean") this.shouldDisplayGrid = shouldDisplayGrid;
 
     this.options = options;
-    this.init();
+    this.initFabricCanvas();
   }
 
   /**
    * @protected
    */
-  init = () => {
+  initFabricCanvas = () => {
     const size = this.pageSize;
 
     // let HtmlCanvas = this.canvas.current;

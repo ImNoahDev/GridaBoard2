@@ -241,6 +241,8 @@ class Page extends Component<PageProps> {
   }
 
   renderPage = async (page: NeoPdfPage, zoom: number) => {
+    if (!this.canvas) return;
+
     const viewport: any = page.getViewport({ scale: 1 });
     const { width, height } = viewport;
     const canvas = this.canvas;
@@ -305,7 +307,7 @@ class Page extends Component<PageProps> {
 
   render = () => {
     const { status } = this.state;
-    const { pdf, index, scale, position, ...rest} = this.props;
+    const { pdf, index, scale, position, ...rest } = this.props;
 
     const zoom = this.props.position.zoom;
     const pageCanvas: CSSProperties = {
