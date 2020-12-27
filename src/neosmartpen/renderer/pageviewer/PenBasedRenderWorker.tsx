@@ -36,7 +36,7 @@ interface IPenHoverCursors {
 
   visibleHoverPoints: number,
   // pathHoverPoints: Array<fabric.Circle> = new Array(0);
-  timeOut: number,
+  intervalHandle: number,
   waitCount: number,
   eraserLastPoint: IPoint,
 
@@ -255,7 +255,7 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
 
       this.penCursors[mac] = {
         visibleHoverPoints: NUM_HOVER_POINTERS,
-        timeOut: 0,
+        intervalHandle: 0,
         waitCount: 0,
         eraserLastPoint: undefined,
         penTracker: penTrackerObj[0] as fabric.Circle,
@@ -297,19 +297,20 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
     const radius = obj.radius;
     obj.set({ left: canvas_xy.x - radius, top: canvas_xy.y - radius });
     obj.setCoords();
-    this.canvasFb.renderAll();
 
     const pen = event.pen;
 
-    cursor.waitCount = REMOVE_HOVER_POINTS_WAIT;
-    cursor.visibleHoverPoints--;
-    if (cursor.visibleHoverPoints >= 0) {
-      cursor.hoverPoints[cursor.visibleHoverPoints].visible = false;
+    const hps = cursor.hoverPoints;
+    for (let i = 0; i < cursor.visibleHoverPoints; i++) {
+      const r = hps[i].radius;
+      hps[i].set({ left: canvas_xy.x - r, top: canvas_xy.y - r });
+      hps[i].visible = false;
     }
+    this.canvasFb.renderAll();
 
-    if (cursor.timeOut) {
-      clearInterval(cursor.timeOut);
-      cursor.timeOut = 0;
+    if (cursor.intervalHandle) {
+      clearInterval(cursor.intervalHandle);
+      cursor.intervalHandle = 0;
     }
   }
 
@@ -329,15 +330,13 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
 
     // hover point를 쉬프트해서 옮겨 놓는다
     for (let i = NUM_HOVER_POINTERS - 1; i > 0; i--) {
-      hps[i].left = hps[i - 1].left;
-      hps[i].top = hps[i - 1].top;
+      hps[i].set({ left: hps[i - 1].left, top: hps[i - 1].top });
       hps[i].setCoords();
     }
 
-    hps[0].left = canvas_xy.x;
-    hps[0].top = canvas_xy.y;
+    const r = hps[0].radius;
+    hps[0].set({ left: canvas_xy.x - r, top: canvas_xy.y - r });
     hps[0].setCoords();
-
 
     cursor.visibleHoverPoints = NUM_HOVER_POINTERS;
     for (let i = 0; i < cursor.visibleHoverPoints; i++) {
@@ -345,18 +344,18 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
     }
     this.canvasFb.renderAll();
 
-    if (cursor.timeOut) {
-      clearInterval(cursor.timeOut);
-      cursor.timeOut = null;
+    if (cursor.intervalHandle) {
+      clearInterval(cursor.intervalHandle);
+      cursor.intervalHandle = 0;
     }
     cursor.waitCount = 0;
     const self = this;
 
-    cursor.timeOut = window.setInterval(() => {
+    cursor.intervalHandle = window.setInterval(() => {
       const cursor = this.penCursors[e.mac];
       if (!cursor) {
         console.log(`ERROR: pen cursor has not been initiated`);
-        clearInterval(cursor.timeOut);
+        clearInterval(cursor.intervalHandle);
         return;
       }
       const hps = cursor.hoverPoints;
@@ -376,7 +375,7 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
           hps[cursor.visibleHoverPoints].visible = false;
           self.canvasFb.renderAll();
         } else {
-          clearInterval(cursor.timeOut);
+          clearInterval(cursor.intervalHandle);
         }
       }
     }, REMOVE_HOVER_POINTS_INTERVAL);
@@ -394,6 +393,7 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
     // 현재 모든 stroke를 지운다.
     this.removeAllCanvasObject();
     this.resetLocalPathArray();
+    this.resetPageDependentData();
 
     // grid를 그려준다
     this.drawPageLayout();
@@ -470,6 +470,13 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
   resetLocalPathArray = () => {
     this.localPathArray = new Array(0);
 
+  }
+
+  resetPageDependentData = () => {
+    Object.keys(this.penCursors).forEach(key => {
+      const cursor = this.penCursors[key];
+      cursor.eraserLastPoint = undefined;
+    });
   }
 
   /**

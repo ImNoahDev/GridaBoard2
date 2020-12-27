@@ -276,14 +276,6 @@ export default class RenderWorkerBase {
         Mag: info.Mag,
         rotation: this.options.rotation,
       };
-
-      const width_pu = (info.Xmax - info.Xmin) * 6.72;
-      const height_pu = (info.Ymax - info.Ymin) * 6.72;
-
-      this.viewSize = {
-        width: width_pu,
-        height: height_pu,
-      }
     }
 
     return true;

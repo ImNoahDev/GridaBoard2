@@ -9,8 +9,8 @@ const UrlActionType = Object.freeze({
 //]
 
 const initialState = {
-  filename: undefined,
-  url: undefined,
+  filename: "A4_Pirates-of-the-Caribbean-Hes-a-Pirate-Klaus-Badelt.pdf",
+  url: "./A4_Pirates-of-the-Caribbean-Hes-a-Pirate-Klaus-Badelt.pdf",
 };
 
 
