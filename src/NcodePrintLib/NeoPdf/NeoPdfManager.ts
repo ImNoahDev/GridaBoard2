@@ -3,9 +3,9 @@ import NeoPdfDocument, { IGetDocumentOptions } from "./NeoPdfDocument";
 import EventDispatcher, { EventCallbackType } from "../../neosmartpen/penstorage/EventSystem";
 import { MappingStorage } from "../SurfaceMapper";
 import { IMappingStorageEvent, MappingStorageEventName } from "../SurfaceMapper/MappingStorage";
+import * as PdfJs from "pdfjs-dist";
 
 let _pdf_manager: NeoPdfManager = undefined;
-
 
 
 /** @enum {string} */
@@ -46,13 +46,12 @@ export default class NeoPdfManager {
   public getDocument = async (options: IGetDocumentOptions) => {
     if (options.url && !options.fingerprint) {
       const pdf = new NeoPdfDocument();
-      // console.log(`+GRIDA DOC+, getDocument START ${pdf.filename},  purpose:${pdf.purpose} - ${pdf.url}`);
-      const load = await pdf.load(options);
-
-      // console.log(`+GRIDA DOC+, getDocument COMPLETED ${pdf.filename},  purpose:${pdf.purpose} - ${pdf.url}`);
+      console.log(`+GRIDA DOC+, getDocument START ${pdf._uuid},  purpose:${pdf.purpose} - ${pdf.url}`);
+      await pdf.load(options);
+      console.log(`+GRIDA DOC+, getDocument COMPLETED ${pdf._uuid},  purpose:${pdf.purpose} - ${pdf.url}`);
 
       this.dispatcher.dispatch(PdfManagerEventName.ON_PDF_LOADED, { pdf });
-      return load;
+      return pdf;
 
     }
     else {
@@ -66,7 +65,7 @@ export default class NeoPdfManager {
 
       if (status.result === "success") {
         const doc = new NeoPdfDocument();
-        return await doc.load({ url: status.url, filename: status.file.name, purpose: "to be opened from Google Drive by NeoPdfManager " });
+        // return await doc.load({ url: status.url, filename: status.file.name, purpose: "to be opened from Google Drive by NeoPdfManager " });
       }
 
       if (status.result === "not match") {
@@ -110,7 +109,7 @@ export default class NeoPdfManager {
   static checkFingerprint = async (options: IGetDocumentOptions, fingerprint: string) => {
 
     let doc = new NeoPdfDocument();
-    await doc.load(options);
+    // await doc.load(options);
 
     const docFingerprint = doc.fingerprint;
 

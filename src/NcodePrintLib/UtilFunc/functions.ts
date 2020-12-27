@@ -1,10 +1,6 @@
-/// util functions, UTIL, utils
-
 import { sprintf } from "sprintf-js";
-import { isObject } from "util";
 import { IPageSOBP } from "../DataStructure/Structures";
 import { IUnitString } from "../NcodePrint/PrintDataTypes";
-import { IPaperSize } from "../NcodeSurface/SurfaceDataTypes";
 import { g_availablePagesInSection } from "../NcodeSurface/SurfaceInfo";
 
 export function compareObject(curr: Object, next: Object, header = "") {
@@ -348,4 +344,3 @@ export function hex2ColorObject(hex) {
   }
   throw new Error('Bad Hex');
 }
-

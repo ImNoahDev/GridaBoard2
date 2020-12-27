@@ -20,10 +20,6 @@ import { g_nullNcode, g_defaultPrintOption } from "../DefaultOption";
 // https://stackoverflow.com/questions/9616426/javascript-print-iframe-contents-only/9616706
 // ifame
 
-// PdfJs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${PdfJs.version}/pdf.worker.js`;
-// var CMAP_URL = "./cmaps/";
-// var CMAP_PACKED = true;
-
 type IPrintOptionCallbackType = (arg: IPrintOption) => Promise<IPrintOption>;
 
 let g_printCancelFired = false;
@@ -85,6 +81,7 @@ export default class PrintNcodedPdfWorker {
   private loadPdf = async (url: string, filename: string, printOption: IPrintOption) => {
     if (url === undefined) return;
 
+    // const loaded = await NeoPdfManager.getDocument({ url, filename, purpose: "to be printed by PrintNcodedPdfWorker", });
     const loaded = await NeoPdfManager.getInstance().getDocument({ url, filename, purpose: "to be printed by PrintNcodedPdfWorker", });
     if (loaded) {
       // console.log(`[yyy] setPageOverview called`);

@@ -16,9 +16,6 @@ import { diffPropsAndState } from "../../UtilFunc";
 import { g_defaultPrintOption } from "../../DefaultOption";
 import ProgressDialog from "../ProgressDialog";
 
-// PdfJs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${PdfJs.version}/pdf.worker.js`;
-// var CMAP_URL = "./cmaps/";
-// var CMAP_PACKED = true;
 
 export interface IPrintPdfButtonProps extends ButtonProps {
   /** 인쇄될 문서의 url, printOption.url로 들어간다. */
@@ -120,7 +117,7 @@ export default class PrintPdfButton extends React.Component<IPrintPdfButtonProps
   }
 
   shouldComponentUpdate(nextProps: IPrintPdfButtonProps, nextState: State) {
-    diffPropsAndState("PrintPdfButton", this.props, nextProps, this.state, nextState);
+    // diffPropsAndState("PrintPdfButton", this.props, nextProps, this.state, nextState);
 
     let needToCheck = false;
     if (this.props.url !== nextProps.url) {
@@ -221,6 +218,7 @@ export default class PrintPdfButton extends React.Component<IPrintPdfButtonProps
   loadPdf = (url: string, filename: string) => {
     if (url === undefined) return;
 
+    // const loadingPromise = NeoPdfManager.getDocument({ url, filename, purpose: "to be printed by PrintPdfButton", });
     const loadingPromise = NeoPdfManager.getInstance().getDocument({ url, filename, purpose: "to be printed by PrintPdfButton", });
     // console.log(`[yyy] `);
     // console.log(`[yyy] LOAIND: ${url}`);

@@ -68,24 +68,6 @@ export default class GridaDoc {
 
   }
 
-  // public addPdfDoc = (option: IGetDocumentOptions) => {
-  //   // 1) 먼저 PDF를 저장하고 
-  //   const promise = NeoPdfManager.getInstance().getDocument(option);
-  //   const pdfObj = {
-  //     pdfNames: option,
-  //     pdf: undefined,
-  //     promise: promise,
-  //   }
-  //   this.pdfs.push(pdfObj);
-
-  //   promise.then((pdf) => {
-  //     pdfObj.pdf = pdf;
-
-  //     // 2) 페이지를 넣어 주자
-  //     this.addPdfPages(pdf);
-  //   });
-  // }
-
   public addNcodePage = (pageInfo: IPageSOBP) => {
     const map: IPageMapItem = {
       pageInfo,

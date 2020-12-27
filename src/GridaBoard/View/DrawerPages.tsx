@@ -3,9 +3,6 @@ import React, { CSSProperties } from "react";
 import GridaDoc from "../GridaDoc";
 // import PropTypes from "prop-types";
 
-// PdfJs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${PdfJs.version}/pdf.worker.js`;
-// const CMAP_URL = "./cmaps/";
-// const CMAP_PACKED = true;
 
 interface Props {
   title?: "";

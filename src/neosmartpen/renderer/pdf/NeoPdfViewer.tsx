@@ -10,10 +10,6 @@ import { TransformParameters } from "../../../NcodePrintLib/Coordinates";
 import { diffPropsAndState } from "../../../NcodePrintLib/UtilFunc/functions";
 
 
-// PdfJs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${PdfJs.version}/pdf.worker.js`;
-// const CMAP_URL = "./cmaps/";
-// const CMAP_PACKED = true;
-
 interface Props {
   url: string,
 
@@ -64,8 +60,7 @@ class NeoPdfViewer extends React.Component<Props, State> {
     // kitty, 나중에는 분리할 것
     showUIProgressBackdrop();
     console.log("*GRIDA DOC*, loadDocument START");
-    // const neoPdf = new NeoPdfDocument();
-    // const loadingTask = neoPdf.load({ url, filename, purpose: "MAIN DOCUMENT: to be opend by NeoPdfViewer" });
+    // const loadingTask = NeoPdfManager.getDocument({ url, filename, purpose: "MAIN DOCUMENT: to be opend by NeoPdfViewer" });
     const loadingTask = NeoPdfManager.getInstance().getDocument({ url, filename, purpose: "MAIN DOCUMENT: to be opend by NeoPdfViewer" });
     this.setState({ status: "loading" });
 
