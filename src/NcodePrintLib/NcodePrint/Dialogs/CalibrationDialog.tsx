@@ -90,7 +90,7 @@ function CalibrationDialog(props: IDialogProps) {
 
 
   // useEffect(() => {
-  //   NeoPdfManager.getDocument({ url: props.url }).then(loadedPdf => {
+  //   NeoPdfManager.getInstance().getDocument({ url: props.url }).then(loadedPdf => {
   //     if (loadedPdf) {
   //       const w = imgWidth * imgDensity;
   //       const h = imgHeight * imgDensity;
@@ -122,7 +122,7 @@ function CalibrationDialog(props: IDialogProps) {
 
   useEffect(() => {
     if (show) {
-      NeoPdfManager.getDocument({ url: props.url, filename: props.filename }).then(loadedPdf => {
+      NeoPdfManager.getInstance().getDocument({ url: props.url, filename: props.filename }).then(loadedPdf => {
         if (loadedPdf) {
           const w = imgWidth * imgDensity;
           const h = imgHeight * imgDensity;

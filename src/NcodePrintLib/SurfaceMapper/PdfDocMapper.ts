@@ -1,12 +1,12 @@
-import { CoordinateTanslater, IMappingParams, IPdfMappingDesc } from "../Coordinates";
+import { CoordinateTanslater, IPageMapItem, IPdfToNcodeMapItem } from "../Coordinates";
 import { IPageSOBP } from "../DataStructure/Structures";
 import * as Util from "../UtilFunc";
 import { g_availablePagesInSection } from "../NcodeSurface/SurfaceInfo";
 
 export default class PdfDocMapper {
-  private _arrMapped: IMappingParams[] = [];
+  private _arrMapped: IPageMapItem[] = [];
 
-  private _docMap: IPdfMappingDesc;
+  private _docMap: IPdfToNcodeMapItem;
 
   private _filename: string;
 
@@ -32,10 +32,10 @@ export default class PdfDocMapper {
   }
 
 
-  public push = (item: IMappingParams) => {
+  public push = (item: IPageMapItem) => {
     this._arrMapped.push(item);
 
-    const compare = (a: IMappingParams, b: IMappingParams) => {
+    const compare = (a: IPageMapItem, b: IPageMapItem) => {
       const p1 = Util.makeNPageId(a.pageInfo);
       const p2 = Util.makeNPageId(b.pageInfo);
 
@@ -90,7 +90,7 @@ export default class PdfDocMapper {
        * 더미는, 첫 페이지의 매핑 정보를 그대로 활용한다. 대부분 같으리라
        */
       if (idx < 0) {
-        const item: IMappingParams = Util.cloneObj(head);
+        const item: IPageMapItem = Util.cloneObj(head);
 
         item.pdfDesc.pageNo = pgNo;
         item.pageInfo.page = (pi.page + (pgNo - 1)) % availablePages;

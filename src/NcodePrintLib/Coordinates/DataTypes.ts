@@ -90,7 +90,7 @@ export interface IPdfPageDesc {
   pageNo: number,
 }
 
-export type IPdfMappingDesc = {
+export interface IPdfToNcodeMapItem {
   /** PDF url */
   url: string,
 
@@ -112,7 +112,7 @@ export type IPdfMappingDesc = {
   /** mapping 정보가 생성된 시각 */
   timeString?: string,
 
-  params?: IMappingParams[],
+  params?: IPageMapItem[],
 }
 
 
@@ -126,7 +126,7 @@ export type IPdfMappingDesc = {
  *    x' = (x*h[0] + y*h[1] + h[2]) / G;
  *    y' = (x*h[3] + y*h[4] + h[5]) / G;
  */
-export interface IMappingParams {
+export interface IPageMapItem {
   /** 최초 로컬 Mapping Storage에 store된 시각 */
   timeString?: string,
 

@@ -8,7 +8,7 @@ import NeoPdfDocument from "../../NeoPdf/NeoPdfDocument";
 import NeoPdfManager from "../../NeoPdf/NeoPdfManager";
 import { PDF_VIEWPORT_DESC } from "../../NeoPdf/NeoPdfPage";
 import { IPageOverview } from "./PagesForPrint";
-import { IPdfMappingDesc } from "../../Coordinates";
+import { IPdfToNcodeMapItem } from "../../Coordinates";
 import { MappingStorage, PdfDocMapper } from "../../SurfaceMapper";
 
 import * as Util from "../../UtilFunc";
@@ -221,7 +221,8 @@ export default class PrintPdfButton extends React.Component<IPrintPdfButtonProps
   loadPdf = (url: string, filename: string) => {
     if (url === undefined) return;
 
-    const loadingPromise = NeoPdfManager.getDocument({ url, filename });
+    const instance = NeoPdfManager.getInstance();
+    const loadingPromise = instance.getDocument({ url, filename });
     // console.log(`[yyy] `);
     // console.log(`[yyy] LOAIND: ${url}`);
     loadingPromise.then(
@@ -254,15 +255,17 @@ export default class PrintPdfButton extends React.Component<IPrintPdfButtonProps
     const { pagesPerSheet } = printOption;
 
     const fingerprint = pdf.fingerprint;
-    const id = Util.makePdfId(fingerprint, pagesPerSheet as number);
 
     const instance = MappingStorage.getInstance();
-    const mapped = instance.findNcodeRange(id);
+    // const id = Util.makePdfId(fingerprint, pagesPerSheet as number);
+    // const mapped = instance.findNcodeRangeByPrintId(id);
+    const maps = instance.findAssociatedNcode(fingerprint, pagesPerSheet);
 
-    if (mapped)
-      return mapped;
+    const mapped = maps.length > 0 ? maps[0]: undefined;
+    return mapped;
 
-    return undefined;
+    // if (mapped) return mapped;
+    // return undefined;
   }
 
   setOptionForTest = (printOption: IPrintOption) => {
@@ -318,7 +321,7 @@ export default class PrintPdfButton extends React.Component<IPrintPdfButtonProps
     const { pdf } = this.state;
     const { targetPages, pagesPerSheet, hasToPutNcode, url, filename } = printOption;
 
-    const option: IPdfMappingDesc = {
+    const option: IPdfToNcodeMapItem = {
       url,
       filename,
       fingerprint: pdf.fingerprint,

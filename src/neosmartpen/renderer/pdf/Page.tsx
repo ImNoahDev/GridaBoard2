@@ -168,7 +168,13 @@ class Page extends Component<PageProps> {
   _loadPage = (pdf: NeoPdfDocument) => {
     if (this.state.status === 'rendering') return;
 
-    pdf.getPageAsync(this.props.index).then(
+    let pageNo = this.props.index;
+    if (pageNo > pdf.numPages) {
+      console.error("PDF 페이지의 범위를 넘은 페이지를 렌더링하려고 합니다.");
+      pageNo = pdf.numPages;
+    }
+
+    pdf.getPageAsync(pageNo).then(
       (page) => {
         this.backPlane.inited = false;
         this.setState({ page, status: 'rendering' });
@@ -257,16 +263,8 @@ class Page extends Component<PageProps> {
       this.backPlane.size = { ...result };
     }
 
-
-    // const displaySize = pdfSizeToDIsplayPixel_int(size);
     const displaySize = { width, height };
     const { px_width, px_height } = this.backPlane.size;
-
-
-    // const new_scale = displaySize.width / viewport.width;
-    // viewport = page.getViewport({ scale: new_scale });
-
-    // console.log(sprintf("back plane = zoom(%.1f) (%d, %d)", zoom, px_width, px_height));
 
     const ctx = canvas.getContext('2d');
     const dw = ret.px.width / ret.ratio;
@@ -274,6 +272,8 @@ class Page extends Component<PageProps> {
 
     ctx.drawImage(this.backPlane.canvas, 0, 0, px_width, px_height, 0, 0, dw, dh);
 
+
+    // Lazy update
     if (this.backPlane.prevZoom !== zoom) {
       this.zoomQueue.push(zoom);
       await this.timeOut(200);
@@ -290,7 +290,6 @@ class Page extends Component<PageProps> {
         this.backPlane.size = { ...result };
 
         const { px_width, px_height } = result;
-        // console.log(sprintf("LAZY plane = zoom(%.1f) (%d, %d)", zoom, px_width, px_height));
         ctx.drawImage(this.backPlane.canvas, 0, 0, px_width, px_height, 0, 0, dw, dh);
 
         const renderCount = this.state.renderCount + 1;

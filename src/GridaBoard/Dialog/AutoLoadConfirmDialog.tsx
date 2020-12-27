@@ -1,5 +1,5 @@
 import React from "react";
-import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button, DialogProps, makeStyles, createStyles } from "@material-ui/core";
+import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button, DialogProps, makeStyles, createStyles, Grid, Paper } from "@material-ui/core";
 import { Theme } from '@material-ui/core';
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -47,19 +47,34 @@ const AutoLoadConfirmDialog = (props: Props) => {
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
             이전에 인쇄되었던 파일입니다. 파일을 로드하면 인쇄된 배경이 화면에도 그대로 나타납니다.
+            아니오를 선택하면 빈화면에 쓰게 됩니다.
             파일을 로드하시겠습니까?
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={props.onNoMore} color="primary" >
-            다시 이 페이지에서 묻지 않기
-          </Button>
-          <Button onClick={props.onCancel} color="primary" >
-            아니오, 빈화면에 쓰겠습니다.
-          </Button>
-          <Button onClick={props.onOk} color="primary" autoFocus>
-            예, 선택합니다.
-          </Button>
+
+          <Grid container spacing={1} direction="row" justify="space-between" alignItems="center" >
+            <Grid item sm={3}>
+              <Button style={{ width: "100%" }} onClick={props.onNoMore} color="primary" >
+                다시 묻지 않기
+              </Button>
+            </Grid>
+
+            <Grid item sm={3}> </Grid>
+            
+            <Grid item sm={3}>
+              <Button style={{ width: "100%" }} onClick={props.onOk} variant="contained" color="primary" autoFocus>
+                예, 선택합니다.
+              </Button>
+            </Grid>
+
+            <Grid item sm={3}>
+              <Button style={{ width: "100%" }} onClick={props.onCancel} variant="outlined" color="primary" >
+                아니오
+              </Button>
+            </Grid>
+          </Grid>
+
         </DialogActions>
       </Dialog>
 
@@ -71,18 +86,32 @@ const AutoLoadConfirmDialog = (props: Props) => {
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
             선택한 파일을 이전에 인쇄했던 파일과 다른 파일입니다. 다시 한번 파일을 선택하고 로드하겠습니까?
+            아니오를 선택하면 빈화면에 쓰게 됩니다.
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={props.onNoMore} color="primary" >
-            다시 이 페이지에서 묻지 않기
-          </Button>
-          <Button onClick={props.onCancel} color="primary" >
-            아니오, 빈화면에 쓰겠습니다.
-          </Button>
-          <Button onClick={props.onOk} color="primary" autoFocus>
-            예, 다시 한번 선택합니다.
-          </Button>
+          <Grid container spacing={1} direction="row" justify="space-between" alignItems="center" >
+            <Grid item sm={3}>
+              <Button style={{ width: "100%" }} onClick={props.onNoMore} color="primary" >
+                다시 묻지 않기
+              </Button>
+            </Grid>
+
+            <Grid item sm={3}> </Grid>
+
+            <Grid item sm={3}>
+              <Button style={{ width: "100%" }} onClick={props.onOk} variant="contained" color="primary" autoFocus>
+                예, 선택합니다.
+              </Button>
+            </Grid>
+
+            <Grid item sm={3}>
+              <Button style={{ width: "100%" }} onClick={props.onCancel} variant="outlined" color="primary" >
+                아니오
+              </Button>
+            </Grid>
+          </Grid>
+
         </DialogActions>
       </Dialog>
     </div >

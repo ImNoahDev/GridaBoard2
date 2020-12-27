@@ -4,7 +4,7 @@
 import { IPageSOBP } from "../DataStructure/Structures";
 import { IPaperSize } from "../NcodeSurface/SurfaceDataTypes";
 import { ColorConvertMethod } from "../NcodeSurface/CanvasColorConverter";
-import { CoordinateTanslater, IPdfMappingDesc } from "../Coordinates";
+import { CoordinateTanslater, IPdfToNcodeMapItem } from "../Coordinates";
 import { IPrintingSheetDesc } from "../NcodeSurface/SheetRenderer";
 
 
@@ -166,7 +166,7 @@ export interface IPrintOption {
   pdfPagePadding: number, // mm단위
 
 
-  pdfMappingDesc?: IPdfMappingDesc;
+  pdfMappingDesc?: IPdfToNcodeMapItem;
 
   /**
    * 인쇄할 페이지에서 4씩 카운트가 증가되는 call back,

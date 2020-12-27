@@ -1,8 +1,8 @@
 import { IPageSOBP, IRectDpi } from "../DataStructure/Structures";
-import { IMappingParams, IPdfPageDesc, IPolygonArea, TransformParameters, TransformPoints } from "../Coordinates";
+import { IPageMapItem, IPdfPageDesc, IPolygonArea, TransformParameters, TransformPoints } from "../Coordinates";
 
 export class MappingItem {
-  _params: IMappingParams = {
+  _params: IPageMapItem = {
     pageInfo: {} as IPageSOBP,
     npageArea: [] as any,
     pdfDesc: {} as IPdfPageDesc,

@@ -1,9 +1,8 @@
-import { StrokePageAttr, StrokeStatus } from "./../DataStructure/NeoStroke";
-import { IPoint } from "./../DataStructure/Structures";
+import { StrokePageAttr } from "./../DataStructure/NeoStroke";
 import PenComm, { deviceSelectDlg } from "./pencomm";
 import InkStorage, { IOpenStrokeArg } from "../penstorage/InkStorage";
 import { paperInfo } from "../noteserver/PaperInfo";
-import Dispatcher, { EventCallbackType } from "../penstorage/EventSystem";
+import EventDispatcher, { EventCallbackType } from "../penstorage/EventSystem";
 import PenManager from "./PenManager";
 import "../types";
 import { IPenEvent, IBrushState } from "../DataStructure/Structures";
@@ -12,7 +11,6 @@ import { IWritingSurfaceInfo } from "../DataStructure/Structures";
 import NeoDot from "../DataStructure/NeoDot";
 import { IBrushType } from "../DataStructure/Enums"
 import PUIController from "../../components/PUIController";
-
 
 export type IPenToViewerEvent = {
   pen: NeoSmartpen,
@@ -86,7 +84,7 @@ export class NeoSmartpen {
 
   storage: InkStorage = InkStorage.getInstance();
   manager: PenManager = PenManager.getInstance();
-  dispatcher: Dispatcher = new Dispatcher();
+  dispatcher: EventDispatcher = new EventDispatcher();
 
 
   /**
@@ -312,6 +310,8 @@ export class NeoSmartpen {
     else if (this.lastState === PEN_STATE.PEN_MOVE) {
       // 펜 move 중 페이지가 바뀌는 경우
 
+      // 이것, 2.19에서는 버리는 듯, 2020/12/27 kitty
+      // pen up 다음의 page info도 안나온다
 
       // 1) pen up 처리
       {

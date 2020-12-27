@@ -1,4 +1,4 @@
-import { IMappingParams, IPdfPageDesc } from "../Coordinates";
+import { IPageMapItem, IPdfPageDesc } from "../Coordinates";
 // import * as PdfJs from "pdfjs-dist";
 
 
@@ -8,7 +8,7 @@ import { IMappingParams, IPdfPageDesc } from "../Coordinates";
 export type INcodePdfDescriptor = {
   pdfInfo: IPdfPageDesc;
 
-  mappingTable: IMappingParams[],
+  mappingTable: IPageMapItem[],
 }
 
 
@@ -24,7 +24,7 @@ export type IPdfTable = {
 /**
  * Ncode에 mapping된 영역들의 저장소 타입
  */
-export type INcodePolygonsTable = IMappingParams[];
+export type INcodePolygonsTable = IPageMapItem[];
 
 /**
  * section.owner.book.page에서 바로 PDF 정보를 가져오기 위한 storage type

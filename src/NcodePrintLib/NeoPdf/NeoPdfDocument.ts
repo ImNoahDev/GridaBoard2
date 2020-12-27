@@ -1,5 +1,5 @@
 import * as PdfJs from "pdfjs-dist";
-import { CoordinateTanslater, IPdfMappingDesc, IPolygonArea } from "../Coordinates";
+import { CoordinateTanslater, IPageMapItem, IPdfToNcodeMapItem, IPolygonArea } from "../Coordinates";
 import { IPageSOBP, stringToDpiNum, } from "../DataStructure/Structures";
 import { IPageOverview } from "../NcodePrint/HtmlRenderPrint/PagesForPrint";
 import { ColorConvertMethod } from "../NcodeSurface/CanvasColorConverter";
@@ -24,7 +24,7 @@ export type IGetDocumentOptions = {
 }
 
 export default class NeoPdfDocument {
-  _mappingInfo: IPdfMappingDesc;
+  _mappingInfo: IPdfToNcodeMapItem;
 
   _pdfDoc: PdfJs.PDFDocumentProxy = null;
 
@@ -74,13 +74,38 @@ export default class NeoPdfDocument {
 
     // page를 로드한다
     this._pages = [];
-    for (let i = 1; i <= this._pdfDoc.numPages; i++) {
-      const neoPage = new NeoPdfPage(this, i);
+    for (let i = 0; i < this._pdfDoc.numPages; i++) {
+      const neoPage = new NeoPdfPage(this, i + 1);
       this._pages.push(neoPage);
     }
 
+    this.refreshNcodeMappingTable();
+
     await this.setPageOverview();
     return this;
+  }
+
+  /**
+   * PDF에 할당된 ncode를 저장하는 루틴
+   * 
+   * MappingStorage가 변하고 나면, 로드된 모든 PDF에 이 함수를 한번씩 불러줘야 한다
+   */
+  refreshNcodeMappingTable = () => {
+    const mapper = MappingStorage.getInstance();
+    const pdfMapDescArr: IPdfToNcodeMapItem[] = mapper.findAssociatedNcode(this.fingerprint);
+
+    const flattenedMaps: IPageMapItem[] = [];
+    pdfMapDescArr.forEach(map => {
+      flattenedMaps.push(...map.params);
+    });
+
+    for (let i = 0; i < this._pdfDoc.numPages; i++) {
+      const page = this._pages[i];
+      const pageNo = i + 1;
+
+      const maps = flattenedMaps.filter(map => map.pdfDesc.pageNo === pageNo);
+      page.setPageMap(maps);
+    }
   }
 
   destroy = () => {
@@ -313,7 +338,7 @@ export default class NeoPdfDocument {
     return this.direction;
   }
 
-  setNcodeAssigned = (pdfMapDesc: IPdfMappingDesc) => {
+  setNcodeAssigned = (pdfMapDesc: IPdfToNcodeMapItem) => {
     this._ncodeAssigned = MappingStorage.makeAssignedNcodeArray(pdfMapDesc.nPageStart, this.numPages);
   }
 

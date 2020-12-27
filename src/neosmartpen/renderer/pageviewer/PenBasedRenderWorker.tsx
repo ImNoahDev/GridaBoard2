@@ -124,7 +124,17 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
     //pen tracker rendering
     this.movePenTracker(event);
 
-    const live = this.livePaths[event.strokeKey];
+    let live = this.livePaths[event.strokeKey];
+    if (!live) {
+      console.error("왜 live stroke가 등록 안된게 나오지?");
+      
+      live = {
+        stroke: event.stroke,
+        path: null
+      };
+      this.livePaths[event.strokeKey] = live;
+    }
+
     const dot = event.dot;
 
     //지우개 구현

@@ -1,11 +1,56 @@
 import { openFileBrowser } from "./FileBrowser";
 import NeoPdfDocument, { IGetDocumentOptions } from "./NeoPdfDocument";
+import EventDispatcher, { EventCallbackType } from "../../neosmartpen/penstorage/EventSystem";
+import { MappingStorage } from "../SurfaceMapper";
+import { IMappingStorageEvent, MappingStorageEventName } from "../SurfaceMapper/MappingStorage";
+
+let _pdf_manager: NeoPdfManager = undefined;
+
+
+
+/** @enum {string} */
+export enum PdfManagerEventName {
+  ON_PDF_LOADED = "on_pdf_loaded",
+}
+
+export type IPenToViewerEvent = {
+  pdf?: NeoPdfDocument,     // ON_PDF_LOADED
+}
+
 
 export default class NeoPdfManager {
-  static getDocument = async (options: IGetDocumentOptions) => {
+  _pdfs: NeoPdfDocument[];
+
+  dispatcher: EventDispatcher = new EventDispatcher();
+
+  constructor() {
+    if (_pdf_manager) return _pdf_manager;
+
+    this._pdfs = [];
+  }
+
+  static getInstance() {
+    if (_pdf_manager) return _pdf_manager;
+
+    _pdf_manager = new NeoPdfManager();
+    const ms = MappingStorage.getInstance();
+    ms.addEventListener(MappingStorageEventName.ON_MAPINFO_CHANGED, _pdf_manager.refreshNcodeMappingTable);
+
+    return _pdf_manager;
+  }
+
+  refreshNcodeMappingTable = (event: IMappingStorageEvent) => {
+    this._pdfs.forEach(pdf => pdf.refreshNcodeMappingTable());
+  }
+
+  getDocument = async (options: IGetDocumentOptions) => {
     if (options.url && !options.fingerprint) {
       const doc = new NeoPdfDocument();
-      return await doc.load(options);
+      const load = await doc.load(options);
+
+      this.dispatcher.dispatch(PdfManagerEventName.ON_PDF_LOADED, { pdf: doc });
+      return load;
+
     }
     else {
       if (!options.fingerprint) {
@@ -72,4 +117,19 @@ export default class NeoPdfManager {
     if (fingerprint !== docFingerprint) return false;
     return true;
   }
+
+
+  public addEventListener(eventName: PdfManagerEventName, listener: EventCallbackType) {
+    this.dispatcher.on(eventName, listener, null);
+  }
+
+  /**
+   *
+   * @param eventName
+   * @param listener
+   */
+  public removeEventListener(eventName: PdfManagerEventName, listener: EventCallbackType) {
+    this.dispatcher.off(eventName, listener);
+  }
+
 }

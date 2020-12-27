@@ -5,7 +5,7 @@ import { INcodeSOBPxy, IPageSOBP } from "../DataStructure/Structures";
 import { NeoSmartpen } from "../pencomm/neosmartpen";
 import * as PdfJs from "pdfjs-dist";
 import { MappingStorage } from "../../NcodePrintLib/SurfaceMapper";
-import { IMappingParams, IPdfMappingDesc, IPdfPageDesc, TransformParameters } from "../../NcodePrintLib/Coordinates";
+import { IPageMapItem, IPdfToNcodeMapItem, IPdfPageDesc, TransformParameters } from "../../NcodePrintLib/Coordinates";
 import { IFileBrowserReturn, isSameObject, openFileBrowser2 } from "../../NcodePrintLib";
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from "@material-ui/core";
 import { ZoomFitEnum } from "./pageviewer/RenderWorkerBase";
@@ -34,7 +34,7 @@ interface Props {
 
 
   /** 현재 view가 가진 pdf와 다른 code map된 pdf가 감지되면 autoload를 시도한다. undefiled이면 안한다. */
-  onFileLoadNeeded: (doc: IAutoLoadDocDesc ) => void;
+  onFileLoadNeeded: (doc: IAutoLoadDocDesc) => void;
 
 }
 
@@ -107,7 +107,13 @@ export default class MixedPageView extends React.Component<Props, State> {
     }
   }
 
-  onNcodePageChanged = async (pageInfo: IPageSOBP) => {
+
+  /**
+   * 
+   * @param pageInfo 
+   * @param isFromEveryPgInfo - 매번 page info가 나올때마다 불려진 것인가? 아니면 페이지가 바뀔때 불려진 것인가?
+   */
+  onNcodePageChanged = async (pageInfo: IPageSOBP, isFromEveryPgInfo: boolean) => {
     // 페이지를 찾자
     const mapper = MappingStorage.getInstance();
     const ncodeXy: INcodeSOBPxy = { ...pageInfo, x: 0, y: 0 };
@@ -127,22 +133,12 @@ export default class MixedPageView extends React.Component<Props, State> {
       if (onFileLoadNeeded) {
         onFileLoadNeeded(coupledDoc);
       }
-      // const url = coupledDoc.pdf.url;
-      // if (url.indexOf("blob:http") > -1) {
-      //   this._fileToLoad = coupledDoc;
-      //   this.setState({ showFileOpenDlg: true });
-      // }
-      // else {
-      //   // 구글 드라이브에서 파일을 불러오자
-      // }
-
-      // return;
     }
 
     // 이미 로드되어 있고 같은 파일이라면, 페이지를 전환한다.
-    if (this.pdf) {
+    if (this.pdf && this.pdf.fingerprint === coupledDoc.pdf.fingerprint) {
       const pageNo = coupledDoc.pageMapping.pdfDesc.pageNo;
-      this.setState({ pageNo });
+      if (this.state.pageNo !== pageNo) this.setState({ pageNo });
     }
   }
 
@@ -247,7 +243,8 @@ export default class MixedPageView extends React.Component<Props, State> {
             <NeoPdfViewer
               url={this.state.pdfUrl}
               filename={this.state.pdfFilename}
-              pageNo={this.state.pageNo} onReportPdfInfo={this.onReportPdfInfo}
+              pageNo={this.state.pageNo}
+              onReportPdfInfo={this.onReportPdfInfo}
               position={this.state.canvasPosition}
             />
           </div>
@@ -257,6 +254,7 @@ export default class MixedPageView extends React.Component<Props, State> {
               viewFit={ZoomFitEnum.FULL}
               fitMargin={100}
               position={this.state.canvasPosition}
+              pdfUrl={this.state.pdfUrl}
               pdfSize={{ width: 210 / 25.4 * 72, height: 297 / 25.4 * 72 }}
               pageInfo={{ section: 0, owner: 0, book: 0, page: 0 }}
               playState={PLAYSTATE.live}
@@ -269,46 +267,6 @@ export default class MixedPageView extends React.Component<Props, State> {
           </div>
 
         </div>
-        {/* <Dialog open={this.state.showFileOpenDlg} onClose={this.handleClose} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description" >
-          <DialogTitle id="alert-dialog-title">
-            파일 불러오기
-          </DialogTitle>
-          <DialogContent>
-            <DialogContentText id="alert-dialog-description">
-              이전에 인쇄되었던 파일입니다. 파일을 로드하면 인쇄된 배경이 화면에도 그대로 나타납니다.
-              파일을 로드하시겠습니까?
-          </DialogContentText>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={this.handleClose} color="primary" >
-              아니오, 빈화면에 쓰겠습니다.
-          </Button>
-            <Button onClick={this.onFileSelect} color="primary" autoFocus>
-              예, 선택합니다.
-          </Button>
-          </DialogActions>
-        </Dialog>
-
-
-        <Dialog open={this.state.showCancelConfirmDlg} onClose={this.handleClose} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description" >
-          <DialogTitle id="alert-dialog-title">
-            파일 불러오기를 취소
-          </DialogTitle>
-          <DialogContent>
-            <DialogContentText id="alert-dialog-description">
-              선택한 파일을 이전에 인쇄했던 파일과 다른 파일입니다. 다시 한번 파일을 선택하고 로드하겠습니까?
-          </DialogContentText>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={this.handleClose} color="primary" >
-              아니오, 빈화면에 쓰겠습니다.
-          </Button>
-            <Button onClick={this.onFileSelect} color="primary" autoFocus>
-              예, 다시 한번 선택합니다.
-          </Button>
-          </DialogActions>
-        </Dialog> */}
-
       </div>
     );
   }

@@ -62,7 +62,7 @@ class NeoPdfViewer extends React.Component<Props, State> {
 
     // kitty, 나중에는 분리할 것
     showUIProgressBackdrop();
-    const loadingTask = NeoPdfManager.getDocument({ url, filename })
+    const loadingTask = NeoPdfManager.getInstance().getDocument({ url, filename });
 
     const self = this;
     this.setState({ status: "loading" });

@@ -1,5 +1,5 @@
 import * as PdfJs from "pdfjs-dist";
-import { CoordinateTanslater, IPdfPageDesc } from "../Coordinates";
+import { CoordinateTanslater, IPageMapItem, IPdfPageDesc } from "../Coordinates";
 import { IRectDpi, } from "../DataStructure/Structures";
 import CanvasColorConverter, { ColorConvertMethod } from "../NcodeSurface/CanvasColorConverter";
 import { PDF_DEFAULT_DPI } from "../NcodeSurface/NcodeConstans";
@@ -57,6 +57,12 @@ export default class NeoPdfPage {
 
   _thumbnail: IThumbnailDesc;
 
+  private _pageToNcodeMaps: IPageMapItem[];
+
+  get pageToNcodeMaps() {
+    return this._pageToNcodeMaps;
+  }
+
   constructor(neoPdf: NeoPdfDocument, pageNo: number) {
     this._pageNo = pageNo;
     this._doc = neoPdf;
@@ -73,6 +79,10 @@ export default class NeoPdfPage {
   getPage = async () => {
     await this._ready;
     return this._pdfPage;
+  }
+
+  setPageMap = (maps: IPageMapItem[]) => {
+    this._pageToNcodeMaps = maps;
   }
 
   render = (params: PdfJs.PDFRenderParams) => {

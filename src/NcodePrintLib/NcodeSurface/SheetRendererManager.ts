@@ -13,17 +13,17 @@ type ISheetRendererDesc = {
 }
 
 
-let _instance: SheetRendererManager = null;
+let _srm: SheetRendererManager = null;
 
 export class SheetRendererManager {
 
   _cache: ISheetRendererDesc[] = [];
 
   static getInstance() {
-    if (_instance) return _instance;
+    if (_srm) return _srm;
 
-    _instance = new SheetRendererManager();
-    return _instance;
+    _srm = new SheetRendererManager();
+    return _srm;
   }
 
   private isSameSheet = (a: ISheetRendererDesc, b: ISheetRendererDesc) => {

@@ -1,6 +1,6 @@
 import { IPoint } from "../DataStructure/Structures";
 import * as Solve from "./SolveTransform";
-import { TransformPoints, TransformPointPairs, TransformParameters, IMappingParams } from "./DataTypes";
+import { TransformPoints, TransformPointPairs, TransformParameters, IPageMapItem } from "./DataTypes";
 import { MappingItem } from "../SurfaceMapper";
 import { sprintf } from "sprintf-js";
 
@@ -87,10 +87,10 @@ export default class CoordinateTanslater {
   // private _params: TransformParameters = null;
   // private _paramsReverse: TransformParameters = null;
 
-  private _mappingParams: IMappingParams = null;
+  private _mappingParams: IPageMapItem = null;
   public name = "CoordinateTanslater";
 
-  constructor(arg: CoordinateTanslater | IMappingParams = null) {
+  constructor(arg: CoordinateTanslater | IPageMapItem = null) {
     if (arg) {
       if (Object.prototype.hasOwnProperty.call(arg, "_mappingParams")) {
         const trans = arg as CoordinateTanslater;
@@ -99,7 +99,7 @@ export default class CoordinateTanslater {
         this.calcReverse();
       }
       else {
-        const params = arg as IMappingParams;
+        const params = arg as IPageMapItem;
         const json = JSON.stringify(params);
         this._mappingParams = JSON.parse(json);
         this.calcReverse();

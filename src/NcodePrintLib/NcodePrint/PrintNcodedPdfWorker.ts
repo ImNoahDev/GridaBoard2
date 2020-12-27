@@ -4,7 +4,7 @@ import { IPrintingEvent, NcodePdfScaleMode, IPrintingReport, IPrintOption, IUnit
 
 import NeoPdfDocument from "../NeoPdf/NeoPdfDocument";
 import NeoPdfManager from "../NeoPdf/NeoPdfManager";
-import { IPdfMappingDesc } from "../Coordinates";
+import { IPdfToNcodeMapItem } from "../Coordinates";
 import { MappingStorage, PdfDocMapper } from "../SurfaceMapper";
 
 import { SheetRendererManager } from "../NcodeSurface/SheetRendererManager";
@@ -85,7 +85,7 @@ export default class PrintNcodedPdfWorker {
   private loadPdf = async (url: string, filename: string, printOption: IPrintOption) => {
     if (url === undefined) return;
 
-    const loaded = await NeoPdfManager.getDocument({ url, filename });
+    const loaded = await NeoPdfManager.getInstance().getDocument({ url, filename });
     if (loaded) {
       // console.log(`[yyy] setPageOverview called`);
       printOption.url = url;
@@ -289,7 +289,8 @@ export default class PrintNcodedPdfWorker {
   private getAssociatedMappingInfo = (printOption: IPrintOption, pdf: NeoPdfDocument) => {
     /** 코드 할당에 대한 기본 값을 써 주자 */
     const maps = MappingStorage.getInstance();
-    const pdfMapDesc = maps.findAssociatedNcode(pdf.fingerprint, printOption.pagesPerSheet);
+    const pdfMapDescArr = maps.findAssociatedNcode(pdf.fingerprint, printOption.pagesPerSheet);
+    const pdfMapDesc = pdfMapDescArr.length > 0 ? pdfMapDescArr[0] : undefined;
 
     /** 코드 할당에 대한 기본값 설정 */
     if (pdfMapDesc) {
@@ -332,7 +333,7 @@ export default class PrintNcodedPdfWorker {
 
     const { pdf } = this;
 
-    const option: IPdfMappingDesc = {
+    const option: IPdfToNcodeMapItem = {
       url,
       filename,
       fingerprint: pdf.fingerprint,

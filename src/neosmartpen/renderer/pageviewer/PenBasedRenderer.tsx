@@ -16,6 +16,7 @@ import { withResizeDetector } from 'react-resize-detector';
 import { CSSProperties } from "@material-ui/core/styles/withStyles";
 import { BoxProps } from "@material-ui/core";
 import { IPenToViewerEvent } from "../../pencomm/neosmartpen";
+import NeoPdfDocument from "../../../NcodePrintLib/NeoPdf/NeoPdfDocument";
 
 export { PLAYSTATE };
 
@@ -41,7 +42,14 @@ interface Props extends BoxProps {
 
   pdfSize: { width: number, height: number };
 
-  onNcodePageChanged: (arg: IPageSOBP) => void;
+  pdfUrl: string;
+
+  /**
+   * @param pageInfo 
+   * @param isFromEveryPgInfo - 매번 page info가 나올때마다 불려진 것인가? 아니면 페이지가 바뀔때 불려진 것인가?
+   */
+  onNcodePageChanged: (arg: IPageSOBP, isFromEveryPgInfo: boolean) => void;
+
   onCanvasShapeChanged: (arg: { offsetX: number, offsetY: number, zoom: number }) => void;
 
   /** canvas rotation, 0: portrait, 90: landscape */
@@ -51,6 +59,7 @@ interface Props extends BoxProps {
   /** transform matrix it can be undefined */
   h: TransformParameters;
   position: { offsetX: number, offsetY: number, zoom: number },
+
 
 }
 
@@ -122,6 +131,7 @@ class PenBasedRenderer_module extends React.Component<Props, State> {
 
   fitMargin = 0;
   fixed = false;
+  shouldSendPageInfo = false;
 
   setMainDivRef = (div: HTMLDivElement) => {
     this.mainDiv = div;
@@ -266,6 +276,10 @@ class PenBasedRenderer_module extends React.Component<Props, State> {
       ret_val = true;
     }
 
+    if (nextProps.pdfUrl !== this.props.pdfUrl) {
+      this.shouldSendPageInfo = true;
+      ret_val = true;
+    }
 
     return ret_val;
   }
@@ -369,9 +383,10 @@ class PenBasedRenderer_module extends React.Component<Props, State> {
     const { section, owner, book, page } = event;
 
     const prevPageInfo = this.state.pageInfo;
-    if (UTIL.isSamePage(prevPageInfo, event as IPageSOBP)) {
+    if (UTIL.isSamePage(prevPageInfo, event as IPageSOBP) && (!this.shouldSendPageInfo)) {
       return;
     }
+    this.shouldSendPageInfo = false;
 
     /** 내부 상태를 바꾼다. */
     this.setState({
@@ -392,7 +407,7 @@ class PenBasedRenderer_module extends React.Component<Props, State> {
     }
 
     /** pdf pageNo를 바꿀 수 있게, container에게 전달한다. */
-    this.props.onNcodePageChanged({ section, owner, book, page });
+    this.props.onNcodePageChanged({ section, owner, book, page }, true);
   }
 
 

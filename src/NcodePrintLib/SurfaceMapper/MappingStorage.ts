@@ -1,24 +1,37 @@
-import { CoordinateTanslater, IMappingParams, IPdfMappingDesc } from "../Coordinates";
+import { IPageMapItem, IPdfToNcodeMapItem } from "../Coordinates";
 import { INcodeSOBPxy, IPageSOBP } from "../DataStructure/Structures";
 import PdfDocMapper from "./PdfDocMapper";
 import * as cloud_util_func from "../../cloud_util_func";
 import { g_defaultNcode } from "../DefaultOption";
 import { isSamePage } from "../../neosmartpen/utils/UtilsFunc";
 import * as Util from "../UtilFunc";
-import { isObject } from "util";
+import NeoPdfManager from "../NeoPdf/NeoPdfManager";
+import EventDispatcher, { EventCallbackType } from "../../neosmartpen/penstorage/EventSystem";
+
+
+export enum MappingStorageEventName {
+  ON_MAPINFO_CHANGED = "on_map_changed",
+}
+
+
+export type IMappingStorageEvent = {
+  mapper?: PdfDocMapper,      // ON_MAP_INFO_CHANGED
+}
+
+
 
 const _debug = false;
-let _instance: MappingStorage = null;
+let _ms_i: MappingStorage = null;
 const LOCAL_STORAGE_ID = "GridaBoard_codeMappingInfo_v2";
 
 export type IMappingData = {
   nextIssuable: IPageSOBP;
-  arrDocMap: IPdfMappingDesc[];
+  arrDocMap: IPdfToNcodeMapItem[];
 }
 
 export type IAutoLoadDocDesc = {
-  pdf: IPdfMappingDesc,
-  pageMapping: IMappingParams,
+  pdf: IPdfToNcodeMapItem,
+  pageMapping: IPageMapItem,
 }
 
 export default class MappingStorage {
@@ -28,15 +41,19 @@ export default class MappingStorage {
   };
 
   _testStorage;
+
+  dispatcher: EventDispatcher = new EventDispatcher();
+
+
   private constructor() {
-    if (_instance) return _instance;
+    if (_ms_i) return _ms_i;
   }
 
   static getInstance() {
-    if (_instance) return _instance;
+    if (_ms_i) return _ms_i;
 
-    _instance = new MappingStorage();
-    return _instance;
+    _ms_i = new MappingStorage();
+    return _ms_i;
   }
 
   static makeAssignedNcodeArray = (startPage: IPageSOBP, numPages: number) => {
@@ -59,7 +76,7 @@ export default class MappingStorage {
     return this._data.nextIssuable;
   }
 
-  public issueNcode = (options: IPdfMappingDesc): IPdfMappingDesc => {
+  public issueNcode = (options: IPdfToNcodeMapItem) => {
     const { numPages } = options;
 
     // this._nextIssuableNcode를 참조해서
@@ -81,12 +98,14 @@ export default class MappingStorage {
   register = (mapper: PdfDocMapper) => {
     mapper.makeSummary();
 
-    const docMap: IPdfMappingDesc = Util.cloneObj(mapper.docMap);
+    const docMap: IPdfToNcodeMapItem = Util.cloneObj(mapper.docMap);
     docMap.timeString = Util.getNowTimeStr();
     this._data.arrDocMap.push(docMap);
 
-    this.storeMappingInfo();
+    // NeoPdfManager.getInstance().refreshNcodeMappingTable();
+    this.dispatcher.dispatch(MappingStorageEventName.ON_MAPINFO_CHANGED, { mapper });
 
+    this.storeMappingInfo();
     if (_debug) this.dump("mapping");
   }
 
@@ -107,13 +126,13 @@ export default class MappingStorage {
   public saveOnCloud = () => {
 
     const params = {
-      "IMappingParams": {
+      "IPageMapItem": {
         timeString: "1111",
         pageInfo: { section: "1", book: "1", owner: "1", page: "1" },
       }
     }
     const params2 = {
-      "IMappingParams": {
+      "IPageMapItem": {
         timeString: "1111",
         pageInfo: { section: "1", book: "1", owner: "1", page: "2" },
       }
@@ -161,7 +180,7 @@ export default class MappingStorage {
   /**
    * Ncode가 발행된 적이 있는지를 점검하기 위해서 쓰인다.
    */
-  findNcodeRange = (pdfId: string) => {
+  private findNcodeRangeByPrintId = (pdfId: string) => {
     const found = this._data.arrDocMap.find(m => pdfId === m.id);
     if (found) {
 
@@ -174,15 +193,21 @@ export default class MappingStorage {
   /**
    * Ncode가 발행된 적이 있는지를 점검하기 위해서 쓰인다.
    */
-  findAssociatedNcode = (fingerprint: string, pagesPerSheet: number) => {
-    const id = Util.makePdfId(fingerprint, pagesPerSheet as number);
-    const mapped = this.findNcodeRange(id);
+  findAssociatedNcode = (fingerprint: string, pagesPerSheet?: number) => {
+    if (pagesPerSheet) {
+      const id = Util.makePdfId(fingerprint, pagesPerSheet as number);
+      const mapped = this.findNcodeRangeByPrintId(id);
 
-    if (mapped && mapped.nPageStart.section !== -1) {
-      return mapped;
+      if (mapped && mapped.nPageStart.section !== -1) {
+        return [mapped];
+      }
+
+      return [];
     }
-
-    return undefined;
+    else {
+      const found = this._data.arrDocMap.filter(m => m.fingerprint === fingerprint);
+      return found;
+    }
   }
 
   dump = (prefix: string) => {
@@ -221,6 +246,18 @@ export default class MappingStorage {
     }
 
     return false;
+  }
+  public addEventListener(eventName: MappingStorageEventName, listener: EventCallbackType) {
+    this.dispatcher.on(eventName, listener, null);
+  }
+
+  /**
+   *
+   * @param eventName
+   * @param listener
+   */
+  public removeEventListener(eventName: MappingStorageEventName, listener: EventCallbackType) {
+    this.dispatcher.off(eventName, listener);
   }
 
 

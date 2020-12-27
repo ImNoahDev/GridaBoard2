@@ -6,20 +6,20 @@ import NcodeFetcher from "./NcodeFetcher";
 import { INcodeSurfaceDesc } from "./SurfaceDataTypes";
 
 
-let _instance: NcodeFetcherPool = null;
+let _fi: NcodeFetcherPool = null;
 export default class NcodeFetcherPool {
 
   _codeData: INcodeSurfaceDesc[] = [];
 
   private constructor() {
-    if (_instance) return _instance;
+    if (_fi) return _fi;
   }
 
   static getInstance() {
-    if (_instance) return _instance;
+    if (_fi) return _fi;
 
-    _instance = new NcodeFetcherPool();
-    return _instance;
+    _fi = new NcodeFetcherPool();
+    return _fi;
   }
 
   findCodeData = (pageInfo: IPageSOBP) => {

@@ -1,11 +1,11 @@
 import { INcodeToAreaStore, INcodePolygonsTable } from "./NcodeGps";
 import { IPageSOBP, IPoint, INcodeSOBPxy } from "../DataStructure/Structures";
-import { IMappingParams, } from "../Coordinates";
+import { IPageMapItem, } from "../Coordinates";
 import { MappingItem } from "./MappingItem";
 // import { restoreDashPattern } from "pdf-lib";
 
 /**
- * public getMappingItem = (ncodeXy: INcodeSOBPxy): IMappingParams | null
+ * public getMappingItem = (ncodeXy: INcodeSOBPxy): IPageMapItem | null
  *
  * public addMappingArea = async (arg: IMappingParam)
  */
@@ -45,7 +45,7 @@ export class AreaToPosMapper {
    *
    * @param ncodeXy
    */
-  public getMappingItem = (ncodeXy: INcodeSOBPxy): IMappingParams | null => {
+  public getMappingItem = (ncodeXy: INcodeSOBPxy): IPageMapItem | null => {
     const pageInfo = ncodeXy as IPageSOBP;
 
     const pageObj = this.getPageObject(pageInfo);
@@ -117,7 +117,7 @@ export class AreaToPosMapper {
    * mapping data 저장소에 mapping item을 저장
    * @param item
    */
-  private push = (item: IMappingParams) => {
+  private push = (item: IPageMapItem) => {
     // 벌크 배열에도 넣고
     this.mappingItems.push(item);
 
@@ -149,7 +149,7 @@ export class AreaToPosMapper {
     // /** PDF가 차지하는 Ncode 영역 */
     // const npageArea: IPolygonArea = [topLeft, topRight, bottomRight, bottomLeft];
 
-    // const mappingItem: IMappingParams = {
+    // const mappingItem: IPageMapItem = {
     //   pageInfo: { ...arg.pageInfo },
     //   npageArea,
 

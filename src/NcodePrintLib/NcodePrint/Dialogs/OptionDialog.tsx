@@ -132,7 +132,9 @@ export function OptionDialog(props: IDialogProps) {
   const checkAssociatedMappingInfo = () => {
     // PrintPdfMain의 printTrigger를 +1 해 주면, 인쇄가 시작된다
     const maps = MappingStorage.getInstance();
-    const pdfMapDesc = maps.findAssociatedNcode(printOption.fingerprint, printOption.pagesPerSheet);
+    const pdfMapDescArr = maps.findAssociatedNcode(printOption.fingerprint, printOption.pagesPerSheet);
+    const pdfMapDesc = pdfMapDescArr.length > 0 ? pdfMapDescArr[0] : undefined;
+
     printOption.needToIssueCode = !pdfMapDesc;
     if (printOption.needToIssueCode) {
       printOption.pageInfo = { ...g_nullNcode };

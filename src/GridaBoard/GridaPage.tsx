@@ -1,98 +1,19 @@
-import React, { Component, createRef } from "react";
-import { CSSProperties } from "@material-ui/core/styles/withStyles";
-import { uuidv4 } from "../NcodePrintLib";
-import { IMappingParams, IPdfPageDesc } from "../NcodePrintLib/Coordinates";
-import { IPageSOBP, ISizeDpi } from "../NcodePrintLib/DataStructure/Structures";
-import { IRenderWorkerOption, PLAYSTATE } from "../neosmartpen/renderer/pageviewer/RenderWorkerBase";
-import NeoPdfViewer from "../neosmartpen/renderer/pdf/NeoPdfViewer";
-import { Page } from "../neosmartpen/renderer/pdf/Page";
-import PenBasedRenderer from "../neosmartpen/renderer/pageviewer/PenBasedRenderer";
+import { IPageSOBP } from "../NcodePrintLib/DataStructure/Structures";
+import NeoPdfDocument from "../NcodePrintLib/NeoPdf/NeoPdfDocument";
+import NeoPdfPage from "../NcodePrintLib/NeoPdf/NeoPdfPage";
 
-interface Props {
-  pdfUrl: string,
-  pdfFilename: string,
-  pageNo: string,
 
-  pageInfo: IPageSOBP,
-  rotation: number,
+export default class GridaPage {
+  pageInfos: IPageSOBP[];
+  pdf: NeoPdfDocument;
+  pageNo: number;
 
-  mapping: IMappingParams;
-}
-
-interface State {
-  status: string,
-}
-
-export default class GridaPage extends Component<Props, State> {
-
-  mappingInfo: IMappingParams;
-  pdfPage: Page;
-
-  penPage: typeof PenBasedRenderer;
-
-  size: ISizeDpi;
-
-  canvasId = uuidv4();
-
-  // setCanvasRef = (canvas: HTMLCanvasElement) => this.canvas = canvas;
-  // setInkCanvasRef = (canvas: HTMLCanvasElement) => this.canvas = canvas;
-
-  state: State = {
-    status: "N/A",
+  pdfPage: NeoPdfPage;
+  constructor(pageInfos: IPageSOBP[]) {
+    this.pageInfos = pageInfos;
   }
 
-  render = () => {
-    const pdfCanvas: CSSProperties = {
-      position: "absolute",
-      height: "0px",
-      width: "0px",
-      left: "0px",
-      top: "0px",
-      // zoom: this.state.canvasPosition.zoom,
-      overflow: "visible",
-    }
+  setPdfPage = (pdf: NeoPdfDocument, pageNo: number) => {
 
-    const inkCanvas: CSSProperties = {
-      position: "absolute",
-      height: "100%",
-      width: "100%",
-      left: "0px",
-      top: "0px",
-      overflow: "visible",
-    }
-
-    return (
-      <div id={"mixed_view"} style={{
-        position: "absolute",
-        left: "0px", top: "0px",
-        // flexDirection: "row-reverse", display: "flex",
-        width: "100%", height: "100%",
-        alignItems: "center",
-        zIndex: 1,
-      }
-      }>
-        <div id={"pdf_layer"} style={pdfCanvas} >
-          <NeoPdfViewer
-            url={this.props.pdfUrl}
-            filename={this.props.pdfFilename}
-            pageNo={this.props.pageNo} onReportPdfInfo={undefined}
-            position={undefined}
-          />
-        </div>
-        < div id={"ink_layer"} style={inkCanvas} >
-          <PenBasedRenderer
-            baseScale={1}
-            position={undefined}
-            pdfSize={{ width: 210 / 25.4 * 72, height: 297 / 25.4 * 72 }}
-            pageInfo={this.props.pageInfo}
-            playState={PLAYSTATE.live} pens={[]}
-            onNcodePageChanged={undefined}
-            onCanvasShapeChanged={undefined}
-            rotation={this.props.rotation}
-            h={this.props.mapping.h}
-          />
-        </div>
-      </div>
-    );
   }
 }

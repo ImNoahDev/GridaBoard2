@@ -2,6 +2,7 @@ import { g_defaultPrintOption } from "./../../NcodePrintLib/DefaultOption";
 import { store } from "../../client/Root";
 import { IPrintOption } from "../../NcodePrintLib";
 import { NeoSmartpen } from "../../neosmartpen";
+import GridaDoc from "../../GridaBoard/GridaDoc";
 //[Define Action Types
 const ActionGroup = "APP_CONFIG";
 
@@ -37,6 +38,7 @@ const initialState = {
   printOption: g_defaultPrintOption,
   pens: [] as NeoSmartpen[],
   num_pens: 0,
+  gridaDoc: GridaDoc.getInstance(),
 };
 
 export type IAppConfig = typeof initialState;
