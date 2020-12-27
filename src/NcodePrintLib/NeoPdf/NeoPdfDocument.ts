@@ -11,7 +11,6 @@ import * as Util from "../UtilFunc";
 import { IPrintOption, IProgressCallbackFunction } from "../NcodePrint/PrintDataTypes";
 import { uuidv4 } from "../UtilFunc";
 
-PdfJs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${PdfJs.version}/pdf.worker.js`;
 const CMAP_URL = "./cmaps/";
 const CMAP_PACKED = true;
 
@@ -31,11 +30,11 @@ export type IGetDocumentOptions = {
 export default class NeoPdfDocument {
   _mappingInfo: IPdfToNcodeMapItem;
 
-  _pdfDoc: PdfJs.PDFDocumentProxy = null;
+  _pdfDoc: PdfJs.PDFDocumentProxy;
 
-  _ready: PdfJs.PDFLoadingTask<PdfJs.PDFDocumentProxy>;
+  // _ready: PdfJs.PDFLoadingTask<PdfJs.PDFDocumentProxy>;
 
-  private _uuid: string;
+  _uuid: string;
 
   private _url: string;
 
@@ -48,6 +47,8 @@ export default class NeoPdfDocument {
   private _id: string;
 
   private _title: string;
+
+  private _numPages: number;
 
   get title() {
     return this._title;
@@ -72,8 +73,20 @@ export default class NeoPdfDocument {
 
   load = async (options: IGetDocumentOptions) => {
     console.log("~GRIDA DOC~,   load, step 1")
-    await this.justLoad(options);
+    const pdfDoc = await pdfJsOpenDocument(options);
     console.log("~GRIDA DOC~,   load, step 2")
+
+
+    const { url, filename, cMapUrl, cMapPacked, purpose } = options;
+
+    this._url = url;
+    this._filename = filename;
+    this._purpose = purpose;
+    _doc_fingerprint = pdfDoc.fingerprint;
+    this._fingerprint = pdfDoc.fingerprint;
+    this._numPages = pdfDoc.numPages;
+    this._pdfDoc = pdfDoc;
+
 
     // const { url, cMapUrl, cMapPacked } = options;
 
@@ -91,17 +104,21 @@ export default class NeoPdfDocument {
 
     // page를 로드한다
 
-    this._pages = [];
-    for (let i = 0; i < this._pdfDoc.numPages; i++) {
-      // const page = await pdf.getPageAsync(i + 1);
-      const neoPage = new NeoPdfPage(this, i + 1);
-      this._pages.push(neoPage);
+    if (pdfDoc) {
+      this._pages = [];
+      for (let i = 0; i < this._pdfDoc.numPages; i++) {
+        // const page = await pdf.getPageAsync(i + 1);
+        const neoPage = new NeoPdfPage(this, i + 1);
+        this._pages.push(neoPage);
+      }
+
+      this.refreshNcodeMappingTable();
+
+      await this.setPageOverview();
+      return this;
     }
 
-    this.refreshNcodeMappingTable();
-
-    await this.setPageOverview();
-    return this;
+    return undefined;
   }
 
   /**
@@ -132,65 +149,32 @@ export default class NeoPdfDocument {
     this._pdfDoc.destroy();
   }
 
-  justLoad = async (options: IGetDocumentOptions) => {
-    const { url, filename, cMapUrl, cMapPacked, purpose } = options;
 
-    this._url = url;
-    this._filename = filename;
-    this._purpose = purpose;
-    console.log(":GRIDA DOC:,     justLoad, step 1")
+  // justLoad_old = async (options: IGetDocumentOptions) => {
+  //   const { url, filename, cMapUrl, cMapPacked, purpose } = options;
 
-    const openOption = {
-      url: url,
-      cMapUrl: cMapUrl ? cMapUrl : CMAP_URL,
-      cMapPacked: cMapPacked ? cMapPacked : CMAP_PACKED,
-    };
+  //   this._url = url;
+  //   this._filename = filename;
+  //   this._purpose = purpose;
 
-    _doc_fingerprint = "";
+  //   this._ready = PdfJs.getDocument(
+  //     {
+  //       url: url,
+  //       cMapUrl: cMapUrl ? cMapUrl : CMAP_URL,
+  //       cMapPacked: cMapPacked ? cMapPacked : CMAP_PACKED,
+  //     });
 
-    console.log(`:GRIDA DOC:,     justLoad, step 2  : ${this._fingerprint}`);
-    const loadingTask = PdfJs.getDocument(openOption);
-    const pdfDoc = await loadingTask.promise;
+  //   const pdfDoc = await this._ready.promise;
+  //   this._pdfDoc = pdfDoc;
+  //   this._fingerprint = pdfDoc.fingerprint;
 
-    // 왜, 아래의 부분이 두번 실행되지? callback에 등록이 희안하게 되는 모양인데 말이지.
-    // NeoPdfDocument도 객체가 두번 생긴다. 이건 버그가 아닌가 싶은데 말이지?
-    console.log(`:GRIDA DOC:,     justLoad, step 3  :  this.uuid [${this._uuid}]  global fingerprint [${_doc_fingerprint}] pdf.fingerprint [${pdfDoc.fingerprint}] =>  `);
-    _doc_fingerprint = pdfDoc.fingerprint;
-    this._fingerprint = pdfDoc.fingerprint;
+  //   const meta = await pdfDoc.getMetadata();
+  //   this._title = meta.info.title ? meta.info.title : "";
 
-    // const pdfDoc = await this._ready.promise;
-    this._pdfDoc = pdfDoc;
-    this._fingerprint = pdfDoc.fingerprint;
+  //   return this;
+  // }
 
-    // const meta = await pdfDoc.getMetadata();
-    // this._title = meta.info.title ? meta.info.title : "";
-  }
-
-  justLoad_old = async (options: IGetDocumentOptions) => {
-    const { url, filename, cMapUrl, cMapPacked, purpose } = options;
-
-    this._url = url;
-    this._filename = filename;
-    this._purpose = purpose;
-
-    this._ready = PdfJs.getDocument(
-      {
-        url: url,
-        cMapUrl: cMapUrl ? cMapUrl : CMAP_URL,
-        cMapPacked: cMapPacked ? cMapPacked : CMAP_PACKED,
-      });
-
-    const pdfDoc = await this._ready.promise;
-    this._pdfDoc = pdfDoc;
-    this._fingerprint = pdfDoc.fingerprint;
-
-    const meta = await pdfDoc.getMetadata();
-    this._title = meta.info.title ? meta.info.title : "";
-
-    return this;
-  }
-
-  get numPages() { return this._pdfDoc.numPages; }
+  get numPages() { return this._numPages; }
 
   get url() { return this._url; }
 
@@ -354,17 +338,19 @@ export default class NeoPdfDocument {
   }
 
   setPageOverview = async () => {
-    const pdf = this;
+    // const pdf = this;
 
     // const pdf = this.props.pdf;
-    this._pagesOverview = new Array(pdf.numPages);
+    this._pagesOverview = new Array(this.numPages);
     // const { pagesPerSheet } = this.printOption;
 
     let numPortraitPages = 0;
     let numLandscapePages = 0;
 
-    for (let i = 0; i < pdf.numPages; i++) {
-      const page = await pdf.getPageAsync(i + 1);
+    for (let i = 0; i < this.numPages; i++) {
+      // const page = await pdf.getPageAsync(i + 1);
+      const page = await this._pdfDoc.getPage(i + 1);
+
       const vpt: PDF_VIEWPORT_DESC = page.getViewport({ scale: 1, rotation: 0 });
       const { width, height } = vpt;
 
@@ -404,3 +390,62 @@ export default class NeoPdfDocument {
     return this._pagesOverview;
   }
 }
+
+
+
+
+
+
+PdfJs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${PdfJs.version}/pdf.worker.js`;
+
+let pdf_fingerprint = "";
+function pdfJsOpenDocument(options: IGetDocumentOptions): Promise<PdfJs.PDFDocumentProxy> {
+  const { url, filename, cMapUrl, cMapPacked, purpose } = options;
+  pdf_fingerprint = "";
+
+  console.log(":GRIDA DOC:,     pdfJsOpenDocument, step 1")
+
+  const openOption = {
+    url: url,
+    cMapUrl: cMapUrl ? cMapUrl : CMAP_URL,
+    cMapPacked: cMapPacked ? cMapPacked : CMAP_PACKED,
+  };
+
+
+  console.log(`:GRIDA DOC:,     pdfJsOpenDocument, step 2  fingerprint=${pdf_fingerprint} `);
+  const loadingTask = PdfJs.getDocument(openOption);
+
+  /**
+   * 왜, 아래의 부분의 await 다음이 두번 콜백 실행되지? callback에 등록이 희안하게 되는 모양인데 말이지.
+   * 마치 thread가 나뉘어 진 것 같이 동작한다.
+   * NeoPdfDocument도 객체가 두번 생긴다. 이건 버그가 아닌가 싶은데 말이지?
+   * 
+   * 2020/12/27, kitty
+   */
+  // // eslint-disable-next-line no-constant-condition
+  // if (1 === 0) {
+  //   const pdfDoc = await loadingTask.promise;
+  //   console.log(`:GRIDA DOC:,     pdfJsOpenDocument, step 3  fingerprint=${pdf_fingerprint} `);
+  //   pdf_fingerprint = pdfDoc.fingerprint;
+  //   return pdfDoc;
+  // }
+
+
+  /**
+   * 아래는 임시 방편으로 하나만 리턴하도록 했다. 즉, 꼼수다. 
+   * 2020/12/27, kitty
+   */
+  return new Promise(resolve => {
+    loadingTask.promise.then(pdf => {
+      if (pdf_fingerprint === "") {
+        resolve(pdf);
+      }
+      else {
+        pdf.destroy();
+      }
+      console.log(`:GRIDA DOC:,     pdfJsOpenDocument, step 3  fingerprint=${pdf_fingerprint} `);
+      pdf_fingerprint = pdf.fingerprint;
+    });
+  })
+}
+
