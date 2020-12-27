@@ -8,6 +8,7 @@ import GridaToolTip from "../styles/GridaToolTip";
 import { useSelector } from "react-redux";
 import ColorButtons from "../components/navbar/ColorButtons";
 import { setUrlAndFilename } from "../store/reducers/activePdfReducer";
+import { RootState } from "../store/rootReducer";
 
 const localStyle = {
   position: "absolute",
@@ -72,16 +73,11 @@ const ButtonLayerBottom = () => {
     }
   };
 
-
-  const pdfUrl = useSelector((state) => {
-    console.log(state.pdfInfo);
-    return state.pdfInfo.url;
+  const [ pdfUrl, pdfFilename]  = useSelector((state: RootState) => {
+    console.log(state.pdfInfo.pdfLocation);
+    return [state.pdfInfo.pdfLocation.url, state.pdfInfo.pdfLocation.filename];
   });
 
-  const pdfFilename = useSelector((state) => {
-    console.log(state.pdfInfo);
-    return state.pdfInfo.filename;
-  });
 
   return (
     <div style={localStyle}>

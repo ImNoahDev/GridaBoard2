@@ -43,12 +43,15 @@ export default class NeoPdfManager {
     this._pdfs.forEach(pdf => pdf.refreshNcodeMappingTable());
   }
 
-  getDocument = async (options: IGetDocumentOptions) => {
+  public getDocument = async (options: IGetDocumentOptions) => {
     if (options.url && !options.fingerprint) {
-      const doc = new NeoPdfDocument();
-      const load = await doc.load(options);
+      const pdf = new NeoPdfDocument();
+      // console.log(`+GRIDA DOC+, getDocument START ${pdf.filename},  purpose:${pdf.purpose} - ${pdf.url}`);
+      const load = await pdf.load(options);
 
-      this.dispatcher.dispatch(PdfManagerEventName.ON_PDF_LOADED, { pdf: doc });
+      // console.log(`+GRIDA DOC+, getDocument COMPLETED ${pdf.filename},  purpose:${pdf.purpose} - ${pdf.url}`);
+
+      this.dispatcher.dispatch(PdfManagerEventName.ON_PDF_LOADED, { pdf });
       return load;
 
     }
@@ -63,7 +66,7 @@ export default class NeoPdfManager {
 
       if (status.result === "success") {
         const doc = new NeoPdfDocument();
-        return await doc.load({ url: status.url, filename: status.file.name });
+        return await doc.load({ url: status.url, filename: status.file.name, purpose: "to be opened from Google Drive by NeoPdfManager " });
       }
 
       if (status.result === "not match") {
@@ -90,7 +93,7 @@ export default class NeoPdfManager {
     if (result.result === "success") {
       const { url, file } = result;
       console.log(url);
-      const isSame = NeoPdfManager.checkFingerprint({ url, filename: file.name }, fingerprint);
+      const isSame = NeoPdfManager.checkFingerprint({ url, filename: file.name, purpose: "to check fingerprint by NeoPdfManager" }, fingerprint);
       if (isSame)
         return { result: "success", url, file };
       return { result: "not match", url, file };

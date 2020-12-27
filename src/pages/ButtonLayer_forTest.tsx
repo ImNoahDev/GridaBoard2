@@ -71,12 +71,12 @@ const ButtonLayer_forTest = () => {
   }
 
   const pdfUrl = useSelector((state) => {
-    console.log(state.pdfInfo);
+    console.log(state.pdfInfo.url);
     return state.pdfInfo.url;
   });
 
   const pdfFilename = useSelector((state) => {
-    console.log(state.pdfInfo);
+    console.log(state.pdfInfo.filename);
     return state.pdfInfo.filename;
   });
 

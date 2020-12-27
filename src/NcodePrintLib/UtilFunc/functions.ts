@@ -141,28 +141,56 @@ export function getNextNcodePage(curr: IPageSOBP, delta = 1) {
   return pi;
 }
 
-export function diffPropsAndState(prefix, obj, nextProps, nextState = undefined) {
-  console.log(`[${prefix}]==============================================================================================================================`);
-  console.log(`[${prefix}] [update props and state test] CHECK START`);
+/**
+ * shouldComponentUpdated 등에서 쓰이는 상태 비교 디버거 메시지 
+ * @param prefix - prefix string of debug message
+ * @param prevProps 
+ * @param nextProps 
+ * @param prevState 
+ * @param nextState 
+ */
+export function diffPropsAndState(prefix, prevProps, nextProps, prevState = undefined, nextState = undefined) {
+
+  let isChanged = false;
   for (const [key, value] of Object.entries(nextProps)) {
-    if (typeof value === "function" || typeof value === "object") continue;
-    if (obj.props[key] !== value) {
-      console.log(`[${prefix}] property[${key}] was changed, from "${obj.props[key]}" to "${value}"`);
+    // if (typeof value === "function" || typeof value === "object") continue;
+    if (prevProps[key] !== value) {
+      isChanged = true;
     }
   }
 
-  console.log(`[${prefix}]..............................................................................................................................`);
-  if (nextState) {
+  if (prevState && nextState) {
     for (const [key, value] of Object.entries(nextState)) {
-      if (typeof value === "function" || typeof value === "object") continue;
-      if (obj.state[key] !== value) {
-        console.log(`[${prefix}] state[${key}] was changed, from "${obj.state[key]}" to "${value}"`);
+      // if (typeof value === "function" || typeof value === "object") continue;
+      if (prevState[key] !== value) {
+        isChanged = true;
       }
     }
   }
 
-  console.log(`[${prefix}] [update props and state test] CHECK END`);
-  console.log(`[${prefix}]==============================================================================================================================`);
+  if (!isChanged) {
+    console.log(`[${prefix}] =============== Properties & State NOT CHANGED`);
+    return
+  }
+
+  console.log(`[${prefix}] =============== Properties & State ===========================================================================================`);
+  for (const [key, value] of Object.entries(nextProps)) {
+    // if (typeof value === "function" || typeof value === "object") continue;
+    if (prevProps[key] !== value) {
+      console.log(`[${prefix}] PROPERTY [${key}] was changed, "${prevProps[key]}" ==> "${value}"`);
+    }
+  }
+
+  // console.log(`[${prefix}] State .......................................................................................................................`);
+  if (prevState && nextState) {
+    for (const [key, value] of Object.entries(nextState)) {
+      // if (typeof value === "function" || typeof value === "object") continue;
+      if (prevState[key] !== value) {
+        console.log(`[${prefix}] STATE    [${key}] was changed, "${prevState[key]}" ==> "${value}"`);
+      }
+    }
+  }
+  // console.log(`[${prefix}]==============================================================================================================================`);
 }
 
 

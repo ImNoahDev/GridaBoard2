@@ -120,7 +120,7 @@ export default class PrintPdfButton extends React.Component<IPrintPdfButtonProps
   }
 
   shouldComponentUpdate(nextProps: IPrintPdfButtonProps, nextState: State) {
-    diffPropsAndState("PrintPdfButton", this, nextProps, nextState);
+    diffPropsAndState("PrintPdfButton", this.props, nextProps, this.state, nextState);
 
     let needToCheck = false;
     if (this.props.url !== nextProps.url) {
@@ -221,8 +221,7 @@ export default class PrintPdfButton extends React.Component<IPrintPdfButtonProps
   loadPdf = (url: string, filename: string) => {
     if (url === undefined) return;
 
-    const instance = NeoPdfManager.getInstance();
-    const loadingPromise = instance.getDocument({ url, filename });
+    const loadingPromise = NeoPdfManager.getInstance().getDocument({ url, filename, purpose: "to be printed by PrintPdfButton", });
     // console.log(`[yyy] `);
     // console.log(`[yyy] LOAIND: ${url}`);
     loadingPromise.then(

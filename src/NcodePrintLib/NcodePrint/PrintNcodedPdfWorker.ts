@@ -85,7 +85,7 @@ export default class PrintNcodedPdfWorker {
   private loadPdf = async (url: string, filename: string, printOption: IPrintOption) => {
     if (url === undefined) return;
 
-    const loaded = await NeoPdfManager.getInstance().getDocument({ url, filename });
+    const loaded = await NeoPdfManager.getInstance().getDocument({ url, filename, purpose: "to be printed by PrintNcodedPdfWorker", });
     if (loaded) {
       // console.log(`[yyy] setPageOverview called`);
       printOption.url = url;

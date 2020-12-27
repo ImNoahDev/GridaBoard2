@@ -59,8 +59,20 @@ export default class NeoPdfPage {
 
   private _pageToNcodeMaps: IPageMapItem[];
 
+  /** 
+   * 이 값은 NeoPdfDocument의 load에서 refreshNcodeMappingTable에 의해 자동으로 설정되고
+   * MappingStorage가 update될 때마다 자동으로 갱신된다.
+   */
   get pageToNcodeMaps() {
     return this._pageToNcodeMaps;
+  }
+
+  setPageToNcodeMaps = (maps: IPageMapItem[]) => {
+    // this._pageToNcodeMaps 자체가 바뀌는 것을 막자, GridaDoc에서 쓴다.
+    //
+    // 이걸, pointer로 복사하게 된다면,
+    // GridaDoc와 GridaPage의 pageInfo 관련된 항목을 자동 업데이트 되게 수정해야 한다.
+    this._pageToNcodeMaps = Util.cloneObj(maps);
   }
 
   constructor(neoPdf: NeoPdfDocument, pageNo: number) {
@@ -81,9 +93,6 @@ export default class NeoPdfPage {
     return this._pdfPage;
   }
 
-  setPageMap = (maps: IPageMapItem[]) => {
-    this._pageToNcodeMaps = maps;
-  }
 
   render = (params: PdfJs.PDFRenderParams) => {
     // await this._ready;

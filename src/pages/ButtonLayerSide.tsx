@@ -48,7 +48,6 @@ const ButtonLayerSide = () => {
   }
 
   const pens = useSelector((state: RootState) => {
-    console.log(state.pdfInfo);
     return state.appConfig.pens;
   });
 

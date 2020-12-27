@@ -38,7 +38,6 @@ const initialState = {
   printOption: g_defaultPrintOption,
   pens: [] as NeoSmartpen[],
   num_pens: 0,
-  gridaDoc: GridaDoc.getInstance(),
 };
 
 export type IAppConfig = typeof initialState;
@@ -68,3 +67,6 @@ export default (state = initialState, action) => {
   }
 };
 //]
+
+
+GridaDoc.getInstance();

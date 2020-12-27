@@ -44,17 +44,13 @@ const Home = () => {
   const [pdfFilename, setPdfFilename] = useState(undefined as string);
   const [noMoreAutoLoad, setNoMoreAutoLoad] = useState(false);
 
-  const pdfUrl_store = useSelector((state: RootState) => {
-    console.log(state.pdfInfo);
-    return state.pdfInfo.url;
-  });
-  const pdfFilename_store = useSelector((state: RootState) => {
-    console.log(state.pdfInfo);
-    return state.pdfInfo.filename;
+  const [ pdfUrl_store, pdfFilename_store]  = useSelector((state: RootState) => {
+    console.log(state.pdfInfo.pdfLocation);
+    return [state.pdfInfo.pdfLocation.url, state.pdfInfo.pdfLocation.filename];
   });
 
   const pens_store = useSelector((state: RootState) => {
-    console.log(state.pdfInfo);
+    // console.log(state.appConfig.pens);
     return state.appConfig.pens;
   });
 

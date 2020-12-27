@@ -7,6 +7,7 @@ import { hideUIProgressBackdrop, showUIProgressBackdrop } from "../../../store/r
 import NeoPdfDocument from "../../../NcodePrintLib/NeoPdf/NeoPdfDocument";
 import NeoPdfManager from "../../../NcodePrintLib/NeoPdf/NeoPdfManager";
 import { TransformParameters } from "../../../NcodePrintLib/Coordinates";
+import { diffPropsAndState } from "../../../NcodePrintLib/UtilFunc/functions";
 
 
 // PdfJs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${PdfJs.version}/pdf.worker.js`;
@@ -53,7 +54,7 @@ class NeoPdfViewer extends React.Component<Props, State> {
   }
 
   componentDidMount() {
-    this.loadDocument(this.props.url, this.props.filename);
+    // this.loadDocument(this.props.url, this.props.filename);
   }
 
   loadDocument = async (url: string, filename: string) => {
@@ -62,11 +63,14 @@ class NeoPdfViewer extends React.Component<Props, State> {
 
     // kitty, 나중에는 분리할 것
     showUIProgressBackdrop();
-    const loadingTask = NeoPdfManager.getInstance().getDocument({ url, filename });
-
-    const self = this;
+    console.log("*GRIDA DOC*, loadDocument START");
+    // const neoPdf = new NeoPdfDocument();
+    // const loadingTask = neoPdf.load({ url, filename, purpose: "MAIN DOCUMENT: to be opend by NeoPdfViewer" });
+    const loadingTask = NeoPdfManager.getInstance().getDocument({ url, filename, purpose: "MAIN DOCUMENT: to be opend by NeoPdfViewer" });
     this.setState({ status: "loading" });
+
     const pdf = await loadingTask;
+    console.log("*GRIDA DOC*, loadDocument COMPLETED")
 
     this.props.onReportPdfInfo(pdf);
     this.setState({ pdf });
@@ -77,11 +81,18 @@ class NeoPdfViewer extends React.Component<Props, State> {
   }
 
   shouldComponentUpdate(nextProps: Props, nextState: State) {
+    // diffPropsAndState("GRIDA DOC", this.props, nextProps, this.state, nextState);
     if (nextProps.url !== this.props.url) {
-      this.setState({ status: "loading" });
+      // this.setState({ status: "loading" });
       this.loadDocument(nextProps.url, nextProps.filename);
       return false;
     }
+
+    if (nextState.status === "loading") {
+      return false;
+    }
+
+
     return true;
   }
 
@@ -96,15 +107,15 @@ class NeoPdfViewer extends React.Component<Props, State> {
   render() {
     const { pdf } = this.state;
     // console.log("Pdf Viewer Renderer");
-// console.log(this.props.position);
+    // console.log(this.props.position);
 
 
     const zoom = this.props.position.zoom;
     const pdfCanvas: CSSProperties = {
       position: "absolute",
       zoom: zoom,
-      left: this.props.position.offsetX/zoom,
-      top:this.props.position.offsetY/zoom,
+      left: this.props.position.offsetX / zoom,
+      top: this.props.position.offsetY / zoom,
     }
 
     if (pdf) {
