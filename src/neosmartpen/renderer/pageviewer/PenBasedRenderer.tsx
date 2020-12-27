@@ -165,6 +165,10 @@ class PenBasedRenderer_module extends React.Component<Props, State> {
       pen.addEventListener(PenEventName.ON_HOVER_MOVE, this.onLiveHoverMove);
       pen.addEventListener(PenEventName.ON_PEN_HOVER_PAGEINFO, this.onLiveHoverPageInfo);
 
+      // virual pen down/up은, 펜 스트로크가 이어지고 있음에도 페이지가 바뀌는 경우에 발생한다
+      pen.addEventListener(PenEventName.ON_PEN_DOWN_VIRTUAL, this.onLivePenDown);
+      pen.addEventListener(PenEventName.ON_PEN_UP_VIRTUAL, this.onLivePenUp);
+
       this.subscribedPens.push(pen);
 
       if (this.renderer) {
@@ -184,6 +188,9 @@ class PenBasedRenderer_module extends React.Component<Props, State> {
       pen.removeEventListener(PenEventName.ON_PEN_MOVE, this.onLivePenMove);
       pen.removeEventListener(PenEventName.ON_PEN_UP, this.onLivePenUp);
       pen.removeEventListener(PenEventName.ON_HOVER_MOVE, this.onLiveHoverMove);
+
+      pen.removeEventListener(PenEventName.ON_PEN_DOWN_VIRTUAL, this.onLivePenDown);
+      pen.removeEventListener(PenEventName.ON_PEN_UP_VIRTUAL, this.onLivePenUp);
 
       const index = this.subscribedPens.indexOf(pen);
       this.subscribedPens.splice(index, 1);

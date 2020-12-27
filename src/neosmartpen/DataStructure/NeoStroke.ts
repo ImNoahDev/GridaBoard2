@@ -5,7 +5,13 @@ import { IBrushType } from "../DataStructure/Enums"
 export enum StrokeStatus {
   NORMAL,
   ERASED,
-};
+}
+
+
+export enum StrokePageAttr {
+  SINGLEPAGE,
+  MULTIPAGE,
+}
 
 export interface INeoStrokeProps {
   section: number,
@@ -22,6 +28,8 @@ export interface INeoStrokeProps {
   color: string,
 
   status: StrokeStatus,
+
+  multiPage?: StrokePageAttr,
 }
 
 
@@ -74,19 +82,23 @@ export default class NeoStroke implements INeoStrokeProps {
   constructor(props: INeoStrokeProps) {
     const { section, owner, book, page, startTime, mac, thickness, brushType, color, status } = props;
     // from INeoStrokeProps
-    this.mac = mac;
+    Object.keys(props).forEach(key => {
+      this[key] = props[key];
+    });
 
-    this.section = section;
-    this.owner = owner;
-    this.book = book;
-    this.page = page;
+    // this.mac = mac;
 
-    this.startTime = startTime;
+    // this.section = section;
+    // this.owner = owner;
+    // this.book = book;
+    // this.page = page;
 
-    this.thickness = thickness;
-    this.brushType = brushType;
-    this.color = color;
-    this.status = status;
+    // this.startTime = startTime;
+
+    // this.thickness = thickness;
+    // this.brushType = brushType;
+    // this.color = color;
+    // this.status = status;
 
     // own properties
     this.key = uuidv4();
@@ -107,5 +119,12 @@ export default class NeoStroke implements INeoStrokeProps {
 
   close() {
     this.opened = false;
+  }
+
+  set = (properties: Object) => {
+    Object.keys(properties).forEach(key => {
+      this[key] = properties[key];
+    });
+
   }
 }

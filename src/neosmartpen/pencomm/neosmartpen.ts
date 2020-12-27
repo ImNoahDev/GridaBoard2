@@ -1,3 +1,4 @@
+import { StrokePageAttr, StrokeStatus } from "./../DataStructure/NeoStroke";
 import { IPoint } from "./../DataStructure/Structures";
 import PenComm, { deviceSelectDlg } from "./pencomm";
 import InkStorage, { IOpenStrokeArg } from "../penstorage/InkStorage";
@@ -314,11 +315,14 @@ export class NeoSmartpen {
 
       // 1) pen up 처리
       {
+        const stroke = this.currPenMovement.stroke;
+        stroke.set({ multiPage: StrokePageAttr.MULTIPAGE });
+
         const penUpStrokeInfo = this.processPenUp(event);
         const { mac, section, owner, book, page } = penUpStrokeInfo.stroke;
 
         console.log(`NeoSmartpen dispatch event VIRTUAL ON_PEN_UP`);
-        this.dispatcher.dispatch(PenEventName.ON_PEN_UP, { ...penUpStrokeInfo, mac, pen: this, section, owner, book, page });
+        this.dispatcher.dispatch(PenEventName.ON_PEN_UP_VIRTUAL, { ...penUpStrokeInfo, mac, pen: this, section, owner, book, page });
         this.resetPenStroke();
 
       }
@@ -326,8 +330,11 @@ export class NeoSmartpen {
       // 2) pen down처리
       {
         const penDownStrokeInfo = this.processPenDown(event);
+        const stroke = penDownStrokeInfo.stroke;
+        stroke.set({ multiPage: StrokePageAttr.MULTIPAGE });
+
         console.log(`NeoSmartpen dispatch event VIRTUAL ON_PEN_DOWN`);
-        this.dispatcher.dispatch(PenEventName.ON_PEN_DOWN, penDownStrokeInfo);
+        this.dispatcher.dispatch(PenEventName.ON_PEN_DOWN_VIRTUAL, penDownStrokeInfo);
       }
 
       // 3) page Info 처리

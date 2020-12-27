@@ -25,11 +25,28 @@ export enum PEN_STATE {
 /** @enum {string} */
 export enum PenEventName {
   ON_PEN_DOWN = "pendown",
+
   ON_PEN_PAGEINFO = "penpageinfo",
   ON_PEN_HOVER_PAGEINFO = "hoverpageinfo",
   ON_PEN_MOVE = "penmove",
   ON_PEN_UP = "penup",
+
   ON_HOVER_MOVE = "hovermove",
+
+
+  /**
+   * pen move 도중 페이지가 바뀜에 따라 생성하는 virtual event
+   *
+   * virual pen down/up은, 펜 스트로크가 이어지고 있음에도 페이지가 바뀌는 경우에 발생한다
+   * 잉크 스토리지에는 각각의 페이지에 새로운 스트로크로 등록되도록 설계되어 있다
+   *
+   * 이 이벤트를 분리하는 이유는, post it 등, 아래의 종이와 겹쳐진 상태에서, 그 위치를 파악하기 위함이다
+   */
+  ON_PEN_DOWN_VIRTUAL = "pendown_virtual",
+
+  /** pen move 도중 페이지가 바뀜에 따라 생성하는 virtual event */
+  ON_PEN_UP_VIRTUAL = "penup_virtual",
+
 
   ON_NCODE_ERROR = "error",
   ON_PW_REQUIRED = "pw_req",
