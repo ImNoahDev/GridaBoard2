@@ -63,7 +63,7 @@ export interface IRenderWorkerOption {
 
   rotation: number,
 
-  onCanvasShapeChanged: (arg: { offsetX, offsetY, zoom }) => void,
+  onCanvasPositionChanged: (arg: { offsetX, offsetY, zoom }) => void,
 }
 
 /**
@@ -438,7 +438,7 @@ export default class RenderWorkerBase {
 
   reportCanvasChanged = () => {
     const { x: offsetX, y: offsetY, zoom } = this.offset;
-    this.options.onCanvasShapeChanged({ offsetX, offsetY, zoom });
+    this.options.onCanvasPositionChanged({ offsetX, offsetY, zoom });
   }
 
   /**

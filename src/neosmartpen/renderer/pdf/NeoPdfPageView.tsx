@@ -10,16 +10,15 @@ import NeoPdfPage from '../../../NcodePrintLib/NeoPdf/NeoPdfPage';
 import { MAX_RENDERER_PIXELS } from "../Constants";
 import { CSSProperties } from '@material-ui/core/styles/withStyles';
 import { BoxProps } from '@material-ui/core';
+import { MixedViewProps } from '../MixedPageView';
 
 
-interface PageProps extends BoxProps {
+interface PageProps extends MixedViewProps {
   // pdf: PdfJs.PDFDocumentProxy,
   pdf: NeoPdfDocument,
   index: number,
-  scale?: number,
   position: { offsetX: number, offsetY: number, zoom: number },
   // pdfCanvas: CSSProperties,
-
 }
 
 interface PageState {
@@ -40,7 +39,7 @@ type IBackRenderedStatus = {
   px_height: number
 }
 
-class Page extends Component<PageProps> {
+export default class NeoPdfPageView extends Component<PageProps> {
   state: PageState = {
     status: 'N/A',
     page: null,
@@ -308,9 +307,6 @@ class Page extends Component<PageProps> {
 
   render = () => {
     const { status } = this.state;
-    const { pdf, index, scale, position, ...rest } = this.props;
-
-    const zoom = this.props.position.zoom;
     const pageCanvas: CSSProperties = {
       position: "absolute",
       zoom: 1,
@@ -325,4 +321,3 @@ class Page extends Component<PageProps> {
   }
 }
 
-export { Page };

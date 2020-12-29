@@ -179,8 +179,10 @@ const Home = () => {
 
         <div style={{ position: "absolute", top: 0, left: 0, bottom: 0, right: drawerOpen ? drawerWidth : 0 }}>
           <MixedPageView
-            pdfUrl={pdfUrl} filename={pdfFilename} pageNo={1} scale={1}
-            playState={PLAYSTATE.live} pens={pens}
+            pdfUrl={pdfUrl} filename={pdfFilename} pageNo={1}
+            playState={PLAYSTATE.live}
+            pens={pens} fromStorage={false}
+            autoPageChange={true}
             rotation={0}
             onFileLoadNeeded={noMoreAutoLoad ? undefined : onFileLoadNeeded}
             parentName={"grida-main-home"}

@@ -1,6 +1,6 @@
 import { Box, Paper, Typography } from "@material-ui/core";
 import React, { CSSProperties, useState } from "react";
-import { MixedPageView, PLAYSTATE } from "../../neosmartpen";
+import { InkStorage, MixedPageView, PLAYSTATE } from "../../neosmartpen";
 import { ZoomFitEnum } from "../../neosmartpen/renderer/pageviewer/RenderWorkerBase";
 import GridaDoc from "../GridaDoc";
 import { RootState } from "../../store/rootReducer";
@@ -61,6 +61,7 @@ class DrawerPages extends React.Component<Props, State>  {
       height = drawerWidth / wh_ratio;
     }
 
+    const inkStorage = InkStorage.getInstance();
     return (
       <div
         style={{ height: height, marginLeft: 10, marginRight: 10, position: "relative" }}
@@ -83,12 +84,14 @@ class DrawerPages extends React.Component<Props, State>  {
             >
               <div id={`thumbnail-${i}`} style={{ position: "absolute", margin: 0, padding: 0, right: 0, left: 0, top: 0, height: "100%", backgroundColor: bgColor }}>
                 <MixedPageView
-                  pdfUrl={pdfUrl} filename={pdfFilename} pageNo={pageNo} scale={1}
+                  pdfUrl={pdfUrl} filename={pdfFilename} pageNo={pageNo}
                   playState={PLAYSTATE.live} pens={[]}
                   rotation={0}
                   onFileLoadNeeded={undefined}
                   parentName={`thumbnail-${i}`}
                   viewFit={ZoomFitEnum.FULL}
+                  autoPageChange={false}
+                  fromStorage={true}
                   fitMargin={2}
                   // fixed
                   noInfo

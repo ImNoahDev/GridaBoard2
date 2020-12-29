@@ -1,6 +1,6 @@
 import React, { CSSProperties } from "react";
 // import PropTypes from "prop-types";
-import { Page } from './Page';
+import NeoPdfPageView from './NeoPdfPageView';
 // import * as PdfJs from "pdfjs-dist";
 import { connect } from 'react-redux';
 import { hideUIProgressBackdrop, showUIProgressBackdrop } from "../../../store/reducers/ui";
@@ -8,9 +8,10 @@ import NeoPdfDocument from "../../../NcodePrintLib/NeoPdf/NeoPdfDocument";
 import NeoPdfManager from "../../../NcodePrintLib/NeoPdf/NeoPdfManager";
 import { TransformParameters } from "../../../NcodePrintLib/Coordinates";
 import { diffPropsAndState } from "../../../NcodePrintLib/UtilFunc/functions";
+import { MixedViewProps } from "../MixedPageView";
 
 
-interface Props {
+interface Props extends MixedViewProps {
   url: string,
 
   filename: string,
@@ -37,9 +38,6 @@ interface State {
 
 class NeoPdfViewer extends React.Component<Props, State> {
   static displayName = "Viewer";
-  documentContainer = React.createRef();
-  document = React.createRef();
-  scroller = React.createRef();
 
   constructor(Props: Props) {
     super(Props);
@@ -118,10 +116,9 @@ class NeoPdfViewer extends React.Component<Props, State> {
     if (pdf) {
       return (
         <div id={`${this.props.parentName}-pdf_view`} style={pdfCanvas}>
-          <Page
+          <NeoPdfPageView {...this.props}
             pdf={pdf} index={this.props.pageNo}
             key={`document-page-${this.props.pageNo}`}
-            style={pdfCanvas}
             position={this.props.position}
           />
         </div>

@@ -17,6 +17,7 @@ import { CSSProperties } from "@material-ui/core/styles/withStyles";
 import { BoxProps } from "@material-ui/core";
 import { IPenToViewerEvent } from "../../pencomm/neosmartpen";
 import NeoPdfDocument from "../../../NcodePrintLib/NeoPdf/NeoPdfDocument";
+import { MixedViewProps } from "../MixedPageView";
 
 export { PLAYSTATE };
 
@@ -24,48 +25,18 @@ export { PLAYSTATE };
 /**
  * Properties
  */
-interface Props extends BoxProps {
-  pageInfo: IPageSOBP,
-  inkStorage?: InkStorage,
-  playState?: PLAYSTATE,
-  pens?: NeoSmartpen[],
-
+interface Props extends MixedViewProps {
   baseScale?: number,
-  width?: number,
-  height?: number,
-
-  viewFit?: ZoomFitEnum;
-
-  /** viewFit을 맞출 때의 마진 pixel 단위 */
-  fitMargin?: number,
 
   pdfSize: { width: number, height: number };
 
-  pdfUrl: string;
+  onNcodePageChanged: (arg: IPageSOBP) => void;
 
-  /**
-   * @param pageInfo 
-   * @param isFromEveryPgInfo - 매번 page info가 나올때마다 불려진 것인가? 아니면 페이지가 바뀔때 불려진 것인가?
-   */
-  onNcodePageChanged: (arg: IPageSOBP, isFromEveryPgInfo: boolean) => void;
+  onCanvasPositionChanged: (arg: { offsetX: number, offsetY: number, zoom: number }) => void;
 
-  onCanvasShapeChanged: (arg: { offsetX: number, offsetY: number, zoom: number }) => void;
-
-  /** canvas rotation, 0: portrait, 90: landscape */
-  rotation: number;
-
-
-  /** transform matrix it can be undefined */
   h: TransformParameters;
+
   position: { offsetX: number, offsetY: number, zoom: number },
-
-  noInfo?: boolean;
-
-  fixed?: boolean;
-
-  parentName: string;
-
-
 }
 
 
@@ -151,8 +122,8 @@ class PenBasedRenderer_module extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
 
-    const { pageInfo, inkStorage, baseScale, playState, fitMargin, width, height, fixed, pdfSize, viewFit } = props;
-    this.inkStorage = inkStorage ? inkStorage : InkStorage.getInstance();
+    const { pageInfo, baseScale, playState, fitMargin, width, height, fixed, pdfSize, viewFit } = props;
+    this.inkStorage = InkStorage.getInstance();
 
     this.canvasId = UTIL.uuidv4();
     // this.canvasId = "fabric canvas";
@@ -306,7 +277,7 @@ class PenBasedRenderer_module extends React.Component<Props, State> {
       mouseAction: !this.fixed,
       viewFit: this.state.viewFit,
       fitMargin: this.fitMargin,
-      onCanvasShapeChanged: this.props.onCanvasShapeChanged,
+      onCanvasPositionChanged: this.props.onCanvasPositionChanged,
       rotation: this.props.rotation,
     };
 
@@ -337,26 +308,26 @@ class PenBasedRenderer_module extends React.Component<Props, State> {
   }
 
 
-  resizeListener = (e) => {
-    this.setState({ sizeUpdate: this.state.sizeUpdate + 1 });
+  // resizeListener = (e) => {
+  //   this.setState({ sizeUpdate: this.state.sizeUpdate + 1 });
 
-    // const { classes, scaleType, scale } = this.props;
+  //   // const { classes, scaleType, scale } = this.props;
 
-    let { width, height } = this.propsSize;
+  //   let { width, height } = this.propsSize;
 
-    const node = this.mainDiv;
+  //   const node = this.mainDiv;
 
-    if (node) {
-      const parentHeight = node.offsetHeight;
-      const parentWidth = node.offsetWidth;
+  //   if (node) {
+  //     const parentHeight = node.offsetHeight;
+  //     const parentWidth = node.offsetWidth;
 
-      width = parentWidth;
-      height = parentHeight;
+  //     width = parentWidth;
+  //     height = parentHeight;
 
-      // console.log(`boundary check, Parent window (width, height) = (${parentWidth}, ${parentHeight})`);
-    }
-    this.onViewResized({ width, height });
-  };
+  //     // console.log(`boundary check, Parent window (width, height) = (${parentWidth}, ${parentHeight})`);
+  //   }
+  //   this.onViewResized({ width, height });
+  // };
 
 
 
@@ -372,7 +343,7 @@ class PenBasedRenderer_module extends React.Component<Props, State> {
     pens.forEach(pen => this.unsubscribePenEvent(pen));
 
     // this.renderer.stopInterval();
-    window.removeEventListener("resize", this.resizeListener);
+    // window.removeEventListener("resize", this.resizeListener);
 
     // penManager에 연결 해제
     const penManager = PenManager.getInstance();
@@ -428,7 +399,7 @@ class PenBasedRenderer_module extends React.Component<Props, State> {
     }
 
     /** pdf pageNo를 바꿀 수 있게, container에게 전달한다. */
-    this.props.onNcodePageChanged({ section, owner, book, page }, true);
+    this.props.onNcodePageChanged({ section, owner, book, page });
   }
 
 
@@ -573,7 +544,7 @@ class PenBasedRenderer_module extends React.Component<Props, State> {
   }
 }
 
-const AdaptiveWithDetector = withResizeDetector(PenBasedRenderer_module);
+const AdaptiveWithDetector = PenBasedRenderer_module;
 
 const PenBasedRenderer = (props: Props) => {
   return (
