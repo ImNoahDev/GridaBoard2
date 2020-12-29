@@ -46,9 +46,7 @@ export default class NeoPdfManager {
   public getDocument = async (options: IGetDocumentOptions) => {
     if (options.url && !options.fingerprint) {
       const pdf = new NeoPdfDocument();
-      console.log(`+GRIDA DOC+, getDocument START ${pdf._uuid},  purpose:${pdf.purpose} - ${pdf.url}`);
       await pdf.load(options);
-      console.log(`+GRIDA DOC+, getDocument COMPLETED ${pdf._uuid},  purpose:${pdf.purpose} - ${pdf.url}`);
 
       this.dispatcher.dispatch(PdfManagerEventName.ON_PDF_LOADED, { pdf });
       return pdf;

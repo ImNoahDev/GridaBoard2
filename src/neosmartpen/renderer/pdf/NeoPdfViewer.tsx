@@ -21,6 +21,8 @@ interface Props {
 
   progressDlgTitle?: string;
 
+  parentName: string;
+
 
 }
 
@@ -50,7 +52,7 @@ class NeoPdfViewer extends React.Component<Props, State> {
   }
 
   componentDidMount() {
-    // this.loadDocument(this.props.url, this.props.filename);
+    this.loadDocument(this.props.url, this.props.filename);
   }
 
   loadDocument = async (url: string, filename: string) => {
@@ -115,7 +117,7 @@ class NeoPdfViewer extends React.Component<Props, State> {
 
     if (pdf) {
       return (
-        <div id="pdf-viewer" style={pdfCanvas}>
+        <div id={`${this.props.parentName}-pdf_view`} style={pdfCanvas}>
           <Page
             pdf={pdf} index={this.props.pageNo}
             key={`document-page-${this.props.pageNo}`}
@@ -124,9 +126,12 @@ class NeoPdfViewer extends React.Component<Props, State> {
           />
         </div>
       );
-
     }
-    return null;
+    return (
+      <React.Fragment>
+        {this.props.filename}
+      </React.Fragment>
+    )
   }
 }
 

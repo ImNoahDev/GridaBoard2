@@ -333,14 +333,14 @@ function storageAvailable(type) {
 
   // https://stackoverflow.com/questions/26257183/detecting-available-storage-with-indexeddb/38905723#38905723 ==> right!
   // https://storage.spec.whatwg.org/#dom-storagemanager-estimate ==> this one, also.
-  navigator.storage.estimate().then((data) => {
-    console.log(data);
-  }); // Object { quota: 2147483648, usage: 0 }
+  // navigator.storage.estimate().then((data) => {
+  //   console.log(data);
+  // }); // Object { quota: 2147483648, usage: 0 }
 
-  for (let i = 0; i < 4 * 1024; i++) {
-    const key = `storage_test_${i}`;
-    localStorage.removeItem(key);
-  }
+  // for (let i = 0; i < 4 * 1024; i++) {
+  //   const key = `storage_test_${i}`;
+  //   localStorage.removeItem(key);
+  // }
 
   // let acc = 0;
   // for (let i = 0; i < 4 * 1024; i++) {

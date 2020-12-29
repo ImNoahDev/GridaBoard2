@@ -10,6 +10,7 @@ import { IFileBrowserReturn, isSameObject, openFileBrowser2 } from "../../NcodeP
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from "@material-ui/core";
 import { ZoomFitEnum } from "./pageviewer/RenderWorkerBase";
 import { IAutoLoadDocDesc } from "../../NcodePrintLib/SurfaceMapper/MappingStorage";
+import NeoPdfDocument from "../../NcodePrintLib/NeoPdf/NeoPdfDocument";
 
 export const ZINDEX_INK_LAYER = 3;
 export const ZINDEX_PDF_LAYER = 2;
@@ -29,6 +30,8 @@ interface Props {
   scale: number,
   playState: PLAYSTATE;
 
+  noInfo?: boolean;
+
   /** canvas view rotation, 0: portrait, 90: landscape */
   rotation: number;
 
@@ -36,11 +39,20 @@ interface Props {
   /** 현재 view가 가진 pdf와 다른 code map된 pdf가 감지되면 autoload를 시도한다. undefiled이면 안한다. */
   onFileLoadNeeded: (doc: IAutoLoadDocDesc) => void;
 
+  parentName: string;
+
+  viewFit?: ZoomFitEnum;
+  fitMargin?: number;
+
+  fixed?: boolean;
+
 }
 
 interface State {
   pageInfo: IPageSOBP;
   pdfUrl: string;
+
+  pdfSize_pu: { width: number, height: number };
 
   pdfFilename: string;
 
@@ -60,7 +72,7 @@ interface State {
 
 export default class MixedPageView extends React.Component<Props, State> {
 
-  pdf: PdfJs.PDFDocumentProxy;
+  pdf: NeoPdfDocument;
   rendererRef: React.RefObject<typeof PenBasedRenderer> = React.createRef();
 
   filename: string;
@@ -84,7 +96,7 @@ export default class MixedPageView extends React.Component<Props, State> {
       pdfUrl,
       pdfFilename: filename,
       pageNo,
-
+      pdfSize_pu: { width: 595, height: 841 },    // 초기 값이 없으면 zoom 비율을 따질 때 에러를 낸다. 당연히
       pageInfo,
 
       canvasPosition,
@@ -97,12 +109,21 @@ export default class MixedPageView extends React.Component<Props, State> {
     };
   }
 
-  onReportPdfInfo = (pdf: PdfJs.PDFDocumentProxy) => {
+  onReportPdfInfo = (pdf: NeoPdfDocument) => {
     this.pdf = pdf;
 
     // 이미 로드되어 있고 같은 파일이라면, 페이지를 전환한다.
     if (this.pdf) {
+      let pageNo = this.state.pageNo;
+      let size = this.pdf.getPageSize(pageNo);
+      if (!size) {
+        pageNo = 1;
+        size = this.pdf.getPageSize(pageNo);
+      }
+
+      this.setState({ pageNo, pdfSize_pu: size });
       const newPageInfo = { ...this.state.pageInfo };
+
       this.setState({ pageInfo: newPageInfo });
     }
   }
@@ -135,10 +156,19 @@ export default class MixedPageView extends React.Component<Props, State> {
       }
     }
 
+    const pageNo = coupledDoc.pageMapping.pdfDesc.pageNo;
     // 이미 로드되어 있고 같은 파일이라면, 페이지를 전환한다.
-    if (this.pdf && this.pdf.fingerprint === coupledDoc.pdf.fingerprint) {
-      const pageNo = coupledDoc.pageMapping.pdfDesc.pageNo;
-      if (this.state.pageNo !== pageNo) this.setState({ pageNo });
+    if (!this.pdf) return;
+
+    if (pageNo !== this.state.pageNo) {
+      const size = this.pdf.getPageSize(pageNo);
+      this.setState({ pdfSize_pu: size });
+    }
+
+    if (this.pdf.fingerprint === coupledDoc.pdf.fingerprint) {
+      if (this.state.pageNo !== pageNo) {
+        this.setState({ pageNo });
+      }
     }
   }
 
@@ -187,6 +217,8 @@ export default class MixedPageView extends React.Component<Props, State> {
 
 
   render() {
+    const pdfSize = this.state.pdfSize_pu;
+    console.log(`PDF SIZE CANVAS: ${pdfSize.width}, ${pdfSize.height}`);
     const pdfCanvas: CSSProperties = {
       position: "absolute",
       // height: "0px",
@@ -197,7 +229,8 @@ export default class MixedPageView extends React.Component<Props, State> {
       top: 0,
       left: 0,
       right: 0,
-      bottom: 0,
+      // bottom: 0,
+      height: "100%",
 
       // zoom: this.state.canvasPosition.zoom,
       overflow: "visible",
@@ -213,60 +246,59 @@ export default class MixedPageView extends React.Component<Props, State> {
       top: 0,
       left: 0,
       right: 0,
-      bottom: 0,
+      // bottom: 0,
+      height: "100%",
 
       overflow: "visible",
     }
 
     // console.log(`MixedViewer: rendering, h=${JSON.stringify(this.state.h)}`);
     // console.log(this.state.canvasPosition);
+
+    console.log(`THUMB, mixed viewFit = ${this.props.viewFit}`);
     return (
-      <div style={{
+      <div id={`${this.props.parentName}-mixed_view`} style={{
         position: "absolute",
         left: 0,
         top: 0,
-        bottom: 0,
         right: 0,
+        // bottom: 0,
+        height: "100%",
         alignItems: "center",
         zIndex: 1,
       }}>
-        <div id={"mixed_view"} style={{
-          position: "absolute",
-          left: 0,
-          top: 0,
-          bottom: 0,
-          right: 0,
-          alignItems: "center",
-          zIndex: 1,
-        }}>
-          <div id={"pdf_layer"} style={pdfCanvas} >
-            <NeoPdfViewer
-              url={this.state.pdfUrl}
-              filename={this.state.pdfFilename}
-              pageNo={this.state.pageNo}
-              onReportPdfInfo={this.onReportPdfInfo}
-              position={this.state.canvasPosition}
-            />
-          </div>
-          <div id={"ink_layer"} style={inkCanvas} >
-            <PenBasedRenderer
-              baseScale={1}
-              viewFit={ZoomFitEnum.FULL}
-              fitMargin={100}
-              position={this.state.canvasPosition}
-              pdfUrl={this.state.pdfUrl}
-              pdfSize={{ width: 210 / 25.4 * 72, height: 297 / 25.4 * 72 }}
-              pageInfo={{ section: 0, owner: 0, book: 0, page: 0 }}
-              playState={PLAYSTATE.live}
-              pens={this.props.pens}
-              onNcodePageChanged={this.onNcodePageChanged}
-              onCanvasShapeChanged={this.onCanvasShapeChanged}
-              rotation={this.props.rotation}
-              h={this.state.h}
-            />
-          </div>
-
+        <div id={`${this.props.parentName}-pdf_layer`} style={pdfCanvas} >
+          <NeoPdfViewer
+            url={this.state.pdfUrl}
+            filename={this.state.pdfFilename}
+            pageNo={this.state.pageNo}
+            onReportPdfInfo={this.onReportPdfInfo}
+            position={this.state.canvasPosition}
+            parentName={this.props.parentName}
+          />
         </div>
+        <div id={`${this.props.parentName}-ink_layer`} style={inkCanvas} >
+          <PenBasedRenderer
+            baseScale={1}
+            viewFit={this.props.viewFit}
+            fitMargin={this.props.fitMargin}
+            position={this.state.canvasPosition}
+            pdfUrl={this.state.pdfUrl}
+            pdfSize={pdfSize}
+            // pdfSize={{ width: 210 / 25.4 * 72, height: 297 / 25.4 * 72 }}
+            pageInfo={{ section: 0, owner: 0, book: 0, page: 0 }}
+            playState={PLAYSTATE.live}
+            pens={this.props.pens}
+            onNcodePageChanged={this.onNcodePageChanged}
+            onCanvasShapeChanged={this.onCanvasShapeChanged}
+            rotation={this.props.rotation}
+            h={this.state.h}
+            noInfo={this.props.noInfo}
+            fixed={this.props.fixed}
+            parentName={this.props.parentName}
+          />
+        </div>
+
       </div>
     );
   }

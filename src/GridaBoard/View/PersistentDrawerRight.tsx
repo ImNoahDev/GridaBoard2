@@ -1,76 +1,65 @@
 import React, { useCallback, useEffect } from 'react';
-import clsx from 'clsx';
 import { makeStyles, useTheme, Theme, createStyles } from '@material-ui/core/styles';
 import Drawer from '@material-ui/core/Drawer';
-import AppBar from '@material-ui/core/AppBar';
-import Toolbar from '@material-ui/core/Toolbar';
-import CssBaseline from '@material-ui/core/CssBaseline';
-import List from '@material-ui/core/List';
-import Typography from '@material-ui/core/Typography';
-import Divider from '@material-ui/core/Divider';
 import IconButton from '@material-ui/core/IconButton';
-import MenuIcon from '@material-ui/icons/Menu';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemIcon from '@material-ui/core/ListItemIcon';
-import ListItemText from '@material-ui/core/ListItemText';
-import InboxIcon from '@material-ui/icons/MoveToInbox';
-import MailIcon from '@material-ui/icons/Mail';
 import { BoxProps } from '@material-ui/core';
 import DrawerPages from './DrawerPages';
+import { updateDrawerWidth } from '../../store/reducers/ui';
+import { RootState } from '../../store/rootReducer';
+import { useSelector } from "react-redux";
 
 
-
-const useStyles_HOME_TSX = makeStyles((theme: Theme) =>
-  createStyles({
-    root: {
-      display: "flex"
-    },
-    appBar: {
-      transition: theme.transitions.create(['margin', 'width'], {
-        easing: theme.transitions.easing.sharp,
-        duration: theme.transitions.duration.leavingScreen,
-      }),
-    },
-    appBarShift: {
-      width: `calc(100% - ${g_drawerWidth}px)`,
-      transition: theme.transitions.create(['margin', 'width'], {
-        easing: theme.transitions.easing.easeOut,
-        duration: theme.transitions.duration.enteringScreen,
-      }),
-      marginRight: `calc( ${g_drawerWidth}`,
-    },
-    toolbar: theme.mixins.toolbar,
-    content: {
-      flexGrow: 1,
-      padding: theme.spacing(3),
-      transition: theme.transitions.create('margin', {
-        easing: theme.transitions.easing.sharp,
-        duration: theme.transitions.duration.leavingScreen,
-      }),
-      marginRight: `calc(${-g_drawerWidth}`,
-    },
-    drawerHeader: {
-      display: 'flex',
-      alignItems: 'center',
-      padding: theme.spacing(0, 1),
-      // necessary for content to be below app bar
-      ...theme.mixins.toolbar,
-      justifyContent: 'flex-start',
-    },
-    contentShift: {
-      transition: theme.transitions.create('margin', {
-        easing: theme.transitions.easing.easeOut,
-        duration: theme.transitions.duration.enteringScreen,
-      }),
-      marginRight: 0,
-    },
-    hide: {
-      display: 'none',
-    },
-  }),
-);
+// const useStyles_HOME_TSX = makeStyles((theme: Theme) =>
+//   createStyles({
+//     root: {
+//       display: "flex"
+//     },
+//     appBar: {
+//       transition: theme.transitions.create(['margin', 'width'], {
+//         easing: theme.transitions.easing.sharp,
+//         duration: theme.transitions.duration.leavingScreen,
+//       }),
+//     },
+//     appBarShift: {
+//       width: `calc(100% - ${g_drawerWidth}px)`,
+//       transition: theme.transitions.create(['margin', 'width'], {
+//         easing: theme.transitions.easing.easeOut,
+//         duration: theme.transitions.duration.enteringScreen,
+//       }),
+//       marginRight: `calc( ${g_drawerWidth}`,
+//     },
+//     toolbar: theme.mixins.toolbar,
+//     content: {
+//       flexGrow: 1,
+//       padding: theme.spacing(3),
+//       transition: theme.transitions.create('margin', {
+//         easing: theme.transitions.easing.sharp,
+//         duration: theme.transitions.duration.leavingScreen,
+//       }),
+//       marginRight: `calc(${-g_drawerWidth}`,
+//     },
+//     drawerHeader: {
+//       display: 'flex',
+//       alignItems: 'center',
+//       padding: theme.spacing(0, 1),
+//       // necessary for content to be below app bar
+//       ...theme.mixins.toolbar,
+//       justifyContent: 'flex-start',
+//     },
+//     contentShift: {
+//       transition: theme.transitions.create('margin', {
+//         easing: theme.transitions.easing.easeOut,
+//         duration: theme.transitions.duration.enteringScreen,
+//       }),
+//       marginRight: 0,
+//     },
+//     hide: {
+//       display: 'none',
+//     },
+//   }),
+// );
 
 
 // https://codesandbox.io/s/resizable-drawer-34ife?from-embed=&file=/src/CustomDrawer.js:649-948
@@ -124,16 +113,16 @@ const useStyles = makeStyles((theme: Theme) =>
       // right:0,
       bottom: 0,
       zIndex: 100,
-      // backgroundColor: "#f4f7f9"
-      backgroundColor: "#ff0000"
+      backgroundColor: "#f4f7f9"
+      // backgroundColor: "#ff0000"
     }
 
   }),
 );
-export const defaultDrawerWidth = 240;
+
 const minDrawerWidth = 50;
 const maxDrawerWidth = 1000;
-export let g_drawerWidth = defaultDrawerWidth;
+
 
 
 interface Props extends BoxProps {
@@ -147,7 +136,11 @@ export default function PersistentDrawerRight(props: Props) {
   const theme = useTheme();
   const [open, setOpen] = React.useState(props.open);
   // const [handleDrawerClose, setHandleDrawerClose] = React.useState(props.handleDrawerClose);
-  const [drawerWidth, setDrawerWidth] = React.useState(defaultDrawerWidth);
+
+  // const [drawerWidth, setDrawerWidth] = React.useState(defaultDrawerWidth);
+  const drawerWidth = useSelector((state: RootState) => state.ui.drawer.width);
+  const setDrawerWidth = (width: number) => updateDrawerWidth({ width });
+
 
   useEffect(() => { setOpen(props.open); }, [props.open]);
 
@@ -166,8 +159,8 @@ export default function PersistentDrawerRight(props: Props) {
     // const newWidth = e.clientX - document.body.offsetLeft;
     if (newWidth > minDrawerWidth && newWidth < maxDrawerWidth) {
       setDrawerWidth(newWidth);
-      g_drawerWidth = newWidth;
-      props.onDrawerResize(newWidth);
+      // g_drawerWidth = newWidth;
+      // props.onDrawerResize(newWidth);
     }
   }, []);
 
@@ -190,14 +183,11 @@ export default function PersistentDrawerRight(props: Props) {
           </IconButton>
         </div>
         <div onMouseDown={e => handleMouseDown(e)} className={classes.dragger} />
-        <Divider />
+        < DrawerPages />
+        {/* <Divider />
         <List>
           < DrawerPages />
-        </List>
-        <Divider />
-        <List>
-          < DrawerPages />
-        </List>
+        </List> */}
       </Drawer>
     </div>
   );

@@ -38,7 +38,6 @@ interface Props extends BoxProps {
 
   /** viewFit을 맞출 때의 마진 pixel 단위 */
   fitMargin?: number,
-  fixed?,
 
   pdfSize: { width: number, height: number };
 
@@ -59,6 +58,12 @@ interface Props extends BoxProps {
   /** transform matrix it can be undefined */
   h: TransformParameters;
   position: { offsetX: number, offsetY: number, zoom: number },
+
+  noInfo?: boolean;
+
+  fixed?: boolean;
+
+  parentName: string;
 
 
 }
@@ -150,7 +155,7 @@ class PenBasedRenderer_module extends React.Component<Props, State> {
     this.inkStorage = inkStorage ? inkStorage : InkStorage.getInstance();
 
     this.canvasId = UTIL.uuidv4();
-    this.canvasId = "fabric canvas";
+    // this.canvasId = "fabric canvas";
 
     this.propsSize = { scale: baseScale, ...pdfSize };
 
@@ -272,12 +277,17 @@ class PenBasedRenderer_module extends React.Component<Props, State> {
 
 
     if (nextProps.width !== this.props.width || nextProps.height !== this.props.height) {
-      this.onResized({ width: nextProps.width, height: nextProps.height });
+      this.onViewResized({ width: nextProps.width, height: nextProps.height });
       ret_val = true;
     }
 
     if (nextProps.pdfUrl !== this.props.pdfUrl) {
       this.shouldSendPageInfo = true;
+      ret_val = true;
+    }
+
+    if (nextProps.pdfSize.width !== this.props.pdfSize.width || nextProps.pdfSize.height !== this.props.pdfSize.height) {
+      this.onPaperResized({ width: nextProps.pdfSize.width, height: nextProps.pdfSize.height });
       ret_val = true;
     }
 
@@ -304,7 +314,18 @@ class PenBasedRenderer_module extends React.Component<Props, State> {
     this.renderer = renderer;
   }
 
-  onResized = ({ width, height }) => {
+
+  onPaperResized = ({ width, height }) => {
+    this.propsSize = { scale: this.propsSize.scale, width, height };
+
+
+    if (this.renderer) {
+      this.renderer.onPageSizeChanged(width, height);
+    }
+  }
+
+
+  onViewResized = ({ width, height }) => {
     const rect = { x: 0, y: 0, width, height };
     const scale = this.propsSize.scale;
 
@@ -334,7 +355,7 @@ class PenBasedRenderer_module extends React.Component<Props, State> {
 
       // console.log(`boundary check, Parent window (width, height) = (${parentWidth}, ${parentHeight})`);
     }
-    this.onResized({ width, height });
+    this.onViewResized({ width, height });
   };
 
 
@@ -478,7 +499,7 @@ class PenBasedRenderer_module extends React.Component<Props, State> {
 
   render() {
     // const { classes, scaleType, scale } = this.props;
-    const { pens } = this.props;
+    const { pens, viewFit, fixed } = this.props;
     const { scale, width, height } = this.propsSize;
     const { section, owner, book, page } = this.state.pageInfo;
     let { zoom } = this.props.position;
@@ -501,7 +522,8 @@ class PenBasedRenderer_module extends React.Component<Props, State> {
       zoom: zoom,
       left: this.props.position.offsetX / zoom,
       top: this.props.position.offsetY / zoom,
-      zIndex: 3,
+      zIndex: 10,
+      overflow: "hidden",
     }
 
     const inkCanvas: CSSProperties = {
@@ -509,37 +531,40 @@ class PenBasedRenderer_module extends React.Component<Props, State> {
       zoom: 1,
       left: 0,
       top: 0,
-      zIndex: 3,
+      zIndex: 10,
     }
 
 
+    // if (fixed) {
+    //   inkContainerDiv = {
+    //     position: "absolute",
+    //     zoom: zoom,
+    //     left: 0,
+    //     top: 0,
+    //     right: 0,
+    //     height: "100%",
+    //     zIndex: 10,
+    //     overflow: "hidden",
+    //   };
+
+    //   inkCanvas = {
+    //     position: "absolute",
+    //     zoom: 1,
+    //     left: 0,
+    //     top: 0,
+    //     right: 0,
+    //     height: "100%",
+    //     zIndex: 10,
+    //   }
+    // }
+    console.log(`THUMB, renderer viewFit = ${this.props.viewFit}`);
+
     return (
       <div id="pen-based-renderer" ref={this.setMainDivRef} style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0 }}>
-        <div style={{
-          position: "absolute",
-          left: 0,
-          top: 0,
-          right: 0,
-          bottom: 0,
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "flex-start",
-          alignItems: "flex-start",
-        }}>
-          <div id="pen-information">
-            <ul>
-              {pens.map((pen, i) => (
-                <li key={i}>{pen.mac}</li>
-              ))}
-            </ul>
-          </div>
-          <div style={{ fontSize: "20px", fontWeight: "bold", color: "rgba(255,0,0,255)" }}>
-            PenBasedRenderer{section}.{owner}.{book}.{page}:{penEventCount}
-          </div>
-        </div>
+
 
         {/* <Paper style={{ height: this.size.height, width: this.size.width }}> */}
-        <div id="ink-container" style={inkContainerDiv} >
+        <div id={`${this.props.parentName}-fabric_container`} style={inkContainerDiv} >
           <canvas id={this.canvasId} width={cssWidth} height={cssHeight} style={inkCanvas} ref={this.setCanvasRef} />
         </div>
         {/* </Paper> */}

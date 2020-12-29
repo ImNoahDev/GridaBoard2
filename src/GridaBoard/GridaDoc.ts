@@ -2,19 +2,21 @@ import { IPageMapItem } from "../NcodePrintLib/Coordinates";
 import NeoPdfDocument, { IGetDocumentOptions } from "../NcodePrintLib/NeoPdf/NeoPdfDocument";
 import NeoPdfManager, { IPenToViewerEvent, PdfManagerEventName } from "../NcodePrintLib/NeoPdf/NeoPdfManager";
 import { IPageSOBP } from "../neosmartpen/DataStructure/Structures";
+import { setDocNumPages } from "../store/reducers/activePdfReducer";
 import GridaPage from "./GridaPage";
 
-let _doc_instance = undefined;
+let _doc_instance = undefined as GridaDoc;
 
 export default class GridaDoc {
   private pages: GridaPage[] = [];
 
   private pdfs: {
-    pdfNames: IGetDocumentOptions,
     pdf: NeoPdfDocument,
+    fingerprint: string,
+    pdfNames: IGetDocumentOptions,
     promise: Promise<NeoPdfDocument>,
-    docStartPage: number,       // starting from 0
-    docEndPage: number,         // starting from 0
+    startPageInDoc: number,       // starting from 0
+    endPageInDoc: number,         // starting from 0
   }[] = [];
 
   get numPages() {
@@ -44,18 +46,20 @@ export default class GridaDoc {
     console.log(`file ${pdf.filename} loaded`);
     console.log(`-GRIDA DOC-, onPdfLoaded ${pdf.filename},  purpose:${pdf.purpose} - ${pdf.url}`);
 
-    if (pdf.purpose.indexOf("MAIN DOCUMENT") > -1) {
+    const found = this.pdfs.findIndex(item => item.fingerprint === pdf.fingerprint);
+    if (found < 0) {
       this.pdfs.push({
         pdf,
+        fingerprint: pdf.fingerprint,
         pdfNames: { url: pdf.url, filename: pdf.filename, purpose: "to be stored by GridaDoc", },
         promise: Promise.resolve(pdf),
-        docStartPage: this.numPages,
-        docEndPage: this.numPages + pdf.numPages - 1,
-
+        startPageInDoc: this.numPages,
+        endPageInDoc: this.numPages + pdf.numPages - 1,
       });
 
       // 2) 페이지를 넣어 주자
       this.addPdfPages(pdf);
+      setDocNumPages(this.numPages);
     }
   }
 
@@ -82,8 +86,8 @@ export default class GridaDoc {
     const targets = this.pdfs.filter(item => item.pdf.fingerprint === pdf.fingerprint);
 
     targets.forEach(target => {
-      const len = target.docEndPage - target.docStartPage;
-      this.pages = this.pages.splice(target.docStartPage, len);
+      const len = target.endPageInDoc - target.startPageInDoc;
+      this.pages = this.pages.splice(target.startPageInDoc, len);
     });
 
     this.pdfs = this.pdfs.filter(item => item.pdf.fingerprint !== pdf.fingerprint);

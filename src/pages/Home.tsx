@@ -6,7 +6,7 @@ import PUIController from '../components/PUIController';
 import { Theme } from '@material-ui/core';
 import { useSelector } from "react-redux";
 import { turnOnGlobalKeyShortCut } from "../GridaBoard/GlobalFunctions";
-import PersistentDrawerRight, { g_drawerWidth } from "../GridaBoard/View/PersistentDrawerRight";
+import PersistentDrawerRight from "../GridaBoard/View/PersistentDrawerRight";
 import MenuIcon from '@material-ui/icons/Menu';
 import ButtonLayer from "./ButtonLayer";
 import { g_hiddenFileInputBtnId, onFileInputChanged, onFileInputClicked, openFileBrowser2 } from "../NcodePrintLib/NeoPdf/FileBrowser";
@@ -14,6 +14,8 @@ import { theme } from "../styles/theme";
 import { IAutoLoadDocDesc } from "../NcodePrintLib/SurfaceMapper/MappingStorage";
 import AutoLoadConfirmDialog from "../GridaBoard/Dialog/AutoLoadConfirmDialog";
 import { RootState } from "../store/rootReducer";
+import { ZoomFitEnum } from "../neosmartpen/renderer/pageviewer/RenderWorkerBase";
+import { updateDrawerWidth } from "../store/reducers/ui";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -30,10 +32,8 @@ const useStyles = makeStyles((theme: Theme) =>
 
 
 const Home = () => {
-  const pageRef: React.RefObject<MixedPageView> = useRef();
   const [isRotate, setRotate] = useState();
   const [drawerOpen, setDrawerOpen] = useState(true);
-  const [drawerWidth, setDrawerWidth] = useState(g_drawerWidth);
   const [rightMargin, setRightMargin] = useState(0);
   const [pens, setPens] = useState([] as NeoSmartpen[]);
 
@@ -44,7 +44,10 @@ const Home = () => {
   const [pdfFilename, setPdfFilename] = useState(undefined as string);
   const [noMoreAutoLoad, setNoMoreAutoLoad] = useState(false);
 
-  const [ pdfUrl_store, pdfFilename_store]  = useSelector((state: RootState) => {
+  const drawerWidth = useSelector((state: RootState) => state.ui.drawer.width);
+  const setDrawerWidth = (width: number) => updateDrawerWidth({ width });
+
+  const [pdfUrl_store, pdfFilename_store] = useSelector((state: RootState) => {
     console.log(state.pdfInfo.pdfLocation);
     return [state.pdfInfo.pdfLocation.url, state.pdfInfo.pdfLocation.filename];
   });
@@ -126,9 +129,6 @@ const Home = () => {
 
 
   const classes = useStyles();
-  console.log(g_drawerWidth);
-
-
 
   //https://css-tricks.com/controlling-css-animations-transitions-javascript/
 
@@ -150,7 +150,7 @@ const Home = () => {
         easing: theme.transitions.easing.easeOut,
         duration: theme.transitions.duration.enteringScreen,
       }),
-      marginRight: g_drawerWidth,
+      marginRight: drawerWidth,
     }
   }
 
@@ -173,16 +173,19 @@ const Home = () => {
           </nav>
         </div>
 
-        <div style={{ position: "absolute", top: 0, left: 0, bottom: 0, right: drawerOpen ? g_drawerWidth : 0 }}>
+        <div style={{ position: "absolute", top: 0, left: 0, bottom: 0, right: drawerOpen ? drawerWidth : 0 }}>
           <ButtonLayer />
         </div>
 
-        <div style={{ position: "absolute", top: 0, left: 0, bottom: 0, right: drawerOpen ? g_drawerWidth : 0 }}>
+        <div style={{ position: "absolute", top: 0, left: 0, bottom: 0, right: drawerOpen ? drawerWidth : 0 }}>
           <MixedPageView
             pdfUrl={pdfUrl} filename={pdfFilename} pageNo={1} scale={1}
-            playState={PLAYSTATE.live} pens={pens} ref={pageRef}
+            playState={PLAYSTATE.live} pens={pens}
             rotation={0}
             onFileLoadNeeded={noMoreAutoLoad ? undefined : onFileLoadNeeded}
+            parentName={"grida-main-home"}
+            viewFit={ZoomFitEnum.FULL}
+            fitMargin={100}
           />
         </div>
       </main >

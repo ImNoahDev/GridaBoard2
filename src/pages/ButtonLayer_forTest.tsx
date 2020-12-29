@@ -14,6 +14,7 @@ import { savePDF } from "../NcodePrintLib/Save/SavePdf";
 import ReactJson from "react-json-view";
 import { MappingStorage } from "../NcodePrintLib/SurfaceMapper";
 import { IMappingData } from "../NcodePrintLib/SurfaceMapper/MappingStorage";
+import { RootState } from "../store/rootReducer";
 
 const buttonDivStyle = {
   position: "absolute",
@@ -70,15 +71,11 @@ const ButtonLayer_forTest = () => {
     mapJson = data;
   }
 
-  const pdfUrl = useSelector((state) => {
-    console.log(state.pdfInfo.url);
-    return state.pdfInfo.url;
+  const [pdfUrl, pdfFilename] = useSelector((state: RootState) => {
+    console.log(state.pdfInfo.pdfLocation);
+    return [state.pdfInfo.pdfLocation.url, state.pdfInfo.pdfLocation.filename];
   });
 
-  const pdfFilename = useSelector((state) => {
-    console.log(state.pdfInfo.filename);
-    return state.pdfInfo.filename;
-  });
 
   return (
     <div id={"button_div"} style={buttonDivStyle}>

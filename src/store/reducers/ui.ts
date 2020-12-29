@@ -14,6 +14,9 @@ export const UIActionTypes = Object.freeze({
   SHOW_PROGRESS_DIALOG: `${ActionGroup}.SHOW_PROGRESS_DIALOG`,
   HIDE_PROGRESS_DIALOG: `${ActionGroup}.HIDE_PROGRESS_DIALOG`,
   UPDATE_PROGRESS_DIALOG: `${ActionGroup}.UPDATE_PROGRESS_DIALOG`,
+
+  UPDATE_DRAWER_WITH: `${ActionGroup}.UPDATE_DRAWER_WITH`,
+  UPDATED_SELECTD_PAGE: `${ActionGroup}.UPDATED_SELECTD_PAGE`,
 });
 //]
 
@@ -115,9 +118,25 @@ export const updateProgressDlg = async (option: { progress: number }) => {
     progress: option.progress,
   });
 }
+
+
+export const updateDrawerWidth = async (option: { width: number }) => {
+  store.dispatch({
+    type: UIActionTypes.UPDATE_DRAWER_WITH,
+    width: option.width,
+  });
+}
+
+export const updateSelectedPage = async (option: { pageNo: number }) => {
+  store.dispatch({
+    type: UIActionTypes.UPDATED_SELECTD_PAGE,
+    pageNo: option.pageNo,
+  });
+}
+
 //]
-
-
+const defaultDrawerWidth = 240;
+// export let g_drawerWidth = defaultDrawerWidth;
 const initialState = {
   waiting: {
     circular: false
@@ -142,6 +161,10 @@ const initialState = {
     title: '',
     message: '',
     progress: 0,
+  },
+  drawer: {
+    width: defaultDrawerWidth,
+    pageNo: 0,
   }
 }
 
@@ -221,6 +244,28 @@ export default (state = initialState, action) => {
         }
       }
     }
+
+    case UIActionTypes.UPDATE_DRAWER_WITH: {
+      return {
+        ...state,
+        drawer: {
+          ...state.drawer,
+          width: action.width,
+        }
+      }
+    }
+
+    case UIActionTypes.UPDATED_SELECTD_PAGE: {
+      return {
+        ...state,
+        drawer: {
+          ...state.drawer,
+          pageNo: action.pageNo,
+        }
+      }
+    }
+
+
     default: {
       return state;
     }

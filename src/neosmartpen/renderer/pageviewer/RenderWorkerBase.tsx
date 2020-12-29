@@ -235,17 +235,14 @@ export default class RenderWorkerBase {
   }
 
   getPaperSize_pu = (): ISize => {
-    const { Xmin, Xmax, Ymin, Ymax, rotation } = this.surfaceInfo;
-    const ncode_width = Xmax - Xmin;
-    const ncode_height = Ymax - Ymin;
+    const { rotation } = this.surfaceInfo;
 
-    const actual_width = ncodeToPdfPoint(ncode_width);
-    const actual_height = ncodeToPdfPoint(ncode_height);
-    const s: ISize = {
-      width: actual_width,
-      height: actual_height,
-    };
+    // const ncode_width = Xmax - Xmin;
+    // const ncode_height = Ymax - Ymin;
 
+    // const actual_width = ncodeToPdfPoint(ncode_width);
+    // const actual_height = ncodeToPdfPoint(ncode_height);
+    const s: ISize = { ...this.pageSize };
     if (rotation === 90) {
       const temp = s.width;
       s.width = s.height;
@@ -298,7 +295,7 @@ export default class RenderWorkerBase {
 
     // 그리기
     const size = this.getPaperSize_pu();
-    console.log(`drawPageLayout: ${size.width}, ${size.height}`);
+    // console.log(`drawPageLayout: ${size.width}, ${size.height}`);
 
     // console.log(`Grid: scale=${this.nu_to_pu_scale} (width, height)=(${size.width}, ${size.height})`);
 
@@ -480,78 +477,77 @@ export default class RenderWorkerBase {
     }
   }
 
-
   scrollBoundaryCheck = () => {
-    // http://fabricjs.com/fabric-intro-part-5#pan_zoom
+    // const zoom = this.calcScaleFactor(this.viewFit, this.offset.zoom);
+    // if (zoom === 0) {
+    //   this.reportCanvasChanged();
+    //   return false;
+    // }
 
-    const zoom = this.calcScaleFactor(this.viewFit, this.offset.zoom);
-    if (zoom === 0) {
-      this.reportCanvasChanged();
-      return false;
+    // if (zoom !== this.offset.zoom) {
+    //   this.offset.zoom = zoom;
+    //   this.zoomToPoint(undefined, zoom);
+    // }
+
+    // http://fabricjs.com/fabric-intro-part-5#pan_zoom
+    const zoom = this.offset.zoom;
+    let offsetX = this.offset.x;
+    let offsetY = this.offset.y;
+
+    // const { section, owner, book, page } = this.surfaceInfo;
+    // const szPaper = paperInfo.getPaperSize({ section, owner, book, page });
+
+    // const size_pu = {
+    //   width: szPaper.width * this.nu_to_pu_scale,
+    //   height: szPaper.height * this.nu_to_pu_scale,
+    // }
+
+
+    const pageSize = {
+      width: this.pageSize.width * zoom,
+      height: this.pageSize.height * zoom
+    };
+
+    let shouldReset = false;
+
+    if (pageSize.width <= this.viewSize.width) {
+      offsetX = Math.round((this.viewSize.width - pageSize.width) / 2);
+      shouldReset = true;
     }
     else {
-      if (zoom !== this.offset.zoom) {
-        this.offset.zoom = zoom;
-        this.zoomToPoint(undefined, zoom);
-      }
-
-      let offsetX = this.offset.x;
-      let offsetY = this.offset.y;
-
-      // const { section, owner, book, page } = this.surfaceInfo;
-      // const szPaper = paperInfo.getPaperSize({ section, owner, book, page });
-
-      // const size_pu = {
-      //   width: szPaper.width * this.nu_to_pu_scale,
-      //   height: szPaper.height * this.nu_to_pu_scale,
-      // }
-
-
-      const pageSize = {
-        width: this.pageSize.width * zoom,
-        height: this.pageSize.height * zoom
-      };
-
-      let shouldReset = false;
-
-      if (pageSize.width <= this.viewSize.width) {
-        offsetX = Math.round((this.viewSize.width - pageSize.width) / 2);
+      if (offsetX > 0) {
+        offsetX = 0;
         shouldReset = true;
       }
-      else {
-        if (offsetX > 0) {
-          offsetX = 0;
-          shouldReset = true;
-        }
-        else if (offsetX + pageSize.width < this.viewSize.width) {
-          offsetX = this.viewSize.width - pageSize.width;
-          shouldReset = true;
-        }
-      }
-
-      if (pageSize.height <= this.viewSize.height) {
-        offsetY = Math.round((this.viewSize.height - pageSize.height) / 2);
+      else if (offsetX + pageSize.width < this.viewSize.width) {
+        offsetX = this.viewSize.width - pageSize.width;
         shouldReset = true;
       }
-
-      else {
-        if (offsetY > 0) {
-          offsetY = 0;
-          shouldReset = true;
-        }
-        else if (offsetY + pageSize.height < this.viewSize.height) {
-          offsetY = this.viewSize.height - pageSize.height;
-          shouldReset = true;
-        }
-      }
-
-      if (shouldReset) {
-        this.offset.x = offsetX;
-        this.offset.y = offsetY;
-      }
-      this.reportCanvasChanged();
-      return shouldReset;
     }
+
+    if (pageSize.height <= this.viewSize.height) {
+      offsetY = Math.round((this.viewSize.height - pageSize.height) / 2);
+      shouldReset = true;
+    }
+
+    else {
+      if (offsetY > 0) {
+        offsetY = 0;
+        shouldReset = true;
+      }
+      else if (offsetY + pageSize.height < this.viewSize.height) {
+        offsetY = this.viewSize.height - pageSize.height;
+        shouldReset = true;
+      }
+    }
+
+    if (shouldReset) {
+      this.offset.x = offsetX;
+      this.offset.y = offsetY;
+    }
+    this.reportCanvasChanged();
+    return shouldReset;
+
   }
 
 
@@ -581,14 +577,15 @@ export default class RenderWorkerBase {
     opt.e.stopPropagation();
   }
 
-  zoomToPoint = (pt: Point, zoom: number, animate = true) => {
+  zoomToPoint = (pt: Point, newZoom: number, animate = true) => {
+    const zoom = this.calcScaleFactor(this.viewFit, newZoom);
 
     let x1 = this.offset.x;
     let y1 = this.offset.y;
 
     if (pt) {
       const z0 = this.offset.zoom;
-      const z1 = zoom;
+      const z1 = zoom
 
       const x0 = this.offset.x;
       const y0 = this.offset.y;
@@ -676,7 +673,11 @@ export default class RenderWorkerBase {
    * @param currScale
    */
   protected calcScaleFactor(mode: ZoomFitEnum, currScale: number) {
-    const szPaper = this.pageSize;
+    const szPaper = { ...this.pageSize };
+    if (!szPaper.width) {
+      szPaper.width = 841;
+      szPaper.height = 595;
+    }
 
     const actual_width = szPaper.width;
     const actual_height = szPaper.height;
@@ -689,7 +690,6 @@ export default class RenderWorkerBase {
     switch (mode) {
       case ZoomFitEnum.WIDTH:
         scale = szCanvas.width / actual_width;
-
         break;
 
       case ZoomFitEnum.HEIGHT:
@@ -800,6 +800,7 @@ export default class RenderWorkerBase {
         y0 += step_y;
         this.offset.x = x0;
         this.offset.y = y0;
+
         this.scrollBoundaryCheck();
         canvasFb.requestRenderAll();
 
@@ -814,6 +815,7 @@ export default class RenderWorkerBase {
     else {
       this.offset.x = point.x;
       this.offset.y = point.y;
+
       this.scrollBoundaryCheck();
       canvasFb.requestRenderAll();
       canvasFb.setViewportTransform(canvasFb.viewportTransform);
@@ -823,6 +825,18 @@ export default class RenderWorkerBase {
 
   onViewSizeChanged = (width: number, height: number) => {
     this.viewSize = { width, height };
+
+    const zoom = this.calcScaleFactor(this.viewFit, this.offset.zoom);
+    this.zoomToPoint(undefined, zoom);
+    this.scrollBoundaryCheck();
+  }
+
+  onPageSizeChanged = (width: number, height: number) => {
+    this.pageSize = { width, height };
+
+    const zoom = this.calcScaleFactor(this.viewFit, this.offset.zoom);
+    this.drawPageLayout();
+    this.zoomToPoint(undefined, zoom);
     this.scrollBoundaryCheck();
   }
 

@@ -133,7 +133,9 @@ class Page extends Component<PageProps> {
     const zoomChanged = nextProps.position.zoom !== this.props.position.zoom;
 
     if (zoomChanged) {
-      this.renderPage(this.state.page, nextProps.position.zoom);
+      if (this.state.page) {
+        this.renderPage(this.state.page, nextProps.position.zoom);
+      }
       return false;
     }
 

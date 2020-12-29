@@ -182,7 +182,7 @@ export default class NeoPdfDocument {
 
   get fingerprint() { return this._fingerprint; }
 
-  get purpose() { return this._purpose };
+  get purpose() { return this._purpose }
 
 
   getPageAsync = async (pageNo: number) => {
@@ -192,6 +192,11 @@ export default class NeoPdfDocument {
 
   /** page가 로드된 것이 확실할 때만 쓸 것! */
   getPage = (pageNo: number) => {
+    if (pageNo > this.numPages) {
+      console.error(`page range over ${pageNo}/${this.numPages}`);
+      return undefined;
+    }
+
     if (!this._pages[pageNo - 1]._loaded) {
       throw new Error(`PDF page ${pageNo} has not been loaded`);
     }
@@ -337,6 +342,14 @@ export default class NeoPdfDocument {
     return this._id;
   }
 
+  getPageSize = (pageNo: number) => {
+    if (pageNo > this.numPages) {
+      return undefined;
+    }
+
+    return this._pagesOverview[pageNo - 1].sizePu;
+  }
+
   setPageOverview = async () => {
     // const pdf = this;
 
@@ -398,10 +411,14 @@ export default class NeoPdfDocument {
 
 PdfJs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${PdfJs.version}/pdf.worker.js`;
 
-let pdf_fingerprint = "";
+const max_concurrent = 16;
+let pdf_loader_idx = 0;
+const pdf_fingerprint: string[] = new Array(16);
 function pdfJsOpenDocument(options: IGetDocumentOptions): Promise<PdfJs.PDFDocumentProxy> {
   const { url, filename, cMapUrl, cMapPacked, purpose } = options;
-  pdf_fingerprint = "";
+
+  pdf_loader_idx = (pdf_loader_idx + 1) % max_concurrent;
+  pdf_fingerprint[pdf_loader_idx] = "";
 
   console.log(":GRIDA DOC:,     pdfJsOpenDocument, step 1")
 
@@ -437,14 +454,15 @@ function pdfJsOpenDocument(options: IGetDocumentOptions): Promise<PdfJs.PDFDocum
    */
   return new Promise(resolve => {
     loadingTask.promise.then(pdf => {
-      if (pdf_fingerprint === "") {
-        resolve(pdf);
-      }
-      else {
-        pdf.destroy();
-      }
+      resolve(pdf);
+      // if (pdf_fingerprint[pdf_loader_idx] === "" || pdf_fingerprint[pdf_loader_idx] !== pdf.fingerprint) {
+      //   resolve(pdf);
+      // }
+      // else {
+      //   pdf.destroy();
+      // }
       console.log(`:GRIDA DOC:,     pdfJsOpenDocument, step 3  fingerprint=${pdf_fingerprint} `);
-      pdf_fingerprint = pdf.fingerprint;
+      pdf_fingerprint[pdf_loader_idx] = pdf.fingerprint;
     });
   })
 }
