@@ -25,6 +25,8 @@ import configureStore from "../store/configureStore";
 import { RootState } from '../store/rootReducer';
 import { useSelector } from "react-redux";
 import { g_hiddenFileInputBtnId, onFileInputChanged, onFileInputClicked } from "../NcodePrintLib/NeoPdf/FileBrowser";
+import GridaDoc from "../GridaBoard/GridaDoc";
+import { IFileBrowserReturn } from "../NcodePrintLib/NcodePrint/PrintDataTypes";
 
 // const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 // export const store = createStore(rootReducer, composeEnhancers(applyMiddleware(thunk)));
@@ -138,6 +140,16 @@ const Root = () => {
 //   elem.addEventListener("click", onTest);
 //   elem.addEventListener("change", onChange);
 // })();
+
+(function () {
+  const doc = GridaDoc.getInstance();
+  const filename = "A4_Pirates-of-the-Caribbean-Hes-a-Pirate-Klaus-Badelt.pdf";
+  const url = "./A4_Pirates-of-the-Caribbean-Hes-a-Pirate-Klaus-Badelt.pdf";
+
+  doc.openPdfFile({ url, filename });
+})();
+
+
 
 
 export default Root;

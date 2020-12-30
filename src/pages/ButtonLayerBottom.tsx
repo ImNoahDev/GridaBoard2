@@ -7,7 +7,6 @@ import { NeoSmartpen } from "../neosmartpen";
 import GridaToolTip from "../styles/GridaToolTip";
 import { useSelector } from "react-redux";
 import ColorButtons from "../components/navbar/ColorButtons";
-import { setUrlAndFilename } from "../store/reducers/activePdfReducer";
 import { RootState } from "../store/rootReducer";
 
 const localStyle = {
@@ -55,27 +54,23 @@ function hideAndShowFnc() {
 
 
 
-
+interface Props {
+  onFileOpen: (event: IFileBrowserReturn) => void,
+}
 /**
  * 
  */
-const ButtonLayerBottom = () => {
+const ButtonLayerBottom = (props:Props) => {
+  const { onFileOpen, ...rest } = props;
+
   const [num_pens, setNumPens] = useState(0);
   const [pens, setPens] = useState(new Array(0) as NeoSmartpen[]);
 
-  // 이 함수에서 pdf를 연다
-  const onFileOpen = async (event: IFileBrowserReturn) => {
-    console.log(event.url)
-    if (event.result === "success") {
-      await setUrlAndFilename(event.url, event.fileDesc.name);
-      // setUrl(event.url);
-      // setFilename(event.fileDesc.name);
-    }
-  };
 
-  const [ pdfUrl, pdfFilename]  = useSelector((state: RootState) => {
-    console.log(state.pdfInfo.pdfLocation);
-    return [state.pdfInfo.pdfLocation.url, state.pdfInfo.pdfLocation.filename];
+
+  const [pdfUrl, pdfFilename] = useSelector((state: RootState) => {
+    console.log(state.pdfInfo.activePdf);
+    return [state.pdfInfo.activePdf.url, state.pdfInfo.activePdf.filename];
   });
 
 

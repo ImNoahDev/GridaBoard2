@@ -44,6 +44,9 @@ export interface MixedViewProps {
   baseScale?: number;
 
   pageInfo?: IPageSOBP;
+
+  pdf?: NeoPdfDocument,
+
   pdfUrl: string;
   filename: string,
 
@@ -66,17 +69,18 @@ export interface MixedViewProps {
   /**
    * 현재 view가 가진 코드와 다른 코드가 들어왔을 때
    * 페이지를 자동으로 변경하는 스위치
-   * 
+   *
    * onFileLoadNeeded를 쓰려면 이 스위치가 true여야 한다
    */
   autoPageChange: boolean;
-  /** 
-   * 현재 view가 가진 pdf와 다른 code map된 pdf가 감지되면 아래의 callback이 불려진다. 
+  /**
+   * 현재 view가 가진 pdf와 다른 code map된 pdf가 감지되면 아래의 callback이 불려진다.
    * 불려진 콜백을 가진 component에서는 본 클래스의 property 중 pdfUrl 값을 변경해야 한다
-   * 
+   *
    * autoChangePage가 true 인 상태에서만 동작한다
    **/
   onFileLoadNeeded?: (doc: IAutoLoadDocDesc) => void;
+  onNcodePageChanged: (pageInfo: IPageSOBP) => void,
 
   parentName: string;
 
@@ -104,7 +108,7 @@ interface State {
 
   /** NOTE: pageNo라고 씌어 있는 것은, 항상 PDF의 페이지번호(1부터 시작)를 나타내기로 한다.  */
   pageNo: number;
-  canvasPosition: { offsetX: number, offsetY: number, zoom: number },
+  viewPos: { offsetX: number, offsetY: number, zoom: number },
 
   renderCount: number;
 
@@ -129,6 +133,7 @@ interface State {
 const defaultMixedPageViewProps: MixedViewProps = {
   // properties
   pageInfo: undefined,
+  pdf: undefined,
   pdfUrl: undefined,
   filename: undefined,
   pageNo: undefined,
@@ -136,7 +141,6 @@ const defaultMixedPageViewProps: MixedViewProps = {
   playState: PLAYSTATE.live,
   noInfo: false,
   rotation: 0,
-  onFileLoadNeeded: undefined,
   parentName: "",
   viewFit: ZoomFitEnum.FULL,
   fitMargin: 100,
@@ -146,6 +150,9 @@ const defaultMixedPageViewProps: MixedViewProps = {
   baseScale: 1,
   fromStorage: false,
   autoPageChange: true,
+
+  onFileLoadNeeded: undefined,
+  onNcodePageChanged: undefined,
 }
 
 
@@ -165,14 +172,11 @@ class MixedPageView_module extends React.Component<MixedViewProps, State>  {
   constructor(props: MixedViewProps) {
     super(props);
 
-    const { pdfUrl, pageNo, filename } = props;
-    const canvasPosition = { offsetX: 0, offsetY: 0, zoom: 1 };
     this.state = {
       // 아래는 순수히 이 component의 state
       pdfSize: { width: 595, height: 841 },    // 초기 값이 없으면 zoom 비율을 따질 때 에러를 낸다. 당연히
-      pdf: undefined,
       status: "N/A",
-      canvasPosition,
+      viewPos: { offsetX: 0, offsetY: 0, zoom: 1 },
       renderCount: 0,
 
       showFileOpenDlg: false,
@@ -184,9 +188,10 @@ class MixedPageView_module extends React.Component<MixedViewProps, State>  {
       pageInfoGiven: props.pageInfo !== undefined ? true : false,
 
       // 아래는 property에서 나온 것
-      pdfUrl,
-      pdfFilename: filename,
-      pageNo,
+      pdf: props.pdf,
+      pdfUrl: props.pdfUrl,
+      pdfFilename: props.filename,
+      pageNo: props.pageNo,
 
       pageInfo: props.pageInfo !== undefined ? props.pageInfo : { section: -1, owner: -1, book: -1, page: -1 },
       width: props.width !== undefined ? props.width : 0,
@@ -196,7 +201,9 @@ class MixedPageView_module extends React.Component<MixedViewProps, State>  {
 
 
   componentDidMount() {
-    this.loadDocument(this.props.pdfUrl, this.props.filename);
+    if (this.props.pdf === undefined) {
+      this.loadDocument(this.props.pdfUrl, this.props.filename);
+    }
   }
 
   loadDocument = async (url: string, filename: string) => {
@@ -206,7 +213,6 @@ class MixedPageView_module extends React.Component<MixedViewProps, State>  {
     // kitty, 나중에는 분리할 것
     showUIProgressBackdrop();
     console.log("*GRIDA DOC*, loadDocument START");
-    // const loadingTask = NeoPdfManager.getDocument({ url, filename, purpose: "MAIN DOCUMENT: to be opend by NeoPdfViewer" });
     const loadingTask = NeoPdfManager.getInstance().getDocument({ url, filename, purpose: "MAIN DOCUMENT: to be opend by NeoPdfViewer" });
     this.setState({ status: "loading" });
 
@@ -214,8 +220,7 @@ class MixedPageView_module extends React.Component<MixedViewProps, State>  {
     console.log("*GRIDA DOC*, loadDocument COMPLETED")
 
     this.onReportPdfInfo(pdf);
-    this.setState({ pdf });
-    this.setState({ status: "loaded" });
+    this.setState({ pdf, status: "loaded" });
 
     hideUIProgressBackdrop();
     // console.log("pdf loaded");
@@ -223,8 +228,9 @@ class MixedPageView_module extends React.Component<MixedViewProps, State>  {
 
 
   onViewResized = ({ width, height }) => {
-    if (!this.state.widthGiven) this.setState({ width });
-    if (!this.state.heightGiven) this.setState({ height });
+    if (!this.state.widthGiven && !this.state.heightGiven) this.setState({ width, height });
+    else if (!this.state.widthGiven) this.setState({ width });
+    else if (!this.state.heightGiven) this.setState({ height });
   }
 
   shouldComponentUpdate(nextProps: MixedViewProps, nextState: State) {
@@ -238,6 +244,12 @@ class MixedPageView_module extends React.Component<MixedViewProps, State>  {
     }
 
 
+    if (nextProps.pdf !== this.props.pdf) {
+      this.filename = nextProps.pdf.filename;
+      this.setState({ pdf: nextProps.pdf, pdfUrl: nextProps.pdf.url, pdfFilename: nextProps.pdf.filename, status: "loaded" });
+      return false;
+    }
+
     if (nextProps.pdfUrl !== this.props.pdfUrl) {
       this.loadDocument(nextProps.pdfUrl, nextProps.filename);
       this.setState({ pdfUrl: nextProps.pdfUrl });
@@ -247,7 +259,6 @@ class MixedPageView_module extends React.Component<MixedViewProps, State>  {
     if (nextState.status === "loading") {
       return false;
     }
-
 
     if (nextProps.filename !== this.props.filename) {
       this.filename = nextProps.filename;
@@ -272,19 +283,17 @@ class MixedPageView_module extends React.Component<MixedViewProps, State>  {
   }
 
   componentWillUnmount() {
-    if (this.state.pdf) {
+    if (this.props.pdf ===undefined && this.state.pdf ) {
       const pdf = this.state.pdf;
       pdf.destroy();
     }
   }
 
-
-
   onReportPdfInfo = (pdf: NeoPdfDocument) => {
     this.pdf = pdf;
 
     // 이미 로드되어 있고 같은 파일이라면, 페이지를 전환한다.
-    if (this.pdf) {
+    if (pdf) {
       let pageNo = this.state.pageNo;
       let size = this.pdf.getPageSize(pageNo);
       if (!size) {
@@ -301,8 +310,8 @@ class MixedPageView_module extends React.Component<MixedViewProps, State>  {
 
 
   /**
-   * 
-   * @param pageInfo 
+   *
+   * @param pageInfo
    * @param isFromEveryPgInfo - 매번 page info가 나올때마다 불려진 것인가? 아니면 페이지가 바뀔때 불려진 것인가?
    */
   onNcodePageChanged = async (pageInfo: IPageSOBP) => {
@@ -315,7 +324,12 @@ class MixedPageView_module extends React.Component<MixedViewProps, State>  {
 
     // 인쇄된 적이 없는 파일이라면 PDF 관련의 오퍼레이션을 하지 않는다.
     const coupledDoc = mapper.findPdfPage(ncodeXy);
-    if (!coupledDoc) return;
+    if (!coupledDoc) {
+      if (this.props.onNcodePageChanged) this.props.onNcodePageChanged(pageInfo);
+      return;
+    }
+
+
     console.log(coupledDoc.pageMapping);
 
     console.log(`MixedViewer: pagechanged Set h, h=${JSON.stringify(coupledDoc.pageMapping.h)}`);
@@ -331,7 +345,10 @@ class MixedPageView_module extends React.Component<MixedViewProps, State>  {
 
     const pageNo = coupledDoc.pageMapping.pdfDesc.pageNo;
     // 이미 로드되어 있고 같은 파일이라면, 페이지를 전환한다.
-    if (!this.pdf) return;
+    if (!this.pdf) {
+      if (this.props.onNcodePageChanged) this.props.onNcodePageChanged(pageInfo);
+      return;
+    }
 
     if (pageNo !== this.state.pageNo) {
       const size = this.pdf.getPageSize(pageNo);
@@ -343,12 +360,14 @@ class MixedPageView_module extends React.Component<MixedViewProps, State>  {
         this.setState({ pageNo });
       }
     }
+
+    if (this.props.onNcodePageChanged) this.props.onNcodePageChanged(pageInfo);
   }
 
 
   onCanvasPositionChanged = (arg: { offsetX: number, offsetY: number, zoom: number }) => {
     // console.log(arg);
-    this.setState({ canvasPosition: arg });
+    this.setState({ viewPos: arg });
 
     const r = this.state.renderCount;
     this.setState({ renderCount: r + 1 });
@@ -361,21 +380,23 @@ class MixedPageView_module extends React.Component<MixedViewProps, State>  {
 
 
   render() {
-    const zoom = this.state.canvasPosition.zoom;
+    const zoom = this.state.viewPos.zoom;
 
 
     const pdfCanvas: CSSProperties = {
       position: "absolute",
       zoom: zoom,
-      left: this.state.canvasPosition.offsetX / zoom,
-      top: this.state.canvasPosition.offsetY / zoom,
+      left: this.state.viewPos.offsetX / zoom,
+      top: this.state.viewPos.offsetY / zoom,
     }
 
     // console.log(`MixedViewer: rendering, h=${JSON.stringify(this.state.h)}`);
-    // console.log(this.state.canvasPosition);
+    // console.log(this.state.viewPos);
 
     console.log(`THUMB, mixed viewFit = ${this.props.viewFit}`);
+    console.log(`PDF PAGE, page number,  = ${this.state.pageNo}`);
     const { pdf } = this.state;
+
 
     return (
       <div id={`${this.props.parentName}-mixed_view`} style={{
@@ -392,9 +413,10 @@ class MixedPageView_module extends React.Component<MixedViewProps, State>  {
           <div id={`${this.props.parentName}-pdf_view`} style={pdfCanvas}>
             {pdf
               ? <NeoPdfPageView {...this.props}
-                pdf={pdf} index={this.props.pageNo}
+                pageNo={this.state.pageNo}
+                pdf={pdf} index={this.state.pageNo}
                 key={`document-page-${this.props.pageNo}`}
-                position={this.state.canvasPosition}
+                position={this.state.viewPos}
               />
               : ""}
           </div>
@@ -403,13 +425,13 @@ class MixedPageView_module extends React.Component<MixedViewProps, State>  {
             filename={this.state.pdfFilename}
             pageNo={this.state.pageNo}
             onReportPdfInfo={this.onReportPdfInfo}
-            position={this.state.canvasPosition}
+            position={this.state.viewPos}
             parentName={this.props.parentName}
           /> */}
         </div>
         <div id={`${this.props.parentName}-ink_layer`} style={inkContainer} >
           <PenBasedRenderer {...this.props}
-            position={this.state.canvasPosition}
+            position={this.state.viewPos}
             pdfUrl={this.state.pdfUrl}
             pdfSize={this.state.pdfSize}
             pageInfo={this.state.pageInfo}

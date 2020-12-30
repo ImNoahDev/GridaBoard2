@@ -2,16 +2,23 @@ import React from "react";
 import ButtonLayer_forTest from "./ButtonLayer_forTest";
 import ButtonLayerBottom from "./ButtonLayerBottom";
 import ButtonLayerSide from "./ButtonLayerSide";
+import { ButtonProps } from "@material-ui/core";
+import { IFileBrowserReturn } from "../NcodePrintLib/NcodePrint/PrintDataTypes";
 
 /**
  * 
  */
-const ButtonLayer = () => {
+interface Props extends ButtonProps {
+  onFileOpen: (event: IFileBrowserReturn) => void,
+}
+
+
+const ButtonLayer = (props: Props) => {
   return (
     <div style={{ zIndex: 0 }}>
-      <ButtonLayer_forTest />
-      <ButtonLayerBottom />
-      <ButtonLayerSide />
+      <ButtonLayer_forTest {...props}/>
+      <ButtonLayerBottom {...props} />
+      <ButtonLayerSide {...props}/>
     </div>
   );
 }

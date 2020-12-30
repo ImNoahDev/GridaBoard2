@@ -16,6 +16,10 @@ import AutoLoadConfirmDialog from "../GridaBoard/Dialog/AutoLoadConfirmDialog";
 import { RootState } from "../store/rootReducer";
 import { ZoomFitEnum } from "../neosmartpen/renderer/pageviewer/RenderWorkerBase";
 import { updateDrawerWidth } from "../store/reducers/ui";
+import { IPageSOBP } from "../NcodePrintLib/DataStructure/Structures";
+import GridaDoc from "../GridaBoard/GridaDoc";
+import { IFileBrowserReturn } from "../NcodePrintLib/NcodePrint/PrintDataTypes";
+import { PdfInfoType } from "../store/reducers/activePdfReducer";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -47,19 +51,30 @@ const Home = () => {
   const drawerWidth = useSelector((state: RootState) => state.ui.drawer.width);
   const setDrawerWidth = (width: number) => updateDrawerWidth({ width });
 
-  const [pdfUrl_store, pdfFilename_store] = useSelector((state: RootState) => {
-    console.log(state.pdfInfo.pdfLocation);
-    return [state.pdfInfo.pdfLocation.url, state.pdfInfo.pdfLocation.filename];
+  // const [pdfUrl_store, pdfFilename_store] = useSelector((state: RootState) => {
+  //   console.log(state.pdfInfo.activePdf);
+  //   return [state.pdfInfo.activePdf.url, state.pdfInfo.activePdf.filename];
+  // });
+
+
+  const activePageNo = useSelector((state: RootState) => {
+    return state.pdfInfo.activePageNo;
+  });
+
+  const [pdf, pdfUrl_store, pdfFilename_store] = useSelector((state: RootState) => {
+    const pdfInfo = state.pdfInfo as PdfInfoType;
+
+    const pdf = pdfInfo.activePdf.pdf;
+    const url = pdfInfo.activePdf.url;
+    const filename = pdfInfo.activePdf.filename;
+
+    return [pdf, url, filename];
   });
 
   const pens_store = useSelector((state: RootState) => {
     // console.log(state.appConfig.pens);
     return state.appConfig.pens;
   });
-
-
-
-
 
   useEffect(() => {
     if (pdfUrl_store !== pdfUrl) setPdfUrl(pdfUrl_store);
@@ -75,13 +90,11 @@ const Home = () => {
     setDrawerOpen(false);
   };
 
-
-
   const onDrawerResize = (size) => {
     setDrawerWidth(size);
   }
 
-  const onFileLoadNeeded = async (coupledDoc: IAutoLoadDocDesc) => {
+  const onFileLoadNeeded = (coupledDoc: IAutoLoadDocDesc) => {
     const url = coupledDoc.pdf.url;
     if (url.indexOf("blob:http") > -1) {
       setAutoLoadDoc(coupledDoc);
@@ -93,7 +106,12 @@ const Home = () => {
     }
 
     return;
+  }
 
+  const onNcodePageChanged = (pageInfo: IPageSOBP) => {
+    const doc = GridaDoc.getInstance();
+
+    doc.addNcodePage(pageInfo);
   }
 
   const onNoMoreAutoLoad = () => {
@@ -104,7 +122,7 @@ const Home = () => {
     setLoadConfirmDlgOn(false);
   }
 
-  const onLoadFile = async () => {
+  const onAppendPdfFile = async () => {
     setLoadConfirmDlgOn(false);
     const coupledDoc = autoLoadDoc;
 
@@ -159,6 +177,21 @@ const Home = () => {
 
   }
 
+  // 이 함수에서 pdf를 연다
+  const onFileOpen = async (event: IFileBrowserReturn) => {
+    console.log(event.url)
+    if (event.result === "success") {
+      const doc = GridaDoc.getInstance();
+      doc.openPdfFile({ url: event.url, filename: event.file.name });
+
+    }
+    else if (event.result === "canceled") {
+      alert("file open cancelled");
+    }
+  };
+
+
+
   return (
     <div className={classes.root}>
       {/* <CssBaseline /> */}
@@ -174,17 +207,20 @@ const Home = () => {
         </div>
 
         <div style={{ position: "absolute", top: 0, left: 0, bottom: 0, right: drawerOpen ? drawerWidth : 0 }}>
-          <ButtonLayer />
+          <ButtonLayer onFileOpen={onFileOpen} />
         </div>
 
         <div style={{ position: "absolute", top: 0, left: 0, bottom: 0, right: drawerOpen ? drawerWidth : 0 }}>
           <MixedPageView
-            pdfUrl={pdfUrl} filename={pdfFilename} pageNo={1}
+            // pdf={pdf}
+            pdfUrl={pdfUrl} filename={pdfFilename}
+            pageNo={1}
             playState={PLAYSTATE.live}
             pens={pens} fromStorage={false}
             autoPageChange={true}
             rotation={0}
             onFileLoadNeeded={noMoreAutoLoad ? undefined : onFileLoadNeeded}
+            onNcodePageChanged={onNcodePageChanged}
             parentName={"grida-main-home"}
             viewFit={ZoomFitEnum.FULL}
             fitMargin={100}
@@ -210,7 +246,7 @@ const Home = () => {
       </div>
 
       <AutoLoadConfirmDialog open={loadConfirmDlgOn} step={loadConfirmDlgStep}
-        onOk={onLoadFile} onCancel={onCancelAutoLoad} onNoMore={onNoMoreAutoLoad} />
+        onOk={onAppendPdfFile} onCancel={onCancelAutoLoad} onNoMore={onNoMoreAutoLoad} />
 
 
       {/* 파일 인풋을 위한 것 */}

@@ -116,6 +116,12 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
     }
   }
 
+
+  createLiveStroke_byStorage = (event: IPenToViewerEvent) => {
+    this.createLiveStroke(event);
+  }
+
+
   /**
    *
    * @param {{strokeKey:string, mac:string, stroke:NeoStroke, dot:NeoDot}} event
@@ -127,7 +133,7 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
     let live = this.livePaths[event.strokeKey];
     if (!live) {
       console.error("왜 live stroke가 등록 안된게 나오지?");
-      
+
       live = {
         stroke: event.stroke,
         path: null
@@ -143,7 +149,7 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
     const pen = event.pen;
 
     const cursor = this.penCursors[event.mac];
-    if (pen.penRendererType === IBrushType.ERASER) {
+    if (pen && pen.penRendererType === IBrushType.ERASER) {
       console.log('ERASE');
       if (cursor.eraserLastPoint !== undefined) {
         this.eraseOnLine(
@@ -170,6 +176,37 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
     }
   }
 
+
+  pushLiveDot_byStorage = (event: IPenToViewerEvent) => {
+    let live = this.livePaths[event.strokeKey];
+    if (!live) {
+      console.error("왜 live stroke가 등록 안된게 나오지?");
+
+      live = {
+        stroke: event.stroke,
+        path: null
+      };
+      this.livePaths[event.strokeKey] = live;
+    }
+    const dot = event.dot;
+
+    //지우개 구현
+    const canvas_xy = this.getPdfXY_scaled(dot);
+    if (!live.path) {
+      const new_path = this.createFabricPath(live.stroke, false);
+      live.path = new_path as IExtendedPathType;
+      this.canvasFb.add(new_path);
+    }
+    else {
+      const pathData = this.createPathData_arr(live.stroke);
+      const obj = live.path as fabric.Path;
+      obj.path = pathData as any;
+    }
+
+    this.focusToDot(dot);
+  }
+
+
   /**
    *
    * @param {{strokeKey:string, mac:string, stroke, section:number, owner:number, book:number, page:number}} event
@@ -192,6 +229,14 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
     delete this.livePaths[event.strokeKey];
   }
 
+
+  /**
+   *
+   * @param {{strokeKey:string, mac:string, stroke, section:number, owner:number, book:number, page:number}} event
+   */
+  closeLiveStroke_byStorage = (event: IPenToViewerEvent) => {
+    this.closeLiveStroke(event);
+  }
 
   eraseOnLine(ink_x0, ink_y0, ink_x1, ink_y1, stroke) {
     const pathData = 'M ' + ink_x0 + ' ' + ink_y0 + ' L ' + ink_x1 + ' ' + ink_y1 + 'z';
@@ -422,6 +467,12 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
 
     return true;
   }
+
+
+  changePage_byStorage = (section: number, owner: number, book: number, page: number, forceToRefresh: boolean) => {
+    return this.changePage(section, owner, book, page, forceToRefresh);
+  }
+
 
   private generateDotForTest(x: number, y: number): NeoDot {
     const dot = new NeoDot({

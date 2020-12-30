@@ -144,6 +144,13 @@ export default class NeoPdfPageView extends Component<PageProps> {
       return false;
     }
 
+    const pageChanged = this.props.index !== nextProps.index;
+    if (pageChanged) {
+      console.log(`PDF PAGE: page, page Number = ${nextProps.index}`)
+      this._update(nextProps.pdf, nextProps.index);
+      return false;
+    }
+
     return true;
   }
 
@@ -157,19 +164,21 @@ export default class NeoPdfPageView extends Component<PageProps> {
     this.canvas = canvas;
   };
 
-  _update = (pdf: NeoPdfDocument) => {
+  _update = (pdf: NeoPdfDocument, pageNo: number = undefined) => {
+    console.log(`PDF PAGE: _update, page Number = ${pageNo}`)
+
     if (pdf) {
       this.backPlane.inited = false;
-      this._loadPage(pdf);
+      this._loadPage(pdf, pageNo);
     } else {
       this.setState({ status: 'loading' });
     }
   };
 
-  _loadPage = (pdf: NeoPdfDocument) => {
+  _loadPage = (pdf: NeoPdfDocument, pageNo: number = this.props.index) => {
+    console.log(`PDF PAGE: _loadPage, page Number = ${pageNo}`)
     if (this.state.status === 'rendering') return;
 
-    let pageNo = this.props.index;
     if (pageNo > pdf.numPages) {
       console.error("PDF 페이지의 범위를 넘은 페이지를 렌더링하려고 합니다.");
       pageNo = pdf.numPages;
@@ -178,7 +187,6 @@ export default class NeoPdfPageView extends Component<PageProps> {
     pdf.getPageAsync(pageNo).then(
       (page) => {
         this.backPlane.inited = false;
-        this.setState({ page, status: 'rendering' });
         this.renderPage(page, this.props.position.zoom);
       }
     );
@@ -249,6 +257,7 @@ export default class NeoPdfPageView extends Component<PageProps> {
 
   renderPage = async (page: NeoPdfPage, zoom: number) => {
     if (!this.canvas) return;
+    this.setState({ page, status: 'rendering' });
 
     const viewport: any = page.getViewport({ scale: 1 });
     const { width, height } = viewport;

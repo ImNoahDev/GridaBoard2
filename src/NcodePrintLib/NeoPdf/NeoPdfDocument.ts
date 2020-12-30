@@ -82,28 +82,12 @@ export default class NeoPdfDocument {
     this._url = url;
     this._filename = filename;
     this._purpose = purpose;
-    _doc_fingerprint = pdfDoc.fingerprint;
     this._fingerprint = pdfDoc.fingerprint;
     this._numPages = pdfDoc.numPages;
     this._pdfDoc = pdfDoc;
-
-
-    // const { url, cMapUrl, cMapPacked } = options;
-
-    // this._url = url;
-    // this._ready = PdfJs.getDocument(
-    //   {
-    //     url: url,
-    //     cMapUrl: cMapUrl ? cMapUrl : CMAP_URL,
-    //     cMapPacked: cMapPacked ? cMapPacked : CMAP_PACKED,
-    //   });
-
-    // const _pdfDoc = await this._ready.promise;
-    // this._pdfDoc = _pdfDoc;
-    // this._fingerprint = _pdfDoc.fingerprint;
+    _doc_fingerprint = pdfDoc.fingerprint;
 
     // page를 로드한다
-
     if (pdfDoc) {
       this._pages = [];
       for (let i = 0; i < this._pdfDoc.numPages; i++) {
@@ -123,7 +107,7 @@ export default class NeoPdfDocument {
 
   /**
    * PDF에 할당된 ncode를 저장하는 루틴
-   * 
+   *
    * MappingStorage가 변하고 나면, 로드된 모든 PDF에 이 함수를 한번씩 불러줘야 한다
    */
   refreshNcodeMappingTable = () => {
@@ -148,31 +132,6 @@ export default class NeoPdfDocument {
     this._pages = [];
     this._pdfDoc.destroy();
   }
-
-
-  // justLoad_old = async (options: IGetDocumentOptions) => {
-  //   const { url, filename, cMapUrl, cMapPacked, purpose } = options;
-
-  //   this._url = url;
-  //   this._filename = filename;
-  //   this._purpose = purpose;
-
-  //   this._ready = PdfJs.getDocument(
-  //     {
-  //       url: url,
-  //       cMapUrl: cMapUrl ? cMapUrl : CMAP_URL,
-  //       cMapPacked: cMapPacked ? cMapPacked : CMAP_PACKED,
-  //     });
-
-  //   const pdfDoc = await this._ready.promise;
-  //   this._pdfDoc = pdfDoc;
-  //   this._fingerprint = pdfDoc.fingerprint;
-
-  //   const meta = await pdfDoc.getMetadata();
-  //   this._title = meta.info.title ? meta.info.title : "";
-
-  //   return this;
-  // }
 
   get numPages() { return this._numPages; }
 
@@ -436,7 +395,7 @@ function pdfJsOpenDocument(options: IGetDocumentOptions): Promise<PdfJs.PDFDocum
    * 왜, 아래의 부분의 await 다음이 두번 콜백 실행되지? callback에 등록이 희안하게 되는 모양인데 말이지.
    * 마치 thread가 나뉘어 진 것 같이 동작한다.
    * NeoPdfDocument도 객체가 두번 생긴다. 이건 버그가 아닌가 싶은데 말이지?
-   * 
+   *
    * 2020/12/27, kitty
    */
   // // eslint-disable-next-line no-constant-condition
@@ -449,7 +408,7 @@ function pdfJsOpenDocument(options: IGetDocumentOptions): Promise<PdfJs.PDFDocum
 
 
   /**
-   * 아래는 임시 방편으로 하나만 리턴하도록 했다. 즉, 꼼수다. 
+   * 아래는 임시 방편으로 하나만 리턴하도록 했다. 즉, 꼼수다.
    * 2020/12/27, kitty
    */
   return new Promise(resolve => {

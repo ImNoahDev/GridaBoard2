@@ -124,6 +124,7 @@ class PenBasedRenderer_module extends React.Component<Props, State> {
 
     const { pageInfo, baseScale, playState, fitMargin, width, height, fixed, pdfSize, viewFit } = props;
     this.inkStorage = InkStorage.getInstance();
+    if (this.props.fromStorage) this.subScriptStorageEvent();
 
     this.canvasId = UTIL.uuidv4();
     // this.canvasId = "fabric canvas";
@@ -137,6 +138,27 @@ class PenBasedRenderer_module extends React.Component<Props, State> {
     if (viewFit !== undefined) this.state.viewFit = viewFit;
   }
 
+  private subScriptStorageEvent = () => {
+    const inkStorage = this.inkStorage;
+    if (inkStorage) {
+      const filter = { mac: null };
+      inkStorage.addEventListener(PenEventName.ON_PEN_DOWN, this.onLivePenDown_byStorage, filter);
+      inkStorage.addEventListener(PenEventName.ON_PEN_PAGEINFO, this.onLivePenPageInfo_byStorage, filter);
+      inkStorage.addEventListener(PenEventName.ON_PEN_MOVE, this.onLivePenMove_byStorage, filter);
+      inkStorage.addEventListener(PenEventName.ON_PEN_UP, this.onLivePenUp_byStorage, filter);
+    }
+  }
+
+
+  private unsubScriptStorageEvent = () => {
+    const inkStorage = this.inkStorage;
+    if (inkStorage) {
+      inkStorage.removeEventListener(PenEventName.ON_PEN_DOWN, this.onLivePenDown_byStorage);
+      inkStorage.removeEventListener(PenEventName.ON_PEN_PAGEINFO, this.onLivePenPageInfo_byStorage);
+      inkStorage.removeEventListener(PenEventName.ON_PEN_MOVE, this.onLivePenMove_byStorage);
+      inkStorage.removeEventListener(PenEventName.ON_PEN_UP, this.onLivePenUp_byStorage);
+    }
+  }
 
   /**
    * @private
@@ -308,31 +330,6 @@ class PenBasedRenderer_module extends React.Component<Props, State> {
   }
 
 
-  // resizeListener = (e) => {
-  //   this.setState({ sizeUpdate: this.state.sizeUpdate + 1 });
-
-  //   // const { classes, scaleType, scale } = this.props;
-
-  //   let { width, height } = this.propsSize;
-
-  //   const node = this.mainDiv;
-
-  //   if (node) {
-  //     const parentHeight = node.offsetHeight;
-  //     const parentWidth = node.offsetWidth;
-
-  //     width = parentWidth;
-  //     height = parentHeight;
-
-  //     // console.log(`boundary check, Parent window (width, height) = (${parentWidth}, ${parentHeight})`);
-  //   }
-  //   this.onViewResized({ width, height });
-  // };
-
-
-
-
-
   /**
    * @override
    * @public
@@ -342,6 +339,7 @@ class PenBasedRenderer_module extends React.Component<Props, State> {
     const pens = this.props.pens;
     pens.forEach(pen => this.unsubscribePenEvent(pen));
 
+    if (this.props.fromStorage) this.unsubScriptStorageEvent();
     // this.renderer.stopInterval();
     // window.removeEventListener("resize", this.resizeListener);
 
@@ -365,6 +363,12 @@ class PenBasedRenderer_module extends React.Component<Props, State> {
     }
   }
 
+  onLivePenDown_byStorage = (event: IPenToViewerEvent) => {
+    // console.log(event);
+    if (this.renderer) {
+      this.renderer.createLiveStroke_byStorage(event);
+    }
+  }
 
   /**
    *
@@ -402,6 +406,41 @@ class PenBasedRenderer_module extends React.Component<Props, State> {
     this.props.onNcodePageChanged({ section, owner, book, page });
   }
 
+  onLivePenPageInfo_byStorage = (event: IPenToViewerEvent) => {
+    const { penEventCount } = this.state;
+    const { section, owner, book, page } = event;
+
+    const prevPageInfo = this.state.pageInfo;
+    if (UTIL.isSamePage(prevPageInfo, event as IPageSOBP) && (!this.shouldSendPageInfo)) {
+      return;
+    }
+    this.shouldSendPageInfo = false;
+
+    /** 내부 상태를 바꾼다. */
+    this.setState({
+      penEventCount: penEventCount + 1,
+      pageInfo: { section, owner, book, page }
+    });
+
+    /** 테스트용 */
+    const inkStorage = this.inkStorage;
+    if (inkStorage) {
+      const pageStrokesCount = inkStorage.getPageStrokes(event as IPageSOBP).length;
+      this.setState({ strokeCount: pageStrokesCount });
+    }
+
+    /** 잉크 렌더러의 페이지를 바꾼다 */
+    if (this.renderer) {
+      this.renderer.changePage_byStorage(section, owner, book, page, false);
+    }
+
+    /** pdf pageNo를 바꿀 수 있게, container에게 전달한다. */
+    this.props.onNcodePageChanged({ section, owner, book, page });
+  }
+
+
+
+
 
   /**
    *
@@ -411,6 +450,17 @@ class PenBasedRenderer_module extends React.Component<Props, State> {
   onLivePenMove = (event: IPenToViewerEvent) => {
     if (this.renderer) {
       this.renderer.pushLiveDot(event);
+    }
+    // const { liveDotCount } = this.state;
+
+    // this.setState({ liveDotCount: liveDotCount + 1 });
+    // console.log(event);
+  }
+
+
+  onLivePenMove_byStorage = (event: IPenToViewerEvent) => {
+    if (this.renderer) {
+      this.renderer.pushLiveDot_byStorage(event);
     }
     // const { liveDotCount } = this.state;
 
@@ -436,6 +486,22 @@ class PenBasedRenderer_module extends React.Component<Props, State> {
     // }
     // console.log(event);
   }
+
+  onLivePenUp_byStorage = (event: IPenToViewerEvent) => {
+    console.log("Pen Up");
+    if (this.renderer) {
+      this.renderer.closeLiveStroke_byStorage(event);
+    }
+
+    // const { penEventCount, inkStorage } = this.state;
+    // this.setState({ penEventCount: penEventCount + 1 });
+    // if (inkStorage) {
+    //   let pageStrokesCount = inkStorage.getPageStrokes(event).length;
+    //   this.setState({ strokeCount: pageStrokesCount });
+    // }
+    // console.log(event);
+  }
+
 
   onLiveHoverPageInfo = (event: IPenToViewerEvent) => {
     if (this.renderer) {

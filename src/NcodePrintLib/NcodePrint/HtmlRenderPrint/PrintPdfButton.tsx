@@ -181,50 +181,14 @@ export default class PrintPdfButton extends React.Component<IPrintPdfButtonProps
     const printOption = this.printOption;
     printOption.direction = pdf.direction;
 
-    // // const pdf = this.props.pdf;
-    // this.pagesOverview = new Array(pdf.numPages + 1);
-    // // const { pagesPerSheet } = this.printOption;
-
-    // let numPortraitPages = 0;
-    // let numLandscapePages = 0;
-
-    // for (let i = 0; i < pdf.numPages; i++) {
-    //   const page = await pdf.getPageAsync(i + 1);
-    //   const vpt: PDF_VIEWPORT_DESC = page.getViewport({ scale: 1, rotation: 0 });
-    //   const { width, height } = vpt;
-
-    //   const landscape = width > height;
-    //   landscape ? numLandscapePages++ : numPortraitPages++;
-
-    //   const pageOverview = {
-    //     rotation: vpt.rotation,
-    //     landscape,
-    //     sizePu: { width, height },
-    //   }
-    //   this.pagesOverview[i] = pageOverview;
-    // }
-
-    // const printOption = this.printOption;
-
-    // if (numPortraitPages >= numLandscapePages) {
-    //   printOption.direction = "portrait";
-    // } else {
-    //   printOption.direction = "landscape";
-    // }
-
     console.log(`[yyy] setPageOverview - ${printOption.direction}`);
   }
 
   loadPdf = (url: string, filename: string) => {
     if (url === undefined) return;
-
-    // const loadingPromise = NeoPdfManager.getDocument({ url, filename, purpose: "to be printed by PrintPdfButton", });
     const loadingPromise = NeoPdfManager.getInstance().getDocument({ url, filename, purpose: "to be printed by PrintPdfButton", });
-    // console.log(`[yyy] `);
-    // console.log(`[yyy] LOAIND: ${url}`);
     loadingPromise.then(
       async (pdf) => {
-        // console.log(`[yyy] setPageOverview called`);
         this.printOption.url = url;
         this.printOption.filename = filename;
 
@@ -234,8 +198,8 @@ export default class PrintPdfButton extends React.Component<IPrintPdfButtonProps
         this.printOption.docNumPages = docNumPages;
         this.printOption.targetPages = Array.from({ length: docNumPages }, (_, i) => i + 1);
         // 여기까지
-        await this.setPageOverview(pdf);
 
+        await this.setPageOverview(pdf);
 
         this.printStatus = {
           ...this.printStatus,
@@ -243,9 +207,7 @@ export default class PrintPdfButton extends React.Component<IPrintPdfButtonProps
         }
         this.setState({ pdf });
       });
-
   }
-
 
   getAssociatedMappingInfo = (printOption: IPrintOption) => {
     const { pdf } = this.state;

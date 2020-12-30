@@ -1,14 +1,17 @@
 import { IPageMapItem } from "../NcodePrintLib/Coordinates";
+import { IFileBrowserReturn } from "../NcodePrintLib/NcodePrint/PrintDataTypes";
 import NeoPdfDocument, { IGetDocumentOptions } from "../NcodePrintLib/NeoPdf/NeoPdfDocument";
 import NeoPdfManager, { IPenToViewerEvent, PdfManagerEventName } from "../NcodePrintLib/NeoPdf/NeoPdfManager";
+import { makeNPageIdStr } from "../NcodePrintLib/UtilFunc/functions";
 import { IPageSOBP } from "../neosmartpen/DataStructure/Structures";
-import { setDocNumPages } from "../store/reducers/activePdfReducer";
+import { setActivePdf, setDocNumPages, setUrlAndFilename } from "../store/reducers/activePdfReducer";
 import GridaPage from "./GridaPage";
 
 let _doc_instance = undefined as GridaDoc;
 
 export default class GridaDoc {
   private pages: GridaPage[] = [];
+
 
   private pdfs: {
     pdf: NeoPdfDocument,
@@ -27,6 +30,10 @@ export default class GridaDoc {
     if (_doc_instance) return _doc_instance;
   }
 
+  getPage = (pageNo: number) => {
+    return this.pages[pageNo];
+  }
+
   static getInstance() {
     if (_doc_instance) return _doc_instance;
     _doc_instance = new GridaDoc();
@@ -37,6 +44,18 @@ export default class GridaDoc {
     return _doc_instance;
   }
 
+  public openPdfFile = async (option: { url: string, filename: string }) => {
+    // setUrlAndFilename(option.url, option.filename);
+    const pdfDoc = await NeoPdfManager.getInstance().getDocument({ url: option.url, filename: option.filename, purpose: "open pdf by GridaDoc" });
+    setActivePdf(pdfDoc);
+
+    if (pdfDoc) {
+      this.registerPdfDoc(pdfDoc);
+    }
+
+  }
+
+
   /**
    * Message handlers
    * @param event 
@@ -45,34 +64,47 @@ export default class GridaDoc {
     const pdf = event.pdf;
     console.log(`file ${pdf.filename} loaded`);
     console.log(`-GRIDA DOC-, onPdfLoaded ${pdf.filename},  purpose:${pdf.purpose} - ${pdf.url}`);
+  }
 
-    const found = this.pdfs.findIndex(item => item.fingerprint === pdf.fingerprint);
+  public setActivePageNo = (pageNo: number) => {
+
+  }
+
+  private registerPdfDoc = (pdfDoc: NeoPdfDocument) => {
+    const found = this.pdfs.findIndex(item => item.fingerprint === pdfDoc.fingerprint);
+
     if (found < 0) {
       this.pdfs.push({
-        pdf,
-        fingerprint: pdf.fingerprint,
-        pdfNames: { url: pdf.url, filename: pdf.filename, purpose: "to be stored by GridaDoc", },
-        promise: Promise.resolve(pdf),
+        pdf: pdfDoc,
+        fingerprint: pdfDoc.fingerprint,
+        pdfNames: { url: pdfDoc.url, filename: pdfDoc.filename, purpose: "to be stored by GridaDoc", },
+        promise: Promise.resolve(pdfDoc),
         startPageInDoc: this.numPages,
-        endPageInDoc: this.numPages + pdf.numPages - 1,
+        endPageInDoc: this.numPages + pdfDoc.numPages - 1,
       });
 
       // 2) 페이지를 넣어 주자
-      this.addPdfPages(pdf);
-      setDocNumPages(this.numPages);
+      const numPages = pdfDoc.numPages;
+      for (let i = 0; i < numPages; i++) {
+        const maps = pdfDoc.getPage(i + 1).pageToNcodeMaps;
+        this.addPage(maps, pdfDoc, i + 1);
+      }
     }
   }
 
-  private addPdfPages = (pdf: NeoPdfDocument) => {
-    const numPages = pdf.numPages;
-    for (let i = 0; i < numPages; i++) {
-      const maps = pdf.getPage(i + 1).pageToNcodeMaps;
-      this.addPage(maps, pdf, i + 1);
-    }
+  private addPage = (maps: IPageMapItem[], pdf: NeoPdfDocument, pageNo: number) => {
+    const page = new GridaPage(maps);
+    page.setPdfPage(pdf, pageNo)
 
+    this.pages.push(page);
+
+    setDocNumPages(this.pages.length);
   }
+
 
   public addNcodePage = (pageInfo: IPageSOBP) => {
+    console.log(` GRIDA DOC , ncode page added ${makeNPageIdStr(pageInfo)}`);
+
     const map: IPageMapItem = {
       pageInfo,
       npageArea: undefined,
@@ -93,12 +125,6 @@ export default class GridaDoc {
     this.pdfs = this.pdfs.filter(item => item.pdf.fingerprint !== pdf.fingerprint);
   }
 
-  private addPage = (maps: IPageMapItem[], pdf: NeoPdfDocument, pageNo: number) => {
-    const page = new GridaPage(maps);
-    page.setPdfPage(pdf, pageNo)
-
-    this.pages.push(page);
-  }
 
   getPages = () => {
     return this.pages;

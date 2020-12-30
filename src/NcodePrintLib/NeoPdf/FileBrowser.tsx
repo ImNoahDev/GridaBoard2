@@ -1,3 +1,4 @@
+import { IFileBrowserReturn } from "../NcodePrint/PrintDataTypes";
 import * as Util from "../UtilFunc";
 import { sleep } from "../UtilFunc";
 
@@ -6,22 +7,14 @@ const _fileInputId = g_hiddenFileInputBtnId;
 
 let _acc = 0;
 
-let _fileOpenPromise: Promise<IFileBrowserResult> = null;
+let _fileOpenPromise: Promise<IFileBrowserReturn> = null;
 let _resolveFunc = null;
 let _filename = "";
 let _isRunning = false;
 
 
-export type IFileBrowserResult = {
-  result: "success" | "canceled" | "failed",
-  file: any,
-  url?: any
-}
-
-
-
 export async function openFileBrowser2() {
-  const result: IFileBrowserResult = {
+  const result: IFileBrowserReturn = {
     result: "failed",
     file: null,
     url: null,
@@ -50,7 +43,7 @@ async function performClick2(elemId) {
 
 
 
-export async function openFileBrowser(): Promise<IFileBrowserResult> {
+export async function openFileBrowser(): Promise<IFileBrowserReturn> {
   let result = await performClick(_fileInputId);
   const file = result.file;
   if (file) {
@@ -66,7 +59,7 @@ export async function openFileBrowser(): Promise<IFileBrowserResult> {
 }
 
 
-async function performClick(elemId): Promise<IFileBrowserResult> {
+async function performClick(elemId): Promise<IFileBrowserReturn> {
   _filename = "";
 
 
@@ -81,7 +74,7 @@ async function performClick(elemId): Promise<IFileBrowserResult> {
       return _fileOpenPromise;
     }
     else {
-      resolve({ result: "failed", file: null });
+      resolve({ result: "failed", file: undefined, url: undefined });
     }
   });
 
@@ -89,7 +82,7 @@ async function performClick(elemId): Promise<IFileBrowserResult> {
 }
 
 
-async function performClick_old(elemId): Promise<IFileBrowserResult> {
+async function performClick_old(elemId): Promise<IFileBrowserReturn> {
   _filename = "";
   const elem = document.getElementById(elemId);
   if (elem && document.createEvent) {
@@ -103,7 +96,7 @@ async function performClick_old(elemId): Promise<IFileBrowserResult> {
     return _fileOpenPromise;
   }
 
-  return Promise.resolve({ result: "failed", file: null });
+  return Promise.resolve({ result: "failed", file: undefined, url: undefined });
 }
 
 
@@ -114,7 +107,7 @@ function handleFocusBack(e) {
   setTimeout(() => {
     _resolveFunc = undefined;
 
-    const result: IFileBrowserResult = {
+    const result: IFileBrowserReturn = {
       result: "failed",
       file: null,
       url: null,

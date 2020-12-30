@@ -52,7 +52,7 @@ export interface IPrintingReport {
 export interface IFileBrowserReturn {
   result: "success" | "canceled" | "failed",
   url: string,
-  fileDesc: any,
+  file: File,
 }
 
 

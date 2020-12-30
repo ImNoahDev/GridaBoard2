@@ -5,21 +5,26 @@ import NeoPdfPage from "../NcodePrintLib/NeoPdf/NeoPdfPage";
 
 
 export default class GridaPage {
-  maps: IPageMapItem[];
-  pdf: NeoPdfDocument;
-  pageNo: number;
+  _maps: IPageMapItem[];
+  _pdf: NeoPdfDocument;
+  _pageNo: number;
 
-  pdfPage: NeoPdfPage;
+  _pdfPage: NeoPdfPage;
 
-  get pageInfos() {
+  _pageInfo: IPageSOBP = { section: -1, owner: -1, book: -1, page: -1 };
+
+
+  constructor(maps: IPageMapItem[]) {
+    this._maps = maps;
+  }
+
+
+  getAssociatedNcodes = () => {
     const pageInfos: IPageSOBP[] = [];
-    this.maps.forEach(map => pageInfos.push(map.pageInfo));
+    this._maps.forEach(map => pageInfos.push(map.pageInfo));
     return pageInfos;
   }
 
-  constructor(maps: IPageMapItem[]) {
-    this.maps = maps;
-  }
 
   /**
    * 이 함수는 NeoPdfPage의 _pageToNcodeMaps을 저장해 둔다
@@ -29,9 +34,24 @@ export default class GridaPage {
    * NeoPdfPage._pageToNcodeMapgs = new IPageMapItem[]; 이런식의 코드를 쓰지 말라는 얘기
    */
   setPdfPage = (pdf: NeoPdfDocument, pageNo: number) => {
-    this.pdf = pdf;
-    this.pageNo = pageNo;
-    this.pdfPage = pdf.getPage(pageNo);
-    this.maps = this.pdfPage.pageToNcodeMaps;
+    this._pdf = pdf;
+    this._pageNo = pageNo;
+    this._pdfPage = pdf.getPage(pageNo);
+    this._maps = this._pdfPage.pageToNcodeMaps;
+  }
+
+  get pageOverview() {
+    return this.pdf.pagesOverview[this._pageNo - 1];
+  }
+
+  get filename() {
+    return this._pdf.filename;
+  }
+  get url() {
+    return this._pdf.url;
+  }
+
+  get pdf() {
+    return this._pdf;
   }
 }

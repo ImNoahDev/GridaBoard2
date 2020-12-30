@@ -73,10 +73,6 @@ const ButtonLayerSide = () => {
 
   return (
     <div style={{ zIndex: 0 }}>
-      <ButtonLayer_forTest />
-      <ButtonLayerBottom />
-
-
 
       <div id="mainFrame" style={mainFrameStyle}>
         {/* <nav id="sidenav" className="navbar fixed-left navbar-light bg-transparent"> */}

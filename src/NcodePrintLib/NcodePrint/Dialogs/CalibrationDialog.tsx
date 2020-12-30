@@ -122,23 +122,28 @@ function CalibrationDialog(props: IDialogProps) {
 
   useEffect(() => {
     if (show) {
-      // NeoPdfManager.getDocument({ url: props.url, filename: props.filename, purpose: "to be used by CalibrationDialog", }).then(loadedPdf => {
-      NeoPdfManager.getInstance().getDocument({ url: props.url, filename: props.filename, purpose: "to be used by CalibrationDialog", }).then(loadedPdf => {
-        if (loadedPdf) {
-          const w = imgWidth * imgDensity;
-          const h = imgHeight * imgDensity;
-          // loadedPdf.generatePageThumbnails(w, h, "rgb(220,220,220)", true).then(() => {
-          setPdf(loadedPdf);
-          const t = Array.from({ length: loadedPdf.numPages }, (_, i) => i + 1);
-          setTargetPages(t);
-          console.log(`calibration: pdf loaded, pages=${t}`)
-          setNumPages(t.length);
+      NeoPdfManager.getInstance().getDocument(
+        {
+          url: props.url,
+          filename: props.filename,
+          purpose: "to be used by CalibrationDialog"
+        })
+        .then(loadedPdf => {
+          if (loadedPdf) {
+            const w = imgWidth * imgDensity;
+            const h = imgHeight * imgDensity;
+            // loadedPdf.generatePageThumbnails(w, h, "rgb(220,220,220)", true).then(() => {
+            setPdf(loadedPdf);
+            const t = Array.from({ length: loadedPdf.numPages }, (_, i) => i + 1);
+            setTargetPages(t);
+            console.log(`calibration: pdf loaded, pages=${t}`)
+            setNumPages(t.length);
 
-          updateCalibrationDialog(0);
-          setStatus("progress");
-          // })
-        }
-      });
+            updateCalibrationDialog(0);
+            setStatus("progress");
+            // })
+          }
+        });
     }
     else {
       initState();
