@@ -128,6 +128,11 @@ export default class NeoPdfPageView extends Component<PageProps> {
   }
 
 
+  componentDidMount() {
+    const { pdf } = this.props;
+    this._update(pdf);
+  }
+
   shouldComponentUpdate(nextProps: PageProps, nextState: PageState) {
     const zoomChanged = nextProps.position.zoom !== this.props.position.zoom;
 
@@ -141,24 +146,19 @@ export default class NeoPdfPageView extends Component<PageProps> {
     const pdfChanged = this.props.pdf !== nextProps.pdf;
     if (pdfChanged) {
       this._update(nextProps.pdf);
-      return false;
+      return true;
     }
 
     const pageChanged = this.props.index !== nextProps.index;
     if (pageChanged) {
       console.log(`PDF PAGE: page, page Number = ${nextProps.index}`)
       this._update(nextProps.pdf, nextProps.index);
-      return false;
+      return true;
     }
 
     return true;
   }
 
-
-  componentDidMount() {
-    const { pdf } = this.props;
-    this._update(pdf);
-  }
 
   setCanvasRef = (canvas: HTMLCanvasElement) => {
     this.canvas = canvas;
@@ -186,8 +186,9 @@ export default class NeoPdfPageView extends Component<PageProps> {
 
     pdf.getPageAsync(pageNo).then(
       (page) => {
-        this.backPlane.inited = false;
-        this.renderPage(page, this.props.position.zoom);
+        console.log(`BACKPLANE _loadPage renderPage start`)
+        this.renderPage(page, this.props.position.zoom, );
+        console.log(`BACKPLANE _loadPage renderPage end`)
       }
     );
   }
@@ -214,6 +215,15 @@ export default class NeoPdfPageView extends Component<PageProps> {
     canvas.width = px_width;
     canvas.height = px_height;
 
+    const destCanvas = this.backPlane.canvas;
+    destCanvas.width = canvas.width;
+    destCanvas.height = canvas.height;
+
+    const destCtx = destCanvas.getContext("2d");
+    destCtx.fillStyle = "#fff";
+    destCtx.fillRect(0, 0, destCanvas.width, destCanvas.height);
+
+
     const ctx = canvas.getContext('2d');
     try {
       this.backPlane.nowRendering = true;
@@ -237,11 +247,6 @@ export default class NeoPdfPageView extends Component<PageProps> {
     }
 
     if (canvas.width > 0 && canvas.height > 0) {
-      const destCanvas = this.backPlane.canvas;
-      destCanvas.width = canvas.width;
-      destCanvas.height = canvas.height;
-
-      const destCtx = destCanvas.getContext("2d");
       destCtx.drawImage(canvas, 0, 0);
       this.renderTask = null;
 
@@ -257,6 +262,8 @@ export default class NeoPdfPageView extends Component<PageProps> {
 
   renderPage = async (page: NeoPdfPage, zoom: number) => {
     if (!this.canvas) return;
+    console.log(`BACKPLANE RENDERPAGE start`)
+
     this.setState({ page, status: 'rendering' });
 
     const viewport: any = page.getViewport({ scale: 1 });
@@ -266,11 +273,14 @@ export default class NeoPdfPageView extends Component<PageProps> {
     const ret = this.scaleCanvas(canvas, size.width, size.height, zoom);
     const dpi = canvas.width / zoom / size.width * 72;
 
+    let noLazyUpdate = false;
     if (!this.backPlane.inited) {
-      // console.log(`[yyy] DRAWING`)
+      console.log(`BACKPLANE DRAWING start`)
       const result = await this.renderToCanvasSafe(page, dpi, zoom);
+      console.log(`BACKPLANE DRAWING end`)
       this.backPlane.inited = result.result;
       this.backPlane.size = { ...result };
+      noLazyUpdate = true;
     }
 
     const displaySize = { width, height };
@@ -282,9 +292,12 @@ export default class NeoPdfPageView extends Component<PageProps> {
 
     ctx.drawImage(this.backPlane.canvas, 0, 0, px_width, px_height, 0, 0, dw, dh);
 
+    console.log(`BACKPLANE RENDERPAGE realtime end`)
 
     // Lazy update
-    if (this.backPlane.prevZoom !== zoom) {
+    if (!noLazyUpdate && this.backPlane.prevZoom !== zoom) {
+      console.log(`BACKPLANE RENDERPAGE lazy start`);
+
       this.zoomQueue.push(zoom);
       await this.timeOut(200);
 
@@ -308,7 +321,12 @@ export default class NeoPdfPageView extends Component<PageProps> {
       else {
         // console.log(`lazy back plane CANCELLED`)
       }
+      console.log(`BACKPLANE RENDERPAGE lazy end`);
+
     }
+
+    console.log(`BACKPLANE RENDERPAGE end`)
+
     this.setState({ status: 'rendered' });
 
   }

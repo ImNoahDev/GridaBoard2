@@ -9,7 +9,7 @@ import { IFileBrowserReturn } from "../NcodePrintLib/NcodePrint/PrintDataTypes";
  * 
  */
 interface Props extends ButtonProps {
-  onFileOpen: (event: IFileBrowserReturn) => void,
+  handlePdfOpen: (event: IFileBrowserReturn) => void,
 }
 
 

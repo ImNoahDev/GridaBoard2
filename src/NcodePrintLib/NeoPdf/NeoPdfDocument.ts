@@ -60,7 +60,7 @@ export default class NeoPdfDocument {
   /** starting from 0 (page 1 ==> 0) */
   _pagesOverview: IPageOverview[];
 
-  /** starting from 0 (page 1 ==> 0) */
+  /** starting from 0 (page 1 ==> 0), for printing */
   _ncodeAssigned: IPageSOBP[];
 
   direction: "portrait" | "landscape";
@@ -110,21 +110,23 @@ export default class NeoPdfDocument {
    *
    * MappingStorage가 변하고 나면, 로드된 모든 PDF에 이 함수를 한번씩 불러줘야 한다
    */
-  refreshNcodeMappingTable = () => {
+  public refreshNcodeMappingTable = () => {
     const mapper = MappingStorage.getInstance();
-    const pdfMapDescArr: IPdfToNcodeMapItem[] = mapper.findAssociatedNcode(this.fingerprint);
+    const docMaps: IPdfToNcodeMapItem[] = mapper.findAssociatedNcode(this.fingerprint);
 
-    const flattenedMaps: IPageMapItem[] = [];
-    pdfMapDescArr.forEach(map => {
-      flattenedMaps.push(...map.params);
-    });
+    docMaps.forEach( docMap => this.addNcodeMapping(docMap));
+  }
 
-    for (let i = 0; i < this._pdfDoc.numPages; i++) {
+  public addNcodeMapping = (docMap: IPdfToNcodeMapItem) => {
+    if (docMap.fingerprint !== this.fingerprint) {
+      console.error("NeoPdfDocument: the fingerprint of the map item is not same");
+      return;
+    }
+
+    for (let i = 0; i < this.numPages; i++) {
       const page = this._pages[i];
       const pageNo = i + 1;
-
-      const maps = flattenedMaps.filter(map => map.pdfDesc.pageNo === pageNo);
-      page.setPageToNcodeMaps(maps);
+      page.addPageToNcodeMaps([docMap.params[i]]);
     }
   }
 

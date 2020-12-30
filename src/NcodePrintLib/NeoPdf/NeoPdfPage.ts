@@ -5,6 +5,7 @@ import CanvasColorConverter, { ColorConvertMethod } from "../NcodeSurface/Canvas
 import { PDF_DEFAULT_DPI } from "../NcodeSurface/NcodeConstans";
 import NeoPdfDocument from "./NeoPdfDocument";
 import * as Util from "../UtilFunc";
+import { isSamePage } from "../../neosmartpen/utils/UtilsFunc";
 
 export type PDF_VIEWPORT_DESC = PdfJs.ViewportParameters & PdfJs.PDFPageViewport;
 
@@ -57,7 +58,7 @@ export default class NeoPdfPage {
 
   _thumbnail: IThumbnailDesc;
 
-  private _pageToNcodeMaps: IPageMapItem[];
+  private _pageToNcodeMaps: IPageMapItem[] = [];
 
   /** 
    * 이 값은 NeoPdfDocument의 load에서 refreshNcodeMappingTable에 의해 자동으로 설정되고
@@ -67,12 +68,21 @@ export default class NeoPdfPage {
     return this._pageToNcodeMaps;
   }
 
-  setPageToNcodeMaps = (maps: IPageMapItem[]) => {
+  addPageToNcodeMaps = (pageMaps: IPageMapItem[]) => {
     // this._pageToNcodeMaps 자체가 바뀌는 것을 막자, GridaDoc에서 쓴다.
     //
     // 이걸, pointer로 복사하게 된다면,
     // GridaDoc와 GridaPage의 pageInfo 관련된 항목을 자동 업데이트 되게 수정해야 한다.
-    this._pageToNcodeMaps = Util.cloneObj(maps);
+    const storedMaps = this._pageToNcodeMaps;
+    pageMaps.forEach(pageMap => {
+      const isIncluded =
+        storedMaps.findIndex(storedMap => isSamePage(storedMap.pageInfo, pageMap.pageInfo)) >= 0;
+      if (!isIncluded) storedMaps.push(pageMap);
+    });
+  }
+
+  resetPageToNcodeMaps = () => {
+    this._pageToNcodeMaps = [];
   }
 
   constructor(neoPdf: NeoPdfDocument, pageNo: number) {

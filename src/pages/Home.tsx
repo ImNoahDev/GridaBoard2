@@ -4,7 +4,7 @@ import { IconButton, makeStyles, createStyles, } from "@material-ui/core";
 import '../styles/main.css'
 import PUIController from '../components/PUIController';
 import { Theme } from '@material-ui/core';
-import { useSelector } from "react-redux";
+import { useSelector, shallowEqual } from "react-redux";
 import { turnOnGlobalKeyShortCut } from "../GridaBoard/GlobalFunctions";
 import PersistentDrawerRight from "../GridaBoard/View/PersistentDrawerRight";
 import MenuIcon from '@material-ui/icons/Menu';
@@ -19,7 +19,9 @@ import { updateDrawerWidth } from "../store/reducers/ui";
 import { IPageSOBP } from "../NcodePrintLib/DataStructure/Structures";
 import GridaDoc from "../GridaBoard/GridaDoc";
 import { IFileBrowserReturn } from "../NcodePrintLib/NcodePrint/PrintDataTypes";
-import { PdfInfoType } from "../store/reducers/activePdfReducer";
+import { IActivePageState } from "../store/reducers/activePageReducer";
+import NeoPdfDocument from "../NcodePrintLib/NeoPdf/NeoPdfDocument";
+import NeoPdfManager from "../NcodePrintLib/NeoPdf/NeoPdfManager";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -49,6 +51,11 @@ const Home = () => {
   const [noMoreAutoLoad, setNoMoreAutoLoad] = useState(false);
 
   const drawerWidth = useSelector((state: RootState) => state.ui.drawer.width);
+  const activePageNo = useSelector((state: RootState) => state.activePage.activePageNo);
+  const pdf = useSelector((state: RootState) => state.activePage.pdf);
+  const pdfUrl_store = useSelector((state: RootState) => state.activePage.url);
+  const pdfFilename_store = useSelector((state: RootState) => state.activePage.filename);
+
   const setDrawerWidth = (width: number) => updateDrawerWidth({ width });
 
   // const [pdfUrl_store, pdfFilename_store] = useSelector((state: RootState) => {
@@ -56,20 +63,6 @@ const Home = () => {
   //   return [state.pdfInfo.activePdf.url, state.pdfInfo.activePdf.filename];
   // });
 
-
-  const activePageNo = useSelector((state: RootState) => {
-    return state.pdfInfo.activePageNo;
-  });
-
-  const [pdf, pdfUrl_store, pdfFilename_store] = useSelector((state: RootState) => {
-    const pdfInfo = state.pdfInfo as PdfInfoType;
-
-    const pdf = pdfInfo.activePdf.pdf;
-    const url = pdfInfo.activePdf.url;
-    const filename = pdfInfo.activePdf.filename;
-
-    return [pdf, url, filename];
-  });
 
   const pens_store = useSelector((state: RootState) => {
     // console.log(state.appConfig.pens);
@@ -94,12 +87,21 @@ const Home = () => {
     setDrawerWidth(size);
   }
 
+
+
+  const onNcodePageChanged = (pageInfo: IPageSOBP) => {
+    const doc = GridaDoc.getInstance();
+
+    doc.addNcodePage(pageInfo);
+
+  }
+
   const onFileLoadNeeded = (coupledDoc: IAutoLoadDocDesc) => {
     const url = coupledDoc.pdf.url;
     if (url.indexOf("blob:http") > -1) {
       setAutoLoadDoc(coupledDoc);
+      setLoadConfirmDlgStep(0);
       setLoadConfirmDlgOn(true);
-      setLoadConfirmDlgStep(1);
     }
     else {
       // 구글 드라이브에서 파일을 불러오자
@@ -108,43 +110,69 @@ const Home = () => {
     return;
   }
 
-  const onNcodePageChanged = (pageInfo: IPageSOBP) => {
-    const doc = GridaDoc.getInstance();
-
-    doc.addNcodePage(pageInfo);
-  }
-
-  const onNoMoreAutoLoad = () => {
+  const handleNoMoreAutoLoad = () => {
     setNoMoreAutoLoad(true);
-  }
-
-  const onCancelAutoLoad = () => {
     setLoadConfirmDlgOn(false);
   }
 
-  const onAppendPdfFile = async () => {
+  const handleCancelAutoLoad = () => {
+    setLoadConfirmDlgOn(false);
+  }
+
+  const handleAppendFileOk = async () => {
     setLoadConfirmDlgOn(false);
     const coupledDoc = autoLoadDoc;
 
-    let url = coupledDoc.pdf.url;
-    if (url.indexOf("blob:http") > -1) {
-      console.log(`try to load file: ${coupledDoc.pdf.filename}`);
+    const url = coupledDoc.pdf.url;
+    if (url.indexOf("blob:http") < 0)
+      return { result: "fail", status: "not a local file, please load the file from google drive" }
 
-      // 여기서 펜 입력은 버퍼링해야 한다.
-      const selectedFile = await openFileBrowser2();
-      console.log(selectedFile.result);
+    console.log(`try to load file: ${coupledDoc.pdf.filename}`);
 
-      if (selectedFile.result === "success") {
-        url = selectedFile.url;
-        const filename = selectedFile.file.name;
-        console.log(url);
+    // 여기서 펜 입력은 버퍼링해야 한다.
+    const selectedFile = await openFileBrowser2();
+    console.log(selectedFile.result);
 
-        setPdfUrl(url);
-        setPdfFilename(filename);
+    if (selectedFile.result === "success") {
+      const { url, file } = selectedFile;
+
+      const doc = await NeoPdfManager.getInstance().getDocument({ url, filename: file.name, purpose: "test fingerprint" });
+      if (doc.fingerprint === coupledDoc.pdf.fingerprint) {
+        doc.destroy();
+        handlePdfOpen({ result: "success", url, file });
+
+        return { result: "success", status: "same fingerprint" }
       }
+      else {
+        doc.destroy();
+        setLoadConfirmDlgStep(1);
+        setLoadConfirmDlgOn(true);
+
+        return { result: "fail", status: "same fingerprint" }
+      }
+      // setPdfUrl(url);
+      // setPdfFilename(filename);
+    }
+    else if (selectedFile.result === "canceled") {
+      setLoadConfirmDlgStep(1);
+      setLoadConfirmDlgOn(true);
+      return { result: "fail", status: "file open canceled" }
     }
   }
 
+
+  // 이 함수에서 pdf를 연다
+  const handlePdfOpen = async (event: IFileBrowserReturn) => {
+    console.log(event.url)
+    if (event.result === "success") {
+      const doc = GridaDoc.getInstance();
+      doc.openPdfFile({ url: event.url, filename: event.file.name });
+
+    }
+    else if (event.result === "canceled") {
+      alert("file open cancelled");
+    }
+  };
 
   const classes = useStyles();
 
@@ -177,19 +205,6 @@ const Home = () => {
 
   }
 
-  // 이 함수에서 pdf를 연다
-  const onFileOpen = async (event: IFileBrowserReturn) => {
-    console.log(event.url)
-    if (event.result === "success") {
-      const doc = GridaDoc.getInstance();
-      doc.openPdfFile({ url: event.url, filename: event.file.name });
-
-    }
-    else if (event.result === "canceled") {
-      alert("file open cancelled");
-    }
-  };
-
 
 
   return (
@@ -207,7 +222,7 @@ const Home = () => {
         </div>
 
         <div style={{ position: "absolute", top: 0, left: 0, bottom: 0, right: drawerOpen ? drawerWidth : 0 }}>
-          <ButtonLayer onFileOpen={onFileOpen} />
+          <ButtonLayer handlePdfOpen={handlePdfOpen} />
         </div>
 
         <div style={{ position: "absolute", top: 0, left: 0, bottom: 0, right: drawerOpen ? drawerWidth : 0 }}>
@@ -246,7 +261,7 @@ const Home = () => {
       </div>
 
       <AutoLoadConfirmDialog open={loadConfirmDlgOn} step={loadConfirmDlgStep}
-        onOk={onAppendPdfFile} onCancel={onCancelAutoLoad} onNoMore={onNoMoreAutoLoad} />
+        onOk={handleAppendFileOk} onCancel={handleCancelAutoLoad} onNoMore={handleNoMoreAutoLoad} />
 
 
       {/* 파일 인풋을 위한 것 */}

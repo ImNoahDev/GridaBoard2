@@ -10,11 +10,13 @@ import EventDispatcher, { EventCallbackType } from "../../neosmartpen/penstorage
 
 
 export enum MappingStorageEventName {
-  ON_MAPINFO_CHANGED = "on_map_changed",
+  ON_MAPINFO_REFRESHED = "on_map_refreshed",
+  ON_MAPINFO_ADDED = "on_map_changed",
 }
 
 
 export type IMappingStorageEvent = {
+  status: string,
   mapper?: PdfDocMapper,      // ON_MAP_INFO_CHANGED
 }
 
@@ -103,7 +105,7 @@ export default class MappingStorage {
     this._data.arrDocMap.push(docMap);
 
     // NeoPdfManager.getInstance().refreshNcodeMappingTable();
-    this.dispatcher.dispatch(MappingStorageEventName.ON_MAPINFO_CHANGED, { mapper });
+    this.dispatcher.dispatch(MappingStorageEventName.ON_MAPINFO_ADDED, { status: "new map added", mapper });
 
     this.storeMappingInfo();
     if (_debug) this.dump("mapping");

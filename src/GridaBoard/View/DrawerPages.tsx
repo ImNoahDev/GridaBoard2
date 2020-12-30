@@ -1,4 +1,4 @@
-import { Box, Paper, Typography } from "@material-ui/core";
+import { Box, Paper, Typography, withStyles } from "@material-ui/core";
 import React, { CSSProperties, useState } from "react";
 import { InkStorage, MixedPageView, PLAYSTATE } from "../../neosmartpen";
 import { ZoomFitEnum } from "../../neosmartpen/renderer/pageviewer/RenderWorkerBase";
@@ -6,6 +6,7 @@ import GridaDoc from "../GridaDoc";
 import { RootState } from "../../store/rootReducer";
 import { connect } from "react-redux";
 import { updateDrawerWidth, updateSelectedPage } from "../../store/reducers/ui";
+import { makeNPageIdStr } from "../../NcodePrintLib";
 
 interface Props {
   numPages?: number,
@@ -54,7 +55,7 @@ class DrawerPages extends React.Component<Props, State>  {
           bgColor = `rgb(255, 255, 255)`;
 
           console.log(`DRAWER page #${i + 1}`)
-          const pageOverview = pages[i].pageOverview;
+          const pageOverview = page.pageOverview;
           const isLandscape = pageOverview.landscape;
           const sizePu = pageOverview.sizePu;
           const wh_ratio = sizePu.width / sizePu.height;
@@ -67,7 +68,7 @@ class DrawerPages extends React.Component<Props, State>  {
               this._orientation = "landscape";
               // setDrawerWidth(drawerWidth * wh_ratio);
             }
-            height = drawerWidth * wh_ratio / 0.9;
+            height = drawerWidth / wh_ratio * 0.9;
           }
           else {
             console.log(`drawPageLayout: orientation=${this._orientation}, drawerWidth=${drawerWidth}`);
@@ -101,6 +102,11 @@ class DrawerPages extends React.Component<Props, State>  {
                   onFileLoadNeeded={undefined}
                 />
               </div>
+
+              <div id={`thumbnail-pageInfo-${i}`} style={{ position: "absolute", margin: 0, padding: 0, right: 0, left: 0, top: 0, height: "100%", zIndex: 999 }}>
+                <Typography style={{ color: "#f00" }}> {makeNPageIdStr(page._pageInfo)}</Typography>
+              </div>
+
               {/* 
             <Box id={`box-id-${i}`}
               style={{ position: "absolute", right: 0, left: 0, top: 0, height: "100%", backgroundColor: bgColor }}
@@ -121,7 +127,7 @@ class DrawerPages extends React.Component<Props, State>  {
 }
 
 const mapStateToProps = (state: RootState) => ({
-  numPages: state.pdfInfo.numDocPages,
+  numPages: state.activePage.numDocPages,
   drawerWidth: state.ui.drawer.width,
 });
 

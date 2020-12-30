@@ -1,6 +1,6 @@
 
 import { combineReducers } from 'redux';
-import activePdfReducer from "./reducers/activePdfReducer"
+import activePageReducer from "./reducers/activePageReducer"
 
 import authorizationReducer from './reducers/authorization';
 import pointerTracer from './reducers/pointerTracer';
@@ -16,7 +16,7 @@ const rootReducer = combineReducers({
   ui: uiReducer,
   pointerTracer,
   rotate,
-  pdfInfo: activePdfReducer,
+  activePage: activePageReducer,
   progress: progressDlgReducer,
 
   calibration: calibrationReducer,

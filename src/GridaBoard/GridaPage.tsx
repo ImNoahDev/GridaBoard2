@@ -1,5 +1,7 @@
 import { IPageMapItem } from "../NcodePrintLib/Coordinates";
 import { IPageSOBP } from "../NcodePrintLib/DataStructure/Structures";
+import { IPageOverview } from "../NcodePrintLib/NcodePrint/HtmlRenderPrint/PagesForPrint";
+import { getNPaperSize_pu } from "../NcodePrintLib/NcodeSurface/SurfaceInfo";
 import NeoPdfDocument from "../NcodePrintLib/NeoPdf/NeoPdfDocument";
 import NeoPdfPage from "../NcodePrintLib/NeoPdf/NeoPdfPage";
 
@@ -41,7 +43,17 @@ export default class GridaPage {
   }
 
   get pageOverview() {
-    return this.pdf.pagesOverview[this._pageNo - 1];
+    if (this._pdf)
+      return this._pdf.pagesOverview[this._pageNo - 1];
+
+    const pageSize = getNPaperSize_pu(this._pageInfo);
+    const landscape = pageSize.width > pageSize.height;
+    const retVal: IPageOverview = {
+      sizePu: pageSize,
+      rotation: 0,
+      landscape
+    };
+    return retVal;
   }
 
   get filename() {

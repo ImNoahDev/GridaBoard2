@@ -9,38 +9,25 @@ import GridaDoc from '../../GridaBoard/GridaDoc';
 
 
 interface Props extends ButtonProps {
-  onFileOpen: (event: IFileBrowserReturn) => void,
+  handlePdfOpen: (event: IFileBrowserReturn) => void,
 }
 
 
 const FileBrowserButton = (props: Props) => {
-  const { onFileOpen, ...rest } = props;
+  const { handlePdfOpen, ...rest } = props;
   async function fileOpenHandler() {
-    const result = await openFileBrowser();
-    console.log(result.result);
+    const selectedFile = await openFileBrowser();
+    console.log(selectedFile.result);
 
-    if (result.result === "success") {
-      const { url, file } = result;
-      // const doc = GridaDoc.getInstance();
-      // doc.openPdfFile({ url, file });
-
-      console.log(url);
-
-      if (onFileOpen) {
-        const retVal: IFileBrowserReturn = {
-          result: "success",
-          url,
-          file: result.file,
-        }
-        onFileOpen(retVal);
+    if (selectedFile.result === "success") {
+      const { url, file } = selectedFile;
+      if (handlePdfOpen) {
+        handlePdfOpen({ result: "success", url, file });
       }
     } else {
-      const retVal: IFileBrowserReturn = {
-        result: "canceled",
-        url: null,
-        file: null,
+      if (handlePdfOpen) {
+        handlePdfOpen({ result: "canceled", url: null, file: null, });
       }
-      onFileOpen(retVal);
     }
   }
 

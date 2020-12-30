@@ -55,13 +55,13 @@ function hideAndShowFnc() {
 
 
 interface Props {
-  onFileOpen: (event: IFileBrowserReturn) => void,
+  handlePdfOpen: (event: IFileBrowserReturn) => void,
 }
 /**
  * 
  */
 const ButtonLayerBottom = (props:Props) => {
-  const { onFileOpen, ...rest } = props;
+  const { handlePdfOpen, ...rest } = props;
 
   const [num_pens, setNumPens] = useState(0);
   const [pens, setPens] = useState(new Array(0) as NeoSmartpen[]);
@@ -69,8 +69,7 @@ const ButtonLayerBottom = (props:Props) => {
 
 
   const [pdfUrl, pdfFilename] = useSelector((state: RootState) => {
-    console.log(state.pdfInfo.activePdf);
-    return [state.pdfInfo.activePdf.url, state.pdfInfo.activePdf.filename];
+    return [state.activePage.url, state.activePage.filename];
   });
 
 
@@ -100,7 +99,7 @@ const ButtonLayerBottom = (props:Props) => {
           <div className="navbar-menu d-flex justify-content-center align-items-center neo_shadow">
             <PageNumbering />
             <PrintButton targetId={printBtnId} url={pdfUrl} filename={pdfFilename} />
-            <FileBrowserButton onFileOpen={onFileOpen} />
+            <FileBrowserButton handlePdfOpen={handlePdfOpen} />
           </div>
         </div>
 

@@ -2,9 +2,11 @@ import { IPageMapItem } from "../NcodePrintLib/Coordinates";
 import { IFileBrowserReturn } from "../NcodePrintLib/NcodePrint/PrintDataTypes";
 import NeoPdfDocument, { IGetDocumentOptions } from "../NcodePrintLib/NeoPdf/NeoPdfDocument";
 import NeoPdfManager, { IPenToViewerEvent, PdfManagerEventName } from "../NcodePrintLib/NeoPdf/NeoPdfManager";
+import { MappingStorage } from "../NcodePrintLib/SurfaceMapper";
+import { IMappingStorageEvent, MappingStorageEventName } from "../NcodePrintLib/SurfaceMapper/MappingStorage";
 import { makeNPageIdStr } from "../NcodePrintLib/UtilFunc/functions";
 import { IPageSOBP } from "../neosmartpen/DataStructure/Structures";
-import { setActivePdf, setDocNumPages, setUrlAndFilename } from "../store/reducers/activePdfReducer";
+import { setActivePdf, setDocNumPages, setUrlAndFilename } from "../store/reducers/activePageReducer";
 import GridaPage from "./GridaPage";
 
 let _doc_instance = undefined as GridaDoc;
@@ -13,7 +15,7 @@ export default class GridaDoc {
   private pages: GridaPage[] = [];
 
 
-  private pdfs: {
+  private _pdfDescs: {
     pdf: NeoPdfDocument,
     fingerprint: string,
     pdfNames: IGetDocumentOptions,
@@ -41,9 +43,19 @@ export default class GridaDoc {
     const pdfManager = NeoPdfManager.getInstance();
     pdfManager.addEventListener(PdfManagerEventName.ON_PDF_LOADED, _doc_instance.onPdfLoaded);
 
+    const mapper = MappingStorage.getInstance();
+    mapper.addEventListener(MappingStorageEventName.ON_MAPINFO_ADDED, _doc_instance.handleMapInfoAdded);
+
+
     return _doc_instance;
   }
 
+  handleMapInfoAdded = (event: IMappingStorageEvent) => {
+    const docMap = event.mapper.docMap;
+    const pdfDescs = this._pdfDescs.filter( pdfDesc => pdfDesc.fingerprint === docMap.fingerprint);
+    pdfDescs.forEach(pdfDesc => pdfDesc.pdf.addNcodeMapping(docMap));
+  }
+  
   public openPdfFile = async (option: { url: string, filename: string }) => {
     // setUrlAndFilename(option.url, option.filename);
     const pdfDoc = await NeoPdfManager.getInstance().getDocument({ url: option.url, filename: option.filename, purpose: "open pdf by GridaDoc" });
@@ -52,9 +64,7 @@ export default class GridaDoc {
     if (pdfDoc) {
       this.registerPdfDoc(pdfDoc);
     }
-
   }
-
 
   /**
    * Message handlers
@@ -71,10 +81,10 @@ export default class GridaDoc {
   }
 
   private registerPdfDoc = (pdfDoc: NeoPdfDocument) => {
-    const found = this.pdfs.findIndex(item => item.fingerprint === pdfDoc.fingerprint);
+    const found = this._pdfDescs.findIndex(item => item.fingerprint === pdfDoc.fingerprint);
 
     if (found < 0) {
-      this.pdfs.push({
+      this._pdfDescs.push({
         pdf: pdfDoc,
         fingerprint: pdfDoc.fingerprint,
         pdfNames: { url: pdfDoc.url, filename: pdfDoc.filename, purpose: "to be stored by GridaDoc", },
@@ -115,14 +125,14 @@ export default class GridaDoc {
   }
 
   public removePdfDoc = (pdf: NeoPdfDocument) => {
-    const targets = this.pdfs.filter(item => item.pdf.fingerprint === pdf.fingerprint);
+    const targets = this._pdfDescs.filter(item => item.pdf.fingerprint === pdf.fingerprint);
 
     targets.forEach(target => {
       const len = target.endPageInDoc - target.startPageInDoc;
       this.pages = this.pages.splice(target.startPageInDoc, len);
     });
 
-    this.pdfs = this.pdfs.filter(item => item.pdf.fingerprint !== pdf.fingerprint);
+    this._pdfDescs = this._pdfDescs.filter(item => item.pdf.fingerprint !== pdf.fingerprint);
   }
 
 

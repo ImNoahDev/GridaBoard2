@@ -72,8 +72,7 @@ const ButtonLayer_forTest = () => {
   }
 
   const [pdfUrl, pdfFilename] = useSelector((state: RootState) => {
-    console.log(state.pdfInfo.activePdf);
-    return [state.pdfInfo.activePdf.url, state.pdfInfo.activePdf.filename];
+    return [state.activePage.url, state.activePage.filename];
   });
 
 

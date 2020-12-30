@@ -33,8 +33,9 @@ export default class NeoPdfManager {
     if (_pdf_manager) return _pdf_manager;
 
     _pdf_manager = new NeoPdfManager();
-    const ms = MappingStorage.getInstance();
-    ms.addEventListener(MappingStorageEventName.ON_MAPINFO_CHANGED, _pdf_manager.refreshNcodeMappingTable);
+    const mapper = MappingStorage.getInstance();
+    mapper.addEventListener(MappingStorageEventName.ON_MAPINFO_REFRESHED, _pdf_manager.refreshNcodeMappingTable);
+    mapper.addEventListener(MappingStorageEventName.ON_MAPINFO_ADDED, _pdf_manager.handleMapInfoAdded);
 
     return _pdf_manager;
   }
@@ -42,6 +43,13 @@ export default class NeoPdfManager {
   refreshNcodeMappingTable = (event: IMappingStorageEvent) => {
     this._pdfs.forEach(pdf => pdf.refreshNcodeMappingTable());
   }
+
+  handleMapInfoAdded = (event: IMappingStorageEvent) => {
+    const docMap = event.mapper.docMap;
+    const pdfs = this._pdfs.filter( pdf => pdf.fingerprint === docMap.fingerprint);
+    pdfs.forEach(pdf => pdf.addNcodeMapping(docMap));
+  }
+
 
   public getDocument = async (options: IGetDocumentOptions) => {
     if (options.url && !options.fingerprint) {
