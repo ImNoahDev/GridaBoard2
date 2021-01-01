@@ -278,9 +278,11 @@ export default class MappingStorage {
 
     const docMap: IPdfToNcodeMapItem = Util.cloneObj(mapper.docMap);
     docMap.timeString = Util.getNowTimeStr();
-    this._data.arrDocMap.push(docMap);
 
-    // NeoPdfManager.getInstance().refreshNcodeMappingTable();
+    this._data.arrDocMap.unshift(docMap);
+    // 최신순으로 소팅
+    // this._data.arrDocMap.sort((a, b) => (b.timeString > a.timeString ? 1 : (b.timeString === a.timeString ? 0 : -1)));
+
     this.dispatcher.dispatch(MappingStorageEventName.ON_MAPINFO_ADDED, { status: "new map added", mapper });
 
     this.storeMappingInfo();
@@ -370,7 +372,7 @@ export default class MappingStorage {
     const id = Util.makePdfId(fingerprint, pagesPerSheet as number);
 
     const theSames = this._data.arrDocMap.filter(m => id === m.id);
-    theSames.sort((a, b) => b.timeString > a.timeString ? 1 : (b.timeString === a.timeString ? 0 : -1));
+    // theSames.sort((a, b) => b.timeString > a.timeString ? 1 : (b.timeString === a.timeString ? 0 : -1));
 
     return theSames;
   }
@@ -380,7 +382,7 @@ export default class MappingStorage {
 
     // const theBase = this._data.arrDocMap.find(m => baseId === m.id);
     const theBases = this._data.arrDocMap.filter(m => baseId === m.id);
-    theBases.sort((a, b) => b.timeString > a.timeString ? 1 : (b.timeString === a.timeString ? 0 : -1));
+    // theBases.sort((a, b) => b.timeString > a.timeString ? 1 : (b.timeString === a.timeString ? 0 : -1));
     const theBase = theBases.length > 0 ? theBases[0] : undefined;
 
     return theBase;
@@ -450,14 +452,9 @@ export default class MappingStorage {
       if (value) {
         this._data = JSON.parse(value);
 
-        this._data.arrDocMap.sort(function (a, b) {
-          if (a.timeString < b.timeString) return 1;
-          else if (a.timeString > b.timeString) return -1;
-          else return 0;
-        });
-
+        // 최신순으로 소팅
+        this._data.arrDocMap.sort((a, b) => b.timeString > a.timeString ? 1 : (b.timeString === a.timeString ? 0 : -1));
         this.dump("loading");
-
 
         // const debug = JSON.stringify(this._arrMapped);
         // console.log(`Pdf Ncode Info Loaded   ${key}: ${debug}`);

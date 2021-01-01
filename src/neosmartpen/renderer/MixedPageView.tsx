@@ -46,6 +46,8 @@ export interface MixedViewProps {
 
   pageInfo?: IPageSOBP;
 
+  printedPageInfo?: IPageSOBP;
+
   pdf?: NeoPdfDocument,
 
   pdfUrl: string;
