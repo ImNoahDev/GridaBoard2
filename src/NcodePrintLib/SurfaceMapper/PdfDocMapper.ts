@@ -50,27 +50,7 @@ export default class PdfDocMapper {
     });
   }
 
-  private getStartingNPageInfo = () => {
-    const head = this._arrMapped[0];
-    if (!head) {
-      console.error("Temp Mapping Storage: nothing to summary up");
-      return null;
-    }
-    const { section, owner, book, page } = head.pageInfo;
-    const availablePages = g_availablePagesInSection[section];
-
-    const pi_start: IPageSOBP = {
-      section, owner, book,
-      page: ((page - (head.pdfDesc.pageNo - 1)) + availablePages) % availablePages,
-    }
-
-
-
-    return pi_start;
-
-  }
-
-  private insertDummy = (pi: IPageSOBP) => {
+  private insertDummy = (pi: IPageSOBP, basePageInfo: IPageSOBP) => {
     /** 빈 페이지를 채워 넣자 */
     const arr = [];
     for (let i = 0; i < this._arrMapped.length; i++) {
@@ -82,6 +62,7 @@ export default class PdfDocMapper {
     const head = this._arrMapped[0];
     const { url, fingerprint, numPages } = head.pdfDesc;
     const availablePages = g_availablePagesInSection[pi.section];
+    const availablePages_base = g_availablePagesInSection[basePageInfo.section];
     for (let pgNo = 1; pgNo <= numPages; pgNo++) {
       const idx = arr.indexOf(pgNo);
 
@@ -94,18 +75,46 @@ export default class PdfDocMapper {
 
         item.pdfDesc.pageNo = pgNo;
         item.pageInfo.page = (pi.page + (pgNo - 1)) % availablePages;
+        item.basePageInfo.page = (basePageInfo.page + (pgNo - 1)) % availablePages;
         this.push(item);
       }
     }
   }
 
+
+  private getStartingNPageInfo = () => {
+    const head = this._arrMapped[0];
+    if (!head) {
+      console.error("Temp Mapping Storage: nothing to summary up");
+      return [undefined, undefined];
+    }
+
+    const { section, owner, book, page } = head.pageInfo;
+    const availablePages = g_availablePagesInSection[section];
+    const printCodeStart: IPageSOBP = {
+      section, owner, book,
+      page: ((page - (head.pdfDesc.pageNo - 1)) + availablePages) % availablePages,
+    }
+
+    const { section: s0, owner: o0, book: b0, page: p0 } = head.basePageInfo;
+    const availablePages0 = g_availablePagesInSection[s0];
+    const baseCodeStart: IPageSOBP = {
+      section: s0, owner: o0, book: b0,
+      page: ((p0 - (head.pdfDesc.pageNo - 1)) + availablePages0) % availablePages0,
+    }
+
+
+    return [printCodeStart, baseCodeStart];
+  }
+
+
   public makeSummary = () => {
     /** PDF 파일 전체의 첫 페이지에 해당하는 ncode 정보를 가져온다 */
-    const pi_start = this.getStartingNPageInfo();
-    if (!pi_start) return;
+    const [printCodeStart, baseCodeStart] = this.getStartingNPageInfo();
+    if (!printCodeStart) return;
 
     /** 빈 페이지에 더미 데이터를 채워 넣는다 */
-    this.insertDummy(pi_start);
+    this.insertDummy(printCodeStart, baseCodeStart);
 
     /** 파일 전체의 매핑 정보를 기록해 둔다 */
     const head = this._arrMapped[0];
@@ -114,19 +123,22 @@ export default class PdfDocMapper {
 
 
     this._docMap = {
-      url, fingerprint, id, numPages,
+      url, numPages,
+      fingerprint, id,
+      pagesPerSheet: this._pagesPerSheet,
       filename: this._filename,
-      nPageStart: pi_start,
+      printPageInfo: printCodeStart,
+      basePageInfo: baseCodeStart,
       params: this._arrMapped,
       timeString: Util.getNowTimeStr(),
     }
 
-    console.log(`${numPages}: starting from ${Util.makeNPageIdStr(pi_start)}`);
-    for (let i = 0; i < this._arrMapped.length; i++) {
-      const pageNo = this._arrMapped[i].pdfDesc.pageNo;
-      const pageInfo = this._arrMapped[i].pageInfo;
-      console.log(`         ${pageNo}/${numPages}: ${Util.makeNPageIdStr(pageInfo)}`);
-    }
+    // console.log(`${numPages}: starting from ${Util.makeNPageIdStr(printCodeStart)}`);
+    // for (let i = 0; i < this._arrMapped.length; i++) {
+    //   const pageNo = this._arrMapped[i].pdfDesc.pageNo;
+    //   const pageInfo = this._arrMapped[i].pageInfo;
+    //   console.log(`         ${pageNo}/${numPages}: ${Util.makeNPageIdStr(pageInfo)}`);
+    // }
 
   }
 

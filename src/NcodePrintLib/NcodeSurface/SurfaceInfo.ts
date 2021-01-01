@@ -1,5 +1,5 @@
 import { paperType } from "./NcodeSurfaceDataJson";
-import { INcodeSurfaceDesc, IPaperSize } from "./SurfaceDataTypes";
+import { INoteServerItem, IPaperSize } from "./SurfaceDataTypes";
 
 import { IPageSOBP, INcodeSOBPxy, ISize, UNIT_TO_DPI } from "../DataStructure/Structures";
 import { INCH_TO_MM_SCALE, NCODE_TO_INCH_SCALE, PDF_DEFAULT_DPI } from "./NcodeConstans";
@@ -70,8 +70,8 @@ export function isPUI(pageInfo: INcodeSOBPxy): boolean {
  * @param pageInfo
  * @return paper size in NU
  */
-function getNPaperSize_nu(item: IPageSOBP | INcodeSurfaceDesc): ISize {
-  let desc = item as INcodeSurfaceDesc;
+function getNPaperSize_nu(item: IPageSOBP | INoteServerItem): ISize {
+  let desc = item as INoteServerItem;
 
   if (!Object.prototype.hasOwnProperty.call(item, "margin")) {
     const pageInfo = item as IPageSOBP;
@@ -85,7 +85,7 @@ function getNPaperSize_nu(item: IPageSOBP | INcodeSurfaceDesc): ISize {
 }
 
 
-function getNPaperSize_dpi(item: IPageSOBP | INcodeSurfaceDesc, dpi: number): ISize {
+function getNPaperSize_dpi(item: IPageSOBP | INoteServerItem, dpi: number): ISize {
   // const { section, owner, book, page } = pageInfo;
   const size = getNPaperSize_nu(item);
 
@@ -95,7 +95,7 @@ function getNPaperSize_dpi(item: IPageSOBP | INcodeSurfaceDesc, dpi: number): IS
   }
 }
 
-export function getNPaperSize_pu(item: IPageSOBP | INcodeSurfaceDesc): ISize {
+export function getNPaperSize_pu(item: IPageSOBP | INoteServerItem): ISize {
   return getNPaperSize_dpi(item, PDF_DEFAULT_DPI);
 }
 
@@ -113,9 +113,14 @@ export function getMediaSize_pu(mediaType: IPaperSize): ISize {
  * paper size를 해당 inch 단위로 돌려 준다.
  * @param pageInfo
  */
-export function getNPaperInfo(pageInfo: IPageSOBP): INcodeSurfaceDesc {
-  const { section, owner, book } = pageInfo;
-
+export function getNPaperInfo(pageInfo: IPageSOBP): INoteServerItem {
+  let section = -1, owner = -1, book = -1;
+  if( pageInfo ) {
+    section = pageInfo.section;
+    owner = pageInfo.owner;
+    book = pageInfo.book;
+  }
+  // const { section, owner, book } = pageInfo;
 
   let found = paperType.paperA4_dummy;
   let found_key = "paperA4_dummy";
@@ -135,7 +140,7 @@ export function getNPaperInfo(pageInfo: IPageSOBP): INcodeSurfaceDesc {
     }
   }
 
-  const desc: INcodeSurfaceDesc = {
+  const desc: INoteServerItem = {
     id: found_key,
     pageInfo,
     margin: {

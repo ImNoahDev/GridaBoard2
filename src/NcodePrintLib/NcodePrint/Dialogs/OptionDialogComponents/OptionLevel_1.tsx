@@ -7,6 +7,13 @@ import { ILeveledDialogProps, LineBreak, useLevelDialogStyles, cellRadioStyle } 
 import { SelectField } from './SelectField';
 import { MediaSize } from '../../..';
 
+function EmptryTableRow() {
+  return (
+    <TableRow style={{ height: "24px" }}><TableCell colSpan={2} style={cellRadioStyle}>
+      {/* <hr /> */}
+    </TableCell> </TableRow>
+  )
+}
 
 function OptionLevel_1(props: ILeveledDialogProps) {
   const { optionLevel, printOption, handleChange2, color } = props;
@@ -26,20 +33,20 @@ function OptionLevel_1(props: ILeveledDialogProps) {
   // console.log(`OptionLevel1: level=${optionLevel}`);
   const msg = optionLevel > 0 ? "고급 설정 닫기" : "고급 설정 열기";
 
-  const mapper = MappingStorage.getInstance();
-  const newNcode = mapper.getNextIssuableNcodeInfo();
+  const msi = MappingStorage.getInstance();
+  const [newBaseCode, newPrintCode] = msi.getNextIssuablePageInfo(printOption);
 
   // console.log(printOption);
   const help = printOption.showTooltip;
 
   let newCodeOnly = false;
-  if (printOption.pageInfo.page === -1) {
+  if (printOption.needToIssueBaseCode) {
     newCodeOnly = true;
   }
 
   const ncodeA4 = !printOption.hasToPutNcode;
 
-  const newCodeWillUsed = printOption.needToIssueCode || printOption.forceToIssueNewCode;
+  const newCodeWillUsed = printOption.needToIssueBaseCode || printOption.forceToUpdateBaseCode;
 
   const mediaNames = Object.keys(MediaSize);
   return (
@@ -115,7 +122,8 @@ function OptionLevel_1(props: ILeveledDialogProps) {
             <TableCell colSpan={2} style={cellRadioStyle}>
               <RadioField showHelp={help} colSpan={2} disabled={newCodeOnly || ncodeA4} checked={!newCodeWillUsed} handleChange={handleChange2} color={color}
                 name="sameCode">
-                이전 인쇄물과 같은 페이지로 인쇄: {makeNPageIdStr(printOption.pageInfo)}
+                {printOption.needToIssueBaseCode ? "이전 ID로 인쇄할 수 없음" : "이전 ID로 인쇄: "}
+                {printOption.needToIssueBaseCode ? "" : makeNPageIdStr(printOption.prevBasePageInfo)}
               </RadioField >
             </TableCell>
           </TableRow>
@@ -123,14 +131,54 @@ function OptionLevel_1(props: ILeveledDialogProps) {
 
           <TableRow className={classes.tr}>
             <TableCell colSpan={2} style={cellRadioStyle}>
-              <RadioField showHelp={help} colSpan={2} disabled={newCodeOnly || ncodeA4} checked={newCodeWillUsed && !ncodeA4} handleChange={handleChange2} color={color} name="newNcode">
-                새로운 페이지에서 시작하도록 인쇄: {makeNPageIdStr(newNcode)}~
+              <RadioField showHelp={help} colSpan={2} disabled={newCodeOnly || ncodeA4} checked={newCodeWillUsed && !ncodeA4} handleChange={handleChange2}
+                color={color} name="newNcode">
+                새로운 ID로 인쇄: {makeNPageIdStr(newBaseCode)}~
               </RadioField >
             </TableCell>
           </TableRow>
 
 
+          <EmptryTableRow />
 
+
+          <TableRow className={classes.tr}>
+            <TableCell colSpan={2} style={cellRadioStyle}>
+              <RadioField showHelp={help} colSpan={2} disabled={true} checked={newCodeWillUsed && !ncodeA4} handleChange={handleChange2}
+                color={color} name="ncodePrint">
+                (내부 상태) 인쇄 Ncode 정보
+                {printOption.needToIssuePrintCode ? "(새코드)" : "(이전코드)"} :
+                {makeNPageIdStr(printOption.printPageInfo)}~
+              </RadioField >
+            </TableCell>
+          </TableRow>
+
+          <TableRow className={classes.tr}>
+            <TableCell colSpan={2} style={cellRadioStyle}>
+              <RadioField showHelp={help} colSpan={2} disabled={true} checked={printOption.needToIssueBaseCode} handleChange={handleChange2}
+                color={color} name="needToIssueBaseCode">
+                (상태) needToIssueBaseCode: {printOption.needToIssueBaseCode ? "true" : "false"}
+              </RadioField >
+            </TableCell>
+          </TableRow>
+
+          <TableRow className={classes.tr}>
+            <TableCell colSpan={2} style={cellRadioStyle}>
+              <RadioField showHelp={help} colSpan={2} disabled={true} checked={printOption.needToIssuePrintCode} handleChange={handleChange2}
+                color={color} name="needToIssuePrintCode">
+                (상태) needToIssuePrintCode: {printOption.needToIssuePrintCode ? "true" : "false"}
+              </RadioField >
+            </TableCell>
+          </TableRow>
+
+          <TableRow className={classes.tr}>
+            <TableCell colSpan={2} style={cellRadioStyle}>
+              <RadioField showHelp={help} colSpan={2} disabled={true} checked={printOption.forceToUpdateBaseCode} handleChange={handleChange2}
+                color={color} name="forceToUpdateBaseCode">
+                (선택) forceToUpdateBaseCode: {printOption.forceToUpdateBaseCode ? "true" : "false"}
+              </RadioField >
+            </TableCell>
+          </TableRow>
 
         </TableBody>
       </Table>

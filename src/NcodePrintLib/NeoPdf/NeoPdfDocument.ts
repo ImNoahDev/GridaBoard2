@@ -1,15 +1,14 @@
 import * as PdfJs from "pdfjs-dist";
-import { CoordinateTanslater, IPageMapItem, IPdfToNcodeMapItem, IPolygonArea } from "../Coordinates";
-import { IPageSOBP, stringToDpiNum, } from "../DataStructure/Structures";
-import { IPageOverview } from "../NcodePrint/HtmlRenderPrint/PagesForPrint";
-import { ColorConvertMethod } from "../NcodeSurface/CanvasColorConverter";
+import { CoordinateTanslater,  IPdfToNcodeMapItem, IPolygonArea } from "../Coordinates";
+import { IPageOverview, IPageSOBP, stringToDpiNum, } from "../DataStructure/Structures";
 import { getNcodeAtCanvasPixel, getNcodeRectAtCanvasPixel, ICellsOnSheetDesc } from "../NcodeSurface/NcodeRasterizer";
 import { MappingItem, MappingStorage } from "../SurfaceMapper";
-import NeoPdfPage, { IPdfPageCanvasDesc, IThumbnailDesc, PDF_VIEWPORT_DESC } from "./NeoPdfPage";
+import NeoPdfPage, { IPdfPageCanvasDesc, PDF_VIEWPORT_DESC } from "./NeoPdfPage";
 
 import * as Util from "../UtilFunc";
 import { IPrintOption, IProgressCallbackFunction } from "../NcodePrint/PrintDataTypes";
-import { uuidv4 } from "../UtilFunc";
+import { makeNPageId, makePdfId, uuidv4 } from "../UtilFunc";
+import { BASECODE_PAGES_PER_SHEET } from "../SurfaceMapper/MappingStorage";
 
 const CMAP_URL = "./cmaps/";
 const CMAP_PACKED = true;
@@ -97,7 +96,6 @@ export default class NeoPdfDocument {
       }
 
       this.refreshNcodeMappingTable();
-
       await this.setPageOverview();
       return this;
     }
@@ -111,9 +109,12 @@ export default class NeoPdfDocument {
    * MappingStorage가 변하고 나면, 로드된 모든 PDF에 이 함수를 한번씩 불러줘야 한다
    */
   public refreshNcodeMappingTable = () => {
-    const mapper = MappingStorage.getInstance();
-    const docMaps: IPdfToNcodeMapItem[] = mapper.findAssociatedNcode(this.fingerprint);
+    const msi = MappingStorage.getInstance();
 
+    const mapItems = msi.findAssociatedNcode(this.fingerprint, BASECODE_PAGES_PER_SHEET);
+    const docMaps = mapItems.theSames;
+
+    // unique하므로 배열이 아닌 하나 밖에 안나올텐데, 이렇게 써 둔다.
     docMaps.forEach( docMap => this.addNcodeMapping(docMap));
   }
 
@@ -187,117 +188,117 @@ export default class NeoPdfDocument {
     }
   }
 
-  public renderPages_dpi = async (pageNums: number[], dpi: number, printOption: IPrintOption, progressCallback: IProgressCallbackFunction)
-    : Promise<IPdfPageCanvasDesc[]> => {
-    const { colorMode, luminanceMaxRatio } = printOption;
-    const pdfDpi = dpi;
+  // public renderPages_dpi = async (pageNums: number[], dpi: number, printOption: IPrintOption, progressCallback: IProgressCallbackFunction)
+  //   : Promise<IPdfPageCanvasDesc[]> => {
+  //   const { colorMode, luminanceMaxRatio } = printOption;
+  //   const pdfDpi = dpi;
 
-    const promises: Promise<IPdfPageCanvasDesc>[] = [];
-    for (let i = 0; i < pageNums.length; i++) {
-      const pageNo = pageNums[i];
-      const neoPage = await this.getPageAsync(pageNo);
-      if (progressCallback) progressCallback();
+  //   const promises: Promise<IPdfPageCanvasDesc>[] = [];
+  //   for (let i = 0; i < pageNums.length; i++) {
+  //     const pageNo = pageNums[i];
+  //     const neoPage = await this.getPageAsync(pageNo);
+  //     if (progressCallback) progressCallback();
 
-      const pr = neoPage.render_dpi(i, pdfDpi).then(async (canvasDesc) => {
-        const convertResult = await neoPage.convertColor(canvasDesc, colorMode, luminanceMaxRatio);
-        if (progressCallback) progressCallback();
+  //     const pr = neoPage.render_dpi(i, pdfDpi).then(async (canvasDesc) => {
+  //       const convertResult = await neoPage.convertColor(canvasDesc, colorMode, luminanceMaxRatio);
+  //       if (progressCallback) progressCallback();
 
-        return convertResult;
-      })
-      promises.push(pr);
-    }
-    const descs = await Promise.all(promises);
+  //       return convertResult;
+  //     })
+  //     promises.push(pr);
+  //   }
+  //   const descs = await Promise.all(promises);
 
-    const pageImageDescs: IPdfPageCanvasDesc[] = new Array(descs.length);
-    descs.forEach(async (canvasDesc) => {
-      const { index } = canvasDesc;
-      pageImageDescs[index] = canvasDesc;
-      // console.log(`[Multipage] page rendered ${canvasDesc.pdfPageInfo.pageNo}, index ${index}`);
-    });
+  //   const pageImageDescs: IPdfPageCanvasDesc[] = new Array(descs.length);
+  //   descs.forEach(async (canvasDesc) => {
+  //     const { index } = canvasDesc;
+  //     pageImageDescs[index] = canvasDesc;
+  //     // console.log(`[Multipage] page rendered ${canvasDesc.pdfPageInfo.pageNo}, index ${index}`);
+  //   });
 
-    // let converterPromises = [];
-    // descs.forEach(async (canvasDesc) => {
-    //   const { index } = canvasDesc;
-    //   pageImageDescs[index] = canvasDesc;
+  //   // let converterPromises = [];
+  //   // descs.forEach(async (canvasDesc) => {
+  //   //   const { index } = canvasDesc;
+  //   //   pageImageDescs[index] = canvasDesc;
 
-    //   const pdfCanvas = canvasDesc.canvas;
-    //   const converter = new CanvasColorConverter(pdfCanvas);
-    //   const pr = converter.convert(colorConvertMode);
-    //   converterPromises.push(pr);
-    // });
-    return pageImageDescs;
-  }
-
-
-  generateMappingItems = (pageImagesDesc: IPdfPageCanvasDesc[], ncodePlane: ICellsOnSheetDesc, needToIssueCode: boolean) => {
-    const array: CoordinateTanslater[] = [];
-
-    for (let i = 0; i < ncodePlane.ncodeAreas.length; i++) {
-      const desc = pageImagesDesc[i];
-      const pdfRect = desc.drawnRect;
-      const ncode = ncodePlane.ncodeAreas[i];
-
-      const mapData = new MappingItem();
-
-      /** canvas 좌표계 */
-      const { x, y, unit, width, height } = pdfRect;
-      const dpi = stringToDpiNum(unit);
-
-      /** Ncode 좌표계 */
-      const pt0_nu = getNcodeAtCanvasPixel({ x, y, dpi }, ncodePlane);
-      const pt1_nu = getNcodeAtCanvasPixel({ x: x + width, y: y + height, dpi }, ncodePlane);
-
-      const pdfRect_nu = getNcodeRectAtCanvasPixel({ dpi, x, y, width, height }, ncodePlane);
-
-      /** 페이지에 해당하는 ncode가 인쇄된 영역 */
-      const r_nu = ncode.rect;
-      const polygon: IPolygonArea = [
-        { x: r_nu.x, y: r_nu.y },
-        { x: r_nu.x + r_nu.width, y: r_nu.y },
-        { x: r_nu.x + r_nu.width, y: r_nu.y + r_nu.height },
-        { x: r_nu.x, y: r_nu.y + r_nu.height },
-      ];
-
-      mapData.setNcodeArea({
-        pageInfo: ncode.pageInfo,
-        pdfDrawnRect: { ...pdfRect_nu },
-        npageArea: polygon,
-      });
+  //   //   const pdfCanvas = canvasDesc.canvas;
+  //   //   const converter = new CanvasColorConverter(pdfCanvas);
+  //   //   const pr = converter.convert(colorConvertMode);
+  //   //   converterPromises.push(pr);
+  //   // });
+  //   return pageImageDescs;
+  // }
 
 
-      /** PDF 좌표계 */
-      mapData.setPdfArea({
-        pdfPageInfo: { ...desc.pdfPageInfo },
-        rect: {
-          unit: "pu",
-          x: 0, y: 0,
-          width: desc.width_pu,
-          height: desc.height_pu,
-        }
-      });
+  // generateMappingItems = (pageImagesDesc: IPdfPageCanvasDesc[], ncodePlane: ICellsOnSheetDesc, needToIssuePrintCode: boolean) => {
+  //   const array: CoordinateTanslater[] = [];
 
-      const trans = new CoordinateTanslater();
-      trans.calc(mapData);
-      array.push(trans);
+  //   for (let i = 0; i < ncodePlane.ncodeAreas.length; i++) {
+  //     const desc = pageImagesDesc[i];
+  //     const pdfRect = desc.drawnRect;
+  //     const ncode = ncodePlane.ncodeAreas[i];
 
-      // const pageNo = desc.pdfPageInfo.pageNo;
-      // const page = this.getPage(pageNo);
-      // page.setTranslater(trans);
+  //     const mapData = new MappingItem();
 
-      // if (needToIssueCode) {
-      //   const st = MappingStorage.getInstance();
-      //   st.register(trans);
-      // }
-      // trans.dump(`[dump-${this._url}]-${i} `);
-    }
+  //     /** canvas 좌표계 */
+  //     const { x, y, unit, width, height } = pdfRect;
+  //     const dpi = stringToDpiNum(unit);
 
-    return array;
+  //     /** Ncode 좌표계 */
+  //     const pt0_nu = getNcodeAtCanvasPixel({ x, y, dpi }, ncodePlane);
+  //     const pt1_nu = getNcodeAtCanvasPixel({ x: x + width, y: y + height, dpi }, ncodePlane);
 
-  }
+  //     const pdfRect_nu = getNcodeRectAtCanvasPixel({ dpi, x, y, width, height }, ncodePlane);
 
-  setDocumentId = (pagesPerSheet: number) => {
-    this._id = Util.makePdfId(this._fingerprint, pagesPerSheet);
-  }
+  //     /** 페이지에 해당하는 ncode가 인쇄된 영역 */
+  //     const r_nu = ncode.rect;
+  //     const polygon: IPolygonArea = [
+  //       { x: r_nu.x, y: r_nu.y },
+  //       { x: r_nu.x + r_nu.width, y: r_nu.y },
+  //       { x: r_nu.x + r_nu.width, y: r_nu.y + r_nu.height },
+  //       { x: r_nu.x, y: r_nu.y + r_nu.height },
+  //     ];
+
+  //     mapData.setNcodeArea({
+  //       pageInfo: ncode.pageInfo,
+  //       pdfDrawnRect: { ...pdfRect_nu },
+  //       npageArea: polygon,
+  //     });
+
+
+  //     /** PDF 좌표계 */
+  //     mapData.setPdfArea({
+  //       pdfPageInfo: { ...desc.pdfPageInfo },
+  //       rect: {
+  //         unit: "pu",
+  //         x: 0, y: 0,
+  //         width: desc.width_pu,
+  //         height: desc.height_pu,
+  //       }
+  //     });
+
+  //     const trans = new CoordinateTanslater();
+  //     trans.calc(mapData);
+  //     array.push(trans);
+
+  //     // const pageNo = desc.pdfPageInfo.pageNo;
+  //     // const page = this.getPage(pageNo);
+  //     // page.setTranslater(trans);
+
+  //     // if (needToIssuePrintCode) {
+  //     //   const msi = MappingStorage.getInstance();
+  //     //   msi.register(trans);
+  //     // }
+  //     // trans.dump(`[dump-${this._url}]-${i} `);
+  //   }
+
+  //   return array;
+
+  // }
+
+  // setDocumentId = (pagesPerSheet: number) => {
+  //   this._id = Util.makePdfId(this._fingerprint, pagesPerSheet);
+  // }
 
   get id() {
     return this._id;
@@ -348,8 +349,8 @@ export default class NeoPdfDocument {
     return this.direction;
   }
 
-  setNcodeAssigned = (pdfMapDesc: IPdfToNcodeMapItem) => {
-    this._ncodeAssigned = MappingStorage.makeAssignedNcodeArray(pdfMapDesc.nPageStart, this.numPages);
+  setNcodeAssigned = (pdfToNcodeMap: IPdfToNcodeMapItem) => {
+    this._ncodeAssigned = MappingStorage.makeAssignedNcodeArray(pdfToNcodeMap.printPageInfo, this.numPages);
   }
 
   getPageNcode = (pageNo: number) => {

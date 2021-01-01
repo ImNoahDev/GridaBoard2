@@ -98,8 +98,7 @@ function OptionLevel_0(props: ILeveledDialogProps) {
   // console.log(`OptionLevel1: level=${optionLevel}`);
   const msg = optionLevel > 0 ? "고급 설정 닫기" : "고급 설정 열기";
 
-  const mapper = MappingStorage.getInstance();
-  const newNcode = mapper.getNextIssuableNcodeInfo();
+  const msi = MappingStorage.getInstance();
 
   // console.log(printOption);
   const help = printOption ? printOption.showTooltip : true;

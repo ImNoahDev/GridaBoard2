@@ -1,31 +1,33 @@
 import { IPageSOBP } from "../DataStructure/Structures";
 import * as Zlib from "zlib";
-import { INcodeSurfaceDesc } from "./SurfaceDataTypes";
+import { INoteServerItem } from "./SurfaceDataTypes";
 import { getNPaperInfo } from "./SurfaceInfo";
 import * as Util from "../UtilFunc";
 import { makeNPageIdStr } from "../UtilFunc";
+import { sprintf } from "sprintf-js";
 
 
 /**
  * Class
  */
 export default class NcodeFetcher {
-  private codeText = "";
-  private fetchPromise: Promise<string> = Promise.resolve("");
   pageInfo: IPageSOBP;
+  private codeText = "";
+
+  // private fetchPromise: Promise<string> = Promise.resolve("");
 
 
-  constructor(pageInfo: IPageSOBP) {
-    this.pageInfo = pageInfo;
-    console.log(`[fetch] CONSTRUCTOR, Download NCODE: ${makeNPageIdStr(pageInfo)}`);
-    const pr = this.fetchNcodeData(pageInfo);
-    this.fetchPromise = pr;
+  // constructor(pageInfo: IPageSOBP) {
+  //   this.pageInfo = pageInfo;
+  //   console.log(`[fetch] CONSTRUCTOR, Download NCODE: ${makeNPageIdStr(pageInfo)}`);
+  //   const pr = this.fetchNcodeData(pageInfo);
+  //   this.fetchPromise = pr;
 
-    pr.then(txt => {
-      console.log(`[fetch] CONSTRUCTOR, Download completed: ${makeNPageIdStr(pageInfo)}`);
-      this.codeText = txt;
-    });
-  }
+  //   pr.then(txt => {
+  //     console.log(`[fetch] CONSTRUCTOR, Download completed: ${makeNPageIdStr(pageInfo)}`);
+  //     this.codeText = txt;
+  //   });
+  // }
 
 
   /**
@@ -33,27 +35,39 @@ export default class NcodeFetcher {
    * 코드 정보를 받아올 때 나중에는 x margin, y margin도 서버에서 받아오게 해야 한다 2020/11/26
    * @param pageInfo
    */
-  public getNcodeData = async (pageInfo: IPageSOBP): Promise<INcodeSurfaceDesc> => {
+
+  // public getNcodeData = async (pageInfo: IPageSOBP) => {
+  //   // glyph text를 받아 온다.
+  //   let code_txt = "";
+  //   if (Util.isSamePage(this.pageInfo, pageInfo)) {
+  //     console.log(`[fetch] wait for: ${makeNPageIdStr(pageInfo)}`);
+  //     code_txt = await this.fetchPromise;
+  //     console.log(`[fetch] download completed: ${makeNPageIdStr(pageInfo)} len=${code_txt.length}`);
+  //     this.codeText = code_txt;
+  //   }
+  //   else {
+  //     console.log(`[fetch] Download new NCODE: ${makeNPageIdStr(pageInfo)}`);
+  //     const promise = this.fetchNcodeData(pageInfo);
+  //     this.fetchPromise = promise;
+  //     code_txt = await this.fetchPromise;
+  //     console.log(`[fetch] download NEW completed: ${makeNPageIdStr(pageInfo)} len=${code_txt.length}`);
+
+  //     this.pageInfo = pageInfo;
+  //     this.codeText = code_txt;
+  //   }
+
+  //   const result: INoteServerItem = getNPaperInfo(pageInfo);
+  //   result.glyphData = code_txt;
+
+  //   return result;
+  // }
+  public getNcodeData = async (pageInfo: IPageSOBP) => {
     // glyph text를 받아 온다.
-    let code_txt = "";
-    if (Util.isSamePage(this.pageInfo, pageInfo)) {
-      console.log(`[fetch] wait for: ${makeNPageIdStr(pageInfo)}`);
-      code_txt = await this.fetchPromise;
-      console.log(`[fetch] download completed: ${makeNPageIdStr(pageInfo)} len=${code_txt.length}`);
-      this.codeText = code_txt;
-    }
-    else {
-      console.log(`[fetch] Download new NCODE: ${makeNPageIdStr(pageInfo)}`);
-      const promise = this.fetchNcodeData(pageInfo);
-      this.fetchPromise = promise;
-      code_txt = await this.fetchPromise;
-      console.log(`[fetch] download NEW completed: ${makeNPageIdStr(pageInfo)} len=${code_txt.length}`);
+    const code_txt = await this.fetchNcodeData(pageInfo);
+    this.pageInfo = pageInfo;
+    this.codeText = code_txt;
 
-      this.pageInfo = pageInfo;
-      this.codeText = code_txt;
-    }
-
-    const result: INcodeSurfaceDesc = getNPaperInfo(pageInfo);
+    const result: INoteServerItem = getNPaperInfo(pageInfo);
     result.glyphData = code_txt;
 
     return result;
@@ -66,19 +80,35 @@ export default class NcodeFetcher {
     // const res = await axios.get('https://dog.ceo/api/breeds/list/all');
     // const blob = await res.blob();
 
-    console.log(`[fetch] ${pageInfo.section}.${pageInfo.owner}.${pageInfo.book}.${pageInfo.page} - URL ${url}`);
     // const blob = await fetch(url).then(res => res.blob()).catch(reason => {
     //   console.log(reason);
     // });
-    const response = await fetch(url);
+
+    let success = false;
+    let retryCount = 0;
     let blob = undefined;
-    try {
-       blob = await response.blob();
+
+    while (!success && retryCount < 3) {
+      const rand = (new Date()).getTime();
+
+      let urlRetry = url;
+      if (retryCount > 0) {
+        urlRetry = sprintf("%s?%d", url, rand);
+      }
+
+      console.log(`[fetch] ${pageInfo.section}.${pageInfo.owner}.${pageInfo.book}.${pageInfo.page} - URL ${urlRetry}`);
+      const response = await fetch(urlRetry);
+      try {
+        blob = await response.blob();
+        success = true;
+      }
+      catch (e) {
+        console.log(response);
+        console.log(e);
+        retryCount++;
+      }
     }
-    catch (e) {
-      console.log(response);
-      console.log(e);
-    }
+
     // const blob = await fetch(url).then(res => res.blob()).catch(reason => {
     //   console.log(reason);
     // });

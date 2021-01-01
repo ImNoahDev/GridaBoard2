@@ -589,7 +589,7 @@ export class NeoSmartpen {
     this.mac = mac;
     console.log(`Connected: ${mac}`);
 
-    this.manager.onConnected({ pen: this, event });
+    // this.manager.onConnected({ pen: this, event });
     this.dispatcher.dispatch(PenEventName.ON_CONNECTED, { pen: this, mac, event });
   }
 
@@ -624,7 +624,7 @@ export class NeoSmartpen {
       console.error(event);
     }
     else {
-      this.manager.onDisconnected({ pen: this, event });
+      // this.manager.onDisconnected({ pen: this, event });
       this.dispatcher.dispatch(PenEventName.ON_DISCONNECTED, { pen: this, mac, event });
     }
   }

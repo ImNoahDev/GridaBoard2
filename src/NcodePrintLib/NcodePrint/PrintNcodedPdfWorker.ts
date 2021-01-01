@@ -9,12 +9,12 @@ import { MappingStorage, PdfDocMapper } from "../SurfaceMapper";
 
 import { SheetRendererManager } from "../NcodeSurface/SheetRendererManager";
 import { IPrintingSheetDesc } from "../NcodeSurface/SheetRenderer";
-import { convertUnit, getExtensionName, getFilenameOnly, getNcodedPdfName, makeNPageIdStr, makePdfId, sleep, uuidv4 } from "../UtilFunc";
+import { cloneObj, convertUnit, getExtensionName, getFilenameOnly, getNcodedPdfName, makeNPageIdStr, makePdfId, sleep, uuidv4 } from "../UtilFunc";
 import { PageSizes, PDFDict, PDFDocument, PDFHexString, PDFName } from "pdf-lib";
 import { saveAs } from "file-saver";
 import printJS from "print-js";
 import { _app_name, _lib_name, _version } from "../Version";
-import { g_nullNcode, g_defaultPrintOption } from "../DefaultOption";
+import { g_nullNcode, g_defaultPrintOption, nullNcode } from "../DefaultOption";
 
 
 // https://stackoverflow.com/questions/9616426/javascript-print-iframe-contents-only/9616706
@@ -58,16 +58,18 @@ export default class PrintNcodedPdfWorker {
   private reportProgress?: (arg: IPrintingReport) => void;
 
   constructor(props: Props, reportProgress?: (arg: IPrintingReport) => void) {
-    this.printOption = this.setDefaultPrintOption(g_defaultPrintOption);
+    this.printOption = cloneObj(g_defaultPrintOption);
+    this.setDefaultPrintOption(cloneObj(g_defaultPrintOption), undefined);
+
     this.url = props.url;
     this.filename = props.filename;
     this.reportProgress = reportProgress;
   }
 
-  private setDefaultPrintOption = (printOption: IPrintOption) => {
-    printOption.pageInfo = { ...g_nullNcode };
-    return printOption;
-  }
+  // private setDefaultPrintOption = (printOption: IPrintOption) => {
+  //   printOption.pageInfo = { ...g_nullNcode };
+  //   return printOption;
+  // }
 
   private setStatus = (status: string) => {
     this.status = status;
@@ -102,6 +104,35 @@ export default class PrintNcodedPdfWorker {
     return loaded;
   }
 
+  /**
+   * @param printOption - in/out
+   * @param pdf - in
+   */
+  private setDefaultPrintOption = (printOption: IPrintOption, pdf: NeoPdfDocument) => {
+    let pdfToNcodeMap: IPdfToNcodeMapItem = undefined;
+
+    if (pdf) {
+      // 기본 값으로는 모든 페이지를 인쇄하도록
+      printOption.fingerprint = pdf.fingerprint;
+      printOption.docNumPages = pdf.numPages;
+      printOption.targetPages = Array.from({ length: printOption.docNumPages }, (_, i) => i + 1);
+
+      // 이전에 매핑되었던 값을 찾아서 기본값으로 설정해 둔다
+      const msi = MappingStorage.getInstance();
+      pdfToNcodeMap = msi.getAssociatedMappingInfo(printOption.fingerprint, printOption.pagesPerSheet, printOption.docNumPages);
+
+      const partOption = msi.getCodePrintInfo(printOption, undefined);
+      for (const key in partOption) printOption[key] = partOption[key];
+    }
+    else {
+      printOption.needToIssuePrintCode = true;
+      printOption.forceToUpdateBaseCode = true;
+      printOption.printPageInfo = { ...g_nullNcode };
+      printOption.basePageInfo = { ...g_nullNcode };
+    }
+
+    return pdfToNcodeMap;
+  }
 
   public startPrint = async (url: string, filename: string, printOptionCallback: IPrintOptionCallbackType) => {
     this.setStatus("loading");
@@ -115,23 +146,10 @@ export default class PrintNcodedPdfWorker {
     }
 
     this.setStatus("configuring");
-    printOption.fingerprint = pdf.fingerprint;
 
-    // PrintPdfMain의 printTrigger를 +1 해 주면, 인쇄가 시작된다
-    let pdfMapDesc = this.getAssociatedMappingInfo(printOption, pdf);
-    printOption.needToIssueCode = !pdfMapDesc;
-    if (printOption.needToIssueCode) {
-      // const mapper = MappingStorage.getInstance();
-      // printOption.pageInfo = { ...mapper.getNextIssuableNcodeInfo() };
-      printOption.pageInfo = { ...g_nullNcode };
-    }
-    else {
-      printOption.pageInfo = { ...pdfMapDesc.nPageStart };
-    }
 
     // 기본 값으로는 모든 페이지를 인쇄하도록
-    printOption.docNumPages = pdf.numPages;
-    printOption.targetPages = Array.from({ length: pdf.numPages }, (_, i) => i + 1);
+    let pdfToNcodeMap = this.setDefaultPrintOption(printOption, pdf);
 
     // 기본 인쇄 옵션 외의 옵션을 이용자로부터 받는다
     if (printOptionCallback) {
@@ -141,12 +159,14 @@ export default class PrintNcodedPdfWorker {
         printOption = result;
 
         // pages per sheet가 바뀌었을 가능성이 있어서
-        pdfMapDesc = this.getAssociatedMappingInfo(printOption, pdf);
+        const msi = MappingStorage.getInstance();
+        pdfToNcodeMap = msi.getAssociatedMappingInfo(printOption.fingerprint, printOption.pagesPerSheet, printOption.docNumPages);
+        const partOption = msi.getCodePrintInfo(printOption, undefined);
+        for (const key in partOption) printOption[key] = partOption[key];
       }
       else {
         // 옵션 설정에서 취소를 눌렀다.
-        if (printOption.completedCallback)
-          printOption.completedCallback();
+        if (printOption.completedCallback) printOption.completedCallback();
         return;
       }
     }
@@ -160,18 +180,18 @@ export default class PrintNcodedPdfWorker {
 
 
     // Ncode가 필요하면 코드를 받아 온다, 여기서 받아오는 ncode page 수는 전체 PDF의 페이지 수
-    printOption.needToIssueCode = printOption.needToIssueCode || printOption.forceToIssueNewCode;
-    if (printOption.needToIssueCode) {
-      pdfMapDesc = this.getNewNcode(printOption);
-    }
+    const msi = MappingStorage.getInstance();
+    pdfToNcodeMap = msi.issueNcode(printOption);
 
     // 할당된 코드를 옵션에 세팅한다
-    pdf.setNcodeAssigned(pdfMapDesc);
-    printOption.pdfMappingDesc = pdfMapDesc;
-    printOption.pageInfo = { ...pdfMapDesc.nPageStart };
-    printOption.issuedNcodes = MappingStorage.makeAssignedNcodeArray(pdfMapDesc.nPageStart, pdf.numPages);
-
+    pdf.setNcodeAssigned(pdfToNcodeMap);
+    printOption.pdfToNcodeMap = pdfToNcodeMap;
+    printOption.printPageInfo = { ...pdfToNcodeMap.printPageInfo };
+    printOption.basePageInfo = { ...pdfToNcodeMap.basePageInfo };
+    printOption.printedNcodes = MappingStorage.makeAssignedNcodeArray(pdfToNcodeMap.printPageInfo, pdf.numPages);
+    printOption.basedNcodes = MappingStorage.makeAssignedNcodeArray(pdfToNcodeMap.basePageInfo, pdf.numPages);
     this.printOption = printOption;
+
 
     // sheet에 해당하는 페이 번호들을 세팅하고
     this.setStatus("progress");
@@ -239,7 +259,7 @@ export default class PrintNcodedPdfWorker {
     // 저장 옵션이 켜져 있으면 저장한다
     if (printOption.downloadNcodedPdf) {
       // 파일 이름을 변경하고
-      const fn = getNcodedPdfName(filename, printOption.pdfMappingDesc.nPageStart, pagesPerSheet);
+      const fn = getNcodedPdfName(filename, printOption.pdfToNcodeMap.printPageInfo, pagesPerSheet);
       saveAs(blob, fn);
     }
 
@@ -248,12 +268,15 @@ export default class PrintNcodedPdfWorker {
     this.setStatus("completed");
 
     // tempMapper 정보를 등록
-    if (printOption.needToIssueCode) {
-      const storage = MappingStorage.getInstance();
-      storage.register(tempMapping);
+    if (printOption.needToIssuePrintCode) {
+      const msi = MappingStorage.getInstance();
+      msi.register(tempMapping);
     }
 
     if (printOption.completedCallback) printOption.completedCallback();
+
+    // default print option에 복사
+    for (const key in printOption) g_defaultPrintOption[key] = printOption[key];
     return;
   }
 
@@ -274,38 +297,50 @@ export default class PrintNcodedPdfWorker {
       await sleep(10);
       await this.addSheetToPdfPage(pdfDoc, sheet, printOption);
 
-      console.log(`doc add image = ${i + 1}/${numSheets}`);
+      // console.log(`doc add image = ${i + 1}/${numSheets}`);
     }
 
     return pdfDoc;
   }
 
-  /**
-   * 이 함수를 dialog로 수정함으로써 프린터 옵션을 바꿀 수 있다.
-   */
-  private getAssociatedMappingInfo = (printOption: IPrintOption, pdf: NeoPdfDocument) => {
-    /** 코드 할당에 대한 기본 값을 써 주자 */
-    const maps = MappingStorage.getInstance();
-    const pdfMapDescArr = maps.findAssociatedNcode(pdf.fingerprint, printOption.pagesPerSheet);
-    const pdfMapDesc = pdfMapDescArr.length > 0 ? pdfMapDescArr[0] : undefined;
+  // /**
+  //  * 이 함수를 dialog로 수정함으로써 프린터 옵션을 바꿀 수 있다.
+  //  */
+  // private getAssociatedMappingInfo = (fingerprint: string, pagesPerSheet: number) => {
+  //   let needToIssuePrintCode = true;
+  //   let printPageInfo = nullNcode();
 
-    /** 코드 할당에 대한 기본값 설정 */
-    if (pdfMapDesc) {
-      const pageInfo = pdfMapDesc.nPageStart;
-      printOption.pageInfo = { ...pageInfo };
-    }
+  //   let forceToUpdateBaseCode = true;
+  //   let basePageInfo = nullNcode();
 
-    /** 기본 값으로는 모든 페이지를 인쇄하도록 */
-    const numPages = pdf.numPages;
-    printOption.docNumPages = numPages;
-    printOption.targetPages = Array.from({ length: numPages }, (_, i) => i + 1);
+  //   /** 코드 할당에 대한 기본 값을 써 주자 */
+  //   const msi = MappingStorage.getInstance();
+  //   const mapItems = msi.findAssociatedNcode(fingerprint, pagesPerSheet);
+  //   // const pdfToNcodeMapArr = maps.findAssociatedNcode(fingerprint, pagesPerSheet);
+  //   const pdfToNcodeMap: IPdfToNcodeMapItem = mapItems.theSame.length > 0 ? mapItems.theSame[0] : undefined;
+  //   const pdfMapBase = mapItems.theBase;
 
-    // 1,2 페이지만 인쇄
-    // printOption.targetPages = Array.from({ length: 2 }, (_, i) => i + 1);
-    // printOption.debugMode = 0;
+  //   /** 코드 할당에 대한 기본값 설정 */
+  //   if (pdfToNcodeMap) {
+  //     needToIssuePrintCode = false;
+  //     printPageInfo = { ...pdfToNcodeMap.printPageInfo }
+  //   }
 
-    return pdfMapDesc;
-  }
+  //   if (pdfMapBase) {
+  //     forceToUpdateBaseCode = false;
+  //     basePageInfo = { ...pdfMapBase.basePageInfo };
+  //   }
+
+  //   return {
+  //     pdfToNcodeMap: pdfToNcodeMap,
+
+  //     needToIssuePrintCode,
+  //     printPageInfo,
+
+  //     forceToUpdateBaseCode,
+  //     basePageInfo,
+  //   }
+  // }
 
   private genaratePageNumsInSheets = (targetPages: number[], pagesPerSheet: number) => {
     const numPages = targetPages.length;
@@ -326,20 +361,21 @@ export default class PrintNcodedPdfWorker {
   }
 
   private getNewNcode = (printOption: IPrintOption) => {
-    const { pagesPerSheet, hasToPutNcode, url, filename } = printOption;
+    // const { pagesPerSheet, url, filename } = printOption;
 
-    const { pdf } = this;
+    // const { pdf } = this;
 
-    const option: IPdfToNcodeMapItem = {
-      url,
-      filename,
-      fingerprint: pdf.fingerprint,
-      id: makePdfId(pdf.fingerprint, pagesPerSheet as number),
-      numPages: pdf.numPages,
-    }
-    const instance = MappingStorage.getInstance();
-    const pdfMappingDesc = instance.issueNcode(option);
-    return pdfMappingDesc;
+    // const option: IPdfToNcodeMapItem = {
+    //   url,
+    //   filename,
+    //   fingerprint: pdf.fingerprint,
+    //   pagesPerSheet,
+    //   id: makePdfId(pdf.fingerprint, pagesPerSheet as number),
+    //   numPages: pdf.numPages,
+    // }
+    const msi = MappingStorage.getInstance();
+    const pdfToNcodeMap = msi.issueNcode(printOption);
+    return pdfToNcodeMap;
   }
 
   private addSheetToPdfPage = async (pdfDoc: PDFDocument, sheet, printOption: IPrintOption) => {
@@ -417,7 +453,7 @@ export default class PrintNcodedPdfWorker {
     console.log(meta);
 
     const filename = getFilenameOnly(printOption.filename) + "." + getExtensionName(printOption.filename);
-    const ncodeStr = makeNPageIdStr(printOption.pdfMappingDesc.nPageStart);
+    const ncodeStr = makeNPageIdStr(printOption.pdfToNcodeMap.printPageInfo);
 
     pdfDoc.setTitle(meta.info.title ? meta.info.title : filename);
     pdfDoc.setAuthor('Gridaboard');
@@ -429,7 +465,7 @@ export default class PrintNcodedPdfWorker {
 
     pdfDoc.setKeywords(['Gridaboard', 'Ncode', 'Neosmartpen', 'NeoLAB', "Smartpen",
       `${pagesPerSheet}_pagesPerSheet`,
-      `${makeNPageIdStr(printOption.pdfMappingDesc.nPageStart)}`]);
+      `${makeNPageIdStr(printOption.pdfToNcodeMap.printPageInfo)}`]);
 
     this.setMetaInfoValue(pdfDoc, "mappingID", `${makePdfId(pdf.fingerprint, pagesPerSheet as number)}`);
     this.setMetaInfoValue(pdfDoc, "pagesPerSheet", `${pagesPerSheet}`);
@@ -439,7 +475,7 @@ export default class PrintNcodedPdfWorker {
     //   author: _app_name,
     //   title: meta.info.title ? meta.info.title : filename,
     //   subject: `ncoded: ${ncodeStr}`,
-    //   keywords: ['Gridaboard', 'Ncode', 'Neo smartpen', 'NeoLAB', `${pagesPerSheet} pages per sheet`, `${makeNPageIdStr(printOption.pdfMappingDesc.nPageStart)}`],
+    //   keywords: ['Gridaboard', 'Ncode', 'Neo smartpen', 'NeoLAB', `${pagesPerSheet} pages per sheet`, `${makeNPageIdStr(printOption.pdfToNcodeMap.printPageInfo)}`],
     //   producer: `${_lib_name} v${_version}`,
     //   creatorTool: `${_lib_name} v${_version} (https://www.neolab.net)`,
     //   documentCreationDate: new Date(),

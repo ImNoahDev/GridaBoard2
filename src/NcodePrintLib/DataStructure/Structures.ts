@@ -202,3 +202,15 @@ export type IBrushState = {
   color: string,    // "rgba(0,0,0,255)"
 
 }
+
+
+
+export type IPageOverview = {
+  rotation: number,
+
+  /** pdf의 viewport가 rotation 0일 때의 크기로 판단(rotation은 고려하지 않음) */
+  landscape: boolean,
+
+  /** pdf의 viewport의 rotation은 고려하지 않음, 각 페이지에서 rotation된 것으로 rendering */
+  sizePu: ISize,
+}

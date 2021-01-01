@@ -375,6 +375,7 @@ export default class InkStorage {
 
     // hand the event
     const { mac, section, owner, book, page } = stroke;
+    console.log( `inkStorage: close Stroke event dispatch`);
     this.dispatcher.dispatch(PenEventName.ON_PEN_UP, { strokeKey, mac, stroke, section, owner, book, page });
   }
 }

@@ -1,12 +1,15 @@
-import { NeoSmartpen } from "./neosmartpen";
+import { IPenToViewerEvent, NeoSmartpen } from "./neosmartpen";
 import { IPenEvent } from "../DataStructure/Structures";
-import { IBrushType } from "../DataStructure/Enums"
+import { IBrushType, PenEventName } from "../DataStructure/Enums"
 // import PenBasedRenderer from "../renderer/pageviewer/PenBasedRenderer";
 import ThemeManager from "../../styles/ThemeManager"
 import $ from "jquery";
+import EventDispatcher, { EventCallbackType } from "../penstorage/EventSystem";
 
 let _penmanager_instance = null;
 let _active_pen: NeoSmartpen = null;
+
+
 
 export const DEFAULT_PEN_COLOR_NUM = 2;
 export const DEFAULT_PEN_THICKNESS = 2;
@@ -57,6 +60,9 @@ export default class PenManager {
   thickness: number = DEFAULT_PEN_THICKNESS;
   penRendererType: IBrushType = DEFAULT_PEN_RENDERER_TYPE;
 
+
+  dispatcher: EventDispatcher = new EventDispatcher();
+
   init = () => {
     this.setThickness(DEFAULT_PEN_THICKNESS);
     this.setPenRendererType(DEFAULT_PEN_RENDERER_TYPE);
@@ -82,9 +88,16 @@ export default class PenManager {
    */
   public createPen = () => {
     const pen = new NeoSmartpen();
+    pen.addEventListener(PenEventName.ON_CONNECTED, this.onConnected);
+    pen.addEventListener(PenEventName.ON_DISCONNECTED, this.onDisconnected);
+    pen.addEventListener(PenEventName.ON_PEN_PAGEINFO, this.onLivePenPageInfo);
+
     return pen;
   }
 
+  onLivePenPageInfo = (event: IPenToViewerEvent) => {
+    this.dispatcher.dispatch(PenEventName.ON_PEN_PAGEINFO, event);
+  }
 
   /**
    *
@@ -295,6 +308,22 @@ export default class PenManager {
     });
 
     return ret;
+  }
+
+
+
+  public addEventListener(eventName: PenEventName, listener: EventCallbackType) {
+    this.dispatcher.on(eventName, listener, null);
+  }
+
+
+  /**
+   *
+   * @param eventName
+   * @param listener
+   */
+  public removeEventListener(eventName: PenEventName, listener: EventCallbackType) {
+    this.dispatcher.off(eventName, listener);
   }
 
 }

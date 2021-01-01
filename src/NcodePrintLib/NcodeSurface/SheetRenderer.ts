@@ -1,8 +1,6 @@
-import { IPageSOBP, ISize, ICssSize, IRectDpi, } from '../DataStructure/Structures';
-import NcodeRasterizer, { IPagesPerSheetNumbers, IRasterizeOption, drawArrow, IAreasDesc, } from "../NcodeSurface/NcodeRasterizer";
+import { IPageSOBP, ISize, ICssSize, IRectDpi, stringToDpiNum, } from '../DataStructure/Structures';
+import NcodeRasterizer, { IRasterizeOption, drawArrow, IAreasDesc, ICellsOnSheetDesc, getNcodeAtCanvasPixel, getNcodeRectAtCanvasPixel, } from "../NcodeSurface/NcodeRasterizer";
 import { CSS_DPI, IPrintingEvent, IPrintOption, IProgressCallbackFunction } from "../NcodePrint/PrintDataTypes";
-
-import { IPageOverview } from '../NcodePrint/HtmlRenderPrint/PagesForPrint';
 
 import { getCellMatrixShape } from '../NcodeSurface/SurfaceSplitter';
 import { IPdfPageCanvasDesc } from '../NeoPdf/NeoPdfPage';
@@ -10,10 +8,9 @@ import NeoPdfDocument from '../NeoPdf/NeoPdfDocument';
 
 import { getSurfaceSize_css } from '../NcodeSurface/SurfaceInfo';
 import * as Util from "../UtilFunc";
-import { isSameObject, makeNPageIdStr } from '../UtilFunc';
-import { SignalCellularNullOutlined } from '@material-ui/icons';
-import { createElement } from 'react';
-import { CoordinateTanslater } from '../Coordinates';
+import { isSameObject, makeNPageIdStr, makePdfId } from '../UtilFunc';
+import { CoordinateTanslater, IPolygonArea } from '../Coordinates';
+import { MappingItem } from '../SurfaceMapper/MappingItem';
 
 let debug = 0;
 
@@ -203,12 +200,12 @@ export class SheetRenderer {
     this.overlayNcodePlaneOnMainCanvas(ctx, codeCanvas);
     if (progressCallback) progressCallback();
 
-    // PDF와 ncode의 mapping table에 추가
-    const pagesPerSheet = printOption.pagesPerSheet as number;
-    pdf.setDocumentId(pagesPerSheet);
-    for (let i = 0; i < pageImagesDesc.length; i++) {
-      pageImagesDesc[i].pdfPageInfo.id = pdf.id;
-    }
+    // // PDF와 ncode의 mapping table에 추가
+    // const pagesPerSheet = printOption.pagesPerSheet as number;
+    // pdf.setDocumentId(pagesPerSheet);
+    // for (let i = 0; i < pageImagesDesc.length; i++) {
+    //   pageImagesDesc[i].pdfPageInfo.id = pdf.id;
+    // }
 
     // 캔버스의 색상 값 디버깅용, debug level 3 이상
     this.debugCheckColorValues(mainCanvas, ctx);
@@ -218,7 +215,7 @@ export class SheetRenderer {
     this.setState({ status: 'rendered', width: css_width, height: css_height });
 
     // 보고를 위해 code mapping item을 가져온다
-    const array = pdf.generateMappingItems(pageImagesDesc, ncodePlane, printOption.needToIssueCode);
+    const array = this.generateMappingItems(pageImagesDesc, ncodePlane, printOption.needToIssuePrintCode);
     if (progressCallback) progressCallback();
 
     const ret: IPrintingSheetDesc = {
@@ -304,35 +301,24 @@ export class SheetRenderer {
     // const { padding, drawFrame, drawMarkRatio, drawCalibrationMark, maxPagesPerSheetToDrawMark, pagesPerSheet, debugMode, printDpi, direction, mediaSize, hasToPutNcode } = printOption;
     const { direction } = printOption;
     const pageInfos: IPageSOBP[] = [];
+    const basePageInfos: IPageSOBP[] = [];
 
     // 페이지에 코드를 할당하는 부분인데, 이게 이상하다.
     console.log(`[code assign] ${pageNums}`);
     for (let i = 0; i < pageNums.length; i++) {
       const pageNo = pageNums[i];
-      const assignedCode = printOption.issuedNcodes[pageNo - 1];
-      const p: IPageSOBP = { ...assignedCode };
-      console.log(`[code assign]    ${makeNPageIdStr(p)}`);
-      pageInfos.push(p);
+      // const assignedCode = printOption.printedNcodes[pageNo - 1];
+      const printPageInfo = { ...printOption.printedNcodes[pageNo - 1] };
+      const basePageInfo = { ...printOption.basedNcodes[pageNo - 1] };
+      // console.log(`[code assign]    ${makeNPageIdStr(p)}`);
+      pageInfos.push(printPageInfo);
+      basePageInfos.push(basePageInfo);
     }
 
-    const options: IRasterizeOption = {
-      srcDirection: direction,
-      pageInfos,
-      printOption,
-      // mediaSize,
-      // debugMode,
-      // hasToPutNcode,
-      // maxPagesPerSheetToDrawMark,
-      // drawCalibrationMark,
-      // drawMarkRatio,
-      // drawFrame,
-      // padding,
-    };
-
     const rasterizer = new NcodeRasterizer(printOption);
-    const ncodePlane = await rasterizer.prepareNcodePlane(options, progressCallback);
+    const ncodePlane = await rasterizer.prepareNcodePlane(direction, printOption, pageInfos, basePageInfos, progressCallback);
 
-    console.log(`[mapping] return ncodePlane = ${makeNPageIdStr(ncodePlane.ncodeAreas[0].pageInfo)}`);
+    // console.log(`[mapping] return ncodePlane = ${makeNPageIdStr(ncodePlane.ncodeAreas[0].pageInfo)}`);
 
     return ncodePlane;
   }
@@ -477,18 +463,127 @@ export class SheetRenderer {
   /**
    * this.pdfCanvasDescs에 canvasDesc들을 넣어 둔다.
    */
-  private preparePdfPageImages = async (pdf: NeoPdfDocument, pageNums: number[], progressCallback: IProgressCallbackFunction)
-    : Promise<IPdfPageCanvasDesc[]> => {
+  private preparePdfPageImages = async (pdf: NeoPdfDocument, pageNums: number[], progressCallback: IProgressCallbackFunction) => {
 
     const printOption = this.printOption;
-
     const { pagesPerSheet, pdfRenderingDpi } = printOption;
 
     // const pdfDpi = pdfRenderingDpi / pagesPerSheet;
     const pdfDpi = Math.round(pdfRenderingDpi / Math.sqrt(Math.sqrt(pagesPerSheet)));
-    const descs = await pdf.renderPages_dpi(pageNums, pdfDpi, printOption, progressCallback);
+    // const descs = await pdf.renderPages_dpi(pageNums, pdfDpi, printOption, progressCallback);
+    const descs = await this.renderPages_dpi(pdf, pageNums, pdfDpi, printOption, progressCallback);
     this.entireRotation = descs[0].rotation;
 
     return descs;
+  }
+
+
+
+  private renderPages_dpi = async (pdf: NeoPdfDocument, pageNums: number[], dpi: number, printOption: IPrintOption, progressCallback: IProgressCallbackFunction) => {
+    const { colorMode, luminanceMaxRatio } = printOption;
+    const pdfDpi = dpi;
+
+    const promises: Promise<IPdfPageCanvasDesc>[] = [];
+    for (let i = 0; i < pageNums.length; i++) {
+      const pageNo = pageNums[i];
+      const pdfPage = await pdf.getPageAsync(pageNo);
+      if (progressCallback) progressCallback();
+
+      const pr = pdfPage.render_dpi(i, pdfDpi).then(async (canvasDesc) => {
+        // canvasDesc.pdfPageInfo에서, id는 printOption이 없어서 제대로 세팅되어 오지 않아서 따로 값을 넣어준다
+        canvasDesc.pdfPageInfo.id = makePdfId(canvasDesc.pdfPageInfo.fingerprint, printOption.pagesPerSheet);
+
+        // 색변환
+        const convertResult = await pdfPage.convertColor(canvasDesc, colorMode, luminanceMaxRatio);
+        if (progressCallback) progressCallback();
+
+        return convertResult;
+      })
+      promises.push(pr);
+    }
+
+    const pageImageDescs = await Promise.all(promises);
+    pageImageDescs.sort((a, b) => a.index - b.index);
+
+    // 소팅
+    // const descs = await Promise.all(promises);
+
+    // const pageImageDescs: IPdfPageCanvasDesc[] = new Array(descs.length);
+    // descs.forEach(async (canvasDesc) => {
+    //   const { index } = canvasDesc;
+    //   pageImageDescs[index] = canvasDesc;
+    //   // console.log(`[Multipage] page rendered ${canvasDesc.pdfPageInfo.pageNo}, index ${index}`);
+    // });
+
+    return pageImageDescs;
+  }
+
+
+
+  private generateMappingItems = (pageImagesDesc: IPdfPageCanvasDesc[], ncodePlane: ICellsOnSheetDesc, needToIssuePrintCode: boolean) => {
+    const array: CoordinateTanslater[] = [];
+
+    for (let i = 0; i < ncodePlane.ncodeAreas.length; i++) {
+      const desc = pageImagesDesc[i];
+      const pdfRect = desc.drawnRect;
+      const ncode = ncodePlane.ncodeAreas[i];
+
+      const mapData = new MappingItem(desc.pdfPageInfo.pageNo);
+
+      /** canvas 좌표계 */
+      const { x, y, unit, width, height } = pdfRect;
+      const dpi = stringToDpiNum(unit);
+
+      /** Ncode 좌표계 */
+      const pt0_nu = getNcodeAtCanvasPixel({ x, y, dpi }, ncodePlane);
+      const pt1_nu = getNcodeAtCanvasPixel({ x: x + width, y: y + height, dpi }, ncodePlane);
+
+      const pdfRect_nu = getNcodeRectAtCanvasPixel({ dpi, x, y, width, height }, ncodePlane);
+
+      /** 페이지에 해당하는 ncode가 인쇄된 영역 */
+      const r_nu = ncode.rect;
+      const polygon: IPolygonArea = [
+        { x: r_nu.x, y: r_nu.y },
+        { x: r_nu.x + r_nu.width, y: r_nu.y },
+        { x: r_nu.x + r_nu.width, y: r_nu.y + r_nu.height },
+        { x: r_nu.x, y: r_nu.y + r_nu.height },
+      ];
+
+      mapData.setNcodeArea({
+        pageInfo: ncode.pageInfo,
+        basePageInfo: ncode.basePageInfo,
+        pdfDrawnRect: { ...pdfRect_nu },
+        npageArea: polygon,
+      });
+
+
+      /** PDF 좌표계 */
+      mapData.setPdfArea({
+        pdfPageInfo: { ...desc.pdfPageInfo },
+        rect: {
+          unit: "pu",
+          x: 0, y: 0,
+          width: desc.width_pu,
+          height: desc.height_pu,
+        }
+      });
+
+      const trans = new CoordinateTanslater();
+      trans.calc(mapData);
+      array.push(trans);
+
+      // const pageNo = desc.pdfPageInfo.pageNo;
+      // const page = this.getPage(pageNo);
+      // page.setTranslater(trans);
+
+      // if (needToIssuePrintCode) {
+      //   const msi = MappingStorage.getInstance();
+      //   msi.register(trans);
+      // }
+      // trans.dump(`[dump-${this._url}]-${i} `);
+    }
+
+    return array;
+
   }
 }

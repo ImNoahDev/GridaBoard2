@@ -1,7 +1,7 @@
 import { UNIT_TO_DPI, IPageSOBP, IPointDpi, IRectDpi, autoSetDpi, } from "../DataStructure/Structures";
 
 import NcodeFetcher from "./NcodeFetcher";
-import { INcodeSurfaceDesc, IPaperSize } from "./SurfaceDataTypes";
+import { INoteServerItem, IPaperSize } from "./SurfaceDataTypes";
 
 // import expect from "expect.js";
 import { getSurfaceSize_dpi } from "./SurfaceInfo";
@@ -70,19 +70,24 @@ export interface IAreasDesc {
   areas: IRectDpi[];
 }
 
-export type INcodeAreaDesc = {
+export type IDrawNcodeResult = {
   success: boolean,
 
   dpi: number,
   pixelsPerDot: number,
   dotsPerCell: number,
-
-  pageInfo: IPageSOBP,
   rect: IRectDpi,
-  // x_nu: number,
-  // y_nu: number,
-  // width_nu: number,
-  // height_nu: number,
+};
+
+export type INcodeAreaDesc = IDrawNcodeResult & {
+  // success: boolean,
+
+  // dpi: number,
+  // pixelsPerDot: number,
+  // dotsPerCell: number,
+  // rect: IRectDpi,
+  pageInfo: IPageSOBP,
+  basePageInfo: IPageSOBP,
 }
 
 /**
@@ -120,6 +125,8 @@ export interface IRasterizeOption {
 
   pageInfos: IPageSOBP[],
 
+  basePageInfos: IPageSOBP[],
+
   printOption: IPrintOption,
 }
 
@@ -128,7 +135,7 @@ export interface IRasterizeOption {
  */
 export default class NcodeRasterizer {
 
-  // private ncodeSurfaceDesc: INcodeSurfaceDesc = null;
+  // private ncodeSurfaceDesc: INoteServerItem = null;
 
   private glyphDistancePx_canvas = 8;
 
@@ -175,15 +182,19 @@ export default class NcodeRasterizer {
 
   /**
    * 이 함수 내부에서 쓰이는 모든 단위는 600dpi 인쇄를 기준으로 한 pixel 값
+   *
+   * srcDirection은, PDF 파일 전체의 landscape/portrait를 넣어야 한다.
    */
-  public prepareNcodePlane = async (options: IRasterizeOption, progressCallback: IProgressCallbackFunction) => {
-    const { srcDirection, pageInfos } = options;
-    const { pagesPerSheet, printDpi, imagePadding, drawFrame, drawMarkRatio, maxPagesPerSheetToDrawMark, drawCalibrationMark, mediaSize, hasToPutNcode, debugMode } = options.printOption;
+  public prepareNcodePlane = async (
+    srcDirection: "auto" | "portrait" | "landscape", printOption: IPrintOption,
+    printPageInfos: IPageSOBP[], basePageInfos: IPageSOBP[], progressCallback: IProgressCallbackFunction) => {
+
+    const { pagesPerSheet, printDpi, imagePadding, drawFrame, drawMarkRatio, maxPagesPerSheetToDrawMark, drawCalibrationMark, mediaSize, hasToPutNcode, debugMode } = printOption;
 
     let dpi = printDpi;
     dpi = 600;  // kitty  2020/11/29, 코드 제네레이터는 600 dpi로 고정
 
-    // expect(pageInfos.length).to.be(pagesPerSheet);
+    // expect(printPageInfos.length).to.be(pagesPerSheet);
 
     // temp canvas size를 구한다.
     let isLandscape = (srcDirection === "landscape");
@@ -238,8 +249,9 @@ export default class NcodeRasterizer {
       if (drawFrame) this.drawFrame(drawingContext, null);
 
       // 코드 영역에 필요한 것을 그린다
-      if (hasToPutNcode && i < pageInfos.length) {
-        const assignedNcode = pageInfos[i];
+      if (hasToPutNcode && i < printPageInfos.length) {
+        const assignedNcode = printPageInfos[i];
+        const baseNcode = basePageInfos[i];
 
         const fetcher = NcodeFetcherPool.getInstance();
         // const fetcher = new NcodeFetcher(pageInfo);
@@ -261,13 +273,16 @@ export default class NcodeRasterizer {
         }
 
         // 코드 정보를 넣는다
-        this.putNcodeInfo(drawingContext, assignedNcode, options.printOption);
+        this.putNcodeInfo(drawingContext, assignedNcode, baseNcode, printOption);
 
         // 코드 점을 찍는다
-        const ncodeArea = await this.drawNcode(drawingContext, ncodeSurfaceDesc, dpi);
+        const ncodeArea = await this.drawNcode(drawingContext, ncodeSurfaceDesc, dpi) as INcodeAreaDesc;
+        ncodeArea.pageInfo = assignedNcode;
+        ncodeArea.basePageInfo = baseNcode;
+
         if (progressCallback) progressCallback();
 
-        console.log(`[mapping] push Page Info = ${makeNPageIdStr(ncodeSurfaceDesc.pageInfo)}`);
+        // console.log(`[mapping] push Page Info = ${makeNPageIdStr(ncodeSurfaceDesc.pageInfo)}`);
         ncodeAreas.push(ncodeArea);
 
       }
@@ -349,37 +364,16 @@ export default class NcodeRasterizer {
     ctx.restore();
   }
 
-  private putNcodeInfo = (context: INcodeDrawContext, pageInfo: IPageSOBP, printOption: IPrintOption) => {
+  private putNcodeInfo = (context: INcodeDrawContext, printPageInfo: IPageSOBP, basePageInfo: IPageSOBP, printOption: IPrintOption) => {
     const { x, y, width, height } = context;
 
-    const code_str = makeNPageIdStr(pageInfo);
-    let modeStr = "";
-    switch (printOption.drawImageOnPdfMode ) {
-      case NcodePdfScaleMode.IMAGE_SIZE_UP_TO_PAGE: 
-        modeStr = "image scale up";
-        break;
+    const baseCodeStr = makeNPageIdStr(basePageInfo);
+    const pagePrintCodeStr = makeNPageIdStr(printPageInfo);
+    const code_str = "b:" + baseCodeStr + "/" + printOption.docNumPages + ", p:" + pagePrintCodeStr;  //makeNPageIdStr(pageInfo);
 
-      case NcodePdfScaleMode.PAGE_SIZE_DOWN_TO_IMAGE: 
-        modeStr = "page scale down";
-        break;
-
-      case NcodePdfScaleMode.NO_SCALE: 
-        modeStr = "no scale";
-        break;
-
-      case NcodePdfScaleMode.IMAGE_SIZE_UP_TO_PAGE_PADDING: 
-        modeStr = "page down, image up";
-        break;
-
-      default: 
-        modeStr = "none";
-        break;
-    }
-
-    const info_str = sprintf("%s, mode=%s, sheet mrgn=%d, page mrgn=%d", 
-      code_str, 
-      modeStr,
-      printOption.imagePadding, 
+    const info_str = sprintf("%s, s-mgn=%d, p-mgn=%d",
+      code_str,
+      printOption.imagePadding,
       printOption.pdfPagePadding);
     const ctx = context.ctx;
     ctx.save();
@@ -388,7 +382,7 @@ export default class NcodeRasterizer {
     ctx.rotate(-Math.PI / 2);
 
     ctx.fillStyle = "#0000ff";
-    ctx.font = "50px Arial";
+    ctx.font = "40px Arial";
     ctx.textBaseline = "bottom";
     ctx.fillText(info_str, -height + 30, width - 20);
     ctx.restore();
@@ -545,7 +539,7 @@ export default class NcodeRasterizer {
   }
 
 
-  private drawNcode = async (context: INcodeDrawContext, surfaceDesc: INcodeSurfaceDesc, dpi: number) => {
+  private drawNcode = async (context: INcodeDrawContext, surfaceDesc: INoteServerItem, dpi: number) => {
 
     // kitty
     const DEBUG_MODE = this.printOption.debugMode;
@@ -556,13 +550,11 @@ export default class NcodeRasterizer {
     const glyphStringSkipTop = Math.round(this.printOption.ncodeMargin.top * NCODE_CLASS6_NUM_DOTS);
     const codeDrawingPromises = new Array(0);
 
-    const result: INcodeAreaDesc = {
+    const result: IDrawNcodeResult = {
       success: false,
       dpi,
       pixelsPerDot: glyphDistancePx_canvas,
       dotsPerCell: NCODE_CLASS6_NUM_DOTS,
-
-      pageInfo: { ...surfaceDesc.pageInfo },
 
       rect: {
         unit: "nu",
@@ -614,7 +606,7 @@ export default class NcodeRasterizer {
     }
 
     await Promise.all(codeDrawingPromises);
-    const successResult: INcodeAreaDesc = {
+    const successResult: IDrawNcodeResult = {
       ...result,
       success: true,
       rect: {

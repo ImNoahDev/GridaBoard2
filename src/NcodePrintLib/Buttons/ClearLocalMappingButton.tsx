@@ -9,8 +9,8 @@ export default function ClearLocalMappingButton(props: ButtonProps) {
   const [open, setOpen] = useState(false);
 
   const clear = () => {
-    const instance = MappingStorage.getInstance();
-    instance.clear();
+    const msi = MappingStorage.getInstance();
+    msi.clear();
     setOpen(true);
   }
 

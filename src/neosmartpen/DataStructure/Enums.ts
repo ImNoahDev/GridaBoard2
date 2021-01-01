@@ -54,6 +54,8 @@ export enum PenEventName {
   ON_DISCONNECTED = "disconnected",
 
   ON_UPGRADE_NEEDED = "fw_up",
+
+  ON_START_TO_CONNECT = "start_to_connect",
 }
 
 

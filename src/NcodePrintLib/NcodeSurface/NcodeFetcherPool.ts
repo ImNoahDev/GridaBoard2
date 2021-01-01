@@ -3,13 +3,13 @@ import { IPageSOBP } from "../DataStructure/Structures";
 import * as Util from "../UtilFunc";
 import { makeNPageIdStr } from "../UtilFunc";
 import NcodeFetcher from "./NcodeFetcher";
-import { INcodeSurfaceDesc } from "./SurfaceDataTypes";
+import { INoteServerItem } from "./SurfaceDataTypes";
 
 
 let _fi: NcodeFetcherPool = null;
 export default class NcodeFetcherPool {
 
-  _codeData: INcodeSurfaceDesc[] = [];
+  _codeData: INoteServerItem[] = [];
 
   private constructor() {
     if (_fi) return _fi;
@@ -24,6 +24,12 @@ export default class NcodeFetcherPool {
 
   findCodeData = (pageInfo: IPageSOBP) => {
     const found = this._codeData.find(item => Util.isSamePage(pageInfo, item.pageInfo));
+    if (!found) return undefined;
+
+    if (found.glyphData.length < 16) {
+      console.error("something wrong!");
+      return undefined;
+    }
     return found;
   }
 
@@ -34,9 +40,13 @@ export default class NcodeFetcherPool {
       return alreadyDownloaded;
     }
 
-    const fetcher = new NcodeFetcher(pageInfo);
+    // const fetcher = new NcodeFetcher(pageInfo);
+    const fetcher = new NcodeFetcher();
     const ncodeSurfaceDesc = await fetcher.getNcodeData(pageInfo);
-    this._codeData.push(ncodeSurfaceDesc);
+    if (ncodeSurfaceDesc.glyphData.length > 16) {
+      this._codeData.push(ncodeSurfaceDesc);
+    }
+
     return ncodeSurfaceDesc;
   }
 }

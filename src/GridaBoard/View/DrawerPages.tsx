@@ -1,16 +1,18 @@
-import { Box, Paper, Typography, withStyles } from "@material-ui/core";
-import React, { CSSProperties, useState } from "react";
+import { Box, Paper, Typography  } from "@material-ui/core";
+import React from "react";
 import { InkStorage, MixedPageView, PLAYSTATE } from "../../neosmartpen";
 import { ZoomFitEnum } from "../../neosmartpen/renderer/pageviewer/RenderWorkerBase";
 import GridaDoc from "../GridaDoc";
 import { RootState } from "../../store/rootReducer";
 import { connect } from "react-redux";
-import { updateDrawerWidth, updateSelectedPage } from "../../store/reducers/ui";
+import { updateDrawerWidth } from "../../store/reducers/ui";
 import { makeNPageIdStr } from "../../NcodePrintLib";
 
 interface Props {
   numPages?: number,
   drawerWidth?: number,
+
+  renderCount?: number,
 
   onSelectPage?: (pageNo: number) => void,
 }
@@ -35,7 +37,7 @@ class DrawerPages extends React.Component<Props, State>  {
     if (numPages < 1) return null;
 
     const doc = GridaDoc.getInstance();
-    const pages = doc.getPages();
+    const pages = doc.pages;
 
     const setDrawerWidth = (width: number) => updateDrawerWidth({ width });
     const inkStorage = InkStorage.getInstance();
@@ -59,6 +61,7 @@ class DrawerPages extends React.Component<Props, State>  {
           const isLandscape = pageOverview.landscape;
           const sizePu = pageOverview.sizePu;
           const wh_ratio = sizePu.width / sizePu.height;
+          const pageInfo = page.pageInfos[0];
 
           let height;
           if (isLandscape) {
@@ -90,6 +93,7 @@ class DrawerPages extends React.Component<Props, State>  {
                   pdfUrl={pdfUrl} filename={pdfFilename} pageNo={pageNo}
                   playState={PLAYSTATE.live} pens={[]}
                   rotation={0}
+                  pageInfo={pageInfo}
                   parentName={`thumbnail-${i}`}
                   viewFit={ZoomFitEnum.FULL}
                   autoPageChange={false}
@@ -99,12 +103,12 @@ class DrawerPages extends React.Component<Props, State>  {
                   noInfo
 
                   onNcodePageChanged={undefined}
-                  onFileLoadNeeded={undefined}
+                  handleFileLoadNeeded={undefined}
                 />
               </div>
 
               <div id={`thumbnail-pageInfo-${i}`} style={{ position: "absolute", margin: 0, padding: 0, right: 0, left: 0, top: 0, height: "100%", zIndex: 999 }}>
-                <Typography style={{ color: "#f00" }}> {makeNPageIdStr(page._pageInfo)}</Typography>
+                <Typography style={{ color: "#f00" }}> {makeNPageIdStr(page.pageInfos[0])}</Typography>
               </div>
 
               {/* 
@@ -129,6 +133,8 @@ class DrawerPages extends React.Component<Props, State>  {
 const mapStateToProps = (state: RootState) => ({
   numPages: state.activePage.numDocPages,
   drawerWidth: state.ui.drawer.width,
+  renderCount: state.activePage.renderCount,
+
 });
 
 // const mapDispatchToProps = (dispatch) => {

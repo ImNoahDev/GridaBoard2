@@ -34,20 +34,13 @@ export type TransformPointPairs = {
  * 결과물, 아래의 함수에서 불러서 쓰자
  * function applyTransform(mtx: TransformParameters, pt: IPoint): IPoint
  */
-export type TransformParameters = {
-  type: "homography" | "affine",
-  a: number,
-  b: number,
-  c: number,
-  d: number,
-  e: number,
-  f: number,
-  g: number,
-  h: number,
-  i: number,
+export class TransformParameters {
+  type: "homography" | "affine" = "homography";
+  a = 1; b = 0; c = 0;
+  d = 0; e = 1; f = 0;
+  g = 0; h = 0; i = 1;
 
-  tx: number,
-  ty: number,
+  tx = 0; ty = 0;
 }
 
 
@@ -81,7 +74,7 @@ export interface IPdfPageDesc {
   fingerprint: string,
 
   /** POD id = fingerprint + "/" + pagesPerSheet */
-  id?: string,
+  id: string,
 
   /** total pages in pdf file */
   numPages: number,
@@ -91,6 +84,7 @@ export interface IPdfPageDesc {
 }
 
 export interface IPdfToNcodeMapItem {
+  // 아래는 printOption에 의해 추가되는 값
   /** PDF url */
   url: string,
 
@@ -100,19 +94,28 @@ export interface IPdfToNcodeMapItem {
   /** PDF fingerprint */
   fingerprint: string,
 
+  pagesPerSheet: number,
+
   /** POD id = fingerprint + "/" + pagesPerSheet */
   id: string,
 
   /** total pages in pdf file */
   numPages: number,
 
+
+  // 아래는 issue code에 의해 추가되는 값
   /** NCode pageInfo of the 1st page (physical first page, not the printed first page) */
-  nPageStart?: IPageSOBP,
+  printPageInfo: IPageSOBP,
 
-  /** mapping 정보가 생성된 시각 */
-  timeString?: string,
+  /** 2페이지/장 등 복수 페이지/장의 경우 1페이지/장의 base ncode를 대표코드로 활용한다 */
+  basePageInfo: IPageSOBP,
+  // 여기까지
 
-  params?: IPageMapItem[],
+  // 아래는 인쇄되고 나서 추가되는 값
+  params: IPageMapItem[],
+
+  /** mapping 정보가 생성된 시각. 등록시에 추가되는 값 */
+  timeString: string,
 }
 
 
@@ -130,8 +133,13 @@ export interface IPageMapItem {
   /** 최초 로컬 Mapping Storage에 store된 시각 */
   timeString?: string,
 
-  /** Ncode page information */
+  pdfPageNo: number,
+
+  /** 인쇄된 Ncode page information */
   pageInfo: IPageSOBP,
+
+  /** 인식되어 구분되는 base pageInfo */
+  basePageInfo: IPageSOBP,
 
   /**
    * Ncode area information,

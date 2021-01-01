@@ -43,13 +43,13 @@ export const printOptionTip: { [key: string]: ITipType } = {
     tail: 'Ncode A4를 선택한 경우에는 적용되지 않습니다.'
   },
 
-  'forceToIssueNewCode': {
+  'forceToUpdateBaseCode': {
     head: '새로운 Ncode를 강제',
     msg: '문서에 등록된 Ncode의 유무와 상관 없이 새로운 Ncode를 강제로 발행합니다.',
     tail: 'Ncode A4를 선택한 경우에는 적용되지 않습니다.'
   },
 
-  'needToIssueCode': {
+  'needToIssuePrintCode': {
     head: '새 Ncode가 필요',
     msg: '문서에 Ncode가 등록되어 있지 않습니다. 새로운 Ncode를 발급 받아야 일반 용지에 인쇄할 수 있습니다.',
     tail: 'Ncode A4를 선택한 경우에는 적용되지 않습니다.'

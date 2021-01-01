@@ -3,8 +3,12 @@ import { IPageMapItem, IPdfPageDesc, IPolygonArea, TransformParameters, Transfor
 
 export class MappingItem {
   _params: IPageMapItem = {
+    pdfPageNo: undefined,
+
     pageInfo: {} as IPageSOBP,
+    basePageInfo: {} as IPageSOBP,
     npageArea: [] as any,
+
     pdfDesc: {} as IPdfPageDesc,
     h: {} as TransformParameters,
     h_rev: {} as TransformParameters,
@@ -19,6 +23,25 @@ export class MappingItem {
   // ncodePoints: IPoint[] = new Array(4);
   // pdfPoints: IPoint[] = new Array(4);
 
+  constructor(pdfPageNo: number) {
+    this._params.pdfPageNo = pdfPageNo;
+
+    this._params.h = {
+      type: "homography",
+      a: 1, b: 0, c: 0,
+      d: 0, e: 1, f: 0,
+      g: 0, h: 0, i: 1,
+      tx: 0, ty: 0
+    };
+
+    this._params.h_rev = {
+      type: "homography",
+      a: 1, b: 0, c: 0,
+      d: 0, e: 1, f: 0,
+      g: 0, h: 0, i: 1,
+      tx: 0, ty: 0
+    };
+  }
 
   get srcPts() {
     return this._srcPts;
@@ -72,6 +95,7 @@ export class MappingItem {
     this.setPointsFromRect("ncode", area_nu);
 
     this._params.pageInfo = { ...arg.pageInfo };
+    this._params.basePageInfo = { ...arg.basePageInfo };
     this._params.npageArea = { ...arg.npageArea };
   }
 
@@ -93,6 +117,8 @@ export interface INcodePageMappingParam {
   /** 4점 매핑을 위한 rect */
   pdfDrawnRect: IRectDpi,        // unit should be "nu"
   pageInfo: IPageSOBP,
+
+  basePageInfo: IPageSOBP,
 
   /** 아래의 영역에 들어오면 위의 */
   npageArea: IPolygonArea,

@@ -58,7 +58,7 @@ export default function ProgressDialog(props: Props) {
   const buffered = Math.ceil(progress / 10) * 10;
 
   useEffect(() => {
-    console.log(`dlg progress >> ${progress}, percent=${percent}, buffered=${buffered}`)
+    // console.log(`dlg progress >> ${progress}, percent=${percent}, buffered=${buffered}`)
   }, [progress]);
 
   return (

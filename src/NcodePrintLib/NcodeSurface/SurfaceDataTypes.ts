@@ -34,7 +34,7 @@ export type IPaperSize = {
   height: number
 };
 
-export type INcodeSurfaceDesc = {
+export type INoteServerItem = {
   id: string;           //
   pageInfo: IPageSOBP;
 

@@ -1,23 +1,18 @@
 import React from "react";
-// import React, { Component } from 'react';
-// import PropTypes from "prop-types";
 import { InkStorage, PenEventName } from "../..";
-
 import { PLAYSTATE, IRenderWorkerOption, ZoomFitEnum } from "./RenderWorkerBase";
 import PenBasedRenderWorker from "./PenBasedRenderWorker";
-// import { Paper } from "@material-ui/core";
 import { NeoSmartpen, PenManager } from "../../index";
 import * as UTIL from "../../utils/UtilsFunc";
-
-
 import { IPageSOBP, ISize } from "../../DataStructure/Structures";
 import { TransformParameters } from "../../../NcodePrintLib/Coordinates";
-import { withResizeDetector } from 'react-resize-detector';
 import { CSSProperties } from "@material-ui/core/styles/withStyles";
-import { BoxProps } from "@material-ui/core";
+import { Typography } from "@material-ui/core";
 import { IPenToViewerEvent } from "../../pencomm/neosmartpen";
-import NeoPdfDocument from "../../../NcodePrintLib/NeoPdf/NeoPdfDocument";
 import { MixedViewProps } from "../MixedPageView";
+import { isSamePage } from "../../utils/UtilsFunc";
+import { makeNPageIdStr } from "../../../NcodePrintLib";
+
 
 export { PLAYSTATE };
 
@@ -284,6 +279,20 @@ class PenBasedRenderer_module extends React.Component<Props, State> {
       ret_val = true;
     }
 
+    if (!isSamePage(nextProps.pageInfo, this.props.pageInfo)) {
+      if (!nextProps.autoPageChange) {
+        this.setState({ pageInfo: { ...nextProps.pageInfo } });
+
+        /** 잉크 렌더러의 페이지를 바꾼다 */
+        const { section, owner, book, page } = nextProps.pageInfo;
+        if (this.renderer) {
+          this.renderer.changePage(section, owner, book, page, false);
+        }
+      }
+
+      ret_val = true;
+    }
+
     return ret_val;
   }
 
@@ -375,6 +384,8 @@ class PenBasedRenderer_module extends React.Component<Props, State> {
    * @param {{strokeKey:string, mac:string, stroke:NeoStroke, section:number, owner:number, book:number, page:number}} event
    */
   onLivePenPageInfo = (event: IPenToViewerEvent) => {
+    if (!this.props.autoPageChange) return;
+
     const { penEventCount } = this.state;
     const { section, owner, book, page } = event;
 
@@ -384,29 +395,30 @@ class PenBasedRenderer_module extends React.Component<Props, State> {
     }
     this.shouldSendPageInfo = false;
 
-    /** 내부 상태를 바꾼다. */
-    this.setState({
-      penEventCount: penEventCount + 1,
-      pageInfo: { section, owner, book, page }
-    });
+    // /** 내부 상태를 바꾼다. */
+    // this.setState({
+    //   penEventCount: penEventCount + 1,
+    //   pageInfo: { section, owner, book, page }
+    // });
 
-    /** 테스트용 */
-    const inkStorage = this.inkStorage;
-    if (inkStorage) {
-      const pageStrokesCount = inkStorage.getPageStrokes(event as IPageSOBP).length;
-      this.setState({ strokeCount: pageStrokesCount });
-    }
+    // /** 테스트용 */
+    // const inkStorage = this.inkStorage;
+    // if (inkStorage) {
+    //   const pageStrokesCount = inkStorage.getPageStrokes(event as IPageSOBP).length;
+    //   this.setState({ strokeCount: pageStrokesCount });
+    // }
 
-    /** 잉크 렌더러의 페이지를 바꾼다 */
-    if (this.renderer) {
-      this.renderer.changePage(section, owner, book, page, false);
-    }
+    // /** 잉크 렌더러의 페이지를 바꾼다 */
+    // if (this.renderer) {
+    //   this.renderer.changePage(section, owner, book, page, false);
+    // }
 
     /** pdf pageNo를 바꿀 수 있게, container에게 전달한다. */
     this.props.onNcodePageChanged({ section, owner, book, page });
   }
 
   onLivePenPageInfo_byStorage = (event: IPenToViewerEvent) => {
+    if (!this.props.autoPageChange) return;
     const { penEventCount } = this.state;
     const { section, owner, book, page } = event;
 
@@ -416,23 +428,23 @@ class PenBasedRenderer_module extends React.Component<Props, State> {
     }
     this.shouldSendPageInfo = false;
 
-    /** 내부 상태를 바꾼다. */
-    this.setState({
-      penEventCount: penEventCount + 1,
-      pageInfo: { section, owner, book, page }
-    });
+    // /** 내부 상태를 바꾼다. */
+    // this.setState({
+    //   penEventCount: penEventCount + 1,
+    //   pageInfo: { section, owner, book, page }
+    // });
 
-    /** 테스트용 */
-    const inkStorage = this.inkStorage;
-    if (inkStorage) {
-      const pageStrokesCount = inkStorage.getPageStrokes(event as IPageSOBP).length;
-      this.setState({ strokeCount: pageStrokesCount });
-    }
+    // /** 테스트용 */
+    // const inkStorage = this.inkStorage;
+    // if (inkStorage) {
+    //   const pageStrokesCount = inkStorage.getPageStrokes(event as IPageSOBP).length;
+    //   this.setState({ strokeCount: pageStrokesCount });
+    // }
 
-    /** 잉크 렌더러의 페이지를 바꾼다 */
-    if (this.renderer) {
-      this.renderer.changePage_byStorage(section, owner, book, page, false);
-    }
+    // /** 잉크 렌더러의 페이지를 바꾼다 */
+    // if (this.renderer) {
+      // this.renderer.changePage_byStorage(section, owner, book, page, false);
+    // }
 
     /** pdf pageNo를 바꿀 수 있게, container에게 전달한다. */
     this.props.onNcodePageChanged({ section, owner, book, page });
@@ -563,6 +575,16 @@ class PenBasedRenderer_module extends React.Component<Props, State> {
       overflow: "hidden",
     }
 
+    const inkContainerInfo: CSSProperties = {
+      position: "absolute",
+      zoom: zoom,
+      left: this.props.position.offsetX / zoom,
+      top: this.props.position.offsetY / zoom,
+      zIndex: 9,
+      overflow: "hidden",
+    }
+
+
     const inkCanvas: CSSProperties = {
       position: "absolute",
       zoom: 1,
@@ -598,13 +620,15 @@ class PenBasedRenderer_module extends React.Component<Props, State> {
 
     return (
       <div id="pen-based-renderer" ref={this.setMainDivRef} style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0 }}>
-
-
         {/* <Paper style={{ height: this.size.height, width: this.size.width }}> */}
         <div id={`${this.props.parentName}-fabric_container`} style={inkContainerDiv} >
           <canvas id={this.canvasId} width={cssWidth} height={cssHeight} style={inkCanvas} ref={this.setCanvasRef} />
         </div>
         {/* </Paper> */}
+
+        <div id={`${this.props.parentName}-info`} style={inkContainerDiv} >
+          <Typography style={{ color: "#00f" }}> {makeNPageIdStr(this.state.pageInfo)}</Typography>
+        </div >
       </div >
     );
   }

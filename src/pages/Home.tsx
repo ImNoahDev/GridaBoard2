@@ -22,6 +22,7 @@ import { IFileBrowserReturn } from "../NcodePrintLib/NcodePrint/PrintDataTypes";
 import { IActivePageState } from "../store/reducers/activePageReducer";
 import NeoPdfDocument from "../NcodePrintLib/NeoPdf/NeoPdfDocument";
 import NeoPdfManager from "../NcodePrintLib/NeoPdf/NeoPdfManager";
+import { IHandleFileLoadNeededEvent } from "../neosmartpen/renderer/MixedPageView";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -91,15 +92,20 @@ const Home = () => {
 
   const onNcodePageChanged = (pageInfo: IPageSOBP) => {
     const doc = GridaDoc.getInstance();
-
-    doc.addNcodePage(pageInfo);
-
+    doc.handleActivePageChanged(pageInfo);
   }
 
-  const onFileLoadNeeded = (coupledDoc: IAutoLoadDocDesc) => {
-    const url = coupledDoc.pdf.url;
+  const handleFileLoadNeeded = (event: IHandleFileLoadNeededEvent) => {
+    if (event.isLoaded) {
+      const doc = GridaDoc.getInstance();
+      doc.handleSetNcodeMapping(event.coupledDoc.pdf);
+      return;
+    }
+
+    const url = event.coupledDoc.pdf.url;
+
     if (url.indexOf("blob:http") > -1) {
-      setAutoLoadDoc(coupledDoc);
+      setAutoLoadDoc(event.coupledDoc);
       setLoadConfirmDlgStep(0);
       setLoadConfirmDlgOn(true);
     }
@@ -200,17 +206,11 @@ const Home = () => {
     }
   }
 
-  const aaa = (e) => {
-    console.log(e);
-
-  }
-
-
 
   return (
     <div className={classes.root}>
       {/* <CssBaseline /> */}
-      <main style={mainStyle} onAnimationEnd={aaa} onAnimationEndCapture={aaa} onAnimationStart={aaa}>
+      <main style={mainStyle}>
         <div style={{ position: "absolute", top: 0, left: 0 }}>
           <nav id="uppernav" className="navbar navbar-light bg-transparent" style={{ float: "left", zIndex: 3 }}>
             <a id="grida_board" className="navbar-brand" href="#">Grida board
@@ -226,7 +226,7 @@ const Home = () => {
         </div>
 
         <div style={{ position: "absolute", top: 0, left: 0, bottom: 0, right: drawerOpen ? drawerWidth : 0 }}>
-          <MixedPageView
+          {/* <MixedPageView
             // pdf={pdf}
             pdfUrl={pdfUrl} filename={pdfFilename}
             pageNo={1}
@@ -234,12 +234,12 @@ const Home = () => {
             pens={pens} fromStorage={false}
             autoPageChange={true}
             rotation={0}
-            onFileLoadNeeded={noMoreAutoLoad ? undefined : onFileLoadNeeded}
+            handleFileLoadNeeded={noMoreAutoLoad ? undefined : handleFileLoadNeeded}
             onNcodePageChanged={onNcodePageChanged}
             parentName={"grida-main-home"}
             viewFit={ZoomFitEnum.FULL}
             fitMargin={100}
-          />
+          /> */}
         </div>
       </main >
 

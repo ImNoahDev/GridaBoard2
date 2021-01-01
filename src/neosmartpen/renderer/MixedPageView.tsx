@@ -39,6 +39,7 @@ const inkContainer: CSSProperties = {
 
 
 
+export type IHandleFileLoadNeededEvent = { coupledDoc: IAutoLoadDocDesc, isLoaded: boolean };
 
 export interface MixedViewProps {
   baseScale?: number;
@@ -79,7 +80,7 @@ export interface MixedViewProps {
    *
    * autoChangePage가 true 인 상태에서만 동작한다
    **/
-  onFileLoadNeeded?: (doc: IAutoLoadDocDesc) => void;
+  handleFileLoadNeeded?: (event: IHandleFileLoadNeededEvent) => void,
   onNcodePageChanged: (pageInfo: IPageSOBP) => void,
 
   parentName: string;
@@ -151,7 +152,7 @@ const defaultMixedPageViewProps: MixedViewProps = {
   fromStorage: false,
   autoPageChange: true,
 
-  onFileLoadNeeded: undefined,
+  handleFileLoadNeeded: undefined,
   onNcodePageChanged: undefined,
 }
 
@@ -269,8 +270,8 @@ class MixedPageView_module extends React.Component<MixedViewProps, State>  {
       const ncodeXy: INcodeSOBPxy = { ...nextState.pageInfo, x: 0, y: 0 };
 
       // 인쇄된 적이 없는 파일이라면 PDF 관련의 오퍼레이션을 하지 않는다.
-      const mapper = MappingStorage.getInstance();
-      const coupledDoc = mapper.findPdfPage(ncodeXy);
+      const msi = MappingStorage.getInstance();
+      const coupledDoc = msi.findPdfPage(ncodeXy);
       if (coupledDoc) {
         console.log(`MixedViewer: Set h, h=${JSON.stringify(coupledDoc.pageMapping.h)}`);
         this.setState({ h: coupledDoc.pageMapping.h });
@@ -283,7 +284,7 @@ class MixedPageView_module extends React.Component<MixedViewProps, State>  {
   }
 
   componentWillUnmount() {
-    if (this.props.pdf ===undefined && this.state.pdf ) {
+    if (this.props.pdf === undefined && this.state.pdf) {
       const pdf = this.state.pdf;
       pdf.destroy();
     }
@@ -318,12 +319,12 @@ class MixedPageView_module extends React.Component<MixedViewProps, State>  {
     if (!this.props.autoPageChange) return;
 
     // 페이지를 찾자
-    const mapper = MappingStorage.getInstance();
     const ncodeXy: INcodeSOBPxy = { ...pageInfo, x: 0, y: 0 };
     this.setState({ pageInfo: { ...pageInfo } });
 
     // 인쇄된 적이 없는 파일이라면 PDF 관련의 오퍼레이션을 하지 않는다.
-    const coupledDoc = mapper.findPdfPage(ncodeXy);
+    const msi = MappingStorage.getInstance();
+    const coupledDoc = msi.findPdfPage(ncodeXy);
     if (!coupledDoc) {
       if (this.props.onNcodePageChanged) this.props.onNcodePageChanged(pageInfo);
       return;
@@ -336,10 +337,16 @@ class MixedPageView_module extends React.Component<MixedViewProps, State>  {
     this.setState({ h: coupledDoc.pageMapping.h });
 
     // 파일을 로드해야 한다면, 로컬이든 클라우드든 로드하도록 한다.
+    const { handleFileLoadNeeded } = this.props;
     if (!this.pdf || this.pdf.fingerprint !== coupledDoc.pdf.fingerprint) {
-      const { onFileLoadNeeded } = this.props;
-      if (onFileLoadNeeded) {
-        onFileLoadNeeded(coupledDoc);
+      if (handleFileLoadNeeded) {
+        handleFileLoadNeeded({ coupledDoc, isLoaded: false });
+      }
+    }
+    else {
+      // 이 뷰에 의해 로드된 pdf이다
+      if (handleFileLoadNeeded) {
+        handleFileLoadNeeded({ coupledDoc, isLoaded: true });
       }
     }
 

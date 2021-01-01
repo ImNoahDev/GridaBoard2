@@ -1,4 +1,4 @@
-import PrintPdfButton from "./NcodePrint/HtmlRenderPrint/PrintPdfButton";
+// import PrintPdfButton from "./NcodePrint/HtmlRenderPrint/PrintPdfButton";
 import FileBrowserButton from './NeoPdf/FileBrowserButton';
 import PrintOptionDialog from './NcodePrint/Dialogs/PrintOptionDialog';
 
@@ -10,12 +10,11 @@ import { g_defaultPrintOption } from "./DefaultOption";
 import { onFileInputChanged, g_hiddenFileInputBtnId, onFileInputClicked, openFileBrowser, openFileBrowser2 } from "./NeoPdf/FileBrowser";
 
 export * from "./NcodePrint/PrintDataTypes";
-export * from "./NcodePrint/HtmlRenderPrint/PrintPdfButton";
 export * from "./UtilFunc";
 
 export {
   g_defaultPrintOption,
-  PrintPdfButton,
+  // PrintPdfButton,
   addGraphicAndSavePdf,
   FileBrowserButton,
   MediaSize,

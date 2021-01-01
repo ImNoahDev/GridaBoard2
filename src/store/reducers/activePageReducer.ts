@@ -8,6 +8,7 @@ const UrlActionType = Object.freeze({
   SET: `${ActionGroup}.SET`,
   GET: `${ActionGroup}.GET`,
 
+  RENDER: `${ActionGroup}.RENDER`,
   // SET_DOC_NUMPAGES: `${ActionGroup}.SET_DOC_NUMPAGES`,
   // SET_DOC_ACTIVE_PAGE_NO: `${ActionGroup}.SET_DOC_ACTIVE_PAGE_NO`,
   // SET_DOC_ACTIVE_PDF: `${ActionGroup}.SET_DOC_ACTIVE_PDF`,
@@ -48,7 +49,12 @@ export const setActivePdf = async (pdf: NeoPdfDocument) => {
 
 }
 
-
+export const forceToRenderPanes = async () => {
+  store.dispatch({
+    type: UrlActionType.RENDER,
+    value: 1,
+  });
+}
 
 
 const initialState = {
@@ -63,6 +69,8 @@ const initialState = {
   owner: 0,
   book: 0,
   page: 0,
+
+  renderCount: 0,
 };
 
 export type IActivePageState = typeof initialState;
@@ -78,6 +86,15 @@ export default (state = initialState, action) => {
         ...action.value
       };
     }
+
+    case UrlActionType.RENDER: {
+      const cnt = state.renderCount + 1;
+      return {
+        ...state,
+        renderCount: cnt,
+      };
+    }
+
 
     default: {
       return state;

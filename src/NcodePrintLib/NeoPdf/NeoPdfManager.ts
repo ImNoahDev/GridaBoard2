@@ -33,9 +33,9 @@ export default class NeoPdfManager {
     if (_pdf_manager) return _pdf_manager;
 
     _pdf_manager = new NeoPdfManager();
-    const mapper = MappingStorage.getInstance();
-    mapper.addEventListener(MappingStorageEventName.ON_MAPINFO_REFRESHED, _pdf_manager.refreshNcodeMappingTable);
-    mapper.addEventListener(MappingStorageEventName.ON_MAPINFO_ADDED, _pdf_manager.handleMapInfoAdded);
+    const msi = MappingStorage.getInstance();
+    msi.addEventListener(MappingStorageEventName.ON_MAPINFO_REFRESHED, _pdf_manager.refreshNcodeMappingTable);
+    msi.addEventListener(MappingStorageEventName.ON_MAPINFO_ADDED, _pdf_manager.handleMapInfoAdded);
 
     return _pdf_manager;
   }

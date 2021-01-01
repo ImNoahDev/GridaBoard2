@@ -56,7 +56,7 @@ export default function PrintNcodedPdfButton(props: Props) {
   const openOptionDialog = () => setOptionOn(true);
 
   useEffect(() => {
-    console.log(`status = ${status}, progress=${progressPercent}`);
+    // console.log(`status = ${status}, progress=${progressPercent}`);
   }, [status, progressPercent]);
 
 
@@ -92,11 +92,11 @@ export default function PrintNcodedPdfButton(props: Props) {
 
   /**
    * worker에서 callback으로 불려지는, printOption의 개인 설정 다이얼로그를 처리하는 부분
-   * 
+   *
    * promise 관점에서 보면, 아래의 onOK, onCancel과 쌍을 이룬다.
    * onConfigurePrintOption 에서 promimse를 생성하고, onOK 또는 onCancel 에서 resolve하는 식이다.
-   * 
-   * @param printOption 
+   *
+   * @param printOption
    */
   const onConfigurePrintOption = (printOption: IPrintOption): Promise<IPrintOption> => {
     // 리턴값을 준비
@@ -121,7 +121,7 @@ export default function PrintNcodedPdfButton(props: Props) {
 
   /**
    * configure 다이얼로그에서 OK가 눌려졌다. worker로 돌아갈 수 있도록 resolve(printOption);
-   * @param printOption 
+   * @param printOption
    */
   const onOK = (printOption: IPrintOption) => {
     // 디이얼로그를 닫고, 프로그레스 바를 보여준다.
@@ -138,7 +138,7 @@ export default function PrintNcodedPdfButton(props: Props) {
 
   /**
    * configure 다이얼로그에서 cancel이 눌려졌다. worker로 돌아가서 바로 빠져 나오도록 undefined
-   * @param printOption 
+   * @param printOption
    */
   const onCancel = (printOption: IPrintOption) => {
     // 디이얼로그를 닫고, 프로그레스 바를 열지 않는다.
@@ -158,7 +158,7 @@ export default function PrintNcodedPdfButton(props: Props) {
 
   /**
    * worker에서 progress가 있을 때 마다 보고하는 callback
-   * @param event 
+   * @param event
    */
 
   const onProgress = (event: IPrintingReport) => {

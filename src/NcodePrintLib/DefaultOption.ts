@@ -9,6 +9,7 @@ export const g_debugURL = "./2P_test.pdf";
 export const g_debugFilename = "./2P_test.pdf";
 
 export const g_nullNcode = { section: -1, owner: -1, book: -1, page: -1 };
+export const nullNcode = () => { return { ...g_nullNcode } }
 
 export const g_defaultPrintOption: IPrintOption = {
   /** DO NOT MODIFY */
@@ -23,9 +24,12 @@ export const g_defaultPrintOption: IPrintOption = {
   url: undefined,
   filename: undefined,
 
-  needToIssueCode: true,
-  forceToIssueNewCode: false,
-  pageInfo: { ...g_nullNcode },
+  needToIssuePrintCode: true,
+  needToIssueBaseCode: false,
+  forceToUpdateBaseCode: false,
+
+  printPageInfo: { ...g_nullNcode },
+  basePageInfo: { ...g_nullNcode },
   ncodeMargin: { left: -1, top: -1 },
 
   codeDensity: 2,
@@ -39,11 +43,6 @@ export const g_defaultPrintOption: IPrintOption = {
   // colorMode: ColorConvertMethod.BLUEPRINT,
   colorMode: ColorConvertMethod.ANDROID_STYLE,
 
-  /** 출력할 종이보다 작은 경우에는 확대할 것 */
-  scaleUpToMedia: false,
-
-  /** 출력할 종이보다 큰 경우에는 축소할 것 */
-  scaleDownToMedia: false,
 
   magnification: 1,
 

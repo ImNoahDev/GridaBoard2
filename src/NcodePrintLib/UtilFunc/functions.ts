@@ -33,8 +33,11 @@ export function makeNPageId(pageInfo: IPageSOBP) {
 }
 
 export function makeNPageIdStr(pageInfo: IPageSOBP) {
-  const { section, book, owner, page } = pageInfo;
-  return `${section}.${book}.${owner}.${page}`;
+  if (pageInfo) {
+    const { section, book, owner, page } = pageInfo;
+    return `${section}.${book}.${owner}.${page}`;
+  }
+  return "undefined";
 }
 
 export function cloneObj(obj) {

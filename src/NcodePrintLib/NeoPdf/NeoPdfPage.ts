@@ -6,6 +6,7 @@ import { PDF_DEFAULT_DPI } from "../NcodeSurface/NcodeConstans";
 import NeoPdfDocument from "./NeoPdfDocument";
 import * as Util from "../UtilFunc";
 import { isSamePage } from "../../neosmartpen/utils/UtilsFunc";
+import { makePdfId } from "../UtilFunc";
 
 export type PDF_VIEWPORT_DESC = PdfJs.ViewportParameters & PdfJs.PDFPageViewport;
 
@@ -60,7 +61,7 @@ export default class NeoPdfPage {
 
   private _pageToNcodeMaps: IPageMapItem[] = [];
 
-  /** 
+  /**
    * 이 값은 NeoPdfDocument의 load에서 refreshNcodeMappingTable에 의해 자동으로 설정되고
    * MappingStorage가 update될 때마다 자동으로 갱신된다.
    */
@@ -220,8 +221,7 @@ export default class NeoPdfPage {
    * @param index - splitted area index, starting from 0
    * @param dpi - print dpi
    */
-  public render_dpi = async (index: number, dpi: number)
-    : Promise<IPdfPageCanvasDesc> => {
+  public render_dpi = async (index: number, dpi: number) => {
 
     await this._ready;
 
@@ -268,6 +268,7 @@ export default class NeoPdfPage {
         url: doc.url,
         filename: doc.filename,
         fingerprint: doc.fingerprint,
+        id: undefined,
         numPages: doc.numPages,
         pageNo: this._pageNo,
       },

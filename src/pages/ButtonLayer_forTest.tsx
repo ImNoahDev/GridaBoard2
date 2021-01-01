@@ -1,7 +1,7 @@
 import { Box, Button, Paper } from "@material-ui/core";
 import React, { useState } from "react";
 import { NeoImage } from "../components/CustomElement/NeoImage";
-import { g_defaultPrintOption, makeNPageIdStr, PrintOptionDialog, PrintPdfButton } from "../NcodePrintLib";
+import { g_defaultPrintOption, makeNPageIdStr, PrintOptionDialog } from "../NcodePrintLib";
 import ClearLocalMappingButton from "../NcodePrintLib/Buttons/ClearLocalMappingButton";
 import CalibrationButton from "../NcodePrintLib/NcodePrint/Dialogs/CalibrationDialog";
 import OptionDialogButton from "../NcodePrintLib/NcodePrint/Dialogs/OptionDialog";
@@ -49,8 +49,8 @@ const ButtonLayer_forTest = () => {
 
   let mapJson = {} as any;
   if (mapViewDetail) {
-    const instance = MappingStorage.getInstance();
-    const data = JSON.parse(JSON.stringify(instance._data));
+    const msi = MappingStorage.getInstance();
+    const data = JSON.parse(JSON.stringify(msi._data));
     const arrDocMap = data.arrDocMap;
 
     arrDocMap.forEach(map => {
@@ -58,12 +58,14 @@ const ButtonLayer_forTest = () => {
         const splitted = map.id.match(/^.+\/(.*)$/i);
         const pagesPerSheet = parseInt(splitted[1]);
         map["pagesPerSheet"] = pagesPerSheet;
-        map["pageInfo"] = makeNPageIdStr(map.nPageStart) + "    // this is the content of nPageStart";
+        map["printPageInfo.sum"] = makeNPageIdStr(map.printPageInfo);
+        map["basePageInfo.sum"] = makeNPageIdStr(map.basePageInfo);
         delete map.url;
         delete map.id;
         delete map.params;
         delete map.fingerprint;
-        delete map.nPageStart;
+        delete map.printPageInfo;
+        delete map.basePageInfo;
 
       }
     });
@@ -110,7 +112,7 @@ const ButtonLayer_forTest = () => {
       <NeoImage src="./icons/icon_trash_n.png" />
 
       {/* 인쇄 테스트 버튼 */}
-      <div style={{ fontSize: "20px", fontWeight: "bold" }}>
+      {/* <div style={{ fontSize: "20px", fontWeight: "bold" }}>
         <PrintPdfButton variant="contained" color="primary"
           id={printBtnId}
           url={pdfUrl}
@@ -120,7 +122,7 @@ const ButtonLayer_forTest = () => {
           <Box fontSize={14} fontWeight="fontWeightBold" >인쇄 시험 (인쇄 옵션 창을 띄울것)</Box>
         </PrintPdfButton>
       </div>
-      <div style={{ flex: 1 }}> </div>
+      <div style={{ flex: 1 }}> </div> */}
 
 
       {/* High-speed 인쇄 테스트 버튼 */}

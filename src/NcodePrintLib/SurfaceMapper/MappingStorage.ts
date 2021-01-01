@@ -1,13 +1,19 @@
-import { IPageMapItem, IPdfToNcodeMapItem } from "../Coordinates";
-import { INcodeSOBPxy, IPageSOBP } from "../DataStructure/Structures";
+import { IPageMapItem, IPdfPageDesc, IPdfToNcodeMapItem, IPolygonArea } from "../Coordinates";
+import { INcodeSOBPxy, IPageSOBP, IRectDpi } from "../DataStructure/Structures";
 import PdfDocMapper from "./PdfDocMapper";
 import * as cloud_util_func from "../../cloud_util_func";
-import { g_defaultNcode } from "../DefaultOption";
+import { g_defaultNcode, nullNcode } from "../DefaultOption";
 import { isSamePage } from "../../neosmartpen/utils/UtilsFunc";
 import * as Util from "../UtilFunc";
 import NeoPdfManager from "../NeoPdf/NeoPdfManager";
 import EventDispatcher, { EventCallbackType } from "../../neosmartpen/penstorage/EventSystem";
+import { IPrintOption } from "../NcodePrint/PrintDataTypes";
+import { makePdfId } from "../UtilFunc";
+import { MappingItem } from ".";
+import { getNPaperInfo, getNPaperSize_pu } from "../NcodeSurface/SurfaceInfo";
+import { INoteServerItem } from "../NcodeSurface/SurfaceDataTypes";
 
+export const BASECODE_PAGES_PER_SHEET = 16384;
 
 export enum MappingStorageEventName {
   ON_MAPINFO_REFRESHED = "on_map_refreshed",
@@ -49,6 +55,8 @@ export default class MappingStorage {
 
   private constructor() {
     if (_ms_i) return _ms_i;
+
+    this.initNextIssuable();
   }
 
   static getInstance() {
@@ -67,34 +75,202 @@ export default class MappingStorage {
 
     return pages;
   }
+
+  private initNextIssuable = () => {
+    if (this._data.nextIssuable.section === -1) {
+      this.nextIssuable = g_defaultNcode;
+    }
+  }
+
   public reset = () => {
     this._data = {
       nextIssuable: { ...g_defaultNcode },
       arrDocMap: [],
     };
   }
-
-  public getNextIssuableNcodeInfo = () => {
+  get nextIssuable() {
     return this._data.nextIssuable;
   }
 
-  public issueNcode = (options: IPdfToNcodeMapItem) => {
-    const { numPages } = options;
+  set nextIssuable(pageInfo: IPageSOBP) {
+    this._data.nextIssuable = { ...pageInfo };
+  }
 
-    // this._nextIssuableNcode를 참조해서
-    if (this._data.nextIssuable.section === -1) {
-      this._data.nextIssuable = { ...g_defaultNcode } as IPageSOBP;
+
+  /**
+   * 이 함수를 dialog로 수정함으로써 프린터 옵션을 바꿀 수 있다.
+   */
+  public getAssociatedMappingInfo = (fingerprint: string, pagesPerSheet: number, docNumPages: number) => {
+    const theSames = this.findAssociatedPrintNcode(fingerprint, pagesPerSheet);
+    const theSame: IPdfToNcodeMapItem = theSames.length > 0 ? theSames[0] : undefined;
+
+    return theSame;
+  }
+
+  /**
+   *  이 함수가 불려지기 전에, printOption에는 다음과 같은 항목이 설정되어 있어야만 한다.
+   * * url, filename, fingerprint, pagesperSheet, docNumPages
+   *
+   * 이 리턴 값은 printOption으로 바로 들어가서 대체될 수 있다.
+   * * printOption = {...printOption, ...returnValue }
+   * * 또는, for (const key in returnValue) printOption[key] = returnValue[key];
+   */
+  public getCodePrintInfo = (printOption: IPrintOption, forceToUpdateBaseCode: boolean) => {
+    if (forceToUpdateBaseCode === undefined) forceToUpdateBaseCode = printOption.forceToUpdateBaseCode;
+
+    const { fingerprint, pagesPerSheet, docNumPages } = printOption;
+    let needToIssueBaseCode: boolean;
+    let needToIssuePrintCode: boolean;
+
+    let basePageInfo: IPageSOBP;
+    let printPageInfo: IPageSOBP;
+
+    let prevBasePageInfo = nullNcode();
+    let prevPrintPageInfo = nullNcode();
+    let baseCodeIssued = false;
+
+
+    /** 코드 할당에 대한 기본 값을 써 주자 */
+    const theBase = this.findAssociatedBaseNcode(fingerprint);
+    const theSames = this.findAssociatedPrintNcode(fingerprint, pagesPerSheet);
+    const theSame = theSames.length > 0 ? theSames[0] : undefined as IPdfToNcodeMapItem;
+
+    let codeDelta = 0;
+
+    // base 코드 재활용 또는 할당
+    if (theBase) prevBasePageInfo = { ...theBase.basePageInfo };
+    if (theBase && !forceToUpdateBaseCode) {
+      // 재활용할 수 있는 경우
+      needToIssueBaseCode = false;
+      basePageInfo = { ...theBase.basePageInfo };
+    }
+    else {
+      // 할당해야만 하는 경우
+      if (!theBase) needToIssueBaseCode = true;
+      const nextCode = Util.getNextNcodePage(this.nextIssuable, codeDelta);
+      basePageInfo = { ...nextCode };
+      baseCodeIssued = true;
+      codeDelta += docNumPages;
     }
 
-    const pages: IPageSOBP[] = [];
-    for (let i = 0; i < numPages; i++) {
-      const pi = Util.getNextNcodePage(this._data.nextIssuable, i);
-      pages.push(pi);
+
+    // 인쇄될 페이지의 코드 재활용 또는 할당
+
+    if (theSame) prevPrintPageInfo = { ...theSame.printPageInfo };
+
+    const reUsable = (!!theSame) && isSamePage(theSame.basePageInfo, theBase.basePageInfo);
+    if (reUsable && !forceToUpdateBaseCode) {
+      // 재활용할 수 있는 경우
+      needToIssuePrintCode = false;
+      printPageInfo = { ...theSames[0].printPageInfo };
+    }
+    else {
+      // 할당해야만 하는 경우
+      if (!(theSames.length > 0)) needToIssuePrintCode = true;
+      const nextCode = Util.getNextNcodePage(this.nextIssuable, codeDelta);
+      printPageInfo = { ...nextCode };
+      codeDelta += docNumPages;
     }
 
-    this._data.nextIssuable = { ...Util.getNextNcodePage(this._data.nextIssuable, numPages) };
-    options.nPageStart = pages[0];
-    return options;
+    return {
+      prevBasePageInfo,
+      needToIssueBaseCode,
+      basePageInfo,
+      baseCodeIssued,
+
+      prevPrintPageInfo,
+      needToIssuePrintCode,
+      printPageInfo,
+
+      numNcodeComsumed: codeDelta,
+    }
+  }
+
+
+  public getNextIssuablePageInfo = (printOption: IPrintOption) => {
+    const codeInfo = this.getCodePrintInfo(printOption, true);
+
+    return [codeInfo.basePageInfo, codeInfo.printPageInfo];
+  }
+
+  private makeDummyParamsForBasePageInfo = (codeNeeded, printOption: IPrintOption) => {
+    const { docNumPages, pagesPerSheet, fingerprint, url, filename } = printOption;
+
+    // dummy
+    const params: IPageMapItem[] = [];
+    for (let i = 0; i < docNumPages; i++) {
+      const pageNo = i + 1;
+      const mapData = new MappingItem(pageNo);      // h의 기본값은 여기서 세팅된다.
+      const basePageInfo = codeNeeded.basePageInfo;
+
+      const pi: INoteServerItem = getNPaperInfo(codeNeeded.basePageInfo);
+      const paperSize_pu = getNPaperSize_pu(codeNeeded.basePageInfo);
+
+      // dummy Ncode page info
+      const { Xmin: x0, Xmax: x1, Ymin: y0, Ymax: y1 } = pi.margin;
+      const pdfDrawnRect: IRectDpi = { unit: "nu", x: x0, y: y0, width: x1 - x0, height: y1 - y0 };
+      const npageArea: IPolygonArea = [{ x: x0, y: y0 }, { x: x1, y: y0 }, { x: x1, y: y1 }, { x: x0, y: y1 }];
+      mapData.setNcodeArea({ pageInfo: basePageInfo, basePageInfo: basePageInfo, pdfDrawnRect, npageArea });
+
+      // dummy PDF page info
+      const { url, filename, fingerprint, docNumPages: numPages } = printOption;
+      const pdfPageInfo: IPdfPageDesc = { url, filename, fingerprint, id: makePdfId(fingerprint, BASECODE_PAGES_PER_SHEET), numPages, pageNo };
+      mapData.setPdfArea({ pdfPageInfo, rect: { unit: "pu", x: 0, y: 0, width: paperSize_pu.width, height: paperSize_pu.height } });
+
+      params.push(mapData._params);
+    }
+
+    const basePdfToNcodeMap: IPdfToNcodeMapItem = {
+      url,
+      filename,
+      fingerprint,
+      pagesPerSheet: BASECODE_PAGES_PER_SHEET,
+      id: makePdfId(fingerprint, BASECODE_PAGES_PER_SHEET),
+      numPages: docNumPages,
+
+      printPageInfo: { ...codeNeeded.basePageInfo },
+      basePageInfo: { ...codeNeeded.basePageInfo },
+
+      params,
+      timeString: Util.getNowTimeStr(),
+    }
+    return basePdfToNcodeMap;
+  }
+
+
+  public issueNcode = (printOption: IPrintOption) => {
+    // 한번도 코드를 발행해 본적이 없는 경우의 default
+    this.initNextIssuable();
+
+    // 리턴 값을 준비
+    const { docNumPages, pagesPerSheet, fingerprint, url, filename } = printOption;
+    const codeNeeded = this.getCodePrintInfo(printOption, undefined);
+
+    // Base map을 등록해야 한다면, 아래와 같이 더미의 base code map을 등록
+    // 아래의 맵에서는 h가 정의되어 있지 않으므로, 직접 불러서 transform할 수 없다
+    if (codeNeeded.baseCodeIssued) {
+      const basePdfToNcodeMap = this.makeDummyParamsForBasePageInfo(codeNeeded, printOption);
+      this._data.arrDocMap.push(basePdfToNcodeMap);
+    }
+
+    // 현재 인쇄 상태의 map의 코드 정보를 전달
+    const pdfToNcodeMap: IPdfToNcodeMapItem = {
+      url,
+      filename,
+      fingerprint,
+      pagesPerSheet,
+      id: makePdfId(fingerprint, pagesPerSheet as number),
+      numPages: docNumPages,
+
+      printPageInfo: { ...codeNeeded.printPageInfo },
+      basePageInfo: { ...codeNeeded.basePageInfo },
+
+      params: undefined,
+      timeString: Util.getNowTimeStr(),
+    }
+    this.nextIssuable = Util.getNextNcodePage(this.nextIssuable, codeNeeded.numNcodeComsumed);
+
+    return pdfToNcodeMap;
   }
 
   register = (mapper: PdfDocMapper) => {
@@ -169,7 +345,7 @@ export default class MappingStorage {
     //   }
     // }
 
-    const found = this._data.arrDocMap.find(m => Util.isPageInRange(ncodeXy, m.nPageStart, m.numPages));
+    const found = this._data.arrDocMap.find(m => Util.isPageInRange(ncodeXy, m.printPageInfo, m.numPages));
     if (found) {
       /** 원래는 폴리곤에 속했는지 점검해야 하지만, 현재는 같은 페이지인지만 점검한다  2020/12/06 */
       const pageMap = found.params.find(param => isSamePage(ncodeXy, param.pageInfo));
@@ -179,37 +355,35 @@ export default class MappingStorage {
     return undefined;
   }
 
+
   /**
    * Ncode가 발행된 적이 있는지를 점검하기 위해서 쓰인다.
    */
-  private findNcodeRangeByPrintId = (pdfId: string) => {
-    const found = this._data.arrDocMap.find(m => pdfId === m.id);
-    if (found) {
+  findAssociatedNcode = (fingerprint: string, pagesPerSheet: number) => {
+    const theBase = this.findAssociatedBaseNcode(fingerprint);
+    const theSames = this.findAssociatedPrintNcode(fingerprint, pagesPerSheet);
 
-      return found;
-    }
-    // const found = this._arrMapped.find(trans => pdfId === trans.pdfDesc.id);
-    return undefined;
+    return { theBase, theSames }
   }
 
-  /**
-   * Ncode가 발행된 적이 있는지를 점검하기 위해서 쓰인다.
-   */
-  findAssociatedNcode = (fingerprint: string, pagesPerSheet?: number) => {
-    if (pagesPerSheet) {
-      const id = Util.makePdfId(fingerprint, pagesPerSheet as number);
-      const mapped = this.findNcodeRangeByPrintId(id);
+  findAssociatedPrintNcode = (fingerprint: string, pagesPerSheet: number) => {
+    const id = Util.makePdfId(fingerprint, pagesPerSheet as number);
 
-      if (mapped && mapped.nPageStart.section !== -1) {
-        return [mapped];
-      }
+    const theSames = this._data.arrDocMap.filter(m => id === m.id);
+    theSames.sort((a, b) => b.timeString > a.timeString ? 1 : (b.timeString === a.timeString ? 0 : -1));
 
-      return [];
-    }
-    else {
-      const found = this._data.arrDocMap.filter(m => m.fingerprint === fingerprint);
-      return found;
-    }
+    return theSames;
+  }
+
+  findAssociatedBaseNcode = (fingerprint: string) => {
+    const baseId = Util.makePdfId(fingerprint, BASECODE_PAGES_PER_SHEET);
+
+    // const theBase = this._data.arrDocMap.find(m => baseId === m.id);
+    const theBases = this._data.arrDocMap.filter(m => baseId === m.id);
+    theBases.sort((a, b) => b.timeString > a.timeString ? 1 : (b.timeString === a.timeString ? 0 : -1));
+    const theBase = theBases.length > 0 ? theBases[0] : undefined;
+
+    return theBase;
   }
 
   dump = (prefix: string) => {
@@ -328,8 +502,8 @@ function storageAvailable(type) {
 // 이것 참고해서 더 수정할 것
 
 (function () {
-  const instance = MappingStorage.getInstance();
-  instance.loadMappingInfo();
+  const msi = MappingStorage.getInstance();
+  msi.loadMappingInfo();
 
   // https://developer.chrome.com/docs/apps/offline_storage/#query ==> enter
 

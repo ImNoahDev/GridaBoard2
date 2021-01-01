@@ -24,6 +24,7 @@ const useStyles = makeStyles({
 
 
 export const MAX_PRINTOPTION_LEVEL = 1;    // 2: debug mode
+export const DEFAULT_PRINTOPTION_LEVEL = 1;    // 2: debug mode
 
 interface IDialogProps extends DialogProps {
   open: boolean,
@@ -40,7 +41,7 @@ export function OptionDialog(props: IDialogProps) {
   const classes = useStyles();
   const theme = useTheme();
   const dialogRef = useRef(null);
-  const [optionLevel, setOptionLevel] = useState(0);
+  const [optionLevel, setOptionLevel] = useState(DEFAULT_PRINTOPTION_LEVEL);
   const isInitialMount = useRef(true);
 
   /** force to rerender */
@@ -129,20 +130,25 @@ export function OptionDialog(props: IDialogProps) {
   };
 
 
-  const checkAssociatedMappingInfo = () => {
-    // PrintPdfMain의 printTrigger를 +1 해 주면, 인쇄가 시작된다
-    const maps = MappingStorage.getInstance();
-    const pdfMapDescArr = maps.findAssociatedNcode(printOption.fingerprint, printOption.pagesPerSheet);
-    const pdfMapDesc = pdfMapDescArr.length > 0 ? pdfMapDescArr[0] : undefined;
+  // const checkAssociatedMappingInfo = () => {
+  //   // PrintPdfMain의 printTrigger를 +1 해 주면, 인쇄가 시작된다
+  //   const msi = MappingStorage.getInstance();
+  //   const pdfToNcodeMapArr = msi.findAssociatedNcode(printOption.fingerprint, printOption.pagesPerSheet);
+  //   const pdfToNcodeMap = pdfToNcodeMapArr.length > 0 ? pdfToNcodeMapArr[0] : undefined;
 
-    printOption.needToIssueCode = !pdfMapDesc;
-    if (printOption.needToIssueCode) {
-      printOption.pageInfo = { ...g_nullNcode };
-    }
-    else {
-      printOption.pageInfo = { ...pdfMapDesc.nPageStart };
-    }
-  }
+  //   if (!pdfToNcodeMap) {
+  //     printOption.forceToUpdateBaseCode = true;
+  //     printOption.needToIssuePrintCode = true;
+  //   }
+  //   else if (pdfToNcodeMap.printPageInfo)
+
+  //     if (printOption.needToIssuePrintCode) {
+  //       printOption.pageInfo = { ...g_nullNcode };
+  //     }
+  //     else {
+  //       printOption.pageInfo = { ...pdfToNcodeMap.printPageInfo };
+  //     }
+  // }
 
 
   const handleChange2 = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -164,27 +170,41 @@ export function OptionDialog(props: IDialogProps) {
         printOption[name] = convertStringToArray(value);
         break;
 
-      case "pagesPerSheet":
+      case "pagesPerSheet": {
         printOption[name] = parseInt(value) as 1 | 2 | 4 | 8 | 9 | 16 | 18 | 25 | 32;
-        checkAssociatedMappingInfo();
+        const msi = MappingStorage.getInstance();
+        const partOption = msi.getCodePrintInfo(printOption, undefined);
+        for (const key in partOption) printOption[key] = partOption[key];
         break;
+      }
 
       case "showTooltip":
-      case "forceToIssueNewCode":
-      case "needToIssueCode":
+      case "forceToUpdateBaseCode":
+      case "needToIssuePrintCode":
       case "downloadNcodedPdf":
       case "drawCalibrationMark":
       case "drawFrame":
         printOption[name] = checked;
         break;
 
-      case "sameCode":
-        printOption["needToIssueCode"] = !checked;
-        break;
+      case "sameCode": {
+        printOption["forceToUpdateBaseCode"] = !checked;
 
-      case "newNcode":
-        printOption["needToIssueCode"] = checked;
+        const msi = MappingStorage.getInstance();
+        const partOption = msi.getCodePrintInfo(printOption, undefined);
+        for (const key in partOption) printOption[key] = partOption[key];
+
         break;
+      }
+
+      case "newNcode": {
+        printOption["forceToUpdateBaseCode"] = checked;
+
+        const msi = MappingStorage.getInstance();
+        const partOption = msi.getCodePrintInfo(printOption, undefined);
+        for (const key in partOption) printOption[key] = partOption[key];
+        break;
+      }
 
 
       case "mediaSize":

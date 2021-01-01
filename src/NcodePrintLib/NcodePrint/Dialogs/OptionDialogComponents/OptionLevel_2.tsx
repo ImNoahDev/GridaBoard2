@@ -29,18 +29,16 @@ function OptionLevel_2(props: ILeveledDialogProps) {
   const msg = optionLevel > 1 ? "전문가 설정 닫기" : "전문가 설정 열기";
   console.log(`OptionLevel2: step 2, level=${optionLevel}`);
 
-  const mapper = MappingStorage.getInstance();
-  const newNcode = mapper.getNextIssuableNcodeInfo();
+  const msi = MappingStorage.getInstance();
 
   // console.log(printOption);
   const help = printOption.showTooltip;
 
   let newCodeOnly = false;
-  if (printOption.pageInfo.page === -1) {
+  if (printOption.printPageInfo.page === -1) {
     newCodeOnly = true;
   }
 
-  const newCodeWillUsed = printOption.needToIssueCode || printOption.forceToIssueNewCode;
   const pageMarginArray = Array.from({ length: 21 }, (_, i) => `${i} mm`);
   const imgMarginArray = Array.from({ length: 21 }, (_, i) => `${i} mm`);
   return (
@@ -122,8 +120,8 @@ function OptionLevel_2(props: ILeveledDialogProps) {
 
           <TableRow className={classes.tr}>
             <TableCell colSpan={1} style={cellRadioStyle}>
-              <RadioField showHelp={help} checked={printOption.forceToIssueNewCode} handleChange={handleChange2} color={localColor} name="forceToIssueNewCode">
-                강제 새코드 발행: {printOption.forceToIssueNewCode ? "true" : "false"}
+              <RadioField showHelp={help} checked={printOption.forceToUpdateBaseCode} handleChange={handleChange2} color={localColor} name="forceToUpdateBaseCode">
+                강제 새코드 발행: {printOption.forceToUpdateBaseCode ? "true" : "false"}
               </RadioField >
             </TableCell>
           </TableRow>
@@ -164,8 +162,8 @@ function OptionLevel_2(props: ILeveledDialogProps) {
 
           <TableRow className={classes.tr}>
             <TableCell colSpan={1} style={cellRadioStyle}>
-              <RadioField disabled showHelp={help} checked={printOption.needToIssueCode} handleChange={handleChange2} color={localColor} name="needToIssueCode">
-                코드 할당 예정: {printOption.needToIssueCode ? "true" : "false"}
+              <RadioField disabled showHelp={help} checked={printOption.needToIssuePrintCode} handleChange={handleChange2} color={localColor} name="needToIssuePrintCode">
+                코드 할당 예정: {printOption.needToIssuePrintCode ? "true" : "false"}
               </RadioField >
             </TableCell>
           </TableRow>
