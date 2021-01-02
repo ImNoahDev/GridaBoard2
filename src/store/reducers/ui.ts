@@ -4,6 +4,8 @@ import { store } from "../../client/Root";
 const ActionGroup = 'UI';
 
 export const UIActionTypes = Object.freeze({
+
+
   SHOW_UI_PROGRESS: `${ActionGroup}.SHOW_UI_PROGRESS`,
   HIDE_UI_PROGRESS: `${ActionGroup}.HIDE_UI_PROGRESS`,
   SHOW_TOAST_MESSAGE: `${ActionGroup}.SHOW_TOAST_MESSAGE`,
@@ -174,7 +176,7 @@ export default (state = initialState, action) => {
     case UIActionTypes.SHOW_UI_PROGRESS: {
       return {
         ...state,
-        progress: {
+        waiting: {
           circular: true
         }
       };
@@ -182,7 +184,7 @@ export default (state = initialState, action) => {
     case UIActionTypes.HIDE_UI_PROGRESS: {
       return {
         ...state,
-        progress: {
+        waiting: {
           circular: false
         }
       };

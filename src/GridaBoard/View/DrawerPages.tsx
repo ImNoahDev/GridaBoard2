@@ -94,6 +94,7 @@ class DrawerPages extends React.Component<Props, State>  {
                   playState={PLAYSTATE.live} pens={[]}
                   rotation={0}
                   pageInfo={pageInfo}
+                  basePageInfo={pageInfo}
                   parentName={`thumbnail-${i}`}
                   viewFit={ZoomFitEnum.FULL}
                   autoPageChange={false}
@@ -111,7 +112,7 @@ class DrawerPages extends React.Component<Props, State>  {
                 <Typography style={{ color: "#f00" }}> {makeNPageIdStr(page.pageInfos[0])}</Typography>
               </div>
 
-              {/* 
+              {/*
             <Box id={`box-id-${i}`}
               style={{ position: "absolute", right: 0, left: 0, top: 0, height: "100%", backgroundColor: bgColor }}
               fontSize={18}>

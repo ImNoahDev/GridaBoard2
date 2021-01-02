@@ -131,15 +131,15 @@ export interface IPdfToNcodeMapItem {
  */
 export interface IPageMapItem {
   /** 최초 로컬 Mapping Storage에 store된 시각 */
-  timeString?: string,
+  timeString?: string;
 
-  pdfPageNo: number,
+  pdfPageNo: number;
 
   /** 인쇄된 Ncode page information */
-  pageInfo: IPageSOBP,
+  pageInfo: IPageSOBP;
 
   /** 인식되어 구분되는 base pageInfo */
-  basePageInfo: IPageSOBP,
+  basePageInfo: IPageSOBP;
 
   /**
    * Ncode area information,
@@ -153,14 +153,14 @@ export interface IPageMapItem {
    *
    * 따라서, IPolygonArea로 쓰도록 했다.
    **/
-  npageArea: IPolygonArea,
+  npageArea: IPolygonArea;
 
   /** (section.owner.book.page): (x,y)~(width,height) ==> pdfInfo */
-  pdfDesc: IPdfPageDesc,
+  pdfDesc: IPdfPageDesc;
 
   /** Homography matrix (Ncode to Pdf) */
-  h: TransformParameters,
+  h: TransformParameters;
 
   /** Homography matrix (Pdf to Ncode) */
-  h_rev: TransformParameters,
+  h_rev: TransformParameters;
 }

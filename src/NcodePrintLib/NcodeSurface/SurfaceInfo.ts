@@ -1,4 +1,4 @@
-import { paperType } from "./NcodeSurfaceDataJson";
+import { g_paperType } from "./NcodeSurfaceDataJson";
 import { INoteServerItem, IPaperSize } from "./SurfaceDataTypes";
 
 import { IPageSOBP, INcodeSOBPxy, ISize, UNIT_TO_DPI } from "../DataStructure/Structures";
@@ -24,6 +24,9 @@ export const g_availablePagesInSection = {
   13: 512,
   14: 512,
   15: 512,
+
+  // 임시 mapping을 위한 섹션코드, 256
+  256: 4096,
 }
 
 
@@ -115,40 +118,23 @@ export function getMediaSize_pu(mediaType: IPaperSize): ISize {
  */
 export function getNPaperInfo(pageInfo: IPageSOBP): INoteServerItem {
   let section = -1, owner = -1, book = -1;
-  if( pageInfo ) {
+  if (pageInfo) {
     section = pageInfo.section;
     owner = pageInfo.owner;
     book = pageInfo.book;
   }
-  // const { section, owner, book } = pageInfo;
 
-  let found = paperType.paperA4_dummy;
-  let found_key = "paperA4_dummy";
-
-  const keys = Object.keys(paperType);
-  for (let j = 0; j < keys.length; j++) {
-    const key = keys[j];
-    const value = paperType[key];
-
-    const idx = value.books.indexOf(book);
-    if (idx > -1) {
-      if (section === value.section && owner === value.owner) {
-        found = value;
-        found_key = key;
-        break;
-      }
-    }
+  let key = section.toString() + "." + owner.toString() + "." + book.toString();
+  let found = g_paperType.definition[key];
+  if ( !found ) {
+    key = g_paperType.defaultKey;
+    found = g_paperType.definition[key];
   }
 
   const desc: INoteServerItem = {
-    id: found_key,
+    ...found,
+    id: key,
     pageInfo,
-    margin: {
-      Xmin: found.Xmin,
-      Xmax: found.Xmax,
-      Ymin: found.Ymin,
-      Ymax: found.Ymax,
-    },
     glyphData: "",
   };
 

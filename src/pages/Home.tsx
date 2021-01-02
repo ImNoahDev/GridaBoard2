@@ -23,6 +23,7 @@ import { IActivePageState } from "../store/reducers/activePageReducer";
 import NeoPdfDocument from "../NcodePrintLib/NeoPdf/NeoPdfDocument";
 import NeoPdfManager from "../NcodePrintLib/NeoPdf/NeoPdfManager";
 import { IHandleFileLoadNeededEvent } from "../neosmartpen/renderer/MixedPageView";
+import { nullNcode } from "../NcodePrintLib/DefaultOption";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -50,6 +51,9 @@ const Home = () => {
   const [pdfUrl, setPdfUrl] = useState(undefined as string);
   const [pdfFilename, setPdfFilename] = useState(undefined as string);
   const [noMoreAutoLoad, setNoMoreAutoLoad] = useState(false);
+
+  const [pageInfo, setPageInfo] = useState(nullNcode());
+  const [basePageInfo, setBasePageInfo] = useState(nullNcode());
 
   const drawerWidth = useSelector((state: RootState) => state.ui.drawer.width);
   const activePageNo = useSelector((state: RootState) => state.activePage.activePageNo);
@@ -230,6 +234,8 @@ const Home = () => {
             // pdf={pdf}
             pdfUrl={pdfUrl} filename={pdfFilename}
             pageNo={1}
+            pageInfo={pageInfo}
+            basePageInfo={basePageInfo}
             playState={PLAYSTATE.live}
             pens={pens} fromStorage={false}
             autoPageChange={true}

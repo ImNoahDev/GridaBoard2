@@ -1,5 +1,5 @@
 import { openFileBrowser } from "./FileBrowser";
-import NeoPdfDocument, { IGetDocumentOptions } from "./NeoPdfDocument";
+import NeoPdfDocument, { IPdfOpenOption } from "./NeoPdfDocument";
 import EventDispatcher, { EventCallbackType } from "../../neosmartpen/penstorage/EventSystem";
 import { MappingStorage } from "../SurfaceMapper";
 import { IMappingStorageEvent, MappingStorageEventName } from "../SurfaceMapper/MappingStorage";
@@ -47,11 +47,12 @@ export default class NeoPdfManager {
   handleMapInfoAdded = (event: IMappingStorageEvent) => {
     const docMap = event.mapper.docMap;
     const pdfs = this._pdfs.filter( pdf => pdf.fingerprint === docMap.fingerprint);
-    pdfs.forEach(pdf => pdf.addNcodeMapping(docMap));
+    // pdfs.forEach(pdf => pdf.addNcodeMapping(docMap));
+    pdfs.forEach(pdf => pdf.refreshNcodeMappingTable());
   }
 
 
-  public getDocument = async (options: IGetDocumentOptions) => {
+  public getDocument = async (options: IPdfOpenOption) => {
     if (options.url && !options.fingerprint) {
       const pdf = new NeoPdfDocument();
       await pdf.load(options);
@@ -85,7 +86,7 @@ export default class NeoPdfManager {
   }
 
 
-  static getUrl = async (options: IGetDocumentOptions) => {
+  static getUrl = async (options: IPdfOpenOption) => {
     const fingerprint = options.fingerprint;
 
     if (!fingerprint) {
@@ -112,7 +113,7 @@ export default class NeoPdfManager {
     }
   }
 
-  static checkFingerprint = async (options: IGetDocumentOptions, fingerprint: string) => {
+  static checkFingerprint = async (options: IPdfOpenOption, fingerprint: string) => {
 
     let doc = new NeoPdfDocument();
     // await doc.load(options);

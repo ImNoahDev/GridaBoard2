@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import App from "../shared/App";
 import { Provider } from "react-redux";
 import { theme } from "../styles/theme";
@@ -23,11 +23,15 @@ import CloseIcon from "@material-ui/icons/Close";
 
 import configureStore from "../store/configureStore";
 import { RootState } from '../store/rootReducer';
-import { useSelector } from "react-redux";
-import { g_hiddenFileInputBtnId, onFileInputChanged, onFileInputClicked } from "../NcodePrintLib/NeoPdf/FileBrowser";
 import GridaDoc from "../GridaBoard/GridaDoc";
 import { IFileBrowserReturn } from "../NcodePrintLib/NcodePrint/PrintDataTypes";
 import GridaApp from "../GridaBoard/GridaApp";
+import { hideUIProgressBackdrop, showUIProgressBackdrop } from "../store/reducers/ui";
+import { fetchGzippedFile } from "../NcodePrintLib/NcodeSurface/NcodeFetcher";
+import { g_paperType, g_paperType_default } from "../NcodePrintLib/NcodeSurface/NcodeSurfaceDataJson";
+import { sleep } from "../NcodePrintLib/UtilFunc";
+
+
 
 // const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 // export const store = createStore(rootReducer, composeEnhancers(applyMiddleware(thunk)));
@@ -92,6 +96,24 @@ const renderToastMessage = () => {
 
 
 const Root = () => {
+  const [paperInfoInited, setPaperInfoInited] = useState(false);
+  useEffect(() => {
+    if (!paperInfoInited) {
+      showUIProgressBackdrop();
+      fetchGzippedFile("./nbs_v2.json.gz").then(async (nbs) => {
+        // await sleep(10000);
+        g_paperType.definition = JSON.parse(nbs);
+        hideUIProgressBackdrop();
+        setPaperInfoInited(true);
+      }
+      ).catch((e) => {
+        g_paperType.definition = g_paperType_default;
+        hideUIProgressBackdrop();
+      });
+
+
+    }
+  }, [paperInfoInited]);
 
   const styles = {
     routerWrapper: {

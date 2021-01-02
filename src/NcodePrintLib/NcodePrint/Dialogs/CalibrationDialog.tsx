@@ -5,12 +5,11 @@ import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../../../store/rootReducer';
 import { hideCalibrationDialog, showCalibrationDialog, updateCalibrationDialog } from '../../../store/reducers/calibrationReducer';
 import { IPrintOption } from '../..';
-import NeoPdfDocument, { IGetDocumentOptions } from '../../NeoPdf/NeoPdfDocument';
+import NeoPdfDocument, { IPdfOpenOption } from '../../NeoPdf/NeoPdfDocument';
 import { IThumbnailDesc } from "../../NeoPdf/NeoPdfPage";
 import NeoPdfManager from '../../NeoPdf/NeoPdfManager';
 import { theme } from '../../../styles/theme';
 import "./pen_touch.css";
-import { hideUIProgressBackdrop, showUIProgressBackdrop } from '../../../store/reducers/ui';
 
 const _penImageUrl = "./icons/image_calibration.png";
 

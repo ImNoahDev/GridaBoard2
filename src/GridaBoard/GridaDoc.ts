@@ -1,6 +1,6 @@
 import { IPageMapItem, IPdfToNcodeMapItem } from "../NcodePrintLib/Coordinates";
 import { IFileBrowserReturn } from "../NcodePrintLib/NcodePrint/PrintDataTypes";
-import NeoPdfDocument, { IGetDocumentOptions } from "../NcodePrintLib/NeoPdf/NeoPdfDocument";
+import NeoPdfDocument, { IPdfOpenOption } from "../NcodePrintLib/NeoPdf/NeoPdfDocument";
 import NeoPdfManager, { IPenToViewerEvent, PdfManagerEventName } from "../NcodePrintLib/NeoPdf/NeoPdfManager";
 import { MappingStorage } from "../NcodePrintLib/SurfaceMapper";
 import { IAutoLoadDocDesc, IMappingStorageEvent, MappingStorageEventName } from "../NcodePrintLib/SurfaceMapper/MappingStorage";
@@ -17,8 +17,9 @@ export default class GridaDoc {
 
   private _pdfDescs: {
     pdf: NeoPdfDocument,
+
     fingerprint: string,
-    pdfNames: IGetDocumentOptions,
+    pdfOpenInfo: IPdfOpenOption,
     promise: Promise<NeoPdfDocument>,
     startPageInDoc: number,       // starting from 0
     endPageInDoc: number,         // starting from 0
@@ -53,7 +54,8 @@ export default class GridaDoc {
   handleMapInfoAdded = (event: IMappingStorageEvent) => {
     const docMap = event.mapper.docMap;
     const pdfDescs = this._pdfDescs.filter(pdfDesc => pdfDesc.fingerprint === docMap.fingerprint);
-    pdfDescs.forEach(pdfDesc => pdfDesc.pdf.addNcodeMapping(docMap));
+    // pdfDescs.forEach(pdfDesc => pdfDesc.pdf.addNcodeMapping(docMap));
+    pdfDescs.forEach(pdfDesc => pdfDesc.pdf.refreshNcodeMappingTable());
 
     forceToRenderPanes();
   }
@@ -61,7 +63,9 @@ export default class GridaDoc {
   public handleSetNcodeMapping = (docMap: IPdfToNcodeMapItem) => {
     // 내장한 PDF들에 대해서 pageInfo를 등록
     const pdfDescs = this._pdfDescs.filter(pdfDesc => pdfDesc.fingerprint === docMap.fingerprint);
-    pdfDescs.forEach(pdfDesc => pdfDesc.pdf.addNcodeMapping(docMap));
+    // pdfDescs.forEach(pdfDesc => pdfDesc.pdf.addNcodeMapping(docMap));
+    pdfDescs.forEach(pdfDesc => pdfDesc.pdf.refreshNcodeMappingTable());
+
     forceToRenderPanes();
 
     // GridaPage에 pageInfo를 등록
@@ -80,9 +84,45 @@ export default class GridaDoc {
     setActivePdf(pdfDoc);
 
     if (pdfDoc) {
-      this.registerPdfDoc(pdfDoc);
+      this.appendPagesFromPdf(pdfDoc);
     }
   }
+
+  private appendPagesFromPdf = (pdfDoc: NeoPdfDocument) => {
+    // 0) PDF가 있는지 찾아보고 있으면 return, (없으면 1, 2를 통해서 넣는다)
+    const found = this._pdfDescs.findIndex(item => item.fingerprint === pdfDoc.fingerprint);
+    if (found >= 0) return;
+
+    // 1) page와 maps(MappingStorage)에 있는 정보를 매핑해둔다.
+    pdfDoc.refreshNcodeMappingTable();
+
+    // 2) PDF 배열에 정보를 추가하고
+    this._pdfDescs.push({
+      pdf: pdfDoc,
+      fingerprint: pdfDoc.fingerprint,
+      pdfOpenInfo: { url: pdfDoc.url, filename: pdfDoc.filename, purpose: "to be stored by GridaDoc", },
+      promise: Promise.resolve(pdfDoc),
+      startPageInDoc: this.numPages,
+      endPageInDoc: this.numPages + pdfDoc.numPages - 1,
+    });
+
+    // 3) 페이지를 넣어 주자
+    const numPages = pdfDoc.numPages;
+    for (let i = 0; i < numPages; i++) {
+      const maps = pdfDoc.getPage(i + 1).pageToNcodeMaps;
+      this.addPage(maps, pdfDoc, i + 1);
+    }
+  }
+
+  private addPage = (maps: IPageMapItem[], pdf: NeoPdfDocument, pageNo: number) => {
+    const page = new GridaPage(maps);
+    page.setPdfPage(pdf, pageNo)
+
+    this._pages.push(page);
+
+    setDocNumPages(this._pages.length);
+  }
+
 
   /**
    * Message handlers
@@ -98,36 +138,6 @@ export default class GridaDoc {
 
   }
 
-  private registerPdfDoc = (pdfDoc: NeoPdfDocument) => {
-    const found = this._pdfDescs.findIndex(item => item.fingerprint === pdfDoc.fingerprint);
-
-    if (found < 0) {
-      this._pdfDescs.push({
-        pdf: pdfDoc,
-        fingerprint: pdfDoc.fingerprint,
-        pdfNames: { url: pdfDoc.url, filename: pdfDoc.filename, purpose: "to be stored by GridaDoc", },
-        promise: Promise.resolve(pdfDoc),
-        startPageInDoc: this.numPages,
-        endPageInDoc: this.numPages + pdfDoc.numPages - 1,
-      });
-
-      // 2) 페이지를 넣어 주자
-      const numPages = pdfDoc.numPages;
-      for (let i = 0; i < numPages; i++) {
-        const maps = pdfDoc.getPage(i + 1).pageToNcodeMaps;
-        this.addPage(maps, pdfDoc, i + 1);
-      }
-    }
-  }
-
-  private addPage = (maps: IPageMapItem[], pdf: NeoPdfDocument, pageNo: number) => {
-    const page = new GridaPage(maps);
-    page.setPdfPage(pdf, pageNo)
-
-    this._pages.push(page);
-
-    setDocNumPages(this._pages.length);
-  }
 
   public handleActivePageChanged = (pageInfo: IPageSOBP) => {
   }

@@ -35,9 +35,16 @@ export type IPaperSize = {
 };
 
 export type INoteServerItem = {
-  id: string;           //
-  pageInfo: IPageSOBP;
+  id: string;                 // 3.27.964
 
+  title?: string;              // "페가수스 수학1_3권"
+  pdf_page_count?: number;     // 131
+  nproj_file?: string;         // "note_964.nproj"
+  pdf_name?: string;           // "math1_vol.3_print.pdf"
+  ncode_end_page?: number;     // 131
+  ncode_start_page?: number;   // 1
+
+  pageInfo: IPageSOBP;
   /** Ncode Unit margin  */
   margin: {
     Xmin: number,
@@ -53,13 +60,26 @@ export type INoteServerItem = {
 
 export type IPaperTypeDesc = {
   [key: string]: {
+    id: string;                 // 3.27.964
+
+    title?: string;              // "페가수스 수학1_3권"
+    pdf_page_count?: number;     // 131
+    nproj_file?: string;         // "note_964.nproj"
+    pdf_name?: string;           // "math1_vol.3_print.pdf"
+    ncode_end_page?: number;     // 131
+    ncode_start_page?: number;   // 1
+
     section: number,
     owner: number,
-    books: number[],
+    book: number,
 
-    Xmin: number,
-    Ymin: number,
-    Xmax: number,
-    Ymax: number,
+    /** Ncode Unit margin  */
+    margin: {
+      Xmin: number,
+      Xmax?: number,
+
+      Ymin: number,
+      Ymax?: number,
+    };
   }
 }

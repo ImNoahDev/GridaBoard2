@@ -44,13 +44,14 @@ export type IHandleFileLoadNeededEvent = { coupledDoc: IAutoLoadDocDesc, isLoade
 export interface MixedViewProps {
   baseScale?: number;
 
-  pageInfo?: IPageSOBP;
+  pageInfo: IPageSOBP;
 
-  printedPageInfo?: IPageSOBP;
+  basePageInfo: IPageSOBP;
 
   pdf?: NeoPdfDocument,
 
   pdfUrl: string;
+
   filename: string,
 
   pageNo: number;
@@ -136,6 +137,8 @@ interface State {
 const defaultMixedPageViewProps: MixedViewProps = {
   // properties
   pageInfo: undefined,
+  basePageInfo: undefined,
+
   pdf: undefined,
   pdfUrl: undefined,
   filename: undefined,
@@ -214,7 +217,7 @@ class MixedPageView_module extends React.Component<MixedViewProps, State>  {
     if (url === undefined) return;
 
     // kitty, 나중에는 분리할 것
-    showUIProgressBackdrop();
+    // showUIProgressBackdrop();
     console.log("*GRIDA DOC*, loadDocument START");
     const loadingTask = NeoPdfManager.getInstance().getDocument({ url, filename, purpose: "MAIN DOCUMENT: to be opend by NeoPdfViewer" });
     this.setState({ status: "loading" });
@@ -225,7 +228,7 @@ class MixedPageView_module extends React.Component<MixedViewProps, State>  {
     this.onReportPdfInfo(pdf);
     this.setState({ pdf, status: "loaded" });
 
-    hideUIProgressBackdrop();
+    // hideUIProgressBackdrop();
     // console.log("pdf loaded");
   }
 

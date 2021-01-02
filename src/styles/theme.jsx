@@ -96,6 +96,10 @@ export const theme = createMuiTheme({
     },
   },
 
+  zIndex: {
+    drawer: 1000,
+  },
+
   typography: {
     useNextVariants: true,
     // fontFamily: '"Noto Sans KR"'

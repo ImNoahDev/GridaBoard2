@@ -2,15 +2,15 @@ import { IPageMapItem, IPdfPageDesc, IPdfToNcodeMapItem, IPolygonArea } from "..
 import { INcodeSOBPxy, IPageSOBP, IRectDpi } from "../DataStructure/Structures";
 import PdfDocMapper from "./PdfDocMapper";
 import * as cloud_util_func from "../../cloud_util_func";
-import { g_defaultNcode, nullNcode } from "../DefaultOption";
+import { g_defaultNcode, g_defaultPrintOption, g_defaultTemporaryNcode, nullNcode } from "../DefaultOption";
 import { isSamePage } from "../../neosmartpen/utils/UtilsFunc";
 import * as Util from "../UtilFunc";
 import NeoPdfManager from "../NeoPdf/NeoPdfManager";
 import EventDispatcher, { EventCallbackType } from "../../neosmartpen/penstorage/EventSystem";
 import { IPrintOption } from "../NcodePrint/PrintDataTypes";
-import { makePdfId } from "../UtilFunc";
+import { cloneObj, makePdfId } from "../UtilFunc";
 import { MappingItem } from ".";
-import { getNPaperInfo, getNPaperSize_pu } from "../NcodeSurface/SurfaceInfo";
+import { getNPaperInfo, getNPaperSize_pu, g_availablePagesInSection } from "../NcodeSurface/SurfaceInfo";
 import { INoteServerItem } from "../NcodeSurface/SurfaceDataTypes";
 
 export const BASECODE_PAGES_PER_SHEET = 16384;
@@ -42,9 +42,22 @@ export type IAutoLoadDocDesc = {
   pageMapping: IPageMapItem,
 }
 
+
+
+/**
+ *
+ */
 export default class MappingStorage {
+
+  /** 프로그램 실행이 끝나도 저장되어야 하는 mapping table */
   _data: IMappingData = {
     nextIssuable: { ...g_defaultNcode },
+    arrDocMap: []
+  };
+
+  /** 프로그램이 실행되는 동안만 유지되는 mapping table */
+  _temporary: IMappingData = {
+    nextIssuable: { ...g_defaultTemporaryNcode },
     arrDocMap: []
   };
 
@@ -193,27 +206,31 @@ export default class MappingStorage {
     return [codeInfo.basePageInfo, codeInfo.printPageInfo];
   }
 
-  private makeDummyParamsForBasePageInfo = (codeNeeded, printOption: IPrintOption) => {
-    const { docNumPages, pagesPerSheet, fingerprint, url, filename } = printOption;
+  private makeDummyParamsForBasePageInfo = (basePageInfo: IPageSOBP, url: string, filename: string, fingerprint: string, numPages: number, isPod = true) => {
+    // const { docNumPages: numPages, fingerprint, url, filename } = printOption;
 
     // dummy
     const params: IPageMapItem[] = [];
-    for (let i = 0; i < docNumPages; i++) {
+    for (let i = 0; i < numPages; i++) {
       const pageNo = i + 1;
       const mapData = new MappingItem(pageNo);      // h의 기본값은 여기서 세팅된다.
-      const basePageInfo = codeNeeded.basePageInfo;
 
-      const pi: INoteServerItem = getNPaperInfo(codeNeeded.basePageInfo);
-      const paperSize_pu = getNPaperSize_pu(codeNeeded.basePageInfo);
+      const pi: INoteServerItem = getNPaperInfo(basePageInfo);
+      const paperSize_pu = getNPaperSize_pu(basePageInfo);
 
       // dummy Ncode page info
       const { Xmin: x0, Xmax: x1, Ymin: y0, Ymax: y1 } = pi.margin;
+
+      // 아래 부분은 고쳐야 한다. kitty, 2021/01/02
       const pdfDrawnRect: IRectDpi = { unit: "nu", x: x0, y: y0, width: x1 - x0, height: y1 - y0 };
       const npageArea: IPolygonArea = [{ x: x0, y: y0 }, { x: x1, y: y0 }, { x: x1, y: y1 }, { x: x0, y: y1 }];
-      mapData.setNcodeArea({ pageInfo: basePageInfo, basePageInfo: basePageInfo, pdfDrawnRect, npageArea });
+
+      let page = basePageInfo.page + i;
+      if (isPod) page = (page + g_availablePagesInSection[basePageInfo.section]) % g_availablePagesInSection[basePageInfo.section];
+      const printPageInfo = { ...basePageInfo, page };
+      mapData.setNcodeArea({ pageInfo: printPageInfo, basePageInfo, pdfDrawnRect, npageArea });
 
       // dummy PDF page info
-      const { url, filename, fingerprint, docNumPages: numPages } = printOption;
       const pdfPageInfo: IPdfPageDesc = { url, filename, fingerprint, id: makePdfId(fingerprint, BASECODE_PAGES_PER_SHEET), numPages, pageNo };
       mapData.setPdfArea({ pdfPageInfo, rect: { unit: "pu", x: 0, y: 0, width: paperSize_pu.width, height: paperSize_pu.height } });
 
@@ -226,10 +243,10 @@ export default class MappingStorage {
       fingerprint,
       pagesPerSheet: BASECODE_PAGES_PER_SHEET,
       id: makePdfId(fingerprint, BASECODE_PAGES_PER_SHEET),
-      numPages: docNumPages,
+      numPages,
 
-      printPageInfo: { ...codeNeeded.basePageInfo },
-      basePageInfo: { ...codeNeeded.basePageInfo },
+      printPageInfo: { ...basePageInfo },
+      basePageInfo: { ...basePageInfo },
 
       params,
       timeString: Util.getNowTimeStr(),
@@ -249,7 +266,7 @@ export default class MappingStorage {
     // Base map을 등록해야 한다면, 아래와 같이 더미의 base code map을 등록
     // 아래의 맵에서는 h가 정의되어 있지 않으므로, 직접 불러서 transform할 수 없다
     if (codeNeeded.baseCodeIssued) {
-      const basePdfToNcodeMap = this.makeDummyParamsForBasePageInfo(codeNeeded, printOption);
+      const basePdfToNcodeMap = this.makeDummyParamsForBasePageInfo(codeNeeded.basePageInfo, url, filename, fingerprint, docNumPages);
       this._data.arrDocMap.push(basePdfToNcodeMap);
     }
 
@@ -272,6 +289,34 @@ export default class MappingStorage {
 
     return pdfToNcodeMap;
   }
+
+  /**
+   * mapping되지 않은 PDF나, ncode 공책들의 임시 mapping table을 생성하고 돌려주는 주고
+   */
+  public makeTemporaryAssociateMapItem = (option: { n_paper: IPageSOBP, pdf: { url: string, filename: string, fingerprint: string, numPages: number } }) => {
+    const { pdf, n_paper } = option;
+
+    if (!pdf && !n_paper) {
+      console.error("n_paper neighter pdf has not been given to makeTemporaryAssociateMapItem ");
+      return undefined;
+    }
+
+    const nextCode = Util.getNextNcodePage(this._temporary.nextIssuable, 0);
+    let basePdfToNcodeMap: IPdfToNcodeMapItem;
+    if (pdf) {
+      this._temporary.nextIssuable = Util.getNextNcodePage(this._temporary.nextIssuable, pdf.numPages);
+      basePdfToNcodeMap = this.makeDummyParamsForBasePageInfo(nextCode, pdf.url, pdf.filename, pdf.fingerprint, pdf.numPages, true);
+    }
+    else {
+      const pi: INoteServerItem = getNPaperInfo(n_paper);
+      const basePageInfo = { ...n_paper, page: pi.ncode_start_page };
+      basePdfToNcodeMap = this.makeDummyParamsForBasePageInfo(basePageInfo, pi.pdf_name, pi.pdf_name, pi.pdf_name, pi.pdf_page_count + 1, false);
+    }
+
+    this._temporary.arrDocMap.push(basePdfToNcodeMap);
+    return basePdfToNcodeMap;
+  }
+
 
   register = (mapper: PdfDocMapper) => {
     mapper.makeSummary();

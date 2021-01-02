@@ -1,172 +1,333 @@
-import {IPaperTypeDesc } from "./SurfaceDataTypes";
+import { IPaperTypeDesc } from "./SurfaceDataTypes";
 
-export const paperType: IPaperTypeDesc = {
-  paperA4_dummy: {
+export const g_paperType_default: IPaperTypeDesc = {
+  "3.27.0": {   // paperA4_dummy
+    id: "3.27.0",
     section: 3,
     owner: 27,
-    books: [0],
-    Xmin: 0,
-    Ymin: 0,
-    Xmax: 88.56,
-    Ymax: 125.24,
+    book: 0,
+    margin: {
+      Xmin: 0,
+      Ymin: 0,
+      Xmax: 88.56,
+      Ymax: 125.24,
+    }
   },
 
-  paperSCKP: {
+  "3.1013.1": {   // paperSCKP
+    id: "3.1013.1",
     section: 3,
     owner: 1013,
-    books: [1],
-    Xmin: 4.91,
-    Ymin: 4.91,
-    Xmax: 113.28,
-    Ymax: 81.66,
+    book: 1,
+    margin: {
+      Xmin: 4.91,
+      Ymin: 4.91,
+      Xmax: 113.28,
+      Ymax: 81.66,
+    },
   },
-  paperSCKPad: {
+
+  "3.1013.2": {   // paperSCKPad
+    id: "3.1013.2",
     section: 3,
     owner: 1013,
-    books: [2],
-    Xmin: 0,
-    Ymin: 0,
-    Xmax: 88.55,
-    Ymax: 49.76,
+    book: 2,
+    margin: {
+      Xmin: 0,
+      Ymin: 0,
+      Xmax: 88.55,
+      Ymax: 49.76,
+    },
   },
 
-  paperA4300: {
+  "3.27.168": {   // paperA4300
+    id: "3.27.168",
     section: 3,
     owner: 27,
-    books: [168],
-    Xmin: 3.12,
-    Ymin: 3.12,
-    Xmax: 91.68,
-    Ymax: 128.36,
+    book: 168,
+    margin: {
+      Xmin: 3.12,
+      Ymin: 3.12,
+      Xmax: 91.68,
+      Ymax: 128.36,
+    },
   },
 
-  paperResearch: {
+  "3.27.205": {   // paperResearch
+    id: "3.27.205",
     section: 3,
     owner: 27,
-    books: [205],
-    Xmin: 5.48,
-    Ymin: 5.48,
-    Xmax: 102.47,
-    Ymax: 131.99,
+    book: 205,
+    margin: {
+      Xmin: 5.48,
+      Ymin: 5.48,
+      Xmax: 102.47,
+      Ymax: 131.99,
+    },
   },
 
-  paperDnote: {
+  "3.27.232": {   // paperDnote_232
+    id: "3.27.232",
     section: 3,
     owner: 27,
-    books: [232, 233, 234, 235, 236],
-    Xmin: 5.48,
-    Ymin: 5.48,
-    Xmax: 84.76,
-    Ymax: 113.85,
+    book: 232,
+    margin: {
+      Xmin: 5.48,
+      Ymin: 5.48,
+      Xmax: 84.76,
+      Ymax: 113.85,
+    },
   },
 
-  paperA450: {
+  "3.27.233": {   // paperDnote_233
+    id: "3.27.233",
     section: 3,
     owner: 27,
-    books: [517],
-    Xmin: 5.48,
-    Ymin: 5.48,
-    Xmax: 94.04,
-    Ymax: 130.72,
+    book: 233,
+    margin: {
+      Xmin: 5.48,
+      Ymin: 5.48,
+      Xmax: 84.76,
+      Ymax: 113.85,
+    },
+  },
+  "3.27.234": {   // paperDnote_234
+    id: "3.27.234",
+    section: 3,
+    owner: 27,
+    book: 234,
+    margin: {
+      Xmin: 5.48,
+      Ymin: 5.48,
+      Xmax: 84.76,
+      Ymax: 113.85,
+    },
+  },
+  "3.27.235": {   // paperDnote_235
+    id: "3.27.235",
+    section: 3,
+    owner: 27,
+    book: 235,
+    margin: {
+      Xmin: 5.48,
+      Ymin: 5.48,
+      Xmax: 84.76,
+      Ymax: 113.85,
+    },
   },
 
-  paperNring: {
+  "3.27.236": {   // paperDnote_236
+    id: "3.27.236",
     section: 3,
     owner: 27,
-    books: [603],
-    Xmin: 5.48,
-    Ymin: 5.48,
-    Xmax: 68.73,
-    Ymax: 94.04,
+    book: 236,
+    margin: {
+      Xmin: 5.48,
+      Ymin: 5.48,
+      Xmax: 84.76,
+      Ymax: 113.85,
+    },
   },
 
-  paperIdeaPad: {
+
+  "3.27.517": {   // paperA450
+    id: "3.27.517",
     section: 3,
     owner: 27,
-    books: [609],
-    Xmin: 5.48,
-    Ymin: 16.02,
-    Xmax: 94.04,
-    Ymax: 130.72,
+    book: 517,
+    margin: {
+      Xmin: 5.48,
+      Ymin: 5.48,
+      Xmax: 94.04,
+      Ymax: 130.72,
+    },
   },
 
-  paperNpro: {
+  "3.27.603": {   // paperNring
+    id: "3.27.603",
     section: 3,
     owner: 27,
-    books: [615],
-    Xmin: 5.48,
-    Ymin: 5.48,
-    Xmax: 64.52,
-    Ymax: 83.07,
+    book: 603,
+    margin: {
+      Xmin: 5.48,
+      Ymin: 5.48,
+      Xmax: 68.73,
+      Ymax: 94.04,
+    },
   },
 
-  paperCollege: {
+  "3.27.609": {   // paperIdeaPad
+    id: "3.27.609",
     section: 3,
     owner: 27,
-    books: [619, 655, 656, 657],
-    Xmin: 5.48,
-    Ymin: 5.48,
-    Xmax: 96.57,
-    Ymax: 123.55,
+    book: 609,
+    margin: {
+      Xmin: 5.48,
+      Ymin: 16.02,
+      Xmax: 94.04,
+      Ymax: 130.72,
+    },
   },
 
-  paperMskin: {
+  "3.27.615": {   // paperNpro
+    id: "3.27.615",
     section: 3,
     owner: 27,
-    books: [700],
-    Xmin: 1.26,
-    Ymin: 1.67,
-    Xmax: 55.91,
-    Ymax: 89.21,
-  },
-  paperMSK701: {
-    section: 3,
-    owner: 27,
-    books: [701],
-    Xmin: 4.22,
-    Ymin: 4.22,
-    Xmax: 59.53,
-    Ymax: 92.85,
+    book: 615,
+    margin: {
+      Xmin: 5.48,
+      Ymin: 5.48,
+      Xmax: 64.52,
+      Ymax: 83.07,
+    },
   },
 
-  paperMSK703: {
+  "3.27.619": {   // paperCollege_619
+    id: "3.27.619",
     section: 3,
     owner: 27,
-    books: [703, 704],
-    Xmin: 4.61,
-    Ymin: 4.61,
-    Xmax: 59.43,
-    Ymax: 93.17,
+    book: 619,
+    margin: {
+      Xmin: 5.48,
+      Ymin: 5.48,
+      Xmax: 96.57,
+      Ymax: 123.55,
+    },
   },
 
-  paperMSK705: {
+  "3.27.655": {   // paperCollege_655
+    id: "3.27.655",
     section: 3,
     owner: 27,
-    books: [705],
-    Xmin: 3.12,
-    Ymin: 3.12,
-    Xmax: 57.94,
-    Ymax: 91.68,
+    book: 655,
+    margin: {
+      Xmin: 5.48,
+      Ymin: 5.48,
+      Xmax: 96.57,
+      Ymax: 123.55,
+    },
   },
 
-  paperMSK708: {
+  "3.27.656": {   // paperCollege_656
+    id: "3.27.656",
     section: 3,
     owner: 27,
-    books: [708],
-    Xmin: 3.12,
-    Ymin: 3.12,
-    Xmax: 83.24,
-    Ymax: 108.54,
+    book: 656,
+    margin: {
+      Xmin: 5.48,
+      Ymin: 5.48,
+      Xmax: 96.57,
+      Ymax: 123.55,
+    },
   },
 
-  paperA4_POD: {
+  "3.27.657": {   // paperCollege_657
+    id: "3.27.657",
     section: 3,
     owner: 27,
-    books: [1068],
-    Xmin: 5,
-    Ymin: 5,
-    Xmax: 93.46,
-    Ymax: 130.24,
+    book: 657,
+    margin: {
+      Xmin: 5.48,
+      Ymin: 5.48,
+      Xmax: 96.57,
+      Ymax: 123.55,
+    },
+  },
+
+  "3.27.700": {   // paperMskin
+    id: "3.27.700",
+    section: 3,
+    owner: 27,
+    book: 700,
+    margin: {
+      Xmin: 1.26,
+      Ymin: 1.67,
+      Xmax: 55.91,
+      Ymax: 89.21,
+    },
+  },
+
+  "3.27.701": {   // paperMSK701
+    id: "3.27.701",
+    section: 3,
+    owner: 27,
+    book: 701,
+    margin: {
+      Xmin: 4.22,
+      Ymin: 4.22,
+      Xmax: 59.53,
+      Ymax: 92.85,
+    },
+  },
+
+  "3.27.703": {   // paperMSK703
+    id: "3.27.703",
+    section: 3,
+    owner: 27,
+    book: 703,
+    margin: {
+      Xmin: 4.61,
+      Ymin: 4.61,
+      Xmax: 59.43,
+      Ymax: 93.17,
+    },
+  },
+
+  "3.27. 704": {   // paperMSK704
+    id: "3.27. 704",
+    section: 3,
+    owner: 27,
+    book: 704,
+    margin: {
+      Xmin: 4.61,
+      Ymin: 4.61,
+      Xmax: 59.43,
+      Ymax: 93.17,
+    },
+  },
+
+  "3.27.705": {   // paperMSK705
+    id: "3.27.705",
+    section: 3,
+    owner: 27,
+    book: 705,
+    margin: {
+      Xmin: 3.12,
+      Ymin: 3.12,
+      Xmax: 57.94,
+      Ymax: 91.68,
+    },
+  },
+
+  "3.27.708": {   // paperMSK708
+    id: "3.27.708",
+    section: 3,
+    owner: 27,
+    book: 708,
+    margin: {
+      Xmin: 3.12,
+      Ymin: 3.12,
+      Xmax: 83.24,
+      Ymax: 108.54,
+    },
+  },
+
+  "3.27.1068": {   // paperA4_POD
+    id: "3.27.1068",
+    section: 3,
+    owner: 27,
+    book: 1068,
+    margin: {
+      Xmin: 5,
+      Ymin: 5,
+      Xmax: 93.46,
+      Ymax: 130.24,
+    },
   },
 };
 
+
+export const g_paperType = {
+  defaultKey: "3.27.517",   // paperA450
+  definition: g_paperType_default,
+}
