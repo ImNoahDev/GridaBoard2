@@ -365,7 +365,8 @@ class MixedPageView_module extends React.Component<MixedViewProps, State>  {
           }
 
           // 파일 로드를 요청
-          if (!this.props.noMorePdfSignal && this.state.pdf.fingerprint !== found.pdf.fingerprint) {
+          if (!this.props.noMorePdfSignal &&
+            (!this.state.pdf || this.state.pdf.fingerprint !== found.pdf.fingerprint)) {
             if (this.props.handleFileLoadNeeded) {
               // 요청 당한 쪽(parent component)에서는 반드시 다음과 같은 처리를 해야 한다
               //    1) props의 url을 본 파일의 url로 바꿔준다
