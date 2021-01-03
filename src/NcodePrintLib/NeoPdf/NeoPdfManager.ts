@@ -33,23 +33,23 @@ export default class NeoPdfManager {
     if (_pdf_manager) return _pdf_manager;
 
     _pdf_manager = new NeoPdfManager();
-    const msi = MappingStorage.getInstance();
-    msi.addEventListener(MappingStorageEventName.ON_MAPINFO_REFRESHED, _pdf_manager.refreshNcodeMappingTable);
-    msi.addEventListener(MappingStorageEventName.ON_MAPINFO_ADDED, _pdf_manager.handleMapInfoAdded);
+    // const msi = MappingStorage.getInstance();
+    // msi.addEventListener(MappingStorageEventName.ON_MAPINFO_REFRESHED, _pdf_manager.refreshNcodeMappingTable);
+    // msi.addEventListener(MappingStorageEventName.ON_MAPINFO_ADDED, _pdf_manager.handleMapInfoAdded);
 
     return _pdf_manager;
   }
 
-  refreshNcodeMappingTable = (event: IMappingStorageEvent) => {
-    this._pdfs.forEach(pdf => pdf.refreshNcodeMappingTable());
-  }
+  // refreshNcodeMappingTable = (event: IMappingStorageEvent) => {
+  //   this._pdfs.forEach(pdf => pdf.refreshNcodeMappingTable());
+  // }
 
-  handleMapInfoAdded = (event: IMappingStorageEvent) => {
-    const docMap = event.mapper.docMap;
-    const pdfs = this._pdfs.filter( pdf => pdf.fingerprint === docMap.fingerprint);
-    // pdfs.forEach(pdf => pdf.addNcodeMapping(docMap));
-    pdfs.forEach(pdf => pdf.refreshNcodeMappingTable());
-  }
+  // handleMapInfoAdded = (event: IMappingStorageEvent) => {
+  //   const docMap = event.mapper.docMap;
+  //   const pdfs = this._pdfs.filter( pdf => pdf.fingerprint === docMap.fingerprint);
+  //   // pdfs.forEach(pdf => pdf.addNcodeMapping(docMap));
+  //   pdfs.forEach(pdf => pdf.refreshNcodeMappingTable());
+  // }
 
 
   public getDocument = async (options: IPdfOpenOption) => {

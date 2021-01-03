@@ -7,6 +7,8 @@ import { Theme, Typography, withStyles } from '@material-ui/core';
 import PenManager from '../../neosmartpen/pencomm/PenManager'
 import { NeoSmartpen, PenEventName, } from '../../neosmartpen';
 import GridaToolTip from "../../styles/GridaToolTip";
+import { useSelector } from "react-redux";
+import { RootState } from "../../store/rootReducer";
 
 type Props = {
   onPenLinkChanged: (e) => void;
@@ -30,6 +32,8 @@ const ConnectButton = (props: Props) => {
     }
   };
 
+  const num_pens = useSelector((state: RootState) => state.appConfig.num_pens);
+
   return (
     <div className="btn-group-vertical neo_shadow" style={{ marginBottom: 10 }}>
       <button id="btn_connect" type="button" className="btn btn-neo btn-neo-vertical"
@@ -45,7 +49,7 @@ const ConnectButton = (props: Props) => {
             <img src='../../icons/icon_smartpen_connected_n.png' className="toggle-on normal-image"></img>
             <img src='../../icons/icon_smartpen_disconnected_p.png' className="toggle-on hover-image"></img>
 
-            <span id="pen_id" className="pen-badge badge badge-pill badge-light">0</span>
+            <span id="pen_id" className="pen-badge badge badge-pill badge-light">{num_pens}</span>
           </div>
         </GridaToolTip>
       </button>

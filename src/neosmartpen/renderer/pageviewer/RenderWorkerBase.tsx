@@ -4,7 +4,7 @@ import { InkStorage } from "../..";
 import { PATH_THICKNESS_SCALE } from "./DrawCurves";
 import { PDFVIEW_ZOOM_MAX, PDFVIEW_ZOOM_MIN } from "../Constants";
 import { IWritingSurfaceInfo, ISize } from "../../DataStructure/Structures";
-import { ncodeToPdfPoint } from "../../utils/UtilsFunc";
+import { convertNuToPu } from "../../utils/UtilsFunc";
 import { Point } from "fabric/fabric-impl";
 import { paperInfo } from "../../noteserver/PaperInfo";
 import { TransformParameters } from "../../../NcodePrintLib/Coordinates";
@@ -185,7 +185,7 @@ export default class RenderWorkerBase {
     this.canvasId = canvasId;
     this.canvas = canvas;
     this.pageSize = { width, height };
-    this.nu_to_pu_scale = ncodeToPdfPoint(1);
+    this.nu_to_pu_scale = convertNuToPu(1);
     this.canvasFb = null;
 
     if (bgColor !== undefined) this.bgColor = bgColor;
@@ -240,8 +240,8 @@ export default class RenderWorkerBase {
     // const ncode_width = Xmax - Xmin;
     // const ncode_height = Ymax - Ymin;
 
-    // const actual_width = ncodeToPdfPoint(ncode_width);
-    // const actual_height = ncodeToPdfPoint(ncode_height);
+    // const actual_width = convertNuToPu(ncode_width);
+    // const actual_height = convertNuToPu(ncode_height);
     const s: ISize = { ...this.pageSize };
     if (rotation === 90) {
       const temp = s.width;

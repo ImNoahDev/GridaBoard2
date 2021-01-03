@@ -50,6 +50,7 @@ export default (state = initialState, action) => {
       return {
         ...state,
         pens: action.value,
+        num_pens: action.value.length,
       };
 
     }

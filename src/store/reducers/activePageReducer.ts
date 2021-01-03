@@ -19,14 +19,14 @@ const UrlActionType = Object.freeze({
 export const setUrlAndFilename = async (url: string, filename: string) => {
   store.dispatch({
     type: UrlActionType.SET,
-    value: { url, filename },
+    value: { url, filename } as ActionValue,
   });
 };
 
 export const setDocNumPages = async (numPages: number) => {
   store.dispatch({
     type: UrlActionType.SET,
-    value: { numDocPages: numPages },
+    value: { numDocPages: numPages } as ActionValue,
   });
 }
 
@@ -34,7 +34,7 @@ export const setDocNumPages = async (numPages: number) => {
 export const setActivePageNo = async (pageNo: number) => {
   store.dispatch({
     type: UrlActionType.SET,
-    value: { activePageNo: pageNo },
+    value: { activePageNo: pageNo } as ActionValue,
   });
 }
 
@@ -44,7 +44,7 @@ export const setActivePdf = async (pdf: NeoPdfDocument) => {
 
   store.dispatch({
     type: UrlActionType.SET,
-    value: { url, filename, pdf }
+    value: { url, filename, pdf } as ActionValue,
   });
 
 }
@@ -63,7 +63,7 @@ const initialState = {
   filename: undefined as string,
 
   numDocPages: 0,
-  activePageNo: 0,
+  activePageNo: -1,
 
   section: 0,
   owner: 0,
@@ -73,6 +73,21 @@ const initialState = {
   renderCount: 0,
 };
 
+type ActionValue = {
+  pdf?: NeoPdfDocument,
+  url?: string,
+  filename?: string,
+
+  numDocPages?: number,
+  activePageNo?: number,
+
+  section?: number,
+  owner?: number,
+  book?: number,
+  page?: number,
+
+  renderCount?: number,
+}
 export type IActivePageState = typeof initialState;
 
 //[Reducer
@@ -81,9 +96,10 @@ export default (state = initialState, action) => {
 
   switch (action.type) {
     case UrlActionType.SET: {
+      const value = action.value as typeof initialState;
       return {
         ...state,
-        ...action.value
+        ...value
       };
     }
 

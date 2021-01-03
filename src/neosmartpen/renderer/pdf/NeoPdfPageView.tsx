@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { pdfSizeToDIsplayPixel, pdfSizeToDIsplayPixel_int } from "../../utils/UtilsFunc";
+import { convertPuTOCssPoint, convertPuTOCssPoint_int } from "../../utils/UtilsFunc";
 
 // import "pdfjs-dist";
 // import * as PdfJs from "pdfjs-dist";
@@ -186,9 +186,9 @@ export default class NeoPdfPageView extends Component<PageProps> {
 
     pdf.getPageAsync(pageNo).then(
       (page) => {
-        console.log(`BACKPLANE _loadPage renderPage start`)
+        // console.log(`BACKPLANE _loadPage renderPage start`)
         this.renderPage(page, this.props.position.zoom, );
-        console.log(`BACKPLANE _loadPage renderPage end`)
+        // console.log(`BACKPLANE _loadPage renderPage end`)
       }
     );
   }
@@ -262,7 +262,7 @@ export default class NeoPdfPageView extends Component<PageProps> {
 
   renderPage = async (page: NeoPdfPage, zoom: number) => {
     if (!this.canvas) return;
-    console.log(`BACKPLANE RENDERPAGE start`)
+    // console.log(`BACKPLANE RENDERPAGE start`)
 
     this.setState({ page, status: 'rendering' });
 
@@ -275,9 +275,9 @@ export default class NeoPdfPageView extends Component<PageProps> {
 
     let noLazyUpdate = false;
     if (!this.backPlane.inited) {
-      console.log(`BACKPLANE DRAWING start`)
+      // console.log(`BACKPLANE DRAWING start`)
       const result = await this.renderToCanvasSafe(page, dpi, zoom);
-      console.log(`BACKPLANE DRAWING end`)
+      // console.log(`BACKPLANE DRAWING end`)
       this.backPlane.inited = result.result;
       this.backPlane.size = { ...result };
       noLazyUpdate = true;
@@ -292,11 +292,11 @@ export default class NeoPdfPageView extends Component<PageProps> {
 
     ctx.drawImage(this.backPlane.canvas, 0, 0, px_width, px_height, 0, 0, dw, dh);
 
-    console.log(`BACKPLANE RENDERPAGE realtime end`)
+    // console.log(`BACKPLANE RENDERPAGE realtime end`)
 
     // Lazy update
     if (!noLazyUpdate && this.backPlane.prevZoom !== zoom) {
-      console.log(`BACKPLANE RENDERPAGE lazy start`);
+      // console.log(`BACKPLANE RENDERPAGE lazy start`);
 
       this.zoomQueue.push(zoom);
       await this.timeOut(200);
@@ -321,11 +321,11 @@ export default class NeoPdfPageView extends Component<PageProps> {
       else {
         // console.log(`lazy back plane CANCELLED`)
       }
-      console.log(`BACKPLANE RENDERPAGE lazy end`);
+      // console.log(`BACKPLANE RENDERPAGE lazy end`);
 
     }
 
-    console.log(`BACKPLANE RENDERPAGE end`)
+    // console.log(`BACKPLANE RENDERPAGE end`)
 
     this.setState({ status: 'rendered' });
 

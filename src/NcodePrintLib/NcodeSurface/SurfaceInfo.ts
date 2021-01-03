@@ -76,10 +76,12 @@ export function isPUI(pageInfo: INcodeSOBPxy): boolean {
 function getNPaperSize_nu(item: IPageSOBP | INoteServerItem): ISize {
   let desc = item as INoteServerItem;
 
+  // IPageSOBP 이면 noteserver item을 가져 온다.
   if (!Object.prototype.hasOwnProperty.call(item, "margin")) {
     const pageInfo = item as IPageSOBP;
     desc = getNPaperInfo(pageInfo);
   }
+
   const margin = desc.margin;
   return {
     width: margin.Xmax - margin.Xmin,
@@ -116,7 +118,7 @@ export function getMediaSize_pu(mediaType: IPaperSize): ISize {
  * paper size를 해당 inch 단위로 돌려 준다.
  * @param pageInfo
  */
-export function getNPaperInfo(pageInfo: IPageSOBP): INoteServerItem {
+export function getNPaperInfo(pageInfo: IPageSOBP) {
   let section = -1, owner = -1, book = -1;
   if (pageInfo) {
     section = pageInfo.section;
@@ -124,11 +126,13 @@ export function getNPaperInfo(pageInfo: IPageSOBP): INoteServerItem {
     book = pageInfo.book;
   }
 
+  let isDefault = false;
   let key = section.toString() + "." + owner.toString() + "." + book.toString();
   let found = g_paperType.definition[key];
   if ( !found ) {
     key = g_paperType.defaultKey;
     found = g_paperType.definition[key];
+    isDefault = true;
   }
 
   const desc: INoteServerItem = {
@@ -136,6 +140,7 @@ export function getNPaperInfo(pageInfo: IPageSOBP): INoteServerItem {
     id: key,
     pageInfo,
     glyphData: "",
+    isDefault,
   };
 
   return desc;

@@ -56,6 +56,8 @@ export type INoteServerItem = {
 
   /** n,u,l,d,r */
   glyphData: string;
+
+  isDefault?: boolean;
 }
 
 export type IPaperTypeDesc = {

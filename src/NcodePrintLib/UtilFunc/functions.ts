@@ -60,6 +60,10 @@ export function isSameObject(a: any, b: any) {
 
 
 export function isSamePage(pg1: IPageSOBP, pg2: IPageSOBP): boolean {
+  if (pg1 === undefined && pg2 === undefined) return true;
+  if (pg1 && !pg2 ) return false;
+  if (!pg1 && pg2 ) return false;
+
   if (pg1.page !== pg2.page || pg1.book !== pg2.book || pg1.owner !== pg2.owner || pg1.section !== pg2.section) {
     return false;
   }
@@ -141,12 +145,12 @@ export function getNextNcodePage(curr: IPageSOBP, delta = 1) {
 }
 
 /**
- * shouldComponentUpdated 등에서 쓰이는 상태 비교 디버거 메시지 
+ * shouldComponentUpdated 등에서 쓰이는 상태 비교 디버거 메시지
  * @param prefix - prefix string of debug message
- * @param prevProps 
- * @param nextProps 
- * @param prevState 
- * @param nextState 
+ * @param prevProps
+ * @param nextProps
+ * @param prevState
+ * @param nextState
  */
 export function diffPropsAndState(prefix, prevProps, nextProps, prevState = undefined, nextState = undefined) {
 

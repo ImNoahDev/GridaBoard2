@@ -1,5 +1,6 @@
 
 import { IPageSOBP, IPoint } from "../DataStructure/Structures";
+export const NU_TO_PU = 56 / 600 * 72;
 
 // export type HomographyPoints = {
 //   type: "homography",
@@ -36,8 +37,11 @@ export type TransformPointPairs = {
  */
 export class TransformParameters {
   type: "homography" | "affine" = "homography";
-  a = 1; b = 0; c = 0;
-  d = 0; e = 1; f = 0;
+
+  a = NU_TO_PU; b = 0; c = 0;
+
+  d = 0; e = NU_TO_PU; f = 0;
+
   g = 0; h = 0; i = 1;
 
   tx = 0; ty = 0;
@@ -119,6 +123,13 @@ export interface IPdfToNcodeMapItem {
 }
 
 
+export interface IPageMapBase {
+  /** 인쇄된 Ncode page information */
+  pageInfo: IPageSOBP;
+
+  /** 인식되어 구분되는 base pageInfo */
+  basePageInfo: IPageSOBP;
+}
 /**
  * Ncode to PDF page
  * Ncode와 mapping된 PDF 정보를 저장하기 위한 구조체
@@ -129,17 +140,17 @@ export interface IPdfToNcodeMapItem {
  *    x' = (x*h[0] + y*h[1] + h[2]) / G;
  *    y' = (x*h[3] + y*h[4] + h[5]) / G;
  */
-export interface IPageMapItem {
+export interface IPageMapItem extends IPageMapBase {
   /** 최초 로컬 Mapping Storage에 store된 시각 */
   timeString?: string;
 
   pdfPageNo: number;
 
-  /** 인쇄된 Ncode page information */
-  pageInfo: IPageSOBP;
+  // /** 인쇄된 Ncode page information */
+  // pageInfo: IPageSOBP;
 
-  /** 인식되어 구분되는 base pageInfo */
-  basePageInfo: IPageSOBP;
+  // /** 인식되어 구분되는 base pageInfo */
+  // basePageInfo: IPageSOBP;
 
   /**
    * Ncode area information,

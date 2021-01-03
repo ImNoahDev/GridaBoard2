@@ -12,15 +12,17 @@ import appConfigReducer from './reducers/appConfigReducer';
 
 
 const rootReducer = combineReducers({
+  progress: progressDlgReducer,
+
+  calibration: calibrationReducer,
+  appConfig: appConfigReducer,
+
   auth: authorizationReducer,
   ui: uiReducer,
   pointerTracer,
   rotate,
   activePage: activePageReducer,
-  progress: progressDlgReducer,
 
-  calibration: calibrationReducer,
-  appConfig: appConfigReducer,
 });
 
 export default rootReducer;

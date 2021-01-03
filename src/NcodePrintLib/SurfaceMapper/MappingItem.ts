@@ -1,5 +1,7 @@
 import { IPageSOBP, IRectDpi } from "../DataStructure/Structures";
-import { IPageMapItem, IPdfPageDesc, IPolygonArea, TransformParameters, TransformPoints } from "../Coordinates";
+import { IPageMapItem, IPdfPageDesc, IPolygonArea, NU_TO_PU, TransformParameters, TransformPoints } from "../Coordinates";
+
+
 
 export class MappingItem {
   _params: IPageMapItem = {
@@ -28,16 +30,16 @@ export class MappingItem {
 
     this._params.h = {
       type: "homography",
-      a: 1, b: 0, c: 0,
-      d: 0, e: 1, f: 0,
+      a: NU_TO_PU, b: 0, c: 0,
+      d: 0, e: NU_TO_PU, f: 0,
       g: 0, h: 0, i: 1,
       tx: 0, ty: 0
     };
 
     this._params.h_rev = {
       type: "homography",
-      a: 1, b: 0, c: 0,
-      d: 0, e: 1, f: 0,
+      a: NU_TO_PU, b: 0, c: 0,
+      d: 0, e: NU_TO_PU, f: 0,
       g: 0, h: 0, i: 1,
       tx: 0, ty: 0
     };
@@ -88,8 +90,25 @@ export class MappingItem {
     }
   }
 
+  setSrc4Points_ncode = (points: IPolygonArea) => {
+    this._srcPts = {
+      type: "homography",
+      unit: "nu",
+      pts: [...points],
+    }
+  }
+
+  setDst4Points_pdf = (points: IPolygonArea) => {
+    this._dstPts = {
+      type: "homography",
+      unit: "pu",
+      pts: [...points],
+    }
+  }
+
+
   setNcodeArea = (arg: INcodePageMappingParam) => {
-    const { pdfDrawnRect: area_nu } = arg;
+    const { rect: area_nu } = arg;
 
     this._srcPts = {} as TransformPoints;
     this.setPointsFromRect("ncode", area_nu);
@@ -115,7 +134,7 @@ export interface IPdfPageMappingParam {
 
 export interface INcodePageMappingParam {
   /** 4점 매핑을 위한 rect */
-  pdfDrawnRect: IRectDpi,        // unit should be "nu"
+  rect: IRectDpi,        // unit should be "nu"
   pageInfo: IPageSOBP,
 
   basePageInfo: IPageSOBP,

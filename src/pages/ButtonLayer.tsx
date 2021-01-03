@@ -4,9 +4,10 @@ import ButtonLayerBottom from "./ButtonLayerBottom";
 import ButtonLayerSide from "./ButtonLayerSide";
 import { ButtonProps } from "@material-ui/core";
 import { IFileBrowserReturn } from "../NcodePrintLib/NcodePrint/PrintDataTypes";
+import { IPageSOBP } from "../NcodePrintLib/DataStructure/Structures";
 
 /**
- * 
+ *
  */
 interface Props extends ButtonProps {
   handlePdfOpen: (event: IFileBrowserReturn) => void,

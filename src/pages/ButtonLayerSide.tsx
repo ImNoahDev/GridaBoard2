@@ -35,8 +35,6 @@ const mainFrameStyle = {
  *
  */
 const ButtonLayerSide = () => {
-  const [num_pens, setNumPens] = useState(0);
-
   const handleTrashBtn = () => {
     // 고쳐야 한다. kitty
     // const penRendererState = pageRef.current.rendererRef.current.state;
@@ -56,8 +54,6 @@ const ButtonLayerSide = () => {
     if (e.event.event === 'on_connected') {
       pens.push(pen);
       setPens([...pens]);
-
-      setNumPens(num_pens + 1);
     }
     else if (e.event.event === 'on_disconnected') {
       const mac = pen.getMac();
@@ -66,7 +62,6 @@ const ButtonLayerSide = () => {
       if (index > -1) {
         const newPens = pens.splice(index, 1);
         setPens([...newPens]);
-        setNumPens(num_pens - 1);
       }
     }
   }

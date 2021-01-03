@@ -1,6 +1,4 @@
-import { IPaperTypeDesc } from "./SurfaceDataTypes";
-
-export const g_paperType_default: IPaperTypeDesc = {
+{
   "3.27.0": {
     "id": "3.27.0",
     "section": 3,
@@ -437,9 +435,5 @@ export const g_paperType_default: IPaperTypeDesc = {
     "ncode_end_page": 1,
     "ncode_start_page": 1
   },
-};
-
-export const g_paperType = {
-  defaultKey: "3.27.0",   // paperA450
-  definition: g_paperType_default,
+  "updated": "2021-01-03 12:45:46"
 }

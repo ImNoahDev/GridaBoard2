@@ -1,5 +1,5 @@
 import { Box, Button, Paper } from "@material-ui/core";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { NeoImage } from "../components/CustomElement/NeoImage";
 import { g_defaultPrintOption, makeNPageIdStr, PrintOptionDialog } from "../NcodePrintLib";
 import ClearLocalMappingButton from "../NcodePrintLib/Buttons/ClearLocalMappingButton";
@@ -15,6 +15,7 @@ import ReactJson from "react-json-view";
 import { MappingStorage } from "../NcodePrintLib/SurfaceMapper";
 import { IMappingData } from "../NcodePrintLib/SurfaceMapper/MappingStorage";
 import { RootState } from "../store/rootReducer";
+import GridaDoc from "../GridaBoard/GridaDoc";
 
 const buttonDivStyle = {
   position: "absolute",
@@ -46,6 +47,7 @@ const getNoteInfo = (event) => {
 const ButtonLayer_forTest = () => {
   const [num_pens, setNumPens] = useState(0);
   const [mapViewDetail, setMapViewDetail] = useState(0);
+  const [docViewDetail, setDocViewDetail] = useState(0);
 
   let mapJson = {} as any;
   if (mapViewDetail) {
@@ -73,10 +75,51 @@ const ButtonLayer_forTest = () => {
     mapJson = data;
   }
 
-  const [pdfUrl, pdfFilename] = useSelector((state: RootState) => {
-    return [state.activePage.url, state.activePage.filename];
-  });
+  const [pdfUrl, setPdfUrl] = useState(undefined as string);
+  const [pdfFilename, setPdfFilename] = useState(undefined as string);
 
+  const activePageNo = useSelector((state: RootState) => state.activePage.activePageNo);
+  useEffect(() => {
+    if (activePageNo >= 0) {
+      const doc = GridaDoc.getInstance();
+      const page = doc.getPageAt(activePageNo)
+      setPdfUrl(doc.getPdfUrlAt(activePageNo));
+      setPdfFilename(doc.getPdfFilenameAt(activePageNo));
+    }
+  }, [activePageNo]);
+
+
+  const docJson = { pdf: [], pages: [] };
+  const doc = GridaDoc.getInstance();
+
+  for (let i = 0; i < doc._pdfd.length; i++) {
+    const p = doc._pdfd[i];
+    const obj = {
+      pdf: p.pdf,
+      filename: p.pdf.filename,
+      fingerprint: p.fingerprint,
+      pdfOpenInfo: p.pdfOpenInfo,
+      startPageInDoc: p.startPageInDoc,       // starting from 0
+      endPageInDoc: p.endPageInDoc,         // starting from 0
+      pdfToNcodeMap: p.pdfToNcodeMap,
+    };
+    docJson.pdf.push(obj);
+  }
+
+  for (let i = 0; i < doc.numPages; i++) {
+    const p = doc._pages[i];
+    const { _pdfPageNo, _pageToNcodeMaps} = p;
+    const pageInfo = _pageToNcodeMaps[0].pageInfo;
+    const basePageInfo = _pageToNcodeMaps[0].basePageInfo;
+    const obj = {
+      _pdfPageNo,
+      _pageToNcodeMaps,
+      pageInfo : makeNPageIdStr(pageInfo),
+      basePageInfo: makeNPageIdStr(basePageInfo),
+
+    }
+    docJson.pages.push(obj);
+  }
 
   return (
     <div id={"button_div"} style={buttonDivStyle}>
@@ -96,6 +139,22 @@ const ButtonLayer_forTest = () => {
           <ReactJson src={mapJson}
             displayDataTypes={false}
             name={"MappingStorage._data"} collapsed={4} theme="monokai" />
+        </Paper>
+        : ""}
+
+      {/* GridaDoc 내부 */}
+      <div style={{ fontSize: "20px", fontWeight: "bold" }}>
+        <Button variant="contained" color="primary"
+          onClick={(event) => setDocViewDetail((docViewDetail + 1) % 2)} >
+          <Box fontSize={14} fontWeight="fontWeightBold" >GridaDoc 살펴보기</Box>
+        </Button>
+      </div>
+
+      { docViewDetail
+        ? <Paper style={{ position: "absolute", top: 100, minWidth: 800, maxHeight: 800, overflow: 'auto' }}>
+          <ReactJson src={docJson}
+            displayDataTypes={false}
+            name={"MappingStorage._data"} collapsed={3} theme="monokai" />
         </Paper>
         : ""}
 

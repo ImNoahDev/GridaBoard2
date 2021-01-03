@@ -1,8 +1,7 @@
-import { createMuiTheme, useMediaQuery } from '@material-ui/core';
 import Colors from '../styles/colors.scss';
 import { colors } from '@material-ui/core';
 import { koKR } from '@material-ui/core/locale';
-import { Button, Typography } from "@material-ui/core";
+import { createMuiTheme, useMediaQuery } from '@material-ui/core';
 
 const prev_palette = {
   type: 'light',

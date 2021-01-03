@@ -62,41 +62,41 @@ export function scaleCanvas(canvas: HTMLCanvasElement) {
 }
 
 
-export function ncodeToInch(n: number): number {
+export function convertNuToInch(n: number) {
   return n * CONST.NCODE_TO_INCH_SCALE;
 }
 
-export function ncodeToPdfPoint(n: number): number {
+export function convertNuToPu(n: number) {
   return n * CONST.NCODE_TO_INCH_SCALE * CONST.PDF_DEFAULT_DPI;
 }
-export function pdfSizeUnitToInch(n: number): number {
+export function convertPuToInch(n: number) {
   // 72 DPI
   return n * CONST.PDF_SCALE_TO_INCH;
 }
 
-export function pdfSizeUnitToDIsplayPixel(n: number): number {
+export function convertPuToCss(n: number) {
   return n * CONST.PDF_SCALE_TO_INCH * CONST.DISPLAY_DEFAULT_DPI * getDisplayRatio();
 }
 
 
-export function pdfSizeToDIsplayPixel(sz: { width: number, height: number }): { width: number, height: number } {
+export function convertPuTOCssPoint(sz: { width: number, height: number }) {
   return {
-    width: pdfSizeUnitToDIsplayPixel(sz.width),
-    height: pdfSizeUnitToDIsplayPixel(sz.height),
+    width: convertPuToCss(sz.width),
+    height: convertPuToCss(sz.height),
   };
 }
 
 
-export function pdfSizeToDIsplayPixel_int(sz: { width: number, height: number }): { width: number, height: number } {
+export function convertPuTOCssPoint_int(sz: { width: number, height: number }) {
   return {
-    width: Math.floor(pdfSizeUnitToDIsplayPixel(sz.width)),
-    height: Math.floor(pdfSizeUnitToDIsplayPixel(sz.height))
+    width: Math.floor(convertPuToCss(sz.width)),
+    height: Math.floor(convertPuToCss(sz.height))
   };
 }
 
 
 
-export function isSamePage(page1: IPageSOBP, page2: IPageSOBP): boolean {
+export function isSamePage(page1: IPageSOBP, page2: IPageSOBP) {
   if (page1.page !== page2.page || page1.book !== page2.book || page1.owner !== page2.owner || page1.section !== page2.section) {
     return false;
   }

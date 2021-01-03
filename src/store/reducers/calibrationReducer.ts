@@ -9,6 +9,12 @@ const ACTION_TYPE = Object.freeze({
 });
 //]
 
+type Action = {
+  type: any,
+  option?: ICalibrationState,
+  progress?: number,
+  show?: boolean,
+}
 //[Action Methods
 export const showCalibrationDialog = async (option: ICalibrationState) => {
   store.dispatch({
@@ -23,7 +29,7 @@ export const hideCalibrationDialog = async () => {
   });
 };
 
-export const updateCalibrationDialog = async (progress:number) => {
+export const updateCalibrationDialog = async (progress: number) => {
 
   store.dispatch({
     type: ACTION_TYPE.PROGRESS,
@@ -50,9 +56,10 @@ const initialState = {
   /** 0:page 1 top left,  1:page 1 bottom right,  2:page 2,  3: page 3,  ... */
   progress: 0 as number,
 };
+
 export type ICalibrationState = typeof initialState;
 
-export default (state = initialState, action) => {
+export default (state = initialState, action: Action) => {
   // console.log(action);
 
   switch (action.type) {

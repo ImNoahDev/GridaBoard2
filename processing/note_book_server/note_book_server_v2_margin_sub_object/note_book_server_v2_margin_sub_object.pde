@@ -1,4 +1,4 @@
-import java.util.zip.*; //<>//
+import java.util.zip.*; //<>// //<>// //<>//
 import java.io.*;
 
 import java.io.File;
@@ -80,12 +80,45 @@ void setup() {
       int b = item.getInt("note_id");
       String SOBP = s + "." + o + "." + b;
 
+
       System.out.printf("Processing: %d/%d\n", i+1, numItems);
 
       JSONObject j = item.getJSONObject( "resource" );
       String zipfile_url = j.getString( "zipfile" );
 
       println( "    "+SOBP + ": " + zipfile_url);
+
+          //  if(! ( SOBP.equals( "3.27.0")
+          //|| SOBP.equals( "3.1013.1")
+          //|| SOBP.equals( "3.1013.2")
+          //|| SOBP.equals(  "3.27.168")
+          //|| SOBP.equals( "3.27.205")
+          //|| SOBP.equals(  "3.27.232")
+          //|| SOBP.equals( "3.27.233")
+          //|| SOBP.equals( "3.27.234")
+          //|| SOBP.equals( "3.27.235")
+          //|| SOBP.equals( "3.27.236")
+          //|| SOBP.equals( "3.27.517")
+          //|| SOBP.equals( "3.27.603")
+          //|| SOBP.equals( "3.27.609")
+          //|| SOBP.equals( "3.27.615")
+          //|| SOBP.equals(  "3.27.619")
+          //|| SOBP.equals( "3.27.655")
+          //|| SOBP.equals( "3.27.656")
+          //|| SOBP.equals( "3.27.657")
+          //|| SOBP.equals( "3.27.700")
+          //|| SOBP.equals( "3.27.701")
+          //|| SOBP.equals(  "3.27.703")
+          //|| SOBP.equals( "3.27.704")
+          //|| SOBP.equals( "3.27.705")
+          //|| SOBP.equals( "3.27.708")
+          //|| SOBP.equals( "3.27.1068")
+          //|| SOBP.equals( "3.27.1069")
+          //) ) {
+          //  continue;
+          //}
+
+
       byte buffer[] = loadBytes(zipfile_url);
       ByteArrayInputStream bais = new ByteArrayInputStream(buffer);
       ZipInputStream zis = new ZipInputStream(bais);
@@ -97,6 +130,9 @@ void setup() {
         zipEntry= zis.getNextEntry();
 
         while (zipEntry != null) {
+
+
+
           println( "    "+zipEntry.getName() );
           boolean isDirectory = false;
 
@@ -340,7 +376,7 @@ void setup() {
                     // book_detail.put( "Ymin", Ymin);
                     // book_detail.put( "Xmax", Xmax);
                     // book_detail.put( "Ymax", Ymax);
-
+ //<>// //<>//
                     // //book.put( "nu_to_pu", nu_to_pu);
                     // book.put( "Xmin", Xmin);
                     // book.put( "Ymin", Ymin);
@@ -375,10 +411,11 @@ void setup() {
         // if ( need_to_add_detail ) {
         //   root.put(SOBP, book_detail);
         // } else {
-          root.put(SOBP, book);
+
+          root.put(SOBP, book); //<>//
         // }
 
-        saveJSONObject(root, ".\\nbs_v2.json");
+        saveJSONObject(root, ".\\nbs_v2_partial.json");
         saveJSONObject(root_detail, ".\\nbs_detail_v2.json");
       }
       catch (IOException e ) {

@@ -552,7 +552,7 @@ export class SheetRenderer {
       mapData.setNcodeArea({
         pageInfo: ncode.pageInfo,
         basePageInfo: ncode.basePageInfo,
-        pdfDrawnRect: { ...pdfRect_nu },
+        rect: { ...pdfRect_nu },
         npageArea: polygon,
       });
 

@@ -101,8 +101,15 @@ const Root = () => {
     if (!paperInfoInited) {
       showUIProgressBackdrop();
       fetchGzippedFile("./nbs_v2.json.gz").then(async (nbs) => {
-        // await sleep(10000);
-        g_paperType.definition = JSON.parse(nbs);
+        if (nbs.length > 10) {
+          g_paperType.definition = JSON.parse(nbs);
+        }
+
+        for ( const key in g_paperType_default) {
+          if (!Object.prototype.hasOwnProperty.call(g_paperType.definition, key)) {
+            g_paperType.definition[key] = g_paperType_default[key];
+          }
+        }
         hideUIProgressBackdrop();
         setPaperInfoInited(true);
       }
@@ -110,8 +117,6 @@ const Root = () => {
         g_paperType.definition = g_paperType_default;
         hideUIProgressBackdrop();
       });
-
-
     }
   }, [paperInfoInited]);
 
@@ -135,7 +140,7 @@ const Root = () => {
   return (
     <Provider store={store}>
       <MuiThemeProvider theme={theme}>
-        <App theme={theme} />
+        {paperInfoInited ? <App theme={theme} /> : <></>}
 
         <Backdrop style={styles.backdrop} open={shouldWait} >
           <CircularProgress color="inherit" />

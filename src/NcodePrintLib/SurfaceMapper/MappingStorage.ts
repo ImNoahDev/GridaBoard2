@@ -1,9 +1,9 @@
-import { IPageMapItem, IPdfPageDesc, IPdfToNcodeMapItem, IPolygonArea } from "../Coordinates";
+import { CoordinateTanslater, IPageMapItem, IPdfPageDesc, IPdfToNcodeMapItem, IPolygonArea, TransformParameters } from "../Coordinates";
 import { INcodeSOBPxy, IPageSOBP, IRectDpi } from "../DataStructure/Structures";
 import PdfDocMapper from "./PdfDocMapper";
 import * as cloud_util_func from "../../cloud_util_func";
 import { g_defaultNcode, g_defaultPrintOption, g_defaultTemporaryNcode, nullNcode } from "../DefaultOption";
-import { isSamePage } from "../../neosmartpen/utils/UtilsFunc";
+import { convertNuToPu, isSamePage } from "../../neosmartpen/utils/UtilsFunc";
 import * as Util from "../UtilFunc";
 import NeoPdfManager from "../NeoPdf/NeoPdfManager";
 import EventDispatcher, { EventCallbackType } from "../../neosmartpen/penstorage/EventSystem";
@@ -12,6 +12,22 @@ import { cloneObj, makePdfId } from "../UtilFunc";
 import { MappingItem } from ".";
 import { getNPaperInfo, getNPaperSize_pu, g_availablePagesInSection } from "../NcodeSurface/SurfaceInfo";
 import { INoteServerItem } from "../NcodeSurface/SurfaceDataTypes";
+
+export type IGetNPageTransformType = {
+  type: "default" | "note" | "pod";
+  pageInfo: IPageSOBP;
+  basePageInfo: IPageSOBP;
+  h: TransformParameters;
+  pdf: {
+    url: string;
+    filename: string;
+    fingerprint: string;
+    numPages: number;
+
+    pdfPageNo: number;
+    pagesPerSheet: number;
+  };
+}
 
 export const BASECODE_PAGES_PER_SHEET = 16384;
 
@@ -222,13 +238,18 @@ export default class MappingStorage {
       const { Xmin: x0, Xmax: x1, Ymin: y0, Ymax: y1 } = pi.margin;
 
       // 아래 부분은 고쳐야 한다. kitty, 2021/01/02
-      const pdfDrawnRect: IRectDpi = { unit: "nu", x: x0, y: y0, width: x1 - x0, height: y1 - y0 };
+      const rect: IRectDpi = { unit: "nu", x: x0, y: y0, width: x1 - x0, height: y1 - y0 };
       const npageArea: IPolygonArea = [{ x: x0, y: y0 }, { x: x1, y: y0 }, { x: x1, y: y1 }, { x: x0, y: y1 }];
 
       let page = basePageInfo.page + i;
-      if (isPod) page = (page + g_availablePagesInSection[basePageInfo.section]) % g_availablePagesInSection[basePageInfo.section];
+      if (isPod) {
+        const maxPages = g_availablePagesInSection[basePageInfo.section];
+        page = (page + maxPages) % maxPages;
+      }
+
       const printPageInfo = { ...basePageInfo, page };
-      mapData.setNcodeArea({ pageInfo: printPageInfo, basePageInfo, pdfDrawnRect, npageArea });
+      const basePageInfo_for_page = { ...basePageInfo, page };
+      mapData.setNcodeArea({ pageInfo: printPageInfo, basePageInfo: basePageInfo_for_page, rect, npageArea });
 
       // dummy PDF page info
       const pdfPageInfo: IPdfPageDesc = { url, filename, fingerprint, id: makePdfId(fingerprint, BASECODE_PAGES_PER_SHEET), numPages, pageNo };
@@ -288,6 +309,97 @@ export default class MappingStorage {
     this.nextIssuable = Util.getNextNcodePage(this.nextIssuable, codeNeeded.numNcodeComsumed);
 
     return pdfToNcodeMap;
+  }
+
+  private calcHfromNote = (arg: { Xmin: number, Ymin: number, Xmax?: number, Ymax?: number, pageNo: number }) => {
+    const { Xmin: x0, Ymin: y0, Xmax: x1, Ymax: y1, pageNo } = arg;
+    if (x1 === undefined || y1 === undefined) {
+      const h = new TransformParameters();
+      return h;
+    }
+    const mapData = new MappingItem(pageNo);
+    const w_nu = x1 - x0;
+    const h_nu = y1 - y0;
+
+    const w_pu = convertNuToPu(w_nu);
+    const h_pu = convertNuToPu(h_nu);
+
+
+    const srcPoints: IPolygonArea = [{ x: x0, y: y0 }, { x: x1, y: y0 }, { x: x1, y: y1 }, { x: x0, y: y1 }];
+    const dstPoints: IPolygonArea = [{ x: 0, y: 0 }, { x: w_pu, y: 0 }, { x: w_pu, y: h_pu }, { x: 0, y: h_pu }];
+    mapData.setSrc4Points_ncode(srcPoints);
+    mapData.setDst4Points_pdf(dstPoints);
+
+    const trans = new CoordinateTanslater();
+    const h = trans.calc(mapData);
+    return h;
+
+  }
+
+  public getNPageTransform = (pageInfo: IPageSOBP) => {
+    let h: TransformParameters;
+    const ret: IGetNPageTransformType = {
+      type: undefined as "note" | "pod" | "default",
+      pageInfo: undefined as IPageSOBP,
+      basePageInfo: undefined as IPageSOBP,
+      h: undefined as TransformParameters,
+
+      pdf: {
+        url: undefined as string,
+        filename: undefined as string,
+        fingerprint: undefined as string,
+        numPages: undefined as number,
+
+        pdfPageNo: undefined as number,
+        pagesPerSheet: undefined as number,
+      }
+    };
+
+    // 1) Ncode 페이지 맵에 있는지 확인한다.
+    const noteItem = getNPaperInfo(pageInfo);
+    if (!noteItem.isDefault) {
+      h = this.calcHfromNote({ ...noteItem.margin, pageNo: pageInfo.page });
+      ret.h = h;
+      ret.type = "note";
+      ret.pageInfo = pageInfo;
+      ret.basePageInfo = pageInfo;
+
+      ret.pdf.filename = noteItem.pdf_name;
+
+      return ret;
+    }
+
+    // 2) Mapping된 PDF 페이지인지 확인한다.
+    const pdfItem = this.findPdfPage({ ...pageInfo, x: 10, y: 10 });
+    if (pdfItem) {
+      const pageMap = pdfItem.pageMapping;
+      ret.h = pageMap.h;
+      ret.type = "pod";
+      ret.pageInfo = pageMap.pageInfo;
+      ret.basePageInfo = pageMap.basePageInfo;
+
+      ret.pdf = {
+        url: pdfItem.pdf.url,
+        filename: pdfItem.pdf.filename,
+        fingerprint: pdfItem.pdf.fingerprint,
+        numPages: pdfItem.pdf.numPages,
+
+        pdfPageNo: pageMap.pdfPageNo,
+        pagesPerSheet: pdfItem.pdf.pagesPerSheet,
+      }
+      return ret;
+    }
+
+    // 3) 아니면 그냥 A4를 리턴한다.
+    const defaultItem = getNPaperInfo({ section: -1, owner: -1, book: -1, page: -1 });
+    h = this.calcHfromNote({ ...defaultItem.margin, pageNo: pageInfo.page });
+    ret.h = h;
+
+    ret.type = "default";
+    ret.pageInfo = pageInfo;
+    ret.basePageInfo = pageInfo;
+
+    return ret;
   }
 
   /**
@@ -380,18 +492,6 @@ export default class MappingStorage {
    * pen down시에 새로운 SOBP라면, 관련된 PDF가 있는지 찾을 때 쓰인다
    */
   findPdfPage = (ncodeXy: INcodeSOBPxy) => {
-    // const pdfPageInfo: IPdfPageDesc = null;
-    // const pdfDocInfo: IPdfDocDesc = null;
-
-    // let found = -1;
-    // for ( let i=0; i<this._arrMapped.length; i++ ) {
-    //   const trans = this._arrMapped[i];
-    //   if ( isSamePage(ncodeXy as IPageSOBP, trans.pageInfo) ) {
-    //     found = i;
-    //     break;
-    //   }
-    // }
-
     const found = this._data.arrDocMap.find(m => Util.isPageInRange(ncodeXy, m.printPageInfo, m.numPages));
     if (found) {
       /** 원래는 폴리곤에 속했는지 점검해야 하지만, 현재는 같은 페이지인지만 점검한다  2020/12/06 */

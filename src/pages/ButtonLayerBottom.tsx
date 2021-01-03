@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import ManualCalibration from "../components/navbar/ManualCalibration";
 import PageNumbering from "../components/navbar/PageNumbering";
 import PrintButton from "../components/navbar/PrintButton";
@@ -8,6 +8,8 @@ import GridaToolTip from "../styles/GridaToolTip";
 import { useSelector } from "react-redux";
 import ColorButtons from "../components/navbar/ColorButtons";
 import { RootState } from "../store/rootReducer";
+import { IPageSOBP } from "../NcodePrintLib/DataStructure/Structures";
+import GridaDoc from "../GridaBoard/GridaDoc";
 
 const localStyle = {
   position: "absolute",
@@ -58,19 +60,31 @@ interface Props {
   handlePdfOpen: (event: IFileBrowserReturn) => void,
 }
 /**
- * 
+ *
  */
 const ButtonLayerBottom = (props:Props) => {
   const { handlePdfOpen, ...rest } = props;
 
-  const [num_pens, setNumPens] = useState(0);
-  const [pens, setPens] = useState(new Array(0) as NeoSmartpen[]);
+  // const [num_pens, setNumPens] = useState(0);
+  // const [pens, setPens] = useState(new Array(0) as NeoSmartpen[]);
+
+  const [pdfUrl, setPdfUrl] = useState(undefined as string);
+  const [pdfFilename, setPdfFilename] = useState(undefined as string);
+
+  const activePageNo = useSelector((state: RootState) => state.activePage.activePageNo);
+  useEffect(() => {
+    if (activePageNo >= 0) {
+      const doc = GridaDoc.getInstance();
+      const page = doc.getPageAt(activePageNo)
+      setPdfUrl(doc.getPdfUrlAt(activePageNo));
+      setPdfFilename(doc.getPdfFilenameAt(activePageNo));
+    }
+  }, [activePageNo]);
 
 
-
-  const [pdfUrl, pdfFilename] = useSelector((state: RootState) => {
-    return [state.activePage.url, state.activePage.filename];
-  });
+  // const [pdfUrl, pdfFilename] = useSelector((state: RootState) => {
+  //   return [state.activePage.url, state.activePage.filename];
+  // });
 
 
   return (

@@ -142,14 +142,14 @@ export default class CoordinateTanslater {
       this._mappingParams.h_rev = solveAffine(ptsReverse);  // PU -> NU
 
       _params = this._mappingParams.h;
-      return;
+      return this._mappingParams.h;
     }
     else if (srcPts.type === "homography") {
       this._mappingParams.h = solveHomography(pts);  // NU -> PU
       this._mappingParams.h_rev = solveHomography(ptsReverse);  // PU -> NU
 
       _params = this._mappingParams.h;
-      return;
+      return this._mappingParams.h;
     }
 
     throw Error("CoordinateTanslater needs '3 or 4 pairs of points' to initiate class.");
@@ -221,7 +221,7 @@ export default class CoordinateTanslater {
    * return {...this._params} 로 해야 하지 않을까?
    * 이것 때문에 class가 메모리에 계속 남아 있으면 어떻게 하지?
    */
-  public get params(): TransformParameters {
+  public get h(): TransformParameters {
     return this._mappingParams.h;
   }
 

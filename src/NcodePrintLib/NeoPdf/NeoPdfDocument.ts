@@ -27,8 +27,6 @@ export type IPdfOpenOption = {
 }
 
 export default class NeoPdfDocument {
-  _mappingInfo: IPdfToNcodeMapItem;
-
   _pdfDoc: PdfJs.PDFDocumentProxy;
 
   // _ready: PdfJs.PDFLoadingTask<PdfJs.PDFDocumentProxy>;
@@ -104,39 +102,44 @@ export default class NeoPdfDocument {
     return undefined;
   }
 
-  /**
-   * PDF에 할당된 ncode를 저장하는 루틴
-   *
-   * MappingStorage가 변하고 나면, 로드된 모든 PDF에 이 함수를 한번씩 불러줘야 한다
-   */
-  public refreshNcodeMappingTable = () => {
-    const msi = MappingStorage.getInstance();
+  // /**
+  //  * PDF에 할당된 ncode를 저장하는 루틴
+  //  *
+  //  * MappingStorage가 변하고 나면, 로드된 모든 PDF에 이 함수를 한번씩 불러줘야 한다
+  //  */
+  // public refreshNcodeMappingTable = () => {
+  //   const msi = MappingStorage.getInstance();
 
-    const mapItems = msi.findAssociatedNcode(this.fingerprint, BASECODE_PAGES_PER_SHEET);
-    let theSame = mapItems.theSames.length > 0 ? mapItems.theSames[0] : undefined;
-    this.pdfToNcodeMap = theSame;
+  //   const mapItems = msi.findAssociatedNcode(this.fingerprint, BASECODE_PAGES_PER_SHEET);
+  //   let theBase = mapItems.theBase;
+  //   let theSame = mapItems.theSames.length > 0 ? mapItems.theSames[0] : undefined;
+  //   this.pdfToNcodeMap = theBase;
 
-    // unique하므로 배열이 아닌 하나 밖에 안나올텐데, 이렇게 써 둔다.
-    if (!theSame) {
-      // 코드에 등록되지 않은 신규 PDF를 load한 것이다. 이 때는 임시 코드와 매핑해두자
-      const { url, filename, fingerprint, numPages } = this;
-      theSame = msi.makeTemporaryAssociateMapItem({ pdf: { url, filename, fingerprint, numPages }, n_paper: undefined });
-    }
-    this.addNcodeMapping(theSame, mapItems.theBase);
-  }
+  //   // unique하므로 배열이 아닌 하나 밖에 안나올텐데, 이렇게 써 둔다.
+  //   if (!theBase) {
+  //     // 코드에 등록되지 않은 신규 PDF를 load한 것이다. 이 때는 임시 코드와 매핑해두자
+  //     const { url, filename, fingerprint, numPages } = this;
+  //     theBase = msi.makeTemporaryAssociateMapItem({ pdf: { url, filename, fingerprint, numPages }, n_paper: undefined });
 
-  public addNcodeMapping = (theSame: IPdfToNcodeMapItem, theBase: IPdfToNcodeMapItem) => {
-    if (theSame.fingerprint !== this.fingerprint) {
-      console.error("NeoPdfDocument: the fingerprint of the map item is not same");
-      return;
-    }
+  //     if (!theSame) {
+  //       theSame = theBase;
+  //     }
+  //   }
+  //   this.addNcodeMapping(theSame, theBase);
+  // }
 
-    for (let i = 0; i < this.numPages; i++) {
-      const page = this._pages[i];
-      const pageNo = i + 1;
-      page.addPageToNcodeMaps([theSame.params[i]]);
-    }
-  }
+  // public addNcodeMapping = (theSame: IPdfToNcodeMapItem, theBase: IPdfToNcodeMapItem) => {
+  //   if (theSame.fingerprint !== this.fingerprint) {
+  //     console.error("NeoPdfDocument: the fingerprint of the map item is not same");
+  //     return;
+  //   }
+
+  //   for (let i = 0; i < this.numPages; i++) {
+  //     const page = this._pages[i];
+  //     const pageNo = i + 1;
+  //     page.addPageToNcodeMaps([theSame.params[i]]);
+  //   }
+  // }
 
   destroy = () => {
     this._pages = [];
@@ -268,7 +271,7 @@ export default class NeoPdfDocument {
 
   //     mapData.setNcodeArea({
   //       pageInfo: ncode.pageInfo,
-  //       pdfDrawnRect: { ...pdfRect_nu },
+  //       rect: { ...pdfRect_nu },
   //       npageArea: polygon,
   //     });
 

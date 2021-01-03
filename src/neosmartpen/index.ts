@@ -9,7 +9,7 @@ import StorageRenderer from "./renderer/pageviewer/StorageRenderer";
 import NoteserverClient from "./noteserver/NoteserverClient";
 import { paperInfo } from "./noteserver/PaperInfo";
 import PenManager from "./pencomm/PenManager";
-import { uuidv4, pdfSizeToDIsplayPixel } from "./utils/UtilsFunc";
+import { uuidv4, convertPuTOCssPoint } from "./utils/UtilsFunc";
 import { PLAYSTATE } from "./renderer/pageviewer/RenderWorkerBase";
 import MixedPageView from "./renderer/MixedPageView";
 
@@ -54,5 +54,5 @@ export {
   MixedPageView,
   PLAYSTATE,
   uuidv4,
-  pdfSizeToDIsplayPixel,
+  convertPuTOCssPoint,
 };

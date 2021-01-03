@@ -69,22 +69,22 @@ export default class NeoPdfPage {
     return this._pageToNcodeMaps;
   }
 
-  addPageToNcodeMaps = (pageMaps: IPageMapItem[]) => {
-    // this._pageToNcodeMaps 자체가 바뀌는 것을 막자, GridaDoc에서 쓴다.
-    //
-    // 이걸, pointer로 복사하게 된다면,
-    // GridaDoc와 GridaPage의 pageInfo 관련된 항목을 자동 업데이트 되게 수정해야 한다.
-    const storedMaps = this._pageToNcodeMaps;
-    pageMaps.forEach(pageMap => {
-      const isIncluded =
-        storedMaps.findIndex(storedMap => isSamePage(storedMap.pageInfo, pageMap.pageInfo)) >= 0;
-      if (!isIncluded) storedMaps.push(pageMap);
-    });
-  }
+  // addPageToNcodeMaps = (pageMaps: IPageMapItem[]) => {
+  //   // this._pageToNcodeMaps 자체가 바뀌는 것을 막자, GridaDoc에서 쓴다.
+  //   //
+  //   // 이걸, pointer로 복사하게 된다면,
+  //   // GridaDoc와 GridaPage의 pageInfo 관련된 항목을 자동 업데이트 되게 수정해야 한다.
+  //   const storedMaps = this._pageToNcodeMaps;
+  //   pageMaps.forEach(pageMap => {
+  //     const isIncluded =
+  //       storedMaps.findIndex(storedMap => isSamePage(storedMap.pageInfo, pageMap.pageInfo)) >= 0;
+  //     if (!isIncluded) storedMaps.push(pageMap);
+  //   });
+  // }
 
-  resetPageToNcodeMaps = () => {
-    this._pageToNcodeMaps = [];
-  }
+  // resetPageToNcodeMaps = () => {
+  //   this._pageToNcodeMaps = [];
+  // }
 
   constructor(neoPdf: NeoPdfDocument, pageNo: number) {
     this._pageNo = pageNo;

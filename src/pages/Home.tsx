@@ -11,7 +11,7 @@ import MenuIcon from '@material-ui/icons/Menu';
 import ButtonLayer from "./ButtonLayer";
 import { g_hiddenFileInputBtnId, onFileInputChanged, onFileInputClicked, openFileBrowser2 } from "../NcodePrintLib/NeoPdf/FileBrowser";
 import { theme } from "../styles/theme";
-import { IAutoLoadDocDesc } from "../NcodePrintLib/SurfaceMapper/MappingStorage";
+import { IAutoLoadDocDesc, IGetNPageTransformType } from "../NcodePrintLib/SurfaceMapper/MappingStorage";
 import AutoLoadConfirmDialog from "../GridaBoard/Dialog/AutoLoadConfirmDialog";
 import { RootState } from "../store/rootReducer";
 import { ZoomFitEnum } from "../neosmartpen/renderer/pageviewer/RenderWorkerBase";
@@ -24,6 +24,7 @@ import NeoPdfDocument from "../NcodePrintLib/NeoPdf/NeoPdfDocument";
 import NeoPdfManager from "../NcodePrintLib/NeoPdf/NeoPdfManager";
 import { IHandleFileLoadNeededEvent } from "../neosmartpen/renderer/MixedPageView";
 import { nullNcode } from "../NcodePrintLib/DefaultOption";
+import { g_availablePagesInSection } from "../NcodePrintLib/NcodeSurface/SurfaceInfo";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -43,23 +44,29 @@ const Home = () => {
   const [isRotate, setRotate] = useState();
   const [drawerOpen, setDrawerOpen] = useState(true);
   const [rightMargin, setRightMargin] = useState(0);
-  const [pens, setPens] = useState([] as NeoSmartpen[]);
+  // const [pens, setPens] = useState([] as NeoSmartpen[]);
 
-  const [autoLoadDoc, setAutoLoadDoc] = useState(undefined as IAutoLoadDocDesc);
+  const [autoLoadOptions, setAutoLoadOptions] = useState(undefined as IGetNPageTransformType);
   const [loadConfirmDlgOn, setLoadConfirmDlgOn] = useState(false);
   const [loadConfirmDlgStep, setLoadConfirmDlgStep] = useState(0);
-  const [pdfUrl, setPdfUrl] = useState(undefined as string);
-  const [pdfFilename, setPdfFilename] = useState(undefined as string);
+  // const [pdfUrl, setPdfUrl] = useState(undefined as string);
+  // const [pdfFilename, setPdfFilename] = useState(undefined as string);
   const [noMoreAutoLoad, setNoMoreAutoLoad] = useState(false);
 
-  const [pageInfo, setPageInfo] = useState(nullNcode());
+
+  const [pdfUrl, setPdfUrl] = useState(undefined as string);
+  const [pdfFilename, setPdfFilename] = useState(undefined as string);
+  const [pdfFingerprint, setPdfFingerprint] = useState(undefined as string);
+  const [pdfPageNo, setPdfPageNo] = useState(1);
+  const [pdf, setPdf] = useState(undefined as NeoPdfDocument);
+  const [pageInfos, setPageInfos] = useState([nullNcode()]);
   const [basePageInfo, setBasePageInfo] = useState(nullNcode());
 
+
+
   const drawerWidth = useSelector((state: RootState) => state.ui.drawer.width);
-  const activePageNo = useSelector((state: RootState) => state.activePage.activePageNo);
-  const pdf = useSelector((state: RootState) => state.activePage.pdf);
-  const pdfUrl_store = useSelector((state: RootState) => state.activePage.url);
-  const pdfFilename_store = useSelector((state: RootState) => state.activePage.filename);
+  const pens = useSelector((state: RootState) => state.appConfig.pens);
+
 
   const setDrawerWidth = (width: number) => updateDrawerWidth({ width });
 
@@ -74,11 +81,11 @@ const Home = () => {
     return state.appConfig.pens;
   });
 
-  useEffect(() => {
-    if (pdfUrl_store !== pdfUrl) setPdfUrl(pdfUrl_store);
-    if (pdfFilename_store !== pdfFilename) setPdfFilename(pdfFilename_store);
-    if (pens_store !== pens) setPens(pens_store);
-  }, [pdfUrl_store, pdfFilename_store, pens_store]);
+  // useEffect(() => {
+  //   if (pdfUrl_store !== pdfUrl) setPdfUrl(pdfUrl_store);
+  //   if (pdfFilename_store !== pdfFilename) setPdfFilename(pdfFilename_store);
+  //   if (pens_store !== pens) setPens(pens_store);
+  // }, [pdfUrl_store, pdfFilename_store, pens_store]);
 
   const handleDrawerOpen = () => {
     setDrawerOpen(true);
@@ -93,51 +100,51 @@ const Home = () => {
   }
 
 
-
-  const onNcodePageChanged = (pageInfo: IPageSOBP) => {
+  /**
+   * PDF 추가 로드 step 1) 페이지 변화 검출
+   * @param pageInfo - 펜에서 들어온 페이지, PDF의 시작 페이지가 아닐수도 있다
+   * @param found - 위의 pageInfo에 따라 발견된 mapping table 내의 item 정보 일부
+   */
+  const onNcodePageChanged = (pageInfo: IPageSOBP, found: IGetNPageTransformType) => {
     const doc = GridaDoc.getInstance();
-    doc.handleActivePageChanged(pageInfo);
+    const result = doc.handleActivePageChanged(pageInfo, found);
+
+    if (!noMoreAutoLoad && result.needToLoadPdf) {
+      handleFileLoadNeeded(found, result.pageInfo, result.basePageInfo);
+    }
   }
 
-  const handleFileLoadNeeded = (event: IHandleFileLoadNeededEvent) => {
-    if (event.isLoaded) {
-      const doc = GridaDoc.getInstance();
-      doc.handleSetNcodeMapping(event.coupledDoc.pdf);
-      return;
-    }
-
-    const url = event.coupledDoc.pdf.url;
+  /**
+   * PDF 추가 로드 step 2) 다이얼로그 표시
+   * @param found
+   * @param pageInfo - found에 의해 결정된 PDF의 첫 페이지에 해당하는 pageInfo
+   */
+  const handleFileLoadNeeded = (found: IGetNPageTransformType, pageInfo: IPageSOBP, basePageInfo: IPageSOBP) => {
+    const url = found.pdf.url;
 
     if (url.indexOf("blob:http") > -1) {
-      setAutoLoadDoc(event.coupledDoc);
+      setAutoLoadOptions({ ...found, pageInfo, basePageInfo });
       setLoadConfirmDlgStep(0);
       setLoadConfirmDlgOn(true);
     }
     else {
       // 구글 드라이브에서 파일을 불러오자
     }
-
     return;
   }
 
-  const handleNoMoreAutoLoad = () => {
-    setNoMoreAutoLoad(true);
-    setLoadConfirmDlgOn(false);
-  }
-
-  const handleCancelAutoLoad = () => {
-    setLoadConfirmDlgOn(false);
-  }
-
+  /**
+   * PDF 추가 로드 step 3) 다이얼로그 표시
+   * @this autoLoadOption - IGetNPageTransformType.pageInfo에 PDF의 첫페이지가 들어 있다
+   */
   const handleAppendFileOk = async () => {
     setLoadConfirmDlgOn(false);
-    const coupledDoc = autoLoadDoc;
 
-    const url = coupledDoc.pdf.url;
+    const url = autoLoadOptions.pdf.url;
     if (url.indexOf("blob:http") < 0)
       return { result: "fail", status: "not a local file, please load the file from google drive" }
 
-    console.log(`try to load file: ${coupledDoc.pdf.filename}`);
+    console.log(`try to load file: ${autoLoadOptions.pdf.filename}`);
 
     // 여기서 펜 입력은 버퍼링해야 한다.
     const selectedFile = await openFileBrowser2();
@@ -147,9 +154,9 @@ const Home = () => {
       const { url, file } = selectedFile;
 
       const doc = await NeoPdfManager.getInstance().getDocument({ url, filename: file.name, purpose: "test fingerprint" });
-      if (doc.fingerprint === coupledDoc.pdf.fingerprint) {
+      if (doc.fingerprint === autoLoadOptions.pdf.fingerprint) {
         doc.destroy();
-        handlePdfOpen({ result: "success", url, file });
+        handlePdfOpen({ result: "success", url, file }, autoLoadOptions.pageInfo, autoLoadOptions.basePageInfo);
 
         return { result: "success", status: "same fingerprint" }
       }
@@ -170,19 +177,33 @@ const Home = () => {
     }
   }
 
-
-  // 이 함수에서 pdf를 연다
-  const handlePdfOpen = async (event: IFileBrowserReturn) => {
+  /**
+   * PDF 추가 로드 step 4) 다이얼로그에서 OK를 눌렀을 때
+   * @param event
+   * @param pageInfo - PDF의 시작 페이지
+   */
+  const handlePdfOpen = async (event: IFileBrowserReturn, pageInfo?: IPageSOBP, basePageInfo?: IPageSOBP) => {
     console.log(event.url)
     if (event.result === "success") {
       const doc = GridaDoc.getInstance();
-      doc.openPdfFile({ url: event.url, filename: event.file.name });
+      doc.openPdfFile({ url: event.url, filename: event.file.name }, pageInfo, basePageInfo);
 
     }
     else if (event.result === "canceled") {
       alert("file open cancelled");
     }
   };
+
+
+  const handleNoMoreAutoLoad = () => {
+    setNoMoreAutoLoad(true);
+    setLoadConfirmDlgOn(false);
+  }
+
+  const handleCancelAutoLoad = () => {
+    setLoadConfirmDlgOn(false);
+  }
+
 
   const classes = useStyles();
 
@@ -211,6 +232,24 @@ const Home = () => {
   }
 
 
+  const activePageNo = useSelector((state: RootState) => state.activePage.activePageNo);
+  useEffect(() => {
+    if (activePageNo >= 0) {
+      const doc = GridaDoc.getInstance();
+      const page = doc.getPageAt(activePageNo)
+      setPdfUrl(doc.getPdfUrlAt(activePageNo));
+      setPdfFilename(doc.getPdfFilenameAt(activePageNo));
+      setPdfFingerprint(doc.getPdfFingerprintAt(activePageNo));
+      setPdfPageNo(doc.getPdfPageNoAt(activePageNo));
+      setPageInfos(doc.getPageInfosAt(activePageNo));
+      setBasePageInfo(doc.getBasePageInfoAt(activePageNo));
+      setPdf(page.pdf);
+
+    }
+  }, [activePageNo]);
+
+
+  console.log(`Home: active Page=${activePageNo}, pdfUrl=${pdfUrl}`);
   return (
     <div className={classes.root}>
       {/* <CssBaseline /> */}
@@ -230,22 +269,21 @@ const Home = () => {
         </div>
 
         <div style={{ position: "absolute", top: 0, left: 0, bottom: 0, right: drawerOpen ? drawerWidth : 0 }}>
-          {/* <MixedPageView
-            // pdf={pdf}
-            pdfUrl={pdfUrl} filename={pdfFilename}
-            pageNo={1}
-            pageInfo={pageInfo}
+          <MixedPageView
+            pdf={pdf}
+            pdfUrl={pdfUrl} filename={pdfFilename} fingerprint={pdfFingerprint}
+            pdfPageNo={pdfPageNo}
+            pageInfo={pageInfos[0]}
             basePageInfo={basePageInfo}
             playState={PLAYSTATE.live}
             pens={pens} fromStorage={false}
             autoPageChange={true}
             rotation={0}
-            handleFileLoadNeeded={noMoreAutoLoad ? undefined : handleFileLoadNeeded}
             onNcodePageChanged={onNcodePageChanged}
             parentName={"grida-main-home"}
             viewFit={ZoomFitEnum.FULL}
             fitMargin={100}
-          /> */}
+          />
         </div>
       </main >
 

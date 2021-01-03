@@ -12,6 +12,7 @@ import { IPenToViewerEvent } from "../../pencomm/neosmartpen";
 import { MixedViewProps } from "../MixedPageView";
 import { isSamePage } from "../../utils/UtilsFunc";
 import { makeNPageIdStr } from "../../../NcodePrintLib";
+import { MappingStorage } from "../../../NcodePrintLib/SurfaceMapper";
 
 
 export { PLAYSTATE };
@@ -29,8 +30,6 @@ interface Props extends MixedViewProps {
 
   onCanvasPositionChanged: (arg: { offsetX: number, offsetY: number, zoom: number }) => void;
 
-  h: TransformParameters;
-
   position: { offsetX: number, offsetY: number, zoom: number },
 }
 
@@ -45,18 +44,12 @@ interface State {
   strokeCount: number,
   liveDotCount: number,
 
-  pageInfo: {
-    section: number,
-    owner: number,
-    book: number,
-    page: number
-  },
-
   viewFit: ZoomFitEnum,
   pens: NeoSmartpen[],
   playState: PLAYSTATE,
 
   renderCount: number,
+
 
 }
 
@@ -65,19 +58,12 @@ interface State {
  *    1)  Pen에서 Event를 받아 실시간 rendering만 하는 component로 만들것
  *
  */
-class PenBasedRenderer_module extends React.Component<Props, State> {
+class PenBasedRenderer extends React.Component<Props, State> {
   state: State = {
     sizeUpdate: 0,
     penEventCount: 0,
     strokeCount: 0,
     liveDotCount: 0,
-
-    pageInfo: {
-      section: -1,
-      owner: -1,
-      book: -1,
-      page: -1,
-    },
 
     viewFit: ZoomFitEnum.ACTUAL,
 
@@ -128,7 +114,6 @@ class PenBasedRenderer_module extends React.Component<Props, State> {
 
     if (fixed !== undefined) this.fixed = fixed;
     if (fitMargin !== undefined) this.fitMargin = fitMargin;
-    if (pageInfo !== undefined) this.state.pageInfo = pageInfo;
     if (playState !== undefined) this.state.playState = playState;
     if (viewFit !== undefined) this.state.viewFit = viewFit;
   }
@@ -236,6 +221,10 @@ class PenBasedRenderer_module extends React.Component<Props, State> {
 
     console.log("Renderer Inited");
     this.initRenderer(this.propsSize);
+
+    const transform = MappingStorage.getInstance().getNPageTransform(this.props.pageInfo);
+    this.renderer.setTransformParameters(transform.h);
+
     this.makeUpPenEvents(pens);
   }
 
@@ -258,12 +247,6 @@ class PenBasedRenderer_module extends React.Component<Props, State> {
       ret_val = false;
     }
 
-    if (nextProps.h !== this.props.h) {
-      this.renderer.setTransformParameters(nextProps.h);
-      ret_val = false;
-    }
-
-
     if (nextProps.width !== this.props.width || nextProps.height !== this.props.height) {
       this.onViewResized({ width: nextProps.width, height: nextProps.height });
       ret_val = true;
@@ -280,18 +263,28 @@ class PenBasedRenderer_module extends React.Component<Props, State> {
     }
 
     if (!isSamePage(nextProps.pageInfo, this.props.pageInfo)) {
-      if (!nextProps.autoPageChange) {
-        this.setState({ pageInfo: { ...nextProps.pageInfo } });
-
-        /** 잉크 렌더러의 페이지를 바꾼다 */
+      if (this.renderer) {
         const { section, owner, book, page } = nextProps.pageInfo;
-        if (this.renderer) {
-          this.renderer.changePage(section, owner, book, page, false);
-        }
+        this.renderer.changePage(section, owner, book, page, false);
+        const transform = MappingStorage.getInstance().getNPageTransform(this.props.pageInfo);
+        this.renderer.setTransformParameters(transform.h);
+        ret_val = true;
       }
-
-      ret_val = true;
     }
+
+    // if (!isSamePage(nextProps.pageInfo, this.props.pageInfo)) {
+    //   if (!nextProps.autoPageChange) {
+    //     this.setState({ pageInfo: { ...nextProps.pageInfo } });
+
+    //     /** 잉크 렌더러의 페이지를 바꾼다 */
+    //     const { section, owner, book, page } = nextProps.pageInfo;
+    //     if (this.renderer) {
+    //       this.renderer.changePage(section, owner, book, page, false);
+    //     }
+    //   }
+
+    //   ret_val = true;
+    // }
 
     return ret_val;
   }
@@ -384,70 +377,39 @@ class PenBasedRenderer_module extends React.Component<Props, State> {
    * @param {{strokeKey:string, mac:string, stroke:NeoStroke, section:number, owner:number, book:number, page:number}} event
    */
   onLivePenPageInfo = (event: IPenToViewerEvent) => {
-    if (!this.props.autoPageChange) return;
-
-    const { penEventCount } = this.state;
     const { section, owner, book, page } = event;
-
-    const prevPageInfo = this.state.pageInfo;
+    const prevPageInfo = this.props.pageInfo;
     if (UTIL.isSamePage(prevPageInfo, event as IPageSOBP) && (!this.shouldSendPageInfo)) {
       return;
     }
     this.shouldSendPageInfo = false;
 
     // /** 내부 상태를 바꾼다. */
-    // this.setState({
-    //   penEventCount: penEventCount + 1,
-    //   pageInfo: { section, owner, book, page }
-    // });
+    // if (this.props.autoPageChange) {
+    //   const { penEventCount } = this.state;
+    //   this.setState({
+    //     penEventCount: penEventCount + 1,
+    //     // pageInfo: { section, owner, book, page }
+    //   });
 
-    // /** 테스트용 */
-    // const inkStorage = this.inkStorage;
-    // if (inkStorage) {
-    //   const pageStrokesCount = inkStorage.getPageStrokes(event as IPageSOBP).length;
-    //   this.setState({ strokeCount: pageStrokesCount });
-    // }
+    //   /** 테스트용 */
+    //   const inkStorage = this.inkStorage;
+    //   if (inkStorage) {
+    //     const pageStrokesCount = inkStorage.getPageStrokes(event as IPageSOBP).length;
+    //     this.setState({ strokeCount: pageStrokesCount });
+    //   }
 
-    // /** 잉크 렌더러의 페이지를 바꾼다 */
-    // if (this.renderer) {
-    //   this.renderer.changePage(section, owner, book, page, false);
+    //   /** 잉크 렌더러의 페이지를 바꾼다 */
+    //   if (this.renderer) {
+    //     this.renderer.changePage(section, owner, book, page, false);
+    //   }
     // }
 
     /** pdf pageNo를 바꿀 수 있게, container에게 전달한다. */
     this.props.onNcodePageChanged({ section, owner, book, page });
   }
-
   onLivePenPageInfo_byStorage = (event: IPenToViewerEvent) => {
-    if (!this.props.autoPageChange) return;
-    const { penEventCount } = this.state;
-    const { section, owner, book, page } = event;
-
-    const prevPageInfo = this.state.pageInfo;
-    if (UTIL.isSamePage(prevPageInfo, event as IPageSOBP) && (!this.shouldSendPageInfo)) {
-      return;
-    }
-    this.shouldSendPageInfo = false;
-
-    // /** 내부 상태를 바꾼다. */
-    // this.setState({
-    //   penEventCount: penEventCount + 1,
-    //   pageInfo: { section, owner, book, page }
-    // });
-
-    // /** 테스트용 */
-    // const inkStorage = this.inkStorage;
-    // if (inkStorage) {
-    //   const pageStrokesCount = inkStorage.getPageStrokes(event as IPageSOBP).length;
-    //   this.setState({ strokeCount: pageStrokesCount });
-    // }
-
-    // /** 잉크 렌더러의 페이지를 바꾼다 */
-    // if (this.renderer) {
-      // this.renderer.changePage_byStorage(section, owner, book, page, false);
-    // }
-
-    /** pdf pageNo를 바꿀 수 있게, container에게 전달한다. */
-    this.props.onNcodePageChanged({ section, owner, book, page });
+    this.onLivePenPageInfo(event);
   }
 
 
@@ -550,7 +512,7 @@ class PenBasedRenderer_module extends React.Component<Props, State> {
     // const { classes, scaleType, scale } = this.props;
     const { pens, viewFit, fixed } = this.props;
     const { scale, width, height } = this.propsSize;
-    const { section, owner, book, page } = this.state.pageInfo;
+    const { section, owner, book, page } = this.props.pageInfo;
     let { zoom } = this.props.position;
 
     const rect = { x: 0, y: 0, width, height };
@@ -627,21 +589,24 @@ class PenBasedRenderer_module extends React.Component<Props, State> {
         {/* </Paper> */}
 
         <div id={`${this.props.parentName}-info`} style={inkContainerDiv} >
-          <Typography style={{ color: "#00f" }}> {makeNPageIdStr(this.state.pageInfo)}</Typography>
+          <Typography style={{ color: "#00f" }}>
+            {makeNPageIdStr(this.props.pageInfo)} -&gt;
+             {makeNPageIdStr(this.props.basePageInfo)}  -&gt;
+             {this.props.pdfPageNo}</Typography>
         </div >
       </div >
     );
   }
 }
 
-const AdaptiveWithDetector = PenBasedRenderer_module;
+// const AdaptiveWithDetector = PenBasedRenderer_module;
 
-const PenBasedRenderer = (props: Props) => {
-  return (
-    <React.Fragment>
-      <AdaptiveWithDetector {...props} />
-    </React.Fragment>
-  )
-}
+// const PenBasedRenderer = (props: Props) => {
+//   return (
+//     <React.Fragment>
+//       <AdaptiveWithDetector {...props} />
+//     </React.Fragment>
+//   )
+// }
 
 export default PenBasedRenderer;
