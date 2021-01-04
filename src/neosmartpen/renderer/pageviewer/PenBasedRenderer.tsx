@@ -580,19 +580,33 @@ class PenBasedRenderer extends React.Component<Props, State> {
     // }
     console.log(`THUMB, renderer viewFit = ${this.props.viewFit}`);
 
+    const shadowStyle: CSSProperties = {
+      color: "#f00",
+      textShadow: "-1px 0 2px #fff, 0 1px 2px #fff, 1px 0 2px #fff, 0 -1px 2px #fff",
+    }
+
     return (
       <div id="pen-based-renderer" ref={this.setMainDivRef} style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0 }}>
         {/* <Paper style={{ height: this.size.height, width: this.size.width }}> */}
-        <div id={`${this.props.parentName}-fabric_container`} style={inkContainerDiv} >
+        < div id={`${this.props.parentName}-fabric_container`} style={inkContainerDiv} >
           <canvas id={this.canvasId} width={cssWidth} height={cssHeight} style={inkCanvas} ref={this.setCanvasRef} />
-        </div>
+        </div >
         {/* </Paper> */}
 
-        <div id={`${this.props.parentName}-info`} style={inkContainerDiv} >
-          <Typography style={{ color: "#00f" }}>
-            {makeNPageIdStr(this.props.pageInfo)} -&gt;
-             {makeNPageIdStr(this.props.basePageInfo)}  -&gt;
-             {this.props.pdfPageNo}</Typography>
+        < div id={`${this.props.parentName}-info`} style={inkContainerDiv} >
+          <br /> &nbsp; &nbsp;
+            <Typography style={{ ...shadowStyle, fontSize: 10 }}>page:</Typography>
+          <Typography style={{ ...shadowStyle, fontSize: 14, }}> {makeNPageIdStr(this.props.pageInfo)} </Typography>
+
+
+          <br /> &nbsp; &nbsp;
+            <Typography style={{ ...shadowStyle, fontSize: 10 }}>base:</Typography>
+          <Typography style={{ ...shadowStyle, fontSize: 14, fontStyle: "initial" }}> {makeNPageIdStr(this.props.basePageInfo)} </Typography>
+
+          <br /> &nbsp; &nbsp;
+            <Typography style={{ ...shadowStyle, fontSize: 10 }}>pdfPageNo:</Typography>
+          <Typography style={{ ...shadowStyle, fontSize: 14, fontStyle: "initial" }}> {this.props.pdfPageNo} </Typography>
+
         </div >
       </div >
     );

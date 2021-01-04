@@ -53,15 +53,57 @@ const Home = () => {
   // const [pdfFilename, setPdfFilename] = useState(undefined as string);
   const [noMoreAutoLoad, setNoMoreAutoLoad] = useState(false);
 
+  const [activePageNo, setActivePageNo] = useState(-1);
 
-  const [pdfUrl, setPdfUrl] = useState(undefined as string);
-  const [pdfFilename, setPdfFilename] = useState(undefined as string);
-  const [pdfFingerprint, setPdfFingerprint] = useState(undefined as string);
-  const [pdfPageNo, setPdfPageNo] = useState(1);
-  const [pdf, setPdf] = useState(undefined as NeoPdfDocument);
-  const [pageInfos, setPageInfos] = useState([nullNcode()]);
-  const [basePageInfo, setBasePageInfo] = useState(nullNcode());
+  // const [pdfUrl, setPdfUrl] = useState(undefined as string);
+  // const [pdfFilename, setPdfFilename] = useState(undefined as string);
+  // const [pdfFingerprint, setPdfFingerprint] = useState(undefined as string);
+  // const [pdfPageNo, setPdfPageNo] = useState(1);
+  // const [pdf, setPdf] = useState(undefined as NeoPdfDocument);
+  // const [pageInfos, setPageInfos] = useState([nullNcode()]);
+  // const [basePageInfo, setBasePageInfo] = useState(nullNcode());
 
+  let pdfUrl = undefined as string;
+  const setPdfUrl = (value: string) => pdfUrl = value;
+
+  let pdfFilename = undefined as string;
+  const setPdfFilename = (value: string) => pdfFilename = value;
+
+  let pdfFingerprint = undefined as string;
+  const setPdfFingerprint = (value: string) => pdfFingerprint = value;
+
+  let pdfPageNo = 1;
+  const setPdfPageNo = (value: number) => pdfPageNo = value;
+
+  let pdf = undefined as NeoPdfDocument;
+  const setPdf = (value: NeoPdfDocument) => pdf = value;
+
+  let pageInfos = [nullNcode()];
+  const setPageInfos = (value: IPageSOBP[]) => pageInfos = value;
+
+  let basePageInfo = nullNcode();
+  const setBasePageInfo = (value: IPageSOBP) => basePageInfo = value;
+
+  const activePageNo_store = useSelector((state: RootState) => state.activePage.activePageNo);
+  if (activePageNo_store !== activePageNo) {
+    setActivePageNo(activePageNo_store);
+  }
+
+  if (activePageNo >= 0) {
+    const doc = GridaDoc.getInstance();
+    const page = doc.getPageAt(activePageNo_store)
+    setPdf(page.pdf);
+
+    // setPdfUrl(doc.getPdfUrlAt(activePageNo_store));
+    // setPdfFilename(doc.getPdfFilenameAt(activePageNo_store));
+    setPdfFingerprint(doc.getPdfFingerprintAt(activePageNo_store));
+    setPdfPageNo(doc.getPdfPageNoAt(activePageNo_store));
+    setPageInfos(doc.getPageInfosAt(activePageNo_store));
+    setBasePageInfo(doc.getBasePageInfoAt(activePageNo_store));
+  }
+
+
+  // alert(`set pdf=${pdf}`);
 
 
   const drawerWidth = useSelector((state: RootState) => state.ui.drawer.width);
@@ -232,21 +274,6 @@ const Home = () => {
   }
 
 
-  const activePageNo = useSelector((state: RootState) => state.activePage.activePageNo);
-  useEffect(() => {
-    if (activePageNo >= 0) {
-      const doc = GridaDoc.getInstance();
-      const page = doc.getPageAt(activePageNo)
-      setPdfUrl(doc.getPdfUrlAt(activePageNo));
-      setPdfFilename(doc.getPdfFilenameAt(activePageNo));
-      setPdfFingerprint(doc.getPdfFingerprintAt(activePageNo));
-      setPdfPageNo(doc.getPdfPageNoAt(activePageNo));
-      setPageInfos(doc.getPageInfosAt(activePageNo));
-      setBasePageInfo(doc.getBasePageInfoAt(activePageNo));
-      setPdf(page.pdf);
-
-    }
-  }, [activePageNo]);
 
 
   console.log(`Home: active Page=${activePageNo}, pdfUrl=${pdfUrl}`);

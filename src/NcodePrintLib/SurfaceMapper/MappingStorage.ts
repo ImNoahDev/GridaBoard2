@@ -446,12 +446,6 @@ export default class MappingStorage {
     if (_debug) this.dump("mapping");
   }
 
-  clear = () => {
-    this.reset();
-    this.storeMappingInfo();
-    console.log("Mapping information cleared");
-  }
-
   public getCloudData() {
     cloud_util_func.readMappingInfo();
   }
@@ -493,6 +487,7 @@ export default class MappingStorage {
    */
   findPdfPage = (ncodeXy: INcodeSOBPxy) => {
     const found = this._data.arrDocMap.find(m => Util.isPageInRange(ncodeXy, m.printPageInfo, m.numPages));
+
     if (found) {
       /** 원래는 폴리곤에 속했는지 점검해야 하지만, 현재는 같은 페이지인지만 점검한다  2020/12/06 */
       const pageMap = found.params.find(param => isSamePage(ncodeXy, param.pageInfo));
@@ -556,7 +551,11 @@ export default class MappingStorage {
       console.log(`[${prefix}] ${arr[i]}`);
     }
   }
-
+  clear = () => {
+    this.reset();
+    this.storeMappingInfo();
+    console.log("Mapping information cleared");
+  }
 
   storeMappingInfo = () => {
     if (storageAvailable("localStorage")) {
@@ -599,6 +598,16 @@ export default class MappingStorage {
 
         // 최신순으로 소팅
         this._data.arrDocMap.sort((a, b) => b.timeString > a.timeString ? 1 : (b.timeString === a.timeString ? 0 : -1));
+
+        // 개발중 코드, Data Structure가 바뀐 것이라면 reset kitty
+        let validStoredData = true;
+        const found = this._data.arrDocMap.forEach(m => { if (!m.printPageInfo || !m.numPages) validStoredData = false; });
+        if ( !validStoredData ) {
+          alert( `MappingStorage reset`);
+          this.clear();
+        }
+
+
         this.dump("loading");
 
         // const debug = JSON.stringify(this._arrMapped);

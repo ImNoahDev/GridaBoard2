@@ -54,7 +54,7 @@ const ThumbnailItem = (props: Props) => {
   const wh_ratio = sizePu.width / sizePu.height;
   const pageInfo = page.pageInfos[0];
 
-  let height = drawerWidth / wh_ratio * 0.9;
+  const height = drawerWidth / wh_ratio * 0.9;
 
   console.log(`thumbnail - ${pn}: pageNo: ${pdfPageNo} pdf: ${pdf} pdfUrl: ${pdfUrl} fingerprint: ${pdfFingerprint} `)
   return (
