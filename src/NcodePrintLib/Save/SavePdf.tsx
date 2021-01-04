@@ -4,6 +4,8 @@ import InkStorage from "../../neosmartpen/penstorage/InkStorage";
 import { drawPath } from "../../neosmartpen/renderer/pageviewer/DrawCurves";
 import * as CONST from "../../neosmartpen/constants";
 import * as UTIL from "../../neosmartpen/utils/UtilsFunc";
+import GridaDoc from "../../GridaBoard/GridaDoc";
+import Swal from 'sweetalert2'
 
 const PDF_TO_SCREEN_SCALE = 6.72; // (56/600)*72
 
@@ -11,6 +13,22 @@ const PDF_TO_SCREEN_SCALE = 6.72; // (56/600)*72
 
 const inkSt = InkStorage.getInstance();
 export async function savePDF(url: string, saveName: string) {
+
+  const {value: filename} = await Swal.fire({
+    title: 'PDF 저장',
+    input: 'text',
+    inputPlaceholder : '저장할 pdf 파일의 이름을 입력하세요',
+    showCancelButton: true,
+  })
+
+  if (!filename) {
+    console.log('파일 저장 취소');
+    return;
+  }
+
+  const doc = GridaDoc.getInstance();
+  const docPages = doc.pages;
+  
   const existingPdfBytes = await fetch(url).then(res => res.arrayBuffer());
   const pdfDoc = await PDFDocument.load(existingPdfBytes);
   const pages = pdfDoc.getPages();
@@ -61,7 +79,7 @@ export async function savePDF(url: string, saveName: string) {
 
   const pdfBytes = await pdfDoc.save();
   const blob = new Blob([pdfBytes], {type: 'application/pdf'});
-  saveAs(blob, saveName);
+  saveAs(blob, filename);
 }
 
 export async function addGraphicAndSavePdf(url: string, saveName: string) {
