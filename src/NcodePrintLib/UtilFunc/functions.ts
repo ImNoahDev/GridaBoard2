@@ -72,7 +72,7 @@ export function isSamePage(pg1: IPageSOBP, pg2: IPageSOBP): boolean {
 
 export function isPageInRange(pg: IPageSOBP, arrStart: IPageSOBP, numPages: number): boolean {
   if (!pg ) return false;
-  alert( `${arrStart}`)
+  // alert( `${arrStart}`)
   if (pg.book !== arrStart.book || pg.owner !== arrStart.owner || pg.section !== arrStart.section) {
     return false;
   }
