@@ -1,18 +1,19 @@
 import React, { CSSProperties } from "react";
 import PenBasedRenderer, { PLAYSTATE } from "./pageviewer/PenBasedRenderer";
-import { INcodeSOBPxy, IPageSOBP } from "../DataStructure/Structures";
+import { IPageSOBP } from "../DataStructure/Structures";
 import { NeoSmartpen } from "../pencomm/neosmartpen";
 import { MappingStorage } from "../../NcodePrintLib/SurfaceMapper";
-import { TransformParameters } from "../../NcodePrintLib/Coordinates";
 import { ZoomFitEnum } from "./pageviewer/RenderWorkerBase";
 import { IAutoLoadDocDesc, IGetNPageTransformType } from "../../NcodePrintLib/SurfaceMapper/MappingStorage";
 import NeoPdfDocument from "../../NcodePrintLib/NeoPdf/NeoPdfDocument";
-import { hideUIProgressBackdrop, showUIProgressBackdrop } from "../../store/reducers/ui";
 import NeoPdfManager from "../../NcodePrintLib/NeoPdf/NeoPdfManager";
 import NeoPdfPageView from "./pdf/NeoPdfPageView";
 import { withResizeDetector } from 'react-resize-detector';
 import { isSamePage } from "../../NcodePrintLib/UtilFunc/functions";
 import { getNPaperSize_pu } from "../../NcodePrintLib/NcodeSurface/SurfaceInfo";
+import { Typography } from "@material-ui/core";
+import { makeNPageIdStr } from "../../NcodePrintLib";
+
 
 export const ZINDEX_INK_LAYER = 3;
 export const ZINDEX_PDF_LAYER = 2;
@@ -213,7 +214,7 @@ class MixedPageView_module extends React.Component<MixedViewProps, State>  {
       pdfFingerprint: props.fingerprint,
       pdfPageNo: props.pdfPageNo !== undefined ? props.pdfPageNo : 1,
 
-      pageInfo: props.pageInfo !== undefined ? props.pageInfo : { section: -1, owner: -1, book: -1, page: -1 },
+      pageInfo: props.pageInfo,
       width: props.width !== undefined ? props.width : 0,
       height: props.height !== undefined ? props.height : 0,
     };
@@ -229,12 +230,18 @@ class MixedPageView_module extends React.Component<MixedViewProps, State>  {
     else {
       this.setState({ pdf: this.props.pdf });
     }
+
+    this.setState({ pageInfo: { ...this.props.pageInfo } });
   }
 
 
   shouldComponentUpdate(nextProps: MixedViewProps, nextState: State) {
     // diffPropsAndState("GRIDA DOC", this.props, nextProps, this.state, nextState);
     let ret_val = true;
+    if (!isSamePage(nextProps.pageInfo, this.props.pageInfo)) {
+      this.setState({ pageInfo: { ...nextProps.pageInfo } });
+      ret_val = ret_val || true;
+    }
 
 
     if (nextProps.width !== this.props.width || nextProps.height !== this.props.height) {
@@ -283,11 +290,6 @@ class MixedPageView_module extends React.Component<MixedViewProps, State>  {
       ret_val = ret_val || true;
     }
 
-
-    if (!isSamePage(nextProps.pageInfo, this.props.pageInfo)) {
-      this.setState({ pageInfo: { ...nextProps.pageInfo } });
-      return false;
-    }
 
     if (!isSamePage(nextState.pageInfo, this.state.pageInfo)) {
       ret_val = ret_val || true;
@@ -439,6 +441,11 @@ class MixedPageView_module extends React.Component<MixedViewProps, State>  {
     console.log(`PDF PAGE, page number,  = ${this.state.pdfPageNo}`);
 
 
+    const shadowStyle: CSSProperties = {
+      color: "#00f",
+      textShadow: "-1px 0 2px #fff, 0 1px 2px #fff, 1px 0 2px #fff, 0 -1px 2px #fff",
+    }
+
     return (
       <div id={`${this.props.parentName}-mixed_view`} style={{
         position: "absolute",
@@ -478,6 +485,36 @@ class MixedPageView_module extends React.Component<MixedViewProps, State>  {
             onCanvasPositionChanged={this.onCanvasPositionChanged}
           />
         </div>
+
+        < div id={`${this.props.parentName}-info`} style={inkContainer} >
+          <br /> &nbsp; &nbsp;
+          <br /> &nbsp; &nbsp;
+          <br /> &nbsp; &nbsp;
+          <br /> &nbsp; &nbsp;
+          <br /> &nbsp; &nbsp;
+          <br /> &nbsp; &nbsp;
+          <br /> &nbsp; &nbsp;
+          <br /> &nbsp; &nbsp;
+          <br /> &nbsp; &nbsp;
+          <br /> &nbsp; &nbsp;
+            <Typography style={{ ...shadowStyle, fontSize: 10 }}>Page(state):</Typography>
+          <Typography style={{ ...shadowStyle, fontSize: 14, }}> {makeNPageIdStr(this.state.pageInfo)} </Typography>
+
+          <br /> &nbsp; &nbsp;
+            <Typography style={{ ...shadowStyle, fontSize: 10 }}>Page(property):</Typography>
+          <Typography style={{ ...shadowStyle, fontSize: 14, }}> {makeNPageIdStr(this.props.pageInfo)} </Typography>
+
+
+          <br /> &nbsp; &nbsp;
+            <Typography style={{ ...shadowStyle, fontSize: 10 }}>Base(property):</Typography>
+          <Typography style={{ ...shadowStyle, fontSize: 14, fontStyle: "initial" }}> {makeNPageIdStr(this.props.basePageInfo)} </Typography>
+
+          <br /> &nbsp; &nbsp;
+            <Typography style={{ ...shadowStyle, fontSize: 10 }}>pdfPageNo:</Typography>
+          <Typography style={{ ...shadowStyle, fontSize: 14, fontStyle: "initial" }}> {this.props.pdfPageNo} </Typography>
+
+        </div >
+
 
       </div>
     );

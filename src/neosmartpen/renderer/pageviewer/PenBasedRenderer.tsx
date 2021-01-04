@@ -5,7 +5,6 @@ import PenBasedRenderWorker from "./PenBasedRenderWorker";
 import { NeoSmartpen, PenManager } from "../../index";
 import * as UTIL from "../../utils/UtilsFunc";
 import { IPageSOBP, ISize } from "../../DataStructure/Structures";
-import { TransformParameters } from "../../../NcodePrintLib/Coordinates";
 import { CSSProperties } from "@material-ui/core/styles/withStyles";
 import { Typography } from "@material-ui/core";
 import { IPenToViewerEvent } from "../../pencomm/neosmartpen";
@@ -595,12 +594,12 @@ class PenBasedRenderer extends React.Component<Props, State> {
 
         < div id={`${this.props.parentName}-info`} style={inkContainerDiv} >
           <br /> &nbsp; &nbsp;
-            <Typography style={{ ...shadowStyle, fontSize: 10 }}>page:</Typography>
+            <Typography style={{ ...shadowStyle, fontSize: 10 }}>Page:</Typography>
           <Typography style={{ ...shadowStyle, fontSize: 14, }}> {makeNPageIdStr(this.props.pageInfo)} </Typography>
 
 
           <br /> &nbsp; &nbsp;
-            <Typography style={{ ...shadowStyle, fontSize: 10 }}>base:</Typography>
+            <Typography style={{ ...shadowStyle, fontSize: 10 }}>Base:</Typography>
           <Typography style={{ ...shadowStyle, fontSize: 14, fontStyle: "initial" }}> {makeNPageIdStr(this.props.basePageInfo)} </Typography>
 
           <br /> &nbsp; &nbsp;
