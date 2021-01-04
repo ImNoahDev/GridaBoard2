@@ -53,6 +53,7 @@ const ThumbnailItem = (props: Props) => {
   const sizePu = pageOverview.sizePu;
   const wh_ratio = sizePu.width / sizePu.height;
   const pageInfo = page.pageInfos[0];
+  const basePageInfo = page.basePageInfo;
 
   const height = drawerWidth / wh_ratio * 0.9;
 
@@ -67,8 +68,10 @@ const ThumbnailItem = (props: Props) => {
           pdfPageNo={pdfPageNo}
           playState={PLAYSTATE.live} pens={[]}
           rotation={0}
+
           pageInfo={pageInfo}
-          basePageInfo={pageInfo}
+          basePageInfo={basePageInfo}
+
           parentName={`thumbnail - ${pn} `}
           viewFit={ZoomFitEnum.FULL}
           autoPageChange={false}

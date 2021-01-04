@@ -69,7 +69,7 @@ export default class InkStorage {
    */
   public addEventListener(eventName: string, listener: EventCallbackType, filter: any) {
     this.dispatcher.on(eventName, listener, filter);
-    console.log("bound", listener);
+    // console.log("bound", listener);
   }
 
   /**
@@ -375,7 +375,7 @@ export default class InkStorage {
 
     // hand the event
     const { mac, section, owner, book, page } = stroke;
-    console.log( `inkStorage: close Stroke event dispatch`);
+    // console.log( `inkStorage: close Stroke event dispatch`);
     this.dispatcher.dispatch(PenEventName.ON_PEN_UP, { strokeKey, mac, stroke, section, owner, book, page });
   }
 }

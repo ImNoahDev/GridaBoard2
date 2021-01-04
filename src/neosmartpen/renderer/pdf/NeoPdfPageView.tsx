@@ -11,12 +11,14 @@ import { MAX_RENDERER_PIXELS } from "../Constants";
 import { CSSProperties } from '@material-ui/core/styles/withStyles';
 import { BoxProps } from '@material-ui/core';
 import { MixedViewProps } from '../MixedPageView';
+import { Typography } from "@material-ui/core";
+import { makeNPageIdStr } from "../../../NcodePrintLib";
 
 
 interface PageProps extends MixedViewProps {
   // pdf: PdfJs.PDFDocumentProxy,
   pdf: NeoPdfDocument,
-  index: number,
+
   position: { offsetX: number, offsetY: number, zoom: number },
   // pdfCanvas: CSSProperties,
 }
@@ -149,12 +151,12 @@ export default class NeoPdfPageView extends Component<PageProps> {
       return true;
     }
 
-    const pageChanged = this.props.index !== nextProps.index;
-    if (pageChanged) {
-      console.log(`PDF PAGE: page, page Number = ${nextProps.index}`)
-      this._update(nextProps.pdf, nextProps.index);
+    if (this.props.pdfPageNo !== nextProps.pdfPageNo) {
+      console.log(`PDF PAGE: page, page Number = ${nextProps.pdfPageNo}`)
+      this._update(nextProps.pdf, nextProps.pdfPageNo);
       return true;
     }
+
 
     return true;
   }
@@ -165,7 +167,7 @@ export default class NeoPdfPageView extends Component<PageProps> {
   };
 
   _update = (pdf: NeoPdfDocument, pageNo: number = undefined) => {
-    console.log(`PDF PAGE: _update, page Number = ${pageNo}`)
+    // console.log(`PDF PAGE: _update, page Number = ${pageNo}`)
 
     if (pdf) {
       this.backPlane.inited = false;
@@ -175,8 +177,8 @@ export default class NeoPdfPageView extends Component<PageProps> {
     }
   };
 
-  _loadPage = (pdf: NeoPdfDocument, pageNo: number = this.props.index) => {
-    console.log(`PDF PAGE: _loadPage, page Number = ${pageNo}`)
+  _loadPage = (pdf: NeoPdfDocument, pageNo: number = this.props.pdfPageNo) => {
+    // console.log(`PDF PAGE: _loadPage, page Number = ${pageNo}`)
     if (this.state.status === 'rendering') return;
 
     if (pageNo > pdf.numPages) {
@@ -187,7 +189,7 @@ export default class NeoPdfPageView extends Component<PageProps> {
     pdf.getPageAsync(pageNo).then(
       (page) => {
         // console.log(`BACKPLANE _loadPage renderPage start`)
-        this.renderPage(page, this.props.position.zoom, );
+        this.renderPage(page, this.props.position.zoom,);
         // console.log(`BACKPLANE _loadPage renderPage end`)
       }
     );
@@ -339,10 +341,58 @@ export default class NeoPdfPageView extends Component<PageProps> {
       zoom: 1,
       left: 0,
       top: 0,
+      width: 600
+      // background: "#fff"
+    }
+
+    const isPdfPage = this.props.pdf && this.props.pdfPageNo && this.props.pdfPageNo > 0;
+    const shadowStyle: CSSProperties = {
+      color: "#088",
+      textShadow: "-1px 0 2px #fff, 0 1px 2px #fff, 1px 0 2px #fff, 0 -1px 2px #fff",
     }
     return (
+
       <div style={pageCanvas} id={`pdf-page ${status}`} >
-        <canvas ref={this.setCanvasRef} />
+        <div style={pageCanvas}  >
+          {isPdfPage
+            ? <canvas ref={this.setCanvasRef} />
+            : <></>
+          }
+        </div>
+
+        < div id={`${this.props.parentName}-info`} style={pageCanvas} >
+          <br /> &nbsp; &nbsp;
+          <br /> &nbsp; &nbsp;
+          <br /> &nbsp; &nbsp;
+          <br /> &nbsp; &nbsp;
+          <br /> &nbsp; &nbsp;
+          <br /> &nbsp; &nbsp;
+          <br /> &nbsp; &nbsp;
+          <br /> &nbsp; &nbsp;
+          <br /> &nbsp; &nbsp;
+          <br /> &nbsp; &nbsp;
+          <Typography style={{ ...shadowStyle, fontSize: 16 }}>PDFViewer </Typography>
+
+          <br /> &nbsp; &nbsp;
+          <Typography style={{ ...shadowStyle, fontSize: 10 }}>Page(state):</Typography>
+          <Typography style={{ ...shadowStyle, fontSize: 14, }}> {makeNPageIdStr(this.props.pageInfo)} </Typography>
+
+          <br /> &nbsp; &nbsp;
+            <Typography style={{ ...shadowStyle, fontSize: 10 }}>Page(property):</Typography>
+          <Typography style={{ ...shadowStyle, fontSize: 14, }}> {makeNPageIdStr(this.props.pageInfo)} </Typography>
+
+
+          <br /> &nbsp; &nbsp;
+            <Typography style={{ ...shadowStyle, fontSize: 10 }}>Base(property):</Typography>
+          <Typography style={{ ...shadowStyle, fontSize: 14, fontStyle: "initial" }}> {makeNPageIdStr(this.props.basePageInfo)} </Typography>
+
+          <br /> &nbsp; &nbsp;
+            <Typography style={{ ...shadowStyle, fontSize: 10 }}>pdfPageNo:</Typography>
+          <Typography style={{ ...shadowStyle, fontSize: 14, fontStyle: "initial" }}> {this.props.pdfPageNo} </Typography>
+
+        </div >
+
+
       </div>
     );
   }

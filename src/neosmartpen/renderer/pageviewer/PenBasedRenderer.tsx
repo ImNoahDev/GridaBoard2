@@ -104,7 +104,6 @@ class PenBasedRenderer extends React.Component<Props, State> {
 
     const { pageInfo, baseScale, playState, fitMargin, width, height, fixed, pdfSize, viewFit } = props;
     this.inkStorage = InkStorage.getInstance();
-    if (this.props.fromStorage) this.subScriptStorageEvent();
 
     this.canvasId = UTIL.uuidv4();
     // this.canvasId = "fabric canvas";
@@ -119,6 +118,8 @@ class PenBasedRenderer extends React.Component<Props, State> {
 
   private subScriptStorageEvent = () => {
     const inkStorage = this.inkStorage;
+    // console.log(`Renderer(${this.props.parentName}): subScriptStorageEvent`);
+
     if (inkStorage) {
       const filter = { mac: null };
       inkStorage.addEventListener(PenEventName.ON_PEN_DOWN, this.onLivePenDown_byStorage, filter);
@@ -216,15 +217,20 @@ class PenBasedRenderer extends React.Component<Props, State> {
    */
   componentDidMount() {
     const { pens } = this.props;
-    console.log(`PenBasedRenderer: size ${this.propsSize.width}, ${this.propsSize.height}`);
+    // console.log(`PenBasedRenderer: size ${this.propsSize.width}, ${this.propsSize.height}`);
+    // console.log("Renderer Inited");
 
-    console.log("Renderer Inited");
     this.initRenderer(this.propsSize);
 
     const transform = MappingStorage.getInstance().getNPageTransform(this.props.pageInfo);
     this.renderer.setTransformParameters(transform.h);
 
     this.makeUpPenEvents(pens);
+
+    if (this.props.fromStorage) {
+      // console.log(`Renderer(${this.props.parentName}): componentDidMount`);
+      this.subScriptStorageEvent();
+    }
   }
 
 
@@ -236,7 +242,7 @@ class PenBasedRenderer extends React.Component<Props, State> {
     let ret_val = true;
 
     if (nextProps.pens !== this.props.pens) {
-      console.log(`PenBasedRenderer: shouldComponentUpdate, EventSubscribing`);
+      // console.log(`PenBasedRenderer: shouldComponentUpdate, EventSubscribing`);
       this.makeUpPenEvents(nextProps.pens);
       ret_val = true;
     }
@@ -265,7 +271,7 @@ class PenBasedRenderer extends React.Component<Props, State> {
       if (this.renderer) {
         const { section, owner, book, page } = nextProps.pageInfo;
         this.renderer.changePage(section, owner, book, page, false);
-        const transform = MappingStorage.getInstance().getNPageTransform(this.props.pageInfo);
+        const transform = MappingStorage.getInstance().getNPageTransform(nextProps.pageInfo);
         this.renderer.setTransformParameters(transform.h);
         ret_val = true;
       }
@@ -360,15 +366,18 @@ class PenBasedRenderer extends React.Component<Props, State> {
   onLivePenDown = (event: IPenToViewerEvent) => {
     // console.log(event);
     if (this.renderer) {
+      // const { section, owner, book, page } = event;
+      // if (isSamePage(this.props.pageInfo, { section, owner, book, page }))
       this.renderer.createLiveStroke(event);
     }
   }
 
   onLivePenDown_byStorage = (event: IPenToViewerEvent) => {
-    // console.log(event);
-    if (this.renderer) {
-      this.renderer.createLiveStroke_byStorage(event);
-    }
+    console.log(`Renderer(${makeNPageIdStr(this.props.pageInfo)}): onLivePenDown from InkStorage`);
+
+    // if (this.renderer) {
+    //   this.renderer.createLiveStroke_byStorage(event);
+    // }
   }
 
   /**
@@ -383,37 +392,18 @@ class PenBasedRenderer extends React.Component<Props, State> {
     }
     this.shouldSendPageInfo = false;
 
-    // /** 내부 상태를 바꾼다. */
-    // if (this.props.autoPageChange) {
-    //   const { penEventCount } = this.state;
-    //   this.setState({
-    //     penEventCount: penEventCount + 1,
-    //     // pageInfo: { section, owner, book, page }
-    //   });
-
-    //   /** 테스트용 */
-    //   const inkStorage = this.inkStorage;
-    //   if (inkStorage) {
-    //     const pageStrokesCount = inkStorage.getPageStrokes(event as IPageSOBP).length;
-    //     this.setState({ strokeCount: pageStrokesCount });
-    //   }
-
-    //   /** 잉크 렌더러의 페이지를 바꾼다 */
-    //   if (this.renderer) {
-    //     this.renderer.changePage(section, owner, book, page, false);
-    //   }
-    // }
-
     /** pdf pageNo를 바꿀 수 있게, container에게 전달한다. */
-    this.props.onNcodePageChanged({ section, owner, book, page });
+    if (this.props.onNcodePageChanged) {
+      this.props.onNcodePageChanged({ section, owner, book, page });
+    }
   }
   onLivePenPageInfo_byStorage = (event: IPenToViewerEvent) => {
-    this.onLivePenPageInfo(event);
+    // const { section, owner, book, page } = event;
+    // const pageInfo = { section, owner, book, page } as IPageSOBP;
+
+    // console.log(`Renderer(${makeNPageIdStr(this.props.pageInfo)}): PageInfo from InkStorage, pageInfo=${makeNPageIdStr(pageInfo)}`);
+    // this.onLivePenPageInfo(event);
   }
-
-
-
-
 
   /**
    *
@@ -424,21 +414,13 @@ class PenBasedRenderer extends React.Component<Props, State> {
     if (this.renderer) {
       this.renderer.pushLiveDot(event);
     }
-    // const { liveDotCount } = this.state;
-
-    // this.setState({ liveDotCount: liveDotCount + 1 });
-    // console.log(event);
   }
 
 
   onLivePenMove_byStorage = (event: IPenToViewerEvent) => {
-    if (this.renderer) {
-      this.renderer.pushLiveDot_byStorage(event);
-    }
-    // const { liveDotCount } = this.state;
-
-    // this.setState({ liveDotCount: liveDotCount + 1 });
-    // console.log(event);
+    // if (this.renderer) {
+    //   this.renderer.pushLiveDot_byStorage(event);
+    // }
   }
 
   /**
@@ -446,33 +428,24 @@ class PenBasedRenderer extends React.Component<Props, State> {
    * @param {{strokeKey:string, mac:string, stroke, section:number, owner:number, book:number, page:number}} event
    */
   onLivePenUp = (event: IPenToViewerEvent) => {
-    console.log("Pen Up");
+    // console.log("Pen Up");
     if (this.renderer) {
       this.renderer.closeLiveStroke(event);
     }
-
-    // const { penEventCount, inkStorage } = this.state;
-    // this.setState({ penEventCount: penEventCount + 1 });
-    // if (inkStorage) {
-    //   let pageStrokesCount = inkStorage.getPageStrokes(event).length;
-    //   this.setState({ strokeCount: pageStrokesCount });
-    // }
-    // console.log(event);
   }
 
   onLivePenUp_byStorage = (event: IPenToViewerEvent) => {
-    console.log("Pen Up");
-    if (this.renderer) {
+    const { section, owner, book, page } = event;
+    const pageInfo = { section, owner, book, page } as IPageSOBP;
+
+    if (this.renderer && isSamePage(this.props.pageInfo, pageInfo)) {
+      // console.log(`Renderer(${makeNPageIdStr(this.props.pageInfo)}): onLivePenUp, pageInfo=${makeNPageIdStr(pageInfo)}  ==> ADDED`);
       this.renderer.closeLiveStroke_byStorage(event);
     }
-
-    // const { penEventCount, inkStorage } = this.state;
-    // this.setState({ penEventCount: penEventCount + 1 });
-    // if (inkStorage) {
-    //   let pageStrokesCount = inkStorage.getPageStrokes(event).length;
-    //   this.setState({ strokeCount: pageStrokesCount });
+    // else {
+    //   console.log(`Renderer(${makeNPageIdStr(this.props.pageInfo)}): onLivePenUp, pageInfo=${makeNPageIdStr(pageInfo)}  ==> DISCARDED`);
     // }
-    // console.log(event);
+
   }
 
 
@@ -577,10 +550,11 @@ class PenBasedRenderer extends React.Component<Props, State> {
     //     zIndex: 10,
     //   }
     // }
-    console.log(`THUMB, renderer viewFit = ${this.props.viewFit}`);
+    
+    // console.log(`THUMB, renderer viewFit = ${this.props.viewFit}`);
 
     const shadowStyle: CSSProperties = {
-      color: "#f00",
+      color: "#a20",
       textShadow: "-1px 0 2px #fff, 0 1px 2px #fff, 1px 0 2px #fff, 0 -1px 2px #fff",
     }
 
@@ -594,16 +568,20 @@ class PenBasedRenderer extends React.Component<Props, State> {
 
         < div id={`${this.props.parentName}-info`} style={inkContainerDiv} >
           <br /> &nbsp; &nbsp;
-            <Typography style={{ ...shadowStyle, fontSize: 10 }}>Page:</Typography>
+
+          <Typography style={{ ...shadowStyle, fontSize: 16 }}>PenRenderer </Typography>
+
+          <br /> &nbsp; &nbsp;
+          <Typography style={{ ...shadowStyle, fontSize: 10 }}>Page:</Typography>
           <Typography style={{ ...shadowStyle, fontSize: 14, }}> {makeNPageIdStr(this.props.pageInfo)} </Typography>
 
 
           <br /> &nbsp; &nbsp;
-            <Typography style={{ ...shadowStyle, fontSize: 10 }}>Base:</Typography>
+          <Typography style={{ ...shadowStyle, fontSize: 10 }}>Base:</Typography>
           <Typography style={{ ...shadowStyle, fontSize: 14, fontStyle: "initial" }}> {makeNPageIdStr(this.props.basePageInfo)} </Typography>
 
           <br /> &nbsp; &nbsp;
-            <Typography style={{ ...shadowStyle, fontSize: 10 }}>pdfPageNo:</Typography>
+          <Typography style={{ ...shadowStyle, fontSize: 10 }}>pdfPageNo:</Typography>
           <Typography style={{ ...shadowStyle, fontSize: 14, fontStyle: "initial" }}> {this.props.pdfPageNo} </Typography>
 
         </div >

@@ -26,6 +26,7 @@ import { IHandleFileLoadNeededEvent } from "../neosmartpen/renderer/MixedPageVie
 import { nullNcode } from "../NcodePrintLib/DefaultOption";
 import { g_availablePagesInSection } from "../NcodePrintLib/NcodeSurface/SurfaceInfo";
 
+
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {
@@ -148,12 +149,12 @@ const Home = () => {
    * @param found - 위의 pageInfo에 따라 발견된 mapping table 내의 item 정보 일부
    */
   const onNcodePageChanged = (pageInfo: IPageSOBP, found: IGetNPageTransformType) => {
-    const doc = GridaDoc.getInstance();
-    const result = doc.handleActivePageChanged(pageInfo, found);
+    // const doc = GridaDoc.getInstance();
+    // const result = doc.handleActivePageChanged(pageInfo, found);
 
-    if (!noMoreAutoLoad && result.needToLoadPdf) {
-      handleFileLoadNeeded(found, result.pageInfo, result.basePageInfo);
-    }
+    // if (!noMoreAutoLoad && result.needToLoadPdf) {
+    //   handleFileLoadNeeded(found, result.pageInfo, result.basePageInfo);
+    // }
   }
 
   /**

@@ -43,7 +43,7 @@ function CalibrationDialog(props: IDialogProps) {
   let numProgresses = numPages + 1;
 
   const progress = useSelector((state: RootState) => state.calibration.progress);
-  console.log(`calibration: loaded ${progress}`)
+  // console.log(`calibration: loaded ${progress}`)
 
   const show = useSelector((state: RootState) => state.calibration.show);
 
@@ -105,7 +105,7 @@ function CalibrationDialog(props: IDialogProps) {
   // }, [props.url]);
 
   useEffect(() => {
-    console.log(`calibration: progress`)
+    // console.log(`calibration: progress`)
     if (pdf && targetPages.length > 0) {
       const w = imgWidth * imgDensity;
       const h = imgHeight * imgDensity;

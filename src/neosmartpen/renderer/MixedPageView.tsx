@@ -256,6 +256,10 @@ class MixedPageView_module extends React.Component<MixedViewProps, State>  {
         this.setState({ pdf: nextProps.pdf, status: "loaded" });
         return true;
       }
+      else {
+        this.setState({ pdf: nextProps.pdf, status: "loaded" });
+        return true;
+      }
     }
 
     if (nextProps.fingerprint !== this.props.fingerprint) {
@@ -424,7 +428,7 @@ class MixedPageView_module extends React.Component<MixedViewProps, State>  {
     const { pdf } = this.state;
 
     const zoom = this.state.viewPos.zoom;
-    console.log(`${this.props.parentName} render ${this.props.pdfPageNo}, pdf=${pdf}`)
+    // console.log(`${this.props.parentName} render ${this.props.pdfPageNo}, pdf=${pdf}`)
 
 
     const pdfCanvas: CSSProperties = {
@@ -437,8 +441,8 @@ class MixedPageView_module extends React.Component<MixedViewProps, State>  {
     // console.log(`MixedViewer: rendering, h=${JSON.stringify(this.state.h)}`);
     // console.log(this.state.viewPos);
 
-    console.log(`THUMB, mixed viewFit = ${this.props.viewFit}`);
-    console.log(`PDF PAGE, page number,  = ${this.state.pdfPageNo}`);
+    // console.log(`THUMB, mixed viewFit = ${this.props.viewFit}`);
+    // console.log(`PDF PAGE, page number,  = ${this.state.pdfPageNo}`);
 
 
     const shadowStyle: CSSProperties = {
@@ -459,10 +463,11 @@ class MixedPageView_module extends React.Component<MixedViewProps, State>  {
       }}>
         <div id={`${this.props.parentName}-pdf_layer`} style={pdfContainer} >
           <div id={`${this.props.parentName}-pdf_view`} style={pdfCanvas}>
-            {pdf
+            {this.state.pdf
               ? <NeoPdfPageView {...this.props}
+                // pdf={this.props.pdf}
+                pdf={this.state.pdf}
                 pdfPageNo={this.state.pdfPageNo}
-                pdf={pdf} index={this.state.pdfPageNo}
                 key={`document-page-${this.props.pdfPageNo}`}
                 position={this.state.viewPos}
               />
@@ -497,7 +502,11 @@ class MixedPageView_module extends React.Component<MixedViewProps, State>  {
           <br /> &nbsp; &nbsp;
           <br /> &nbsp; &nbsp;
           <br /> &nbsp; &nbsp;
-            <Typography style={{ ...shadowStyle, fontSize: 10 }}>Page(state):</Typography>
+
+          <Typography style={{ ...shadowStyle, fontSize: 16 }}>MixedViewer </Typography>
+
+          <br /> &nbsp; &nbsp;
+          <Typography style={{ ...shadowStyle, fontSize: 10 }}>Page(state):</Typography>
           <Typography style={{ ...shadowStyle, fontSize: 14, }}> {makeNPageIdStr(this.state.pageInfo)} </Typography>
 
           <br /> &nbsp; &nbsp;
@@ -512,6 +521,19 @@ class MixedPageView_module extends React.Component<MixedViewProps, State>  {
           <br /> &nbsp; &nbsp;
             <Typography style={{ ...shadowStyle, fontSize: 10 }}>pdfPageNo:</Typography>
           <Typography style={{ ...shadowStyle, fontSize: 14, fontStyle: "initial" }}> {this.props.pdfPageNo} </Typography>
+
+          <br /> &nbsp; &nbsp;
+            <Typography style={{ ...shadowStyle, fontSize: 10 }}>props.pdf:</Typography>
+          <Typography style={{ ...shadowStyle, fontSize: 14, fontStyle: "initial" }}> {this.props.pdf ? this.props.pdf.filename : ""} </Typography>
+
+
+          <br /> &nbsp; &nbsp;
+            <Typography style={{ ...shadowStyle, fontSize: 10 }}>state.pdfPageNo:</Typography>
+          <Typography style={{ ...shadowStyle, fontSize: 14, fontStyle: "initial" }}> {this.state.pdfPageNo} </Typography>
+
+          <br /> &nbsp; &nbsp;
+            <Typography style={{ ...shadowStyle, fontSize: 10 }}>state.pdf:</Typography>
+          <Typography style={{ ...shadowStyle, fontSize: 14, fontStyle: "initial" }}> {this.state.pdf ? this.state.pdf.filename : ""} </Typography>
 
         </div >
 

@@ -14,6 +14,7 @@ import ButtonLayerBottom from "./ButtonLayerBottom";
 import { RootState } from "../store/rootReducer";
 import { useSelector } from "react-redux";
 import { setPens } from "../store/reducers/appConfigReducer";
+import GridaApp from "../GridaBoard/GridaApp";
 
 
 const mainFrameStyle = {
@@ -50,20 +51,22 @@ const ButtonLayerSide = () => {
   });
 
   const onPenLinkChanged = e => {
-    const pen = e.pen;
-    if (e.event.event === 'on_connected') {
-      pens.push(pen);
-      setPens([...pens]);
-    }
-    else if (e.event.event === 'on_disconnected') {
-      const mac = pen.getMac();
-      console.log(`Home: OnPenDisconnected, mac=${pen.getMac()}`);
-      const index = pens.findIndex(p => p.getMac() === mac);
-      if (index > -1) {
-        const newPens = pens.splice(index, 1);
-        setPens([...newPens]);
-      }
-    }
+    const app = GridaApp.getInstance();
+    app.onPenLinkChanged(e);
+    // const pen = e.pen;
+    // if (e.event.event === 'on_connected') {
+    //   pens.push(pen);
+    //   setPens([...pens]);
+    // }
+    // else if (e.event.event === 'on_disconnected') {
+    //   const mac = pen.getMac();
+    //   console.log(`Home: OnPenDisconnected, mac=${pen.getMac()}`);
+    //   const index = pens.findIndex(p => p.getMac() === mac);
+    //   if (index > -1) {
+    //     const newPens = pens.splice(index, 1);
+    //     setPens([...newPens]);
+    //   }
+    // }
   }
 
   return (

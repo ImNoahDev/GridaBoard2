@@ -1,3 +1,4 @@
+import { store } from "../client/Root";
 import { IPageMapItem, IPdfToNcodeMapItem } from "../NcodePrintLib/Coordinates";
 import { IFileBrowserReturn } from "../NcodePrintLib/NcodePrint/PrintDataTypes";
 import { g_availablePagesInSection } from "../NcodePrintLib/NcodeSurface/SurfaceInfo";
@@ -8,6 +9,7 @@ import { IAutoLoadDocDesc, IGetNPageTransformType, IMappingStorageEvent, Mapping
 import { isSamePage, makeNPageIdStr } from "../NcodePrintLib/UtilFunc/functions";
 import { IPageSOBP } from "../neosmartpen/DataStructure/Structures";
 import { forceToRenderPanes, setActivePageNo, setActivePdf, setDocNumPages, setUrlAndFilename } from "../store/reducers/activePageReducer";
+import { RootState } from "../store/rootReducer";
 import GridaPage from "./GridaPage";
 
 let _doc_instance = undefined as GridaDoc;
@@ -198,13 +200,17 @@ export default class GridaDoc {
 
     if (page) {
       // 페이지가 찾아졌으면
-      const activePageNo = page.pageNo;
+      const newPageNo = page.pageNo;
 
       const msi = MappingStorage.getInstance();
       const map = msi.getNPageTransform(pageInfo);
       page.addPageInfo(pageInfo, map.basePageInfo);
 
-      setActivePageNo(activePageNo);
+      const state = store.getState() as RootState;
+      const currActivePage = state.activePage.activePageNo;
+      if (newPageNo !== currActivePage) {
+        setActivePageNo(newPageNo);
+      }
     }
     else {
       // 페이지가 찾기지 않았으면

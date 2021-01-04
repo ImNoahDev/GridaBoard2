@@ -163,7 +163,7 @@ const clone = (obj: any): any => {
 // Drawing Function
 export const drawPath_arr = (points: IPointForce[], strokeThickness: number) => {
   if (points.length < 3) {
-    return "";
+    return [];
   }
 
   const bezier = [];
