@@ -199,6 +199,11 @@ export default class GridaDoc {
     if (page) {
       // 페이지가 찾아졌으면
       const activePageNo = page.pageNo;
+
+      const msi = MappingStorage.getInstance();
+      const map = msi.getNPageTransform(pageInfo);
+      page.addPageInfo(pageInfo, map.basePageInfo);
+
       setActivePageNo(activePageNo);
     }
     else {

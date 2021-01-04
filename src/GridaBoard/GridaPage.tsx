@@ -59,6 +59,11 @@ export default class GridaPage {
   //   });
   // }
 
+  addPageInfo = (pageInfo: IPageSOBP, basePageInfo: IPageSOBP) => {
+    if (!basePageInfo)
+      basePageInfo = { ...this._pageToNcodeMaps[0].basePageInfo };
+    this._pageToNcodeMaps.unshift({ pageInfo, basePageInfo });
+  }
 
   get pageInfos() {
     const pageInfos: IPageSOBP[] = [];
