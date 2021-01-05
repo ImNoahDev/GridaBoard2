@@ -6,32 +6,7 @@ import { IBrushState, INoteServerItem, IPenEvent, NeoDot, NeoStroke, StrokePageA
 import { IBrushType, PEN_STATE, PenEventName } from "../enums";
 import { PaperInfo } from "../noteserver/PaperInfo";
 import { InkStorage, IOpenStrokeArg } from "../penstorage";
-
-
-export type IPenToViewerEvent = {
-  pen: NeoSmartpen,
-
-  mac: string,
-  event: IPenEvent,
-
-  /** ON_PEN_MOVE and ON_PEN_DOWN only */
-  strokeKey?: string,
-  /** ON_PEN_MOVE and ON_PEN_DOWN only */
-  stroke?: NeoStroke,
-  /** ON_PEN_MOVE only */
-  dot?: NeoDot,
-
-  /** PON_PEN_HOVER_PAGEINFO only */
-  section?: number,
-  /** PON_PEN_HOVER_PAGEINFO only */
-  owner?: number,
-  /** PON_PEN_HOVER_PAGEINFO only */
-  book?: number,
-  /** PON_PEN_HOVER_PAGEINFO only */
-  page?: number,
-  /** PON_PEN_HOVER_PAGEINFO only */
-  time?: string,
-}
+import { IPenToViewerEvent, NeoSmartpenBase } from "./NeoSmartpenBase";
 
 
 interface IPenMovement {
@@ -45,8 +20,8 @@ interface IPenMovement {
 
 const NUM_HOVER_POINTERS = 6;
 
-export default class NeoSmartpen {
-  currPenMovement: IPenMovement = {
+export default class NeoSmartpen implements NeoSmartpenBase {
+  private currPenMovement: IPenMovement = {
     downEvent: null,
     infoEvent: null,
     moveEvents: [],
@@ -61,28 +36,29 @@ export default class NeoSmartpen {
   /** 펜 종류 (렌더러 종류) */
   penRendererType: IBrushType = IBrushType.PEN;
 
-  lastInfoEvent: IPenEvent = null;
+  // lastInfoEvent: IPenEvent = null;
+
   protocolHandler: PenComm = new PenComm(this);
+
   mac: string = null;
 
   lastState: PEN_STATE = PEN_STATE.NONE;
 
-  // surfaceInfo: INoteServerItem;
-  surfaceInfo: INoteServerItem = {
-    id: "3.27.168",
-    section: 3,
-    owner: 27,
-    book: 168,
+  // surfaceInfo: INoteServerItem = {
+  //   id: "3.27.168",
+  //   section: 3,
+  //   owner: 27,
+  //   book: 168,
 
-    margin: {
-      Xmin: 3.12,
-      Ymin: 3.12,
-      Xmax: 91.68,
-      Ymax: 128.36,
-    },
+  //   margin: {
+  //     Xmin: 3.12,
+  //     Ymin: 3.12,
+  //     Xmax: 91.68,
+  //     Ymax: 128.36,
+  //   },
 
-    Mag: 1,
-  }
+  //   Mag: 1,
+  // }
 
   storage: InkStorage = InkStorage.getInstance();
   manager: PenManager = PenManager.getInstance();
@@ -266,13 +242,13 @@ export default class NeoSmartpen {
    * @param hover
    */
   onPageInfo = (event: IPenEvent, hover: boolean) => {
-    // console.log(event);
-    this.lastInfoEvent = event;
+    // // console.log(event);
+    // this.lastInfoEvent = event;
 
 
-    // margin 값을 가져오기 위해서
-    const info = PaperInfo.getPaperInfo({ section: event.section, book: event.book, owner: event.owner, page: event.page });
-    if (info) this.surfaceInfo = info;
+    // // margin 값을 가져오기 위해서
+    // const info = PaperInfo.getPaperInfo({ section: event.section, book: event.book, owner: event.owner, page: event.page });
+    // if (info) this.surfaceInfo = info;
 
     // 이전에 펜 down이 있었으면
     if (this.lastState === PEN_STATE.PEN_DOWN) {

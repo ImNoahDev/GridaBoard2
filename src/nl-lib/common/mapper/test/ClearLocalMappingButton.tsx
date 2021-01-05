@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import { Button, ButtonProps, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, } from "@material-ui/core";
 
-import { MappingStorage } from "../../common/mapper";
+import { MappingStorage } from "..";
 
-import { makeNPageIdStr } from "../../common/util";
-import { g_defaultNcode } from "../../common/constants";
+import { makeNPageIdStr } from "../../util";
+import { g_defaultNcode } from "../../constants";
 
 
 export default function ClearLocalMappingButton(props: ButtonProps) {

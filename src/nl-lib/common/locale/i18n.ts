@@ -1,9 +1,9 @@
 // import i18n from 'i18next';
 // import { initReactI18next } from 'react-i18next';
 
-import tranEn from './Files/en.json';
-import tranKo from './Files/ko.json';
-import tranJa from './Files/ja.json';
+import tranEn from './resource/en.json';
+import tranKo from './resource/ko.json';
+import tranJa from './resource/ja.json';
 
 const resources = {
   en: { translation: tranEn },

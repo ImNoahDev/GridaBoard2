@@ -1,11 +1,12 @@
 import $ from "jquery";
-import NeoSmartpen, { IPenToViewerEvent } from "./neosmartpen";
+import NeoSmartpen from "./neosmartpen";
 import { EventDispatcher, EventCallbackType } from "../event";
 import { IBrushType, PenEventName } from "../enums";
 import { IPenEvent } from "../structures";
 
 
 import ThemeManager from "../../../styles/ThemeManager"
+import { IPenToViewerEvent } from "./NeoSmartpenBase";
 
 
 let _penmanager_instance = null;
@@ -16,6 +17,8 @@ let _active_pen: NeoSmartpen = null;
 export const DEFAULT_PEN_COLOR_NUM = 2;
 export const DEFAULT_PEN_THICKNESS = 2;
 export const DEFAULT_PEN_RENDERER_TYPE: IBrushType = IBrushType.PEN;
+
+
 
 export default class PenManager {
   /** @type {Array.<{id:string, mac:string, pen:NeoSmartpen, connected:boolean}>} */

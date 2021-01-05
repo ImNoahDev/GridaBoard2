@@ -12,7 +12,7 @@ import GridaDoc from "../GridaBoard/GridaDoc";
 import { makeNPageIdStr } from "../nl-lib/common/util";
 
 import { g_defaultPrintOption } from "../nl-lib/ncodepod/DefaultOption";
-import ClearLocalMappingButton from "../nl-lib/ncodepod/Buttons/ClearLocalMappingButton";
+import ClearLocalMappingButton from "../nl-lib/common/mapper/test/ClearLocalMappingButton";
 import CalibrationButton from "../nl-lib/ncodepod/NcodePrint/Dialogs/CalibrationDialog";
 import OptionDialogButton from "../nl-lib/ncodepod/NcodePrint/Dialogs/OptionDialog";
 import PrintNcodedPdfButton from "../nl-lib/ncodepod/NcodePrint/PrintNcodedPdfButton";
