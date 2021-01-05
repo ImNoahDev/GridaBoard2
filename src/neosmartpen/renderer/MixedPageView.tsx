@@ -264,7 +264,8 @@ class MixedPageView_module extends React.Component<MixedViewProps, State>  {
 
     if (nextProps.fingerprint !== this.props.fingerprint) {
       this.loadDocument(nextProps.pdfUrl, nextProps.filename);
-      this.setState({ pdfFingerprint: nextProps.fingerprint });
+      this.setState({ pdfFingerprint: nextProps.fingerprint, pdf: nextProps.pdf });
+      
       return false;
     }
 

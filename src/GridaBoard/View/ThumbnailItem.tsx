@@ -9,6 +9,7 @@ import { RootState } from "../../store/rootReducer";
 import { connect } from "react-redux";
 import { updateDrawerWidth } from "../../store/reducers/ui";
 import { makeNPageIdStr } from "../../NcodePrintLib";
+import { setActivePageNo } from '../../store/reducers/activePageReducer';
 
 
 interface Props {
@@ -25,6 +26,7 @@ const ThumbnailItem = (props: Props) => {
 
   const drawerWidth = useSelector((state: RootState) => state.ui.drawer.width);
   const activePageNo = useSelector((state: RootState) => state.activePage.activePageNo);
+
   let pdfUrl = undefined;
   let pdfFilename = undefined;
   let pdfFingerprint = undefined;
@@ -38,7 +40,13 @@ const ThumbnailItem = (props: Props) => {
     pdfFingerprint = doc.getPdfFingerprintAt(pn);
     pdfPageNo = doc.getPdfPageNoAt(pn);
     pdf = page.pdf;
-  }
+  }  
+
+  const handleMouseDown = e => {
+    var idToken = e.target.id.split('- ');
+    const pageNo = Number(idToken[2]);
+    setActivePageNo(pageNo);
+  };
 
   const numPages = doc.numPages;
 
@@ -59,7 +67,7 @@ const ThumbnailItem = (props: Props) => {
 
   console.log(`thumbnail - ${pn}: pageNo: ${pdfPageNo} pdf: ${pdf} pdfUrl: ${pdfUrl} fingerprint: ${pdfFingerprint} `)
   return (
-    <Paper key={props.key} elevation={3} style={{ height: height, margin: 10, overflow: "hidden", position: "relative" }} >
+    <Paper key={props.key} onMouseDown={e => handleMouseDown(e)} elevation={3} style={{ height: height, margin: 10, overflow: "hidden", position: "relative" }} >
       <div id={`thumbnail - ${pn} `} style={{ position: "absolute", margin: 0, padding: 0, right: 0, left: 0, top: 0, height: "100%", backgroundColor: bgColor }}>
         <MixedPageView
           pdf={pdf}
