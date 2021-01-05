@@ -1,12 +1,11 @@
 import { store } from "../client/Root";
-import { makeNPageIdStr } from "../NcodePrintLib";
-import MappingStorage from "../NcodePrintLib/SurfaceMapper/MappingStorage";
-import { NeoSmartpen, PenEventName, PenManager } from "../neosmartpen";
-import { IPageSOBP } from "../neosmartpen/DataStructure/Structures";
-import { IPenToViewerEvent } from "../neosmartpen/pencomm/neosmartpen";
+import { PenEventName } from "../nl-lib/common/enums";
+import { IPageSOBP } from "../nl-lib/common/structures";
+import { MappingStorage } from "../nl-lib/common/mapper";
+import { IPenToViewerEvent, NeoSmartpen } from "../nl-lib/common/neopen";
 import { setPens } from "../store/reducers/appConfigReducer";
-import { RootState } from "../store/rootReducer";
 import GridaDoc from "./GridaDoc";
+import PenManager from "../nl-lib/common/neopen/PenManager";
 
 let _app_instance = undefined as GridaApp;
 

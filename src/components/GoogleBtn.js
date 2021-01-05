@@ -2,7 +2,7 @@
 import React, {Component, useState, useEffect} from 'react';
 import { gapi } from 'gapi-script';
 import { GoogleLogin, GoogleLogout } from 'react-google-login';
-// import MappingStorage from "../NcodePrintLib/SurfaceMapper/MappingStorage";
+// import { MappingStorage } from "../ncodepod/SurfaceMapper/MappingStorage";
 
 const API_KEY = "AIzaSyCaphl32v2wLhrjuoWJjD_gXmhPTOWLZvs";
 const CLIENT_ID = '169738066451-5u100n2i6rko17jhmtpvq0bnjuedj7g4.apps.googleusercontent.com';

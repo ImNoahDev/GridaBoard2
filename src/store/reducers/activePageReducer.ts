@@ -1,6 +1,6 @@
 import { store } from "../../client/Root";
-import GridaDoc from "../../GridaBoard/GridaDoc";
-import NeoPdfDocument from "../../NcodePrintLib/NeoPdf/NeoPdfDocument";
+import { NeoPdfDocument } from "../../nl-lib/common/neopdf";
+
 //[Define Action Types
 const ActionGroup = "ACTIVE_PDF";
 

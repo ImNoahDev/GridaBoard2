@@ -1,6 +1,7 @@
 import React from 'react';
 import { Theme, Tooltip, TooltipProps, Typography, withStyles } from "@material-ui/core";
-import { ITipType } from '../NcodePrintLib/NcodePrint/Dialogs/OptionDialogComponents/RadioField';
+
+type ITipType = { head: string, msg: string, tail: string };
 
 const GridaToolTipPopup = withStyles((theme: Theme) => ({
   tooltip: {

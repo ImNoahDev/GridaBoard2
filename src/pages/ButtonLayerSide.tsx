@@ -1,19 +1,15 @@
-import React, { useState } from "react";
+import React from "react";
 import BackgroundButton from "../components/buttons/BackgroundButton";
 import ConnectButton from "../components/buttons/ConnectButton";
 import FitButton from "../components/buttons/FitButton";
 import PenTypeButton from "../components/buttons/PenTypeButton";
 import RotateButton from "../components/buttons/RotateButton";
-import { NeoSmartpen } from "../neosmartpen";
 import GridaToolTip from "../styles/GridaToolTip";
 import ZoomButton from "../components/buttons/ZoomButton";
 import FullScreenButton from "../components/buttons/FullScreenButton";
 import TracePointButton from "../components/buttons/TracePointButton";
-import ButtonLayer_forTest from "./ButtonLayer_forTest";
-import ButtonLayerBottom from "./ButtonLayerBottom";
 import { RootState } from "../store/rootReducer";
 import { useSelector } from "react-redux";
-import { setPens } from "../store/reducers/appConfigReducer";
 import GridaApp from "../GridaBoard/GridaApp";
 
 

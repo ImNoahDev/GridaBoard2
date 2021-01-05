@@ -1,11 +1,9 @@
 import React from 'react';
 import '../../styles/main.css';
-import Tooltip, { TooltipProps } from '@material-ui/core/Tooltip';
-import { Theme, Typography, withStyles } from '@material-ui/core';
-import CalibrationButton from '../../NcodePrintLib/NcodePrint/Dialogs/CalibrationDialog';
-import { IPrintOption } from '../../NcodePrintLib';
 import { NeoImage } from '../CustomElement/NeoImage';
 import GridaToolTip from '../../styles/GridaToolTip';
+import { IPrintOption } from '../../nl-lib/common/structures';
+import CalibrationButton from '../../nl-lib/ncodepod/NcodePrint/Dialogs/CalibrationDialog';
 
 
 const style = {
@@ -19,6 +17,9 @@ type Props = {
   printOption: IPrintOption,
   cancelCallback?: (e) => void,
 }
+
+
+
 
 const ManualCalibration = (props: Props) => {
   const { url, filename, printOption, cancelCallback, ...rest } = props;

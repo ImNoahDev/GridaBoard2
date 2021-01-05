@@ -1,11 +1,8 @@
 import React from 'react';
 import '../../styles/main.css';
-import Tooltip, { TooltipProps } from '@material-ui/core/Tooltip';
-import { Theme, Typography, withStyles } from '@material-ui/core';
-// import { PrintPdfButton } from '../../NcodePrintLib';
-import { g_debugFilename, g_debugURL } from '../../NcodePrintLib/DefaultOption';
-import PrintNcodedPdfButton from '../../NcodePrintLib/NcodePrint/PrintNcodedPdfButton';
 import GridaToolTip from '../../styles/GridaToolTip';
+import { g_debugFilename, g_debugURL } from '../../nl-lib/ncodepod/DefaultOption';
+import PrintNcodedPdfButton from '../../nl-lib/ncodepod/NcodePrint/PrintNcodedPdfButton';
 
 type Props = {
   targetId: string,

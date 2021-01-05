@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 import { gapi } from 'gapi-script';
 import * as PdfJs from "pdfjs-dist";
-import { MappingStorage } from "./NcodePrintLib/SurfaceMapper";
+import { MappingStorage } from './nl-lib/common/mapper/MappingStorage';
 
 const FOLDER_ID = "root";
 

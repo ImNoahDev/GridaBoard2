@@ -1,35 +1,18 @@
 import React, { useEffect, useState } from "react";
-import App from "../shared/App";
 import { Provider } from "react-redux";
-import { theme } from "../styles/theme";
-import {
-  Backdrop,
-  CircularProgress,
-  // Backdrop,
-  // Button,
-  // CircularProgress,
-  // Dialog,
-  // DialogActions,
-  // DialogContent,
-  // DialogContentText,
-  // DialogTitle,
-  // Fade,
-  IconButton,
-  MuiThemeProvider,
-  Snackbar,
-} from "@material-ui/core";
+import { Backdrop, CircularProgress, IconButton, MuiThemeProvider, Snackbar } from "@material-ui/core";
 import MuiAlert from "@material-ui/lab/Alert";
 import CloseIcon from "@material-ui/icons/Close";
 
+import App from "../shared/App";
+import { theme } from "../styles/theme";
 import configureStore from "../store/configureStore";
 import { RootState } from '../store/rootReducer';
-import GridaDoc from "../GridaBoard/GridaDoc";
-import { IFileBrowserReturn } from "../NcodePrintLib/NcodePrint/PrintDataTypes";
+
 import GridaApp from "../GridaBoard/GridaApp";
 import { hideUIProgressBackdrop, showUIProgressBackdrop } from "../store/reducers/ui";
-import { fetchGzippedFile } from "../NcodePrintLib/NcodeSurface/NcodeFetcher";
-import { g_paperType, g_paperType_default } from "../NcodePrintLib/NcodeSurface/NcodeSurfaceDataJson";
-import { sleep } from "../NcodePrintLib/UtilFunc";
+import { fetchGzippedFile } from "../nl-lib/common/util";
+import { g_paperType, g_paperType_default } from "../nl-lib/common/noteserver";
 
 
 
@@ -105,7 +88,7 @@ const Root = () => {
           g_paperType.definition = JSON.parse(nbs);
         }
 
-        for ( const key in g_paperType_default) {
+        for (const key in g_paperType_default) {
           if (!Object.prototype.hasOwnProperty.call(g_paperType.definition, key)) {
             g_paperType.definition[key] = g_paperType_default[key];
           }

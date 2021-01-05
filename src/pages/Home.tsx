@@ -1,31 +1,28 @@
 import React, { useState, useRef, useEffect } from "react";
-import { PLAYSTATE, MixedPageView, NeoSmartpen } from "../neosmartpen";
 import { IconButton, makeStyles, createStyles, } from "@material-ui/core";
-import '../styles/main.css'
-import PUIController from '../components/PUIController';
-import { Theme } from '@material-ui/core';
 import { useSelector, shallowEqual } from "react-redux";
+import { Theme } from '@material-ui/core';
+import MenuIcon from '@material-ui/icons/Menu';
+import '../styles/main.css'
+import { theme } from "../styles/theme";
+
+import PUIController from '../components/PUIController';
 import { turnOnGlobalKeyShortCut } from "../GridaBoard/GlobalFunctions";
 import PersistentDrawerRight from "../GridaBoard/View/PersistentDrawerRight";
-import MenuIcon from '@material-ui/icons/Menu';
 import ButtonLayer from "./ButtonLayer";
-import { g_hiddenFileInputBtnId, onFileInputChanged, onFileInputClicked, openFileBrowser2 } from "../NcodePrintLib/NeoPdf/FileBrowser";
-import { theme } from "../styles/theme";
-import { IAutoLoadDocDesc, IGetNPageTransformType } from "../NcodePrintLib/SurfaceMapper/MappingStorage";
 import AutoLoadConfirmDialog from "../GridaBoard/Dialog/AutoLoadConfirmDialog";
 import { RootState } from "../store/rootReducer";
-import { ZoomFitEnum } from "../neosmartpen/renderer/pageviewer/RenderWorkerBase";
 import { updateDrawerWidth } from "../store/reducers/ui";
-import { IPageSOBP } from "../NcodePrintLib/DataStructure/Structures";
 import GridaDoc from "../GridaBoard/GridaDoc";
-import { IFileBrowserReturn } from "../NcodePrintLib/NcodePrint/PrintDataTypes";
-import { IActivePageState } from "../store/reducers/activePageReducer";
-import NeoPdfDocument from "../NcodePrintLib/NeoPdf/NeoPdfDocument";
-import NeoPdfManager from "../NcodePrintLib/NeoPdf/NeoPdfManager";
-import { IHandleFileLoadNeededEvent } from "../neosmartpen/renderer/MixedPageView";
-import { nullNcode } from "../NcodePrintLib/DefaultOption";
-import { g_availablePagesInSection } from "../NcodePrintLib/NcodeSurface/SurfaceInfo";
 
+import {
+  NeoPdfDocument, NeoPdfManager,
+  openFileBrowser2, g_hiddenFileInputBtnId, onFileInputChanged, onFileInputClicked
+} from "../nl-lib/common/neopdf";
+import { IPageSOBP, IFileBrowserReturn, IGetNPageTransformType } from "../nl-lib/common/structures";
+import MixedPageView from "../nl-lib/renderer/MixedPageView";
+import { PLAYSTATE, ZoomFitEnum } from "../nl-lib/renderer/penview/RenderWorkerBase";
+import { nullNcode } from "../nl-lib/common/constants";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({

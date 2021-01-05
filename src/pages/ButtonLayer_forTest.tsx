@@ -1,21 +1,24 @@
-import { Box, Button, Paper } from "@material-ui/core";
 import React, { useEffect, useState } from "react";
-import { NeoImage } from "../components/CustomElement/NeoImage";
-import { g_defaultPrintOption, makeNPageIdStr, PrintOptionDialog } from "../NcodePrintLib";
-import ClearLocalMappingButton from "../NcodePrintLib/Buttons/ClearLocalMappingButton";
-import CalibrationButton from "../NcodePrintLib/NcodePrint/Dialogs/CalibrationDialog";
-import OptionDialogButton from "../NcodePrintLib/NcodePrint/Dialogs/OptionDialog";
-import PrintNcodedPdfButton from "../NcodePrintLib/NcodePrint/PrintNcodedPdfButton";
-import { NeoSmartpen, NoteserverClient } from "../neosmartpen";
+import { Box, Button, Paper } from "@material-ui/core";
 import { useSelector } from "react-redux";
+import ReactJson from "react-json-view";
+
+import { NeoImage } from "../components/CustomElement/NeoImage";
 import Upload from "../components/navbar/Upload";
 import GoogleBtn from "../components/GoogleBtn";
-import { savePDF } from "../NcodePrintLib/Save/SavePdf";
-import ReactJson from "react-json-view";
-import { MappingStorage } from "../NcodePrintLib/SurfaceMapper";
-import { IMappingData } from "../NcodePrintLib/SurfaceMapper/MappingStorage";
 import { RootState } from "../store/rootReducer";
 import GridaDoc from "../GridaBoard/GridaDoc";
+
+import { makeNPageIdStr } from "../nl-lib/common/util";
+
+import { g_defaultPrintOption } from "../nl-lib/ncodepod/DefaultOption";
+import ClearLocalMappingButton from "../nl-lib/ncodepod/Buttons/ClearLocalMappingButton";
+import CalibrationButton from "../nl-lib/ncodepod/NcodePrint/Dialogs/CalibrationDialog";
+import OptionDialogButton from "../nl-lib/ncodepod/NcodePrint/Dialogs/OptionDialog";
+import PrintNcodedPdfButton from "../nl-lib/ncodepod/NcodePrint/PrintNcodedPdfButton";
+import { savePDF } from "../nl-lib/ncodepod/Save/SavePdf";
+import { MappingStorage } from "../nl-lib/common/mapper";
+import { NoteServerClient } from "../nl-lib/common/noteserver";
 
 const buttonDivStyle = {
   position: "absolute",
@@ -35,7 +38,7 @@ const printOption = g_defaultPrintOption;
 
 const getNoteInfo = (event) => {
   // let url = "http://nbs.neolab.net/v1/notebooks/attributes?device=android";
-  const note_info = new NoteserverClient();
+  const note_info = new NoteServerClient();
   // note_info.getNoteInfo({});
 };
 
@@ -108,13 +111,13 @@ const ButtonLayer_forTest = () => {
 
   for (let i = 0; i < doc.numPages; i++) {
     const p = doc._pages[i];
-    const { _pdfPageNo, _pageToNcodeMaps} = p;
+    const { _pdfPageNo, _pageToNcodeMaps } = p;
     const pageInfo = _pageToNcodeMaps[0].pageInfo;
     const basePageInfo = _pageToNcodeMaps[0].basePageInfo;
     const obj = {
       _pdfPageNo,
       _pageToNcodeMaps,
-      pageInfo : makeNPageIdStr(pageInfo),
+      pageInfo: makeNPageIdStr(pageInfo),
       basePageInfo: makeNPageIdStr(basePageInfo),
 
     }
@@ -217,12 +220,6 @@ const ButtonLayer_forTest = () => {
         <OptionDialogButton printOption={printOption} >
           <Box fontSize={14} fontWeight="fontWeightBold" >신규, 인쇄옵션</Box>
         </OptionDialogButton>
-      </div>
-
-
-      {/* 인쇄 옵션 다이얼로그 테스트 버튼 */}
-      <div style={{ fontSize: "14px" }}>
-        <PrintOptionDialog />
       </div>
 
       <div style={{ fontSize: "20px", fontWeight: "bold" }}>

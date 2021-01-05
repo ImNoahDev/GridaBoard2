@@ -1,0 +1,393 @@
+import React, { Component } from 'react';
+import { Typography } from "@material-ui/core";
+import { CSSProperties } from '@material-ui/core/styles/withStyles';
+
+import { MAX_RENDERER_PIXELS } from "../RendererConstants";
+import { MixedViewProps } from '../MixedPageView';
+import { NeoPdfDocument, NeoPdfPage } from '../../common/neopdf';
+import { PDF_DEFAULT_DPI } from '../../common/constants';
+import { makeNPageIdStr } from "../../common/util";
+
+interface PageProps extends MixedViewProps {
+  // pdf: PdfJs.PDFDocumentProxy,
+  pdf: NeoPdfDocument,
+
+  position: { offsetX: number, offsetY: number, zoom: number },
+  // pdfCanvas: CSSProperties,
+}
+
+interface PageState {
+  status: string,
+  // page: PdfJs.PDFPageProxy | null,
+  page: NeoPdfPage,
+  width: number,
+  height: number,
+  imgSrc: string,
+  renderCount: number;
+
+  scratchCanvasStatus: "N/A" | "rendering" | "rendered",
+}
+
+type IBackRenderedStatus = {
+  result: boolean,
+  px_width: number,
+  px_height: number
+}
+
+export default class NeoPdfPageView extends Component<PageProps> {
+  state: PageState = {
+    status: 'N/A',
+    page: null,
+    width: 0,
+    height: 0,
+    imgSrc: URL.createObjectURL(new Blob()),
+    renderCount: 0,
+
+    scratchCanvasStatus: "N/A",
+  };
+
+  canvas: HTMLCanvasElement | null = null;
+
+  inRendering = false;
+
+  // renderTask: PdfJs.PDFRenderTask = null;
+  renderTask: any = null;
+
+  backPlane = {
+    canvas: document.createElement("canvas"),
+    inited: false,
+    nowRendering: false,
+    prevZoom: 0,
+    zoomQueue: [] as number[],
+    size: { result: false, px_width: 0, px_height: 0 },
+  };
+
+  zoomQueue: number[] = [];
+
+
+
+  scaleCanvas(canvas: HTMLCanvasElement, width: number, height: number, zoom: number) {
+    // assume the device pixel ratio is 1 if the browser doesn't specify it
+    const devicePixelRatio = window.devicePixelRatio || 1;
+    const context = canvas.getContext('2d');
+
+    // determine the 'backing store ratio' of the canvas context
+    const backingStoreRatio = 1;
+    // (
+    //   context.webkitBackingStorePixelRatio ||
+    //   context.mozBackingStorePixelRatio ||
+    //   context.msBackingStorePixelRatio ||
+    //   context.oBackingStorePixelRatio ||
+    //   context.backingStorePixelRatio || 1
+    // );
+
+    // determine the actual ratio we want to draw at
+    const pdfCssRatio = 96 / 72;
+    let ratio = devicePixelRatio * pdfCssRatio * zoom / backingStoreRatio;
+
+    // 최대값을 설정하자
+    if (width * height * ratio * ratio > MAX_RENDERER_PIXELS) {
+      ratio = Math.sqrt(MAX_RENDERER_PIXELS / width / height);
+    }
+
+    const px_width = Math.floor(width * ratio);
+    const px_height = Math.floor(height * ratio);
+
+
+
+    if (devicePixelRatio !== backingStoreRatio) {
+      // set the 'real' canvas size to the higher width/height
+      canvas.width = px_width;
+      canvas.height = px_height;
+
+      // ...then scale it back down with CSS
+      canvas.style.width = width + 'px';
+      canvas.style.height = height + 'px';
+    }
+    else {
+      // this is a normal 1:1 device; just scale it simply
+      canvas.width = width;
+      canvas.height = height;
+      canvas.style.width = '';
+      canvas.style.height = '';
+    }
+
+    // scale the drawing context so everything will work at the higher ratio
+    context.scale(ratio, ratio);
+
+    return { ratio, px: { width: px_width, height: px_height }, css: { width, height } };
+  }
+
+  timeOut = (n) => {
+    return new Promise(resolve => { setTimeout(() => { resolve(true); }, n); });
+  }
+
+
+  componentDidMount() {
+    const { pdf } = this.props;
+    this._update(pdf);
+  }
+
+  shouldComponentUpdate(nextProps: PageProps, nextState: PageState) {
+    const zoomChanged = nextProps.position.zoom !== this.props.position.zoom;
+
+    if (zoomChanged) {
+      if (this.state.page) {
+        this.renderPage(this.state.page, nextProps.position.zoom);
+      }
+      return false;
+    }
+
+    const pdfChanged = this.props.pdf !== nextProps.pdf;
+    if (pdfChanged) {
+      this._update(nextProps.pdf);
+      return true;
+    }
+
+    if (this.props.pdfPageNo !== nextProps.pdfPageNo) {
+      console.log(`PDF PAGE: page, page Number = ${nextProps.pdfPageNo}`)
+      this._update(nextProps.pdf, nextProps.pdfPageNo);
+      return true;
+    }
+
+
+    return true;
+  }
+
+
+  setCanvasRef = (canvas: HTMLCanvasElement) => {
+    this.canvas = canvas;
+  };
+
+  _update = (pdf: NeoPdfDocument, pageNo: number = undefined) => {
+    // console.log(`PDF PAGE: _update, page Number = ${pageNo}`)
+
+    if (pdf) {
+      this.backPlane.inited = false;
+      this._loadPage(pdf, pageNo);
+    } else {
+      this.setState({ status: 'loading' });
+    }
+  };
+
+  _loadPage = (pdf: NeoPdfDocument, pageNo: number = this.props.pdfPageNo) => {
+    // console.log(`PDF PAGE: _loadPage, page Number = ${pageNo}`)
+    if (this.state.status === 'rendering') return;
+
+    if (pageNo > pdf.numPages) {
+      console.error("PDF 페이지의 범위를 넘은 페이지를 렌더링하려고 합니다.");
+      pageNo = pdf.numPages;
+    }
+
+    pdf.getPageAsync(pageNo).then(
+      (page) => {
+        // console.log(`BACKPLANE _loadPage renderPage start`)
+        this.renderPage(page, this.props.position.zoom,);
+        // console.log(`BACKPLANE _loadPage renderPage end`)
+      }
+    );
+  }
+
+  renderToCanvasSafe = async (page: NeoPdfPage, dpi: number, zoom: number) => {
+    if (this.backPlane.nowRendering && this.renderTask) {
+      const renderTask = this.renderTask;
+      renderTask.cancel();
+      await renderTask;
+    }
+    return this.renderToCanvas(page, dpi, zoom);
+  }
+
+  renderToCanvas = async (page: NeoPdfPage, dpi: number, zoom: number): Promise<IBackRenderedStatus> => {
+    const canvas = document.createElement("canvas");
+
+    const PRINT_RESOLUTION = dpi * zoom;
+    const PRINT_UNITS = PRINT_RESOLUTION / PDF_DEFAULT_DPI;
+    const viewport: any = page.getViewport({ scale: 1 });
+
+    const px_width = Math.floor(viewport.width * PRINT_UNITS);
+    const px_height = Math.floor(viewport.height * PRINT_UNITS);
+
+    canvas.width = px_width;
+    canvas.height = px_height;
+
+    const destCanvas = this.backPlane.canvas;
+    destCanvas.width = canvas.width;
+    destCanvas.height = canvas.height;
+
+    const destCtx = destCanvas.getContext("2d");
+    destCtx.fillStyle = "#fff";
+    destCtx.fillRect(0, 0, destCanvas.width, destCanvas.height);
+
+
+    const ctx = canvas.getContext('2d');
+    try {
+      this.backPlane.nowRendering = true;
+      const renderContext = {
+        canvasContext: ctx,
+        transform: [PRINT_UNITS, 0, 0, PRINT_UNITS, 0, 0],
+        viewport: page.getViewport({ scale: 1, rotation: viewport.rotation }),
+        intent: "print"
+      };
+      this.renderTask = page.render(renderContext);
+      await this.renderTask.promise;
+    }
+    catch (e) {
+      this.backPlane.nowRendering = false;
+      this.renderTask = null;
+      return {
+        result: false,
+        px_width: 0,
+        px_height: 0,
+      }
+    }
+
+    if (canvas.width > 0 && canvas.height > 0) {
+      destCtx.drawImage(canvas, 0, 0);
+      this.renderTask = null;
+
+      return {
+        result: true,
+        px_width,
+        px_height,
+      }
+    }
+
+    return { ...this.backPlane.size };
+  }
+
+  renderPage = async (page: NeoPdfPage, zoom: number) => {
+    if (!this.canvas) return;
+    // console.log(`BACKPLANE RENDERPAGE start`)
+
+    this.setState({ page, status: 'rendering' });
+
+    const viewport: any = page.getViewport({ scale: 1 });
+    const { width, height } = viewport;
+    const canvas = this.canvas;
+    const size = { width, height };
+    const ret = this.scaleCanvas(canvas, size.width, size.height, zoom);
+    const dpi = canvas.width / zoom / size.width * 72;
+
+    let noLazyUpdate = false;
+    if (!this.backPlane.inited) {
+      // console.log(`BACKPLANE DRAWING start`)
+      const result = await this.renderToCanvasSafe(page, dpi, zoom);
+      // console.log(`BACKPLANE DRAWING end`)
+      this.backPlane.inited = result.result;
+      this.backPlane.size = { ...result };
+      noLazyUpdate = true;
+    }
+
+    const displaySize = { width, height };
+    const { px_width, px_height } = this.backPlane.size;
+
+    const ctx = canvas.getContext('2d');
+    const dw = ret.px.width / ret.ratio;
+    const dh = ret.px.height / ret.ratio;
+
+    ctx.drawImage(this.backPlane.canvas, 0, 0, px_width, px_height, 0, 0, dw, dh);
+
+    // console.log(`BACKPLANE RENDERPAGE realtime end`)
+
+    // Lazy update
+    if (!noLazyUpdate && this.backPlane.prevZoom !== zoom) {
+      // console.log(`BACKPLANE RENDERPAGE lazy start`);
+
+      this.zoomQueue.push(zoom);
+      await this.timeOut(200);
+
+      const lastZoom = this.zoomQueue[this.zoomQueue.length - 1];
+      this.zoomQueue = this.zoomQueue.splice(1);
+      if ((lastZoom && zoom !== lastZoom) || zoom == this.backPlane.prevZoom) {
+        return;
+      }
+
+      const result = await this.renderToCanvasSafe(page, dpi, zoom);
+      if (result.result) {
+        this.backPlane.prevZoom = zoom;
+        this.backPlane.size = { ...result };
+
+        const { px_width, px_height } = result;
+        ctx.drawImage(this.backPlane.canvas, 0, 0, px_width, px_height, 0, 0, dw, dh);
+
+        const renderCount = this.state.renderCount + 1;
+        this.zoomQueue = [];
+      }
+      else {
+        // console.log(`lazy back plane CANCELLED`)
+      }
+      // console.log(`BACKPLANE RENDERPAGE lazy end`);
+
+    }
+
+    // console.log(`BACKPLANE RENDERPAGE end`)
+
+    this.setState({ status: 'rendered' });
+
+  }
+
+
+  render = () => {
+    const { status } = this.state;
+    const pageCanvas: CSSProperties = {
+      position: "absolute",
+      zoom: 1,
+      left: 0,
+      top: 0,
+      width: 600
+      // background: "#fff"
+    }
+
+    const isPdfPage = this.props.pdf && this.props.pdfPageNo && this.props.pdfPageNo > 0;
+    const shadowStyle: CSSProperties = {
+      color: "#088",
+      textShadow: "-1px 0 2px #fff, 0 1px 2px #fff, 1px 0 2px #fff, 0 -1px 2px #fff",
+    }
+    return (
+
+      <div style={pageCanvas} id={`pdf-page ${status}`} >
+        <div style={pageCanvas}  >
+          {isPdfPage
+            ? <canvas ref={this.setCanvasRef} />
+            : <></>
+          }
+        </div>
+
+        < div id={`${this.props.parentName}-info`} style={pageCanvas} >
+          <br /> &nbsp; &nbsp;
+          <br /> &nbsp; &nbsp;
+          <br /> &nbsp; &nbsp;
+          <br /> &nbsp; &nbsp;
+          <br /> &nbsp; &nbsp;
+          <br /> &nbsp; &nbsp;
+          <br /> &nbsp; &nbsp;
+          <br /> &nbsp; &nbsp;
+          <br /> &nbsp; &nbsp;
+          <br /> &nbsp; &nbsp;
+          <Typography style={{ ...shadowStyle, fontSize: 16 }}>PDFViewer </Typography>
+
+          <br /> &nbsp; &nbsp;
+          <Typography style={{ ...shadowStyle, fontSize: 10 }}>Page(state):</Typography>
+          <Typography style={{ ...shadowStyle, fontSize: 14, }}> {makeNPageIdStr(this.props.pageInfo)} </Typography>
+
+          <br /> &nbsp; &nbsp;
+            <Typography style={{ ...shadowStyle, fontSize: 10 }}>Page(property):</Typography>
+          <Typography style={{ ...shadowStyle, fontSize: 14, }}> {makeNPageIdStr(this.props.pageInfo)} </Typography>
+
+
+          <br /> &nbsp; &nbsp;
+            <Typography style={{ ...shadowStyle, fontSize: 10 }}>Base(property):</Typography>
+          <Typography style={{ ...shadowStyle, fontSize: 14, fontStyle: "initial" }}> {makeNPageIdStr(this.props.basePageInfo)} </Typography>
+
+          <br /> &nbsp; &nbsp;
+            <Typography style={{ ...shadowStyle, fontSize: 10 }}>pdfPageNo:</Typography>
+          <Typography style={{ ...shadowStyle, fontSize: 14, fontStyle: "initial" }}> {this.props.pdfPageNo} </Typography>
+
+        </div >
+
+
+      </div>
+    );
+  }
+}
+

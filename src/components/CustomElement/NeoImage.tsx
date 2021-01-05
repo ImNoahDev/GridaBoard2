@@ -1,10 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { ButtonProps, useTheme } from "@material-ui/core";
-import { hex2ColorObject } from "../../NcodePrintLib";
+import { useTheme } from "@material-ui/core";
 import { ImageProps } from "react-bootstrap";
-
-
-
+import { hex2ColorObject } from "../../nl-lib/common/util";
 
 
 function convertColor(c: HTMLCanvasElement, color: string) {

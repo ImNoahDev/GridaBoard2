@@ -1,16 +1,16 @@
+import GridaPage from "./GridaPage";
 import { store } from "../client/Root";
-import { IPageMapItem, IPdfToNcodeMapItem } from "../NcodePrintLib/Coordinates";
-import { IFileBrowserReturn } from "../NcodePrintLib/NcodePrint/PrintDataTypes";
-import { g_availablePagesInSection } from "../NcodePrintLib/NcodeSurface/SurfaceInfo";
-import NeoPdfDocument, { IPdfOpenOption } from "../NcodePrintLib/NeoPdf/NeoPdfDocument";
-import NeoPdfManager, { IPenToViewerEvent, PdfManagerEventName } from "../NcodePrintLib/NeoPdf/NeoPdfManager";
-import { MappingStorage } from "../NcodePrintLib/SurfaceMapper";
-import { IAutoLoadDocDesc, IGetNPageTransformType, IMappingStorageEvent, MappingStorageEventName } from "../NcodePrintLib/SurfaceMapper/MappingStorage";
-import { isSamePage, makeNPageIdStr } from "../NcodePrintLib/UtilFunc/functions";
-import { IPageSOBP } from "../neosmartpen/DataStructure/Structures";
 import { forceToRenderPanes, setActivePageNo, setActivePdf, setDocNumPages, setUrlAndFilename } from "../store/reducers/activePageReducer";
 import { RootState } from "../store/rootReducer";
-import GridaPage from "./GridaPage";
+
+import { g_availablePagesInSection } from "../nl-lib/common/constants";
+import { NeoPdfDocument, IPdfOpenOption, NeoPdfManager, PdfManagerEventName, IPdfManagerEvent } from "../nl-lib/common/neopdf";
+import { IPdfToNcodeMapItem, IPageSOBP, IGetNPageTransformType } from "../nl-lib/common/structures";
+import { isSamePage, makeNPageIdStr } from "../nl-lib/common/util";
+
+
+import { MappingStorageEventName, IMappingStorageEvent, MappingStorage } from "../nl-lib/common/mapper";
+
 
 let _doc_instance = undefined as GridaDoc;
 
@@ -177,7 +177,7 @@ export default class GridaDoc {
    * Message handlers
    * @param event
    */
-  public onPdfLoaded = (event: IPenToViewerEvent) => {
+  public onPdfLoaded = (event: IPdfManagerEvent) => {
     const pdf = event.pdf;
     console.log(`file ${pdf.filename} loaded`);
     console.log(`-GRIDA DOC-, onPdfLoaded ${pdf.filename},  purpose:${pdf.purpose} - ${pdf.url}`);

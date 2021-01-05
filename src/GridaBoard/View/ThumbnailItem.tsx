@@ -1,15 +1,14 @@
 import React from "react";
-import GridaDoc from "../GridaDoc";
 import { useSelector } from "react-redux";
-import { Box, Paper, Typography } from "@material-ui/core";
+import { Paper, Typography } from "@material-ui/core";
 
-import { InkStorage, MixedPageView, PLAYSTATE } from "../../neosmartpen";
-import { ZoomFitEnum } from "../../neosmartpen/renderer/pageviewer/RenderWorkerBase";
+import GridaDoc from "../GridaDoc";
 import { RootState } from "../../store/rootReducer";
-import { connect } from "react-redux";
-import { updateDrawerWidth } from "../../store/reducers/ui";
-import { makeNPageIdStr } from "../../NcodePrintLib";
 import { setActivePageNo } from '../../store/reducers/activePageReducer';
+
+import { PLAYSTATE, ZoomFitEnum } from "../../nl-lib/renderer/penview/RenderWorkerBase";
+import MixedPageView from "../../nl-lib/renderer/MixedPageView";
+import { makeNPageIdStr } from "../../nl-lib/common/util";
 
 
 interface Props {
@@ -40,10 +39,10 @@ const ThumbnailItem = (props: Props) => {
     pdfFingerprint = doc.getPdfFingerprintAt(pn);
     pdfPageNo = doc.getPdfPageNoAt(pn);
     pdf = page.pdf;
-  }  
+  }
 
   const handleMouseDown = e => {
-    var idToken = e.target.id.split('- ');
+    const idToken = e.target.id.split('- ');
     const pageNo = Number(idToken[2]);
     setActivePageNo(pageNo);
   };
@@ -65,6 +64,9 @@ const ThumbnailItem = (props: Props) => {
 
   const height = drawerWidth / wh_ratio * 0.9;
 
+  const playState = PLAYSTATE.live;
+  const viewFit = ZoomFitEnum.FULL;
+
   console.log(`thumbnail - ${pn}: pageNo: ${pdfPageNo} pdf: ${pdf} pdfUrl: ${pdfUrl} fingerprint: ${pdfFingerprint} `)
   return (
     <Paper key={props.key} onMouseDown={e => handleMouseDown(e)} elevation={3} style={{ height: height, margin: 10, overflow: "hidden", position: "relative" }} >
@@ -74,14 +76,14 @@ const ThumbnailItem = (props: Props) => {
           pdfUrl={pdfUrl} filename={pdfFilename}
           fingerprint={pdfFingerprint}
           pdfPageNo={pdfPageNo}
-          playState={PLAYSTATE.live} pens={[]}
+          playState={playState} pens={[]}
           rotation={0}
 
           pageInfo={pageInfo}
           basePageInfo={basePageInfo}
 
           parentName={`thumbnail - ${pn} `}
-          viewFit={ZoomFitEnum.FULL}
+          viewFit={viewFit}
           autoPageChange={false}
           fromStorage={true}
           fitMargin={2}

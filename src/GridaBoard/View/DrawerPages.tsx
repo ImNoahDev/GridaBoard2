@@ -1,14 +1,11 @@
 import React from "react";
-import { Box, Paper, Typography } from "@material-ui/core";
+import { Box } from "@material-ui/core";
+import { connect } from "react-redux";
 
-import { InkStorage, MixedPageView, PLAYSTATE } from "../../neosmartpen";
-import { ZoomFitEnum } from "../../neosmartpen/renderer/pageviewer/RenderWorkerBase";
 import GridaDoc from "../GridaDoc";
 import { RootState } from "../../store/rootReducer";
-import { connect } from "react-redux";
-import { updateDrawerWidth } from "../../store/reducers/ui";
-import { makeNPageIdStr } from "../../NcodePrintLib";
 import ThumbnailItem from "./ThumbnailItem";
+import { InkStorage } from "../../nl-lib/common/penstorage";
 
 interface Props {
   numPages?: number,

@@ -1,15 +1,18 @@
 import React, { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
+
 import ManualCalibration from "../components/navbar/ManualCalibration";
 import PageNumbering from "../components/navbar/PageNumbering";
 import PrintButton from "../components/navbar/PrintButton";
-import { FileBrowserButton, g_defaultPrintOption, IFileBrowserReturn } from "../NcodePrintLib";
-import { NeoSmartpen } from "../neosmartpen";
 import GridaToolTip from "../styles/GridaToolTip";
-import { useSelector } from "react-redux";
 import ColorButtons from "../components/navbar/ColorButtons";
 import { RootState } from "../store/rootReducer";
-import { IPageSOBP } from "../NcodePrintLib/DataStructure/Structures";
 import GridaDoc from "../GridaBoard/GridaDoc";
+import { FileBrowserButton } from "../nl-lib/common/neopdf";
+import { IFileBrowserReturn } from "../nl-lib/common/structures";
+import { g_defaultPrintOption } from "../nl-lib/ncodepod/DefaultOption";
+
+
 
 const localStyle = {
   position: "absolute",
@@ -62,7 +65,7 @@ interface Props {
 /**
  *
  */
-const ButtonLayerBottom = (props:Props) => {
+const ButtonLayerBottom = (props: Props) => {
   const { handlePdfOpen, ...rest } = props;
 
   // const [num_pens, setNumPens] = useState(0);

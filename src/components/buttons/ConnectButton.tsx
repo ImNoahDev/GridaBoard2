@@ -4,11 +4,12 @@ import React, { Component, useState } from "react";
 import '../../styles/buttons.css';
 import Tooltip, { TooltipProps } from '@material-ui/core/Tooltip';
 import { Theme, Typography, withStyles } from '@material-ui/core';
-import PenManager from '../../neosmartpen/pencomm/PenManager'
-import { NeoSmartpen, PenEventName, } from '../../neosmartpen';
 import GridaToolTip from "../../styles/GridaToolTip";
 import { useSelector } from "react-redux";
 import { RootState } from "../../store/rootReducer";
+import PenManager from "../../nl-lib/common/neopen/PenManager";
+import { NeoSmartpen } from "../../nl-lib/common/neopen";
+import { PenEventName } from "../../nl-lib/common/enums";
 
 type Props = {
   onPenLinkChanged: (e) => void;

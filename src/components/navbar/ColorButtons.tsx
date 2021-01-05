@@ -1,9 +1,7 @@
 import React from 'react';
 import '../../styles/main.css';
-import PenManager from "../../neosmartpen/pencomm/PenManager";
-import Tooltip, { TooltipProps } from '@material-ui/core/Tooltip';
-import { Theme, Typography, withStyles } from '@material-ui/core';
 import GridaToolTip from '../../styles/GridaToolTip';
+import PenManager from '../../nl-lib/common/neopen/PenManager';
 
 const manager: PenManager = PenManager.getInstance();
 
