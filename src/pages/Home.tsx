@@ -20,9 +20,9 @@ import {
   openFileBrowser2, g_hiddenFileInputBtnId, onFileInputChanged, onFileInputClicked
 } from "../nl-lib/common/neopdf";
 import { IPageSOBP, IFileBrowserReturn, IGetNPageTransformType } from "../nl-lib/common/structures";
-import MixedPageView from "../nl-lib/renderer/MixedPageView";
-import { PLAYSTATE, ZoomFitEnum } from "../nl-lib/renderer/penview/RenderWorkerBase";
+import { MixedPageView } from "../nl-lib/renderer";
 import { nullNcode } from "../nl-lib/common/constants";
+import { PLAYSTATE, ZoomFitEnum } from "../nl-lib/common/enums";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({

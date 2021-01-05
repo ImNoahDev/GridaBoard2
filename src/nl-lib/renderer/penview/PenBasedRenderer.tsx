@@ -2,11 +2,11 @@ import React from "react";
 import { CSSProperties } from "@material-ui/core/styles/withStyles";
 import { Typography } from "@material-ui/core";
 
-import { PLAYSTATE, IRenderWorkerOption, ZoomFitEnum } from "./RenderWorkerBase";
+import { IRenderWorkerOption } from "./RenderWorkerBase";
 import PenBasedRenderWorker from "./PenBasedRenderWorker";
 import { MixedViewProps } from "../MixedPageView";
 
-import { PenEventName } from "../../common/enums";
+import { PenEventName, PLAYSTATE, ZoomFitEnum } from "../../common/enums";
 import { IPageSOBP, ISize } from "../../common/structures";
 import { isSamePage, makeNPageIdStr, uuidv4 } from "../../common/util";
 
@@ -15,8 +15,6 @@ import { MappingStorage } from "../../common/mapper";
 import PenManager from "../../neosmartpen/PenManager";
 import { InkStorage } from "../../common/penstorage";
 import { NeoSmartpen } from "../../neosmartpen";
-
-export { PLAYSTATE };
 
 
 /**

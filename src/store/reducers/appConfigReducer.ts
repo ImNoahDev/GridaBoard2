@@ -2,7 +2,7 @@ import { store } from "../../client/Root";
 import GridaDoc from "../../GridaBoard/GridaDoc";
 
 import { IPrintOption } from "../../nl-lib/common/structures";
-import { g_defaultPrintOption } from "../../nl-lib/ncodepod/DefaultOption";
+import { g_defaultPrintOption } from "../../nl-lib/ncodepod";
 import { NeoSmartpen } from "../../nl-lib/neosmartpen";
 //[Define Action Types
 const ActionGroup = "APP_CONFIG";

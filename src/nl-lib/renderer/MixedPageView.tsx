@@ -5,8 +5,6 @@ import { withResizeDetector } from 'react-resize-detector';
 import NeoPdfPageView from "./pdfview/NeoPdfPageView";
 import PenBasedRenderer from "./penview/PenBasedRenderer";
 
-import { PLAYSTATE, ZoomFitEnum } from "./penview/RenderWorkerBase";
-
 
 import { IAutoLoadDocDesc, IGetNPageTransformType, IPageSOBP } from "../common/structures";
 import { NeoPdfDocument, NeoPdfManager } from "../common/neopdf";
@@ -14,6 +12,7 @@ import { isSamePage, makeNPageIdStr } from "../common/util";
 import { MappingStorage } from "../common/mapper";
 import { getNPaperSize_pu } from "../common/noteserver";
 import { NeoSmartpen } from "../neosmartpen";
+import { PLAYSTATE, ZoomFitEnum } from "../common/enums";
 
 
 

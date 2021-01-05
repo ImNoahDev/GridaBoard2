@@ -10,7 +10,7 @@ import { RootState } from "../store/rootReducer";
 import GridaDoc from "../GridaBoard/GridaDoc";
 import { FileBrowserButton } from "../nl-lib/common/neopdf";
 import { IFileBrowserReturn } from "../nl-lib/common/structures";
-import { g_defaultPrintOption } from "../nl-lib/ncodepod/DefaultOption";
+import { g_defaultPrintOption } from "../nl-lib/ncodepod";
 
 
 

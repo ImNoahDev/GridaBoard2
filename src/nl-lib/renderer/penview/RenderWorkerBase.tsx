@@ -1,5 +1,6 @@
 import { fabric } from "fabric";
 import { Point } from "fabric/fabric-impl";
+import { ZoomFitEnum } from "../../common/enums";
 import { PaperInfo } from "../../common/noteserver";
 import { InkStorage } from "../../common/penstorage";
 import { TransformParameters, ISize, INoteServerItem } from "../../common/structures";
@@ -18,30 +19,6 @@ import { PDFVIEW_ZOOM_MAX, PDFVIEW_ZOOM_MIN } from "../RendererConstants";
 /**
  * @enum {string}
  */
-
-export enum ZoomFitEnum {
-  // eslint-disable-next-line no-unused-vars
-  ACTUAL,
-  // eslint-disable-next-line no-unused-vars
-  WIDTH,
-  // eslint-disable-next-line no-unused-vars
-  HEIGHT,
-  // eslint-disable-next-line no-unused-vars
-  FULL,
-
-  FREE,
-}
-
-export enum PLAYSTATE {
-  live,
-  play,
-  stop,
-  pause,
-  rewind,
-  trackRewind,
-  setAutoStop,
-  unsetAutoStop,
-}
 
 export interface IRenderWorkerOption {
   canvasId: string,

@@ -11,14 +11,16 @@ import GridaDoc from "../GridaBoard/GridaDoc";
 
 import { makeNPageIdStr } from "../nl-lib/common/util";
 
-import { g_defaultPrintOption } from "../nl-lib/ncodepod/DefaultOption";
-import ClearLocalMappingButton from "../nl-lib/common/mapper/test/ClearLocalMappingButton";
-import CalibrationButton from "../nl-lib/ncodepod/NcodePrint/Dialogs/CalibrationDialog";
-import OptionDialogButton from "../nl-lib/ncodepod/NcodePrint/Dialogs/OptionDialog";
-import PrintNcodedPdfButton from "../nl-lib/ncodepod/NcodePrint/PrintNcodedPdfButton";
-import { savePDF } from "../nl-lib/ncodepod/Save/SavePdf";
+import { g_defaultPrintOption } from "../nl-lib/ncodepod";
+
 import { MappingStorage } from "../nl-lib/common/mapper";
 import { NoteServerClient } from "../nl-lib/common/noteserver";
+import { CalibrationButton, OptionDialogButton, PrintNcodedPdfButton } from "../nl-lib/ncodepod";
+
+
+import { savePDF } from "../nl-lib/ncodepod/Save/SavePdf";
+import ClearLocalMappingButton from "../nl-lib/common/mapper/test/ClearLocalMappingButton";
+
 
 const buttonDivStyle = {
   position: "absolute",

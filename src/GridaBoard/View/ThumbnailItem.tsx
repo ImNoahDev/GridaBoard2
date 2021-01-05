@@ -6,9 +6,9 @@ import GridaDoc from "../GridaDoc";
 import { RootState } from "../../store/rootReducer";
 import { setActivePageNo } from '../../store/reducers/activePageReducer';
 
-import { PLAYSTATE, ZoomFitEnum } from "../../nl-lib/renderer/penview/RenderWorkerBase";
-import MixedPageView from "../../nl-lib/renderer/MixedPageView";
+import { MixedPageView } from "../../nl-lib/renderer";
 import { makeNPageIdStr } from "../../nl-lib/common/util";
+import { PLAYSTATE, ZoomFitEnum } from "../../nl-lib/common/enums";
 
 
 interface Props {
