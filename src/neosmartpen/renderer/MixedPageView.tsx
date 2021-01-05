@@ -436,6 +436,7 @@ class MixedPageView_module extends React.Component<MixedViewProps, State>  {
       zoom: zoom,
       left: this.state.viewPos.offsetX / zoom,
       top: this.state.viewPos.offsetY / zoom,
+      background: "#fff",
     }
 
     // console.log(`MixedViewer: rendering, h=${JSON.stringify(this.state.h)}`);
@@ -463,15 +464,14 @@ class MixedPageView_module extends React.Component<MixedViewProps, State>  {
       }}>
         <div id={`${this.props.parentName}-pdf_layer`} style={pdfContainer} >
           <div id={`${this.props.parentName}-pdf_view`} style={pdfCanvas}>
-            {this.state.pdf
-              ? <NeoPdfPageView {...this.props}
-                // pdf={this.props.pdf}
-                pdf={this.state.pdf}
-                pdfPageNo={this.state.pdfPageNo}
-                key={`document-page-${this.props.pdfPageNo}`}
-                position={this.state.viewPos}
-              />
-              : ""}
+
+            <NeoPdfPageView {...this.props}
+              // pdf={this.props.pdf}
+              pdf={this.state.pdf}
+              pdfPageNo={this.state.pdfPageNo}
+              key={`document-page-${this.props.pdfPageNo}`}
+              position={this.state.viewPos}
+            />
           </div>
           {/* <NeoPdfViewer
             url={this.state.pdfUrl}
