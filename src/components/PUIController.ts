@@ -1,6 +1,6 @@
 import $ from 'jquery';
 import { IBrushType } from '../nl-lib/common/enums';
-import PenManager from '../nl-lib/common/neopen/PenManager';
+import PenManager from '../nl-lib/neosmartpen/PenManager';
 
 
 // 2020-12-09 현재 구현되어 있는 부분까지 PUI 완성(페이지 넘어가는 부분과 스트로크 찍히는 오류 수정할 것)

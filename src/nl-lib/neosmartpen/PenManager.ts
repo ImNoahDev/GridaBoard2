@@ -1,12 +1,12 @@
 import $ from "jquery";
-import NeoSmartpen from "./neosmartpen";
-import { EventDispatcher, EventCallbackType } from "../event";
-import { IBrushType, PenEventName } from "../enums";
-import { IPenEvent } from "../structures";
+import { EventDispatcher, EventCallbackType } from "../common/event";
+import { IBrushType, PenEventName } from "../common/enums";
+import { IPenEvent } from "../common/structures";
 
 
-import ThemeManager from "../../../styles/ThemeManager"
-import { IPenToViewerEvent } from "./NeoSmartpenBase";
+import ThemeManager from "../../styles/ThemeManager"
+import { IPenToViewerEvent } from "../common/neopen/INeoSmartpen";
+import NeoSmartpen from "./NeoSmartpen";
 
 
 let _penmanager_instance = null;

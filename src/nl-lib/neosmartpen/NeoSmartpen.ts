@@ -1,12 +1,12 @@
-import PenComm, { deviceSelectDlg } from "../../neosmartpen/pencomm/pencomm";
-import { EventDispatcher, EventCallbackType } from "../event";
+import PenComm, { deviceSelectDlg } from "./pencomm/pencomm";
+import { EventDispatcher, EventCallbackType } from "../common/event";
 import PenManager from "./PenManager";
-import PUIController from "../../../components/PUIController";
-import { IBrushState, INoteServerItem, IPenEvent, NeoDot, NeoStroke, StrokePageAttr } from "../structures";
-import { IBrushType, PEN_STATE, PenEventName } from "../enums";
-import { PaperInfo } from "../noteserver/PaperInfo";
-import { InkStorage, IOpenStrokeArg } from "../penstorage";
-import { IPenToViewerEvent, NeoSmartpenBase } from "./NeoSmartpenBase";
+import PUIController from "../../components/PUIController";
+import { IBrushState, INoteServerItem, IPenEvent, NeoDot, NeoStroke, StrokePageAttr } from "../common/structures";
+import { IBrushType, PEN_STATE, PenEventName } from "../common/enums";
+import { PaperInfo } from "../common/noteserver/PaperInfo";
+import { InkStorage, IOpenStrokeArg } from "../common/penstorage";
+import { IPenToViewerEvent, INeoSmartpen } from "../common/neopen/INeoSmartpen";
 
 
 interface IPenMovement {
@@ -20,7 +20,7 @@ interface IPenMovement {
 
 const NUM_HOVER_POINTERS = 6;
 
-export default class NeoSmartpen implements NeoSmartpenBase {
+export default class NeoSmartpen implements INeoSmartpen {
   private currPenMovement: IPenMovement = {
     downEvent: null,
     infoEvent: null,

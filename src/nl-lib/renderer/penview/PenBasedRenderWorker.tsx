@@ -6,8 +6,9 @@ import RenderWorkerBase, { IRenderWorkerOption } from "./RenderWorkerBase";
 import { drawPath, drawPath_arr } from "../../common/util";
 import { IBrushType } from "../../common/enums";
 import { IPoint, NeoStroke, NeoDot, IPageSOBP, INeoStrokeProps, StrokeStatus } from "../../common/structures";
-import { NeoSmartpen, IPenToViewerEvent } from "../../common/neopen";
+import { IPenToViewerEvent } from "../../common/neopen";
 import { InkStorage } from "../../common/penstorage";
+import { NeoSmartpen } from "../../neosmartpen";
 // import { PaperInfo } from "../../common/noteserver";
 
 

@@ -1,7 +1,7 @@
 import React from 'react';
 import '../../styles/main.css';
 import GridaToolTip from '../../styles/GridaToolTip';
-import PenManager from '../../nl-lib/common/neopen/PenManager';
+import PenManager from '../../nl-lib/neosmartpen/PenManager';
 
 const manager: PenManager = PenManager.getInstance();
 

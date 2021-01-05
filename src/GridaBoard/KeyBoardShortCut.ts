@@ -2,7 +2,7 @@
 // 2020-12-09 현재 구현되어 있는 기능까지 단축키 완성(추가 구현된 기능 넣고 다른 버튼들 단축키 지정하기)
 
 import { IBrushType } from "../nl-lib/common/enums";
-import PenManager from "../nl-lib/common/neopen/PenManager";
+import PenManager from "../nl-lib/neosmartpen/PenManager";
 
 export default function KeyBoardShortCut(evt) {
 

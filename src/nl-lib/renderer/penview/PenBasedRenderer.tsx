@@ -10,10 +10,11 @@ import { PenEventName } from "../../common/enums";
 import { IPageSOBP, ISize } from "../../common/structures";
 import { isSamePage, makeNPageIdStr, uuidv4 } from "../../common/util";
 
-import { IPenToViewerEvent, NeoSmartpen } from "../../common/neopen";
+import { IPenToViewerEvent } from "../../common/neopen";
 import { MappingStorage } from "../../common/mapper";
-import PenManager from "../../common/neopen/PenManager";
+import PenManager from "../../neosmartpen/PenManager";
 import { InkStorage } from "../../common/penstorage";
+import { NeoSmartpen } from "../../neosmartpen";
 
 export { PLAYSTATE };
 

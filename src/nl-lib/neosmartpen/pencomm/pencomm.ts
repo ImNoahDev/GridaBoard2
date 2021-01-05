@@ -3,7 +3,7 @@ import { DeviceTypeEnum } from "./pencomm_enum";
 import { PenEventEnum, makePenEvent } from "./pencomm_event";
 import { intFromBytes, decimalToHex } from "./pen_util_func";
 import { PEN_PACKET_START, PEN_PACKET_END } from "./pencomm_const";
-import { NeoSmartpen } from "../../common/neopen";
+import NeoSmartpen from "../NeoSmartpen";
 // import { NeoSmartpen } from "./neosmartpen";
 
 

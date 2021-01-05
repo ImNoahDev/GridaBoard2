@@ -7,9 +7,9 @@ import { Theme, Typography, withStyles } from '@material-ui/core';
 import GridaToolTip from "../../styles/GridaToolTip";
 import { useSelector } from "react-redux";
 import { RootState } from "../../store/rootReducer";
-import PenManager from "../../nl-lib/common/neopen/PenManager";
-import { NeoSmartpen } from "../../nl-lib/common/neopen";
+import PenManager from "../../nl-lib/neosmartpen/PenManager";
 import { PenEventName } from "../../nl-lib/common/enums";
+import { NeoSmartpen } from "../../nl-lib/neosmartpen";
 
 type Props = {
   onPenLinkChanged: (e) => void;

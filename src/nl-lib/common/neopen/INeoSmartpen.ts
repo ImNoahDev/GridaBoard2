@@ -1,14 +1,10 @@
 import { EventDispatcher, EventCallbackType } from "../event";
-import PenManager from "./PenManager";
-import PUIController from "../../../components/PUIController";
-import { IBrushState, INoteServerItem, IPenEvent, NeoDot, NeoStroke, StrokePageAttr } from "../structures";
+import { IBrushState,  IPenEvent, NeoDot, NeoStroke } from "../structures";
 import { IBrushType, PEN_STATE, PenEventName } from "../enums";
-import { PaperInfo } from "../noteserver/PaperInfo";
-import { InkStorage, IOpenStrokeArg } from "../penstorage";
 
 
 export type IPenToViewerEvent = {
-  pen: NeoSmartpenBase,
+  pen: INeoSmartpen,
 
   mac: string,
   event: IPenEvent,
@@ -33,7 +29,7 @@ export type IPenToViewerEvent = {
 }
 
 
-export interface NeoSmartpenBase {
+export interface INeoSmartpen {
 
   /** 펜 종류 마다의 굵기와 색깔 */
   penState: IBrushState[];
