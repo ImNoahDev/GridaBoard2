@@ -8,6 +8,7 @@ import PrintNcodedPdfWorker from "./PrintNcodedPdfWorker";
 import { OptionDialog } from "./Dialogs/OptionDialog";
 import CancelWaitingDialog from "./CancelWaitingDialog";
 import { cloneObj } from "../../common/util";
+import Button from '@material-ui/core/Button';
 
 
 interface Props extends ButtonProps {
@@ -42,6 +43,12 @@ let _promise: Promise<IPrintOption>;
 /** _promise의 resolve callback */
 let _resolve;
 
+const printStyle = {
+  padding: "0px",
+  margin: "0px",
+  border: "0px",
+  minWidth: "24px"
+}
 
 /**
  * Class
@@ -206,9 +213,9 @@ export default function PrintNcodedPdfButton(props: Props) {
   // _workingOption = g_defaultPrintOption;
   return (
     <React.Fragment>
-      <button {...rest} onClick={startPrint} >
+      <Button {...rest} onClick={startPrint} style={printStyle}>
         {props.children}
-      </button>
+      </Button>
 
       { optionDialogOn
         ? <OptionDialog open={optionDialogOn}

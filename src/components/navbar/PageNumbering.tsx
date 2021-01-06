@@ -1,15 +1,29 @@
 import React from 'react';
 import '../../styles/main.css';
 import Tooltip, { TooltipProps } from '@material-ui/core/Tooltip';
-import { Theme, Typography, withStyles } from '@material-ui/core';
+import { InputBase, Theme, Typography, withStyles } from '@material-ui/core';
 import GridaToolTip from '../../styles/GridaToolTip';
+import Button from '@material-ui/core/Button';
 
 class PageNumbering extends React.Component {
+
+  inputStyle = {
+    padding: "0px",
+    margin: "0px",
+    border: "0px",
+    minWidth: "24px",
+    fontSize: "14px"
+  }
+
+  buttonStyle = {
+    minWidth: "36px",
+    padding: "0px"
+  }
   render() {
     return (
       // <div className="navbar-menu d-flex justify-content-center align-items-center neo_shadow">
       <React.Fragment>
-        <button id="btn_prevpage" type="button" className="btn btn-neo ">
+        <Button id="btn_prevpage" type="button" className="btn btn-neo" style={this.buttonStyle}>
           <GridaToolTip open={true} placement="top" tip={{
               head: "Pre Page",
               msg: "현재 필기 중인 페이지를, 앞쪽 페이지로 이동시킵니다.",
@@ -20,20 +34,20 @@ class PageNumbering extends React.Component {
               <img src='../../icons/icon_prev_p.png' className="hover-image"></img>
             </div>
           </GridaToolTip>
-        </button>
-        <input type="text" className="form-control-plaintext form-control-sm neo-form-pdf-number"
+        </Button>
+        <InputBase type="text" className="neo-form-pdf-number" style={this.inputStyle}
           placeholder=".form-control-sm" readOnly
           defaultValue="Page:" />
 
-        <input id="curr_page_num" type="text" className="form-control form-control-sm neo-form-pdf-number"
+        <InputBase id="curr_page_num" type="text" className="neo-form-pdf-number" style={this.inputStyle}
           placeholder=".form-control-sm"
           defaultValue=" " />
 
-        <input id="page_count" type="text" className="form-control-plaintext form-control-sm neo-form-pdf-number"
+        <InputBase id="page_count" type="text" className="neo-form-pdf-number" style={this.inputStyle}
           placeholder=".form-control-sm" readOnly
           defaultValue="/" />
 
-        <button id="btn_nextpage" type="button" className="btn btn-neo ">
+        <Button id="btn_nextpage" type="button" className="btn btn-neo" style={this.buttonStyle}>
           <GridaToolTip open={true} placement="top" tip={{
               head: "Next Page",
               msg: "현재 필기 중인 페이지를, 뒤쪽 페이지로 이동시킵니다.",
@@ -44,7 +58,7 @@ class PageNumbering extends React.Component {
               <img src='../../icons/icon_next_p.png' className="hover-image"></img>
             </div>
           </GridaToolTip>
-        </button>
+        </Button>
       </React.Fragment>
     )
   }

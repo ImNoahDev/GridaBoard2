@@ -331,6 +331,7 @@ hr {
 
 .color_bar {
     padding-left: 10px;
+    padding-right: 10px;
     /* margin-left:100px; */
 }
 
@@ -458,4 +459,15 @@ hr {
 
 #grida_board {
     z-index: 100;
+}
+
+.navRoot {
+    color: rgba(0, 0, 0, 0.9);
+    background-color: transparent !important;
+    position: relative;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.5rem 1rem;
 }
