@@ -3,11 +3,20 @@ import '../../styles/main.css';
 import Tooltip, { TooltipProps } from '@material-ui/core/Tooltip';
 import { Theme, Typography, withStyles } from '@material-ui/core';
 import GridaToolTip from '../../styles/GridaToolTip';
+import Button from '@material-ui/core/Button';
+
+const fileStyle = {
+  padding: "0px",
+  margin: "0px",
+  border: "0px",
+  minWidth: "24px"
+}
+
 class fileLoad extends React.Component {
   render() {
     return (
       <React.Fragment>
-        <button id="btn_file_open" type="button" className="btn btn-neo">
+        <Button id="btn_file_open" type="button" className="btn btn-neo" style={fileStyle}>
           <GridaToolTip open={true} placement="top" tip={{
               head: "PDF File Open",
               msg: "배경으로 쓸 PDF 파일을 엽니다. 스마트 플레이트로 조작하거나, 인쇄하여 덧필기할 수 있습니다.",
@@ -18,7 +27,7 @@ class fileLoad extends React.Component {
               <img src='../../icons/icon_file_p.png' className="hover-image"></img>
             </div>
           </GridaToolTip>
-        </button>
+        </Button>
       </React.Fragment>
     )
   }

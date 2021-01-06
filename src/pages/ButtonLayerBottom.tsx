@@ -12,6 +12,8 @@ import { FileBrowserButton } from "../nl-lib/common/neopdf";
 import { IFileBrowserReturn } from "../nl-lib/common/structures";
 import { g_defaultPrintOption } from "../nl-lib/ncodepod";
 
+import { Button, ButtonGroup } from "@material-ui/core";
+
 
 
 const localStyle = {
@@ -32,8 +34,53 @@ const printOption = g_defaultPrintOption;
 const menuStyle = {
   width: '36px',
   height: '36px',
-  padding: '4px'
+  padding: '4px',
 }
+
+const hideAndShowStyle = {
+  display: 'flex',
+  justifyContent: 'start',
+  alignItems: 'end',
+  height: '36px',
+  minWidth: '36px',
+  outline: 'none',
+  textDecoration: 'none'
+}
+
+const buttonStyle = {
+  padding: "0px",
+  margin: "0px",
+  border: "0px",
+  minWidth: "24px"
+}
+
+const centerStyle = {
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
+  height: '36px',
+  minWidth: '36px',
+  outline: 'none',
+  textDecoration: 'none'
+}
+
+const endStyle = {
+  display: 'flex',
+  justifyContent: 'end',
+  alignItems: 'end',
+  height: '36px',
+  minWidth: '36px',
+  outline: 'none',
+  textDecoration: 'none'
+}
+
+const navStyle = {
+  position: 'fixed',
+  right: 0,
+  bottom: 0,
+  left: 0,
+  zIndex: 1030
+} as React.CSSProperties;
 
 
 function hideAndShowFnc() {
@@ -92,10 +139,10 @@ const ButtonLayerBottom = (props: Props) => {
 
   return (
     <div style={localStyle}>
-      <nav id="colornav" className="navbar fixed-bottom navbar-light bg-transparent">
+      <nav id="colornav" className="navRoot" style={navStyle}>
         {/* <div className="d-inline-flex p-2 bd-highlight"> */}
         <div className="navbar-menu d-flex justify-content-start align-items-end neo_shadow ">
-          <button id="btn_menu" type="button" className="btn btn-neo " onClick={hideAndShowFnc}>
+          <Button id="btn_menu" type="button" className="btn btn-neo" style={buttonStyle} onClick={hideAndShowFnc}>
             <GridaToolTip open={true} placement="top-end" tip={{
               head: "Hide And Show",
               msg: "전체 메뉴를 숨기고 보여줍니다.",
@@ -106,22 +153,22 @@ const ButtonLayerBottom = (props: Props) => {
                 <img style={menuStyle} src='../icons/all_menu.png' className="hover-image" alt=""></img>
               </div>
             </GridaToolTip>
-          </button>
-          <div id="color_bar" className="color_bar neo_shadow float-left bottom_text color_bar">
+          </Button>
+          <div id="color_bar" className="color_bar neo_shadow bottom_text" style={{float: "left"}}>
             <ColorButtons />
           </div>
         </div>
 
         <div id="navbar_center">
-          <div className="navbar-menu d-flex justify-content-center align-items-center neo_shadow">
+          <ButtonGroup className="navbar-menu neo_shadow" style={centerStyle}>
             <PageNumbering />
             <PrintButton targetId={printBtnId} url={pdfUrl} filename={pdfFilename} />
             <FileBrowserButton handlePdfOpen={handlePdfOpen} />
-          </div>
+          </ButtonGroup>
         </div>
 
         <div id="navbar_end">
-          <div className="navbar-menu d-flex justify-content-end align-items-end neo_shadow">
+          <div className="navbar-menu neo_shadow" style={endStyle}>
             <ManualCalibration url={pdfUrl} filename={pdfFilename} printOption={printOption} />
           </div>
         </div>
