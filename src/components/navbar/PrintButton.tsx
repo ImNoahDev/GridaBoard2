@@ -3,6 +3,7 @@ import '../../styles/main.css';
 import GridaToolTip from '../../styles/GridaToolTip';
 import { g_debugFilename, g_debugURL } from '../../nl-lib/ncodepod';
 import { PrintNcodedPdfButton } from '../../nl-lib/ncodepod';
+import { turnOnGlobalKeyShortCut } from '../../GridaBoard/GlobalFunctions';
 
 type Props = {
   targetId: string,
@@ -27,7 +28,9 @@ const PrintButton = (props: Props) => {
   return (
     // <div className="navbar-menu d-flex justify-content-center align-items-center neo_shadow">
     <React.Fragment>
-      <PrintNcodedPdfButton id="btn_print_pdf" type="button" className="btn btn-neo "
+      <PrintNcodedPdfButton
+        id="btn_print_pdf" type="button" className="btn btn-neo "
+        handkeTurnOnAppShortCutKey={turnOnGlobalKeyShortCut}
         style={{ margin: 0, padding: 0, }}
         url={props.url} filename={props.filename}>
 

@@ -1,5 +1,5 @@
 import NcodeRasterizer, { drawArrow, IAreasDesc, ICellsOnSheetDesc, getNcodeAtCanvasPixel, getNcodeRectAtCanvasPixel, } from "../NcodeSurface/NcodeRasterizer";
-import { IPrintingEvent, IPrintOption, IProgressCallbackFunction } from "../../common/structures";
+import { ICanvasShapeDesc, IPrintingEvent, IPrintingSheetDesc, IPrintOption, IProgressCallbackFunction } from "../../common/structures";
 import { getCellMatrixShape } from '../NcodeSurface/SurfaceSplitter';
 import { getSurfaceSize_css } from '../../common/noteserver/SurfaceInfo';
 import { MappingItem } from '../../common/mapper/MappingItem';
@@ -11,29 +11,6 @@ import { NeoPdfDocument, IPdfPageCanvasDesc } from "../../common/neopdf";
 import { CoordinateTanslater } from "../../common/mapper";
 
 let debug = 0;
-
-export type ICanvasShapeDesc = {
-  /** before applying rotation */
-  originalPixel: ISize,
-
-  /** after applying rotation */
-  pixel: ISize,
-  rotation: number,
-
-  /** based on originalPixel */
-  css: ICssSize,
-
-  /** based on originalPixel */
-  isLandscape: boolean,
-}
-
-export type IOnPagePreparedFunction = (event: IPrintingEvent) => void;
-
-export type IPrintingSheetDesc = {
-  canvas: HTMLCanvasElement;
-  canvasDesc: ICanvasShapeDesc,
-  mappingItems: CoordinateTanslater[];
-}
 
 /**
  * Class

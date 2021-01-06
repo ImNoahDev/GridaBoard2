@@ -3,11 +3,10 @@ import { saveAs } from "file-saver";
 import printJS from "print-js";
 
 
-import { IPrintingEvent, IPrintingReport, IPrintOption, IUnitString, IProgressCallbackFunction } from "../../common/structures";
+import { IPrintingEvent, IPrintingReport, IPrintOption, IUnitString, IProgressCallbackFunction, IPrintingSheetDesc } from "../../common/structures";
 
 import { MappingStorage, PdfDocMapper } from "../../common/mapper";
 import { SheetRendererManager } from "../NcodeSurface/SheetRendererManager";
-import { IPrintingSheetDesc } from "../NcodeSurface/SheetRenderer";
 import { cloneObj, convertUnit, getExtensionName, getFilenameOnly, getNcodedPdfName, makeNPageIdStr, makePdfId, sleep, uuidv4 } from "../../common/util";
 import { _app_name, _lib_name, _version } from "../Version";
 import { g_defaultPrintOption } from "../DefaultOption";

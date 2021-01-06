@@ -20,6 +20,9 @@ interface Props extends ButtonProps {
 
   /** 기본값의 IPrintOption을 받아서, dialog를 처리하고 다시 돌려주는 콜백 함수 */
   printOptionCallback?: (arg: IPrintOption) => IPrintOption,
+
+  /** 앱이 key event를 바인딩하고 있으면, form에 입력이 안된다, 그래서, dialog가 control 할 수 있도록 전달 */
+  handkeTurnOnAppShortCutKey: (on: boolean) => void,
 }
 
 /**
@@ -208,7 +211,11 @@ export default function PrintNcodedPdfButton(props: Props) {
       </button>
 
       { optionDialogOn
-        ? <OptionDialog open={optionDialogOn} cancelCallback={onCancel} okCallback={onOK} printOption={_workingOption} />
+        ? <OptionDialog open={optionDialogOn}
+          cancelCallback={onCancel} okCallback={onOK}
+          handkeTurnOnAppShortCutKey={props.handkeTurnOnAppShortCutKey}
+          printOption={_workingOption}
+        />
         : <ProgressDialog progress={progressPercent} title={dialogTitle} open={progressOn} cancelCallback={cancelPrint} />
       }
       <CancelWaitingDialog open={waitingOn} />

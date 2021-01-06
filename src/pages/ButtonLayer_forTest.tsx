@@ -18,8 +18,9 @@ import { NoteServerClient } from "../nl-lib/common/noteserver";
 import { CalibrationButton, OptionDialogButton, PrintNcodedPdfButton } from "../nl-lib/ncodepod";
 
 
-import { savePDF } from "../nl-lib/ncodepod/Save/SavePdf";
 import ClearLocalMappingButton from "../nl-lib/common/mapper/test/ClearLocalMappingButton";
+import { turnOnGlobalKeyShortCut } from "../GridaBoard/GlobalFunctions";
+import { savePDF } from "../GridaBoard/Save/SavePdf";
 
 
 const buttonDivStyle = {
@@ -126,6 +127,7 @@ const ButtonLayer_forTest = () => {
     docJson.pages.push(obj);
   }
 
+
   return (
     <div id={"button_div"} style={buttonDivStyle}>
 
@@ -193,8 +195,8 @@ const ButtonLayer_forTest = () => {
       <div style={{ fontSize: "20px", fontWeight: "bold" }}>
         <PrintNcodedPdfButton variant="contained" color="primary"
           id={printBtnId}
-          url={pdfUrl}
-          filename={pdfFilename}
+          url={pdfUrl} filename={pdfFilename}
+          handkeTurnOnAppShortCutKey={turnOnGlobalKeyShortCut}
           // printOption={printOption}
           reportProgress={undefined} printOptionCallback={undefined}>
           <Box fontSize={14} fontWeight="fontWeightBold" >Ncode PDF</Box>
@@ -219,7 +221,11 @@ const ButtonLayer_forTest = () => {
 
       {/* [신] 인쇄 옵션 다이얼로그 테스트 버튼 */}
       <div style={{ fontSize: "14px" }}>
-        <OptionDialogButton printOption={printOption} >
+        <OptionDialogButton
+          printOption={printOption}
+          handkeTurnOnAppShortCutKey={turnOnGlobalKeyShortCut}
+        >
+
           <Box fontSize={14} fontWeight="fontWeightBold" >신규, 인쇄옵션</Box>
         </OptionDialogButton>
       </div>

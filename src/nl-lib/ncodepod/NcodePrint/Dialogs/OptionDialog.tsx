@@ -8,8 +8,6 @@ import OptionLevel_2 from "./OptionDialogComponents/OptionLevel_2";
 import { convertStringToArray } from './OptionDialogComponents/PageRangeField';
 import { MappingStorage } from '../../../common/mapper';
 
-
-import { turnOnGlobalKeyShortCut } from '../../../../GridaBoard/GlobalFunctions';
 import { cloneObj } from '../../../common/util';
 import { IPrintOption } from '../../../common/structures';
 import { MediaSize } from '../../../common/constants';
@@ -32,8 +30,10 @@ export const DEFAULT_PRINTOPTION_LEVEL = 1;    // 2: debug mode
 interface IDialogProps extends DialogProps {
   open: boolean,
   printOption: IPrintOption,
-  cancelCallback: (printOption) => void,
-  okCallback: (printOption) => void,
+  cancelCallback: (printOption: IPrintOption) => void,
+  okCallback: (printOption: IPrintOption) => void,
+
+  handkeTurnOnAppShortCutKey: (on: boolean) => void,
 }
 
 let _printOption: IPrintOption;
@@ -65,10 +65,10 @@ export function OptionDialog(props: IDialogProps) {
 
   useEffect(() => {
     if (props.open) {
-      turnOnGlobalKeyShortCut(false);
+      props.handkeTurnOnAppShortCutKey(false);
     }
     else {
-      turnOnGlobalKeyShortCut(true);
+      props.handkeTurnOnAppShortCutKey(true);
     }
 
   }, [props.open]);
@@ -329,6 +329,7 @@ export function OptionDialog(props: IDialogProps) {
 
 interface Props extends ButtonProps {
   printOption: IPrintOption,
+  handkeTurnOnAppShortCutKey: (on: boolean) => void,
 }
 
 
@@ -337,20 +338,20 @@ export default function OptionDialogButton(props: Props) {
   const [show, setShow] = useState(false);
 
   const openDialog = () => {
-    turnOnGlobalKeyShortCut(false);
+    props.handkeTurnOnAppShortCutKey(false);
 
     setShow(true);
   }
 
   const onCancel = () => {
     setShow(false);
-    turnOnGlobalKeyShortCut(true);
+    props.handkeTurnOnAppShortCutKey(true);
     console.log("onCancel");
   }
 
   const onOK = () => {
     setShow(false);
-    turnOnGlobalKeyShortCut(true);
+    props.handkeTurnOnAppShortCutKey(true);
     console.log("onOK");
   }
 
@@ -360,7 +361,11 @@ export default function OptionDialogButton(props: Props) {
         {props.children}
       </button>
 
-      { show ? <OptionDialog open={show} cancelCallback={onCancel} okCallback={onOK} printOption={_printOption} /> : ""}
+      { show ? <OptionDialog
+        open={show}
+        cancelCallback={onCancel} okCallback={onOK}
+        handkeTurnOnAppShortCutKey={props.handkeTurnOnAppShortCutKey}
+        printOption={_printOption} /> : ""}
     </React.Fragment>
   );
 }

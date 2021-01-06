@@ -1,4 +1,4 @@
-import { ColorConvertMethod } from "../../common/enums";
+import { ColorConvertMethod } from "../enums";
 
 /**
  * Class

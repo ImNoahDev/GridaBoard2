@@ -1,14 +1,12 @@
 /// <reference types="pdfjs-dist"/>
 /// <reference types="@types/pdfjs-dist" />
 
-import { ColorConvertMethod } from "../enums";
-
-import { IPrintingSheetDesc } from "../../ncodepod/NcodeSurface/SheetRenderer";
 import { IPaperSize } from "./SurfaceDataTypes";
 import { IPageSOBP } from "./Structures";
-import { NcodePdfScaleMode } from "../enums";
+import { ColorConvertMethod, NcodePdfScaleMode } from "../enums";
 import { IPdfToNcodeMapItem } from "./MapDataTypes";
-import CoordinateTanslater from "../mapper/CoordinateTanslater";
+import { CoordinateTanslater } from "../mapper";
+import { IPrintingSheetDesc } from "./RasterizerDataType";
 
 
 export interface IPrintingEvent {

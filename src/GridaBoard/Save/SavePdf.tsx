@@ -1,11 +1,11 @@
 import { saveAs } from "file-saver";
 import { degrees, PDFDocument, rgb, StandardFonts } from 'pdf-lib';
-import { InkStorage } from "../../common/penstorage";
-import { drawPath } from "../../common/util";
-
-
-import GridaDoc from "../../../GridaBoard/GridaDoc";
 import Swal from 'sweetalert2'
+
+import GridaDoc from "../GridaDoc";
+
+import { InkStorage } from "../../nl-lib/common/penstorage";
+import { drawPath } from "../../nl-lib/common/util";
 
 
 const PDF_TO_SCREEN_SCALE = 6.72; // (56/600)*72

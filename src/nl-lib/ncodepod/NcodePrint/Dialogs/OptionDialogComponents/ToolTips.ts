@@ -1,4 +1,4 @@
-import { ITipType } from "../../../../common/ui/NeoToolTip";
+import { ITipType } from "../../../../common/ui";
 
 export const printOptionTip: { [key: string]: ITipType } = {
   'hasToPutNcode': {

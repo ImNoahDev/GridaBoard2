@@ -5,3 +5,4 @@ export * from "./Structures";
 export * from "./SurfaceDataTypes";
 export * from "./PrintDataTypes";
 export * from "./MapDataTypes";
+export * from "./RasterizerDataType";

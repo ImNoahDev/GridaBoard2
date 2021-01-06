@@ -1,12 +1,14 @@
 import * as PdfJs from "pdfjs-dist";
-import CanvasColorConverter from "../../ncodepod/NcodeSurface/CanvasColorConverter";
 
 import { ColorConvertMethod } from "../enums";
 import { PDF_DEFAULT_DPI } from "../constants";
 import { IPdfPageDesc, IRectDpi, IPageMapItem } from "../structures";
 import { uuidv4, clearCanvas, drawCrossMark } from "../util";
-import { NeoPdfDocument } from "./NeoPdfDocument";
 import CoordinateTanslater from "../mapper/CoordinateTanslater";
+
+import CanvasColorConverter from "./CanvasColorConverter";
+import { NeoPdfDocument } from "./NeoPdfDocument";
+
 
 export type PDF_VIEWPORT_DESC = PdfJs.ViewportParameters & PdfJs.PDFPageViewport;
 
