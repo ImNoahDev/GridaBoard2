@@ -57,8 +57,6 @@ export interface MixedViewProps {
 
   filename: string,
 
-  fingerprint: string,
-
   pdfPageNo: number;
 
 
@@ -111,12 +109,10 @@ interface State {
 
   pdfSize: { width: number, height: number };
 
-
   pdf: NeoPdfDocument,
 
   pdfUrl: string,
   pdfFilename: string,
-  pdfFingerprint: string,
 
   status: string,
 
@@ -124,18 +120,18 @@ interface State {
   pdfPageNo: number;
   viewPos: { offsetX: number, offsetY: number, zoom: number },
 
-  renderCount: number;
+  // renderCount: number;
 
-  showFileOpenDlg: boolean;
-  showCancelConfirmDlg: boolean;
+  // showFileOpenDlg: boolean;
+  // showCancelConfirmDlg: boolean;
 
   /** property에 width가 주어졌으면 auto resize width를 방지하기 위해, 플래그를 세운다 */
   widthGiven: boolean;
-  width: number;
   /** property에 height 주어졌으면 auto resize height를 방지하기 위해, 플래그를 세운다 */
   heightGiven: boolean;
-  height: number;
 
+  width: number;
+  height: number;
 
   pageInfoGiven: boolean;
   pageInfo: IPageSOBP;
@@ -152,7 +148,6 @@ const defaultMixedPageViewProps: MixedViewProps = {
   pdf: undefined,
   pdfUrl: undefined,
   filename: undefined,
-  fingerprint: undefined,
 
   pdfPageNo: undefined,
   pens: [],
@@ -187,7 +182,6 @@ class MixedPageView_module extends React.Component<MixedViewProps, State>  {
 
   _fileToLoad: IAutoLoadDocDesc;
 
-  filename: string;
 
   constructor(props: MixedViewProps) {
     super(props);
@@ -197,12 +191,12 @@ class MixedPageView_module extends React.Component<MixedViewProps, State>  {
       pdfSize: { width: 595, height: 841 },    // 초기 값이 없으면 zoom 비율을 따질 때 에러를 낸다. 당연히
       status: "N/A",
       viewPos: { offsetX: 0, offsetY: 0, zoom: 1 },
-      renderCount: 0,
+      // renderCount: 0,
 
       noMorePdfSignal: props.noMorePdfSignal,
 
-      showFileOpenDlg: false,
-      showCancelConfirmDlg: false,
+      // showFileOpenDlg: false,
+      // showCancelConfirmDlg: false,
 
       widthGiven: props.width !== undefined ? true : false,
       heightGiven: props.height !== undefined ? true : false,
@@ -212,8 +206,7 @@ class MixedPageView_module extends React.Component<MixedViewProps, State>  {
       pdf: props.pdf,
       pdfUrl: props.pdfUrl,
       pdfFilename: props.filename,
-      pdfFingerprint: props.fingerprint,
-      pdfPageNo: props.pdfPageNo !== undefined ? props.pdfPageNo : 1,
+      pdfPageNo: props.pdfPageNo !== undefined ? props.pdfPageNo : -1,
 
       pageInfo: props.pageInfo,
       width: props.width !== undefined ? props.width : 0,
@@ -232,16 +225,49 @@ class MixedPageView_module extends React.Component<MixedViewProps, State>  {
       this.setState({ pdf: this.props.pdf });
     }
 
-    this.setState({ pageInfo: { ...this.props.pageInfo } });
+    const { pdf, pdfPageNo, filename: pdfFilename, pdfUrl, noMorePdfSignal } = this.props;
+
+    this.setState({
+      pageInfo: { ...this.props.pageInfo },
+      pdf,
+      pdfPageNo,
+      pdfFilename,
+      pdfUrl,
+      noMorePdfSignal
+    });
   }
 
 
   shouldComponentUpdate(nextProps: MixedViewProps, nextState: State) {
     // diffPropsAndState("GRIDA DOC", this.props, nextProps, this.state, nextState);
-    let ret_val = true;
+    let ret_val = false;
+
     if (!isSamePage(nextProps.pageInfo, this.props.pageInfo)) {
       this.setState({ pageInfo: { ...nextProps.pageInfo } });
-      ret_val = ret_val || true;
+    }
+
+    if (nextProps.pdf !== this.state.pdf) {
+      this.setState({ pdf: nextProps.pdf });
+    }
+
+    let filenameChanged = false;
+    if (nextProps.filename !== this.state.pdfFilename) {
+      this.setState({ pdfFilename: nextProps.filename });
+      filenameChanged = true;
+    }
+
+    if (nextProps.pdfUrl !== this.state.pdfUrl) {
+      this.setState({ pdfUrl: nextProps.pdfUrl });
+
+      if (filenameChanged)
+        this.loadDocument(nextProps.pdfUrl, nextProps.filename);
+      else
+        this.loadDocument(nextProps.pdfUrl, this.state.pdfFilename);
+    }
+
+    if (nextProps.pdfPageNo !== this.state.pdfPageNo) {
+      this.setState({ pdfPageNo: nextProps.pdfPageNo });
+      ret_val = true;
     }
 
 
@@ -250,62 +276,51 @@ class MixedPageView_module extends React.Component<MixedViewProps, State>  {
       ret_val = true;
     }
 
+    if (nextProps.noMorePdfSignal !== this.state.noMorePdfSignal) {
+      this.setState({ noMorePdfSignal: nextProps.noMorePdfSignal });
+      ret_val = true;
+    }
 
-    if (nextProps.pdf !== this.props.pdf) {
-      if (nextProps.pdf) {
-        this.filename = nextProps.pdf.filename;
-        this.setState({ pdf: nextProps.pdf, status: "loaded" });
-        return true;
+    const viewPosChanged = (nextState.viewPos.offsetX !== this.state.viewPos.offsetX
+      || nextState.viewPos.offsetY !== this.state.viewPos.offsetY
+      || nextState.viewPos.zoom !== this.state.viewPos.zoom
+    );
+    const pageInfoChanged = !isSamePage(nextState.pageInfo, this.state.pageInfo);
+    const pdfChanged = nextState.pdf !== this.state.pdf;
+    const pdfPageNoChanged = nextState.pdfPageNo !== this.state.pdfPageNo;
+
+    const pdfFilenameChanged = nextState.pdfFilename !== this.state.pdfFilename;
+    const pdfUrlChanged = nextState.pdfUrl !== this.state.pdfUrl;
+    const pdfSizeChanged = nextState.pdfSize !== this.state.pdfSize;
+
+    const pensChanged = nextProps.pens !== this.props.pens;
+    const viewFitChanged = nextProps.viewFit !== this.props.viewFit;
+    const fixedChanged = nextProps.fixed !== this.props.fixed;
+    const rotationchanged = nextProps.rotation !== this.props.rotation;
+    const noInfo = nextProps.noInfo !== this.props.noInfo;
+    const loaded = this.state.status === "loaded" && nextState.status !== this.state.status;
+
+
+    if ((pdfChanged || pdfPageNoChanged) && nextState.pdfPageNo > 0) {
+      if (pdfChanged && pdfPageNoChanged) {
+        let size;
+        if (nextState.pdf) size = nextState.pdf.getPageSize(nextState.pdfPageNo);
+        else size = getNPaperSize_pu(this.state.pageInfo);
+
+        this.setState({ pdfSize: { ...size }, status: "loaded" });
+      }
+      else if (pdfChanged) {
+        const size = nextProps.pdf.getPageSize(this.state.pdfPageNo);
+        this.setState({ pdfSize: { ...size }, status: "loaded" });
       }
       else {
-        this.setState({ pdf: nextProps.pdf, status: "loaded" });
-        return true;
+        const size = this.state.pdf.getPageSize(nextState.pdfPageNo);
+        this.setState({ pdfSize: { ...size }, status: "loaded" });
       }
     }
 
-    if (nextProps.fingerprint !== this.props.fingerprint) {
-      this.loadDocument(nextProps.pdfUrl, nextProps.filename);
-      this.setState({ pdfFingerprint: nextProps.fingerprint, pdf: nextProps.pdf });
-
-      return false;
-    }
-
-    if (nextProps.pdfUrl !== this.props.pdfUrl) {
-      this.setState({ pdfUrl: nextProps.pdfUrl });
-      return false;
-    }
-
-    if (nextProps.filename !== this.props.filename) {
-      this.setState({ pdfFilename: nextProps.filename });
-      return false;
-    }
-
-
-    if (nextState.status === "loading") {
-      return false;
-    }
-
-    if (nextProps.filename !== this.props.filename) {
-      this.filename = nextProps.filename;
-      return false;
-    }
-
-    if (nextProps.pdfPageNo !== this.props.pdfPageNo) {
-      console.log(`${this.props.parentName} pdfPage ${this.props.pdfPageNo} => ${nextProps.pdfPageNo}`)
-      this.setState({ pdfPageNo: nextProps.pdfPageNo });
-      ret_val = ret_val || true;
-    }
-
-
-    if (!isSamePage(nextState.pageInfo, this.state.pageInfo)) {
-      ret_val = ret_val || true;
-    }
-
-    if (nextProps.noMorePdfSignal !== this.props.noMorePdfSignal) {
-      this.setState({ noMorePdfSignal: nextProps.noMorePdfSignal });
-    }
-
-    // console.log("update requested");
+    ret_val = ret_val || viewPosChanged || pageInfoChanged || pdfChanged || pdfPageNoChanged || pdfSizeChanged
+      || pensChanged || viewFitChanged || fixedChanged || rotationchanged || noInfo || loaded;
     return ret_val;
   }
 
@@ -401,7 +416,7 @@ class MixedPageView_module extends React.Component<MixedViewProps, State>  {
         default: {
           const size = getNPaperSize_pu(pageInfo);
           this.setState({ pdfSize: size });
-          this.setState({ pdf: undefined, pdfFilename: undefined, pdfFingerprint: undefined });
+          this.setState({ pdf: undefined, pdfFilename: undefined });
           break;
         }
       }
@@ -414,16 +429,16 @@ class MixedPageView_module extends React.Component<MixedViewProps, State>  {
 
   onCanvasPositionChanged = (arg: { offsetX: number, offsetY: number, zoom: number }) => {
     // console.log(arg);
-    this.setState({ viewPos: arg });
+    this.setState({ viewPos: { ...arg } });
 
-    const r = this.state.renderCount;
-    this.setState({ renderCount: r + 1 });
+    // const r = this.state.renderCount;
+    // this.setState({ renderCount: r + 1 });
   }
 
 
-  handleClose = () => {
-    this.setState({ showFileOpenDlg: false });
-  };
+  // handleClose = () => {
+  //   this.setState({ showFileOpenDlg: false });
+  // };
 
 
   render() {
@@ -453,6 +468,8 @@ class MixedPageView_module extends React.Component<MixedViewProps, State>  {
       textShadow: "-1px 0 2px #fff, 0 1px 2px #fff, 1px 0 2px #fff, 0 -1px 2px #fff",
     }
 
+    console.log(`MixedPageView: pdfSize=${this.state.pdfSize.width}, ${this.state.pdfSize.height}`);
+
     return (
       <div id={`${this.props.parentName}-mixed_view`} style={{
         position: "absolute",
@@ -466,22 +483,13 @@ class MixedPageView_module extends React.Component<MixedViewProps, State>  {
       }}>
         <div id={`${this.props.parentName}-pdf_layer`} style={pdfContainer} >
           <div id={`${this.props.parentName}-pdf_view`} style={pdfCanvas}>
-
             <NeoPdfPageView {...this.props}
-              // pdf={this.props.pdf}
               pdf={this.state.pdf}
               pdfPageNo={this.state.pdfPageNo}
               key={`document-page-${this.props.pdfPageNo}`}
               position={this.state.viewPos}
             />
           </div>
-          {/* <NeoPdfViewer
-            url={this.state.pdfUrl}
-            filename={this.state.pdfFilename}
-            pageNo={this.state.pageNo}
-            position={this.state.viewPos}
-            parentName={this.props.parentName}
-          /> */}
         </div>
         <div id={`${this.props.parentName}-ink_layer`} style={inkContainer} >
           <PenBasedRenderer {...this.props}

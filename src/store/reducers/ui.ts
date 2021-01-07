@@ -137,7 +137,7 @@ export const updateSelectedPage = async (option: { pageNo: number }) => {
 }
 
 //]
-const defaultDrawerWidth = 170;
+const defaultDrawerWidth = 180;
 // export let g_drawerWidth = defaultDrawerWidth;
 const initialState = {
   waiting: {

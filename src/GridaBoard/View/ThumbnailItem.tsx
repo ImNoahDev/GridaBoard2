@@ -34,9 +34,9 @@ const ThumbnailItem = (props: Props) => {
 
   const page = doc.getPageAt(pn)
   if (activePageNo >= 0) {
-    pdfUrl = doc.getPdfUrlAt(pn);
-    pdfFilename = doc.getPdfFilenameAt(pn);
-    pdfFingerprint = doc.getPdfFingerprintAt(pn);
+    // pdfUrl = doc.getPdfUrlAt(pn);
+    // pdfFilename = doc.getPdfFilenameAt(pn);
+    // pdfFingerprint = doc.getPdfFingerprintAt(pn);
     pdfPageNo = doc.getPdfPageNoAt(pn);
     pdf = page.pdf;
   }
@@ -67,14 +67,13 @@ const ThumbnailItem = (props: Props) => {
   const playState = PLAYSTATE.live;
   const viewFit = ZoomFitEnum.FULL;
 
-  console.log(`thumbnail - ${pn}: pageNo: ${pdfPageNo} pdf: ${pdf} pdfUrl: ${pdfUrl} fingerprint: ${pdfFingerprint} `)
+  // console.log(`thumbnail - ${pn}: pageNo: ${pdfPageNo} pdf: ${pdf} pdfUrl: ${pdfUrl} fingerprint: ${pdfFingerprint} `)
   return (
     <Paper key={props.key} onMouseDown={e => handleMouseDown(e)} elevation={3} style={{ height: height, margin: 10, overflow: "hidden", position: "relative" }} >
       <div id={`thumbnail - ${pn} `} style={{ position: "absolute", margin: 0, padding: 0, right: 0, left: 0, top: 0, height: "100%", backgroundColor: bgColor }}>
         <MixedPageView
           pdf={pdf}
           pdfUrl={pdfUrl} filename={pdfFilename}
-          fingerprint={pdfFingerprint}
           pdfPageNo={pdfPageNo}
           playState={playState} pens={[]}
           rotation={0}

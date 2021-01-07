@@ -7,6 +7,7 @@ import { IPenEvent } from "../common/structures";
 import ThemeManager from "../../styles/ThemeManager"
 import { IPenToViewerEvent } from "../common/neopen/INeoSmartpen";
 import NeoSmartpen from "./NeoSmartpen";
+import { IPenManager } from "../common/neopen/IPenManager";
 
 
 let _penmanager_instance = null;
@@ -20,12 +21,12 @@ export const DEFAULT_PEN_RENDERER_TYPE: IBrushType = IBrushType.PEN;
 
 
 
-export default class PenManager {
+export default class PenManager  {
   /** @type {Array.<{id:string, mac:string, pen:NeoSmartpen, connected:boolean}>} */
   penArray = new Array(0);
 
   /** @type {Array.<StorageRenderer>} */
-  render = [];
+  // render = [];
 
   pen_colors: string[] = [
     "rgb(169, 169, 169)", // 0 DARK_GARY #FFAAAAAA #A9A9A9
@@ -224,18 +225,18 @@ export default class PenManager {
     }
   }
 
-  registerRenderContainer = (renderContainer) => {
-    this.render.push(renderContainer);
-  }
+  // registerRenderContainer = (renderContainer) => {
+  //   this.render.push(renderContainer);
+  // }
 
-  unregisterRenderContainer = (renderContainer) => {
-    const sameRender = (item) => item === renderContainer;
-    const index = this.penArray.findIndex(sameRender);
+  // unregisterRenderContainer = (renderContainer) => {
+  //   const sameRender = (item) => item === renderContainer;
+  //   const index = this.penArray.findIndex(sameRender);
 
-    if (index > -1) {
-      this.render.splice(index, 1);
-    }
-  }
+  //   if (index > -1) {
+  //     this.render.splice(index, 1);
+  //   }
+  // }
 
 
   /**

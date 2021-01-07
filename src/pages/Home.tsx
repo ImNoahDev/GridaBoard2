@@ -51,54 +51,55 @@ const Home = () => {
   // const [pdfFilename, setPdfFilename] = useState(undefined as string);
   const [noMoreAutoLoad, setNoMoreAutoLoad] = useState(false);
 
-  const [activePageNo, setActivePageNo] = useState(-1);
+  const [activePageNo, setLocalActivePageNo] = useState(-1);
 
   // const [pdfUrl, setPdfUrl] = useState(undefined as string);
   // const [pdfFilename, setPdfFilename] = useState(undefined as string);
   // const [pdfFingerprint, setPdfFingerprint] = useState(undefined as string);
-  // const [pdfPageNo, setPdfPageNo] = useState(1);
   // const [pdf, setPdf] = useState(undefined as NeoPdfDocument);
   // const [pageInfos, setPageInfos] = useState([nullNcode()]);
   // const [basePageInfo, setBasePageInfo] = useState(nullNcode());
 
   let pdfUrl = undefined as string;
-  const setPdfUrl = (value: string) => pdfUrl = value;
-
   let pdfFilename = undefined as string;
-  const setPdfFilename = (value: string) => pdfFilename = value;
-
   let pdfFingerprint = undefined as string;
-  const setPdfFingerprint = (value: string) => pdfFingerprint = value;
-
   let pdfPageNo = 1;
-  const setPdfPageNo = (value: number) => pdfPageNo = value;
-
   let pdf = undefined as NeoPdfDocument;
-  const setPdf = (value: NeoPdfDocument) => pdf = value;
-
   let pageInfos = [nullNcode()];
-  const setPageInfos = (value: IPageSOBP[]) => pageInfos = value;
 
   let basePageInfo = nullNcode();
-  const setBasePageInfo = (value: IPageSOBP) => basePageInfo = value;
-
   const activePageNo_store = useSelector((state: RootState) => state.activePage.activePageNo);
   if (activePageNo_store !== activePageNo) {
-    setActivePageNo(activePageNo_store);
+    setLocalActivePageNo(activePageNo_store);
   }
+
+  // if (activePageNo >= 0) {
+  //   const doc = GridaDoc.getInstance();
+  //   const page = doc.getPageAt(activePageNo)
+  //   setPdf(page.pdf);
+
+  //   // setPdfUrl(doc.getPdfUrlAt(activePageNo));
+  //   // setPdfFilename(doc.getPdfFilenameAt(activePageNo));
+  //   setPdfFingerprint(doc.getPdfFingerprintAt(activePageNo));
+  //   setPdfPageNo(doc.getPdfPageNoAt(activePageNo));
+  //   setPageInfos(doc.getPageInfosAt(activePageNo));
+  //   setBasePageInfo(doc.getBasePageInfoAt(activePageNo));
+  // }
 
   if (activePageNo >= 0) {
     const doc = GridaDoc.getInstance();
-    const page = doc.getPageAt(activePageNo_store)
-    setPdf(page.pdf);
+    const page = doc.getPageAt(activePageNo)
+    pdf = page.pdf;
 
-    // setPdfUrl(doc.getPdfUrlAt(activePageNo_store));
-    // setPdfFilename(doc.getPdfFilenameAt(activePageNo_store));
-    setPdfFingerprint(doc.getPdfFingerprintAt(activePageNo_store));
-    setPdfPageNo(doc.getPdfPageNoAt(activePageNo_store));
-    setPageInfos(doc.getPageInfosAt(activePageNo_store));
-    setBasePageInfo(doc.getBasePageInfoAt(activePageNo_store));
+    // setPdfUrl(doc.getPdfUrlAt(activePageNo));
+    // setPdfFilename(doc.getPdfFilenameAt(activePageNo));
+    pdfFingerprint = doc.getPdfFingerprintAt(activePageNo);
+    pdfPageNo = doc.getPdfPageNoAt(activePageNo);
+    pageInfos = doc.getPageInfosAt(activePageNo);
+    basePageInfo = doc.getBasePageInfoAt(activePageNo);
+
   }
+
 
 
   // alert(`set pdf=${pdf}`);
@@ -273,8 +274,7 @@ const Home = () => {
 
 
 
-
-  console.log(`Home: active Page=${activePageNo}, pdfUrl=${pdfUrl}`);
+  console.log(`State PageView 1: docPageNo:${activePageNo}, pdfUrl=${pdfUrl}, fingerPrint: ${pdfFingerprint}, pdfPageNo:${pdfPageNo}`);
   return (
     <div className={classes.root}>
       {/* <CssBaseline /> */}
@@ -296,7 +296,7 @@ const Home = () => {
         <div style={{ position: "absolute", top: 0, left: 0, bottom: 0, right: drawerOpen ? drawerWidth : 0 }}>
           <MixedPageView
             pdf={pdf}
-            pdfUrl={pdfUrl} filename={pdfFilename} fingerprint={pdfFingerprint}
+            pdfUrl={pdfUrl} filename={pdfFilename} 
             pdfPageNo={pdfPageNo}
             pageInfo={pageInfos[0]}
             basePageInfo={basePageInfo}

@@ -69,7 +69,7 @@ export function isSamePage(pg1: IPageSOBP, pg2: IPageSOBP): boolean {
 }
 
 export function isPageInRange(pg: IPageSOBP, arrStart: IPageSOBP, numPages: number): boolean {
-  if (!pg ) return false;
+  if (!pg) return false;
   // alert( `${arrStart}`)
   if (pg.book !== arrStart.book || pg.owner !== arrStart.owner || pg.section !== arrStart.section) {
     return false;
@@ -152,7 +152,7 @@ export function getNextNcodePage(curr: IPageSOBP, delta = 1) {
  * @param prevState
  * @param nextState
  */
-export function diffPropsAndState(prefix, prevProps, nextProps, prevState = undefined, nextState = undefined) {
+export function dumpDiffPropsAndState(prefix, prevProps, nextProps, prevState = undefined, nextState = undefined) {
 
   let isChanged = false;
   for (const [key, value] of Object.entries(nextProps)) {
@@ -170,7 +170,7 @@ export function diffPropsAndState(prefix, prevProps, nextProps, prevState = unde
       }
     }
   }
-
+  console.log("");
   if (!isChanged) {
     console.log(`[${prefix}] =============== Properties & State NOT CHANGED`);
     return
@@ -193,6 +193,7 @@ export function diffPropsAndState(prefix, prevProps, nextProps, prevState = unde
       }
     }
   }
+
   // console.log(`[${prefix}]==============================================================================================================================`);
 }
 

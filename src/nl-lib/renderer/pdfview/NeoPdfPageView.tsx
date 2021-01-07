@@ -6,7 +6,7 @@ import { MAX_RENDERER_PIXELS } from "../RendererConstants";
 import { MixedViewProps } from '../MixedPageView';
 import { NeoPdfDocument, NeoPdfPage } from '../../common/neopdf';
 import { PDF_DEFAULT_DPI } from '../../common/constants';
-import { makeNPageIdStr } from "../../common/util";
+import { dumpDiffPropsAndState, makeNPageIdStr } from "../../common/util";
 
 interface PageProps extends MixedViewProps {
   // pdf: PdfJs.PDFDocumentProxy,
@@ -20,12 +20,9 @@ interface PageState {
   status: string,
   // page: PdfJs.PDFPageProxy | null,
   page: NeoPdfPage,
-  width: number,
-  height: number,
   imgSrc: string,
-  renderCount: number;
 
-  scratchCanvasStatus: "N/A" | "rendering" | "rendered",
+  renderCount: number;
 }
 
 type IBackRenderedStatus = {
@@ -34,16 +31,12 @@ type IBackRenderedStatus = {
   px_height: number
 }
 
-export default class NeoPdfPageView extends Component<PageProps> {
+export default class NeoPdfPageView extends Component<PageProps, PageState> {
   state: PageState = {
     status: 'N/A',
     page: null,
-    width: 0,
-    height: 0,
     imgSrc: URL.createObjectURL(new Blob()),
     renderCount: 0,
-
-    scratchCanvasStatus: "N/A",
   };
 
   canvas: HTMLCanvasElement | null = null;
@@ -64,6 +57,51 @@ export default class NeoPdfPageView extends Component<PageProps> {
 
   zoomQueue: number[] = [];
 
+
+  componentDidMount() {
+    // const { pdf, pdfPageNo } = this.props;
+    // this._update(pdf, pdfPageNo);
+  }
+
+  shouldComponentUpdate(nextProps: PageProps, nextState: PageState) {
+    // dumpDiffPropsAndState(`State PageView ${this.props.pdfPageNo}:`, this.props, nextProps, this.state, nextState);
+
+    const zoomChanged = nextProps.position.zoom !== this.props.position.zoom;
+    if (zoomChanged && nextState.page) {
+      this.renderPage(nextState.page, nextProps.position.zoom);
+    }
+
+
+    // pad를 load해야 한다면
+    let pdfChanged = ((!nextProps.pdf) && (!!this.props.pdf)) || ((!!nextProps.pdf) && (!this.props.pdf)) || (nextProps.pdf !== this.props.pdf);
+    if ((!!nextProps.pdf) && (!!this.props.pdf)) pdfChanged = pdfChanged || (nextProps.pdf.fingerprint !== this.props.pdf.fingerprint);
+    const pdfPageNoChanged = nextProps.pdfPageNo !== this.props.pdfPageNo;
+
+    if (pdfChanged || pdfPageNoChanged) {
+      if (pdfChanged)
+        console.log(`*State PageView ${nextProps.pdfPageNo}:* PDF CHANGED ${this.pfp(this.props.pdf)} => ${this.pfp(nextProps.pdf)}`);
+
+      if (pdfPageNoChanged)
+        console.log(`*State PageView ${nextProps.pdfPageNo}:* PAGE CHANGED ${this.props.pdfPageNo} => ${nextProps.pdfPageNo}`);
+
+      this._update(nextProps.pdf, nextProps.pdfPageNo);
+    }
+
+    // rendering을 새로 해야 한다면
+    const loaded = nextState.page !== this.state.page;
+    if (loaded) {
+      this.renderPage(nextState.page, nextProps.position.zoom);
+    }
+
+    // rendering되었 
+    // const rendered =
+    //   (this.state.status !== nextState.status) && (nextState.status === "N/A" || nextState.status === "rendered" || nextState.status === "lazy-rendered");
+
+
+    const rendered = this.state.renderCount !== nextState.renderCount;
+    console.log(`*State PageView ${nextProps.pdfPageNo}:* rendered=${rendered}  this.state.status=${this.state.status} => ${nextState.status}`);
+    return true;
+  }
 
 
   scaleCanvas(canvas: HTMLCanvasElement, width: number, height: number, zoom: number) {
@@ -123,55 +161,30 @@ export default class NeoPdfPageView extends Component<PageProps> {
   }
 
 
-  componentDidMount() {
-    const { pdf } = this.props;
-    this._update(pdf);
+  pfp = (pdf: NeoPdfDocument) => {
+    if (pdf) return pdf.fingerprint;
+    return "N/A";
   }
-
-  shouldComponentUpdate(nextProps: PageProps, nextState: PageState) {
-    const zoomChanged = nextProps.position.zoom !== this.props.position.zoom;
-
-    if (zoomChanged) {
-      if (this.state.page) {
-        this.renderPage(this.state.page, nextProps.position.zoom);
-      }
-      return false;
-    }
-
-    const pdfChanged = this.props.pdf !== nextProps.pdf;
-    if (pdfChanged) {
-      this._update(nextProps.pdf);
-      return true;
-    }
-
-    if (this.props.pdfPageNo !== nextProps.pdfPageNo) {
-      console.log(`PDF PAGE: page, page Number = ${nextProps.pdfPageNo}`)
-      this._update(nextProps.pdf, nextProps.pdfPageNo);
-      return true;
-    }
-
-
-    return true;
-  }
-
 
   setCanvasRef = (canvas: HTMLCanvasElement) => {
+    // console.log(`*State PageView ${this.props.pdfPageNo}:* setCanvasRef`);
     this.canvas = canvas;
   };
 
-  _update = (pdf: NeoPdfDocument, pageNo: number = undefined) => {
-    // console.log(`PDF PAGE: _update, page Number = ${pageNo}`)
+  _update = (pdf: NeoPdfDocument, pageNo: number) => {
 
     if (pdf) {
+      // console.log(`*State PageView ${this.props.pdfPageNo}:* PDF LOADER ${this.pfp(pdf)} / ${pageNo}`);
       this.backPlane.inited = false;
       this._loadPage(pdf, pageNo);
-    } else {
       this.setState({ status: 'loading' });
+    } else {
+      // console.log(`*State PageView ${this.props.pdfPageNo}:* BLANK ${this.pfp(pdf)} / ${pageNo}`);
+      this.setState({ status: 'N/A' });
     }
   };
 
-  _loadPage = (pdf: NeoPdfDocument, pageNo: number = this.props.pdfPageNo) => {
-    // console.log(`PDF PAGE: _loadPage, page Number = ${pageNo}`)
+  _loadPage = async (pdf: NeoPdfDocument, pageNo: number) => {
     if (this.state.status === 'rendering') return;
 
     if (pageNo > pdf.numPages) {
@@ -179,26 +192,22 @@ export default class NeoPdfPageView extends Component<PageProps> {
       pageNo = pdf.numPages;
     }
 
-    pdf.getPageAsync(pageNo).then(
-      (page) => {
-        // console.log(`BACKPLANE _loadPage renderPage start`)
-        this.renderPage(page, this.props.position.zoom,);
-        // console.log(`BACKPLANE _loadPage renderPage end`)
-      }
-    );
+    const page = await pdf.getPageAsync(pageNo);
+    this.backPlane.inited = false;
+    this.setState({ status: 'loaded', page });
   }
 
   renderToCanvasSafe = async (page: NeoPdfPage, dpi: number, zoom: number) => {
-    if (this.backPlane.nowRendering && this.renderTask) {
-      const renderTask = this.renderTask;
-      renderTask.cancel();
-      await renderTask;
-    }
+    // if (this.backPlane.nowRendering && this.renderTask) {
+    //   const renderTask = this.renderTask;
+    //   renderTask.cancel();
+    //   await renderTask;
+    // }
     return this.renderToCanvas(page, dpi, zoom);
   }
 
   renderToCanvas = async (page: NeoPdfPage, dpi: number, zoom: number): Promise<IBackRenderedStatus> => {
-    const canvas = document.createElement("canvas");
+
 
     const PRINT_RESOLUTION = dpi * zoom;
     const PRINT_UNITS = PRINT_RESOLUTION / PDF_DEFAULT_DPI;
@@ -207,17 +216,12 @@ export default class NeoPdfPageView extends Component<PageProps> {
     const px_width = Math.floor(viewport.width * PRINT_UNITS);
     const px_height = Math.floor(viewport.height * PRINT_UNITS);
 
+    const retVal = { result: false, px_width, px_height };
+    if (!px_width || !px_height) return retVal;
+
+    const canvas = document.createElement("canvas");
     canvas.width = px_width;
     canvas.height = px_height;
-
-    const destCanvas = this.backPlane.canvas;
-    destCanvas.width = canvas.width;
-    destCanvas.height = canvas.height;
-
-    const destCtx = destCanvas.getContext("2d");
-    destCtx.fillStyle = "#fff";
-    destCtx.fillRect(0, 0, destCanvas.width, destCanvas.height);
-
 
     const ctx = canvas.getContext('2d');
     try {
@@ -230,32 +234,33 @@ export default class NeoPdfPageView extends Component<PageProps> {
       };
       this.renderTask = page.render(renderContext);
       await this.renderTask.promise;
+
+      // this.backPlane.canvas = document.createElement("canvas");
+      const destCanvas = this.backPlane.canvas;
+      destCanvas.width = canvas.width;
+      destCanvas.height = canvas.height;
+
+      const destCtx = destCanvas.getContext("2d");
+      destCtx.fillStyle = "#fff";
+      destCtx.fillRect(0, 0, destCanvas.width, destCanvas.height);
+      destCtx.drawImage(canvas, 0, 0);
+
+      this.backPlane.prevZoom = zoom;
+      retVal.result = true;
+      this.backPlane.size = { ...retVal };
+
+      this.renderTask = null;
     }
     catch (e) {
+      this.renderTask = null;
       this.backPlane.nowRendering = false;
-      this.renderTask = null;
-      return {
-        result: false,
-        px_width: 0,
-        px_height: 0,
-      }
     }
 
-    if (canvas.width > 0 && canvas.height > 0) {
-      destCtx.drawImage(canvas, 0, 0);
-      this.renderTask = null;
-
-      return {
-        result: true,
-        px_width,
-        px_height,
-      }
-    }
-
-    return { ...this.backPlane.size };
+    return retVal;
   }
 
   renderPage = async (page: NeoPdfPage, zoom: number) => {
+    this.setState({ page, status: 'rendering check canvas' });
     if (!this.canvas) return;
     // console.log(`BACKPLANE RENDERPAGE start`)
 
@@ -274,7 +279,7 @@ export default class NeoPdfPageView extends Component<PageProps> {
       const result = await this.renderToCanvasSafe(page, dpi, zoom);
       // console.log(`BACKPLANE DRAWING end`)
       this.backPlane.inited = result.result;
-      this.backPlane.size = { ...result };
+      // this.backPlane.size = { ...result };
       noLazyUpdate = true;
     }
 
@@ -286,8 +291,7 @@ export default class NeoPdfPageView extends Component<PageProps> {
     const dh = ret.px.height / ret.ratio;
 
     ctx.drawImage(this.backPlane.canvas, 0, 0, px_width, px_height, 0, 0, dw, dh);
-
-    // console.log(`BACKPLANE RENDERPAGE realtime end`)
+    this.setState({ renderCount: this.state.renderCount + 1, status: 'rendered' });
 
     // Lazy update
     if (!noLazyUpdate && this.backPlane.prevZoom !== zoom) {
@@ -304,26 +308,19 @@ export default class NeoPdfPageView extends Component<PageProps> {
 
       const result = await this.renderToCanvasSafe(page, dpi, zoom);
       if (result.result) {
-        this.backPlane.prevZoom = zoom;
-        this.backPlane.size = { ...result };
+        // this.backPlane.size = { ...result };
 
         const { px_width, px_height } = result;
         ctx.drawImage(this.backPlane.canvas, 0, 0, px_width, px_height, 0, 0, dw, dh);
-
-        const renderCount = this.state.renderCount + 1;
         this.zoomQueue = [];
+        this.setState({ renderCount: this.state.renderCount + 1, status: 'lazy-rendered' });
       }
       else {
         // console.log(`lazy back plane CANCELLED`)
       }
       // console.log(`BACKPLANE RENDERPAGE lazy end`);
-
     }
-
     // console.log(`BACKPLANE RENDERPAGE end`)
-
-    this.setState({ status: 'rendered' });
-
   }
 
 
@@ -338,7 +335,6 @@ export default class NeoPdfPageView extends Component<PageProps> {
       // background: "#fff"
     }
 
-    const isPdfPage = this.props.pdf && this.props.pdfPageNo && this.props.pdfPageNo > 0;
     const shadowStyle: CSSProperties = {
       color: "#088",
       textShadow: "-1px 0 2px #fff, 0 1px 2px #fff, 1px 0 2px #fff, 0 -1px 2px #fff",
@@ -347,10 +343,7 @@ export default class NeoPdfPageView extends Component<PageProps> {
 
       <div style={pageCanvas} id={`pdf-page ${status}`} >
         <div style={pageCanvas}  >
-          {isPdfPage
-            ? <canvas ref={this.setCanvasRef} />
-            : <></>
-          }
+          <canvas ref={this.setCanvasRef} />
         </div>
 
         < div id={`${this.props.parentName}-info`} style={pageCanvas} >

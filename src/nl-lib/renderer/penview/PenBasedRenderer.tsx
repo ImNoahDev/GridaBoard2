@@ -350,9 +350,11 @@ class PenBasedRenderer extends React.Component<Props, State> {
     // this.renderer.stopInterval();
     // window.removeEventListener("resize", this.resizeListener);
 
-    // penManager에 연결 해제
-    const penManager = PenManager.getInstance();
-    penManager.unregisterRenderContainer(this);
+    // // penManager에 연결 해제
+    // const penManager = PenManager.getInstance();
+    // if (penManager) {
+    //   penManager.unregisterRenderContainer(this);
+    // }
   }
 
 
