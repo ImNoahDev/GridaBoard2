@@ -16,6 +16,8 @@ interface Props {
   key: string | number,
 
   active: boolean,
+
+  noInfo?: boolean,
 }
 
 const ThumbnailItem = (props: Props) => {
@@ -42,7 +44,7 @@ const ThumbnailItem = (props: Props) => {
   }
 
   const handleMouseDown = e => {
-    const idToken = e.target.id.split('- ');
+    const idToken = e.target.id.split('-');
     const pageNo = Number(idToken[2]);
     setActivePageNo(pageNo);
   };
@@ -69,8 +71,8 @@ const ThumbnailItem = (props: Props) => {
 
   // console.log(`thumbnail - ${pn}: pageNo: ${pdfPageNo} pdf: ${pdf} pdfUrl: ${pdfUrl} fingerprint: ${pdfFingerprint} `)
   return (
-    <Paper key={props.key} onMouseDown={e => handleMouseDown(e)} elevation={3} style={{ height: height, margin: 10, overflow: "hidden", position: "relative" }} >
-      <div id={`thumbnail - ${pn} `} style={{ position: "absolute", margin: 0, padding: 0, right: 0, left: 0, top: 0, height: "100%", backgroundColor: bgColor }}>
+    <Paper id={`thumbnail-item-${pn}`} key={props.key} onMouseDown={e => handleMouseDown(e)} elevation={3} style={{ height: height, margin: 10, overflow: "hidden", position: "relative" }} >
+      <div id={`thumbnail-div-${pn}`} style={{ position: "absolute", margin: 0, padding: 0, right: 0, left: 0, top: 0, height: "100%", backgroundColor: bgColor }}>
         <MixedPageView
           pdf={pdf}
           pdfUrl={pdfUrl} filename={pdfFilename}
@@ -93,8 +95,11 @@ const ThumbnailItem = (props: Props) => {
         />
       </div>
 
-      <div id={`thumbnail - pageInfo - ${pn} `} style={{ position: "absolute", margin: 0, padding: 0, right: 0, left: 0, top: 0, height: "100%", zIndex: 999 }}>
-        <Typography style={{ color: "#f00" }}> {makeNPageIdStr(page.pageInfos[0])}</Typography>
+      <div id={`thumbnail-pageInfo-${pn}`} style={{ position: "absolute", margin: 0, padding: 0, right: 0, left: 0, top: 0, height: "100%", zIndex: 999 }}>
+        {!props.noInfo
+          ? <Typography style={{ color: "#f00" }}> {makeNPageIdStr(page.pageInfos[0])}</Typography>
+          : <Typography style={{ color: "rgba(255,255,255,0)" }}> {makeNPageIdStr(page.pageInfos[0])}</Typography>
+        }
       </div>
 
       {/*

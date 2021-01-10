@@ -129,6 +129,8 @@ interface Props extends BoxProps {
   onDrawerResize: (size: number) => void,
   handleDrawerClose: () => void,
   open: boolean,
+
+  noInfo?:boolean,
 }
 
 export default function PersistentDrawerRight(props: Props) {
@@ -183,7 +185,7 @@ export default function PersistentDrawerRight(props: Props) {
           </IconButton>
         </div>
         <div onMouseDown={e => handleMouseDown(e)} className={classes.dragger} />
-        < DrawerPages />
+        < DrawerPages noInfo={props.noInfo} />
         {/* <Divider />
         <List>
           < DrawerPages />

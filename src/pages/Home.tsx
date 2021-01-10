@@ -270,6 +270,7 @@ const Home = () => {
             parentName={"grida-main-home"}
             viewFit={ZoomFitEnum.FULL}
             fitMargin={100}
+            noInfo
           />
         </div>
       </main >
@@ -288,7 +289,10 @@ const Home = () => {
         >
           <MenuIcon />
         </IconButton>
-        <PersistentDrawerRight open={drawerOpen} handleDrawerClose={handleDrawerClose} onDrawerResize={onDrawerResize} />
+        <PersistentDrawerRight
+          open={drawerOpen} handleDrawerClose={handleDrawerClose} onDrawerResize={onDrawerResize}
+          noInfo
+        />
       </div>
 
       <AutoLoadConfirmDialog open={loadConfirmDlgOn} step={loadConfirmDlgStep}

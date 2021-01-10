@@ -580,8 +580,9 @@ class MixedPageView_module extends React.Component<MixedViewProps, State>  {
           />
         </div>
 
-        < div id={`${this.props.parentName}-info`} style={inkContainer} >
-          <br /> &nbsp; &nbsp;
+        {!this.props.noInfo ?
+          < div id={`${this.props.parentName}-info`} style={inkContainer} >
+            <br /> &nbsp; &nbsp;
           <br /> &nbsp; &nbsp;
           <br /> &nbsp; &nbsp;
           <br /> &nbsp; &nbsp;
@@ -594,39 +595,38 @@ class MixedPageView_module extends React.Component<MixedViewProps, State>  {
 
           <Typography style={{ ...shadowStyle, fontSize: 16 }}>MixedViewer </Typography>
 
-          <br /> &nbsp; &nbsp;
+            <br /> &nbsp; &nbsp;
           <Typography style={{ ...shadowStyle, fontSize: 10 }}>Page(state):</Typography>
-          <Typography style={{ ...shadowStyle, fontSize: 14, }}> {makeNPageIdStr(this.state.pageInfo)} </Typography>
+            <Typography style={{ ...shadowStyle, fontSize: 14, }}> {makeNPageIdStr(this.state.pageInfo)} </Typography>
 
-          <br /> &nbsp; &nbsp;
+            <br /> &nbsp; &nbsp;
             <Typography style={{ ...shadowStyle, fontSize: 10 }}>Page(property):</Typography>
-          <Typography style={{ ...shadowStyle, fontSize: 14, }}> {makeNPageIdStr(this.props.pageInfo)} </Typography>
+            <Typography style={{ ...shadowStyle, fontSize: 14, }}> {makeNPageIdStr(this.props.pageInfo)} </Typography>
 
 
-          <br /> &nbsp; &nbsp;
+            <br /> &nbsp; &nbsp;
             <Typography style={{ ...shadowStyle, fontSize: 10 }}>Base(property):</Typography>
-          <Typography style={{ ...shadowStyle, fontSize: 14, fontStyle: "initial" }}> {makeNPageIdStr(this.props.basePageInfo)} </Typography>
+            <Typography style={{ ...shadowStyle, fontSize: 14, fontStyle: "initial" }}> {makeNPageIdStr(this.props.basePageInfo)} </Typography>
 
-          <br /> &nbsp; &nbsp;
+            <br /> &nbsp; &nbsp;
             <Typography style={{ ...shadowStyle, fontSize: 10 }}>pdfPageNo:</Typography>
-          <Typography style={{ ...shadowStyle, fontSize: 14, fontStyle: "initial" }}> {this.props.pdfPageNo} </Typography>
+            <Typography style={{ ...shadowStyle, fontSize: 14, fontStyle: "initial" }}> {this.props.pdfPageNo} </Typography>
 
-          <br /> &nbsp; &nbsp;
+            <br /> &nbsp; &nbsp;
             <Typography style={{ ...shadowStyle, fontSize: 10 }}>props.pdf:</Typography>
-          <Typography style={{ ...shadowStyle, fontSize: 14, fontStyle: "initial" }}> {this.props.pdf ? this.props.pdf.filename : ""} </Typography>
+            <Typography style={{ ...shadowStyle, fontSize: 14, fontStyle: "initial" }}> {this.props.pdf ? this.props.pdf.filename : ""} </Typography>
 
 
-          <br /> &nbsp; &nbsp;
+            <br /> &nbsp; &nbsp;
             <Typography style={{ ...shadowStyle, fontSize: 10 }}>state.pdfPageNo:</Typography>
-          <Typography style={{ ...shadowStyle, fontSize: 14, fontStyle: "initial" }}> {this.state.pdfPageNo} </Typography>
+            <Typography style={{ ...shadowStyle, fontSize: 14, fontStyle: "initial" }}> {this.state.pdfPageNo} </Typography>
 
-          <br /> &nbsp; &nbsp;
+            <br /> &nbsp; &nbsp;
             <Typography style={{ ...shadowStyle, fontSize: 10 }}>state.pdf:</Typography>
-          <Typography style={{ ...shadowStyle, fontSize: 14, fontStyle: "initial" }}> {this.state.pdf ? this.state.pdf.filename : ""} </Typography>
+            <Typography style={{ ...shadowStyle, fontSize: 14, fontStyle: "initial" }}> {this.state.pdf ? this.state.pdf.filename : ""} </Typography>
 
-        </div >
-
-
+          </div >
+          : "" }
       </div>
     );
   }

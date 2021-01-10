@@ -392,8 +392,9 @@ export default class NeoPdfPageView extends Component<PageProps, PageState> {
           <canvas ref={this.setCanvasRef} />
         </div>
 
-        < div id={`${this.props.parentName}-info`} style={pageCanvas} >
-          <br /> &nbsp; &nbsp;
+        {!this.props.noInfo ?
+          < div id={`${this.props.parentName}-info`} style={pageCanvas} >
+            <br /> &nbsp; &nbsp;
           <br /> &nbsp; &nbsp;
           <br /> &nbsp; &nbsp;
           <br /> &nbsp; &nbsp;
@@ -405,26 +406,26 @@ export default class NeoPdfPageView extends Component<PageProps, PageState> {
           <br /> &nbsp; &nbsp;
           <Typography style={{ ...shadowStyle, fontSize: 16 }}>PDFViewer </Typography>
 
-          <br /> &nbsp; &nbsp;
+            <br /> &nbsp; &nbsp;
           <Typography style={{ ...shadowStyle, fontSize: 10 }}>Page(state):</Typography>
-          <Typography style={{ ...shadowStyle, fontSize: 14, }}> {makeNPageIdStr(this.props.pageInfo)} </Typography>
+            <Typography style={{ ...shadowStyle, fontSize: 14, }}> {makeNPageIdStr(this.props.pageInfo)} </Typography>
 
-          <br /> &nbsp; &nbsp;
+            <br /> &nbsp; &nbsp;
             <Typography style={{ ...shadowStyle, fontSize: 10 }}>Page(property):</Typography>
-          <Typography style={{ ...shadowStyle, fontSize: 14, }}> {makeNPageIdStr(this.props.pageInfo)} </Typography>
+            <Typography style={{ ...shadowStyle, fontSize: 14, }}> {makeNPageIdStr(this.props.pageInfo)} </Typography>
 
 
-          <br /> &nbsp; &nbsp;
+            <br /> &nbsp; &nbsp;
             <Typography style={{ ...shadowStyle, fontSize: 10 }}>Base(property):</Typography>
-          <Typography style={{ ...shadowStyle, fontSize: 14, fontStyle: "initial" }}> {makeNPageIdStr(this.props.basePageInfo)} </Typography>
+            <Typography style={{ ...shadowStyle, fontSize: 14, fontStyle: "initial" }}> {makeNPageIdStr(this.props.basePageInfo)} </Typography>
 
-          <br /> &nbsp; &nbsp;
+            <br /> &nbsp; &nbsp;
             <Typography style={{ ...shadowStyle, fontSize: 10 }}>pdfPageNo:</Typography>
-          <Typography style={{ ...shadowStyle, fontSize: 14, fontStyle: "initial" }}> {this.props.pdfPageNo} </Typography>
+            <Typography style={{ ...shadowStyle, fontSize: 14, fontStyle: "initial" }}> {this.props.pdfPageNo} </Typography>
 
-        </div >
+          </div >
 
-
+          : ""}
       </div>
     );
   }

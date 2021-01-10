@@ -16,6 +16,7 @@ interface Props {
   onSelectPage?: (pageNo: number) => void,
 
   activePageNo?: number,
+  noInfo?: boolean,
 }
 
 interface State {
@@ -50,7 +51,7 @@ class DrawerPages extends React.Component<Props, State>  {
         </Box>
         {pages.map((page, i) =>
           // ""
-          <ThumbnailItem key={i} pageNo={i} active={this.props.activePageNo == i} />
+          <ThumbnailItem key={i} noInfo={this.props.noInfo} pageNo={i} active={this.props.activePageNo == i} />
         )}
       </div>
     );
