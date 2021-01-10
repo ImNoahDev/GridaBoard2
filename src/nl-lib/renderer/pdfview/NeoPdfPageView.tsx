@@ -68,6 +68,8 @@ export default class NeoPdfPageView extends Component<PageProps, PageState> {
 
   zoomQueue: number[] = [];
 
+  lastPdfFingerprint = "";
+  pdfPageNo = -1;
 
   componentDidMount() {
     const { pdf, pdfPageNo } = this.props;
@@ -98,16 +100,16 @@ export default class NeoPdfPageView extends Component<PageProps, PageState> {
 
     // const loaded = nextState.page !== this.state.page;
     // const loaded = nextState.status === "loaded" && (this.state.status !== nextState.status);
-    const loaded =  nextState.page !== this.state.page;
+    const loaded = nextState.page !== this.state.page;
     if (loaded) {
-      console.log(`*State PageView ${nextProps.pdfPageNo}:* LOADED ${this.state.page?._pageNo} => ${nextState.page?._pageNo}, zoom ${nextState.zoom}, status=${this.state.status} => ${nextState.status}`);
+      console.log(`*State PageView ${nextProps.pdfPageNo}:* LOADED ${this.state.page?.pageNo} => ${nextState.page?.pageNo}, zoom ${nextState.zoom}, status=${this.state.status} => ${nextState.status}`);
       if (nextState.page && nextState.zoom > 0)
-        this.renderPage(nextState.page, nextState.zoom, nextState.pdfPageNo);
+        this.renderPage(nextState.page, nextState.zoom, nextState.pdfPageNo, nextProps.pdf.fingerprint);
     }
 
     if (this.state.zoom !== nextState.zoom && nextState.page) {
       console.log(`*State PageView ${nextProps.pdfPageNo}:* ZOOM CHANGED ${nextState.zoom}, status=${this.state.status} => ${nextState.status}`);
-      this.renderPage(nextState.page, nextState.zoom, nextState.pdfPageNo);
+      this.renderPage(nextState.page, nextState.zoom, nextState.pdfPageNo, nextProps.pdf.fingerprint);
     }
 
 
@@ -189,30 +191,42 @@ export default class NeoPdfPageView extends Component<PageProps, PageState> {
 
     if (!pdf) {
       this.setState({ status: 'N/A' });
+      this.lastPdfFingerprint = "";
       return;
     }
+
 
     if (pageNo > pdf.numPages) {
       console.error("PDF 페이지의 범위를 넘은 페이지를 렌더링하려고 합니다.");
       pageNo = pdf.numPages;
     }
 
+    if (this.pdfPageNo === pageNo && this.lastPdfFingerprint === pdf.fingerprint) {
+      console.log(`PDFVIEWER, LOAD  same doc/page`)
+      return;
+    }
+
+    console.log(`PDFVIEWER, LOAD  fingerprint= ${pdf.fingerprint}`)
+
     this.setState({ status: 'loading' });
     const page = await pdf.getPageAsync(pageNo);
+    this.lastPdfFingerprint = pdf.fingerprint;
+    this.pdfPageNo = pageNo;
+
     this.backPlane.inited = false;
     this.setState({ page, status: 'loaded' });
   }
 
-  renderToCanvasSafe = async (page: NeoPdfPage, dpi: number, zoom: number) => {
+  renderToCanvasSafe = async (page: NeoPdfPage, dpi: number, zoom: number, fingerprint: string) => {
     // if (this.backPlane.nowRendering && this.renderTask) {
     //   const renderTask = this.renderTask;
     //   renderTask.cancel();
     //   await renderTask;
     // }
-    return this.renderToCanvas(page, dpi, zoom);
+    return this.renderToCanvas(page, dpi, zoom, fingerprint);
   }
 
-  renderToCanvas = async (page: NeoPdfPage, dpi: number, zoom: number): Promise<IBackRenderedStatus> => {
+  renderToCanvas = async (page: NeoPdfPage, dpi: number, zoom: number, fingerprint: string): Promise<IBackRenderedStatus> => {
 
 
     const PRINT_RESOLUTION = dpi * zoom;
@@ -222,7 +236,13 @@ export default class NeoPdfPageView extends Component<PageProps, PageState> {
     const px_width = Math.floor(viewport.width * PRINT_UNITS);
     const px_height = Math.floor(viewport.height * PRINT_UNITS);
 
-    const retVal = { result: false, px_width, px_height };
+    const retVal = {
+      result: false,
+      px_width, px_height,
+      fingerprint,
+      pdfPageNo: page.pageNo,
+    };
+
     if (!px_width || !px_height) return retVal;
 
     const canvas = document.createElement("canvas");
@@ -240,6 +260,10 @@ export default class NeoPdfPageView extends Component<PageProps, PageState> {
       };
       this.renderTask = page.render(renderContext);
       await this.renderTask.promise;
+      if (this.lastPdfFingerprint !== fingerprint) {
+        retVal.result = false;
+        return retVal;
+      }
 
       // this.backPlane.canvas = document.createElement("canvas");
       const destCanvas = this.backPlane.canvas;
@@ -265,13 +289,23 @@ export default class NeoPdfPageView extends Component<PageProps, PageState> {
     return retVal;
   }
 
-  renderPage = async (page: NeoPdfPage, zoom: number, pdfPageNo: number) => {
+  renderPage = async (page: NeoPdfPage, zoom: number, pdfPageNo: number, fingerprint: string) => {
     this.setState({ page, status: 'rendering check canvas' });
     if (!this.canvas) {
       console.log(`*State PageView ${pdfPageNo}:* CANVAS NOT FOUND`);
-
       return;
     }
+
+    if (fingerprint !== this.lastPdfFingerprint) {
+      console.log(`*State PageView ${pdfPageNo}:* NOT SAME DOCUMENT`);
+      return;
+    }
+
+    if (pdfPageNo !== this.pdfPageNo) {
+      console.log(`*State PageView ${pdfPageNo}:* NOT SAME PAGE`);
+      return;
+    }
+
     // console.log(`BACKPLANE RENDERPAGE start`)
 
     this.setState({ page, status: 'rendering' });
@@ -285,11 +319,12 @@ export default class NeoPdfPageView extends Component<PageProps, PageState> {
 
     let noLazyUpdate = false;
     if (!this.backPlane.inited) {
-      // console.log(`BACKPLANE DRAWING start`)
-      const result = await this.renderToCanvasSafe(page, dpi, zoom);
-      // console.log(`BACKPLANE DRAWING end`)
+      console.log(`PDFVIEWER, BACKPLANE DRAWING start fingerprint=${fingerprint} / ${this.lastPdfFingerprint}`)
+
+      const result = await this.renderToCanvasSafe(page, dpi, zoom, fingerprint);
+      console.log(`PDFVIEWER, BACKPLANE DRAWING end fingerprint=${fingerprint} / ${this.lastPdfFingerprint}`)
       this.backPlane.inited = result.result;
-      // this.backPlane.size = { ...result };
+      this.backPlane.size = { ...result };
       noLazyUpdate = true;
     }
 
@@ -312,14 +347,15 @@ export default class NeoPdfPageView extends Component<PageProps, PageState> {
 
       const lastZoom = this.zoomQueue[this.zoomQueue.length - 1];
       this.zoomQueue = this.zoomQueue.splice(1);
-      if ((lastZoom && zoom !== lastZoom) || zoom == this.backPlane.prevZoom) {
+      if ((lastZoom && zoom !== lastZoom) || zoom == this.backPlane.prevZoom || fingerprint !== this.lastPdfFingerprint || pdfPageNo !== this.pdfPageNo) {
         return;
       }
 
-      const result = await this.renderToCanvasSafe(page, dpi, zoom);
+      const result = await this.renderToCanvasSafe(page, dpi, zoom, fingerprint);
       if (result.result) {
         // this.backPlane.size = { ...result };
 
+        console.log(`PDFVIEWER, LAZY fingerprint=${fingerprint} / ${this.lastPdfFingerprint}`)
         const { px_width, px_height } = result;
         ctx.drawImage(this.backPlane.canvas, 0, 0, px_width, px_height, 0, 0, dw, dh);
         this.zoomQueue = [];

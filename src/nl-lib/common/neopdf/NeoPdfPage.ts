@@ -53,7 +53,9 @@ export class NeoPdfPage {
 
   private _defaultViewport: PDF_VIEWPORT_DESC;
 
-  _pageNo: number;
+  private _pageNo: number;
+
+  get pageNo() { return this._pageNo };
 
   _doc: NeoPdfDocument;
 

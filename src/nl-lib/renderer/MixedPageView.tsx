@@ -188,7 +188,7 @@ class MixedPageView_module extends React.Component<MixedViewProps, State>  {
 
     this.state = {
       // 아래는 순수히 이 component의 state
-      pdfSize: { width: 595, height: 841 },    // 초기 값이 없으면 zoom 비율을 따질 때 에러를 낸다. 당연히
+      pdfSize: { width: 1, height: 1 },    // 초기 값이 없으면 zoom 비율을 따질 때 에러를 낸다. 당연히
       status: "N/A",
       viewPos: { offsetX: 0, offsetY: 0, zoom: 1 },
       // renderCount: 0,
@@ -227,13 +227,25 @@ class MixedPageView_module extends React.Component<MixedViewProps, State>  {
 
     const { pdf, pdfPageNo, filename: pdfFilename, pdfUrl, noMorePdfSignal } = this.props;
 
+    if (isSamePage(this.props.pageInfo, { section: 256, owner: 27, book: 1068, page: 12 })) {
+      console.log("target");
+    }
+
+
+    let size;
+    if (this.props.pdf) size = this.props.pdf.getPageSize(this.props.pdfPageNo);
+    else size = getNPaperSize_pu(this.props.pageInfo);
+
+    // this.setState({ pdfSize: { ...size }, status: "loaded" });
+
     this.setState({
       pageInfo: { ...this.props.pageInfo },
       pdf,
       pdfPageNo,
       pdfFilename,
       pdfUrl,
-      noMorePdfSignal
+      noMorePdfSignal,
+      pdfSize: { ...size },
     });
   }
 
@@ -241,6 +253,11 @@ class MixedPageView_module extends React.Component<MixedViewProps, State>  {
   shouldComponentUpdate(nextProps: MixedViewProps, nextState: State) {
     // diffPropsAndState("GRIDA DOC", this.props, nextProps, this.state, nextState);
     let ret_val = false;
+
+    if (isSamePage(nextProps.pageInfo, { section: 256, owner: 27, book: 1068, page: 12 })) {
+      console.log("target");
+    }
+
 
     if (!isSamePage(nextProps.pageInfo, this.props.pageInfo)) {
       this.handlePageInfoChanged(nextProps.pageInfo);
@@ -303,27 +320,32 @@ class MixedPageView_module extends React.Component<MixedViewProps, State>  {
 
 
     if ((pdfChanged || pdfPageNoChanged) && nextState.pdfPageNo > 0) {
-      if (pdfChanged && pdfPageNoChanged) {
-        let size;
-        if (nextState.pdf) size = nextState.pdf.getPageSize(nextState.pdfPageNo);
-        else size = getNPaperSize_pu(this.state.pageInfo);
+      let size;
+      if (nextState.pdf) size = nextState.pdf.getPageSize(nextState.pdfPageNo);
+      else size = getNPaperSize_pu(this.state.pageInfo);
+      this.setState({ pdfSize: { ...size }, status: "loaded" });
 
-        this.setState({ pdfSize: { ...size }, status: "loaded" });
-      }
-      else if (pdfChanged) {
-        let size;
-        if (nextState.pdf) size = nextState.pdf.getPageSize(nextState.pdfPageNo);
-        else size = getNPaperSize_pu(this.state.pageInfo);
+      // if (pdfChanged && pdfPageNoChanged) {
+      //   let size;
+      //   if (nextState.pdf) size = nextState.pdf.getPageSize(nextState.pdfPageNo);
+      //   else size = getNPaperSize_pu(this.state.pageInfo);
 
-        this.setState({ pdfSize: { ...size }, status: "loaded" });
-      }
-      else {
-        let size;
-        if (nextState.pdf) size = nextState.pdf.getPageSize(nextState.pdfPageNo);
-        else size = getNPaperSize_pu(this.state.pageInfo);
+      //   this.setState({ pdfSize: { ...size }, status: "loaded" });
+      // }
+      // else if (pdfChanged) {
+      //   let size;
+      //   if (nextState.pdf) size = nextState.pdf.getPageSize(nextState.pdfPageNo);
+      //   else size = getNPaperSize_pu(this.state.pageInfo);
 
-        this.setState({ pdfSize: { ...size }, status: "loaded" });
-      }
+      //   this.setState({ pdfSize: { ...size }, status: "loaded" });
+      // }
+      // else {
+      //   let size;
+      //   if (nextState.pdf) size = nextState.pdf.getPageSize(nextState.pdfPageNo);
+      //   else size = getNPaperSize_pu(this.state.pageInfo);
+
+      //   this.setState({ pdfSize: { ...size }, status: "loaded" });
+      // }
     }
 
     ret_val = ret_val || viewPosChanged || pageInfoChanged || pdfChanged || pdfPageNoChanged || pdfSizeChanged
