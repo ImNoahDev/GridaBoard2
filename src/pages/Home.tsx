@@ -86,7 +86,6 @@ const Home = () => {
     pdfPageNo = doc.getPdfPageNoAt(activePageNo);
     pageInfos = doc.getPageInfosAt(activePageNo);
     basePageInfo = doc.getBasePageInfoAt(activePageNo);
-
   }
 
   const drawerWidth = useSelector((state: RootState) => state.ui.drawer.width);

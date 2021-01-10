@@ -243,6 +243,7 @@ class MixedPageView_module extends React.Component<MixedViewProps, State>  {
     let ret_val = false;
 
     if (!isSamePage(nextProps.pageInfo, this.props.pageInfo)) {
+      this.handlePageInfoChanged(nextProps.pageInfo);
       this.setState({ pageInfo: { ...nextProps.pageInfo } });
     }
 
@@ -363,6 +364,56 @@ class MixedPageView_module extends React.Component<MixedViewProps, State>  {
     // hideUIProgressBackdrop();
     // console.log("pdf loaded");
   }
+
+
+  handlePageInfoChanged = async (pageInfo: IPageSOBP) => {
+    const msi = MappingStorage.getInstance();
+    const found = msi.getNPageTransform(pageInfo);
+
+    const { fingerprint, pdfPageNo } = found.pdf;
+
+    switch (found.type) {
+      case "pod": {
+        if (this.state.pdf && (pdfPageNo !== this.state.pdfPageNo)) {
+          const size = this.state.pdf.getPageSize(pdfPageNo);
+          this.setState({ pdfSize: size });
+        }
+
+        // 파일 로드를 요청
+        if (this.props.autoPageChange && !this.props.noMorePdfSignal
+          && (!this.state.pdf || this.state.pdf.fingerprint !== found.pdf.fingerprint)) {
+          if (this.props.handleFileLoadNeeded) {
+            // 요청 당한 쪽(parent component)에서는 반드시 다음과 같은 처리를 해야 한다
+            //    1) props의 url을 본 파일의 url로 바꿔준다
+            //    2) 받은 pageInfo를 props의 pageInfo로 다시 넣어 준다
+            //    3) 아니면, no more change pdf prop을 true로 한다
+            this.props.handleFileLoadNeeded({
+              url: found.pdf.url,
+              filename: found.pdf.filename,
+              fingerprint: found.pdf.fingerprint,
+              pageInfo,
+            });
+          }
+        }
+        else {
+          // handleFileLoadNeeded이 없다는 것은 load하지 않겠다는 소리
+          this.setState({ noMorePdfSignal: true });
+        }
+
+        break;
+      }
+      case "default":
+      case "note":
+      default: {
+        const size = getNPaperSize_pu(pageInfo);
+        this.setState({ pdfSize: size });
+        this.setState({ pdf: undefined, pdfFilename: undefined });
+        break;
+      }
+    }
+  }
+
+
 
 
   onViewResized = ({ width, height }) => {

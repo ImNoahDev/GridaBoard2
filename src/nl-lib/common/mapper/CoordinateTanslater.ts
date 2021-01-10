@@ -160,37 +160,39 @@ export default class CoordinateTanslater {
    *
    */
   private calcReverse = () => {
-    // 아래는 임의의 숫자
-    const srcPts: TransformPoints = {
-      type: "homography",
-      unit: "pu",
-      pts: [
-        { x: 0, y: 0 },
-        { x: 100, y: 0 },
-        { x: 100, y: 100 },
-        { x: 0, y: 100 },
-      ]
-    };
+    // // 아래는 임의의 숫자
+    // const srcPts: TransformPoints = {
+    //   type: "homography",
+    //   unit: "pu",
+    //   pts: [
+    //     { x: 0, y: 0 },
+    //     { x: 100, y: 0 },
+    //     { x: 100, y: 100 },
+    //     { x: 0, y: 100 },
+    //   ]
+    // };
 
-    // 정방향 파라메터로 역방향의 대상이 되는 점을 연산
-    const dstPts: TransformPoints = {
-      type: "homography",
-      unit: "nu",
-      pts: new Array(4),
-    };
+    // // 정방향 파라메터로 역방향의 대상이 되는 점을 연산
+    // const dstPts: TransformPoints = {
+    //   type: "homography",
+    //   unit: "nu",
+    //   pts: new Array(4),
+    // };
 
-    for (let i = 0; i < 4; i++) {
-      const dstPt = this.NUtoPU(srcPts[i]);
-      dstPts[i] = dstPt;
-    }
+    // for (let i = 0; i < 4; i++) {
+    //   const dstPt = this.NUtoPU(srcPts[i]);
+    //   dstPts[i] = dstPt;
+    // }
 
-    /** src:PU, dst:NU */
-    const ptsReverse = {
-      src: { ...dstPts, },
-      dst: { ...srcPts, }
-    } as TransformPointPairs;
+    // /** src:PU, dst:NU */
+    // const ptsReverse = {
+    //   src: { ...dstPts, },
+    //   dst: { ...srcPts, }
+    // } as TransformPointPairs;
 
-    this._mappingParams.h_rev = solveHomography(ptsReverse);
+    // this._mappingParams.h_rev = solveHomography(ptsReverse);
+
+    this._mappingParams.h_rev = calcRevH(this._mappingParams.h);
   }
 
   public dump = (prefix: string) => {
@@ -244,3 +246,41 @@ export default class CoordinateTanslater {
   }
 
 }
+
+
+
+export function calcRevH(h: TransformParameters) {
+  // 아래는 임의의 숫자
+  const srcPts: TransformPoints = {
+    type: "homography",
+    unit: "pu",
+    pts: [
+      { x: 0, y: 0 },
+      { x: 100, y: 0 },
+      { x: 100, y: 100 },
+      { x: 0, y: 100 },
+    ]
+  };
+
+  // 정방향 파라메터로 역방향의 대상이 되는 점을 연산
+  const dstPts: TransformPoints = {
+    type: "homography",
+    unit: "nu",
+    pts: new Array(4),
+  };
+
+  for (let i = 0; i < 4; i++) {
+    const dstPt = Solve.applyTransform(srcPts.pts[i], h);
+    dstPts.pts[i] = dstPt;
+  }
+
+  /** src:PU, dst:NU */
+  const pts = {
+    src: { ...dstPts, },
+    dst: { ...srcPts, }
+  } as TransformPointPairs;
+
+  const h_rev = Solve.solveHomography(pts);
+  return h_rev;
+}
+

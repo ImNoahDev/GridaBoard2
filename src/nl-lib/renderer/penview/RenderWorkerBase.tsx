@@ -1,10 +1,13 @@
 import { fabric } from "fabric";
 import { Point } from "fabric/fabric-impl";
 import { ZoomFitEnum } from "../../common/enums";
-import { PaperInfo } from "../../common/noteserver";
+import { MappingStorage } from "../../common/mapper";
+import { calcRevH } from "../../common/mapper/CoordinateTanslater";
+import { applyTransform } from "../../common/math/echelon/SolveTransform";
+import { getNPaperInfo, PaperInfo } from "../../common/noteserver";
 import { InkStorage } from "../../common/penstorage";
-import { TransformParameters, ISize, INoteServerItem } from "../../common/structures";
-import { convertNuToPu } from "../../common/util";
+import { TransformParameters, ISize, INoteServerItem, IPageSOBP } from "../../common/structures";
+import { convertNuToPu, isSamePage, makeNPageId, makeNPageIdStr } from "../../common/util";
 
 import { PATH_THICKNESS_SCALE } from "../../common/util";
 import { PDFVIEW_ZOOM_MAX, PDFVIEW_ZOOM_MIN } from "../RendererConstants";
@@ -45,18 +48,6 @@ export interface IRenderWorkerOption {
 // const STROKE_OBJECT_ID = "ns";
 const GRID_OBJECT_ID = "g";
 
-/**
- * @typedef {Object} RenderWorkerOption
- * @property {string} canvasId
- * @property {number} width
- * @property {number} height
- * @property {string} [bgColor]
- * @property {boolean} [mouseAction]
- * @property {ZoomFitEnum} [viewFit]
- * @property {boolean} [shouldDisplayGrid]
- * @property {InkStorage} [storage]
- *
- */
 
 export default class RenderWorkerBase {
 
@@ -100,7 +91,7 @@ export default class RenderWorkerBase {
 
 
   /** 종이 정보 */
-  surfaceInfo: INoteServerItem & { rotation: number } = {
+  paperBase: INoteServerItem & { rotation: number } = {
     section: 3,
     owner: 27,
     book: 168,
@@ -170,6 +161,8 @@ export default class RenderWorkerBase {
 
     this.options = options;
     this.initFabricCanvas();
+
+
   }
 
   /**
@@ -209,7 +202,7 @@ export default class RenderWorkerBase {
   }
 
   getPaperSize_pu = (): ISize => {
-    const { rotation } = this.surfaceInfo;
+    const { rotation } = this.paperBase;
 
     // const ncode_width = Xmax - Xmin;
     // const ncode_height = Ymax - Ymin;
@@ -227,30 +220,42 @@ export default class RenderWorkerBase {
   }
 
 
-  changePage(section: number, owner: number, book: number, page: number, forceToRefresh: boolean): boolean {
-    console.log("changePage base");
-    const currPage = this.surfaceInfo;
+  changePage(pageInfo: IPageSOBP, forceToRefresh: boolean): boolean {
+    // console.log("PAGE CHANGE (base)");
+    const currPage = this.paperBase;
 
-    if ((!forceToRefresh)
-      && (section === currPage.section
-        && owner === currPage.owner
-        && book === currPage.book
-        && page === currPage.page)) return false;
+    // if (isSamePage(pageInfo, currPage as IPageSOBP)) {
+    //   console.log(`PAGE CHANGE (base):  return ${makeNPageIdStr({ ...currPage } as IPageSOBP)} ==> ${makeNPageIdStr({ ...pageInfo })}`);
+
+    //   if (!forceToRefresh) {
+    //     console.log(`PAGE CHANGE (base):  return`);
+    //     return false;
+    //   }
+    // }
 
 
     // 페이지 정보와 scale을 조정한다.
-    const info = PaperInfo.getPaperInfo({ section, owner, book, page });
+    const transform = MappingStorage.getInstance().getNPageTransform(pageInfo);
+    const rev_h = calcRevH(transform.h);
+    const leftTop_nu = applyTransform({ x: 0, y: 0 }, rev_h);
+
+    const info = getNPaperInfo(pageInfo);
     const margin = info.margin;
+
+    console.log(`PAGE CHANGE (base):  ${margin.Xmin}, ${margin.Ymin} / ${leftTop_nu.x}, ${leftTop_nu.y}`);
+
     if (info) {
-      this.surfaceInfo = {
-        section, owner, book, page,
+      this.paperBase = {
+        ...pageInfo,
         margin: {
-          Xmin: margin.Xmin,
-          Ymin: margin.Ymin,
+          Xmin: leftTop_nu.x,
+          Ymin: leftTop_nu.y,
+          // Xmin: margin.Xmin,
+          // Ymin: margin.Ymin,
           Xmax: margin.Xmax,
           Ymax: margin.Ymax,
         },
-        Mag: info.Mag,
+        Mag: 1,
         rotation: this.options.rotation,
       };
     }
@@ -474,7 +479,7 @@ export default class RenderWorkerBase {
     let offsetX = this.offset.x;
     let offsetY = this.offset.y;
 
-    // const { section, owner, book, page } = this.surfaceInfo;
+    // const { section, owner, book, page } = this.ncodeSurface;
     // const szPaper = paperInfo.getPaperSize({ section, owner, book, page });
 
     // const size_pu = {
@@ -591,7 +596,7 @@ export default class RenderWorkerBase {
    */
   protected getPdfXY_default = (ncodeXY: { x: number, y: number, f?: number }) => {
     const { x, y, f } = ncodeXY;
-    const { Xmin, Ymin } = this.surfaceInfo.margin;
+    const { Xmin, Ymin } = this.paperBase.margin;
 
     const nu_to_pu_scale = this.nu_to_pu_scale;
 
@@ -824,7 +829,7 @@ export default class RenderWorkerBase {
 
   setRotation = (rotation: number) => {
     console.log(`RenderWorkerBase: setRotation to ${rotation}`);
-    this.surfaceInfo.rotation = rotation;
+    this.paperBase.rotation = rotation;
   }
 
   setTransformParameters = (h: TransformParameters) => {

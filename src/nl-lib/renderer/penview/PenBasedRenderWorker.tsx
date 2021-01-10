@@ -3,7 +3,7 @@ import { fabric } from "fabric";
 
 import RenderWorkerBase, { IRenderWorkerOption } from "./RenderWorkerBase";
 
-import { drawPath, drawPath_arr } from "../../common/util";
+import { drawPath, drawPath_arr, makeNPageIdStr } from "../../common/util";
 import { IBrushType } from "../../common/enums";
 import { IPoint, NeoStroke, NeoDot, IPageSOBP, INeoStrokeProps, StrokeStatus } from "../../common/structures";
 import { IPenToViewerEvent } from "../../common/neopen";
@@ -76,10 +76,9 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
     }
 
 
-    const { section, owner, book, page } = this.surfaceInfo;
-    this.changePage(section, owner, book, page, true);
+    this.changePage(this.paperBase as IPageSOBP, true);
+    console.log(`PAGE CHANGE (worker constructor):                             ${makeNPageIdStr(this.paperBase as IPageSOBP)}`);
 
-    console.log(`constructor size ${options.width}, ${options.height}`)
     // this.resize({ width: options.width, height: options.height });
   }
 
@@ -435,9 +434,12 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
 
 
 
-  changePage = (section: number, owner: number, book: number, page: number, forceToRefresh: boolean): boolean => {
-    console.log("changePage WORKER");
-    if (!super.changePage(section, owner, book, page, forceToRefresh))
+  changePage = (pageInfo: IPageSOBP, forceToRefresh: boolean): boolean => {
+    // const { section, owner, book, page } = pageInfo;
+
+    console.log(`PAGE CHANGE (worker):                 ${makeNPageIdStr(this.paperBase as IPageSOBP)}            ${makeNPageIdStr(pageInfo)}`);
+
+    if (!super.changePage(pageInfo, forceToRefresh))
       return false;
 
     // const szPaper = PaperInfo.getPaperSize_pu({ section, owner, book, page });
@@ -451,7 +453,6 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
     this.drawPageLayout();
 
     // page에 있는 stroke를 가져온다
-    const pageInfo = { section, owner, book, page };
     const strokesAll = this.storage.getPageStrokes(pageInfo);
     const strokes = strokesAll.filter(stroke => stroke.brushType !== IBrushType.ERASER);
 
@@ -470,7 +471,7 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
 
 
   changePage_byStorage = (section: number, owner: number, book: number, page: number, forceToRefresh: boolean) => {
-    return this.changePage(section, owner, book, page, forceToRefresh);
+    return this.changePage({ section, owner, book, page }, forceToRefresh);
   }
 
 

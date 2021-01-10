@@ -267,10 +267,15 @@ class PenBasedRenderer extends React.Component<Props, State> {
       ret_val = true;
     }
 
+    // console.log(`PAGE CHANGE: ${makeNPageIdStr(this.props.pageInfo)} ==> ${makeNPageIdStr(nextProps.pageInfo)}`);
     if (!isSamePage(nextProps.pageInfo, this.props.pageInfo)) {
+      console.log(`PAGE CHANGE 0: ${makeNPageIdStr(this.props.pageInfo)} ==> ${makeNPageIdStr(nextProps.pageInfo)}`);
+
       if (this.renderer) {
-        const { section, owner, book, page } = nextProps.pageInfo;
-        this.renderer.changePage(section, owner, book, page, false);
+        // const { section, owner, book, page } = nextProps.pageInfo;
+            console.log(`PAGE CHANGE 1: ${makeNPageIdStr(nextProps.pageInfo)}`);
+
+        this.renderer.changePage(nextProps.pageInfo, false);
         const transform = MappingStorage.getInstance().getNPageTransform(nextProps.pageInfo);
         this.renderer.setTransformParameters(transform.h);
         ret_val = true;
