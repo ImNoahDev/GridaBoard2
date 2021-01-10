@@ -310,11 +310,17 @@ class MixedPageView_module extends React.Component<MixedViewProps, State>  {
         this.setState({ pdfSize: { ...size }, status: "loaded" });
       }
       else if (pdfChanged) {
-        const size = nextProps.pdf.getPageSize(this.state.pdfPageNo);
+        let size;
+        if (nextState.pdf) size = nextState.pdf.getPageSize(nextState.pdfPageNo);
+        else size = getNPaperSize_pu(this.state.pageInfo);
+
         this.setState({ pdfSize: { ...size }, status: "loaded" });
       }
       else {
-        const size = this.state.pdf.getPageSize(nextState.pdfPageNo);
+        let size;
+        if (nextState.pdf) size = nextState.pdf.getPageSize(nextState.pdfPageNo);
+        else size = getNPaperSize_pu(this.state.pageInfo);
+
         this.setState({ pdfSize: { ...size }, status: "loaded" });
       }
     }

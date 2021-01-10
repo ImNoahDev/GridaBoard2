@@ -1,21 +1,88 @@
 
 // 2020-12-09 현재 구현되어 있는 기능까지 단축키 완성(추가 구현된 기능 넣고 다른 버튼들 단축키 지정하기)
 
+import { store } from "../client/Root";
 import { IBrushType } from "../nl-lib/common/enums";
 import PenManager from "../nl-lib/neosmartpen/PenManager";
+import { setActivePageNo } from "../store/reducers/activePageReducer";
+import GridaDoc from "./GridaDoc";
 
-export default function KeyBoardShortCut(evt) {
 
-  // console.log("webViewerKeyDown");
+let _isCtrl = false;
+let _isAlt = false;
+let _isShift = false;
+let _isMeta = false;
+
+export function KeyBoardShortCut_keyup(evt: KeyboardEvent) {
+  if (evt.defaultPrevented) {
+    return; // Should do nothing if the default action has been cancelled
+  }
+
+  switch (evt.key) {
+    case "Alt": {
+      _isAlt = false;
+      break;
+    }
+
+    case "Control": {
+      _isCtrl = false;
+      break;
+    }
+
+    case "Shift": {
+      _isShift = false;
+      break;
+    }
+  }
+  const cmd = (_isCtrl ? 1 : 0) | (_isAlt ? 2 : 0) | (_isShift ? 4 : 0) | (evt.metaKey ? 8 : 0);
+
+  console.log(`key up cmd=${cmd} ==> code=${evt.code}  key => ${evt.key}`);
+
+}
+
+
+export default function KeyBoardShortCut(evt: KeyboardEvent) {
+  if (evt.defaultPrevented) {
+    return; // Should do nothing if the default action has been cancelled
+  }
+
   let handled = false;
-  const ensureViewerFocused = false;
-  const cmd = (evt.ctrlKey ? 1 : 0) | (evt.altKey ? 2 : 0) | (evt.shiftKey ? 4 : 0) | (evt.metaKey ? 8 : 0);
+  switch (evt.key) {
+    case "Alt": {
+      _isAlt = true;
+      handled = true;
+      break;
+    }
 
-  // console.log(`keyCode = ${evt.keyCode}`);
+    case "Control": {
+      _isCtrl = true;
+      handled = true;
+      break;
+    }
+
+    case "Shift": {
+      _isShift = true;
+      handled = true;
+      break;
+    }
+  }
+
+  const cmd = (_isCtrl ? 1 : 0) | (_isAlt ? 2 : 0) | (_isShift ? 4 : 0) | (evt.metaKey ? 8 : 0);
+
+  console.log(`key down cmd=${cmd} ==> code=${evt.code}  key => ${evt.key}`);
 
   if (cmd == 0) {
-    switch (true) {
-      case 0x30 <= evt.keyCode && evt.keyCode <= 0x39: // '1'
+    switch (evt.key) {
+      case "0":
+      case "1":
+      case "2":
+      case "3":
+      case "4":
+      case "5":
+      case "6":
+      case "7":
+      case "8":
+      case "9":
         {
           const color_num = evt.keyCode - 0x30;
           PenManager.getInstance().setColor(color_num);
@@ -29,137 +96,173 @@ export default function KeyBoardShortCut(evt) {
 
         break;
 
-      case 81 == evt.keyCode: // q
+      case "q": // q
         // setPenType(PenType.PEN);
         PenManager.getInstance().setPenRendererType(IBrushType.PEN);
         handled = true;
         break;
 
-      case 87 == evt.keyCode: // w
+      case "w": // w
         // setPenType(PenType.MARKER);
         PenManager.getInstance().setPenRendererType(IBrushType.MARKER);
         handled = true;
         break;
 
-      case 69 == evt.keyCode: // e
+      case "e": // e
         // setPenType(PenType.ERASER);
         PenManager.getInstance().setPenRendererType(IBrushType.ERASER);
         handled = true;
         break;
 
-      case 82 == evt.keyCode: // r
+      case "r": // r
         break;
 
-      case 84 == evt.keyCode: // t
+      case "t": // t
         break;
 
-      case 65 == evt.keyCode: // a
+      case "a": // a
         // setPenThickness(1);
         PenManager.getInstance().setThickness(1);
         handled = true;
         break;
 
-      case 83 == evt.keyCode: // s
+      case "s": // s
         // setPenThickness(2);
         PenManager.getInstance().setThickness(2);
         handled = true;
         break;
 
-      case 68 == evt.keyCode: // d
+      case "d": // d
         // setPenThickness(3);
         PenManager.getInstance().setThickness(3);
         handled = true;
         break;
 
-      case 70 == evt.keyCode: // f
+      case "f": // f
         // setPenThickness(4);
         // handled = true;
         break;
 
-      case 71 == evt.keyCode: // g
+      case "g": // g
         // setPenThickness(5);
         // handled = true;
         break;
 
-      case 90 == evt.keyCode: // z
+      case "z": // z
         // onBtn_fitWidth();
         // handled = true;
         break;
 
-      case 88 == evt.keyCode: // x
+      case "x": // x
         // onBtn_fitHeight();
         // handled = true;
         break;
 
-      case 67 == evt.keyCode: // c
+      case "c": // c
         // onBtn_fitCanvas();
         // handled = true;
         break;
 
-      case 86 == evt.keyCode: // v
+      case "v": // v
         // onBtn_fitPaper();
         // handled = true;
         break;
 
-      case 66 == evt.keyCode: // b
+      case "b": // b
         break;
 
-      case 9 == evt.keyCode: // <TAB>
+      case "Tab": // <TAB>
         // onRotateButton();
         // handled = true;
         break;
 
 
-      case 80 == evt.keyCode: // P
+      case "p": // P
         // toggleAllStrokesVisible();
         // handled = true;
         break;
 
-      case 33 == evt.keyCode: // page up
+      // page up
+      case "PageUp": {
+        const doc = GridaDoc.getInstance();
+        const state = store.getState();
+        const activePageNo = state.activePage.activePageNo;
+        const pageNo = Math.max(0, activePageNo - 1);
+        setActivePageNo(pageNo);
+
         // onPrevPage();
-        // handled = true;
+        handled = true;
         break;
-      case 34 == evt.keyCode: // page down
-        // onNextPage();
-        // handled = true;
+      }
+
+      // page down
+      case "PageDown": {
+        const doc = GridaDoc.getInstance();
+        const state = store.getState();
+        const activePageNo = state.activePage.activePageNo;
+        const pageNo = Math.min(doc.numPages - 1, activePageNo + 1);
+        setActivePageNo(pageNo);
+
+        // onPrevPage();
+        handled = true;
         break;
+      }
 
     }
   } else if (cmd == 4) {
-    switch (evt.keyCode) {
-      case 0x31:
-      case 0x32:
-      case 0x33:
-      case 0x34:
-      case 0x35:
-      case 0x36:
-      case 0x37:
-      case 0x38:
-      case 0x39:
+    switch (evt.key) {
+      case "1":
+      case "2":
+      case "3":
+      case "4":
+      case "5":
+      case "6":
+      case "7":
         // togglePenStrokeVisible(evt.keyCode - 0x30);
         // handled = true;
         break;
 
-      case 0x30:
+      case "0":
         // toggleAllStrokesVisible();
         // handled = true;
         break;
     }
   } else if (cmd == 1) {
-    switch (evt.keyCode) {
-      case 90: // ctrl-Z
+    switch (evt.key) {
+      case "z": // ctrl-Z
         // onBtnUndo();
         // handled = true;
         break;
 
-      case 89: // ctrl-Z
+      case "y": // ctrl-Z
         // onBtnRedo();
         // handled = true;
         break;
+
+      // ctrl - page up
+      case "Home": {
+        const pageNo = 0;
+        setActivePageNo(pageNo);
+
+        // onPrevPage();
+        handled = true;
+        break;
+      }
+
+      // ctrl - page down
+      case "End": {
+        const doc = GridaDoc.getInstance();
+        const pageNo = doc.numPages - 1;
+        setActivePageNo(pageNo);
+
+        // onPrevPage();
+        handled = true;
+        break;
+      }
     }
   }
 
-  if (handled) {
-    evt.preventDefault();
-  }
+  // if (handled) {
+  //   evt.preventDefault();
+  // }
 }

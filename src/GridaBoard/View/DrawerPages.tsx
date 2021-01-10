@@ -46,7 +46,7 @@ class DrawerPages extends React.Component<Props, State>  {
     return (
       <div >
         <Box style={{ margin: 10 }}>
-          <h5>{numPages}</h5>
+          <h5>index:{this.props.activePageNo} (#{this.props.activePageNo + 1}/{numPages})</h5>
         </Box>
         {pages.map((page, i) =>
           // ""

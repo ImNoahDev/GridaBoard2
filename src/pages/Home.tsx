@@ -60,8 +60,8 @@ const Home = () => {
   // const [pageInfos, setPageInfos] = useState([nullNcode()]);
   // const [basePageInfo, setBasePageInfo] = useState(nullNcode());
 
-  let pdfUrl = undefined as string;
-  let pdfFilename = undefined as string;
+  const pdfUrl = undefined as string;
+  const pdfFilename = undefined as string;
   let pdfFingerprint = undefined as string;
   let pdfPageNo = 1;
   let pdf = undefined as NeoPdfDocument;
@@ -69,22 +69,11 @@ const Home = () => {
 
   let basePageInfo = nullNcode();
   const activePageNo_store = useSelector((state: RootState) => state.activePage.activePageNo);
-  if (activePageNo_store !== activePageNo) {
-    setLocalActivePageNo(activePageNo_store);
-  }
-
-  // if (activePageNo >= 0) {
-  //   const doc = GridaDoc.getInstance();
-  //   const page = doc.getPageAt(activePageNo)
-  //   setPdf(page.pdf);
-
-  //   // setPdfUrl(doc.getPdfUrlAt(activePageNo));
-  //   // setPdfFilename(doc.getPdfFilenameAt(activePageNo));
-  //   setPdfFingerprint(doc.getPdfFingerprintAt(activePageNo));
-  //   setPdfPageNo(doc.getPdfPageNoAt(activePageNo));
-  //   setPageInfos(doc.getPageInfosAt(activePageNo));
-  //   setBasePageInfo(doc.getBasePageInfoAt(activePageNo));
-  // }
+  useEffect(() => {
+    if (activePageNo_store !== activePageNo) {
+      setLocalActivePageNo(activePageNo_store);
+    }
+  }, [activePageNo_store])
 
   if (activePageNo >= 0) {
     const doc = GridaDoc.getInstance();
@@ -100,33 +89,9 @@ const Home = () => {
 
   }
 
-
-
-  // alert(`set pdf=${pdf}`);
-
-
   const drawerWidth = useSelector((state: RootState) => state.ui.drawer.width);
   const pens = useSelector((state: RootState) => state.appConfig.pens);
-
-
   const setDrawerWidth = (width: number) => updateDrawerWidth({ width });
-
-  // const [pdfUrl_store, pdfFilename_store] = useSelector((state: RootState) => {
-  //   console.log(state.pdfInfo.activePdf);
-  //   return [state.pdfInfo.activePdf.url, state.pdfInfo.activePdf.filename];
-  // });
-
-
-  const pens_store = useSelector((state: RootState) => {
-    // console.log(state.appConfig.pens);
-    return state.appConfig.pens;
-  });
-
-  // useEffect(() => {
-  //   if (pdfUrl_store !== pdfUrl) setPdfUrl(pdfUrl_store);
-  //   if (pdfFilename_store !== pdfFilename) setPdfFilename(pdfFilename_store);
-  //   if (pens_store !== pens) setPens(pens_store);
-  // }, [pdfUrl_store, pdfFilename_store, pens_store]);
 
   const handleDrawerOpen = () => {
     setDrawerOpen(true);
@@ -272,9 +237,7 @@ const Home = () => {
     }
   }
 
-
-
-  console.log(`State PageView 1: docPageNo:${activePageNo}, pdfUrl=${pdfUrl}, fingerPrint: ${pdfFingerprint}, pdfPageNo:${pdfPageNo}`);
+  console.log(`HOME: docPageNo:${activePageNo}, pdfUrl=${pdfUrl}, fingerPrint: ${pdfFingerprint}, pdfPageNo:${pdfPageNo}`);
   return (
     <div className={classes.root}>
       {/* <CssBaseline /> */}
@@ -296,7 +259,7 @@ const Home = () => {
         <div style={{ position: "absolute", top: 0, left: 0, bottom: 0, right: drawerOpen ? drawerWidth : 0 }}>
           <MixedPageView
             pdf={pdf}
-            pdfUrl={pdfUrl} filename={pdfFilename} 
+            pdfUrl={pdfUrl} filename={pdfFilename}
             pdfPageNo={pdfPageNo}
             pageInfo={pageInfos[0]}
             basePageInfo={basePageInfo}

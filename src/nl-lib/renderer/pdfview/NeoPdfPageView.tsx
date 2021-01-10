@@ -10,7 +10,7 @@ import { dumpDiffPropsAndState, makeNPageIdStr } from "../../common/util";
 
 interface PageProps extends MixedViewProps {
   // pdf: PdfJs.PDFDocumentProxy,
-  pdf: NeoPdfDocument,
+  // pdf: NeoPdfDocument,
 
   position: { offsetX: number, offsetY: number, zoom: number },
   // pdfCanvas: CSSProperties,
@@ -22,13 +22,20 @@ interface PageState {
   page: NeoPdfPage,
   imgSrc: string,
 
-  renderCount: number;
+  renderCount: number,
+
+  pdf: NeoPdfDocument,
+  pdfPageNo: number,
+
+  zoom: number,
 }
 
 type IBackRenderedStatus = {
   result: boolean,
   px_width: number,
-  px_height: number
+  px_height: number,
+
+
 }
 
 export default class NeoPdfPageView extends Component<PageProps, PageState> {
@@ -37,6 +44,10 @@ export default class NeoPdfPageView extends Component<PageProps, PageState> {
     page: null,
     imgSrc: URL.createObjectURL(new Blob()),
     renderCount: 0,
+
+    pdf: undefined,
+    pdfPageNo: -1,
+    zoom: this.props.position?.zoom,
   };
 
   canvas: HTMLCanvasElement | null = null;
@@ -59,48 +70,50 @@ export default class NeoPdfPageView extends Component<PageProps, PageState> {
 
 
   componentDidMount() {
-    // const { pdf, pdfPageNo } = this.props;
-    // this._update(pdf, pdfPageNo);
+    const { pdf, pdfPageNo } = this.props;
+
+    // this.setState({ pdf, pdfPageNo });
+    // this.loadPage(pdf, pdfPageNo);
   }
 
   shouldComponentUpdate(nextProps: PageProps, nextState: PageState) {
     // dumpDiffPropsAndState(`State PageView ${this.props.pdfPageNo}:`, this.props, nextProps, this.state, nextState);
+    let retVal = false;
 
-    const zoomChanged = nextProps.position.zoom !== this.props.position.zoom;
-    if (zoomChanged && nextState.page) {
-      this.renderPage(nextState.page, nextProps.position.zoom);
-    }
-
-
-    // pad를 load해야 한다면
-    let pdfChanged = ((!nextProps.pdf) && (!!this.props.pdf)) || ((!!nextProps.pdf) && (!this.props.pdf)) || (nextProps.pdf !== this.props.pdf);
-    if ((!!nextProps.pdf) && (!!this.props.pdf)) pdfChanged = pdfChanged || (nextProps.pdf.fingerprint !== this.props.pdf.fingerprint);
-    const pdfPageNoChanged = nextProps.pdfPageNo !== this.props.pdfPageNo;
+    let pdfChanged = nextProps.pdf !== this.state.pdf;
+    if ((!!nextProps.pdf) && (!!this.state.pdf)) pdfChanged = pdfChanged || (nextProps.pdf.fingerprint !== this.state.pdf.fingerprint);
+    const pdfPageNoChanged = nextProps.pdfPageNo !== this.state.pdfPageNo;
 
     if (pdfChanged || pdfPageNoChanged) {
-      if (pdfChanged)
-        console.log(`*State PageView ${nextProps.pdfPageNo}:* PDF CHANGED ${this.pfp(this.props.pdf)} => ${this.pfp(nextProps.pdf)}`);
-
-      if (pdfPageNoChanged)
-        console.log(`*State PageView ${nextProps.pdfPageNo}:* PAGE CHANGED ${this.props.pdfPageNo} => ${nextProps.pdfPageNo}`);
-
-      this._update(nextProps.pdf, nextProps.pdfPageNo);
+      this.setState({ pdf: nextProps.pdf, pdfPageNo: nextProps.pdfPageNo });
+      this.loadPage(nextProps.pdf, nextProps.pdfPageNo);
     }
 
     // rendering을 새로 해야 한다면
-    const loaded = nextState.page !== this.state.page;
-    if (loaded) {
-      this.renderPage(nextState.page, nextProps.position.zoom);
+
+    const zoomChanged = nextProps.position.zoom !== this.props.position.zoom;
+    if (zoomChanged) {
+      this.setState({ zoom: nextProps.position.zoom });
     }
 
-    // rendering되었 
-    // const rendered =
-    //   (this.state.status !== nextState.status) && (nextState.status === "N/A" || nextState.status === "rendered" || nextState.status === "lazy-rendered");
+    // const loaded = nextState.page !== this.state.page;
+    // const loaded = nextState.status === "loaded" && (this.state.status !== nextState.status);
+    const loaded =  nextState.page !== this.state.page;
+    if (loaded) {
+      console.log(`*State PageView ${nextProps.pdfPageNo}:* LOADED ${this.state.page?._pageNo} => ${nextState.page?._pageNo}, zoom ${nextState.zoom}, status=${this.state.status} => ${nextState.status}`);
+      if (nextState.page && nextState.zoom > 0)
+        this.renderPage(nextState.page, nextState.zoom, nextState.pdfPageNo);
+    }
+
+    if (this.state.zoom !== nextState.zoom && nextState.page) {
+      console.log(`*State PageView ${nextProps.pdfPageNo}:* ZOOM CHANGED ${nextState.zoom}, status=${this.state.status} => ${nextState.status}`);
+      this.renderPage(nextState.page, nextState.zoom, nextState.pdfPageNo);
+    }
 
 
     const rendered = this.state.renderCount !== nextState.renderCount;
     console.log(`*State PageView ${nextProps.pdfPageNo}:* rendered=${rendered}  this.state.status=${this.state.status} => ${nextState.status}`);
-    return true;
+    return rendered;
   }
 
 
@@ -171,30 +184,23 @@ export default class NeoPdfPageView extends Component<PageProps, PageState> {
     this.canvas = canvas;
   };
 
-  _update = (pdf: NeoPdfDocument, pageNo: number) => {
+  loadPage = async (pdf: NeoPdfDocument, pageNo: number) => {
+    this.backPlane.inited = false;
 
-    if (pdf) {
-      // console.log(`*State PageView ${this.props.pdfPageNo}:* PDF LOADER ${this.pfp(pdf)} / ${pageNo}`);
-      this.backPlane.inited = false;
-      this._loadPage(pdf, pageNo);
-      this.setState({ status: 'loading' });
-    } else {
-      // console.log(`*State PageView ${this.props.pdfPageNo}:* BLANK ${this.pfp(pdf)} / ${pageNo}`);
+    if (!pdf) {
       this.setState({ status: 'N/A' });
+      return;
     }
-  };
-
-  _loadPage = async (pdf: NeoPdfDocument, pageNo: number) => {
-    if (this.state.status === 'rendering') return;
 
     if (pageNo > pdf.numPages) {
       console.error("PDF 페이지의 범위를 넘은 페이지를 렌더링하려고 합니다.");
       pageNo = pdf.numPages;
     }
 
+    this.setState({ status: 'loading' });
     const page = await pdf.getPageAsync(pageNo);
     this.backPlane.inited = false;
-    this.setState({ status: 'loaded', page });
+    this.setState({ page, status: 'loaded' });
   }
 
   renderToCanvasSafe = async (page: NeoPdfPage, dpi: number, zoom: number) => {
@@ -259,9 +265,13 @@ export default class NeoPdfPageView extends Component<PageProps, PageState> {
     return retVal;
   }
 
-  renderPage = async (page: NeoPdfPage, zoom: number) => {
+  renderPage = async (page: NeoPdfPage, zoom: number, pdfPageNo: number) => {
     this.setState({ page, status: 'rendering check canvas' });
-    if (!this.canvas) return;
+    if (!this.canvas) {
+      console.log(`*State PageView ${pdfPageNo}:* CANVAS NOT FOUND`);
+
+      return;
+    }
     // console.log(`BACKPLANE RENDERPAGE start`)
 
     this.setState({ page, status: 'rendering' });

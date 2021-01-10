@@ -1,8 +1,13 @@
-import KeyBoardShortCut from "./KeyBoardShortCut";
+import KeyBoardShortCut, { KeyBoardShortCut_keyup } from "./KeyBoardShortCut";
 
 export function turnOnGlobalKeyShortCut(on: boolean) {
-  if (on)
+  if (on) {
     window.addEventListener("keydown", KeyBoardShortCut);
-  else
+    window.addEventListener("keyup", KeyBoardShortCut_keyup);
+  }
+
+  else {
     window.removeEventListener("keydown", KeyBoardShortCut);
+    window.removeEventListener("keyup", KeyBoardShortCut_keyup);
+  }
 }
