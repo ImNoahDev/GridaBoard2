@@ -20,9 +20,9 @@ export async function openFileBrowser2() {
 
 
   console.log(`try to load: click simulation ${_acc++}`);
+  _fileOpenPromise = new Promise(resolve => _resolveFunc = resolve);
 
   performClick2(_fileInputId);
-  _fileOpenPromise = new Promise(resolve => _resolveFunc = resolve);
   return _fileOpenPromise;
 }
 
@@ -133,7 +133,8 @@ export function onFileInputChanged(e) {
   _filename = file.name;
   e.target.value = null;
 
-  func({ result: "success", url, file });
+  if (func !== undefined)
+    func({ result: "success", url, file });
 }
 
 export function onFileInputClicked(e) {

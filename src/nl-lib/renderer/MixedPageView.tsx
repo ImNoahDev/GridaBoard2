@@ -260,7 +260,7 @@ class MixedPageView_module extends React.Component<MixedViewProps, State>  {
 
 
     if (!isSamePage(nextProps.pageInfo, this.props.pageInfo)) {
-      this.handlePageInfoChanged(nextProps.pageInfo);
+      // this.handlePageInfoChanged(nextProps.pageInfo);
       this.setState({ pageInfo: { ...nextProps.pageInfo } });
     }
 
@@ -398,7 +398,7 @@ class MixedPageView_module extends React.Component<MixedViewProps, State>  {
       case "pod": {
         if (this.state.pdf && (pdfPageNo !== this.state.pdfPageNo)) {
           const size = this.state.pdf.getPageSize(pdfPageNo);
-          this.setState({ pdfSize: size });
+          this.setState({ pdfSize: { ...size } });
         }
 
         // 파일 로드를 요청
@@ -428,7 +428,7 @@ class MixedPageView_module extends React.Component<MixedViewProps, State>  {
       case "note":
       default: {
         const size = getNPaperSize_pu(pageInfo);
-        this.setState({ pdfSize: size });
+        this.setState({ pdfSize: { ...size } });
         this.setState({ pdf: undefined, pdfFilename: undefined });
         break;
       }
@@ -626,7 +626,7 @@ class MixedPageView_module extends React.Component<MixedViewProps, State>  {
             <Typography style={{ ...shadowStyle, fontSize: 14, fontStyle: "initial" }}> {this.state.pdf ? this.state.pdf.filename : ""} </Typography>
 
           </div >
-          : "" }
+          : ""}
       </div>
     );
   }
