@@ -25,7 +25,7 @@ const TracePointButton = () => {
 
   const onTogglePointerTracer = () => {
     dispatch(setPointerTracer(!isTrace));
-    setEnable("btn_tracepoint", isTrace);
+    setEnable("btn_tracepoint", !isTrace);
   }
 
   return (
