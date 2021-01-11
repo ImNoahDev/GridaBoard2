@@ -2,10 +2,10 @@ import React from "react";
 import { Box } from "@material-ui/core";
 import { connect } from "react-redux";
 
-import GridaDoc from "../GridaDoc";
-import { RootState } from "../../store/rootReducer";
+import GridaDoc from "../../GridaDoc";
+import { RootState } from "../../../store/rootReducer";
 import ThumbnailItem from "./ThumbnailItem";
-import { InkStorage } from "../../nl-lib/common/penstorage";
+import { InkStorage } from "../../../nl-lib/common/penstorage";
 
 interface Props {
   numPages?: number,

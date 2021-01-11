@@ -3,7 +3,7 @@ import ButtonLayer_forTest from "./ButtonLayer_forTest";
 import ButtonLayerBottom from "./ButtonLayerBottom";
 import ButtonLayerSide from "./ButtonLayerSide";
 import { ButtonProps } from "@material-ui/core";
-import { IFileBrowserReturn } from "../nl-lib/common/structures";
+import { IFileBrowserReturn } from "../../nl-lib/common/structures";
 
 /**
  *

@@ -3,24 +3,24 @@ import { Box, Button, Paper } from "@material-ui/core";
 import { useSelector } from "react-redux";
 import ReactJson from "react-json-view";
 
-import { NeoImage } from "../components/CustomElement/NeoImage";
-import Upload from "../components/navbar/Upload";
-import GoogleBtn from "../components/GoogleBtn";
-import { RootState } from "../store/rootReducer";
-import GridaDoc from "../GridaBoard/GridaDoc";
+import { NeoImage } from "../../components/CustomElement/NeoImage";
+import Upload from "../../components/navbar/Upload";
+import GoogleBtn from "../../components/GoogleBtn";
+import { RootState } from "../../store/rootReducer";
+import GridaDoc from "../GridaDoc";
 
-import { makeNPageIdStr } from "../nl-lib/common/util";
+import { makeNPageIdStr } from "../../nl-lib/common/util";
 
-import { g_defaultPrintOption } from "../nl-lib/ncodepod";
+import { g_defaultPrintOption } from "../../nl-lib/ncodepod";
 
-import { MappingStorage } from "../nl-lib/common/mapper";
-import { NoteServerClient } from "../nl-lib/common/noteserver";
-import { CalibrationButton, OptionDialogButton, PrintNcodedPdfButton } from "../nl-lib/ncodepod";
+import { MappingStorage } from "../../nl-lib/common/mapper";
+import { NoteServerClient } from "../../nl-lib/common/noteserver";
+import { CalibrationButton, OptionDialogButton, PrintNcodedPdfButton } from "../../nl-lib/ncodepod";
 
 
-import ClearLocalMappingButton from "../nl-lib/common/mapper/test/ClearLocalMappingButton";
-import { turnOnGlobalKeyShortCut } from "../GridaBoard/GlobalFunctions";
-import { savePDF } from "../GridaBoard/Save/SavePdf";
+import ClearLocalMappingButton from "../../nl-lib/common/mapper/test/ClearLocalMappingButton";
+import { turnOnGlobalKeyShortCut } from "../GlobalFunctions";
+import { savePDF } from "../Save/SavePdf";
 
 
 const buttonDivStyle = {

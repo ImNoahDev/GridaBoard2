@@ -55,7 +55,7 @@ export class NeoPdfPage {
 
   private _pageNo: number;
 
-  get pageNo() { return this._pageNo };
+  get pageNo() { return this._pageNo }
 
   _doc: NeoPdfDocument;
 
@@ -145,6 +145,7 @@ export class NeoPdfPage {
 
     return thumbnail;
   }
+  
   private generateThumbnail = async (width: number, height: number, bgColor = "rgba(255,255,255,0)") => {
     if (this.isSameThumbnail(width, height, bgColor))
       return this._thumbnail;
@@ -194,6 +195,7 @@ export class NeoPdfPage {
 
     return false;
   }
+
   public getThumbnailUrl = async (width: number, height: number, bgColor = "rgba(255,255,255,0)", drawCalibrationMark = false, markPos = 0) => {
     const thumbnail = await this.generateThumbnail(width, height, bgColor);
 
@@ -264,7 +266,7 @@ export class NeoPdfPage {
       }),
       intent: "print"
     };
-    await page.render(renderContext).promise
+    await page.render(renderContext).promise;
 
     const doc = this._doc;
     const result: IPdfPageCanvasDesc = {

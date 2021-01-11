@@ -2,13 +2,13 @@ import React from "react";
 import { useSelector } from "react-redux";
 import { Paper, Typography } from "@material-ui/core";
 
-import GridaDoc from "../GridaDoc";
-import { RootState } from "../../store/rootReducer";
-import { setActivePageNo } from '../../store/reducers/activePageReducer';
+import GridaDoc from "../../GridaDoc";
+import { RootState } from "../../../store/rootReducer";
+import { setActivePageNo } from '../../../store/reducers/activePageReducer';
 
-import { MixedPageView } from "../../nl-lib/renderer";
-import { makeNPageIdStr } from "../../nl-lib/common/util";
-import { PLAYSTATE, ZoomFitEnum } from "../../nl-lib/common/enums";
+import { MixedPageView } from "../../../nl-lib/renderer";
+import { makeNPageIdStr } from "../../../nl-lib/common/util";
+import { PLAYSTATE, ZoomFitEnum } from "../../../nl-lib/common/enums";
 
 
 interface Props {
@@ -28,9 +28,9 @@ const ThumbnailItem = (props: Props) => {
   const drawerWidth = useSelector((state: RootState) => state.ui.drawer.width);
   const activePageNo = useSelector((state: RootState) => state.activePage.activePageNo);
 
-  let pdfUrl = undefined;
-  let pdfFilename = undefined;
-  let pdfFingerprint = undefined;
+  const pdfUrl = undefined;
+  const pdfFilename = undefined;
+  const pdfFingerprint = undefined;
   let pdfPageNo = 1;
   let pdf = undefined;
 

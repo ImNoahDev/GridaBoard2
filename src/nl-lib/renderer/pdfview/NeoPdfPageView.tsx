@@ -80,7 +80,7 @@ export default class NeoPdfPageView extends Component<PageProps, PageState> {
 
   shouldComponentUpdate(nextProps: PageProps, nextState: PageState) {
     // dumpDiffPropsAndState(`State PageView ${this.props.pdfPageNo}:`, this.props, nextProps, this.state, nextState);
-    let retVal = false;
+    const retVal = false;
 
     let pdfChanged = nextProps.pdf !== this.state.pdf;
     if ((!!nextProps.pdf) && (!!this.state.pdf)) pdfChanged = pdfChanged || (nextProps.pdf.fingerprint !== this.state.pdf.fingerprint);

@@ -3,26 +3,26 @@ import { IconButton, makeStyles, createStyles, } from "@material-ui/core";
 import { useSelector, shallowEqual } from "react-redux";
 import { Theme } from '@material-ui/core';
 import MenuIcon from '@material-ui/icons/Menu';
-import '../styles/main.css'
-import { theme } from "../styles/theme";
+import '../../styles/main.css'
+import { theme } from "../../styles/theme";
 
-import PUIController from '../components/PUIController';
-import { turnOnGlobalKeyShortCut } from "../GridaBoard/GlobalFunctions";
-import PersistentDrawerRight from "../GridaBoard/View/PersistentDrawerRight";
-import ButtonLayer from "./ButtonLayer";
-import AutoLoadConfirmDialog from "../GridaBoard/Dialog/AutoLoadConfirmDialog";
-import { RootState } from "../store/rootReducer";
-import { updateDrawerWidth } from "../store/reducers/ui";
-import GridaDoc from "../GridaBoard/GridaDoc";
+import PUIController from '../../components/PUIController';
+import { turnOnGlobalKeyShortCut } from "../GlobalFunctions";
+import PersistentDrawerRight from "./Drawer/PersistentDrawerRight";
+import ButtonLayer from "../Buttons/ButtonLayer";
+import AutoLoadConfirmDialog from "../Dialog/AutoLoadConfirmDialog";
+import { RootState } from "../../store/rootReducer";
+import { updateDrawerWidth } from "../../store/reducers/ui";
+import GridaDoc from "../GridaDoc";
 
 import {
   NeoPdfDocument, NeoPdfManager,
   openFileBrowser2, g_hiddenFileInputBtnId, onFileInputChanged, onFileInputClicked
-} from "../nl-lib/common/neopdf";
-import { IPageSOBP, IFileBrowserReturn, IGetNPageTransformType } from "../nl-lib/common/structures";
-import { MixedPageView } from "../nl-lib/renderer";
-import { nullNcode } from "../nl-lib/common/constants";
-import { PLAYSTATE, ZoomFitEnum } from "../nl-lib/common/enums";
+} from "../../nl-lib/common/neopdf";
+import { IPageSOBP, IFileBrowserReturn, IGetNPageTransformType } from "../../nl-lib/common/structures";
+import { MixedPageView } from "../../nl-lib/renderer";
+import { nullNcode } from "../../nl-lib/common/constants";
+import { PLAYSTATE, ZoomFitEnum } from "../../nl-lib/common/enums";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({

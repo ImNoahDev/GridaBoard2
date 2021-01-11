@@ -1,16 +1,16 @@
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 
-import ManualCalibration from "../components/navbar/ManualCalibration";
-import PageNumbering from "../components/navbar/PageNumbering";
-import PrintButton from "../components/navbar/PrintButton";
-import GridaToolTip from "../styles/GridaToolTip";
-import ColorButtons from "../components/navbar/ColorButtons";
-import { RootState } from "../store/rootReducer";
-import GridaDoc from "../GridaBoard/GridaDoc";
-import { FileBrowserButton } from "../nl-lib/common/neopdf";
-import { IFileBrowserReturn } from "../nl-lib/common/structures";
-import { g_defaultPrintOption } from "../nl-lib/ncodepod";
+import ManualCalibration from "../../components/navbar/ManualCalibration";
+import PageNumbering from "../../components/navbar/PageNumbering";
+import PrintButton from "../../components/navbar/PrintButton";
+import GridaToolTip from "../../styles/GridaToolTip";
+import ColorButtons from "../../components/navbar/ColorButtons";
+import { RootState } from "../../store/rootReducer";
+import GridaDoc from "../GridaDoc";
+import { FileBrowserButton } from "../../nl-lib/common/neopdf";
+import { IFileBrowserReturn } from "../../nl-lib/common/structures";
+import { g_defaultPrintOption } from "../../nl-lib/ncodepod";
 
 import { Button, ButtonGroup } from "@material-ui/core";
 

@@ -6,8 +6,8 @@ import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import { BoxProps } from '@material-ui/core';
 import DrawerPages from './DrawerPages';
-import { updateDrawerWidth } from '../../store/reducers/ui';
-import { RootState } from '../../store/rootReducer';
+import { updateDrawerWidth } from '../../../store/reducers/ui';
+import { RootState } from '../../../store/rootReducer';
 import { useSelector } from "react-redux";
 
 
