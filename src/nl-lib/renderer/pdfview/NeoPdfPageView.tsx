@@ -103,11 +103,11 @@ export default class NeoPdfPageView extends Component<PageProps, PageState> {
     const loaded = nextState.page !== this.state.page;
     if (loaded) {
       console.log(`*State PageView ${nextProps.pdfPageNo}:* LOADED ${this.state.page?.pageNo} => ${nextState.page?.pageNo}, zoom ${nextState.zoom}, status=${this.state.status} => ${nextState.status}`);
-      if (nextState.page && nextState.zoom > 0)
+      if (nextState.page && nextProps.pdf && nextState.zoom > 0)
         this.renderPage(nextState.page, nextState.zoom, nextState.pdfPageNo, nextProps.pdf.fingerprint);
     }
 
-    if (this.state.zoom !== nextState.zoom && nextState.page) {
+    if (this.state.zoom !== nextState.zoom && nextState.page && nextProps.pdf) {
       console.log(`*State PageView ${nextProps.pdfPageNo}:* ZOOM CHANGED ${nextState.zoom}, status=${this.state.status} => ${nextState.status}`);
       this.renderPage(nextState.page, nextState.zoom, nextState.pdfPageNo, nextProps.pdf.fingerprint);
     }
