@@ -2,11 +2,12 @@ import { store } from "../client/Root";
 import { PenEventName } from "../nl-lib/common/enums";
 import { IPageSOBP } from "../nl-lib/common/structures";
 import { MappingStorage } from "../nl-lib/common/mapper";
-import { IPenToViewerEvent } from "../nl-lib/common/neopen";
+import { INeoSmartpen, IPenToViewerEvent } from "../nl-lib/common/neopen";
 import { setPens } from "../store/reducers/appConfigReducer";
 import GridaDoc from "./GridaDoc";
 import PenManager from "../nl-lib/neosmartpen/PenManager";
-import { NeoSmartpen } from "../nl-lib/neosmartpen";
+import { VirtualPen } from "../nl-lib/neosmartpen";
+import { uuidv4 } from "../nl-lib/common/util";
 
 let _app_instance = undefined as GridaApp;
 
@@ -14,7 +15,7 @@ export default class GridaApp {
   _doc: GridaDoc;
   _penManager: PenManager;
 
-  _pens: NeoSmartpen[];
+  _pens: INeoSmartpen[];
 
   constructor() {
     if (_app_instance) return _app_instance;

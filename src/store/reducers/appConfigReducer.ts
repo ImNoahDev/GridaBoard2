@@ -1,5 +1,6 @@
 import { store } from "../../client/Root";
 import GridaDoc from "../../GridaBoard/GridaDoc";
+import { INeoSmartpen } from "../../nl-lib/common/neopen";
 
 import { IPrintOption } from "../../nl-lib/common/structures";
 import { g_defaultPrintOption } from "../../nl-lib/ncodepod";
@@ -24,7 +25,7 @@ export const setPrintOption = async (printOption: IPrintOption) => {
   });
 };
 
-export const setPens = async (pens: NeoSmartpen[]) => {
+export const setPens = async (pens: INeoSmartpen[]) => {
   store.dispatch({
     type: ACTION_TYPE.SET_PENS,
     value: pens,
@@ -37,7 +38,7 @@ export const setPens = async (pens: NeoSmartpen[]) => {
 //[Reducer
 const initialState = {
   printOption: g_defaultPrintOption,
-  pens: [] as NeoSmartpen[],
+  pens: [] as INeoSmartpen[],
   num_pens: 0,
 };
 

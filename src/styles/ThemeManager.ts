@@ -48,23 +48,24 @@ export default class ThemeManager {
 
   // white board 등
   private setPenColorNormal() {
-    let c = this.penManager.defaultColorNum;
-    if (c === 1) {
+    const color = this.penManager.color;
+    if (color === "rgb(255,255,255)") {
       // 흰색 펜이면
-      c = 2;
+      const c = this.penManager.getColorNum("rgb(0,0,0)");
+      if (c >= 0)
+        this.penManager.setColor(c);
     }
-    this.penManager.setColor(c);
   }
 
   // blackboard 등
   private setPenColorInverse() {
-    let c = this.penManager.defaultColorNum;
-    if (c === 2) {
+    const color = this.penManager.color;
+    if (color === "rgb(0,0,0)") {
       // 검은색 펜이면
-      c = 1;
+      const c = this.penManager.getColorNum("rgb(255,255,255)");
+      if (c >= 0)
+        this.penManager.setColor(c);
     }
-
-    this.penManager.setColor(c);
   }
 
   private setThemeDark(val) {

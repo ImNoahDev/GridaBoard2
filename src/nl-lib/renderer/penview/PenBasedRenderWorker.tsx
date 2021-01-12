@@ -3,12 +3,12 @@ import { fabric } from "fabric";
 
 import RenderWorkerBase, { IRenderWorkerOption } from "./RenderWorkerBase";
 
-import { drawPath, drawPath_arr, makeNPageIdStr } from "../../common/util";
+import { drawPath, drawPath_arr, makeNPageIdStr, uuidv4 } from "../../common/util";
 import { IBrushType } from "../../common/enums";
 import { IPoint, NeoStroke, NeoDot, IPageSOBP, INeoStrokeProps, StrokeStatus } from "../../common/structures";
-import { IPenToViewerEvent } from "../../common/neopen";
+import { INeoSmartpen, IPenToViewerEvent } from "../../common/neopen";
 import { InkStorage } from "../../common/penstorage";
-import { NeoSmartpen } from "../../neosmartpen";
+import { NeoSmartpen, PenManager, VirtualPen } from "../../neosmartpen";
 // import { PaperInfo } from "../../common/noteserver";
 
 
@@ -58,6 +58,8 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
   // pathHoverPoints: fabric.Circle[] = [];
   penCursors: { [key: string]: IPenHoverCursors } = {};
 
+  _vpPenDownTime = 0;
+
   /**
    *
    * @param options
@@ -74,8 +76,6 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
       }
       this.storage = storage;
     }
-
-
     this.changePage(this.paperBase as IPageSOBP, true);
     console.log(`PAGE CHANGE (worker constructor):                             ${makeNPageIdStr(this.paperBase as IPageSOBP)}`);
 
@@ -116,6 +116,7 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
   }
 
 
+
   /**
    *
    * @param {{strokeKey:string, mac:string, stroke:NeoStroke, dot:NeoDot}} event
@@ -138,8 +139,8 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
     const dot = event.dot;
 
     //지우개 구현
-    const canvas_xy = this.getPdfXY_scaled(dot);
-    const screen_xy = this.getScreenXY(canvas_xy);
+    const canvas_xy = this.ncodeToPdfXy(dot);
+    const screen_xy = this.pdfToScreenXy(canvas_xy);
     const pen = event.pen;
 
     const cursor = this.penCursors[event.mac];
@@ -185,7 +186,7 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
     const dot = event.dot;
 
     //지우개 구현
-    const canvas_xy = this.getPdfXY_scaled(dot);
+    const canvas_xy = this.ncodeToPdfXy(dot);
     if (!live.pathObj) {
       const new_pathObj = this.createFabricPath(live.stroke, false);
       live.pathObj = new_pathObj as IExtendedPathType;
@@ -266,7 +267,7 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
     }
   }
 
-  createHoverCursor = (pen: NeoSmartpen) => {
+  createHoverCursor = (pen: INeoSmartpen) => {
     const mac = pen.mac;
 
     if (!Object.prototype.hasOwnProperty.call(this.penCursors, mac)) {
@@ -315,7 +316,7 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
     }
   }
 
-  removeHoverCursor = (pen: NeoSmartpen) => {
+  removeHoverCursor = (pen: INeoSmartpen) => {
     const mac = pen.mac;
 
     if (Object.prototype.hasOwnProperty.call(this.penCursors, mac)) {
@@ -340,7 +341,7 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
     }
 
     const dot = event.dot;
-    const canvas_xy = this.getPdfXY(dot);
+    const canvas_xy = this.funcNcodeToPdfXy(dot);
 
     const obj = cursor.penTracker;
     obj.visible = true;
@@ -377,7 +378,7 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
     const isPointerVisible = $("#btn_tracepoint").find(".c2").hasClass("checked");
 
     const dot = { x: e.event.x, y: e.event.y }
-    const canvas_xy = this.getPdfXY(dot);
+    const canvas_xy = this.funcNcodeToPdfXy(dot);
 
     // hover point를 쉬프트해서 옮겨 놓는다
     for (let i = NUM_HOVER_POINTERS - 1; i > 0; i--) {
@@ -601,7 +602,7 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
 
     const pointArray = [];
     dotArray.forEach((dot) => {
-      const pt = this.getPdfXY_scaled(dot);
+      const pt = this.ncodeToPdfXy(dot);
       pointArray.push(pt);
     });
 
@@ -618,7 +619,7 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
 
     const pointArray = [];
     dotArray.forEach((dot) => {
-      const pt = this.getPdfXY_scaled(dot);
+      const pt = this.ncodeToPdfXy(dot);
       pointArray.push(pt);
     });
 
@@ -657,5 +658,69 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
     const path = new fabric.Path(pathData, pathOption);
 
     return path;
+  }
+
+
+
+
+  /**
+   * 아래는 마우스로 그림을 그리는 곳 (Pen down)
+   * WorkerBase의 abstract 함수를 참조
+   * 
+   * 2021/01/12 PointerEvent도 처리할 수 있도록 추가해야 함
+   */
+  onTouchStrokePenDown = (event: MouseEvent) => {
+    // const screen_xy = { x: event.clientX, y: event.clientY };
+
+    // const pdf_xy = this.screenToPdfXy(screen_xy);
+    // const ncode_xy = this.pdfToNcodeXy(pdf_xy);
+    const vp = PenManager.getInstance().virtualPen;
+
+    const timeStamp = Date.now();
+    this._vpPenDownTime = timeStamp;
+    vp.onPenDown({ timeStamp, penTipMode: 0, penId: vp.mac });
+
+    const { section, owner, book, page } = this.paperBase;
+    vp.onPageInfo({ timeStamp, section, owner, book, page }, false);
+  }
+
+  /**
+   * 아래는 마우스로 그림을 그리는 곳 (Pen move)
+   * WorkerBase의 abstract 함수를 참조
+   * 
+   * 2021/01/12 PointerEvent도 처리할 수 있도록 추가해야 함
+   */
+  onTouchStrokePenMove = (event: MouseEvent, force: number) => {
+    const screen_xy = { x: event.clientX, y: event.clientY };
+
+    const pdf_xy = this.screenToPdfXy(screen_xy);
+    const ncode_xy = this.pdfToNcodeXy(pdf_xy);
+
+    const vp = PenManager.getInstance().virtualPen;
+    const timeStamp = Date.now();
+    const timediff = timeStamp - this._vpPenDownTime;
+    const { section, owner, book, page } = this.paperBase;
+
+    const DEFAULT_MOUSE_PEN_FORCE = 512;
+
+    vp.onPenMove({
+      timeStamp, timediff, section, owner, book, page,
+      ...ncode_xy,
+      force: force,
+      isFirstDot: false,
+    });
+  }
+
+  /**
+   * 아래는 마우스로 그림을 그리는 곳 (Pen up)
+   * WorkerBase의 abstract 함수를 참조
+   * 
+   * 2021/01/12 PointerEvent도 처리할 수 있도록 추가해야 함
+   */
+  onTouchStrokePenUp = (event: MouseEvent) => {
+    const vp = PenManager.getInstance().virtualPen;
+    const timeStamp = Date.now();
+
+    vp.onPenUp({ timeStamp });
   }
 }

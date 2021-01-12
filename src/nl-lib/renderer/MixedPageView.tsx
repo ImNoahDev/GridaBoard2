@@ -11,8 +11,8 @@ import { NeoPdfDocument, NeoPdfManager } from "../common/neopdf";
 import { isSamePage, makeNPageIdStr } from "../common/util";
 import { MappingStorage } from "../common/mapper";
 import { getNPaperSize_pu } from "../common/noteserver";
-import { NeoSmartpen } from "../neosmartpen";
 import { PLAYSTATE, ZoomFitEnum } from "../common/enums";
+import { INeoSmartpen } from "../common/neopen";
 
 
 
@@ -62,7 +62,7 @@ export interface MixedViewProps {
 
 
   /** pen의 움직임에 따라 view가 update되려면 pen의 배열을 지정한다 */
-  pens?: NeoSmartpen[];
+  pens?: INeoSmartpen[];
 
   /** ink storage에 stroke가 쌓일 때 view를 update하려면 storage를 지정한다 */
   fromStorage: boolean,

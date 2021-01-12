@@ -49,7 +49,7 @@ export interface IRenderWorkerOption {
 const GRID_OBJECT_ID = "g";
 
 
-export default class RenderWorkerBase {
+export default abstract class RenderWorkerBase {
 
   name: string;
   /** canvas element ID */
@@ -75,11 +75,14 @@ export default class RenderWorkerBase {
   /** mouse에 따라 pan, zoom이 가능한지에 대한 여부 */
   mouseAction = true;
 
-  /**  mouse에 따라 pan, zoom이 가능한지에 대한 여부 */
-  zoomCtrlKey = false;
-
   /** mouse drag & panning 을 위해 */
   pan: { isDragging: boolean, lastPosX: number, lastPosY: number } = {
+    isDragging: false,
+    lastPosX: 0,
+    lastPosY: 0,
+  };
+
+  drawing: { isDragging: boolean, lastPosX: number, lastPosY: number } = {
     isDragging: false,
     lastPosX: 0,
     lastPosY: 0,
@@ -128,8 +131,10 @@ export default class RenderWorkerBase {
   options: IRenderWorkerOption;
 
   h: TransformParameters;
+  h_rev: TransformParameters;
 
-  getPdfXY: (ncodeXY: { x: number, y: number, f?: number }) => { x: number, y: number, f: number };
+  funcNcodeToPdfXy: (ncodeXY: { x: number, y: number, f?: number }) => { x: number, y: number, f: number };
+  funcPdfToNcodeXy: (ncodeXY: { x: number, y: number, f?: number }) => { x: number, y: number, f: number };
 
   fitMargin = 0;
 
@@ -139,7 +144,7 @@ export default class RenderWorkerBase {
    */
   constructor(options: IRenderWorkerOption) {
     const { canvasId, canvas, width, height, bgColor, fitMargin, mouseAction, viewFit, shouldDisplayGrid } = options;
-    this.getPdfXY = this.getPdfXY_default;
+    this.funcNcodeToPdfXy = this.ncodeToPdfXy_default;
 
     this.name = "RenderWorkerBase";
 
@@ -194,6 +199,7 @@ export default class RenderWorkerBase {
       canvasFb.on('mouse:down', this.onCanvasMouseDown);
       canvasFb.on('mouse:move', this.onCanvasMouseMove);
       canvasFb.on('mouse:up', this.onCanvasMousUp);
+
       canvasFb.on('mouse:wheel', this.onCanvasMouseWheel);
     }
 
@@ -236,8 +242,8 @@ export default class RenderWorkerBase {
 
     // 페이지 정보와 scale을 조정한다.
     const transform = MappingStorage.getInstance().getNPageTransform(pageInfo);
-    const rev_h = calcRevH(transform.h);
-    const leftTop_nu = applyTransform({ x: 0, y: 0 }, rev_h);
+    const h_rev = calcRevH(transform.h);
+    const leftTop_nu = applyTransform({ x: 0, y: 0 }, h_rev);
 
     const info = getNPaperInfo(pageInfo);
     const margin = info.margin;
@@ -379,17 +385,35 @@ export default class RenderWorkerBase {
    * @param {Object} opt
    */
   onCanvasMouseDown = (opt: any) => {
-    const canvasFb = this.canvasFb;
-
     const evt: MouseEvent = opt.e;
+    if (this.mouseAction && evt.ctrlKey === true) {
+      const canvasFb = this.canvasFb;
 
-    this.pan.isDragging = true;
-    this.pan.lastPosX = evt.clientX;
-    this.pan.lastPosY = evt.clientY;
+      const evt: MouseEvent = opt.e;
 
-    canvasFb.selection = false;
+      this.pan.isDragging = true;
+      this.pan.lastPosX = evt.clientX;
+      this.pan.lastPosY = evt.clientY;
+
+      canvasFb.selection = false;
+    }
+
+    if (!evt.ctrlKey) {
+      // 그리기 시작
+      // 2021/01/12 PointerEvent도 처리할 수 있도록 추가해야 함
+      this.onTouchStrokePenDown(evt);
+
+      // 아래를 추가할 것, 2021/01/12, kitty
+      // this.onTouchStrokePenMove(evt);
+
+      this.drawing.isDragging = true;
+      this.drawing.lastPosX = evt.clientX;
+      this.drawing.lastPosY = evt.clientY;
+    }
 
   }
+
+  abstract onTouchStrokePenDown(event: MouseEvent): void;
 
   /**
    * @protected
@@ -397,29 +421,48 @@ export default class RenderWorkerBase {
    */
   onCanvasMouseMove = (opt: any) => {
     const canvasFb = this.canvasFb;
+    const evt: MouseEvent = opt.e;
+    if (this.mouseAction && evt.ctrlKey === true) {
+      if (this.pan.isDragging) {
+        // console.log(`Point ${e.clientX}, ${e.clientY}`);
+        // const vpt = canvasFb.viewportTransform;
+        this.offset.x += evt.clientX - this.pan.lastPosX;
+        this.offset.y += evt.clientY - this.pan.lastPosY;
 
-    if (this.pan.isDragging) {
-      const e: MouseEvent = opt.e;
+        this.scrollBoundaryCheck();
 
+        // canvasFb.setViewportTransform(vpt);
+        // canvasFb.requestRenderAll();
 
-      // console.log(`Point ${e.clientX}, ${e.clientY}`);
-      // const vpt = canvasFb.viewportTransform;
-      this.offset.x += e.clientX - this.pan.lastPosX;
-      this.offset.y += e.clientY - this.pan.lastPosY;
-
-      this.scrollBoundaryCheck();
-
-      // canvasFb.setViewportTransform(vpt);
-      // canvasFb.requestRenderAll();
-
-      this.pan.lastPosX = e.clientX;
-      this.pan.lastPosY = e.clientY;
+        this.pan.lastPosX = evt.clientX;
+        this.pan.lastPosY = evt.clientY;
 
 
 
-      // this.canvasBoundaryCheck();
+        // this.canvasBoundaryCheck();
+      }
+    }
+
+    if (!evt.ctrlKey) {
+      // 그리기 중간
+      // 2021/01/12 PointerEvent도 처리할 수 있도록 추가해야 함
+      if (this.drawing.isDragging) {
+        const dx = evt.clientX - this.drawing.lastPosX;
+        const dy = evt.clientY - this.drawing.lastPosY;
+
+        const distance2 = Math.sqrt(Math.sqrt(dx * dx + dy * dy));
+        const distance = Math.max(1, distance2);
+        const force = 800 / distance;
+
+        this.drawing.lastPosX = evt.clientX;
+        this.drawing.lastPosY = evt.clientY;
+
+        this.onTouchStrokePenMove(evt, force);
+      }
     }
   }
+
+  abstract onTouchStrokePenMove(event: MouseEvent, force: number): void;
 
   reportCanvasChanged = () => {
     const { x: offsetX, y: offsetY, zoom } = this.offset;
@@ -431,18 +474,25 @@ export default class RenderWorkerBase {
    * @param {Object} opt
    */
   onCanvasMousUp = (opt: any = undefined) => {
-    const canvasFb = this.canvasFb;
-    canvasFb.selection = false;
+    const evt: MouseEvent = opt.e;
+    if (this.pan.isDragging) {
+      const canvasFb = this.canvasFb;
+      canvasFb.selection = false;
+      this.pan.isDragging = false;
+    }
 
-    // // on mouse up we want to recalculate new interaction
-    // // for all objects, so we call setViewportTransform
-    // canvasFb.setViewportTransform(canvasFb.viewportTransform);
-    this.pan.isDragging = false;
+    if (this.drawing.isDragging) {
+      // 그리기 끝
+      // 2021/01/12 PointerEvent도 처리할 수 있도록 추가해야 함
 
-
-    // let vpt = canvasFb.viewportTransform;
-    // console.log(vpt);
+      this.drawing.isDragging = false;
+      this.onTouchStrokePenUp(evt);
+    }
   }
+
+
+  abstract onTouchStrokePenUp(event: MouseEvent): void;
+
 
   /**
    * @protected
@@ -453,7 +503,7 @@ export default class RenderWorkerBase {
     this.viewFit = ZoomFitEnum.FREE;
 
     const evt: MouseEvent = opt.e;
-    if ((!this.zoomCtrlKey) || (this.zoomCtrlKey === true && evt.ctrlKey === true)) {
+    if (evt.ctrlKey === true) {
       const delta = opt.e.deltaY;
       let zoom = this.offset.zoom;
       zoom *= 0.9985 ** delta;
@@ -594,7 +644,7 @@ export default class RenderWorkerBase {
    * @protected
    * @param {{x:number, y:number, f?:number}} ncodeXY
    */
-  protected getPdfXY_default = (ncodeXY: { x: number, y: number, f?: number }) => {
+  protected ncodeToPdfXy_default = (ncodeXY: { x: number, y: number, f?: number }) => {
     const { x, y, f } = ncodeXY;
     const { Xmin, Ymin } = this.paperBase.margin;
 
@@ -606,10 +656,34 @@ export default class RenderWorkerBase {
     return { x: px, y: py, f };
   }
 
+  protected pdfToNcodeXy_default = (ncodeXY: { x: number, y: number, f?: number }) => {
+    const { x, y, f } = ncodeXY;
+    const { Xmin, Ymin } = this.paperBase.margin;
 
-  protected getPdfXY_homography = (ncodeXY: { x: number, y: number, f?: number }) => {
+    const nu_to_pu_scale = this.nu_to_pu_scale;
+    const nx = x / nu_to_pu_scale + Xmin;
+    const ny = y / nu_to_pu_scale + Ymin;
+
+    return { x: nx, y: ny, f };
+  }
+
+
+
+
+  protected ncodeToPdfXy_homography = (ncodeXY: { x: number, y: number, f?: number }) => {
     const { x, y } = ncodeXY;
     const { a, b, c, d, e, f, g, h } = this.h;
+
+    const nominator = g * x + h * y + 1;
+    const px = (a * x + b * y + c) / nominator;
+    const py = (d * x + e * y + f) / nominator;
+
+    return { x: px, y: py, f: ncodeXY.f };
+  }
+
+  protected pdfToNcodeXy_homography = (ncodeXY: { x: number, y: number, f?: number }) => {
+    const { x, y } = ncodeXY;
+    const { a, b, c, d, e, f, g, h } = this.h_rev;
 
     const nominator = g * x + h * y + 1;
     const px = (a * x + b * y + c) / nominator;
@@ -623,33 +697,63 @@ export default class RenderWorkerBase {
    * @protected
    * @param {{x:number, y:number, f?:number}} ncodeXY
    */
-  protected getPdfXY_scaled = (ncodeXY: { x: number, y: number, f?: number }) => {
-    const ret = this.getPdfXY(ncodeXY);
+  protected ncodeToPdfXy = (ncodeXY: { x: number, y: number, f?: number }) => {
+    const ret = this.funcNcodeToPdfXy(ncodeXY);
     const { x, y, f } = ret;
 
     return { x: x * PATH_THICKNESS_SCALE, y: y * PATH_THICKNESS_SCALE, f };
   }
 
+  protected pdfToNcodeXy = (pdfXY: { x: number, y: number, f?: number }) => {
+    const ret = this.funcPdfToNcodeXy(pdfXY);
+    const { x, y, f } = ret;
+
+    return { x: x * PATH_THICKNESS_SCALE, y: y * PATH_THICKNESS_SCALE, f };
+  }
+
+
   /**
    * @protected
    * @param {{x:number, y:number}} pdfXY
    */
-  protected getScreenXY = (pdfXY: { x: number, y: number }) => {
+  protected pdfToScreenXy = (pdfXY: { x: number, y: number }) => {
     const { x, y } = pdfXY;
 
     const canvasFb = this.canvasFb;
     const vpt = canvasFb.viewportTransform;
 
-    const zoom = this.canvasFb.getZoom();
-    const offset_x = vpt[4];
-    const offset_y = vpt[5];
+    // const zoom = this.canvasFb.getZoom();
+    // const offset_x = vpt[4];
+    // const offset_y = vpt[5];
 
+    const zoom = this.offset.zoom;
+    const offset_x = this.offset.x;
+    const offset_y = this.offset.y;
 
     const sx = x * zoom + offset_x;
     const sy = y * zoom + offset_y;
 
     return { x: sx, y: sy };
   }
+
+
+
+  protected screenToPdfXy = (screenXY: { x: number, y: number }) => {
+    const { x, y } = screenXY;
+
+    const canvasFb = this.canvasFb;
+    const vpt = canvasFb.viewportTransform;
+
+    const zoom = this.offset.zoom;
+    const offset_x = this.offset.x;
+    const offset_y = this.offset.y;
+
+    const px = (x - offset_x) / zoom;
+    const py = (y - offset_y) / zoom;
+
+    return { x: px, y: py };
+  }
+
 
   /**
    *
@@ -708,8 +812,8 @@ export default class RenderWorkerBase {
   protected focusToDot = (dot: { x: number, y: number }) => {
     if (!this.autoFocus) return;
     const margin_to_go_ratio = 0.25;
-    const canvas_xy = this.getPdfXY(dot);
-    const screen_xy = this.getScreenXY(canvas_xy);
+    const canvas_xy = this.funcNcodeToPdfXy(dot);
+    const screen_xy = this.pdfToScreenXy(canvas_xy);
 
     let dx = 0, dy = 0;
     let shouldScroll = false;
@@ -834,12 +938,16 @@ export default class RenderWorkerBase {
 
   setTransformParameters = (h: TransformParameters) => {
     this.h = { ...h };
+    const h_rev = calcRevH(h);
+    this.h_rev = { ...h_rev };
 
     if (h) {
-      this.getPdfXY = this.getPdfXY_homography;
+      this.funcNcodeToPdfXy = this.ncodeToPdfXy_homography;
+      this.funcPdfToNcodeXy = this.pdfToNcodeXy_homography;
     }
     else {
-      this.getPdfXY = this.getPdfXY_default;
+      this.funcNcodeToPdfXy = this.ncodeToPdfXy_default;
+      this.funcPdfToNcodeXy = this.pdfToNcodeXy_default;
     }
   }
 }

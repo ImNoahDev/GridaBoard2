@@ -4,7 +4,6 @@ import { IPenEvent } from "../structures";
 import { INeoSmartpen, IPenToViewerEvent } from "./INeoSmartpen";
 
 export interface IPenManager {
-  /** @type {Array.<{id:string, mac:string, pen:NeoSmartpen, connected:boolean}>} */
   penArray: INeoSmartpen[];
 
   pen_colors: string[];

@@ -9,23 +9,20 @@ import { useSelector } from "react-redux";
 import { RootState } from "../../store/rootReducer";
 import PenManager from "../../nl-lib/neosmartpen/PenManager";
 import { PenEventName } from "../../nl-lib/common/enums";
-import { NeoSmartpen } from "../../nl-lib/neosmartpen";
+import { INeoSmartpen } from "../../nl-lib/common/neopen";
 
 type Props = {
   onPenLinkChanged: (e) => void;
 }
 const ConnectButton = (props: Props) => {
 
-  /**
-   * @param {{pen:NeoSmartpen, mac:string, event:PenEvent}} e
-   */
   const onPenLinkChanged = e => {
     props.onPenLinkChanged(e);
   };
 
   const handleConnectPen = () => {
     const penManager = PenManager.getInstance();
-    const new_pen: NeoSmartpen = penManager.createPen();
+    const new_pen: INeoSmartpen = penManager.createPen();
 
     if (new_pen.connect()) {
       new_pen.addEventListener(PenEventName.ON_CONNECTED, onPenLinkChanged);

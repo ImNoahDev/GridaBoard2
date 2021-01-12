@@ -116,7 +116,7 @@ const ButtonLayerBottom = (props: Props) => {
   const { handlePdfOpen, ...rest } = props;
 
   // const [num_pens, setNumPens] = useState(0);
-  // const [pens, setPens] = useState(new Array(0) as NeoSmartpen[]);
+  // const [pens, setPens] = useState(new Array(0) as INeoSmartpen[]);
 
   const [pdfUrl, setPdfUrl] = useState(undefined as string);
   const [pdfFilename, setPdfFilename] = useState(undefined as string);

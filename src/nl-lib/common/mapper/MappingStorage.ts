@@ -379,10 +379,17 @@ export class MappingStorage {
   /**
    * mapping되지 않은 PDF나, ncode 공책들의 임시 mapping table을 생성하고 돌려주는 주고
    */
-  public makeTemporaryAssociateMapItem = (option: { n_paper: IPageSOBP, pdf: { url: string, filename: string, fingerprint: string, numPages: number } }) => {
-    const { pdf, n_paper } = option;
+  public makeTemporaryAssociateMapItem = (option: {
+    /** Ncode 로 추가되는 페이지의 경우 */
+    n_paper: IPageSOBP,
+    /** PDF로 추가되는 페이지의 경우 */
+    pdf: { url: string, filename: string, fingerprint: string, numPages: number },
+    /** Blank page의 경우 */
+    numBlankPages: number,
+  }) => {
+    const { pdf, n_paper, numBlankPages } = option;
 
-    if (!pdf && !n_paper) {
+    if (!pdf && !n_paper && !numBlankPages) {
       console.error("n_paper neighter pdf has not been given to makeTemporaryAssociateMapItem ");
       return undefined;
     }
@@ -390,13 +397,23 @@ export class MappingStorage {
     const nextCode = getNextNcodePage(this._temporary.nextIssuable, 0);
     let basePdfToNcodeMap: IPdfToNcodeMapItem;
     if (pdf) {
+      // 매핑되지 않은 PDF를 추가
       this._temporary.nextIssuable = getNextNcodePage(this._temporary.nextIssuable, pdf.numPages);
       basePdfToNcodeMap = this.makeDummyParamsForBasePageInfo(nextCode, pdf.url, pdf.filename, pdf.fingerprint, pdf.numPages, true);
     }
-    else {
+    else if (n_paper) {
+      // Ncode가 들어와서 추가되는 페이지
       const pi: INoteServerItem_forPOD = getNPaperInfo(n_paper);
       const basePageInfo = { ...n_paper, page: pi.ncode_start_page };
       basePdfToNcodeMap = this.makeDummyParamsForBasePageInfo(basePageInfo, pi.pdf_name, pi.pdf_name, pi.pdf_name, pi.pdf_page_count + 1, false);
+    }
+    else {
+      // 
+      const nextCode = getNextNcodePage(this._temporary.nextIssuable, 0);
+      this._temporary.nextIssuable = getNextNcodePage(this._temporary.nextIssuable, numBlankPages);
+
+      const piBlank: INoteServerItem_forPOD = getNPaperInfo(nullNcode());
+      basePdfToNcodeMap = this.makeDummyParamsForBasePageInfo(nextCode, piBlank.pdf_name, piBlank.pdf_name, piBlank.pdf_name, numBlankPages, true);
     }
 
     this._temporary.arrDocMap.push(basePdfToNcodeMap);

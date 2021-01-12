@@ -23,6 +23,7 @@ import { IPageSOBP, IFileBrowserReturn, IGetNPageTransformType } from "../../nl-
 import { MixedPageView } from "../../nl-lib/renderer";
 import { nullNcode } from "../../nl-lib/common/constants";
 import { PLAYSTATE, ZoomFitEnum } from "../../nl-lib/common/enums";
+import { PenManager } from "../../nl-lib/neosmartpen";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -42,7 +43,7 @@ const Home = () => {
   const [isRotate, setRotate] = useState();
   const [drawerOpen, setDrawerOpen] = useState(true);
   const [rightMargin, setRightMargin] = useState(0);
-  // const [pens, setPens] = useState([] as NeoSmartpen[]);
+  // const [pens, setPens] = useState([] as INeoSmartpen[]);
 
   const [autoLoadOptions, setAutoLoadOptions] = useState(undefined as IGetNPageTransformType);
   const [loadConfirmDlgOn, setLoadConfirmDlgOn] = useState(false);
@@ -90,6 +91,7 @@ const Home = () => {
 
   const drawerWidth = useSelector((state: RootState) => state.ui.drawer.width);
   const pens = useSelector((state: RootState) => state.appConfig.pens);
+  const virtualPen = PenManager.getInstance().virtualPen;
   const setDrawerWidth = (width: number) => updateDrawerWidth({ width });
 
   const handleDrawerOpen = () => {
@@ -236,6 +238,8 @@ const Home = () => {
     }
   }
 
+
+
   console.log(`HOME: docPageNo:${activePageNo}, pdfUrl=${pdfUrl}, fingerPrint: ${pdfFingerprint}, pdfPageNo:${pdfPageNo}`);
   return (
     <div className={classes.root}>
@@ -263,7 +267,7 @@ const Home = () => {
             pageInfo={pageInfos[0]}
             basePageInfo={basePageInfo}
             playState={PLAYSTATE.live}
-            pens={pens} fromStorage={false}
+            pens={[...pens, virtualPen]} fromStorage={false}
             autoPageChange={true}
             rotation={0}
             onNcodePageChanged={onNcodePageChanged}

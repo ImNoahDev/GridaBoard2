@@ -1,12 +1,11 @@
-import PenComm, { deviceSelectDlg } from "./pencomm/pencomm";
 import { EventDispatcher, EventCallbackType } from "../common/event";
 import PenManager from "./PenManager";
 import PUIController from "../../components/PUIController";
-import { IBrushState, INoteServerItem, IPenEvent, NeoDot, NeoStroke, StrokePageAttr } from "../common/structures";
+import { IBrushState, IPenEvent, NeoDot, NeoStroke } from "../common/structures";
 import { IBrushType, PEN_STATE, PenEventName } from "../common/enums";
-import { PaperInfo } from "../common/noteserver/PaperInfo";
 import { InkStorage, IOpenStrokeArg } from "../common/penstorage";
 import { IPenToViewerEvent, INeoSmartpen } from "../common/neopen/INeoSmartpen";
+import { sprintf } from "sprintf-js";
 
 
 interface IPenMovement {
@@ -20,7 +19,7 @@ interface IPenMovement {
 
 const NUM_HOVER_POINTERS = 6;
 
-export default class NeoSmartpen implements INeoSmartpen {
+export default class VirtualPen implements INeoSmartpen {
   private currPenMovement: IPenMovement = {
     downEvent: null,
     infoEvent: null,
@@ -38,10 +37,9 @@ export default class NeoSmartpen implements INeoSmartpen {
 
   // lastInfoEvent: IPenEvent = null;
 
-  protocolHandler: PenComm = new PenComm(this);
+  // protocolHandler: PenComm = new PenComm(this);
 
   mac: string = null;
-
   id: string = null;
 
   lastState: PEN_STATE = PEN_STATE.NONE;
@@ -91,14 +89,25 @@ export default class NeoSmartpen implements INeoSmartpen {
       };
     }
 
+    const date = Date.now();
+    const hex = sprintf("%012x", date);
 
+    this.mac = sprintf("%2s:%2s:%2s:%2s:%2s:%2s",
+      hex.substr(0, 2),
+      hex.substr(2, 2),
+      hex.substr(4, 2),
+      hex.substr(6, 2),
+      hex.substr(8, 2),
+      hex.substr(10, 2));
+
+    this.id = this.mac;
   }
 
   /**
    *
    */
   getMac = (): string => {
-    return this.mac;
+    return "this.mac";
   }
 
 
@@ -106,7 +115,7 @@ export default class NeoSmartpen implements INeoSmartpen {
    *
    */
   getBtDevice = (): BluetoothDevice => {
-    return this.protocolHandler.getBtDevice();
+    return undefined;
   }
 
 
@@ -114,29 +123,6 @@ export default class NeoSmartpen implements INeoSmartpen {
    *
    */
   async connect(): Promise<boolean> {
-    let device = null;
-    try {
-      device = await deviceSelectDlg();
-    }
-    catch (e) {
-      console.log(e);
-      return false;
-    }
-
-    if (this.manager.isAlreadyConnected(device)) {
-      console.error(`bluetooth device(id:${device.id}) already connectged or connecting process is being processed`);
-      return false;
-    }
-
-    if (device) {
-      this.protocolHandler.connect(device);
-      this.manager.add(this, device);
-    }
-    else {
-      console.error("Device NULL");
-      return false;
-    }
-
     return true;
   }
 
@@ -146,7 +132,7 @@ export default class NeoSmartpen implements INeoSmartpen {
    * @param device
    */
   async connectByWebBtDevice(device: BluetoothDevice) {
-    return this.protocolHandler.connect(device);
+    return true;
   }
 
 
@@ -174,6 +160,8 @@ export default class NeoSmartpen implements INeoSmartpen {
   }
 
   processPenDown = (event: IPenEvent) => {
+    // event: { timeStamp: number, penTipMode: number }
+
     // pen down 처리
     const mac = this.mac;
     const time = event.timeStamp;
@@ -198,6 +186,8 @@ export default class NeoSmartpen implements INeoSmartpen {
    * @param event
    */
   onPenDown = (event: IPenEvent) => {
+    // event: { timeStamp: number, penTipMode: number, penId }
+
     this.resetPenStroke();
     this.currPenMovement.downEvent = event;
     this.lastState = PEN_STATE.PEN_DOWN;
@@ -245,6 +235,10 @@ export default class NeoSmartpen implements INeoSmartpen {
    * @param hover
    */
   onPageInfo = (event: IPenEvent, hover: boolean) => {
+    // event: { section:number, owner:number, book:number, page:number, timeStamp:number }
+
+
+
     // // console.log(event);
     // this.lastInfoEvent = event;
 
@@ -290,60 +284,7 @@ export default class NeoSmartpen implements INeoSmartpen {
       // let ph = this.appPen;
       // ph.onPageInfo(event);
     }
-    else if (this.lastState === PEN_STATE.PEN_MOVE) {
-      // 펜 move 중 페이지가 바뀌는 경우
 
-      // 이것, 2.19에서는 버리는 듯, 2020/12/27 kitty
-      // pen up 다음의 page info도 안나온다
-
-      // 1) pen up 처리
-      {
-        const stroke = this.currPenMovement.stroke;
-        stroke.set({ multiPage: StrokePageAttr.MULTIPAGE });
-
-        const penUpStrokeInfo = this.processPenUp(event);
-        const { mac, section, owner, book, page } = penUpStrokeInfo.stroke;
-
-        console.log(`NeoSmartpen dispatch event VIRTUAL ON_PEN_UP`);
-        this.dispatcher.dispatch(PenEventName.ON_PEN_UP_VIRTUAL, { ...penUpStrokeInfo, mac, pen: this, section, owner, book, page });
-        this.resetPenStroke();
-
-      }
-
-      // 2) pen down처리
-      {
-        const penDownStrokeInfo = this.processPenDown(event);
-        const stroke = penDownStrokeInfo.stroke;
-        stroke.set({ multiPage: StrokePageAttr.MULTIPAGE });
-
-        console.log(`NeoSmartpen dispatch event VIRTUAL ON_PEN_DOWN`);
-        this.dispatcher.dispatch(PenEventName.ON_PEN_DOWN_VIRTUAL, penDownStrokeInfo);
-      }
-
-      // 3) page Info 처리
-      const { section, owner, book, page, timeStamp } = event;
-      const mac = this.mac;
-
-      if (!hover) {
-        // storage에 저장
-        const stroke = this.currPenMovement.stroke;
-        const strokeKey = stroke.key;
-        this.storage.setStrokeInfo(strokeKey, section, owner, book, page, timeStamp);
-
-        // hand pen page the event
-        this.dispatcher.dispatch(PenEventName.ON_PEN_PAGEINFO, {
-          strokeKey, mac, stroke, section, owner, book, page,
-          time: event.timeStamp
-        });
-      }
-      else {
-        // hand hover page the event
-        this.dispatcher.dispatch(PenEventName.ON_PEN_HOVER_PAGEINFO, {
-          mac, section, owner, book, page, time: event.timeStamp
-        });
-
-      }
-    }
 
 
     if (hover) {
@@ -368,6 +309,9 @@ export default class NeoSmartpen implements INeoSmartpen {
    * @param event
    */
   onPenMove = (event: IPenEvent) => {
+    // event: {section, owner, book, page, timediff, timeStamp, force, x, y, isFirstDot}
+
+
     this.lastState = PEN_STATE.PEN_MOVE;
 
     // margin을 paperInfo의 Xmin, Ymin 값에 따라 조정
@@ -460,7 +404,6 @@ export default class NeoSmartpen implements INeoSmartpen {
     // margin을 paperInfo의 Xmin, Ymin 값에 따라 조정
     // event = this.adjustPaperXminYmin(event);
 
-
     // console.log("    -> onHoverMove" + event);
     // let ph = this.appPen;
     // ph.onHoverMove(event);
@@ -526,93 +469,40 @@ export default class NeoSmartpen implements INeoSmartpen {
    * ncode error
    * @param event
    */
-  onNcodeError = (event: IPenEvent) => {
-    // console.log(event);
-
-    // let ph = this.appPen;
-    // ph.onNcodeError(event);
-    const mac = this.mac;
-    if (!mac) {
-      throw new Error("mac address was not registered");
-    }
-
-    this.manager.onNcodeError({ pen: this, event });
-    this.dispatcher.dispatch(PenEventName.ON_NCODE_ERROR, { pen: this, mac, event });
-  }
-
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  onNcodeError = (event: IPenEvent) => { }
 
 
   /**
    *
    * @param event
    */
-  onPasscodeRequired = (event: IPenEvent) => {
-    console.log("onPasscodeRequired" + event);
-    const passcode = prompt("please enter passcode " + (9 - event.retryCount));
-    this.protocolHandler.sendPasscode(passcode);
-
-    const mac = this.protocolHandler.getMac();
-    if (!mac) {
-      throw new Error("mac address was not registered");
-    }
-    this.dispatcher.dispatch(PenEventName.ON_PW_REQUIRED, { pen: this, mac, event });
-    // throw new Error("Not implemented: onPasscodeRequired");
-  }
-
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  onPasscodeRequired = (event: IPenEvent) => { }
 
 
   /**
    *
    * @param event
    */
-  onConnected = (event: IPenEvent) => {
-    // let ph = this.appPen;
-    // ph.onConnected(event);
-
-    console.log("CONNECTED");
-    const mac = this.protocolHandler.getMac();
-    this.mac = mac;
-    console.log(`Connected: ${mac}`);
-
-    // this.manager.onConnected({ pen: this, event });
-    this.dispatcher.dispatch(PenEventName.ON_CONNECTED, { pen: this, mac, event });
-  }
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  onConnected = (event: IPenEvent) => { }
 
 
   /**
    *
    * @param event
    */
-  onFirmwareUpgradeNeeded = (event: IPenEvent) => {
-    // let ph = this.appPen;
-    // ph.onFirmwareUpgradeNeeded(event);
-
-    const mac = this.mac;
-    if (!mac) {
-      throw new Error("mac address was not registered");
-    }
-    this.dispatcher.dispatch(PenEventName.ON_UPGRADE_NEEDED, { pen: this, mac, event });
-  }
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  onFirmwareUpgradeNeeded = (event: IPenEvent) => { }
 
 
   /**
    *
    * @param event
    */
-  onDisconnected = (event: IPenEvent) => {
-    // let event = makePenEvent(DeviceTypeEnum.PEN, PenEventEnum.ON_DISCONNECTED);
-    // let ph = this.appPen;
-    // ph.onDisconnected(event);
-    const mac = this.mac;
-    if (!mac) {
-      console.error(`mac address was not registered`);
-      console.error(event);
-    }
-    else {
-      // this.manager.onDisconnected({ pen: this, event });
-      this.dispatcher.dispatch(PenEventName.ON_DISCONNECTED, { pen: this, mac, event });
-    }
-  }
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  onDisconnected = (event: IPenEvent) => { }
 
   setColor(color: string) {
     this.penState[this.penRendererType].color = color;

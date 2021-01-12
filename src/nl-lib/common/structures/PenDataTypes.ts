@@ -4,7 +4,7 @@ import { IPenEvent } from "./Structures";
 
 
 // export type IPenToViewerEvent = {
-//   pen: NeoSmartpen,
+//   pen: INeoSmartpen,
 
 //   mac: string,
 //   event: IPenEvent,

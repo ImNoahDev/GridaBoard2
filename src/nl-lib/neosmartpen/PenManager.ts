@@ -5,13 +5,15 @@ import { IPenEvent } from "../common/structures";
 
 
 import ThemeManager from "../../styles/ThemeManager"
-import { IPenToViewerEvent } from "../common/neopen/INeoSmartpen";
+import { INeoSmartpen, IPenToViewerEvent } from "../common/neopen/INeoSmartpen";
 import NeoSmartpen from "./NeoSmartpen";
 import { IPenManager } from "../common/neopen/IPenManager";
+import VirtualPen from "./VirtualPen";
+import { sprintf } from "sprintf-js";
 
 
-let _penmanager_instance = null;
-let _active_pen: NeoSmartpen = null;
+let _penmanager_instance = null as PenManager;
+let _active_pen: INeoSmartpen = null;
 
 
 
@@ -21,15 +23,14 @@ export const DEFAULT_PEN_RENDERER_TYPE: IBrushType = IBrushType.PEN;
 
 
 
-export default class PenManager  {
-  /** @type {Array.<{id:string, mac:string, pen:NeoSmartpen, connected:boolean}>} */
-  penArray = new Array(0);
+export default class PenManager {
+  penArray: { id: string, mac: string, pen: INeoSmartpen, connected: boolean }[] = new Array(0);
 
   /** @type {Array.<StorageRenderer>} */
   // render = [];
 
   pen_colors: string[] = [
-    "rgb(169, 169, 169)", // 0 DARK_GARY #FFAAAAAA #A9A9A9
+    "rgb(255, 255, 255)", // 0 DARK_GARY #FFAAAAAA #A9A9A9
     "rgb(255, 0, 0)", // 1 RED #FFFF0200 #FF0000  rgb(255, 0, 0, 0)
     "rgb(255, 255, 2)", // 2 YELLOW #FFFFD001 #FFFF02
     "rgb(0, 0, 128)", // 3 NAVY #FF012EE2 #000080
@@ -69,14 +70,25 @@ export default class PenManager  {
 
   dispatcher: EventDispatcher = new EventDispatcher();
 
+  virtualPenSerial = 0;
+
+  _virtualPen: INeoSmartpen;
+
   init = () => {
     this.setThickness(DEFAULT_PEN_THICKNESS);
     this.setPenRendererType(DEFAULT_PEN_RENDERER_TYPE);
     this.setColor(DEFAULT_PEN_COLOR_NUM);
   }
 
+  getColorNum = (color: string) => {
+    const index = this.pen_colors.findIndex((c) => c == color);
+    return index;
+  }
+
   constructor() {
     if (_penmanager_instance) return _penmanager_instance;
+
+
   }
 
   static getInstance() {
@@ -86,10 +98,18 @@ export default class PenManager  {
     return _penmanager_instance;
   }
 
+  get virtualPen() {
+    if (!this._virtualPen) {
+      this._virtualPen = this.createVirtualPen();
+    }
+
+    return this._virtualPen;
+  }
+
   /**
    *
    */
-  public createPen = () => {
+  public createPen = (): INeoSmartpen => {
     const pen = new NeoSmartpen();
     pen.addEventListener(PenEventName.ON_CONNECTED, this.onConnected);
     pen.addEventListener(PenEventName.ON_DISCONNECTED, this.onDisconnected);
@@ -97,6 +117,15 @@ export default class PenManager  {
 
     return pen;
   }
+
+  public createVirtualPen = (): INeoSmartpen => {
+    const pen = new VirtualPen();
+    this.add(pen, { id: pen.id });
+    this.virtualPenSerial++;
+
+    return pen;
+  }
+
 
   onLivePenPageInfo = (event: IPenToViewerEvent) => {
     this.dispatcher.dispatch(PenEventName.ON_PEN_PAGEINFO, event);
@@ -107,7 +136,7 @@ export default class PenManager  {
    * @param pen
    * @param device
    */
-  public add = (pen: NeoSmartpen, device: BluetoothDevice) => {
+  public add = (pen: INeoSmartpen, device: { id: string }) => {
     console.log(device);
     this.penArray.push({
       id: device.id,
@@ -124,7 +153,7 @@ export default class PenManager  {
    * @param device
    */
   public isAlreadyConnected = (device: BluetoothDevice): boolean => {
-    const index = this.penArray.findIndex(penInfo => penInfo.id === device.id);
+    const index = this.penArray.findIndex(pen => pen.id === device.id);
     if (index > -1) return true;
 
     return false;
@@ -134,7 +163,7 @@ export default class PenManager  {
    *
    * @param pen
    */
-  private removePen = (pen: NeoSmartpen) => {
+  private removePen = (pen: INeoSmartpen) => {
     const btDeviceId = pen.getBtDevice().id;
 
     const index = this.penArray.findIndex(penInfo => penInfo.id === btDeviceId);
@@ -243,7 +272,7 @@ export default class PenManager  {
    *
    * @param opt
    */
-  public onConnected = (opt: { pen: NeoSmartpen, event: IPenEvent }) => {
+  public onConnected = (opt: { pen: INeoSmartpen, event: IPenEvent }) => {
     const { pen } = opt;
     const btDeviceId = pen.getBtDevice().id;
 
@@ -269,7 +298,7 @@ export default class PenManager  {
    *
    * @param opt
    */
-  public onDisconnected = (opt: { pen: NeoSmartpen, event: IPenEvent }) => {
+  public onDisconnected = (opt: { pen: INeoSmartpen, event: IPenEvent }) => {
     const { pen } = opt;
     const btDeviceId = pen.getBtDevice().id;
 
@@ -292,7 +321,7 @@ export default class PenManager  {
    *
    * @param opt
    */
-  public onNcodeError = (opt: { pen: NeoSmartpen, event: IPenEvent }) => {
+  public onNcodeError = (opt: { pen: INeoSmartpen, event: IPenEvent }) => {
     // const { pen, event } = opt;
 
   }
@@ -300,7 +329,7 @@ export default class PenManager  {
   /**
    *
    */
-  getConnectedPens = (): NeoSmartpen[] => {
+  getConnectedPens = (): INeoSmartpen[] => {
     /** @type {Array<NeoSmartpen>} */
     const ret = new Array(0);
 

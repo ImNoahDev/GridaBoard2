@@ -21,6 +21,7 @@ import { CalibrationButton, OptionDialogButton, PrintNcodedPdfButton } from "../
 import ClearLocalMappingButton from "../../nl-lib/common/mapper/test/ClearLocalMappingButton";
 import { turnOnGlobalKeyShortCut } from "../GlobalFunctions";
 import { savePDF } from "../Save/SavePdf";
+import { setActivePageNo } from "../../store/reducers/activePageReducer";
 
 
 const buttonDivStyle = {
@@ -94,6 +95,11 @@ const ButtonLayer_forTest = () => {
     }
   }, [activePageNo]);
 
+  const addBlankPage = (event) => {
+    const doc = GridaDoc.getInstance();
+    const pageNo = doc.addBlankPage();
+    setActivePageNo(pageNo);
+  }
 
   const docJson = { pdf: [], pages: [] };
   const doc = GridaDoc.getInstance();
@@ -137,7 +143,7 @@ const ButtonLayer_forTest = () => {
       <div style={{ fontSize: "20px", fontWeight: "bold" }}>
         <Button variant="contained" color="primary"
           onClick={(event) => setMapViewDetail((mapViewDetail + 1) % 3)} >
-          <Box fontSize={14} fontWeight="fontWeightBold" >매핑 테이블 보기</Box>
+          <Box fontSize={14} fontWeight="fontWeightBold" >매핑 테이블</Box>
         </Button>
       </div>
 
@@ -149,11 +155,12 @@ const ButtonLayer_forTest = () => {
         </Paper>
         : ""}
 
+      <div style={{ flex: 1 }}> </div>
       {/* GridaDoc 내부 */}
       <div style={{ fontSize: "20px", fontWeight: "bold" }}>
         <Button variant="contained" color="primary"
           onClick={(event) => setDocViewDetail((docViewDetail + 1) % 2)} >
-          <Box fontSize={14} fontWeight="fontWeightBold" >GridaDoc 살펴보기</Box>
+          <Box fontSize={14} fontWeight="fontWeightBold" >GridaDoc</Box>
         </Button>
       </div>
 
@@ -165,14 +172,22 @@ const ButtonLayer_forTest = () => {
         </Paper>
         : ""}
 
-
+      <div style={{ flex: 1 }}> </div>
       {/* 공책 정보 가져오기 테스트 버튼 */}
       <div style={{ fontSize: "20px", fontWeight: "bold" }}>
+        <Button variant="contained" color="secondary" onClick={(event) => addBlankPage(event)} >
+          <Box fontSize={14} fontWeight="fontWeightBold" >빈 페이지 추가</Box>
+        </Button>
+      </div>
+      <div style={{ flex: 1 }}> </div>
+
+      {/* 공책 정보 가져오기 테스트 버튼 */}
+      {/* <div style={{ fontSize: "20px", fontWeight: "bold" }}>
         <Button variant="outlined" color="primary" onClick={(event) => getNoteInfo(event)} >
           <Box fontSize={14} fontWeight="fontWeightBold" >공책 정보 받아오기(현재 실패)</Box>
         </Button>
       </div>
-      <div style={{ flex: 1 }}> </div>
+      <div style={{ flex: 1 }}> </div> */}
 
       {/* 이미지 버튼 테스트 */}
       <NeoImage src="./icons/icon_trash_n.png" />

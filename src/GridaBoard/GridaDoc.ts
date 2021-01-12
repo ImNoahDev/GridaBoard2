@@ -3,7 +3,7 @@ import { store } from "../client/Root";
 import { forceToRenderPanes, setActivePageNo, setActivePdf, setDocNumPages, setUrlAndFilename } from "../store/reducers/activePageReducer";
 import { RootState } from "../store/rootReducer";
 
-import { g_availablePagesInSection } from "../nl-lib/common/constants";
+import { g_availablePagesInSection, nullNcode } from "../nl-lib/common/constants";
 import { NeoPdfDocument, IPdfOpenOption, NeoPdfManager, PdfManagerEventName, IPdfManagerEvent } from "../nl-lib/common/neopdf";
 import { IPdfToNcodeMapItem, IPageSOBP, IGetNPageTransformType } from "../nl-lib/common/structures";
 import { isSamePage, makeNPageIdStr } from "../nl-lib/common/util";
@@ -140,7 +140,7 @@ export default class GridaDoc {
       let theBase = msi.findAssociatedBaseNcode(pdfDoc.fingerprint);
       if (!theBase) {
         const { url, filename, fingerprint, numPages } = pdfDoc;
-        theBase = msi.makeTemporaryAssociateMapItem({ pdf: { url, filename, fingerprint, numPages }, n_paper: undefined });
+        theBase = msi.makeTemporaryAssociateMapItem({ pdf: { url, filename, fingerprint, numPages }, n_paper: undefined, numBlankPages: undefined });
       }
 
       basePageInfo = theBase.basePageInfo;
@@ -255,6 +255,15 @@ export default class GridaDoc {
     }
 
     return retVal;
+  }
+
+  public addBlankPage = () => {
+    const msi = MappingStorage.getInstance();
+    const theBase = msi.makeTemporaryAssociateMapItem({ n_paper: undefined, pdf: undefined, numBlankPages: 1 });
+
+    const basePageInfo = theBase.basePageInfo;
+    const newPageNo = this.addNcodePage(basePageInfo);
+    return newPageNo;
   }
 
   public addNcodePage = (pageInfo: IPageSOBP) => {

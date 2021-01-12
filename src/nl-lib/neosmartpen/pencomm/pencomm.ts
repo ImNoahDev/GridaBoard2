@@ -3,7 +3,8 @@ import { DeviceTypeEnum } from "./pencomm_enum";
 import { PenEventEnum, makePenEvent } from "./pencomm_event";
 import { intFromBytes, decimalToHex } from "./pen_util_func";
 import { PEN_PACKET_START, PEN_PACKET_END } from "./pencomm_const";
-import NeoSmartpen from "../NeoSmartpen";
+import { INeoSmartpen } from "../../common/neopen";
+
 // import { NeoSmartpen } from "./neosmartpen";
 
 
@@ -86,17 +87,13 @@ export default class PenComm extends ProtocolHandlerBase {
 
   penCommBase = new PenCommBase(this);
 
-  penHandler: NeoSmartpen;
+  penHandler: INeoSmartpen;
 
   private _strokeStartTime: number;
 
   private _currentTime: number;
 
-  /**
-   *
-   * @param {NeoSmartpen} penHandler
-   */
-  constructor(penHandler: NeoSmartpen) {
+  constructor(penHandler: INeoSmartpen) {
     super();
     this.penHandler = penHandler;
     this.setTimeStamp(0);
@@ -160,7 +157,7 @@ export default class PenComm extends ProtocolHandlerBase {
    */
   connect = (btDevice) => {
     this.btDevice = btDevice;
-    this.penCommBase.connect(btDevice, this.onPhysicallyConnected);
+    return this.penCommBase.connect(btDevice, this.onPhysicallyConnected);
   }
 
   write = (buf: Uint8Array): Promise<void> => {

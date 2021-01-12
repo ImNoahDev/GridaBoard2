@@ -10,11 +10,9 @@ import { PenEventName, PLAYSTATE, ZoomFitEnum } from "../../common/enums";
 import { IPageSOBP, ISize } from "../../common/structures";
 import { isSamePage, makeNPageIdStr, uuidv4 } from "../../common/util";
 
-import { IPenToViewerEvent } from "../../common/neopen";
+import { INeoSmartpen, IPenToViewerEvent } from "../../common/neopen";
 import { MappingStorage } from "../../common/mapper";
-import PenManager from "../../neosmartpen/PenManager";
 import { InkStorage } from "../../common/penstorage";
-import { NeoSmartpen } from "../../neosmartpen";
 
 
 /**
@@ -44,7 +42,7 @@ interface State {
   liveDotCount: number,
 
   viewFit: ZoomFitEnum,
-  pens: NeoSmartpen[],
+  pens: INeoSmartpen[],
   playState: PLAYSTATE,
 
   renderCount: number,
@@ -97,7 +95,7 @@ class PenBasedRenderer extends React.Component<Props, State> {
     this.canvas = canvas;
   }
 
-  subscribedPens = [] as NeoSmartpen[];
+  subscribedPens = [] as INeoSmartpen[];
 
   constructor(props: Props) {
     super(props);
@@ -144,7 +142,7 @@ class PenBasedRenderer extends React.Component<Props, State> {
    * @private
    * @param {NeoSmartpen} pen
    */
-  private subscribePenEvent = (pen: NeoSmartpen) => {
+  private subscribePenEvent = (pen: INeoSmartpen) => {
     if (!this.subscribedPens.includes(pen)) {
       pen.addEventListener(PenEventName.ON_PEN_DOWN, this.onLivePenDown);
       pen.addEventListener(PenEventName.ON_PEN_PAGEINFO, this.onLivePenPageInfo);
@@ -169,7 +167,7 @@ class PenBasedRenderer extends React.Component<Props, State> {
    * @private
    * @param {NeoSmartpen} pen
    */
-  private unsubscribePenEvent = (pen: NeoSmartpen) => {
+  private unsubscribePenEvent = (pen: INeoSmartpen) => {
     if (this.subscribedPens.includes(pen)) {
       pen.removeEventListener(PenEventName.ON_PEN_DOWN, this.onLivePenDown);
       pen.removeEventListener(PenEventName.ON_PEN_PAGEINFO, this.onLivePenPageInfo);
@@ -196,7 +194,7 @@ class PenBasedRenderer extends React.Component<Props, State> {
   }
 
   /** pen array를 제외하고는 event listening을 하지 않도록 */
-  private makeUpPenEvents = (pens: NeoSmartpen[]) => {
+  private makeUpPenEvents = (pens: INeoSmartpen[]) => {
     // 먼저 이벤트 리스닝을 해제할 것은 하고
     const needToUnsubscribe = this.subscribedPens.filter(pen => !pens.includes(pen));
     needToUnsubscribe.forEach(pen => {
@@ -207,7 +205,6 @@ class PenBasedRenderer extends React.Component<Props, State> {
     needToSubscribe.forEach(pen => {
       this.subscribePenEvent(pen);
     });
-
   }
 
 
@@ -299,6 +296,7 @@ class PenBasedRenderer extends React.Component<Props, State> {
     return ret_val;
   }
 
+
   initRenderer(size: { width: number, height: number }) {
     /** @type {{width:number, height:number}} */
     const { width, height } = size;
@@ -347,24 +345,9 @@ class PenBasedRenderer extends React.Component<Props, State> {
    * @public
    */
   componentWillUnmount() {
-    /** @type {Array.<NeoSmartpen>} */
-    const pens = this.props.pens;
-    pens.forEach(pen => this.unsubscribePenEvent(pen));
-
+    this.unsubscribeAllPensEvent();
     if (this.props.fromStorage) this.unsubScriptStorageEvent();
-    // this.renderer.stopInterval();
-    // window.removeEventListener("resize", this.resizeListener);
-
-    // // penManager에 연결 해제
-    // const penManager = PenManager.getInstance();
-    // if (penManager) {
-    //   penManager.unregisterRenderContainer(this);
-    // }
   }
-
-
-
-
 
   /**
    *
