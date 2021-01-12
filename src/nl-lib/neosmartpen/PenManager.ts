@@ -192,6 +192,7 @@ export default class PenManager  {
 
     if (_active_pen) {
       _active_pen.setPenRendererType(this.penRendererType);
+      _active_pen.setColor(this.color);
     }
   }
 
