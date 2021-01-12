@@ -15,7 +15,7 @@ let _active_pen: NeoSmartpen = null;
 
 
 
-export const DEFAULT_PEN_COLOR_NUM = 2;
+export const DEFAULT_PEN_COLOR_NUM = 4;
 export const DEFAULT_PEN_THICKNESS = 2;
 export const DEFAULT_PEN_RENDERER_TYPE: IBrushType = IBrushType.PEN;
 
