@@ -215,9 +215,9 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
     const pathObj = live.pathObj;
 
     if (pathObj) {
-      this.localPathArray.push(pathObj);
       pathObj.fill = pathObj.color;
-      pathObj.stroke = pathObj.color;
+      // pathObj.stroke = pathObj.color;
+      this.localPathArray.push(pathObj);
     }
 
     delete this.livePaths[event.strokeKey];
@@ -230,7 +230,7 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
    */
   closeLiveStroke_byStorage = (event: IPenToViewerEvent) => {
     const new_pathObj = this.createFabricPath(event.stroke, false) as IExtendedPathType;
-    new_pathObj.fill = new_pathObj.color;
+    // new_pathObj.fill = new_pathObj.color;
     new_pathObj.stroke = new_pathObj.color;
 
     this.canvasFb.add(new_pathObj);
@@ -640,9 +640,9 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
     }
 
     const pathOption = {
-      stroke: color, //"rgba(0,0,0,255)"
-      fill: color, //위에 두놈은 그려지는 순간의 color
-      color: color, //얘가 canvas에 저장되는 color
+      // stroke: color, //"rgba(0,0,0,255)"
+      fill: color, 
+      color: color,
       opacity: opacity,
       // strokeWidth: 10,
       originX: 'left',
