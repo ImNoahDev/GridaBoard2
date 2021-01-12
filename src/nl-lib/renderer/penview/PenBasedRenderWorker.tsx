@@ -216,7 +216,7 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
     const pathObj = live.pathObj;
 
     if (pathObj) {
-      pathObj.fill = pathObj.color;
+      // pathObj.fill = pathObj.color;
       // pathObj.stroke = pathObj.color;
       this.localPathArray.push(pathObj);
     }
@@ -232,7 +232,7 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
   closeLiveStroke_byStorage = (event: IPenToViewerEvent) => {
     const new_pathObj = this.createFabricPath(event.stroke, false) as IExtendedPathType;
     // new_pathObj.fill = new_pathObj.color;
-    new_pathObj.stroke = new_pathObj.color;
+    // new_pathObj.stroke = new_pathObj.color;
 
     this.canvasFb.add(new_pathObj);
     this.localPathArray.push(new_pathObj);
@@ -598,7 +598,7 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
   }
 
   createPathData_arr = (stroke: NeoStroke) => {
-    const { dotArray, thickness } = stroke;
+    const { dotArray, brushType, thickness } = stroke;
 
     const pointArray = [];
     dotArray.forEach((dot) => {
@@ -606,7 +606,12 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
       pointArray.push(pt);
     });
 
-    const strokeThickness = thickness / 64;
+    let strokeThickness = thickness / 64;
+    switch (brushType) {
+      case 1: strokeThickness *= 5; break;
+      default: break;
+    }
+
     const pathData_arr = drawPath_arr(pointArray, strokeThickness);
 
     return pathData_arr;
@@ -615,7 +620,7 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
 
 
   createPathData = (stroke: NeoStroke) => {
-    const { dotArray, thickness } = stroke;
+    const { dotArray, brushType, thickness } = stroke;
 
     const pointArray = [];
     dotArray.forEach((dot) => {
@@ -623,7 +628,12 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
       pointArray.push(pt);
     });
 
-    const strokeThickness = thickness / 64;
+    let strokeThickness = thickness / 64;
+    switch (brushType) {
+      case 1: strokeThickness *= 5; break;
+      default: break;
+    }
+
     const pathData = drawPath(pointArray, strokeThickness);
 
     return pathData;

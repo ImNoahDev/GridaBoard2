@@ -1,6 +1,6 @@
 import PenComm, { deviceSelectDlg } from "./pencomm/pencomm";
 import { EventDispatcher, EventCallbackType } from "../common/event";
-import PenManager from "./PenManager";
+import PenManager, {DEFAULT_PEN_THICKNESS} from "./PenManager";
 import PUIController from "../../components/PUIController";
 import { IBrushState, INoteServerItem, IPenEvent, NeoDot, NeoStroke, StrokePageAttr } from "../common/structures";
 import { IBrushType, PEN_STATE, PenEventName } from "../common/enums";
@@ -84,12 +84,10 @@ export default class NeoSmartpen implements INeoSmartpen {
       this.storage = InkStorage.getInstance();
     }
 
+    const color = this.manager.color;
     for (let i = 0; i < this.penState.length; i++) {
-      let thickness = 0.2;
-      const color = this.manager.color;
-      if (i === 1) { thickness = 1; }
       this.penState[i] = {
-        thickness: thickness,
+        thickness: DEFAULT_PEN_THICKNESS / 10,
         color: color,
       };
     }
