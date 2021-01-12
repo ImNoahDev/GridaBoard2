@@ -17,7 +17,7 @@ let _active_pen: INeoSmartpen = null;
 
 
 
-export const DEFAULT_PEN_COLOR_NUM = 2;
+export const DEFAULT_PEN_COLOR_NUM = 4;
 export const DEFAULT_PEN_THICKNESS = 2;
 export const DEFAULT_PEN_RENDERER_TYPE: IBrushType = IBrushType.PEN;
 
@@ -221,6 +221,7 @@ export default class PenManager {
 
     if (_active_pen) {
       _active_pen.setPenRendererType(this.penRendererType);
+      _active_pen.setColor(this.color);
     }
   }
 

@@ -85,9 +85,12 @@ export default class NeoSmartpen implements INeoSmartpen {
     }
 
     for (let i = 0; i < this.penState.length; i++) {
+      let thickness = 0.2;
+      const color = this.manager.color;
+      if (i === 1) { thickness = 1; }
       this.penState[i] = {
-        thickness: 0.2,
-        color: "rgba(0,0,0)",
+        thickness: thickness,
+        color: color,
       };
     }
 

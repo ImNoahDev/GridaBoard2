@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import '../../styles/main.css';
 import GridaToolTip from '../../styles/GridaToolTip';
-import PenManager from '../../nl-lib/neosmartpen/PenManager';
+import PenManager, { DEFAULT_PEN_COLOR_NUM } from '../../nl-lib/neosmartpen/PenManager';
 import Button from '@material-ui/core/Button';
 import ButtonGroup from '@material-ui/core/ButtonGroup';
 import { makeStyles } from '@material-ui/core/styles';
@@ -30,6 +30,10 @@ const groupStyle = {
 }
 
 const ColorButtons = () => {
+
+  useEffect(() => {
+    manager.toggleColorRadioButton(DEFAULT_PEN_COLOR_NUM);
+  });
 
   return (
     // <div className="color_bar neo_shadow float-left bottom_text color_bar">
