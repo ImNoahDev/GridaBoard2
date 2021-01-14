@@ -28,7 +28,7 @@ interface Props {
 }
 
 interface State {
-  name: string;
+  page: number;
 }
 
 const inputStyle = {
@@ -51,6 +51,11 @@ const pageStyle = {
 
 class PageNumbering extends React.Component<Props, State> {
   
+  
+  state: State = {
+    page: 1,
+  }
+
   render() {
     const { numPages, drawerWidth } = this.props;
     // const pn = this.props.pageNo;
@@ -63,29 +68,10 @@ class PageNumbering extends React.Component<Props, State> {
     const inkStorage = InkStorage.getInstance();
 
     // const [page, setPage] = React.useState();
-    // const handleChange = (event: React.ChangeEvent<unknown>, value: number) => {
-    //   setPage(value);
-    // }
-    // let pdfPageNo = 1;
-    // let pdf = undefined;
-
-    // const activePageNo = useSelector((state: RootState) => state.activePage.activePageNo);
-
-    // const page = doc.getPageAt(pn)
-    // if (activePageNo >= 0) {
-    //   // pdfUrl = doc.getPdfUrlAt(pn);
-    //   // pdfFilename = doc.getPdfFilenameAt(pn);
-    //   // pdfFingerprint = doc.getPdfFingerprintAt(pn);
-    //   pdfPageNo = doc.getPdfPageNoAt(pn);
-    //   pdf = page.pdf;
-    // }
-
-    const handleMouseDown = e => {
-      console.log('handle');
-      const idToken = e.target.id.split('-');
-      const pageNo = Number(idToken[2]); // pageNo 에 NaN이 들어감
-      setActivePageNo(pageNo);
-    };
+    const handleChange = (event: React.ChangeEvent<unknown>, value: number) => {
+      this.setState({page : value});
+      setActivePageNo(value-1);
+    }
 
     return (
       // <div className="navbar-menu d-flex justify-content-center align-items-center neo_shadow">
@@ -94,9 +80,9 @@ class PageNumbering extends React.Component<Props, State> {
           <h5>index:{this.props.activePageNo} (#{this.props.activePageNo + 1}/{numPages})</h5>
         </Box>
         {/* {pages.map((page, i) => */}
-        <Pagination count={numPages} color="secondary" className="btn btn-neo" style={pageStyle} 
+        <Pagination count={numPages} page={this.state.page} color="secondary" className="btn btn-neo" style={pageStyle} 
         // key={i} 
-        onMouseDown={e => handleMouseDown(e)}  />
+        onChange={handleChange}  />
         {/* )}  */}
         {/* <div id={`thumbnail-pageInfo-${pn}`} style={{ position: "absolute", margin: 0, padding: 0, right: 0, left: 0, top: 0, height: "100%", zIndex: 999 }}>
           {!this.props.noInfo
