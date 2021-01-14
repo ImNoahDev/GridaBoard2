@@ -9,6 +9,7 @@ import { IPoint, NeoStroke, NeoDot, IPageSOBP, INeoStrokeProps, StrokeStatus } f
 import { INeoSmartpen, IPenToViewerEvent } from "../../common/neopen";
 import { InkStorage } from "../../common/penstorage";
 import { NeoSmartpen, PenManager, VirtualPen } from "../../neosmartpen";
+
 // import { PaperInfo } from "../../common/noteserver";
 
 
@@ -139,8 +140,7 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
     const dot = event.dot;
 
     //지우개 구현
-    const canvas_xy = this.ncodeToPdfXy(dot);
-    const screen_xy = this.pdfToScreenXy(canvas_xy);
+    const pdf_xy = this.ncodeToPdfXy(dot);
     const pen = event.pen;
 
     const cursor = this.penCursors[event.mac];
@@ -149,11 +149,11 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
       if (cursor.eraserLastPoint !== undefined) {
         this.eraseOnLine(
           cursor.eraserLastPoint.x, cursor.eraserLastPoint.y,
-          screen_xy.x, screen_xy.y, live.stroke
+          pdf_xy.x, pdf_xy.y, live.stroke
         );
       }
 
-      cursor.eraserLastPoint = { x: screen_xy.x, y: screen_xy.y };
+      cursor.eraserLastPoint = { x: pdf_xy.x, y: pdf_xy.y };
     }
     else {
       if (!live.pathObj) {
@@ -238,30 +238,29 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
     this.localPathArray.push(new_pathObj);
   }
 
-  eraseOnLine(ink_x0, ink_y0, ink_x1, ink_y1, stroke) {
-    const pathData = 'M ' + ink_x0 + ' ' + ink_y0 + ' L ' + ink_x1 + ' ' + ink_y1 + 'z';
-    const pathOption = {
-      strokeWidth: 5,
-      opacity: 0,
-      originX: 'left',
-      originY: 'top',
+  eraseOnLine(pdf_x0, pdf_y0, pdf_x1, pdf_y1, stroke) {
+    const { section, book, owner, page } = stroke;
+    const pageInfo = { 
+      section: section,
+      book: book,
+      owner: owner,
+      page: page
     }
-    const eraserPath = new fabric.Path(pathData, pathOption);
-    // eraserPath.set({ left: ink_x0, top: ink_y0 });
 
-    const paths = this.canvasFb.getObjects().filter(obj => obj.data === 'ns');
+    const eraserLine = {
+      x0_pu: pdf_x0, y0_pu: pdf_y0, x1_pu: pdf_x1, y1_pu: pdf_y1
+    }
 
     for (let i = 0; i < this.localPathArray.length; i++) {
-      const path = this.localPathArray[i];
+      const fabricPath = this.localPathArray[i];
+      const pathDataStr = fabricPath.path.join();
 
-      if (eraserPath.intersectsWithObject(path)) {
-        this.canvasFb.remove(path);
+      if (this.storage.collisionTest(pathDataStr, eraserLine)) {
+        this.canvasFb.remove(fabricPath);
 
-        const { section, book, owner, page } = stroke;
-        const pageId = InkStorage.makeNPageIdStr({ section, book, owner, page });
-
+        const pageId = InkStorage.makeNPageIdStr(pageInfo);
         this.storage.completed = this.storage.completedOnPage.get(pageId)
-        const idx = this.storage.completed.findIndex(ns => ns.key === path.key);
+        const idx = this.storage.completed.findIndex(ns => ns.key === fabricPath.key);
         this.storage.completed.splice(idx, 1);
       }
     }
