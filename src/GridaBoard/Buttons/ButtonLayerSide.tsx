@@ -11,6 +11,10 @@ import TracePointButton from "../../components/buttons/TracePointButton";
 import { RootState } from "../../store/rootReducer";
 import { useSelector } from "react-redux";
 import GridaApp from "../GridaApp";
+import { Box, Button, Paper } from "@material-ui/core";
+import PostAddIcon from '@material-ui/icons/PostAdd';
+import GridaDoc from "../GridaDoc";
+import { setActivePageNo } from "../../store/reducers/activePageReducer";
 
 
 const mainFrameStyle = {
@@ -26,6 +30,12 @@ const mainFrameStyle = {
   zIndex: 3,
   marginLeft: "-1px",
 } as React.CSSProperties;
+
+const addBlankPage = (event) => {
+  const doc = GridaDoc.getInstance();
+  const pageNo = doc.addBlankPage();
+  setActivePageNo(pageNo);
+}
 
 
 /**
@@ -76,6 +86,11 @@ const ButtonLayerSide = () => {
             <div id="menu-wide" className="d-flex menu-container float-left h-100">
               <div className="d-flex flex-column justify-content-between" style={{ zIndex: 1030 }}>
                 <ConnectButton onPenLinkChanged={e => onPenLinkChanged(e)} />
+                <div className="btn-group-vertical neo_shadow" style={{ fontSize: "20px", fontWeight: "bold" }}>
+                  <button className="btn btn-neo btn-neo-vertical" onClick={(event) => addBlankPage(event)} >
+                    <PostAddIcon fontSize="large">빈 페이지 추가</PostAddIcon>
+                  </button>
+                </div>
                 <div className="btn-group-vertical neo_shadow" style={{ marginBottom: 10 }}>
                   <div className="btn-group dropright" role="group">
                     <PenTypeButton />

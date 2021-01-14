@@ -22,6 +22,7 @@ import ClearLocalMappingButton from "../../nl-lib/common/mapper/test/ClearLocalM
 import { turnOnGlobalKeyShortCut } from "../GlobalFunctions";
 import { savePDF } from "../Save/SavePdf";
 import { setActivePageNo } from "../../store/reducers/activePageReducer";
+import PictureAsPdfIcon from '@material-ui/icons/PictureAsPdf';
 
 
 const buttonDivStyle = {
@@ -174,11 +175,6 @@ const ButtonLayer_forTest = () => {
 
       <div style={{ flex: 1 }}> </div>
       {/* 공책 정보 가져오기 테스트 버튼 */}
-      <div style={{ fontSize: "20px", fontWeight: "bold" }}>
-        <Button variant="contained" color="secondary" onClick={(event) => addBlankPage(event)} >
-          <Box fontSize={14} fontWeight="fontWeightBold" >빈 페이지 추가</Box>
-        </Button>
-      </div>
       <div style={{ flex: 1 }}> </div>
 
       {/* 공책 정보 가져오기 테스트 버튼 */}
@@ -253,9 +249,6 @@ const ButtonLayer_forTest = () => {
       {/* 구글 업로드 테스트 버튼 */}
       <Upload />
       <div style={{ flex: 1 }}> </div>
-      <button id="read_mapping_info" onClick={() => savePDF(pdfUrl, 'hello.pdf')}>
-        Save PDF on Local
-          </button>
       <GoogleBtn />
       <div style={{ flex: 11 }}> </div>
     </div>
