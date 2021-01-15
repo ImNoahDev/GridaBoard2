@@ -33,6 +33,7 @@ export function makeNPageId(pageInfo: IPageSOBP) {
 export function makeNPageIdStr(pageInfo: IPageSOBP) {
   if (pageInfo) {
     const { section, book, owner, page } = pageInfo;
+    if ( section === undefined ) return "section undefined";
     return `${section}.${owner}.${book}.${page}`;
   }
   return "undefined";
@@ -382,21 +383,34 @@ export function scalePoint(pt: IPointDpi, scale: number) {
   return pt;
 }
 
+export function callstackDepth() {
+  const callstack = new Error().stack.toString();
+  const lines = callstack.split("\n");
 
+  const re = /at\s(.+)\.(.+)\s\((.+)\)/
 
+  let cnt = 0;
+  let spc = "";
+  let caller = sprintf("%20s", "");
+  for (let i = 2, br = true; br; i++) {
+    cnt++;
+    spc += "  ";
+    if (!lines[i]) {
+      br = false;
+    }
+    else {
+      const arg = lines[i].split(re);
+      // console.log(`VIEW SIZE   ${arg.length}  ${lines[i]} `);
 
+      if (arg.length !== 5) {
+        br = false;
+        const root = arg[0].split(/at\s(.+)\s\(/);
+        caller = sprintf("%30s", root[1]);
+        // console.log(arg);
+      }
 
+    }
+  }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+  return " " + caller + spc;
+}

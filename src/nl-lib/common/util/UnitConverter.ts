@@ -1,4 +1,10 @@
-import { DISPLAY_DEFAULT_DPI, NCODE_TO_INCH_SCALE, PDF_DEFAULT_DPI, PDF_SCALE_TO_INCH } from "../constants";
+import {
+  DISPLAY_DEFAULT_DPI,
+  NCODE_TO_INCH_SCALE,
+  PDF_SCALE_TO_INCH,
+  NU_TO_PU,
+  PU_TO_NU
+} from "../constants";
 
 
 export function getDisplayRatio(): number {
@@ -12,8 +18,13 @@ export function convertNuToInch(n: number) {
 }
 
 export function convertNuToPu(n: number) {
-  return n * NCODE_TO_INCH_SCALE * PDF_DEFAULT_DPI;
+  return n * NU_TO_PU;
 }
+
+export function convertPuToNu(n: number) {
+  return n * PU_TO_NU;
+}
+
 export function convertPuToInch(n: number) {
   // 72 DPI
   return n * PDF_SCALE_TO_INCH;

@@ -312,7 +312,7 @@ export class NeoPdfDocument {
     if (pageNo > this.numPages) {
       return undefined;
     }
-
+    // return {width:595, height:841};
     return this._pagesOverview[pageNo - 1].sizePu;
   }
 
