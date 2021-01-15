@@ -1,67 +1,38 @@
-import React from 'react';
+import React, { useState } from 'react';
 import '../../styles/main.css';
-import Tooltip, { TooltipProps } from '@material-ui/core/Tooltip';
-import { InputBase, Theme, Typography, withStyles } from '@material-ui/core';
-import GridaToolTip from '../../styles/GridaToolTip';
-import Button from '@material-ui/core/Button';
+import Pagination from '@material-ui/lab/Pagination';
+import { setActivePageNo } from '../../store/reducers/activePageReducer';
+import { RootState } from '../../store/rootReducer';
+import { useSelector } from "react-redux";
 
-class PageNumbering extends React.Component {
+const pageStyle = {
+  outline: 0,
+  border: 0
+} as React.CSSProperties;
 
-  inputStyle = {
-    padding: "0px",
-    margin: "0px",
-    border: "0px",
-    minWidth: "24px",
-    fontSize: "14px"
-  }
+const PageNumbering = () => {
 
-  buttonStyle = {
-    minWidth: "36px",
-    padding: "0px"
-  }
-  render() {
+    const numPages_store = useSelector((state: RootState) => state.activePage.numDocPages);
+    const [page, setPage] = React.useState(1);
+    
+    let numPages;
+    if (numPages_store < 1) { 
+      numPages = 1;
+    } else {
+      numPages = numPages_store;
+    }
+
+    const handleChange = (event: React.ChangeEvent<unknown>, value: number) => {
+      if (numPages_store !== 0) {
+        setPage(value);
+        setActivePageNo(value-1);
+      }
+    }
+
     return (
-      // <div className="navbar-menu d-flex justify-content-center align-items-center neo_shadow">
-      <React.Fragment>
-        <Button id="btn_prevpage" type="button" className="btn btn-neo" style={this.buttonStyle}>
-          <GridaToolTip open={true} placement="top" tip={{
-              head: "Pre Page",
-              msg: "현재 필기 중인 페이지를, 앞쪽 페이지로 이동시킵니다.",
-              tail: "키보드 버튼 Page Up으로 이동 가능합니다"
-            }} title={undefined}>
-            <div className="c2">
-              <img src='../../icons/icon_prev_n.png' className="normal-image"></img>
-              <img src='../../icons/icon_prev_p.png' className="hover-image"></img>
-            </div>
-          </GridaToolTip>
-        </Button>
-        <InputBase type="text" className="neo-form-pdf-number" style={this.inputStyle}
-          placeholder=".form-control-sm" readOnly
-          defaultValue="Page:" />
-
-        <InputBase id="curr_page_num" type="text" className="neo-form-pdf-number" style={this.inputStyle}
-          placeholder=".form-control-sm"
-          defaultValue=" " />
-
-        <InputBase id="page_count" type="text" className="neo-form-pdf-number" style={this.inputStyle}
-          placeholder=".form-control-sm" readOnly
-          defaultValue="/" />
-
-        <Button id="btn_nextpage" type="button" className="btn btn-neo" style={this.buttonStyle}>
-          <GridaToolTip open={true} placement="top" tip={{
-              head: "Next Page",
-              msg: "현재 필기 중인 페이지를, 뒤쪽 페이지로 이동시킵니다.",
-              tail: "키보드 버튼 Page Down으로 이동 가능합니다"
-            }} title={undefined}>
-            <div className="c2">
-              <img src='../../icons/icon_next_n.png' className="normal-image"></img>
-              <img src='../../icons/icon_next_p.png' className="hover-image"></img>
-            </div>
-          </GridaToolTip>
-        </Button>
-      </React.Fragment>
+        <Pagination count={numPages} page={page} color="secondary" className="btn btn-neo" style={pageStyle} 
+        onChange={handleChange} />
     )
-  }
 }
 
 export default PageNumbering;

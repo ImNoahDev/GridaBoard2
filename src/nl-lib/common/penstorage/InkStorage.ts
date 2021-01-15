@@ -1,6 +1,7 @@
 import { EventDispatcher, EventCallbackType } from "../event";
 import { IBrushType, PenEventName } from "../enums";
 import { NeoStroke, IPageSOBP, StrokeStatus, INeoStrokeProps, NeoDot } from "../structures";
+import intersect from 'path-intersection';
 
 /** @type {InkStorage} */
 let _storage_instance = null;
@@ -128,11 +129,10 @@ export default class InkStorage {
     return [];
   }
 
-  public collisionTest = (pageInfo: IPageSOBP, line: { x0_nu: number, y0_nu: number, x1_nu: number, y1_nu: number }) => {
-    // 여기서 충돌 테스트를 하고, 결과를 넘겨 줄 것, 구현해야 함
-    const ret: NeoStroke[] = [];
-
-    return ret;
+  public collisionTest = (pathDataStr: string, line: { x0_pu: number, y0_pu: number, x1_pu: number, y1_pu: number }) => {
+    const eraserSvgPathData = 'M ' + line.x0_pu + ' ' + line.y0_pu + ' L ' + line.x1_pu + ' ' + line.y1_pu + 'z';
+    var intersection = intersect(eraserSvgPathData, pathDataStr);
+    return intersection.length
   }
 
   public markErased = (stroke: NeoStroke) => {

@@ -14,6 +14,10 @@ import { g_defaultPrintOption } from "../../nl-lib/ncodepod";
 
 import { Button, ButtonGroup } from "@material-ui/core";
 
+import PictureAsPdfIcon from '@material-ui/icons/PictureAsPdf';
+import SaveIcon from '@material-ui/icons/Save';
+import { savePDF } from "../Save/SavePdf";
+
 
 
 const localStyle = {
@@ -86,17 +90,20 @@ const navStyle = {
 function hideAndShowFnc() {
   const colorMenu = document.getElementById('color_bar');
   const leftMenu = document.getElementById('leftmenu');
+  const navPage = document.getElementById('navbar_page');
   const navCenter = document.getElementById('navbar_center');
   const navEnd = document.getElementById('navbar_end');
 
   if (colorMenu.style.display === 'none' && navCenter.style.display === 'none'
-    && navEnd.style.display === 'none' && leftMenu.style.display === 'none') {
+    && navEnd.style.display === 'none' && leftMenu.style.display === 'none' && navPage.style.display === 'none') {
     colorMenu.style.display = 'block';
+    navPage.style.display = 'block';
     navCenter.style.display = 'block';
     navEnd.style.display = 'block';
     leftMenu.style.display = 'block';
   } else {
     colorMenu.style.display = 'none';
+    navPage.style.display = 'none';
     navCenter.style.display = 'none';
     navEnd.style.display = 'none';
     leftMenu.style.display = 'none';
@@ -159,11 +166,19 @@ const ButtonLayerBottom = (props: Props) => {
           </div>
         </div>
 
-        <div id="navbar_center">
-          <ButtonGroup className="navbar-menu neo_shadow" style={centerStyle}>
+        <div id="navbar_page">
+          <div className="navbar-menu neo_shadow" style={centerStyle}>
             <PageNumbering />
+          </div>
+        </div>
+
+        <div id="navbar_center" style={{marginLeft: "-500px"}}>          
+          <ButtonGroup className="navbar-menu neo_shadow" style={centerStyle}>   
             <PrintButton targetId={printBtnId} url={pdfUrl} filename={pdfFilename} />
             <FileBrowserButton handlePdfOpen={handlePdfOpen} />
+            <button id="read_mapping_info" className="btn btn-neo" onClick={() => savePDF(pdfUrl, 'hello.pdf')}>
+              <PictureAsPdfIcon />
+            </button>
           </ButtonGroup>
         </div>
 
