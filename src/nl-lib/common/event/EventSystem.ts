@@ -63,7 +63,7 @@ class DispatcherEvent {
     // loop through the callbacks and call each one
     callbacks.forEach((item) => {
       const filter = item.filter;
-      if (!data.mac || filter.allowAll || !filter.mac || filter.mac === data.mac || filter.mac.indexOf(data.mac) > -1) {
+      if ((data && !data.mac) || filter.allowAll || !filter.mac || filter.mac === data.mac || filter.mac.indexOf(data.mac) > -1) {
         item.callback(data);
       }
     });

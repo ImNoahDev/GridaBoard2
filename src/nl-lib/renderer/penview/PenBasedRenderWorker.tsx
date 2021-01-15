@@ -12,6 +12,7 @@ import { NeoSmartpen, PenManager, VirtualPen } from "../../neosmartpen";
 import { MappingStorage } from "../../common/mapper/MappingStorage";
 import { calcRevH } from "../../common/mapper/CoordinateTanslater";
 import { applyTransform } from "../../common/math/echelon/SolveTransform";
+
 // import { PaperInfo } from "../../common/noteserver";
 
 
@@ -22,6 +23,7 @@ import { applyTransform } from "../../common/math/echelon/SolveTransform";
 // const CURRENT_POINT_STROKE_COLOR = "rgba(255, 255, 255, 1)";
 
 const NUM_HOVER_POINTERS = 6;
+const DFAULT_BRUSH_SIZE = 10;
 const REMOVE_HOVER_POINTS_INTERVAL = 50; // 50ms
 const REMOVE_HOVER_POINTS_WAIT = 20; // 20 * 50ms = 1sec
 
@@ -49,7 +51,6 @@ type IExtendedPathType = fabric.Path & {
 }
 
 export default class PenBasedRenderWorker extends RenderWorkerBase {
-
   localPathArray: IExtendedPathType[] = [];
 
   livePaths: { [key: string]: { stroke: NeoStroke, pathObj: IExtendedPathType } } = {};
@@ -62,6 +63,7 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
   penCursors: { [key: string]: IPenHoverCursors } = {};
 
   _vpPenDownTime = 0;
+  brushSize = DFAULT_BRUSH_SIZE;
 
   /**
    *
@@ -78,6 +80,13 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
         throw new Error("storage is not an instance of InkStorage");
       }
       this.storage = storage;
+    }
+
+    this.changeDrawCursor();
+
+    const penManager = PenManager.getInstance();
+    if (penManager.dispatcher.events["colorchanged"] === undefined) {
+      penManager.dispatcher.on("colorchanged", this.changeDrawCursor, null);
     }
 
     this.changePage(this.pageInfo, options.pageSize, true);
@@ -106,6 +115,45 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
    * @public
    * @param {{strokeKey:string, mac:string, time:number, stroke:NeoStroke}} event
    */
+
+  changeDrawCursor = () => {
+    this.canvasFb.hoverCursor = `url(${ this.getDrawCursor() }) ${ this.brushSize / 2 } ${ this.brushSize / 2 }, crosshair`;
+  }
+  getDrawCursor = () => {
+    const color = PenManager.getInstance().color;
+    const pen_colors = PenManager.getInstance().pen_colors;
+    const foundIdx = pen_colors.findIndex(ele => ele === color);
+    
+    let brushColor;
+    switch (foundIdx) {
+      case 1 : brushColor = 'red'; break;
+      case 2 : brushColor = 'yellow'; break;
+      case 3 : brushColor = 'navy'; break;
+      case 4 : brushColor = 'black'; break;
+      case 5 : brushColor = 'white'; break;
+      case 6 : brushColor = 'orange'; break;
+      case 7 : brushColor = 'green'; break;
+      case 8 : brushColor = 'blue'; break;
+      case 9 : brushColor = 'purple'; break;
+      case 10 : brushColor = 'darkgray'; break;
+    }
+    const circle = `
+      <svg
+        height="${ this.brushSize }"
+        fill="${ brushColor }"
+        viewBox="0 0 ${ this.brushSize * 2 } ${ this.brushSize * 2 }"
+        width="${ this.brushSize }"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <circle
+          cx="50%"
+          cy="50%"
+          r="${ this.brushSize }" 
+        />
+      </svg>
+    `;
+    return `data:image/svg+xml;base64,${ window.btoa(circle) }`;
+  };
   createLiveStroke = (event: IPenToViewerEvent) => {
     // console.log(`Stroke created = ${event.strokeKey}`);
     this.livePaths[event.strokeKey] = {
