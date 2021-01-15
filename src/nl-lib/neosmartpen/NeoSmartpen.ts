@@ -550,6 +550,7 @@ export default class NeoSmartpen implements INeoSmartpen {
   onPasscodeRequired = (event: IPenEvent) => {
     console.log("onPasscodeRequired" + event);
     const passcode = prompt("please enter passcode " + (9 - event.retryCount));
+    if (passcode === null) return;
     this.protocolHandler.sendPasscode(passcode);
 
     const mac = this.protocolHandler.getMac();
