@@ -7,7 +7,8 @@ import { useSelector } from "react-redux";
 
 const pageStyle = {
   outline: 0,
-  border: 0
+  border: 0,
+  marginTop: 2
 } as React.CSSProperties;
 
 const PageNumbering = () => {

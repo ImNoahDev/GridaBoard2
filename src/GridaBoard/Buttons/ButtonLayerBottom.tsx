@@ -109,8 +109,6 @@ function hideAndShowFnc() {
 
 }
 
-
-
 interface Props {
   handlePdfOpen: (event: IFileBrowserReturn) => void,
 }
@@ -170,7 +168,7 @@ const ButtonLayerBottom = (props: Props) => {
           </div>
         </div> */}
 
-        <div id="navbar_center" style={{marginLeft: "500px"}}>          
+        <div id="navbar_center" style={{marginLeft: "220px"}}>          
           <ButtonGroup className="navbar-menu neo_shadow" style={centerStyle}>   
             <PrintButton targetId={printBtnId} url={pdfUrl} filename={pdfFilename} />
             <FileBrowserButton handlePdfOpen={handlePdfOpen} />
