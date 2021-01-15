@@ -11,26 +11,26 @@ const pageStyle = {
 } as React.CSSProperties;
 
 const PageNumbering = () => {
-
     const numPages_store = useSelector((state: RootState) => state.activePage.numDocPages);
-    const [page, setPage] = React.useState(1);
+    const activePageNo_store = useSelector((state: RootState) => state.activePage.activePageNo);
     
-    let numPages;
+    let numPages, pageNo;
     if (numPages_store < 1) { 
       numPages = 1;
+      pageNo = 1;
     } else {
       numPages = numPages_store;
+      pageNo = activePageNo_store+1;
     }
 
     const handleChange = (event: React.ChangeEvent<unknown>, value: number) => {
       if (numPages_store !== 0) {
-        setPage(value);
         setActivePageNo(value-1);
       }
     }
 
     return (
-        <Pagination count={numPages} page={page} color="secondary" className="btn btn-neo" style={pageStyle} 
+        <Pagination count={numPages} page={pageNo} color="secondary" className="btn btn-neo" style={pageStyle} 
         onChange={handleChange} />
     )
 }
