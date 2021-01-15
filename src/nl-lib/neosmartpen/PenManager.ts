@@ -30,14 +30,14 @@ export default class PenManager {
   // render = [];
 
   pen_colors: string[] = [
-    "rgb(255, 255, 255)", // 0 DARK_GARY #FFAAAAAA #A9A9A9
+    "rgb(169, 169, 169)", // 0 DARK_GARY #FFAAAAAA #A9A9A9
     "rgb(255, 0, 0)", // 1 RED #FFFF0200 #FF0000  rgb(255, 0, 0, 0)
     "rgb(255, 255, 2)", // 2 YELLOW #FFFFD001 #FFFF02
     "rgb(0, 0, 128)", // 3 NAVY #FF012EE2 #000080
 
     "rgb(0, 0, 0)", // 4 BLACK #FF000000 #000000
 
-    "rgb(211, 211, 211)", // 5 LIGHT_GRAY #FFE5E5E5 #D3D3D3
+    "rgb(255, 255, 255)", // 5 LIGHT_GRAY #FFE5E5E5 #D3D3D3
     "rgb(255, 165, 0)", // 6 ORANGE #FFFF6500 #FFA500
     "rgb(0, 128, 0)", // 7 GREEN #FF3CDD00 #008000
 
@@ -54,7 +54,7 @@ export default class PenManager {
 
     "rgb(167, 167, 174)", // 4
 
-    "rgb(231, 231, 238)", // 5
+    "rgb(255, 255, 255)", // 5
     "rgb(241, 214, 171)", // 6
     "rgb(166, 205, 173)", // 7
 

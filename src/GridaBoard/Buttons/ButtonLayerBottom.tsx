@@ -95,15 +95,13 @@ function hideAndShowFnc() {
   const navEnd = document.getElementById('navbar_end');
 
   if (colorMenu.style.display === 'none' && navCenter.style.display === 'none'
-    && navEnd.style.display === 'none' && leftMenu.style.display === 'none' && navPage.style.display === 'none') {
+    && navEnd.style.display === 'none' && leftMenu.style.display) {
     colorMenu.style.display = 'block';
-    navPage.style.display = 'block';
     navCenter.style.display = 'block';
     navEnd.style.display = 'block';
     leftMenu.style.display = 'block';
   } else {
     colorMenu.style.display = 'none';
-    navPage.style.display = 'none';
     navCenter.style.display = 'none';
     navEnd.style.display = 'none';
     leftMenu.style.display = 'none';
@@ -166,13 +164,13 @@ const ButtonLayerBottom = (props: Props) => {
           </div>
         </div>
 
-        <div id="navbar_page">
+        {/* <div id="navbar_page">
           <div className="navbar-menu neo_shadow" style={centerStyle}>
             <PageNumbering />
           </div>
-        </div>
+        </div> */}
 
-        <div id="navbar_center" style={{marginLeft: "-500px"}}>          
+        <div id="navbar_center" style={{marginLeft: "500px"}}>          
           <ButtonGroup className="navbar-menu neo_shadow" style={centerStyle}>   
             <PrintButton targetId={printBtnId} url={pdfUrl} filename={pdfFilename} />
             <FileBrowserButton handlePdfOpen={handlePdfOpen} />

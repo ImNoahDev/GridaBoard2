@@ -24,6 +24,7 @@ import { MixedPageView } from "../../nl-lib/renderer";
 import { nullNcode } from "../../nl-lib/common/constants";
 import { PLAYSTATE, ZoomFitEnum } from "../../nl-lib/common/enums";
 import { PenManager } from "../../nl-lib/neosmartpen";
+import PageNumbering from "../../components/navbar/PageNumbering";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -37,7 +38,20 @@ const useStyles = makeStyles((theme: Theme) =>
   }),
 );
 
-
+const localStyle = {
+  position: "inherit",
+  // left: "0px", top: "0px",
+  bottom: 0,
+  flexDirection: "row-reverse",
+  display: "flex",
+  alignItems: "center",
+  // zIndex: 1113,
+  // marginRight: 880,
+  // marginTop: 890,
+  // marginTop: '44%',
+  marginLeft: '41.2%',
+  marginBottom: '0.4%',
+} as React.CSSProperties;
 
 const Home = () => {
   const [isRotate, setRotate] = useState();
@@ -276,6 +290,11 @@ const Home = () => {
             fitMargin={100}
             noInfo
           />
+          <div id="navbar_page" style={localStyle}>
+            <div className="navbar-menu neo_shadow" style={{zIndex: 1030, height: "36px"}}>
+              <PageNumbering />
+            </div>
+          </div>
         </div>
       </main >
 

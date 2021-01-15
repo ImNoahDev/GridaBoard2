@@ -42,7 +42,7 @@ const ColorButtons = () => {
         <Button id="clr_1" type="button" className="color_btn" style={groupStyle}
           onClick={() => manager.setColor(1)}>
           <GridaToolTip open={true} placement="top" tip={{
-              head: "Pen Color [RED]",
+              head: "RED",
               msg: "표시되는 펜의 색상을 선택합니다",
               tail: "키보드 버튼 1로 선택 가능합니다"
             }} title={undefined}>
@@ -54,7 +54,7 @@ const ColorButtons = () => {
         <Button id="clr_2" type="button" className="color_btn" style={groupStyle}
           onClick={() => manager.setColor(2)}>
           <GridaToolTip open={true} placement="top" tip={{
-              head: "Pen Color [YELLOW]",
+              head: "YELLOW",
               msg: "표시되는 펜의 색상을 선택합니다",
               tail: "키보드 버튼 2로 선택 가능합니다"
             }} title={undefined}>
@@ -65,7 +65,7 @@ const ColorButtons = () => {
         <Button id="clr_3" type="button" className="color_btn" style={groupStyle}
           onClick={() => manager.setColor(3)}>
           <GridaToolTip open={true} placement="top" tip={{
-              head: "Pen Color [NAVY]",
+              head: "NAVY",
               msg: "표시되는 펜의 색상을 선택합니다",
               tail: "키보드 버튼 3로 선택 가능합니다"
             }} title={undefined}>
@@ -76,7 +76,7 @@ const ColorButtons = () => {
         <Button id="clr_4" type="button" className="color_btn" style={groupStyle}
           onClick={() => manager.setColor(4)}>
           <GridaToolTip open={true} placement="top" tip={{
-              head: "Pen Color [BLACK]",
+              head: "BLACK",
               msg: "표시되는 펜의 색상을 선택합니다",
               tail: "키보드 버튼 4로 선택 가능합니다"
             }} title={undefined}>
@@ -87,7 +87,7 @@ const ColorButtons = () => {
         <Button id="clr_5" type="button" className="color_btn" style={groupStyle}
           onClick={() => manager.setColor(5)}>
           <GridaToolTip open={true} placement="top" tip={{
-              head: "Pen Color [LIGHT_GRAY]",
+              head: "WHITE",
               msg: "표시되는 펜의 색상을 선택합니다",
               tail: "키보드 버튼 5로 선택 가능합니다"
             }} title={undefined}>
@@ -98,7 +98,7 @@ const ColorButtons = () => {
         <Button id="clr_6" type="button" className="color_btn" style={groupStyle}
           onClick={() => manager.setColor(6)}>
           <GridaToolTip open={true} placement="top" tip={{
-              head: "Pen Color [ORANGE]",
+              head: "ORANGE",
               msg: "표시되는 펜의 색상을 선택합니다",
               tail: "키보드 버튼 6로 선택 가능합니다"
             }} title={undefined}>
@@ -109,7 +109,7 @@ const ColorButtons = () => {
         <Button id="clr_7" type="button" className="color_btn" style={groupStyle}
           onClick={() => manager.setColor(7)}>
           <GridaToolTip open={true} placement="top" tip={{
-              head: "Pen Color [GREEN]",
+              head: "GREEN",
               msg: "표시되는 펜의 색상을 선택합니다",
               tail: "키보드 버튼 7로 선택 가능합니다"
             }} title={undefined}>
@@ -120,7 +120,7 @@ const ColorButtons = () => {
         <Button id="clr_8" type="button" className="color_btn" style={groupStyle}
           onClick={() => manager.setColor(8)}>
           <GridaToolTip open={true} placement="top" tip={{
-              head: "Pen Color [BLUE]",
+              head: "BLUE",
               msg: "표시되는 펜의 색상을 선택합니다",
               tail: "키보드 버튼 8로 선택 가능합니다"
             }} title={undefined}>
@@ -131,7 +131,7 @@ const ColorButtons = () => {
         <Button id="clr_9" type="button" className="color_btn" style={groupStyle}
           onClick={() => manager.setColor(9)}>
           <GridaToolTip open={true} placement="top" tip={{
-              head: "Pen Color [PURPLE]",
+              head: "PURPLE",
               msg: "표시되는 펜의 색상을 선택합니다",
               tail: "키보드 버튼 9로 선택 가능합니다"
             }} title={undefined}>
@@ -142,7 +142,7 @@ const ColorButtons = () => {
         <Button id="clr_0" type="button" className="color_btn" style={groupStyle}
           onClick={() => manager.setColor(0)}>
           <GridaToolTip open={true} placement="top" tip={{
-              head: "Pen Color [DARK_GRAY]",
+              head: "DARK GRAY",
               msg: "표시되는 펜의 색상을 선택합니다",
               tail: "키보드 버튼 0로 선택 가능합니다"
             }} title={undefined}>
