@@ -8,17 +8,19 @@ import { MixedViewProps } from "../MixedPageView";
 
 import { PenEventName, PLAYSTATE, ZoomFitEnum } from "../../common/enums";
 import { IPageSOBP, ISize } from "../../common/structures";
-import { isSamePage, makeNPageIdStr, uuidv4 } from "../../common/util";
+import { callstackDepth, isSamePage, makeNPageIdStr, uuidv4 } from "../../common/util";
 
 import { INeoSmartpen, IPenToViewerEvent } from "../../common/neopen";
 import { MappingStorage } from "../../common/mapper";
 import { InkStorage } from "../../common/penstorage";
+import { NeoSmartpen } from "../../neosmartpen";
+import { nullNcode } from "../../common/constants";
 
 
 /**
  * Properties
  */
-interface Props extends MixedViewProps {
+interface Props { // extends MixedViewProps {
   baseScale?: number,
 
   pdfSize: { width: number, height: number };
@@ -28,6 +30,31 @@ interface Props extends MixedViewProps {
   onCanvasPositionChanged: (arg: { offsetX: number, offsetY: number, zoom: number }) => void;
 
   position: { offsetX: number, offsetY: number, zoom: number },
+
+  viewSize: ISize;
+
+  fixed?: boolean,
+
+  playState?: PLAYSTATE,
+
+  fitMargin?: number,
+
+  viewFit?: ZoomFitEnum,
+
+  pens: INeoSmartpen[],
+
+  rotation: number,
+
+  pageInfo: IPageSOBP,
+
+  fromStorage: boolean,
+
+  noInfo: boolean,
+
+  parentName: string,
+
+  basePageInfo: IPageSOBP,
+  pdfPageNo: number,
 }
 
 
@@ -70,12 +97,26 @@ class PenBasedRenderer extends React.Component<Props, State> {
     playState: PLAYSTATE.live,
 
     renderCount: 0,
+
   };
 
-  renderer: PenBasedRenderWorker;
+  _renderer: PenBasedRenderWorker;
+  // pageInfo = nullNcode();
 
-  propsSize: { scale: number, width: number, height: number } = { scale: 1, width: 0, height: 0 };
-  size: ISize = { width: 0, height: 0 };
+
+  get renderer() {
+    if (!this._renderer) {
+      this._renderer = this.initRenderer(this.viewSize, this.pdfSize as ISize);
+      const transform = MappingStorage.getInstance().getNPageTransform(this.props.pageInfo);
+      const r = this._renderer;
+      r.setTransformParameters(transform.h);
+    }
+
+    return this._renderer;
+  }
+
+  pdfSize: { scale: number, width: number, height: number } = { scale: 1, width: 1, height: 1 };
+  viewSize: ISize = { width: 0, height: 0 };
 
   mainDiv: HTMLDivElement = null;
   canvasId = "";
@@ -100,18 +141,20 @@ class PenBasedRenderer extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
 
-    const { pageInfo, baseScale, playState, fitMargin, width, height, fixed, pdfSize, viewFit } = props;
+    const { playState, fitMargin, viewSize, fixed, pdfSize, viewFit } = props;
     this.inkStorage = InkStorage.getInstance();
 
     this.canvasId = uuidv4();
     // this.canvasId = "fabric canvas";
 
-    this.propsSize = { scale: baseScale, ...pdfSize };
 
     if (fixed !== undefined) this.fixed = fixed;
     if (fitMargin !== undefined) this.fitMargin = fitMargin;
     if (playState !== undefined) this.state.playState = playState;
     if (viewFit !== undefined) this.state.viewFit = viewFit;
+
+    this.viewSize = { ...viewSize };
+    this.pdfSize = { ...pdfSize, scale: 1 };
   }
 
   private subScriptStorageEvent = () => {
@@ -213,14 +256,12 @@ class PenBasedRenderer extends React.Component<Props, State> {
    * @public
    */
   componentDidMount() {
-    const { pens } = this.props;
-    // console.log(`PenBasedRenderer: size ${this.propsSize.width}, ${this.propsSize.height}`);
+    const { pens, pdfSize, baseScale } = this.props;
+    // console.log(`PenBasedRenderer: size ${this.pdfSize.width}, ${this.pdfSize.height}`);
     // console.log("Renderer Inited");
 
-    this.initRenderer(this.propsSize);
-
-    const transform = MappingStorage.getInstance().getNPageTransform(this.props.pageInfo);
-    this.renderer.setTransformParameters(transform.h);
+    this.pdfSize = { scale: 1, ...pdfSize };
+    // this.initRenderer(this.props.viewSize, this.pdfSize);
 
     this.makeUpPenEvents(pens);
 
@@ -249,93 +290,83 @@ class PenBasedRenderer extends React.Component<Props, State> {
       ret_val = false;
     }
 
-    if (nextProps.width !== this.props.width || nextProps.height !== this.props.height) {
-      this.onViewResized({ width: nextProps.width, height: nextProps.height });
+    if (nextProps.viewSize.width !== this.viewSize.width || nextProps.viewSize.height !== this.viewSize.height) {
+      this.viewSize = { ...nextProps.viewSize };
+      console.log(`VIEW SIZE${callstackDepth()} WIDTH/HEIGHT:  ${this.viewSize.width}, ${this.viewSize.height}`);
+      this.onViewResized(this.viewSize);
       ret_val = true;
     }
 
-    if (nextProps.pdfUrl !== this.props.pdfUrl) {
-      this.shouldSendPageInfo = true;
-      ret_val = true;
-    }
+    // if (nextProps.pdfUrl !== this.props.pdfUrl) {
+    //   this.shouldSendPageInfo = true;
+    //   ret_val = true;
+    // }
 
-    if (nextProps.pdfSize.width !== this.props.pdfSize.width || nextProps.pdfSize.height !== this.props.pdfSize.height) {
-      this.onPaperResized({ width: nextProps.pdfSize.width, height: nextProps.pdfSize.height });
-      ret_val = true;
-    }
-
-    // console.log(`PAGE CHANGE: ${makeNPageIdStr(this.props.pageInfo)} ==> ${makeNPageIdStr(nextProps.pageInfo)}`);
     if (!isSamePage(nextProps.pageInfo, this.props.pageInfo)) {
-      console.log(`PAGE CHANGE 0: ${makeNPageIdStr(this.props.pageInfo)} ==> ${makeNPageIdStr(nextProps.pageInfo)}`);
+      // this.pageInfo = { ...nextProps.pageInfo };
+      const pageInfo = nextProps.pageInfo;
+
+      console.log("`VIEW SIZE        PAGE CHANGE 0");
 
       if (this.renderer) {
         // const { section, owner, book, page } = nextProps.pageInfo;
-        console.log(`PAGE CHANGE 1: ${makeNPageIdStr(nextProps.pageInfo)}`);
+        console.log(`VIEW SIZE PAGE CHANGE 1: ${makeNPageIdStr(pageInfo)}`);
 
-        this.renderer.changePage(nextProps.pageInfo, false);
-        const transform = MappingStorage.getInstance().getNPageTransform(nextProps.pageInfo);
+        this.renderer.changePage(pageInfo, nextProps.pdfSize, false);
+        this.renderer.onPageSizeChanged(nextProps.pdfSize);
+        this.pdfSize = { ...nextProps.pdfSize, scale: this.pdfSize.scale };
+
+        const transform = MappingStorage.getInstance().getNPageTransform(pageInfo);
         this.renderer.setTransformParameters(transform.h);
         ret_val = true;
+
       }
     }
+    const pageInfo = nextProps.pageInfo;
 
-    // if (!isSamePage(nextProps.pageInfo, this.props.pageInfo)) {
-    //   if (!nextProps.autoPageChange) {
-    //     this.setState({ pageInfo: { ...nextProps.pageInfo } });
-
-    //     /** 잉크 렌더러의 페이지를 바꾼다 */
-    //     const { section, owner, book, page } = nextProps.pageInfo;
-    //     if (this.renderer) {
-    //       this.renderer.changePage(section, owner, book, page, false);
-    //     }
-    //   }
-
-    //   ret_val = true;
-    // }
+    if (pageInfo.section !== -1 && (nextProps.pdfSize.width !== this.props.pdfSize.width || nextProps.pdfSize.height !== this.props.pdfSize.height)) {
+      console.error("`VIEW SIZE (comp) page size change");
+      this.renderer.onPageSizeChanged(nextProps.pdfSize);
+      this.pdfSize = { ...nextProps.pdfSize, scale: this.pdfSize.scale };
+      // pageResized = true;
+      ret_val = true;
+    }
 
     return ret_val;
   }
 
 
-  initRenderer(size: { width: number, height: number }) {
+  initRenderer(viewSize: ISize, pageSize: ISize) {
     /** @type {{width:number, height:number}} */
-    const { width, height } = size;
+    console.log(`VIEW SIZE${callstackDepth()} initRenderer:   view(${viewSize.width}, ${viewSize.height})  page(${pageSize.width}, ${pageSize.height})`);
 
     const options: IRenderWorkerOption = {
       canvasId: this.canvasId,
       canvas: this.canvas,
-      width,
-      height,
+      viewSize,
+      pageSize,
       mouseAction: !this.fixed,
       viewFit: this.state.viewFit,
       fitMargin: this.fitMargin,
       onCanvasPositionChanged: this.props.onCanvasPositionChanged,
       rotation: this.props.rotation,
+      autoFocus: true,
+      shouldDisplayGrid: true,
     };
 
     const renderer = new PenBasedRenderWorker(options);
-    this.renderer = renderer;
-  }
-
-
-  onPaperResized = ({ width, height }) => {
-    this.propsSize = { scale: this.propsSize.scale, width, height };
-
-
-    if (this.renderer) {
-      this.renderer.onPageSizeChanged(width, height);
-    }
+    return renderer;
   }
 
 
   onViewResized = ({ width, height }) => {
     const rect = { x: 0, y: 0, width, height };
-    const scale = this.propsSize.scale;
+    const scale = this.pdfSize.scale;
 
     // this.size = this.getSize(scale, rect);
 
     if (this.renderer) {
-      this.renderer.onViewSizeChanged(width, height);
+      this.renderer.onViewSizeChanged({ width, height });
     }
   }
 
@@ -460,33 +491,19 @@ class PenBasedRenderer extends React.Component<Props, State> {
     // console.log(event);
   }
 
-  getSize = (scale, rect) => {
-    const size = {
-      width: rect.width,
-      height: rect.height,
-    };
-
-    return size;
-  };
-
-
   render() {
-    // const { classes, scaleType, scale } = this.props;
-    const { pens, viewFit, fixed } = this.props;
-    const { scale, width, height } = this.propsSize;
-    const { section, owner, book, page } = this.props.pageInfo;
+
     let { zoom } = this.props.position;
 
-    const rect = { x: 0, y: 0, width, height };
+    // const rect = { x: 0, y: 0, width, height };
     // const { rect } = this.state;
-    const { penEventCount } = this.state;
-    this.size = this.getSize(scale, rect);
+    // const { penEventCount } = this.state;
 
     // const manager = PenManager.getInstance();
     // let connected_pens = manager.getConnectedPens();
 
-    const cssWidth = this.props.pdfSize.width * zoom;
-    const cssHeight = this.props.pdfSize.height * zoom;
+    // const cssWidth = this.props.pdfSize.width * zoom;
+    // const cssHeight = this.props.pdfSize.height * zoom;
 
     zoom = 1;
 
@@ -499,14 +516,14 @@ class PenBasedRenderer extends React.Component<Props, State> {
       overflow: "hidden",
     }
 
-    const inkContainerInfo: CSSProperties = {
-      position: "absolute",
-      zoom: zoom,
-      left: this.props.position.offsetX / zoom,
-      top: this.props.position.offsetY / zoom,
-      zIndex: 9,
-      overflow: "hidden",
-    }
+    // const inkContainerInfo: CSSProperties = {
+    //   position: "absolute",
+    //   zoom: zoom,
+    //   left: this.props.position.offsetX / zoom,
+    //   top: this.props.position.offsetY / zoom,
+    //   zIndex: 9,
+    //   overflow: "hidden",
+    // }
 
 
     const inkCanvas: CSSProperties = {
@@ -515,6 +532,7 @@ class PenBasedRenderer extends React.Component<Props, State> {
       left: 0,
       top: 0,
       zIndex: 10,
+
     }
 
 
@@ -551,9 +569,13 @@ class PenBasedRenderer extends React.Component<Props, State> {
     return (
       <div id="pen-based-renderer" ref={this.setMainDivRef} style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0 }}>
         {/* <Paper style={{ height: this.size.height, width: this.size.width }}> */}
+
         < div id={`${this.props.parentName}-fabric_container`} style={inkContainerDiv} >
-          <canvas id={this.canvasId} width={cssWidth} height={cssHeight} style={inkCanvas} ref={this.setCanvasRef} />
+          <canvas id={this.canvasId} style={inkCanvas} ref={this.setCanvasRef} />
         </div >
+        {/* < div id={`${this.props.parentName}-fabric_container`} style={{ ...inkContainerDiv, border: "dashed blue", }} >
+          <canvas id={this.canvasId} style={{ ...inkCanvas, border: "dashed red", }} ref={this.setCanvasRef} />
+        </div > */}
         {/* </Paper> */}
 
         {!this.props.noInfo ?

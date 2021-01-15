@@ -1,5 +1,7 @@
 import { fabric } from "fabric";
 import { Point } from "fabric/fabric-impl";
+import { sprintf } from "sprintf-js";
+import { NU_TO_PU, PU_TO_NU } from "../../common/constants";
 import { ZoomFitEnum } from "../../common/enums";
 import { MappingStorage } from "../../common/mapper";
 import { calcRevH } from "../../common/mapper/CoordinateTanslater";
@@ -7,7 +9,7 @@ import { applyTransform } from "../../common/math/echelon/SolveTransform";
 import { getNPaperInfo, PaperInfo } from "../../common/noteserver";
 import { InkStorage } from "../../common/penstorage";
 import { TransformParameters, ISize, INoteServerItem, IPageSOBP } from "../../common/structures";
-import { convertNuToPu, isSamePage, makeNPageId, makeNPageIdStr } from "../../common/util";
+import { callstackDepth, convertNuToPu, convertPuToNu, isSamePage, makeNPageId, makeNPageIdStr } from "../../common/util";
 
 import { PATH_THICKNESS_SCALE } from "../../common/util";
 import { PDFVIEW_ZOOM_MAX, PDFVIEW_ZOOM_MIN } from "../RendererConstants";
@@ -18,6 +20,7 @@ import { PDFVIEW_ZOOM_MAX, PDFVIEW_ZOOM_MIN } from "../RendererConstants";
 // const INCOMPLETE_STROKE_COLOR = "rgba(255, 0, 255, 0.4)";
 // const CURRENT_POINT_STROKE_COLOR = "rgba(255, 255, 255, 1)";
 
+let instanceNum = 0;
 
 /**
  * @enum {string}
@@ -27,16 +30,23 @@ export interface IRenderWorkerOption {
   canvasId: string,
 
   canvas: HTMLCanvasElement,
-  width: number,
-  height: number,
+
+  /** screen width, height in pixel */
+  viewSize: ISize,
+
+  /** PDF width, height in PU */
+  pageSize: ISize,
+
   viewFit: ZoomFitEnum,
   fitMargin: number,
   bgColor?: string,
   mouseAction: boolean,
-  shouldDisplayGrid?: boolean,
+  shouldDisplayGrid: boolean,
   storage?: InkStorage,
 
   rotation: number,
+
+  autoFocus: boolean,
 
   onCanvasPositionChanged: (arg: { offsetX, offsetY, zoom }) => void,
 }
@@ -47,24 +57,25 @@ export interface IRenderWorkerOption {
 
 // const STROKE_OBJECT_ID = "ns";
 const GRID_OBJECT_ID = "g";
+const GRID_TEXT_ID = "tt";
 
 
 export default abstract class RenderWorkerBase {
 
   name: string;
   /** canvas element ID */
-  canvasId = "";
+  // canvasId = "";
 
-  canvas: HTMLCanvasElement;
+  // canvas: HTMLCanvasElement;
 
   /** background color */
-  bgColor = "rgba(255,255,255,0)";
+  // bgColor = "rgba(255,255,255,0)";
 
   /** PdfSize */
-  pageSize: { width: number, height: number } = { width: 0, height: 0 };
+  // pageSize: { width: number, height: number } = { width: 0, height: 0 };
 
   /** parent element size */
-  viewSize: { width: number, height: number } = { width: 0, height: 0 };
+  // viewSize: { width: number, height: number } = { width: 0, height: 0 };
 
   /** <canvas>내의 drawing canvas(fabric canvas)의 offset, 현재는 안 씀 - 2020/11/08*/
   offset: { x: number, y: number, zoom: number } = { x: 0, y: 0, zoom: 1 };
@@ -73,7 +84,7 @@ export default abstract class RenderWorkerBase {
   canvasFb: fabric.Canvas = null;
 
   /** mouse에 따라 pan, zoom이 가능한지에 대한 여부 */
-  mouseAction = true;
+  // mouseAction = true;
 
   /** mouse drag & panning 을 위해 */
   pan: { isDragging: boolean, lastPosX: number, lastPosY: number } = {
@@ -89,46 +100,39 @@ export default abstract class RenderWorkerBase {
   };
 
   /** pen stroke에 따라 자동 focus를 맞추도록 */
-  autoFocus = true;
+  // autoFocus = true;
 
 
 
-  /** 종이 정보 */
-  paperBase: INoteServerItem & { rotation: number } = {
-    section: 3,
-    owner: 27,
-    book: 168,
-    page: 1,
-
-    margin: {
-      Xmin: 3.12,   // code unit
-      Ymin: 3.12,
-      Xmax: 91.68,
-      Ymax: 128.36,
-    },
-    Mag: 1,
-
-    // 0: portratio, 90: landscape
-    rotation: 0,
+  // /** 종이 정보 */
+  paperBase = {
+    Xmin: 3.12,   // code unit
+    Ymin: 3.12,
   };
 
+  pageInfo: IPageSOBP;
+  //   Mag: 1,
+
+  //   // 0: portratio, 90: landscape
+  //   rotation: 0,
+  // };
+
   /** Ncode to Screen scale */
-  nu_to_pu_scale: number;
+  // nu_to_pu_scale: number;
 
   /** logical zoom in/out */
   // scale = 1;
 
   /** zoom fit */
-  viewFit: ZoomFitEnum = ZoomFitEnum.ACTUAL;
+  // viewFit: ZoomFitEnum = ZoomFitEnum.ACTUAL;
 
   /** determine whether border and grid lines displayed or not */
-  shouldDisplayGrid = true;
+  // shouldDisplayGrid = true;
 
   /** animation timer */
   scrollAnimateTimer: number = null;
 
   zoomAnimateTimer: number = null;
-  options: IRenderWorkerOption;
 
   h: TransformParameters;
   h_rev: TransformParameters;
@@ -136,35 +140,31 @@ export default abstract class RenderWorkerBase {
   funcNcodeToPdfXy: (ncodeXY: { x: number, y: number, f?: number }) => { x: number, y: number, f: number };
   funcPdfToNcodeXy: (ncodeXY: { x: number, y: number, f?: number }) => { x: number, y: number, f: number };
 
-  fitMargin = 0;
+  // fitMargin = 0;
+
+
+  logCnt = 0;
+
+  _opt: IRenderWorkerOption;
+
+  infoTexts: string[] = [];
 
   /**
    *
    * @param {RenderWorkerOption} options
    */
   constructor(options: IRenderWorkerOption) {
-    const { canvasId, canvas, width, height, bgColor, fitMargin, mouseAction, viewFit, shouldDisplayGrid } = options;
-    this.funcNcodeToPdfXy = this.ncodeToPdfXy_default;
-
+    instanceNum++;
     this.name = "RenderWorkerBase";
 
-    if (typeof canvasId !== "string") {
+    this.funcNcodeToPdfXy = this.ncodeToPdfXy_default;
+
+    if (typeof options.canvasId !== "string") {
       throw new Error("canvasId should be a string");
     }
 
-    this.canvasId = canvasId;
-    this.canvas = canvas;
-    this.pageSize = { width, height };
-    this.nu_to_pu_scale = convertNuToPu(1);
+    this._opt = { ...options };
     this.canvasFb = null;
-
-    if (bgColor !== undefined) this.bgColor = bgColor;
-    if (viewFit) this.viewFit = viewFit;
-    if (fitMargin) this.fitMargin = fitMargin;
-    if (typeof (mouseAction) === "boolean") this.mouseAction = mouseAction;
-    if (typeof (shouldDisplayGrid) === "boolean") this.shouldDisplayGrid = shouldDisplayGrid;
-
-    this.options = options;
     this.initFabricCanvas();
 
 
@@ -174,7 +174,7 @@ export default abstract class RenderWorkerBase {
    * @protected
    */
   initFabricCanvas = () => {
-    const size = this.pageSize;
+    const size = this._opt.pageSize;
 
     // let HtmlCanvas = this.canvas.current;
     // const dpr = getDisplayRatio();
@@ -183,8 +183,8 @@ export default abstract class RenderWorkerBase {
 
     console.log(`Fabric canvas inited: size(${size.width}, ${size.height})`);
 
-    this.canvasFb = new fabric.Canvas(this.canvasId, {
-      backgroundColor: this.bgColor ? this.bgColor : "rgba(255,255,0,0.5)",
+    this.canvasFb = new fabric.Canvas(this._opt.canvasId, {
+      backgroundColor: this._opt.bgColor ? this._opt.bgColor : "rgba(125,137,239,0.1)",
       selection: false,
       controlsAboveOverlay: false,
       selectionLineWidth: 4,
@@ -195,7 +195,7 @@ export default abstract class RenderWorkerBase {
 
     const canvasFb = this.canvasFb;
 
-    if (this.mouseAction) {
+    if (this._opt.mouseAction) {
       canvasFb.on('mouse:down', this.onCanvasMouseDown);
       canvasFb.on('mouse:move', this.onCanvasMouseMove);
       canvasFb.on('mouse:up', this.onCanvasMousUp);
@@ -203,75 +203,125 @@ export default abstract class RenderWorkerBase {
       canvasFb.on('mouse:wheel', this.onCanvasMouseWheel);
     }
 
-    this.drawPageLayout();
-    this.scrollBoundaryCheck();
+    // this.drawPageLayout();
+    // this.scrollBoundaryCheck();
   }
 
-  getPaperSize_pu = (): ISize => {
-    const { rotation } = this.paperBase;
-
-    // const ncode_width = Xmax - Xmin;
-    // const ncode_height = Ymax - Ymin;
-
-    // const actual_width = convertNuToPu(ncode_width);
-    // const actual_height = convertNuToPu(ncode_height);
-    const s: ISize = { ...this.pageSize };
+  getPageSize_pu = (): ISize => {
+    const { rotation } = this._opt;
+    const s: ISize = { ...this._opt.pageSize };
     if (rotation === 90) {
       const temp = s.width;
       s.width = s.height;
       s.height = temp;
     }
 
+    console.log(`VIEW SIZE${callstackDepth()} getPageSize_pu ${this.logCnt++}: ${s.width}, ${s.height}`);
     return s;
   }
 
 
-  changePage(pageInfo: IPageSOBP, forceToRefresh: boolean): boolean {
-    // console.log("PAGE CHANGE (base)");
-    const currPage = this.paperBase;
+  // changePage_base(pageInfo: IPageSOBP, pdfSize: ISize, forceToRefresh: boolean): boolean {
+  //   this.pageInfo = {...pageInfo};
 
-    // if (isSamePage(pageInfo, currPage as IPageSOBP)) {
-    //   console.log(`PAGE CHANGE (base):  return ${makeNPageIdStr({ ...currPage } as IPageSOBP)} ==> ${makeNPageIdStr({ ...pageInfo })}`);
+  //   // console.log("PAGE CHANGE (base)");
+  //   // const currPage = this.paperBase;
 
-    //   if (!forceToRefresh) {
-    //     console.log(`PAGE CHANGE (base):  return`);
-    //     return false;
-    //   }
-    // }
+  //   // 페이지 정보와 scale을 조정한다.
+  //   const transform = MappingStorage.getInstance().getNPageTransform(pageInfo);
+  //   const h_rev = calcRevH(transform.h);
+  //   const leftTop_nu = applyTransform({ x: 0, y: 0 }, h_rev);
 
+  //   this.onPageSizeChanged(pdfSize);
+  //   // this.pageSize = { ...pdfSize };
+  //   // const width_nu = convertPuToNu(pdfSize.width);
+  //   // const height_nu = convertPuToNu(pdfSize.height);
 
-    // 페이지 정보와 scale을 조정한다.
-    const transform = MappingStorage.getInstance().getNPageTransform(pageInfo);
-    const h_rev = calcRevH(transform.h);
-    const leftTop_nu = applyTransform({ x: 0, y: 0 }, h_rev);
+  //   // this.paperBase = {
+  //   //   ...pageInfo,
+  //   //   margin: {
+  //   //     Xmin: leftTop_nu.x,
+  //   //     Ymin: leftTop_nu.y,
+  //   //     // Xmin: margin.Xmin,
+  //   //     // Ymin: margin.Ymin,
+  //   //     Xmax: leftTop_nu.x + width_nu,
+  //   //     Ymax: leftTop_nu.y + height_nu,
+  //   //   },
+  //   //   Mag: 1,
+  //   //   rotation: this.options.rotation,
+  //   // };
 
-    const info = getNPaperInfo(pageInfo);
-    const margin = info.margin;
+  //   // const { Xmin, Ymin, Xmax, Ymax } = this.paperBase.margin;
+  //   // const width = Xmax - Xmin;
+  //   // const height = Ymax - Ymin;
 
-    console.log(`PAGE CHANGE (base):  ${margin.Xmin}, ${margin.Ymin} / ${leftTop_nu.x}, ${leftTop_nu.y}`);
+  //   // console.log(`VIEW SIZE${callstackDepth()} changePage (base):   ${width}, ${height}              ${makeNPageIdStr(this.paperBase as IPageSOBP)}            ${makeNPageIdStr(pageInfo)}`);
 
-    if (info) {
-      this.paperBase = {
-        ...pageInfo,
-        margin: {
-          Xmin: leftTop_nu.x,
-          Ymin: leftTop_nu.y,
-          // Xmin: margin.Xmin,
-          // Ymin: margin.Ymin,
-          Xmax: margin.Xmax,
-          Ymax: margin.Ymax,
-        },
-        Mag: 1,
-        rotation: this.options.rotation,
-      };
+  //   // const info = getNPaperInfo(pageInfo);
+  //   // const margin = info.margin;
+
+  //   // if (info) {
+  //   //   this.paperBase = {
+  //   //     ...pageInfo,
+  //   //     margin: {
+  //   //       Xmin: leftTop_nu.x,
+  //   //       Ymin: leftTop_nu.y,
+  //   //       // Xmin: margin.Xmin,
+  //   //       // Ymin: margin.Ymin,
+  //   //       Xmax: margin.Xmax,
+  //   //       Ymax: margin.Ymax,
+  //   //     },
+  //   //     Mag: 1,
+  //   //     rotation: this.options.rotation,
+  //   //   };
+  //   // }
+
+  //   return true;
+  // }
+
+  drawInfoText = () => {
+    return;
+    const canvasFb = this.canvasFb;
+
+    const objects = canvasFb.getObjects();
+    const texts = objects.filter(obj => obj.data === GRID_TEXT_ID);
+
+    texts.forEach((obj) => {
+      this.canvasFb.remove(obj);
+    });
+
+    const msg = sprintf("instance:%d, zoom:%.2f, pageInfo:%s, viewSize:(%d,%d) pageSize:(%d,%d)\n",
+      instanceNum,
+      this.offset.zoom,
+      makeNPageIdStr(this.pageInfo),
+      Math.round(this._opt.viewSize.width),
+      Math.round(this._opt.viewSize.height),
+
+      Math.round(this._opt.pageSize.width),
+      Math.round(this._opt.pageSize.height));
+
+    this.infoTexts.unshift(msg);
+
+    const len = this.infoTexts.length;
+
+    for (let i = 0; i < 25 && i < len; i++) {
+      const text = new fabric.Text(this.infoTexts[i],
+        {
+          left: 10,
+          top: 10 + i * 20,
+          fill: "black",
+          fontSize: 12,
+          data: GRID_TEXT_ID
+        });
+      canvasFb.add(text);
+
     }
-
-    return true;
   }
 
-
   drawPageLayout = () => {
-    if (!this.shouldDisplayGrid) return;
+    console.log(`VIEW SIZE${callstackDepth()} DrawPageLayout`);
+
+    if (!this._opt.shouldDisplayGrid) return;
     const canvasFb = this.canvasFb;
 
     // 지우기
@@ -285,8 +335,8 @@ export default abstract class RenderWorkerBase {
     }
 
     // 그리기
-    const size = this.getPaperSize_pu();
-    // console.log(`drawPageLayout: ${size.width}, ${size.height}`);
+    const size = this.getPageSize_pu();
+    console.log(`VIEW SIZE${callstackDepth()} DrawPageLayout: ${size.width}, ${size.height} = ${size.width / size.height}`);
 
     // console.log(`Grid: scale=${this.nu_to_pu_scale} (width, height)=(${size.width}, ${size.height})`);
 
@@ -308,34 +358,48 @@ export default abstract class RenderWorkerBase {
     });
     canvasFb.add(rect);
 
-    // for (let x = 0; x < size.width; x += 10) {
-    //   const line = new fabric.Line([x, 0, x, size.height], {
-    //     strokeWidth: 0.5,
-    //     stroke: "rgba(0,0,0,0.1)",
-    //     hasControls: false,
-    //     hasBorders: false,
-    //     lockMovementX: true,
-    //     lockMovementY: true,
-    //     data: GRID_OBJECT_ID,
-    //   });
-
-    //   canvasFb.add(line);
-    // }
+    this.drawInfoText();
 
 
-    // for (let y = 0; y < size.height; y += 10) {
-    //   const line = new fabric.Line([0, y, size.width, y], {
-    //     strokeWidth: 0.5,
-    //     stroke: "rgba(0,0,0,0.1)",
-    //     hasControls: false,
-    //     hasBorders: false,
-    //     lockMovementX: true,
-    //     lockMovementY: true,
-    //     data: GRID_OBJECT_ID,
-    //   });
 
-    //   canvasFb.add(line);
-    // }
+    let sw = true;
+    for (let x = 0; x < size.width; x += size.width / 4) {
+      let color = "rgba(0,0,0,0.3)";
+      if (sw) color = "rgba(0,0,0,0.8)"
+      sw = !sw;
+      const line = new fabric.Line([x, 0, x, size.height], {
+        strokeWidth: 0.5,
+        stroke: color,
+        hasControls: false,
+        hasBorders: false,
+        lockMovementX: true,
+        lockMovementY: true,
+        data: GRID_OBJECT_ID,
+      });
+
+      canvasFb.add(line);
+    }
+
+    sw = true;
+    for (let y = 0; y < size.height; y += size.height / 4) {
+      let color = "rgba(0,0,0,0.3)";
+      if (sw) color = "rgba(0,0,0,0.8)"
+      sw = !sw;
+      const line = new fabric.Line([0, y, size.width, y], {
+        strokeWidth: 0.5,
+        stroke: color,
+        hasControls: false,
+        hasBorders: false,
+        lockMovementX: true,
+        lockMovementY: true,
+        data: GRID_OBJECT_ID,
+      });
+
+      canvasFb.add(line);
+    }
+
+
+
 
   }
 
@@ -347,7 +411,7 @@ export default abstract class RenderWorkerBase {
    * @param {boolean} sw
    */
   enableMouseAction = (sw: boolean) => {
-    if (this.mouseAction !== sw) {
+    if (this._opt.mouseAction !== sw) {
       const canvasFb = this.canvasFb;
 
       if (sw === false) {
@@ -366,7 +430,7 @@ export default abstract class RenderWorkerBase {
         canvasFb.on('mouse:wheel', this.onCanvasMouseWheel);
       }
     }
-    this.mouseAction = sw;
+    this._opt.mouseAction = sw;
   }
 
   /**
@@ -377,7 +441,7 @@ export default abstract class RenderWorkerBase {
    * @param {boolean} sw
    */
   enableAutoFocus = (sw: boolean) => {
-    this.autoFocus = sw;
+    this._opt.autoFocus = sw;
   }
 
   /**
@@ -386,7 +450,7 @@ export default abstract class RenderWorkerBase {
    */
   onCanvasMouseDown = (opt: any) => {
     const evt: MouseEvent = opt.e;
-    if (this.mouseAction && evt.ctrlKey === true) {
+    if (this._opt.mouseAction && evt.ctrlKey === true) {
       const canvasFb = this.canvasFb;
 
       const evt: MouseEvent = opt.e;
@@ -422,7 +486,7 @@ export default abstract class RenderWorkerBase {
   onCanvasMouseMove = (opt: any) => {
     const canvasFb = this.canvasFb;
     const evt: MouseEvent = opt.e;
-    if (this.mouseAction && evt.ctrlKey === true) {
+    if (this._opt.mouseAction && evt.ctrlKey === true) {
       if (this.pan.isDragging) {
         // console.log(`Point ${e.clientX}, ${e.clientY}`);
         // const vpt = canvasFb.viewportTransform;
@@ -466,7 +530,7 @@ export default abstract class RenderWorkerBase {
 
   reportCanvasChanged = () => {
     const { x: offsetX, y: offsetY, zoom } = this.offset;
-    this.options.onCanvasPositionChanged({ offsetX, offsetY, zoom });
+    this._opt.onCanvasPositionChanged({ offsetX, offsetY, zoom });
   }
 
   /**
@@ -500,7 +564,7 @@ export default abstract class RenderWorkerBase {
    */
   onCanvasMouseWheel = (opt: any) => {
 
-    this.viewFit = ZoomFitEnum.FREE;
+    this._opt.viewFit = ZoomFitEnum.FREE;
 
     const evt: MouseEvent = opt.e;
     if (evt.ctrlKey === true) {
@@ -539,14 +603,14 @@ export default abstract class RenderWorkerBase {
 
 
     const pageSize = {
-      width: this.pageSize.width * zoom,
-      height: this.pageSize.height * zoom
+      width: this._opt.pageSize.width * zoom,
+      height: this._opt.pageSize.height * zoom
     };
 
     let shouldReset = false;
 
-    if (pageSize.width <= this.viewSize.width) {
-      offsetX = Math.round((this.viewSize.width - pageSize.width) / 2);
+    if (pageSize.width <= this._opt.viewSize.width) {
+      offsetX = Math.round((this._opt.viewSize.width - pageSize.width) / 2);
       shouldReset = true;
     }
     else {
@@ -554,14 +618,14 @@ export default abstract class RenderWorkerBase {
         offsetX = 0;
         shouldReset = true;
       }
-      else if (offsetX + pageSize.width < this.viewSize.width) {
-        offsetX = this.viewSize.width - pageSize.width;
+      else if (offsetX + pageSize.width < this._opt.viewSize.width) {
+        offsetX = this._opt.viewSize.width - pageSize.width;
         shouldReset = true;
       }
     }
 
-    if (pageSize.height <= this.viewSize.height) {
-      offsetY = Math.round((this.viewSize.height - pageSize.height) / 2);
+    if (pageSize.height <= this._opt.viewSize.height) {
+      offsetY = Math.round((this._opt.viewSize.height - pageSize.height) / 2);
       shouldReset = true;
     }
 
@@ -570,8 +634,8 @@ export default abstract class RenderWorkerBase {
         offsetY = 0;
         shouldReset = true;
       }
-      else if (offsetY + pageSize.height < this.viewSize.height) {
-        offsetY = this.viewSize.height - pageSize.height;
+      else if (offsetY + pageSize.height < this._opt.viewSize.height) {
+        offsetY = this._opt.viewSize.height - pageSize.height;
         shouldReset = true;
       }
     }
@@ -612,15 +676,14 @@ export default abstract class RenderWorkerBase {
     opt.e.stopPropagation();
   }
 
-  zoomToPoint = (pt: Point, newZoom: number, animate = true) => {
-    const zoom = this.calcScaleFactor(this.viewFit, newZoom);
+  zoomToPoint = (pt: Point, zoom: number, animate = true) => {
+    const z1 = this.calcScaleFactor(this._opt.viewFit, zoom);
 
     let x1 = this.offset.x;
     let y1 = this.offset.y;
 
     if (pt) {
       const z0 = this.offset.zoom;
-      const z1 = zoom
 
       const x0 = this.offset.x;
       const y0 = this.offset.y;
@@ -628,13 +691,33 @@ export default abstract class RenderWorkerBase {
       y1 = pt.y * (z0 - z1) / z0 + y0;
     }
 
+    const z = zoom;
+
+    const oldOffsetZoom = this.offset.zoom;
     this.offset.x = x1;
     this.offset.y = y1;
-    this.offset.zoom = zoom;
-    this.canvasFb.setZoom(zoom);
-    this.canvasFb.setWidth(this.pageSize.width * zoom);
-    this.canvasFb.setHeight(this.pageSize.height * zoom);
+    this.offset.zoom = z;
 
+    const zoomed_width = Math.round(this._opt.pageSize.width * z);
+    const zoomed_height = Math.round(this._opt.pageSize.height * z);
+
+    const oldZoom = this.canvasFb.getZoom();
+    const oldWidth = this.canvasFb.getWidth();
+    const oldHeight = this.canvasFb.getHeight();
+
+    this.canvasFb.setZoom(z);
+    this.canvasFb.setWidth(zoomed_width);
+    this.canvasFb.setHeight(zoomed_height);
+    // this.canvasFb.setDimensions({ width: zoomed_width, height: zoomed_height }, { cssOnly: false });
+
+    const newZoom = this.canvasFb.getZoom();
+    const newWidth = this.canvasFb.getWidth();
+    const newHeight = this.canvasFb.getHeight();
+
+
+    // this.canvasFb.renderAll();
+
+    console.log(`VIEW SIZE${callstackDepth()} zoomToPoint: ${oldOffsetZoom} old/new=${oldZoom}(${oldWidth},${oldHeight})/${newZoom}(${newWidth},${newHeight}) zoom=${z} ${zoomed_width}, ${zoomed_height} = ${zoomed_width / zoomed_height}`);
     this.scrollBoundaryCheck();
   }
 
@@ -646,23 +729,18 @@ export default abstract class RenderWorkerBase {
    */
   protected ncodeToPdfXy_default = (ncodeXY: { x: number, y: number, f?: number }) => {
     const { x, y, f } = ncodeXY;
-    const { Xmin, Ymin } = this.paperBase.margin;
-
-    const nu_to_pu_scale = this.nu_to_pu_scale;
-
-    const px = (x - Xmin) * nu_to_pu_scale;
-    const py = (y - Ymin) * nu_to_pu_scale;
+    const { Xmin, Ymin } = this.paperBase;
+    const px = (x - Xmin) * NU_TO_PU;
+    const py = (y - Ymin) * NU_TO_PU;
 
     return { x: px, y: py, f };
   }
 
   protected pdfToNcodeXy_default = (ncodeXY: { x: number, y: number, f?: number }) => {
     const { x, y, f } = ncodeXY;
-    const { Xmin, Ymin } = this.paperBase.margin;
-
-    const nu_to_pu_scale = this.nu_to_pu_scale;
-    const nx = x / nu_to_pu_scale + Xmin;
-    const ny = y / nu_to_pu_scale + Ymin;
+    const { Xmin, Ymin } = this.paperBase;
+    const nx = x * PU_TO_NU + Xmin;
+    const ny = y * PU_TO_NU + Ymin;
 
     return { x: nx, y: ny, f };
   }
@@ -762,31 +840,25 @@ export default abstract class RenderWorkerBase {
    * @param currScale
    */
   protected calcScaleFactor(mode: ZoomFitEnum, currScale: number) {
-    const szPaper = { ...this.pageSize };
-    if (!szPaper.width) {
-      szPaper.width = 841;
-      szPaper.height = 595;
-    }
+    const szPaper = this._opt.pageSize;
+    if (!szPaper.width) return currScale;
 
-    const actual_width = szPaper.width;
-    const actual_height = szPaper.height;
+    const szCanvas = { ... this._opt.viewSize };
+    szCanvas.width -= this._opt.fitMargin;
+    szCanvas.height -= this._opt.fitMargin;
 
-    const szCanvas = { ... this.viewSize };
-    szCanvas.width -= this.fitMargin;
-    szCanvas.height -= this.fitMargin;
-
-    let scale = 1;
+    let scale = 0;
     switch (mode) {
       case ZoomFitEnum.WIDTH:
-        scale = szCanvas.width / actual_width;
+        scale = szCanvas.width / szPaper.width;
         break;
 
       case ZoomFitEnum.HEIGHT:
-        scale = szCanvas.height / actual_height;
+        scale = szCanvas.height / szPaper.height;
         break;
 
       case ZoomFitEnum.FULL:
-        scale = Math.min(szCanvas.width / actual_width, szCanvas.height / actual_height);
+        scale = Math.min(szCanvas.width / szPaper.width, szCanvas.height / szPaper.height);
         break;
 
       case ZoomFitEnum.ACTUAL:
@@ -810,7 +882,7 @@ export default abstract class RenderWorkerBase {
    * @param {{x:number, y:number}} dot
    */
   protected focusToDot = (dot: { x: number, y: number }) => {
-    if (!this.autoFocus) return;
+    if (!this._opt.autoFocus) return;
     const margin_to_go_ratio = 0.25;
     const canvas_xy = this.funcNcodeToPdfXy(dot);
     const screen_xy = this.pdfToScreenXy(canvas_xy);
@@ -825,28 +897,28 @@ export default abstract class RenderWorkerBase {
 
     if (screen_xy.x < 0) {
       // scroll to left
-      const target = this.viewSize.width * margin_to_go_ratio;
+      const target = this._opt.viewSize.width * margin_to_go_ratio;
       dx = target - screen_xy.x;
       shouldScroll = true;
     }
 
     if (screen_xy.y < 0) {
       // scroll to top
-      const target = this.viewSize.height * margin_to_go_ratio;
+      const target = this._opt.viewSize.height * margin_to_go_ratio;
       dy = target - screen_xy.y;
       shouldScroll = true;
     }
 
-    if (screen_xy.x > this.viewSize.width) {
+    if (screen_xy.x > this._opt.viewSize.width) {
       // scroll to right
-      const target = this.viewSize.width * (1 - margin_to_go_ratio);
+      const target = this._opt.viewSize.width * (1 - margin_to_go_ratio);
       dx = target - screen_xy.x;
       shouldScroll = true;
     }
 
-    if (screen_xy.y > this.viewSize.height) {
+    if (screen_xy.y > this._opt.viewSize.height) {
       // scroll to bottom
-      const target = this.viewSize.height * (1 - margin_to_go_ratio);
+      const target = this._opt.viewSize.height * (1 - margin_to_go_ratio);
       dy = target - screen_xy.y;
       shouldScroll = true;
     }
@@ -912,28 +984,11 @@ export default abstract class RenderWorkerBase {
 
   }
 
-  onViewSizeChanged = (width: number, height: number) => {
-    this.viewSize = { width, height };
-
-    const zoom = this.calcScaleFactor(this.viewFit, this.offset.zoom);
-    this.zoomToPoint(undefined, zoom);
-    this.scrollBoundaryCheck();
-  }
-
-  onPageSizeChanged = (width: number, height: number) => {
-    this.pageSize = { width, height };
-
-    const zoom = this.calcScaleFactor(this.viewFit, this.offset.zoom);
-    this.drawPageLayout();
-    this.zoomToPoint(undefined, zoom);
-    this.scrollBoundaryCheck();
-  }
-
 
 
   setRotation = (rotation: number) => {
     console.log(`RenderWorkerBase: setRotation to ${rotation}`);
-    this.paperBase.rotation = rotation;
+    this._opt.rotation = rotation;
   }
 
   setTransformParameters = (h: TransformParameters) => {

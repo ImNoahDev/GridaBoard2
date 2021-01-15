@@ -36,7 +36,7 @@ export function KeyBoardShortCut_keyup(evt: KeyboardEvent) {
   }
   const cmd = (_isCtrl ? 1 : 0) | (_isAlt ? 2 : 0) | (_isShift ? 4 : 0) | (evt.metaKey ? 8 : 0);
 
-  console.log(`key up cmd=${cmd} ==> code=${evt.code}  key => ${evt.key}`);
+  // console.log(`key up cmd=${cmd} ==> code=${evt.code}  key => ${evt.key}`);
 
 }
 

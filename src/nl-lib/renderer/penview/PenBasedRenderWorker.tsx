@@ -3,12 +3,15 @@ import { fabric } from "fabric";
 
 import RenderWorkerBase, { IRenderWorkerOption } from "./RenderWorkerBase";
 
-import { drawPath, drawPath_arr, makeNPageIdStr, uuidv4 } from "../../common/util";
+import { callstackDepth, drawPath, drawPath_arr, makeNPageIdStr, uuidv4 } from "../../common/util";
 import { IBrushType } from "../../common/enums";
-import { IPoint, NeoStroke, NeoDot, IPageSOBP, INeoStrokeProps, StrokeStatus } from "../../common/structures";
+import { IPoint, NeoStroke, NeoDot, IPageSOBP, INeoStrokeProps, StrokeStatus, ISize } from "../../common/structures";
 import { INeoSmartpen, IPenToViewerEvent } from "../../common/neopen";
 import { InkStorage } from "../../common/penstorage";
 import { NeoSmartpen, PenManager, VirtualPen } from "../../neosmartpen";
+import { MappingStorage } from "../../common/mapper/MappingStorage";
+import { calcRevH } from "../../common/mapper/CoordinateTanslater";
+import { applyTransform } from "../../common/math/echelon/SolveTransform";
 // import { PaperInfo } from "../../common/noteserver";
 
 
@@ -76,8 +79,9 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
       }
       this.storage = storage;
     }
-    this.changePage(this.paperBase as IPageSOBP, true);
-    console.log(`PAGE CHANGE (worker constructor):                             ${makeNPageIdStr(this.paperBase as IPageSOBP)}`);
+
+    this.changePage(this.pageInfo, options.pageSize, true);
+    console.log(`PAGE CHANGE (worker constructor):                             ${makeNPageIdStr(this.pageInfo as IPageSOBP)}`);
 
     // this.resize({ width: options.width, height: options.height });
   }
@@ -435,13 +439,29 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
 
 
 
-  changePage = (pageInfo: IPageSOBP, forceToRefresh: boolean): boolean => {
+  changePage = (pageInfo: IPageSOBP, pageSize: ISize, forceToRefresh: boolean): boolean => {
+    if (!pageInfo) return;
+
+    this.pageInfo = { ...pageInfo };
+
     // const { section, owner, book, page } = pageInfo;
 
-    console.log(`PAGE CHANGE (worker):                 ${makeNPageIdStr(this.paperBase as IPageSOBP)}            ${makeNPageIdStr(pageInfo)}`);
+    const pdfSize = {
+      width: Math.round(pageSize.width),
+      height: Math.round(pageSize.height)
+    }
 
-    if (!super.changePage(pageInfo, forceToRefresh))
-      return false;
+    if (pdfSize.width === 0 || pdfSize.height === 0) return;
+
+
+    console.log(`VIEW SIZE`);
+    console.log(`VIEW SIZE${callstackDepth()} changePage (worker):   ${pdfSize?.width}, ${pdfSize?.height}        ${makeNPageIdStr(pageInfo)}`);
+
+    const transform = MappingStorage.getInstance().getNPageTransform(pageInfo);
+    const h_rev = calcRevH(transform.h);
+    const leftTop_nu = applyTransform({ x: 0, y: 0 }, h_rev);
+    this.paperBase = { Xmin: leftTop_nu.x, Ymin: leftTop_nu.y };
+
 
     // const szPaper = PaperInfo.getPaperSize_pu({ section, owner, book, page });
 
@@ -451,7 +471,8 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
     this.resetPageDependentData();
 
     // grid를 그려준다
-    this.drawPageLayout();
+    this.onPageSizeChanged(pdfSize);
+    // this.drawPageLayout();
 
     // page에 있는 stroke를 가져온다
     const strokesAll = this.storage.getPageStrokes(pageInfo);
@@ -471,8 +492,8 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
   }
 
 
-  changePage_byStorage = (section: number, owner: number, book: number, page: number, forceToRefresh: boolean) => {
-    return this.changePage({ section, owner, book, page }, forceToRefresh);
+  changePage_byStorage = (pageInfo: IPageSOBP, pdfSize: ISize, forceToRefresh: boolean) => {
+    return this.changePage(pageInfo, pdfSize, forceToRefresh);
   }
 
 
@@ -652,7 +673,7 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
 
     const pathOption = {
       // stroke: color, //"rgba(0,0,0,255)"
-      fill: color, 
+      fill: color,
       color: color,
       opacity: opacity,
       // strokeWidth: 10,
@@ -690,7 +711,7 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
     this._vpPenDownTime = timeStamp;
     vp.onPenDown({ timeStamp, penTipMode: 0, penId: vp.mac });
 
-    const { section, owner, book, page } = this.paperBase;
+    const { section, owner, book, page } = this.pageInfo;
     vp.onPageInfo({ timeStamp, section, owner, book, page }, false);
   }
 
@@ -709,7 +730,7 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
     const vp = PenManager.getInstance().virtualPen;
     const timeStamp = Date.now();
     const timediff = timeStamp - this._vpPenDownTime;
-    const { section, owner, book, page } = this.paperBase;
+    const { section, owner, book, page } = this.pageInfo;
 
     const DEFAULT_MOUSE_PEN_FORCE = 512;
 
@@ -733,4 +754,34 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
 
     vp.onPenUp({ timeStamp });
   }
+
+
+
+
+  onViewSizeChanged = (viewSize: { width: number, height: number }) => {
+    this._opt.viewSize = { ...viewSize };
+    console.log(`VIEW SIZE${callstackDepth()} onViewSizeChanged ${this.logCnt++}: ${viewSize.width}, ${viewSize.height}`);
+
+    const zoom = this.calcScaleFactor(this._opt.viewFit, this.offset.zoom);
+    this.drawPageLayout();
+    this.scrollBoundaryCheck();
+
+    this.zoomToPoint(undefined, zoom);
+  }
+
+  onPageSizeChanged = (pageSize: { width: number, height: number }) => {
+    this._opt.pageSize = { ...pageSize };
+    if (this.pageInfo === undefined || this.pageInfo.section === undefined)
+      return false;
+
+    console.log(`VIEW SIZE${callstackDepth()} onPageSizeChanged ${makeNPageIdStr(this.pageInfo)}: ${pageSize.width}, ${pageSize.height} = ${pageSize.width / pageSize.height}`);
+    const zoom = this.calcScaleFactor(this._opt.viewFit, this.offset.zoom);
+    this.drawPageLayout();
+    this.scrollBoundaryCheck();
+    this.zoomToPoint(undefined, zoom);
+
+    // this.onViewSizeChanged(this._opt.viewSize);
+    return true;
+  }
+
 }

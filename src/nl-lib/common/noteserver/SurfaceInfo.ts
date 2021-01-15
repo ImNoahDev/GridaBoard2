@@ -70,8 +70,8 @@ function getNPaperSize_dpi(item: IPageSOBP | INoteServerItem_forPOD, dpi: number
   const size = getNPaperSize_nu(item);
 
   return {
-    width: size.width * NCODE_TO_INCH_SCALE * dpi,
-    height: size.height * NCODE_TO_INCH_SCALE * dpi,
+    width: Math.round(size.width * NCODE_TO_INCH_SCALE * dpi),
+    height: Math.round(size.height * NCODE_TO_INCH_SCALE * dpi),
   }
 }
 
