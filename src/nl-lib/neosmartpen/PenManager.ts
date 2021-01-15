@@ -183,6 +183,7 @@ export default class PenManager {
     if (_active_pen) {
       _active_pen.setColor(this.color);
     }
+    this.dispatcher.dispatch("colorchanged", this);
   }
 
   toggleColorRadioButton(color_num: number) {
