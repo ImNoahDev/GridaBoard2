@@ -241,9 +241,6 @@ const ButtonLayer_forTest = () => {
         </OptionDialogButton>
       </div>
 
-      <div style={{ fontSize: "20px", fontWeight: "bold" }}>
-        Pen Connected: {num_pens}
-      </div>
       <div style={{ flex: 1 }}> </div>
 
       {/* 구글 업로드 테스트 버튼 */}

@@ -5,22 +5,6 @@ import { setActivePageNo } from '../../store/reducers/activePageReducer';
 import { RootState } from '../../store/rootReducer';
 import { useSelector } from "react-redux";
 
-interface Props {
-  numPages?: number,
-  drawerWidth?: number,
-
-  renderCount?: number,
-
-  onSelectPage?: (pageNo: number) => void,
-
-  activePageNo?: number,
-  noInfo?: boolean,
-}
-
-interface State {
-  page: number;
-}
-
 const pageStyle = {
   outline: 0,
   border: 0
@@ -28,20 +12,26 @@ const pageStyle = {
 
 const PageNumbering = () => {
 
-    const numPages = useSelector((state: RootState) => state.activePage.numDocPages);
-
+    const numPages_store = useSelector((state: RootState) => state.activePage.numDocPages);
     const [page, setPage] = React.useState(1);
-
-    if (numPages < 1) return null;
+    
+    let numPages;
+    if (numPages_store < 1) { 
+      numPages = 1;
+    } else {
+      numPages = numPages_store;
+    }
 
     const handleChange = (event: React.ChangeEvent<unknown>, value: number) => {
-      setPage(value);
-      setActivePageNo(value-1);
+      if (numPages_store !== 0) {
+        setPage(value);
+        setActivePageNo(value-1);
+      }
     }
 
     return (
         <Pagination count={numPages} page={page} color="secondary" className="btn btn-neo" style={pageStyle} 
-        onChange={handleChange}  />
+        onChange={handleChange} />
     )
 }
 
