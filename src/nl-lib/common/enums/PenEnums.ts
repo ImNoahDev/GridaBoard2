@@ -57,6 +57,8 @@ export enum PenEventName {
   /** pen move 도중 페이지가 바뀜에 따라 생성하는 virtual event */
   ON_PEN_UP_VIRTUAL = "penup_virtual",
 
+  ON_COLOR_CHANGED = "colorchanged",
+
 
 }
 

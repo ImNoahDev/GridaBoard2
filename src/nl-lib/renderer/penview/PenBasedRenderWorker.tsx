@@ -4,7 +4,7 @@ import { fabric } from "fabric";
 import RenderWorkerBase, { IRenderWorkerOption } from "./RenderWorkerBase";
 
 import { callstackDepth, drawPath, drawPath_arr, makeNPageIdStr, uuidv4 } from "../../common/util";
-import { IBrushType } from "../../common/enums";
+import { IBrushType, PenEventName } from "../../common/enums";
 import { IPoint, NeoStroke, NeoDot, IPageSOBP, INeoStrokeProps, StrokeStatus, ISize } from "../../common/structures";
 import { INeoSmartpen, IPenToViewerEvent } from "../../common/neopen";
 import { InkStorage } from "../../common/penstorage";
@@ -85,9 +85,7 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
     this.changeDrawCursor();
 
     const penManager = PenManager.getInstance();
-    if (penManager.dispatcher.events["colorchanged"] === undefined) {
-      penManager.dispatcher.on("colorchanged", this.changeDrawCursor, null);
-    }
+    penManager.addEventListener(PenEventName.ON_COLOR_CHANGED, this.changeDrawCursor);
 
     this.changePage(this.pageInfo, options.pageSize, true);
     console.log(`PAGE CHANGE (worker constructor):                             ${makeNPageIdStr(this.pageInfo as IPageSOBP)}`);
@@ -123,7 +121,7 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
     const color = PenManager.getInstance().color;
     const pen_colors = PenManager.getInstance().pen_colors;
     const foundIdx = pen_colors.findIndex(ele => ele === color);
-    
+
     let brushColor;
     switch (foundIdx) {
       case 1 : brushColor = 'red'; break;
@@ -148,7 +146,7 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
         <circle
           cx="50%"
           cy="50%"
-          r="${ this.brushSize }" 
+          r="${ this.brushSize }"
         />
       </svg>
     `;
@@ -291,7 +289,7 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
 
   eraseOnLine(pdf_x0, pdf_y0, pdf_x1, pdf_y1, stroke) {
     const { section, book, owner, page } = stroke;
-    const pageInfo = { 
+    const pageInfo = {
       section: section,
       book: book,
       owner: owner,
@@ -743,7 +741,7 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
   /**
    * 아래는 마우스로 그림을 그리는 곳 (Pen down)
    * WorkerBase의 abstract 함수를 참조
-   * 
+   *
    * 2021/01/12 PointerEvent도 처리할 수 있도록 추가해야 함
    */
   onTouchStrokePenDown = (event: MouseEvent) => {
@@ -764,7 +762,7 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
   /**
    * 아래는 마우스로 그림을 그리는 곳 (Pen move)
    * WorkerBase의 abstract 함수를 참조
-   * 
+   *
    * 2021/01/12 PointerEvent도 처리할 수 있도록 추가해야 함
    */
   onTouchStrokePenMove = (event: MouseEvent, force: number) => {
@@ -791,7 +789,7 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
   /**
    * 아래는 마우스로 그림을 그리는 곳 (Pen up)
    * WorkerBase의 abstract 함수를 참조
-   * 
+   *
    * 2021/01/12 PointerEvent도 처리할 수 있도록 추가해야 함
    */
   onTouchStrokePenUp = (event: MouseEvent) => {
