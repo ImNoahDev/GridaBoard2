@@ -93,6 +93,11 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
     // this.resize({ width: options.width, height: options.height });
   }
 
+  prepareUnmount = () => {
+    const penManager = PenManager.getInstance();
+    penManager.removeEventListener(PenEventName.ON_COLOR_CHANGED, this.changeDrawCursor);
+  }
+
   /**
    * Pen Down이 들어왔다. 그러나 아직 page 정보가 들어오지 않아서,
    * 이 페이지에 붙여야 할 것인가 아니면, 새로운 페이지에 붙여야 할 것인가를 모른다.
@@ -115,7 +120,7 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
    */
 
   changeDrawCursor = () => {
-    this.canvasFb.hoverCursor = `url(${ this.getDrawCursor() }) ${ this.brushSize / 2 } ${ this.brushSize / 2 }, crosshair`;
+    this.canvasFb.hoverCursor = `url(${this.getDrawCursor()}) ${this.brushSize / 2} ${this.brushSize / 2}, crosshair`;
   }
   getDrawCursor = () => {
     const color = PenManager.getInstance().color;
@@ -124,33 +129,33 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
 
     let brushColor;
     switch (foundIdx) {
-      case 1 : brushColor = 'red'; break;
-      case 2 : brushColor = 'yellow'; break;
-      case 3 : brushColor = 'navy'; break;
-      case 4 : brushColor = 'black'; break;
-      case 5 : brushColor = 'white'; break;
-      case 6 : brushColor = 'orange'; break;
-      case 7 : brushColor = 'green'; break;
-      case 8 : brushColor = 'blue'; break;
-      case 9 : brushColor = 'purple'; break;
-      case 0 : brushColor = 'darkgray'; break;
+      case 1: brushColor = 'red'; break;
+      case 2: brushColor = 'yellow'; break;
+      case 3: brushColor = 'navy'; break;
+      case 4: brushColor = 'black'; break;
+      case 5: brushColor = 'white'; break;
+      case 6: brushColor = 'orange'; break;
+      case 7: brushColor = 'green'; break;
+      case 8: brushColor = 'blue'; break;
+      case 9: brushColor = 'purple'; break;
+      case 0: brushColor = 'darkgray'; break;
     }
     const circle = `
       <svg
-        height="${ this.brushSize }"
-        fill="${ brushColor }"
-        viewBox="0 0 ${ this.brushSize * 2 } ${ this.brushSize * 2 }"
-        width="${ this.brushSize }"
+        height="${this.brushSize}"
+        fill="${brushColor}"
+        viewBox="0 0 ${this.brushSize * 2} ${this.brushSize * 2}"
+        width="${this.brushSize}"
         xmlns="http://www.w3.org/2000/svg"
       >
         <circle
           cx="50%"
           cy="50%"
-          r="${ this.brushSize }"
+          r="${this.brushSize}"
         />
       </svg>
     `;
-    return `data:image/svg+xml;base64,${ window.btoa(circle) }`;
+    return `data:image/svg+xml;base64,${window.btoa(circle)}`;
   };
   createLiveStroke = (event: IPenToViewerEvent) => {
     // console.log(`Stroke created = ${event.strokeKey}`);

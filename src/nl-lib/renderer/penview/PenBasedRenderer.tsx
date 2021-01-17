@@ -378,6 +378,10 @@ class PenBasedRenderer extends React.Component<Props, State> {
   componentWillUnmount() {
     this.unsubscribeAllPensEvent();
     if (this.props.fromStorage) this.unsubScriptStorageEvent();
+
+    if (this.renderer) {
+      this.renderer.prepareUnmount();
+    }
   }
 
   /**
