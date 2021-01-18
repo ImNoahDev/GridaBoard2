@@ -32,7 +32,10 @@ const groupStyle = {
 const ColorButtons = () => {
 
   useEffect(() => {
-    manager.toggleColorRadioButton(DEFAULT_PEN_COLOR_NUM);
+    const colorStr = manager.color;
+    const colorNum = Number(manager.getColorNum(colorStr));
+    const toggleColorNum = colorNum !== -1 ? colorNum : DEFAULT_PEN_COLOR_NUM;
+    manager.toggleColorRadioButton(toggleColorNum);
   });
 
   return (
