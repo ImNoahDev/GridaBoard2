@@ -82,10 +82,11 @@ export default class VirtualPen implements INeoSmartpen {
       this.storage = InkStorage.getInstance();
     }
 
+    const color = this.manager.color;
     for (let i = 0; i < this.penState.length; i++) {
       this.penState[i] = {
         thickness: 0.2,
-        color: "rgba(0,0,0)",
+        color: color,
       };
     }
 
@@ -198,7 +199,8 @@ export default class VirtualPen implements INeoSmartpen {
     if (!this.storage) {
       console.error("Ink Storage has not been initialized");
     }
-
+    
+    this.setColor(this.manager.color);
     const penDownStrokeInfo = this.processPenDown(event);
     // const mac = this.mac;
     // const time = event.timeStamp;
