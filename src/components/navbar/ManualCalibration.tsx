@@ -31,10 +31,10 @@ const ManualCalibration = (props: Props) => {
         msg: "Ncode A4에 인쇄된 페이지를 프로그램에 수동 등록합니다.",
         tail: "단축키 Q로 선택가능합니다."
       }} title={undefined}>
-        <div><NeoImage style={style} src='../../icons/icon_calibration_n.png' /></div>
+        <div><NeoImage style={style} src='/icons/icon_calibration_n.png' /></div>
         {/* <div className="c2">
-          <img style={style} src='../../icons/icon_calibration_n.png' className="normal-image"></img>
-          <img style={style} src='../../icons/icon_calibration_p.png' className="hover-image"></img>
+          <img style={style} src='/icons/icon_calibration_n.png' className="normal-image"></img>
+          <img style={style} src='/icons/icon_calibration_p.png' className="hover-image"></img>
         </div> */}
       </GridaToolTip>
     </CalibrationButton>

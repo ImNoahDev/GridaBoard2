@@ -11,7 +11,7 @@ import { hideCalibrationDialog, showCalibrationDialog, updateCalibrationDialog }
 import { IPrintOption } from '../../../common/structures';
 import { NeoPdfDocument, NeoPdfManager } from '../../../common/neopdf';
 
-const _penImageUrl = "./icons/image_calibration.png";
+const _penImageUrl = "/icons/image_calibration.png";
 
 const useStyles = makeStyles({
   root: {

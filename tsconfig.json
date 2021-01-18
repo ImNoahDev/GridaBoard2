@@ -28,6 +28,7 @@
     "noFallthroughCasesInSwitch": true
   },
   "include": [
-    "src"
+    "src",
+    "public/pdf.worker.2.5.207.js"
   ]
 }

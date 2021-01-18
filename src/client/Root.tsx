@@ -4,7 +4,7 @@ import { Backdrop, CircularProgress, IconButton, MuiThemeProvider, Snackbar } fr
 import MuiAlert from "@material-ui/lab/Alert";
 import CloseIcon from "@material-ui/icons/Close";
 
-import App from "../shared/App";
+// import App from "../shared/App";
 import { theme } from "../styles/theme";
 import configureStore from "../store/configureStore";
 import { RootState } from '../store/rootReducer';
@@ -13,6 +13,7 @@ import GridaApp from "../GridaBoard/GridaApp";
 import { hideUIProgressBackdrop, showUIProgressBackdrop } from "../store/reducers/ui";
 import { fetchGzippedFile } from "../nl-lib/common/util";
 import { g_paperType, g_paperType_default } from "../nl-lib/common/noteserver";
+import Home from "../GridaBoard/View/Home";
 
 
 
@@ -123,7 +124,8 @@ const Root = () => {
   return (
     <Provider store={store}>
       <MuiThemeProvider theme={theme}>
-        {paperInfoInited ? <App theme={theme} /> : <></>}
+        {paperInfoInited ? 
+        <Home /> : <></>}
 
         <Backdrop style={styles.backdrop} open={shouldWait} >
           <CircularProgress color="inherit" />

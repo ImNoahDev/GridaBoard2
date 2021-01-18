@@ -152,8 +152,8 @@ const ButtonLayerBottom = (props: Props) => {
               tail: "키보드 버튼 1로 선택 가능합니다"
             }} title={undefined}>
               <div className="c2">
-                <img style={menuStyle} src='../icons/all_menu.png' className="normal-image" alt=""></img>
-                <img style={menuStyle} src='../icons/all_menu.png' className="hover-image" alt=""></img>
+                <img style={menuStyle} src='./icons/all_menu.png' className="normal-image" alt=""></img>
+                <img style={menuStyle} src='./icons/all_menu.png' className="hover-image" alt=""></img>
               </div>
             </GridaToolTip>
           </Button>

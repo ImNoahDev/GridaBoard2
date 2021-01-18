@@ -15,8 +15,8 @@ class menuButton extends React.Component {
       <React.Fragment>
       <button id="btn_menu" type="button" className="btn btn-neo " title="Open a menu">
           <div className="c2">
-            <img style={style} src='../../icons/all_menu.png' className="normal-image"></img>
-            <img style={style} src='../../icons/all_menu.png' className="hover-image"></img>
+            <img style={style} src='/icons/all_menu.png' className="normal-image"></img>
+            <img style={style} src='/icons/all_menu.png' className="hover-image"></img>
           </div>
       </button>
       </React.Fragment>

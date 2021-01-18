@@ -105,8 +105,8 @@ const ButtonLayerSide = () => {
                       tail: "키보드 버튼 1로 선택 가능합니다"
                     }} title={undefined}>
                       <div className="c2">
-                        <img src='../icons/icon_trash_n.png' className="normal-image"></img>
-                        <img src='../icons/icon_trash_p.png' className="hover-image"></img>
+                        <img src='./icons/icon_trash_n.png' className="normal-image"></img>
+                        <img src='./icons/icon_trash_p.png' className="hover-image"></img>
                       </div>
                     </GridaToolTip>
                   </button>

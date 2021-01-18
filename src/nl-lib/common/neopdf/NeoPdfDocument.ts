@@ -4,6 +4,13 @@ import { uuidv4 } from "../util";
 import { MappingStorage } from "../mapper";
 import { NeoPdfPage, PDF_VIEWPORT_DESC } from "./NeoPdfPage";
 
+// import PdfJsWorker from "../../../../public/pdf.worker.2.5.207.js/index.js";
+console.log(`PDFjs version=${PdfJs.version}`);
+// PdfJs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${PdfJs.version}/pdf.worker.js`;
+PdfJs.GlobalWorkerOptions.workerSrc = "./pdf.worker.2.5.207.js";
+
+
+
 const CMAP_URL = "./cmaps/";
 const CMAP_PACKED = true;
 
@@ -372,10 +379,6 @@ export class NeoPdfDocument {
 
 
 
-
-
-
-PdfJs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${PdfJs.version}/pdf.worker.js`;
 
 const max_concurrent = 16;
 let pdf_loader_idx = 0;

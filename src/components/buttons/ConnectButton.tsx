@@ -42,10 +42,10 @@ const ConnectButton = (props: Props) => {
           tail: "Shift + 1~7 각 펜의 내용을 감추기/보이기, P 모든 펜의 획을 감추기/보이기"
         }} title={undefined}>
           <div className="c2 ">
-            <img src='../../icons/icon_smartpen_connected_p.png' className="toggle-off hover-image"></img>
-            <img src='../../icons/icon_smartpen_disconnected_n.png' className="toggle-off normal-image"></img>
-            <img src='../../icons/icon_smartpen_connected_n.png' className="toggle-on normal-image"></img>
-            <img src='../../icons/icon_smartpen_disconnected_p.png' className="toggle-on hover-image"></img>
+            <img src='/icons/icon_smartpen_connected_p.png' className="toggle-off hover-image"></img>
+            <img src='/icons/icon_smartpen_disconnected_n.png' className="toggle-off normal-image"></img>
+            <img src='/icons/icon_smartpen_connected_n.png' className="toggle-on normal-image"></img>
+            <img src='/icons/icon_smartpen_disconnected_p.png' className="toggle-on hover-image"></img>
 
             <span id="pen_id" className="pen-badge badge badge-pill badge-light">{num_pens}</span>
           </div>

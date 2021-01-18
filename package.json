@@ -3,34 +3,35 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@material-ui/core": "4.11.0",
+    "@material-ui/core": "^4.11.2",
     "@material-ui/icons": "^4.9.1",
     "@material-ui/lab": "4.0.0-alpha.57",
     "@popperjs/core": "2.6.0",
     "@testing-library/jest-dom": "^5.11.8",
     "@testing-library/react": "^11.2.3",
-    "@testing-library/user-event": "12.6.0",
-    "@types/fabric": "3.6.9",
-    "@types/i18next": "^13.0.0",
+    "@testing-library/user-event": "^12.6.0",
+    "@types/fabric": "^4.2.1",
     "@types/jest": "26.0.15",
     "@types/node": "14.14.7",
     "@types/pdfjs-dist": "2.1.6",
     "@types/react": "16.9.56",
     "@types/react-dom": "16.9.9",
-    "@types/react-i18next": "^8.1.0",
     "@types/sprintf-js": "1.1.2",
     "@types/web-bluetooth": "0.0.9",
     "axios": "^0.21.1",
-    "bootstrap": "4.5.3",
+    "bootstrap": "^4.5.3",
+    "cairo": "0.1.0-alpha.3",
+    "canvas": "^2.6.1",
     "cmake-js": "^6.1.0",
-    "eslint-config-airbnb": "18.2.1",
+    "electron-is-dev": "^1.2.0",
+    "eslint-config-airbnb": "^18.2.1",
     "expect.js": "0.3.1",
     "fabric": "^4.3.0",
     "file-saver": "2.0.2",
     "gapi-script": "^1.0.2",
     "jquery": "^3.5.1",
     "jszip": "^3.5.0",
-    "node-sass": "^4.14.1",
+    "nan": "2.14.0",
     "path-browserify": "1.0.1",
     "path-intersection": "^2.2.0",
     "pdf-lib": "1.11.2",
@@ -44,14 +45,14 @@
     "react-dom": "^17.0.1",
     "react-google-login": "^5.2.2",
     "react-i18next": "11.8.4",
-    "react-json-view": "^1.19.1",
+    "react-json-view": "^1.20.0",
     "react-popper": "^2.2.4",
     "react-redux": "7.2.2",
     "react-resize-detector": "5.2.0",
     "react-router-dom": "^5.2.0",
     "react-scripts": "4.0.1",
     "react-to-print": "2.12.1",
-    "react-virtualized": "9.22.3",
+    "react-virtualized": "^9.22.3",
     "react-window": "1.8.6",
     "redux": "^4.0.5",
     "redux-cookies": "^1.0.1",
@@ -65,9 +66,13 @@
   "scripts": {
     "start": "react-scripts start",
     "https": "set HTTPS=true&&react-scripts start",
-    "build": "react-scripts build",
+    "build": "set GENERATE_SOURCEMAP=true && react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "react-eject": "react-scripts eject",
+    "react-start": "react-scripts start",
+    "e:start": "concurrently \"cross-env NODE_ENV=development BROWSER=none npm run react-start\" \"wait-on http://localhost:3000 && electron .\"",
+    "e:build": "npm run build && electron-builder",
+    "deploy": "npm run  build && electron-builder --publish=always"
   },
   "eslintConfig": {
     "extends": [
@@ -103,14 +108,50 @@
     "@types/react-redux": "7.1.14",
     "@typescript-eslint/eslint-plugin": "4.9.0",
     "@typescript-eslint/parser": "4.9.0",
+    "concurrently": "^5.3.0",
+    "cross-env": "^7.0.3",
+    "electron": "^11.2.0",
+    "electron-builder": "^22.9.1",
     "eslint": "7.15.0",
     "eslint-plugin-css-modules": "^2.11.0",
     "eslint-plugin-react": "7.21.5",
-    "typescript": "4.1.2"
+    "typescript": "4.1.2",
+    "wait-on": "^5.2.1"
   },
   "rules": {
     "no-unused-vars": "off",
     "no-prototype-builtins": "off",
     " @typescript-eslint/no-inferrable-types": "off"
-  }
+  },
+  "description": "GridaBoard by Neo smartpen",
+  "author": "NeoLAB Convergence",
+  "build": {
+    "asar": true,
+    "appId": "com.neosmartpen.gridaboard",
+    "productName": "GridaBoard2",
+    "protocols": {
+      "name": "gridaboard",
+      "schemes": [
+        "gridaboard"
+      ]
+    },
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "perMachine": false,
+      "createDesktopShortcut": true
+    }
+  },
+  "main": "public/electron.js",
+  "homepage": "./"
 }

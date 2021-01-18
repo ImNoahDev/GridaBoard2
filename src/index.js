@@ -7,12 +7,17 @@
 // ReactDOM.render(<Root />, document.getElementById('root'));
 // registerServiceWorker();
 
+import 'bootstrap/dist/css/bootstrap.css';
+import "./index.css";
+
 
 import React from 'react';
 import ReactDOM from 'react-dom';
 import Root from './client/Root';
 import './index.css';
 import * as serviceWorker from './serviceWorker';
+
+// import "./electron-starter.js";
 
 
 ReactDOM.render(
@@ -26,3 +31,5 @@ ReactDOM.render(
 // unregister() to register() below. Note this comes with some pitfalls.
 // Learn more about service workers: https://bit.ly/CRA-PWA
 serviceWorker.unregister();
+
+

@@ -38,8 +38,8 @@ const FileBrowserButton = (props: Props) => {
           tail: "키보드 버튼 Ctrl + O으로 이동 가능합니다"
         }} title={undefined}>
           <div className="c2">
-            <img src='../../icons/icon_file_n.png' className="normal-image"></img>
-            <img src='../../icons/icon_file_p.png' className="hover-image"></img>
+            <img src='/icons/icon_file_n.png' className="normal-image"></img>
+            <img src='/icons/icon_file_p.png' className="hover-image"></img>
           </div>
         </NeoToolTip>
         {props.children}

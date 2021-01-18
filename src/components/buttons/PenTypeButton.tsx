@@ -24,14 +24,14 @@ export default class PenTypeButton extends React.Component {
             tail: "Q 펜, W 형광펜, E 지우개, A~G 굵기 선택"
           }} title={undefined}>
             <div className="c2 disabled state_0">
-              <img src="../../icons/icon_pen_n.png" className="state_0 normal-image"></img>
-              <img src="../../icons/icon_pen_p.png" className="state_0 hover-image"></img>
+              <img src="/icons/icon_pen_n.png" className="state_0 normal-image"></img>
+              <img src="/icons/icon_pen_p.png" className="state_0 hover-image"></img>
 
-              <img src="../../icons/icon_highlight_n.png" className="state_1 normal-image"></img>
-              <img src="../../icons/icon_highlight_p.png" className="state_1 hover-image"></img>
+              <img src="/icons/icon_highlight_n.png" className="state_1 normal-image"></img>
+              <img src="/icons/icon_highlight_p.png" className="state_1 hover-image"></img>
 
-              <img src="../../icons/icon_eraser_n.png" className="state_2 normal-image"></img>
-              <img src="../../icons/icon_eraser_p.png" className="state_2 hover-image"></img>
+              <img src="/icons/icon_eraser_n.png" className="state_2 normal-image"></img>
+              <img src="/icons/icon_eraser_p.png" className="state_2 hover-image"></img>
 
               <span id="thickness_num" className="thickness-badge badge badge-pill badge-secondary">2</span>
             </div>
@@ -49,8 +49,8 @@ export default class PenTypeButton extends React.Component {
                 tail: "단축키 Q로 선택가능합니다."
               }} title={undefined}>
                 <div className="c2">
-                  <img src="../../icons/icon_pen_n.png" className="normal-image"></img>
-                  <img src="../../icons/icon_pen_p.png" className="hover-image"></img>
+                  <img src="/icons/icon_pen_n.png" className="normal-image"></img>
+                  <img src="/icons/icon_pen_p.png" className="hover-image"></img>
                 </div>
               </GridaToolTip>
             </button>
@@ -62,8 +62,8 @@ export default class PenTypeButton extends React.Component {
                 tail: "단축키 W로 선택가능합니다."
               }} title={undefined}>
                 <div className="c2">
-                  <img src="../../icons/icon_highlight_n.png" className="normal-image"></img>
-                  <img src="../../icons/icon_highlight_p.png" className="hover-image"></img>
+                  <img src="/icons/icon_highlight_n.png" className="normal-image"></img>
+                  <img src="/icons/icon_highlight_p.png" className="hover-image"></img>
                 </div>
               </GridaToolTip>
             </button>
@@ -75,8 +75,8 @@ export default class PenTypeButton extends React.Component {
                 tail: "단축키 E로 선택가능합니다."
               }} title={undefined}>
                 <div className="c2">
-                  <img src="../../icons/icon_eraser_n.png" className="normal-image"></img>
-                  <img src="../../icons/icon_eraser_p.png" className="hover-image"></img>
+                  <img src="/icons/icon_eraser_n.png" className="normal-image"></img>
+                  <img src="/icons/icon_eraser_p.png" className="hover-image"></img>
                 </div>
               </GridaToolTip>
             </button>
@@ -87,20 +87,20 @@ export default class PenTypeButton extends React.Component {
           <div className="btn-group">
             <button id="btn_thick_1" type="button" className="btn btn-neo btn-neo-dropdown" onClick={() => manager.setThickness(1)}>
               <div className="c2">
-                <img src="../../icons/icon_thickness_01_n.png" className="normal-image"></img>
-                <img src="../../icons/icon_thickness_01_p.png" className="hover-image"></img>
+                <img src="/icons/icon_thickness_01_n.png" className="normal-image"></img>
+                <img src="/icons/icon_thickness_01_p.png" className="hover-image"></img>
               </div>
             </button>
             <button id="btn_thick_2" type="button" className="btn btn-neo btn-neo-dropdown" onClick={() => manager.setThickness(2)}>
               <div className="c2">
-                <img src="../../icons/icon_thickness_02_n.png" className="normal-image"></img>
-                <img src="../../icons/icon_thickness_02_p.png" className="hover-image"></img>
+                <img src="/icons/icon_thickness_02_n.png" className="normal-image"></img>
+                <img src="/icons/icon_thickness_02_p.png" className="hover-image"></img>
               </div>
             </button>
             <button id="btn_thick_3" type="button" className="btn btn-neo btn-neo-dropdown" onClick={() => manager.setThickness(3)}>
               <div className="c2">
-                <img src="../../icons/icon_thickness_03_n.png" className="normal-image"></img>
-                <img src="../../icons/icon_thickness_03_p.png" className="hover-image"></img>
+                <img src="/icons/icon_thickness_03_n.png" className="normal-image"></img>
+                <img src="/icons/icon_thickness_03_p.png" className="hover-image"></img>
               </div>
             </button>
           </div>

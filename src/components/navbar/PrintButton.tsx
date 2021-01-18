@@ -40,8 +40,8 @@ const PrintButton = (props: Props) => {
           tail: "단축키 Q로 선택가능합니다."
         }} title={undefined}>
           <div className="c2">
-            <img src='../../icons/icon_print_n.png' className="normal-image"></img>
-            <img src='../../icons/icon_print_p.png' className="hover-image"></img>
+            <img src='/icons/icon_print_n.png' className="normal-image"></img>
+            <img src='/icons/icon_print_p.png' className="hover-image"></img>
           </div>
         </GridaToolTip>
       </PrintNcodedPdfButton>

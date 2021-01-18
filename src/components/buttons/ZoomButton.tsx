@@ -16,8 +16,8 @@ export default class ZoomButton extends React.Component {
             tail: "단축키 Q로 선택가능합니다."
           }} title={undefined}>
           <div className="c2 disabled">
-            <img src="../../icons/icon_zoom_n.png" className="normal-image"></img>
-            <img src="../../icons/icon_zoom_p.png" className="hover-image"></img>
+            <img src="/icons/icon_zoom_n.png" className="normal-image"></img>
+            <img src="/icons/icon_zoom_p.png" className="hover-image"></img>
           </div>
         </GridaToolTip>
         <span id="zoom-ratio" className="zoom-badge badge badge-pill badge-info">100%</span>

@@ -37,10 +37,10 @@ const TracePointButton = () => {
           tail: "단축키 Q로 선택가능합니다."
         }} title={undefined}>
         <div className="c2 checked">
-          <img src="../../icons/icon_point_d.png" className="toggle-off normal-image"></img>
-          <img src="../../icons/icon_point_p.png" className="toggle-off hover-image"></img>
-          <img src="../../icons/icon_point_n.png" className="toggle-on normal-image"></img>
-          <img src="../../icons/icon_point_p.png" className="toggle-on hover-image"></img>
+          <img src="/icons/icon_point_d.png" className="toggle-off normal-image"></img>
+          <img src="/icons/icon_point_p.png" className="toggle-off hover-image"></img>
+          <img src="/icons/icon_point_n.png" className="toggle-on normal-image"></img>
+          <img src="/icons/icon_point_p.png" className="toggle-on hover-image"></img>
         </div>
       </GridaToolTip>
     </button>

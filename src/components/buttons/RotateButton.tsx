@@ -16,10 +16,10 @@ export default class RotateButton extends React.Component {
               tail: "TAB 가로쓰기/세로쓰기 전환"
             }} title={undefined}>
             <div className="c2">
-              <img src="../../icons/icon_portrait_n.png" className="toggle-off normal-image"></img>
-              <img src="../../icons/icon_portrait_p.png" className="toggle-off hover-image"></img>
-              <img src="../../icons/icon_landscape_n.png" className="toggle-on normal-image"></img>
-              <img src="../../icons/icon_landscape_p.png" className="toggle-on hover-image"></img>
+              <img src="/icons/icon_portrait_n.png" className="toggle-off normal-image"></img>
+              <img src="/icons/icon_portrait_p.png" className="toggle-off hover-image"></img>
+              <img src="/icons/icon_landscape_n.png" className="toggle-on normal-image"></img>
+              <img src="/icons/icon_landscape_p.png" className="toggle-on hover-image"></img>
             </div>
           </GridaToolTip>
         </button>

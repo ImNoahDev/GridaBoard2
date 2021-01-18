@@ -19,8 +19,8 @@ export default class BackgroundButton extends React.Component {
               tail: "키보드 버튼 1로 선택 가능합니다"
             }} title={undefined}>
             <div className="c2">
-              <img src="../../icons/icon_background_n.png" className="normal-image"></img>
-              <img src="../../icons/icon_background_p.png" className="hover-image"></img>
+              <img src="/icons/icon_background_n.png" className="normal-image"></img>
+              <img src="/icons/icon_background_p.png" className="hover-image"></img>
             </div>
           </GridaToolTip>
         </button>
@@ -30,32 +30,32 @@ export default class BackgroundButton extends React.Component {
 
           <a id="btn_bg_gd" className="dropdown-item" href="#" onClick={() => themeManager.setT1()}>
             <div className="c2">
-              <img src="../../icons/icon_bg_gd01_n.png" className="normal-image"></img>
-              <img src="../../icons/icon_bg_gd01_p.png" className="hover-image"></img>
+              <img src="/icons/icon_bg_gd01_n.png" className="normal-image"></img>
+              <img src="/icons/icon_bg_gd01_p.png" className="hover-image"></img>
               <span className="bg-dropmenu">Gurodong</span>
             </div>
           </a>
 
           <a id="btn_bg_avan" className="dropdown-item" href="#" onClick={() => themeManager.setT2()}>
             <div className="c2">
-              <img src="../../icons/icon_bg_gd02_n.png" className="normal-image"></img>
-              <img src="../../icons/icon_bg_gd02_p.png" className="hover-image"></img>
+              <img src="/icons/icon_bg_gd02_n.png" className="normal-image"></img>
+              <img src="/icons/icon_bg_gd02_p.png" className="hover-image"></img>
               <span className="bg-dropmenu">Aubergine</span>
             </div>
           </a>
 
           <a id="btn_bg_white" className="dropdown-item" href="#" onClick={() => themeManager.setT4()}>
             <div className="c2">
-              <img src="../../icons/icon_bg_wh_n.png" className="normal-image"></img>
-              <img src="../../icons/icon_bg_wh_p.png" className="hover-image"></img>
+              <img src="/icons/icon_bg_wh_n.png" className="normal-image"></img>
+              <img src="/icons/icon_bg_wh_p.png" className="hover-image"></img>
               <span className="bg-dropmenu">White</span>
             </div>
           </a>
 
           <a id="btn_bg_black" className="dropdown-item" href="#" onClick={() => themeManager.setT5()}>
             <div className="c2">
-              <img src="../../icons/icon_bg_bk_n.png" className="normal-image"></img>
-              <img src="../../icons/icon_bg_bk_p.png" className="hover-image"></img>
+              <img src="/icons/icon_bg_bk_n.png" className="normal-image"></img>
+              <img src="/icons/icon_bg_bk_p.png" className="hover-image"></img>
               <span className="bg-dropmenu">Black</span>
             </div>
           </a>

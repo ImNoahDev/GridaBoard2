@@ -1,31 +1,31 @@
-import Colors from '../styles/colors.scss';
+// import Colors from '../styles/colors.scss';
 import { colors } from '@material-ui/core';
 import { koKR } from '@material-ui/core/locale';
 import { createMuiTheme, useMediaQuery } from '@material-ui/core';
 
-const prev_palette = {
-  type: 'light',
-  primary: {
-    main: Colors.primary
-  },
-  secondary: {
-    main: Colors.secondary
-  },
-  error: {
-    main: Colors.error
-  },
-  warning: {
-    main: Colors.warning
-  },
-  info: {
-    main: Colors.info
-  },
-  success: {
-    main: Colors.success
-  },
-  contrastThreshold: 3,
-  tonalOffset: 0.2
-};
+// const prev_palette = {
+//   type: 'light',
+//   primary: {
+//     main: Colors.primary
+//   },
+//   secondary: {
+//     main: Colors.secondary
+//   },
+//   error: {
+//     main: Colors.error
+//   },
+//   warning: {
+//     main: Colors.warning
+//   },
+//   info: {
+//     main: Colors.info
+//   },
+//   success: {
+//     main: Colors.success
+//   },
+//   contrastThreshold: 3,
+//   tonalOffset: 0.2
+// };
 
 const palette = {
   myColor: {

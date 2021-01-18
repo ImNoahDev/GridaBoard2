@@ -186,7 +186,7 @@ const ButtonLayer_forTest = () => {
       <div style={{ flex: 1 }}> </div> */}
 
       {/* 이미지 버튼 테스트 */}
-      <NeoImage src="./icons/icon_trash_n.png" />
+      <NeoImage src="/icons/icon_trash_n.png" />
 
       {/* 인쇄 테스트 버튼 */}
       {/* <div style={{ fontSize: "20px", fontWeight: "bold" }}>
