@@ -354,6 +354,7 @@ export default abstract class RenderWorkerBase {
       // lockMovementY: true,
       selectable: false,
       data: GRID_OBJECT_ID,
+      name: 'page_layout'
 
     });
     canvasFb.add(rect);
@@ -375,6 +376,7 @@ export default abstract class RenderWorkerBase {
         lockMovementX: true,
         lockMovementY: true,
         data: GRID_OBJECT_ID,
+        name: 'page_layout'
       });
 
       canvasFb.add(line);
@@ -393,6 +395,7 @@ export default abstract class RenderWorkerBase {
         lockMovementX: true,
         lockMovementY: true,
         data: GRID_OBJECT_ID,
+        name: 'page_layout'
       });
 
       canvasFb.add(line);

@@ -15,7 +15,8 @@ import { Box, Button, Paper } from "@material-ui/core";
 import PostAddIcon from '@material-ui/icons/PostAdd';
 import GridaDoc from "../GridaDoc";
 import { setActivePageNo } from "../../store/reducers/activePageReducer";
-
+import InkStorage from "../../nl-lib/common/penstorage/InkStorage";
+import { PageEventName } from "../../nl-lib/common/enums";
 
 const mainFrameStyle = {
   position: "absolute",
@@ -42,14 +43,18 @@ const addBlankPage = (event) => {
  *
  */
 const ButtonLayerSide = () => {
+  const activePageNo_store = useSelector((state: RootState) => {
+    return state.activePage.activePageNo
+  });
+
+
   const handleTrashBtn = () => {
-    // 고쳐야 한다. kitty
-    // const penRendererState = pageRef.current.rendererRef.current.state;
+    const doc = GridaDoc.getInstance();
+    const basePageInfo = doc.getPage(activePageNo_store).basePageInfo;
 
-    // penRendererState.renderer.removeAllCanvasObject();
-    // InkStorage.getInstance().removeStrokeFromPage(penRendererState.pageInfo);
-
-    console.log('Handle Trash Btn');
+    const inkStorage = InkStorage.getInstance();
+    inkStorage.dispatcher.dispatch(PageEventName.PAGE_CLEAR, null);
+    inkStorage.removeStrokeFromPage(basePageInfo);
   }
 
   const pens = useSelector((state: RootState) => {

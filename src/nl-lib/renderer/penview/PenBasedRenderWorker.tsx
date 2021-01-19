@@ -4,7 +4,7 @@ import { fabric } from "fabric";
 import RenderWorkerBase, { IRenderWorkerOption } from "./RenderWorkerBase";
 
 import { callstackDepth, drawPath, drawPath_arr, makeNPageIdStr, uuidv4 } from "../../common/util";
-import { IBrushType, PenEventName } from "../../common/enums";
+import { IBrushType, PenEventName, PageEventName } from "../../common/enums";
 import { IPoint, NeoStroke, NeoDot, IPageSOBP, INeoStrokeProps, StrokeStatus, ISize } from "../../common/structures";
 import { INeoSmartpen, IPenToViewerEvent } from "../../common/neopen";
 import { InkStorage } from "../../common/penstorage";
@@ -87,6 +87,9 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
     const penManager = PenManager.getInstance();
     penManager.addEventListener(PenEventName.ON_COLOR_CHANGED, this.changeDrawCursor);
 
+    const filter = { mac: null };
+    this.storage.addEventListener(PageEventName.PAGE_CLEAR, this.removeAllCanvasObject, filter);
+
     this.changePage(this.pageInfo, options.pageSize, true);
     console.log(`PAGE CHANGE (worker constructor):                             ${makeNPageIdStr(this.pageInfo as IPageSOBP)}`);
 
@@ -96,6 +99,8 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
   prepareUnmount = () => {
     const penManager = PenManager.getInstance();
     penManager.removeEventListener(PenEventName.ON_COLOR_CHANGED, this.changeDrawCursor);
+
+    this.storage.removeEventListener(PageEventName.PAGE_CLEAR, this.removeAllCanvasObject);
   }
 
   /**
@@ -641,7 +646,7 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
     if (this.canvasFb) {
       const objects = this.canvasFb.getObjects();
       const needToClear = objects.filter(obj =>
-        (obj.data !== 'hps' && obj.data !== 'pt')
+        (obj.data !== 'hps' && obj.data !== 'pt' && obj.name !== 'page_layout')
       );
 
       this.canvasFb.remove(...needToClear);
