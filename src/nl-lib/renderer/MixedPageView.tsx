@@ -103,6 +103,8 @@ export interface MixedViewProps {
   height?: number,
 
   noMorePdfSignal?: boolean;
+
+  pageCenterStyle?: any;
 }
 
 interface State {
@@ -173,6 +175,7 @@ const defaultMixedPageViewProps: MixedViewProps = {
   onNcodePageChanged: undefined,
 
   noMorePdfSignal: false,
+  pageCenterStyle: undefined,
 }
 
 
@@ -516,12 +519,18 @@ class MixedPageView_module extends React.Component<MixedViewProps, State>  {
     if (this.props.onNcodePageChanged) this.props.onNcodePageChanged(pageInfo, found);
   }
 
+  pageCenterStyle = (width:any) => {
+    if (this.props.parentName === "grida-main-home")
+      this.props.pageCenterStyle(width);
+  }
+
 
   onCanvasPositionChanged = (arg: { offsetX: number, offsetY: number, zoom: number }) => {
     // console.log(arg);
     this._internal.viewPos = { ...arg };
     this.setState({ forceToRenderCnt: this.state.forceToRenderCnt + 1 });
 
+    this.pageCenterStyle(this._internal.width);
     // const r = this._internal.renderCount;
     // this.setState({ renderCount: r + 1 });
   }

@@ -38,21 +38,6 @@ const useStyles = makeStyles((theme: Theme) =>
   }),
 );
 
-const localStyle = {
-  position: "inherit",
-  // left: "0px", top: "0px",
-  bottom: 0,
-  flexDirection: "row-reverse",
-  display: "flex",
-  alignItems: "center",
-  // zIndex: 1113,
-  // marginRight: 880,
-  // marginTop: 890,
-  // marginTop: '44%',
-  marginLeft: '41.2%',
-  marginBottom: '0.4%',
-} as React.CSSProperties;
-
 const Home = () => {
   const [isRotate, setRotate] = useState();
   const [drawerOpen, setDrawerOpen] = useState(true);
@@ -67,6 +52,7 @@ const Home = () => {
   const [noMoreAutoLoad, setNoMoreAutoLoad] = useState(false);
 
   const [activePageNo, setLocalActivePageNo] = useState(-1);
+  const [pageCenter, setPageCenter] = useState(0);
 
   // const [pdfUrl, setPdfUrl] = useState(undefined as string);
   // const [pdfFilename, setPdfFilename] = useState(undefined as string);
@@ -118,6 +104,10 @@ const Home = () => {
 
   const onDrawerResize = (size) => {
     setDrawerWidth(size);
+  }
+
+  function pageCenterStyle(width:any) {
+    setPageCenter(width);
   }
 
 
@@ -252,7 +242,18 @@ const Home = () => {
     }
   }
 
-
+  const pageStyle = pageCenter;
+    
+  const localStyle = { // 확인
+    position: "absolute",
+    bottom: 8,
+    flexDirection: "row-reverse",
+    display: "flex",
+    alignItems: "center",
+    zIndex: 1113,
+    justifyContent: "center",
+    width: pageStyle,
+  } as React.CSSProperties;
 
   console.log(`HOME: docPageNo:${activePageNo}, pdfUrl=${pdfUrl}, fingerPrint: ${pdfFingerprint}, pdfPageNo:${pdfPageNo}`);
   return (
@@ -288,7 +289,7 @@ const Home = () => {
             parentName={"grida-main-home"}
             viewFit={ZoomFitEnum.FULL}
             fitMargin={100}
-            noInfo
+            pageCenterStyle = {(width) => pageCenterStyle(width)}
           />
           <div id="navbar_page" style={localStyle}>
             <div className="navbar-menu neo_shadow" style={{zIndex: 1030, height: "36px"}}>
