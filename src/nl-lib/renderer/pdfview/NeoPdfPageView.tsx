@@ -122,17 +122,17 @@ export default class NeoPdfPageView extends Component<PageProps, PageState> {
   scaleCanvas(canvas: HTMLCanvasElement, width: number, height: number, zoom: number) {
     // assume the device pixel ratio is 1 if the browser doesn't specify it
     const devicePixelRatio = window.devicePixelRatio || 1;
-    const context = canvas.getContext('2d');
+    const context = canvas.getContext('2d') as any;
 
     // determine the 'backing store ratio' of the canvas context
-    const backingStoreRatio = 1;
-    // (
-    //   context.webkitBackingStorePixelRatio ||
-    //   context.mozBackingStorePixelRatio ||
-    //   context.msBackingStorePixelRatio ||
-    //   context.oBackingStorePixelRatio ||
-    //   context.backingStorePixelRatio || 1
-    // );
+    const backingStoreRatio =
+    (
+      context.webkitBackingStorePixelRatio ||
+      context.mozBackingStorePixelRatio ||
+      context.msBackingStorePixelRatio ||
+      context.oBackingStorePixelRatio ||
+      context.backingStorePixelRatio || 1
+    );
 
     // determine the actual ratio we want to draw at
     const pdfCssRatio = 96 / 72;
@@ -146,24 +146,13 @@ export default class NeoPdfPageView extends Component<PageProps, PageState> {
     const px_width = Math.floor(width * ratio);
     const px_height = Math.floor(height * ratio);
 
+    // set the 'real' canvas size to the higher width/height
+    canvas.width = px_width;
+    canvas.height = px_height;
 
-
-    if (devicePixelRatio !== backingStoreRatio) {
-      // set the 'real' canvas size to the higher width/height
-      canvas.width = px_width;
-      canvas.height = px_height;
-
-      // ...then scale it back down with CSS
-      canvas.style.width = width + 'px';
-      canvas.style.height = height + 'px';
-    }
-    else {
-      // this is a normal 1:1 device; just scale it simply
-      canvas.width = width;
-      canvas.height = height;
-      canvas.style.width = '';
-      canvas.style.height = '';
-    }
+    // ...then scale it back down with CSS
+    canvas.style.width = width + 'px';
+    canvas.style.height = height + 'px';
 
     // scale the drawing context so everything will work at the higher ratio
     context.scale(ratio, ratio);
