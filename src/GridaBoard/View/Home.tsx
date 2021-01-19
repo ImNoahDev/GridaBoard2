@@ -250,7 +250,6 @@ const Home = () => {
     flexDirection: "row-reverse",
     display: "flex",
     alignItems: "center",
-    zIndex: 1113,
     justifyContent: "center",
     width: pageStyle,
   } as React.CSSProperties;
@@ -292,7 +291,7 @@ const Home = () => {
             pageCenterStyle = {(width) => pageCenterStyle(width)}
           />
           <div id="navbar_page" style={localStyle}>
-            <div className="navbar-menu neo_shadow" style={{zIndex: 1030, height: "36px"}}>
+            <div className="navbar-menu neo_shadow" style={{zIndex: 1000, height: "36px"}}>
               <PageNumbering />
             </div>
           </div>
