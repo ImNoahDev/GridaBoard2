@@ -52,7 +52,7 @@ const Home = () => {
   const [noMoreAutoLoad, setNoMoreAutoLoad] = useState(false);
 
   const [activePageNo, setLocalActivePageNo] = useState(-1);
-  const [pageCenter, setPageCenter] = useState(0);
+  const [pageWidth, setPageWidth] = useState(0);
 
   // const [pdfUrl, setPdfUrl] = useState(undefined as string);
   // const [pdfFilename, setPdfFilename] = useState(undefined as string);
@@ -106,8 +106,8 @@ const Home = () => {
     setDrawerWidth(size);
   }
 
-  function pageCenterStyle(width:any) {
-    setPageCenter(width);
+  const handlePageWidthNeeded = (width: number) => {
+    setPageWidth(width);
   }
 
 
@@ -242,16 +242,14 @@ const Home = () => {
     }
   }
 
-  const pageStyle = pageCenter;
-    
-  const localStyle = { // 확인
+  const pageNumberingStyle = {
     position: "absolute",
     bottom: 8,
     flexDirection: "row-reverse",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    width: pageStyle,
+    width: pageWidth,
   } as React.CSSProperties;
 
   console.log(`HOME: docPageNo:${activePageNo}, pdfUrl=${pdfUrl}, fingerPrint: ${pdfFingerprint}, pdfPageNo:${pdfPageNo}`);
@@ -288,9 +286,9 @@ const Home = () => {
             parentName={"grida-main-home"}
             viewFit={ZoomFitEnum.FULL}
             fitMargin={100}
-            pageCenterStyle = {(width) => pageCenterStyle(width)}
+            handlePageWidthNeeded = {(width) => handlePageWidthNeeded(width)}
           />
-          <div id="navbar_page" style={localStyle}>
+          <div id="navbar_page" style={pageNumberingStyle}>
             <div className="navbar-menu neo_shadow" style={{zIndex: 1000, height: "36px"}}>
               <PageNumbering />
             </div>
