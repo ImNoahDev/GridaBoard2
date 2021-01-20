@@ -30,18 +30,71 @@ export async function savePDF(url: string, saveName: string) {
   const doc = GridaDoc.getInstance();
   const docPages = doc.pages;
 
-  const existingPdfBytes = await fetch(url).then(res => res.arrayBuffer());
-  const pdfDoc = await PDFDocument.load(existingPdfBytes);
-  const pages = pdfDoc.getPages();
+  let pdfUrl, pdfDoc = undefined;
+
+  for (const page of docPages) //병렬처리
+  {
+    if (page.pdf === undefined) {
+      //ncode page일 경우
+      if (pdfDoc === undefined) {
+        pdfDoc = await PDFDocument.create();
+        await pdfDoc.addPage();
+      } else {
+        const lastPrevPageNo = pdfDoc.getPages().length-1;
+        const lastPrevPage = await pdfDoc.getPages()[lastPrevPageNo];
+        const {width, height} = await lastPrevPage.getSize();
+        await pdfDoc.addPage([width, height]);
+      }
+    } 
+    else {
+      //pdf인 경우 
+      if (pdfUrl !== page.pdf.url) {
+        pdfUrl = page.pdf.url;
+        const existingPdfBytes = await fetch(page.pdf.url).then(res => res.arrayBuffer());
+        let pdfDocSrc = await PDFDocument.load(existingPdfBytes);
+
+        if (pdfDoc !== undefined) {
+          //ncode 페이지가 미리 생성돼서 그 뒤에다 붙여야하는 경우
+          const srcLen = pdfDocSrc.getPages().length;
+          let totalPageArr = [];
+          for (let i = 0; i<srcLen; i++) {
+            totalPageArr.push(i);
+          }
+
+          const copiedPages = await pdfDoc.copyPages(pdfDocSrc, totalPageArr);
+
+          for (const copiedPage of copiedPages) {
+            await pdfDoc.addPage(copiedPage);
+          }
+        } else {
+          pdfDoc = pdfDocSrc;
+        }
+      } else {
+        continue;
+      }
+    }
+  }
 
   //this.completedOnPage에는 페이지 순서대로 stroke array가 들어가는게 아니기 때문에 key값(sobp)으로 정렬
   const sortStringKeys = (a, b) => a[0] > b[0] ? 1 : -1;
   const sortedCompletedOnPage = new Map([...inkSt.completedOnPage].sort(sortStringKeys));
 
+  const pages = pdfDoc.getPages();
+
   let i = 0;
   for (const [key, NeoStrokes] of sortedCompletedOnPage.entries()) {
-    console.log(key + ' = ' + NeoStrokes);
-    const page = pages[i++];
+
+    for (const docPage of docPages) {
+      //page info를 grida doc의 그것과 비교해서 어떤 pdf doc에 stroke를 그릴지 결정
+      const { section, book, owner, page } = docPage.basePageInfo;
+      const pageId = InkStorage.makeNPageIdStr({ section, book, owner, page });
+      
+      if (pageId === key) {
+        i = docPage.pageNo;
+      }
+    }
+
+    const page = pages[i];
     const pageHeight = page.getHeight();
 
     for (let j = 0; j < NeoStrokes.length; j++) {
