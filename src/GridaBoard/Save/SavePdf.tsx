@@ -1,6 +1,5 @@
 import { saveAs } from "file-saver";
 import { degrees, PDFDocument, rgb, StandardFonts } from 'pdf-lib';
-import Swal from 'sweetalert2'
 
 import GridaDoc from "../GridaDoc";
 
@@ -13,7 +12,7 @@ const PDF_TO_SCREEN_SCALE = 6.72; // (56/600)*72
 // https://pdf-lib.js.org/
 
 const inkSt = InkStorage.getInstance();
-export async function savePDF(url: string, saveName: string) {
+export async function savePDF(saveName: string) {
 
   const filename = saveName;
 
