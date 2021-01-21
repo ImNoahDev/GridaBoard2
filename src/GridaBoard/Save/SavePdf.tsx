@@ -15,17 +15,7 @@ const PDF_TO_SCREEN_SCALE = 6.72; // (56/600)*72
 const inkSt = InkStorage.getInstance();
 export async function savePDF(url: string, saveName: string) {
 
-  const { value: filename } = await Swal.fire({
-    title: 'PDF 저장',
-    input: 'text',
-    inputPlaceholder: '저장할 pdf 파일의 이름을 입력하세요',
-    showCancelButton: true,
-  })
-
-  if (!filename) {
-    console.log('파일 저장 취소');
-    return;
-  }
+  const filename = saveName;
 
   const doc = GridaDoc.getInstance();
   const docPages = doc.pages;

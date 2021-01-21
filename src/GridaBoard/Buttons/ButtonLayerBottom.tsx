@@ -17,6 +17,7 @@ import { Button, ButtonGroup } from "@material-ui/core";
 import PictureAsPdfIcon from '@material-ui/icons/PictureAsPdf';
 import SaveIcon from '@material-ui/icons/Save';
 import { savePDF } from "../Save/SavePdf";
+import PdfDialog from "../Save/PdfDialog";
 
 
 
@@ -172,8 +173,12 @@ const ButtonLayerBottom = (props: Props) => {
           <ButtonGroup className="navbar-menu neo_shadow" style={centerStyle}>   
             <PrintButton targetId={printBtnId} url={pdfUrl} filename={pdfFilename} />
             <FileBrowserButton handlePdfOpen={handlePdfOpen} />
-            <button id="read_mapping_info" className="btn btn-neo" onClick={() => savePDF(pdfUrl, 'hello.pdf')}>
+            {/* <button id="read_mapping_info" className="btn btn-neo" onClick={() => savePDF(pdfUrl, 'hello.pdf')}>
               <PictureAsPdfIcon />
+            </button> */}
+            <button id="read_mapping_info" className="btn btn-neo" style={{marginLeft: "-5px"}}>
+              {/* <PictureAsPdfIcon /> */}
+              <PdfDialog />
             </button>
           </ButtonGroup>
         </div>
