@@ -158,6 +158,8 @@ export default class GridaDoc {
       pageNoArr.push(pageNo);
     }
 
+    setDocNumPages(this._pages.length);
+
     return pageNoArr[0];
   }
 
@@ -167,7 +169,6 @@ export default class GridaDoc {
     page.setPdfPage(pdf, pdfPageNo)
 
     this._pages.push(page);
-    setDocNumPages(this._pages.length);
 
     return this._pages.length - 1;
   }
@@ -238,6 +239,7 @@ export default class GridaDoc {
             bpi.page = (bpi.page + i) % m1;
             const activePageNo = this.addNcodePage(bpi);
           }
+          setDocNumPages(this._pages.length);
           setActivePageNo(firstPageNo);
 
           break;
@@ -248,6 +250,7 @@ export default class GridaDoc {
         default: {
           //
           const activePageNo = this.addNcodePage(pageInfo);
+          setDocNumPages(this._pages.length);
           setActivePageNo(activePageNo);
           break;
         }
@@ -274,7 +277,6 @@ export default class GridaDoc {
     const page = new GridaPage(this.numPages, pageInfo, pageInfo);
     this._pages.push(page);
 
-    setDocNumPages(this._pages.length);
     return this._pages.length - 1;
   }
 
