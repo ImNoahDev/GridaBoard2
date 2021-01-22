@@ -266,6 +266,7 @@ export default class GridaDoc {
 
     const basePageInfo = theBase.basePageInfo;
     const newPageNo = this.addNcodePage(basePageInfo);
+    setDocNumPages(this._pages.length);
     return newPageNo;
   }
 
