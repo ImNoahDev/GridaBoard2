@@ -201,9 +201,19 @@ class MixedPageView_module extends React.Component<MixedViewProps, State>  {
       status: "N/A",
     };
 
+    const pdfPageNo = props.pdfPageNo !== undefined ? props.pdfPageNo : -1;
+    let size;
+    if (props.pdf) {
+      size = props.pdf.getPageSize(pdfPageNo);
+    }
+    else {
+      size = getNPaperSize_pu(props.pageInfo);
+    }
+    const pdfSize = { ...size };
+
     this._internal = {
       // 아래는 순수히 이 component의 state
-      pdfSize: { width: 0, height: 0 },    // 초기 값이 없으면 zoom 비율을 따질 때 에러를 낸다. 당연히
+      pdfSize: pdfSize,    // 초기 값이 없으면 zoom 비율을 따질 때 에러를 낸다. 당연히
       viewPos: { offsetX: 0, offsetY: 0, zoom: 1 },
       // renderCount: 0,
 
@@ -220,7 +230,7 @@ class MixedPageView_module extends React.Component<MixedViewProps, State>  {
       pdf: props.pdf,
       pdfUrl: props.pdfUrl,
       pdfFilename: props.filename,
-      pdfPageNo: props.pdfPageNo !== undefined ? props.pdfPageNo : -1,
+      pdfPageNo: pdfPageNo,
 
       pageInfo: props.pageInfo,
       width: props.width !== undefined ? props.width : 0,
@@ -228,7 +238,6 @@ class MixedPageView_module extends React.Component<MixedViewProps, State>  {
     };
 
   }
-
 
   componentDidMount() {
     // this.setState({ pageInfo: { ...this.props.pageInfo } });
@@ -268,11 +277,6 @@ class MixedPageView_module extends React.Component<MixedViewProps, State>  {
     // diffPropsAndState("GRIDA DOC", this.props, nextProps, this.state, nextState);
     let ret_val = false;
 
-    if (isSamePage(nextProps.pageInfo, { section: 256, owner: 27, book: 1068, page: 12 })) {
-      console.log("target");
-    }
-
-
     let pageInfoChanged = false;
     if (!isSamePage(nextProps.pageInfo, this.props.pageInfo)) {
       // this.handlePageInfoChanged(nextProps.pageInfo);
@@ -291,10 +295,10 @@ class MixedPageView_module extends React.Component<MixedViewProps, State>  {
     if (nextProps.pdfUrl !== this._internal.pdfUrl) {
       this._internal.pdfUrl = nextProps.pdfUrl;
 
-      if (filenameChanged)
-        this.loadDocument(nextProps.pdfUrl, nextProps.filename);
-      else
-        this.loadDocument(nextProps.pdfUrl, this._internal.pdfFilename);
+      // if (filenameChanged)
+      //   this.loadDocument(nextProps.pdfUrl, nextProps.filename);
+      // else
+      //   this.loadDocument(nextProps.pdfUrl, this._internal.pdfFilename);
     }
 
     let pdfChanged = false;
@@ -332,7 +336,7 @@ class MixedPageView_module extends React.Component<MixedViewProps, State>  {
     const loaded = this.state.status === "loaded" && nextState.status !== this.state.status;
     const renderCntChanged = this.state.forceToRenderCnt !== nextState.forceToRenderCnt;
 
-    if ((pdfChanged || pdfPageNoChanged) && this._internal.pdfPageNo > 0) {
+    if (((pdfChanged || pdfPageNoChanged) && this._internal.pdfPageNo > 0) || pageInfoChanged) {
       let size;
       if (this._internal.pdf) {
         size = this._internal.pdf.getPageSize(this._internal.pdfPageNo);
@@ -349,7 +353,7 @@ class MixedPageView_module extends React.Component<MixedViewProps, State>  {
 
     // ret_val = ret_val || pageInfoChanged || pdfChanged || pdfPageNoChanged
     //   || pensChanged || viewFitChanged || fixedChanged || rotationchanged || noInfo || loaded;
-    ret_val = ret_val || pensChanged || viewFitChanged || fixedChanged || rotationchanged || noInfo || loaded || renderCntChanged;
+    ret_val = ret_val || pageInfoChanged || pensChanged || viewFitChanged || fixedChanged || rotationchanged || noInfo || loaded || renderCntChanged;
     return ret_val;
   }
 
@@ -359,7 +363,6 @@ class MixedPageView_module extends React.Component<MixedViewProps, State>  {
       pdf.destroy();
     }
   }
-
 
   loadDocument = async (url: string, filename: string) => {
     // const { documentZoom } = this.state;
