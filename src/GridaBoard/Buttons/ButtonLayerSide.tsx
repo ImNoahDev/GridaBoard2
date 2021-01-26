@@ -32,12 +32,17 @@ const mainFrameStyle = {
   marginLeft: "-1px",
 } as React.CSSProperties;
 
-const addBlankPage = (event) => {
+const addBlankPage = async (event) => {
   const doc = GridaDoc.getInstance();
-  const pageNo = doc.addBlankPage();
+  const pageNo = await doc.addBlankPage();
   setActivePageNo(pageNo);
+  scrollToBottom();
 }
 
+const scrollToBottom = () => {
+  const ele = document.querySelector("#drawer_content");
+  ele.scrollIntoView({ behavior: "smooth", block: "end" });
+}
 
 /**
  *
