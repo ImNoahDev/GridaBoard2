@@ -17,6 +17,7 @@ import GridaDoc from "../GridaDoc";
 import { setActivePageNo } from "../../store/reducers/activePageReducer";
 import InkStorage from "../../nl-lib/common/penstorage/InkStorage";
 import { PageEventName } from "../../nl-lib/common/enums";
+import { scrollToBottom } from "../../nl-lib/common/util";
 
 const mainFrameStyle = {
   position: "absolute",
@@ -36,12 +37,7 @@ const addBlankPage = async (event) => {
   const doc = GridaDoc.getInstance();
   const pageNo = await doc.addBlankPage();
   setActivePageNo(pageNo);
-  scrollToBottom();
-}
-
-const scrollToBottom = () => {
-  const ele = document.querySelector("#drawer_content");
-  ele.scrollIntoView({ behavior: "smooth", block: "end" });
+  scrollToBottom("drawer_content");
 }
 
 /**

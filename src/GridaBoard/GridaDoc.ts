@@ -10,6 +10,7 @@ import { isSamePage, makeNPageIdStr } from "../nl-lib/common/util";
 
 
 import { MappingStorageEventName, IMappingStorageEvent, MappingStorage } from "../nl-lib/common/mapper";
+import { scrollToBottom } from "../nl-lib/common/util";
 
 
 let _doc_instance = undefined as GridaDoc;
@@ -105,7 +106,8 @@ export default class GridaDoc {
     // setActivePdf(pdfDoc);
 
     if (pdfDoc) {
-      const activatePageNo = this.appendPdfDocument(pdfDoc, pageInfo, basePageInfo);
+      const activatePageNo = await this.appendPdfDocument(pdfDoc, pageInfo, basePageInfo);
+      scrollToBottom("drawer_content");
       this.setActivePageNo(activatePageNo);
     }
   }
