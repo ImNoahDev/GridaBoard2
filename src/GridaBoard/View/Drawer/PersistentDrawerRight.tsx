@@ -179,6 +179,7 @@ export default function PersistentDrawerRight(props: Props) {
 
         PaperProps={{ style: { width: drawerWidth, flexShrink: 0 } }}
       >
+      <div id="drawer_content">
         <div className={classes.drawerHeader}>
           <IconButton onClick={props.handleDrawerClose}>
             {theme.direction === 'rtl' ? <ChevronLeftIcon /> : <ChevronRightIcon />}
@@ -186,10 +187,8 @@ export default function PersistentDrawerRight(props: Props) {
         </div>
         <div onMouseDown={e => handleMouseDown(e)} className={classes.dragger} />
         < DrawerPages noInfo={props.noInfo} />
-        {/* <Divider />
-        <List>
-          < DrawerPages />
-        </List> */}
+
+      </div>
       </Drawer>
     </div>
   );

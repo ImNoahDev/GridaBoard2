@@ -414,3 +414,8 @@ export function callstackDepth() {
 
   return " " + caller + spc;
 }
+
+export function scrollToBottom(id: string) {
+  const ele = document.querySelector("#"+id);
+  ele.scrollIntoView({ behavior: "smooth", block: "end" });
+}
