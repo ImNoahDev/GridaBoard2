@@ -1,18 +1,43 @@
-import React, { Component, useState } from "react";
+import React from "react";
 import '../../styles/buttons.css';
 import ThemeManager from "../../styles/ThemeManager";
-import Tooltip, { TooltipProps } from '@material-ui/core/Tooltip';
-import { Theme, Typography, withStyles } from '@material-ui/core';
 import GridaToolTip from "../../styles/GridaToolTip";
+import Popover from "@material-ui/core/Popover";
 
 const themeManager: ThemeManager = ThemeManager.getInstance();
 
-export default class BackgroundButton extends React.Component {
-  render() {
+export default function BackgroundButton() {
+
+  const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null);
+
+  const setBackground = (background) => {
+    if(background === 1) {
+      themeManager.setT1();
+    } else if(background === 2) {
+      themeManager.setT2();
+    } else if(background === 3) {
+      themeManager.setT3();
+    } else {
+      themeManager.setT4();
+    }
+    handleClose();
+  }
+
+  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const open = Boolean(anchorEl);
+  const id = open ? 'simple-popover' : undefined;
+
     return (
       <div className="btn-group dropright" role="group">
         <button type="button" id="btn_background" className="btn btn-neo btn-neo-vertical"
-          data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" onClick={handleClick} aria-describedby={id}>
           <GridaToolTip open={true} placement="left" tip={{
               head: "Background",
               msg: "화면의 배경색을 선택합니다.",
@@ -24,11 +49,21 @@ export default class BackgroundButton extends React.Component {
             </div>
           </GridaToolTip>
         </button>
-
-        <div className="dropdown-menu p-0 border border-0 " aria-labelledby="btn_background">
-          {/* <a className="dropdown-item" href="#"> */}
-
-          <a id="btn_bg_gd" className="dropdown-item" href="#" onClick={() => themeManager.setT1()}>
+        <Popover
+          id={id}
+          open={open}
+          anchorEl={anchorEl}
+          onClose={handleClose}
+          anchorOrigin={{
+            vertical: 'top',
+            horizontal: 'right'
+          }}
+          transformOrigin={{
+            vertical: 'top',
+            horizontal: 'left',
+          }}
+        >
+          <a id="btn_bg_gd" className="dropdown-item" href="#" onClick={() => setBackground(1)}>
             <div className="c2">
               <img src="/icons/icon_bg_gd01_n.png" className="normal-image"></img>
               <img src="/icons/icon_bg_gd01_p.png" className="hover-image"></img>
@@ -36,7 +71,7 @@ export default class BackgroundButton extends React.Component {
             </div>
           </a>
 
-          <a id="btn_bg_avan" className="dropdown-item" href="#" onClick={() => themeManager.setT2()}>
+          <a id="btn_bg_avan" className="dropdown-item" href="#" onClick={() => setBackground(2)}>
             <div className="c2">
               <img src="/icons/icon_bg_gd02_n.png" className="normal-image"></img>
               <img src="/icons/icon_bg_gd02_p.png" className="hover-image"></img>
@@ -44,7 +79,7 @@ export default class BackgroundButton extends React.Component {
             </div>
           </a>
 
-          <a id="btn_bg_white" className="dropdown-item" href="#" onClick={() => themeManager.setT4()}>
+          <a id="btn_bg_white" className="dropdown-item" href="#" onClick={() => setBackground(3)}>
             <div className="c2">
               <img src="/icons/icon_bg_wh_n.png" className="normal-image"></img>
               <img src="/icons/icon_bg_wh_p.png" className="hover-image"></img>
@@ -52,16 +87,20 @@ export default class BackgroundButton extends React.Component {
             </div>
           </a>
 
-          <a id="btn_bg_black" className="dropdown-item" href="#" onClick={() => themeManager.setT5()}>
+          <a id="btn_bg_black" className="dropdown-item" href="#" onClick={() => setBackground(4)}>
             <div className="c2">
               <img src="/icons/icon_bg_bk_n.png" className="normal-image"></img>
               <img src="/icons/icon_bg_bk_p.png" className="hover-image"></img>
               <span className="bg-dropmenu">Black</span>
             </div>
           </a>
+        </Popover>
+        <div className="dropdown-menu p-0 border border-0 " aria-labelledby="btn_background">
+          {/* <a className="dropdown-item" href="#"> */}
+
+          
           {/* </a> */}
         </div>
       </div>
     );
-  }
 }
