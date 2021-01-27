@@ -39,7 +39,6 @@ const useStyles = makeStyles((theme: Theme) =>
 );
 
 const Home = () => {
-  const [isRotate, setRotate] = useState();
   const [drawerOpen, setDrawerOpen] = useState(true);
   const [rightMargin, setRightMargin] = useState(0);
   // const [pens, setPens] = useState([] as INeoSmartpen[]);
@@ -70,6 +69,7 @@ const Home = () => {
 
   let basePageInfo = nullNcode();
   const activePageNo_store = useSelector((state: RootState) => state.activePage.activePageNo);
+  const rotationAngle = useSelector((state: RootState) => state.rotate.rotationAngle);
   useEffect(() => {
     if (activePageNo_store !== activePageNo) {
       setLocalActivePageNo(activePageNo_store);
