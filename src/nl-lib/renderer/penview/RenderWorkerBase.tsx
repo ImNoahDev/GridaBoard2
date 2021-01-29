@@ -210,11 +210,12 @@ export default abstract class RenderWorkerBase {
   getPageSize_pu = (): ISize => {
     const { rotation } = this._opt;
     const s: ISize = { ...this._opt.pageSize };
-    if (rotation === 90) {
-      const temp = s.width;
-      s.width = s.height;
-      s.height = temp;
-    }
+    // if (rotation === 90) {
+    //   const temp = s.width;
+    //   s.width = s.height;
+    //   s.height = temp;
+    // }
+    // PenBasedRenderer에서 rotation 바뀌면 pdfSize를 바꿔주게 했기 때문에 필요없는 로직
 
     console.log(`VIEW SIZE${callstackDepth()} getPageSize_pu ${this.logCnt++}: ${s.width}, ${s.height}`);
     return s;

@@ -98,20 +98,26 @@ export default class NeoPdfPageView extends Component<PageProps, PageState> {
       this.setState({ zoom: nextProps.position.zoom });
     }
 
+    const rotationChanged = nextProps.rotation !== this.props.rotation;
+
     // const loaded = nextState.page !== this.state.page;
     // const loaded = nextState.status === "loaded" && (this.state.status !== nextState.status);
     const loaded = nextState.page !== this.state.page;
     if (loaded) {
       console.log(`*State PageView ${nextProps.pdfPageNo}:* LOADED ${this.state.page?.pageNo} => ${nextState.page?.pageNo}, zoom ${nextState.zoom}, status=${this.state.status} => ${nextState.status}`);
       if (nextState.page && nextProps.pdf && nextState.zoom > 0)
-        this.renderPage(nextState.page, nextState.zoom, nextState.pdfPageNo, nextProps.pdf.fingerprint);
+        this.renderPage(nextState.page, nextState.zoom, nextState.pdfPageNo, nextProps.pdf.fingerprint, rotationChanged);
     }
 
     if (this.state.zoom !== nextState.zoom && nextState.page && nextProps.pdf) {
       console.log(`*State PageView ${nextProps.pdfPageNo}:* ZOOM CHANGED ${nextState.zoom}, status=${this.state.status} => ${nextState.status}`);
-      this.renderPage(nextState.page, nextState.zoom, nextState.pdfPageNo, nextProps.pdf.fingerprint);
+      this.renderPage(nextState.page, nextState.zoom, nextState.pdfPageNo, nextProps.pdf.fingerprint, rotationChanged);
     }
 
+    if (rotationChanged) {
+      nextState.page.viewport.rotation = nextProps.rotation;
+      this.renderPage(nextState.page, nextState.zoom, nextState.pdfPageNo, nextProps.pdf.fingerprint, rotationChanged);
+    }
 
     const rendered = this.state.renderCount !== nextState.renderCount;
     console.log(`*State PageView ${nextProps.pdfPageNo}:* rendered=${rendered}  this.state.status=${this.state.status} => ${nextState.status}`);
@@ -220,7 +226,7 @@ export default class NeoPdfPageView extends Component<PageProps, PageState> {
 
     const PRINT_RESOLUTION = dpi * zoom;
     const PRINT_UNITS = PRINT_RESOLUTION / PDF_DEFAULT_DPI;
-    const viewport: any = page.getViewport({ scale: 1 });
+    const viewport: any = page.getViewport({ scale: 1, rotation: page.viewport.rotation });
 
     const px_width = Math.floor(viewport.width * PRINT_UNITS);
     const px_height = Math.floor(viewport.height * PRINT_UNITS);
@@ -278,7 +284,7 @@ export default class NeoPdfPageView extends Component<PageProps, PageState> {
     return retVal;
   }
 
-  renderPage = async (page: NeoPdfPage, zoom: number, pdfPageNo: number, fingerprint: string) => {
+  renderPage = async (page: NeoPdfPage, zoom: number, pdfPageNo: number, fingerprint: string, rotationChagned: boolean) => {
     this.setState({ page, status: 'rendering check canvas' });
     if (!this.canvas) {
       console.log(`*State PageView ${pdfPageNo}:* CANVAS NOT FOUND`);
@@ -299,7 +305,8 @@ export default class NeoPdfPageView extends Component<PageProps, PageState> {
 
     this.setState({ page, status: 'rendering' });
 
-    const viewport: any = page.getViewport({ scale: 1 });
+    //아래 viewport의 rotation은 설정안해줘도 된다고 생각했는데 안해주면 문제생긴다
+    const viewport: any = page.getViewport({ scale: 1, rotation: page.viewport.rotation });
     const { width, height } = viewport;
     const canvas = this.canvas;
     const size = { width, height };
@@ -328,7 +335,7 @@ export default class NeoPdfPageView extends Component<PageProps, PageState> {
     this.setState({ renderCount: this.state.renderCount + 1, status: 'rendered' });
 
     // Lazy update
-    if (!noLazyUpdate && this.backPlane.prevZoom !== zoom) {
+    if ((!noLazyUpdate && this.backPlane.prevZoom !== zoom) || rotationChagned) {
       // console.log(`BACKPLANE RENDERPAGE lazy start`);
 
       this.zoomQueue.push(zoom);
@@ -336,7 +343,12 @@ export default class NeoPdfPageView extends Component<PageProps, PageState> {
 
       const lastZoom = this.zoomQueue[this.zoomQueue.length - 1];
       this.zoomQueue = this.zoomQueue.splice(1);
-      if ((lastZoom && zoom !== lastZoom) || zoom == this.backPlane.prevZoom || fingerprint !== this.lastPdfFingerprint || pdfPageNo !== this.pdfPageNo) {
+      if (
+        (lastZoom && zoom !== lastZoom) ||
+        (!rotationChagned && zoom == this.backPlane.prevZoom) ||
+        fingerprint !== this.lastPdfFingerprint ||
+        pdfPageNo !== this.pdfPageNo
+      ) {
         return;
       }
 

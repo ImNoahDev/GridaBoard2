@@ -275,17 +275,20 @@ const Home = () => {
           <MixedPageView
             pdf={pdf}
             pdfUrl={pdfUrl} filename={pdfFilename}
-            pdfPageNo={pdfPageNo}
+            pdfPageNo={pdfPageNo} pens={[...pens, virtualPen]} 
+            playState={PLAYSTATE.live}
+            rotation={rotationAngle}
+
             pageInfo={pageInfos[0]}
             basePageInfo={basePageInfo}
-            playState={PLAYSTATE.live}
-            pens={[...pens, virtualPen]} fromStorage={false}
-            autoPageChange={true}
-            rotation={0}
-            onNcodePageChanged={onNcodePageChanged}
+
             parentName={"grida-main-home"}
             viewFit={ZoomFitEnum.FULL}
+            autoPageChange={true}
+            fromStorage={false}
             fitMargin={100}
+            
+            onNcodePageChanged={onNcodePageChanged}
             handlePageWidthNeeded = {(width) => handlePageWidthNeeded(width)}
           />
           <div id="navbar_page" style={pageNumberingStyle}>

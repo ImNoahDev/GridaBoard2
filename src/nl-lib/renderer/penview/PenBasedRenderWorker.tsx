@@ -491,7 +491,50 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
     }, REMOVE_HOVER_POINTS_INTERVAL);
   }
 
+  rotate = (degrees, pageInfo) => {
+    const ins = InkStorage.getInstance();
+    const pageId = InkStorage.makeNPageIdStr(pageInfo);
+    let strokeArr = ins.completedOnPage.get(pageId);
+    if (strokeArr === undefined) return;
 
+    const canvasCenterSrc = new fabric.Point(this._opt.pageSize.width/2, this._opt.pageSize.height/2)
+    const canvasCenterDst = new fabric.Point(this._opt.pageSize.height/2, this._opt.pageSize.width/2)
+
+    strokeArr.forEach((stroke) => {
+      stroke.dotArray.forEach((dot) => {
+        let pdf_xy = this.ncodeToPdfXy(dot);
+
+        const radians = fabric.util.degreesToRadians(degrees)
+
+        const objectOrigin = new fabric.Point(pdf_xy.x, pdf_xy.y)
+
+        // 1. subtractEquals
+        pdf_xy.x -= canvasCenterSrc.x;
+        pdf_xy.y -= canvasCenterSrc.y;
+        
+        // 2. rotateVector
+        var v = fabric.util.rotateVector(pdf_xy, radians);
+
+        // 3. addEquals
+        v.x += canvasCenterDst.x;
+        v.y += canvasCenterDst.y;
+
+        const ncode_xy = this.pdfToNcodeXy(v);
+
+        dot.x = ncode_xy.x;
+        dot.y = ncode_xy.y;
+      })
+    })
+  
+    this.removeAllCanvasObject();
+    this.resetLocalPathArray();
+    this.resetPageDependentData();
+
+    const strokesAll = this.storage.getPageStrokes(pageInfo);
+    const strokes = strokesAll.filter(stroke => stroke.brushType !== IBrushType.ERASER);
+
+    this.addStrokePaths(strokes);
+  }
 
   changePage = (pageInfo: IPageSOBP, pageSize: ISize, forceToRefresh: boolean): boolean => {
     if (!pageInfo) return;

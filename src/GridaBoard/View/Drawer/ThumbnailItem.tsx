@@ -27,6 +27,7 @@ const ThumbnailItem = (props: Props) => {
 
   const drawerWidth = useSelector((state: RootState) => state.ui.drawer.width);
   const activePageNo = useSelector((state: RootState) => state.activePage.activePageNo);
+  const rotationAngle = useSelector((state: RootState) => state.rotate.rotationAngle);
 
   const pdfUrl = undefined;
   const pdfFilename = undefined;
@@ -58,14 +59,16 @@ const ThumbnailItem = (props: Props) => {
     bgColor = `rgb(0, 255, 255)`;
 
   const pageOverview = page.pageOverview;
-  const isLandscape = pageOverview.landscape;
   const sizePu = pageOverview.sizePu;
-  const wh_ratio = sizePu.width / sizePu.height;
   const pageInfo = page.pageInfos[0];
   const basePageInfo = page.basePageInfo;
+  let wh_ratio = sizePu.width / sizePu.height;
 
+  if (rotationAngle === 90 || rotationAngle === 270) {
+    wh_ratio = sizePu.height / sizePu.width;
+  }
+  
   const height = drawerWidth / wh_ratio * 0.9;
-
   const playState = PLAYSTATE.live;
   const viewFit = ZoomFitEnum.FULL;
 
@@ -78,7 +81,7 @@ const ThumbnailItem = (props: Props) => {
           pdfUrl={pdfUrl} filename={pdfFilename}
           pdfPageNo={pdfPageNo}
           playState={playState} pens={[]}
-          rotation={0}
+          rotation={rotationAngle}
 
           pageInfo={pageInfo}
           basePageInfo={basePageInfo}
@@ -87,7 +90,7 @@ const ThumbnailItem = (props: Props) => {
           viewFit={viewFit}
           autoPageChange={false}
           fromStorage={true}
-          fitMargin={2}
+          fitMargin={5}
           // fixed
           noInfo
 
@@ -95,12 +98,12 @@ const ThumbnailItem = (props: Props) => {
         />
       </div>
 
-      <div id={`thumbnail-pageInfo-${pn}`} style={{ position: "absolute", margin: 0, padding: 0, right: 0, left: 0, top: 0, height: "100%", zIndex: 999 }}>
+      {/* <div id={`thumbnail-pageInfo-${pn}`} style={{ position: "absolute", margin: 0, padding: 0, right: 0, left: 0, top: 0, height: "100%", zIndex: 999 }}>
         {!props.noInfo
           ? <Typography style={{ color: "#f00" }}> {makeNPageIdStr(page.pageInfos[0])}</Typography>
           : <Typography style={{ color: "rgba(0,0,0,255)" }}> {makeNPageIdStr(page.pageInfos[0])}</Typography>
         }
-      </div>
+      </div> */}
 
       {/*
             <Box id={`box - id - ${ pn } `}

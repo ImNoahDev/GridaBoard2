@@ -287,6 +287,15 @@ class PenBasedRenderer extends React.Component<Props, State> {
 
     if (nextProps.rotation !== this.props.rotation) {
       this.renderer.setRotation(nextProps.rotation);
+      const degrees = nextProps.rotation - this.props.rotation;
+      this.renderer.rotate(degrees, this.props.pageInfo);
+
+      const tmp = nextProps.pdfSize.width;
+      nextProps.pdfSize.width = nextProps.pdfSize.height;
+      nextProps.pdfSize.height = tmp;
+
+      this.renderer.onPageSizeChanged(nextProps.pdfSize);
+      this.pdfSize = { ...nextProps.pdfSize, scale: this.pdfSize.scale };
       ret_val = false;
     }
 
