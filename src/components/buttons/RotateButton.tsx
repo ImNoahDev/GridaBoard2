@@ -13,7 +13,7 @@ const RotateButton = () => {
   const onToggleRotate = () => {
     console.log(rotationAngle);
     const angle = rotationAngle < 270 ? rotationAngle + 90 : 0;
-    dispatch(setRotationAngle(angle));
+    setRotationAngle(angle);
   }
 
   return (

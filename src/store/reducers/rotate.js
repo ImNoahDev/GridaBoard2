@@ -1,7 +1,12 @@
+import { store } from "../../client/Root";
 const SET_ROTATE = 'rotate/SET_ROTATE';
 
 // 액션 생성 함수
-export const setRotationAngle = rotationAngle => ({ type: SET_ROTATE, rotationAngle });
+export const setRotationAngle = (rotationAngle) => {
+  store.dispatch({ 
+    type: SET_ROTATE, rotationAngle 
+  });
+};
 
 // 초기 상태
 const initialState = {
