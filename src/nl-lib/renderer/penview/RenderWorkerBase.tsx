@@ -525,7 +525,7 @@ export default abstract class RenderWorkerBase {
         this.drawing.lastPosX = evt.clientX;
         this.drawing.lastPosY = evt.clientY;
 
-        this.onTouchStrokePenMove(evt, force);
+        this.onTouchStrokePenMove(evt, 800);
       }
     }
   }
