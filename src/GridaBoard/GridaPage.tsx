@@ -13,11 +13,12 @@ export default class GridaPage {
   // _pageInfo: IPageSOBP = { section: -1, owner: -1, book: -1, page: -1 };
 
   _pageToNcodeMaps: IPageMapBase[] = [];
-
+  _rotation: number;
 
   constructor(pageNo: number, pageInfo: IPageSOBP, basePageInfo: IPageSOBP) {
     this._pageNo = pageNo;
     this._pageToNcodeMaps = [{ pageInfo, basePageInfo }];
+    this._rotation = 0;
   }
 
   get fingerprint() {
@@ -78,16 +79,23 @@ export default class GridaPage {
   // 여기까지
 
   get pageOverview() {
-    if (this._pdf)
+    if (this._pdf) {
+      this._pdf.pagesOverview[this._pdfPageNo - 1].rotation = this._rotation;
       return this._pdf.pagesOverview[this._pdfPageNo - 1];
+    }
 
     const pageInfo = this.getPageInfoAt(0);
     // undefined인 경우도 있을 것 같긴하다. 아래의 getNPaperSize_pu에서 예외처리 하고 있다.
-    const pageSize = getNPaperSize_pu(pageInfo);
+    let pageSize = getNPaperSize_pu(pageInfo);
+    if (this._rotation === 90 || this._rotation === 270) {
+      const tmp = pageSize.width;
+      pageSize.width = pageSize.height;
+      pageSize.height = tmp;
+    }
     const landscape = pageSize.width > pageSize.height;
     const retVal: IPageOverview = {
       sizePu: pageSize,
-      rotation: 0,
+      rotation: this._rotation,
       landscape
     };
     return retVal;

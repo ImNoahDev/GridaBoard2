@@ -27,21 +27,22 @@ const ThumbnailItem = (props: Props) => {
 
   const drawerWidth = useSelector((state: RootState) => state.ui.drawer.width);
   const activePageNo = useSelector((state: RootState) => state.activePage.activePageNo);
-  const rotationAngle = useSelector((state: RootState) => state.rotate.rotationAngle);
 
   const pdfUrl = undefined;
   const pdfFilename = undefined;
   const pdfFingerprint = undefined;
   let pdfPageNo = 1;
   let pdf = undefined;
-
+  let rotation = 0;
   const page = doc.getPageAt(pn)
+
   if (activePageNo >= 0) {
     // pdfUrl = doc.getPdfUrlAt(pn);
     // pdfFilename = doc.getPdfFilenameAt(pn);
     // pdfFingerprint = doc.getPdfFingerprintAt(pn);
     pdfPageNo = doc.getPdfPageNoAt(pn);
     pdf = page.pdf;
+    rotation = page.pageOverview.rotation;
   }
 
   const handleMouseDown = e => {
@@ -62,11 +63,8 @@ const ThumbnailItem = (props: Props) => {
   const sizePu = pageOverview.sizePu;
   const pageInfo = page.pageInfos[0];
   const basePageInfo = page.basePageInfo;
-  let wh_ratio = sizePu.width / sizePu.height;
-
-  if (rotationAngle === 90 || rotationAngle === 270) {
-    wh_ratio = sizePu.height / sizePu.width;
-  }
+  
+  const wh_ratio = sizePu.width / sizePu.height;
   
   const height = drawerWidth / wh_ratio * 0.9;
   const playState = PLAYSTATE.live;
@@ -81,8 +79,9 @@ const ThumbnailItem = (props: Props) => {
           pdfUrl={pdfUrl} filename={pdfFilename}
           pdfPageNo={pdfPageNo}
           playState={playState} pens={[]}
-          rotation={rotationAngle}
-
+          rotation={rotation}
+          isMainView={false}
+          
           pageInfo={pageInfo}
           basePageInfo={basePageInfo}
 
@@ -95,6 +94,7 @@ const ThumbnailItem = (props: Props) => {
           noInfo
 
           onNcodePageChanged={undefined}
+          activePageNo={activePageNo}
         />
       </div>
 

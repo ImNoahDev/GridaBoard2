@@ -52,6 +52,7 @@ const Home = () => {
 
   const [activePageNo, setLocalActivePageNo] = useState(-1);
   const [pageWidth, setPageWidth] = useState(0);
+  const [toggleRotation, setToggleRotation] = useState(false);
 
   // const [pdfUrl, setPdfUrl] = useState(undefined as string);
   // const [pdfFilename, setPdfFilename] = useState(undefined as string);
@@ -66,27 +67,36 @@ const Home = () => {
   let pdfPageNo = 1;
   let pdf = undefined as NeoPdfDocument;
   let pageInfos = [nullNcode()];
+  let rotation = 0;
 
   let basePageInfo = nullNcode();
   const activePageNo_store = useSelector((state: RootState) => state.activePage.activePageNo);
-  const rotationAngle = useSelector((state: RootState) => state.rotate.rotationAngle);
+  const rotationTrigger = useSelector((state: RootState) => state.rotate.rotationTrigger);
+  
+  useEffect(() => {
+    if (rotationTrigger !== toggleRotation) {
+      setToggleRotation(rotationTrigger);
+    }
+  }, [rotationTrigger])
+
   useEffect(() => {
     if (activePageNo_store !== activePageNo) {
       setLocalActivePageNo(activePageNo_store);
     }
   }, [activePageNo_store])
 
-  if (activePageNo >= 0) {
+  if (activePageNo_store >= 0) {
     const doc = GridaDoc.getInstance();
-    const page = doc.getPageAt(activePageNo)
+    const page = doc.getPageAt(activePageNo_store)
+    rotation = page.pageOverview.rotation;
     pdf = page.pdf;
 
     // setPdfUrl(doc.getPdfUrlAt(activePageNo));
     // setPdfFilename(doc.getPdfFilenameAt(activePageNo));
-    pdfFingerprint = doc.getPdfFingerprintAt(activePageNo);
-    pdfPageNo = doc.getPdfPageNoAt(activePageNo);
-    pageInfos = doc.getPageInfosAt(activePageNo);
-    basePageInfo = doc.getBasePageInfoAt(activePageNo);
+    pdfFingerprint = doc.getPdfFingerprintAt(activePageNo_store);
+    pdfPageNo = doc.getPdfPageNoAt(activePageNo_store);
+    pageInfos = doc.getPageInfosAt(activePageNo_store);
+    basePageInfo = doc.getBasePageInfoAt(activePageNo_store);
   }
 
   const drawerWidth = useSelector((state: RootState) => state.ui.drawer.width);
@@ -277,7 +287,8 @@ const Home = () => {
             pdfUrl={pdfUrl} filename={pdfFilename}
             pdfPageNo={pdfPageNo} pens={[...pens, virtualPen]} 
             playState={PLAYSTATE.live}
-            rotation={rotationAngle}
+            rotation={rotation}
+            isMainView={true}
 
             pageInfo={pageInfos[0]}
             basePageInfo={basePageInfo}
@@ -288,6 +299,7 @@ const Home = () => {
             fromStorage={false}
             fitMargin={100}
             
+            activePageNo={activePageNo_store}
             onNcodePageChanged={onNcodePageChanged}
             handlePageWidthNeeded = {(width) => handlePageWidthNeeded(width)}
           />

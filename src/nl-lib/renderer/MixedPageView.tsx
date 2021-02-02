@@ -15,7 +15,6 @@ import { PLAYSTATE, ZoomFitEnum } from "../common/enums";
 import { INeoSmartpen } from "../common/neopen";
 
 
-
 export const ZINDEX_INK_LAYER = 3;
 export const ZINDEX_PDF_LAYER = 2;
 
@@ -74,6 +73,7 @@ export interface MixedViewProps {
   /** canvas view rotation, 0: portrait, 90: landscape */
   rotation: number;
 
+  isMainView: boolean;
 
   /**
    * 현재 view가 가진 코드와 다른 코드가 들어왔을 때
@@ -92,6 +92,7 @@ export interface MixedViewProps {
   onNcodePageChanged: (pageInfo: IPageSOBP, found: IGetNPageTransformType) => void;
 
   parentName: string;
+  activePageNo: number;
 
   viewFit?: ZoomFitEnum;
   fitMargin?: number;
@@ -105,6 +106,7 @@ export interface MixedViewProps {
   noMorePdfSignal?: boolean;
 
   handlePageWidthNeeded?: any;
+
 }
 
 interface State {
@@ -161,6 +163,7 @@ const defaultMixedPageViewProps: MixedViewProps = {
   playState: PLAYSTATE.live,
   noInfo: false,
   rotation: 0,
+  isMainView: true,
   parentName: "",
   viewFit: ZoomFitEnum.FULL,
   fitMargin: 100,
@@ -176,6 +179,8 @@ const defaultMixedPageViewProps: MixedViewProps = {
 
   noMorePdfSignal: false,
   handlePageWidthNeeded: undefined,
+
+  activePageNo: 0
 }
 
 
@@ -331,10 +336,10 @@ class MixedPageView_module extends React.Component<MixedViewProps, State>  {
     const pensChanged = nextProps.pens !== this.props.pens;
     const viewFitChanged = nextProps.viewFit !== this.props.viewFit;
     const fixedChanged = nextProps.fixed !== this.props.fixed;
-    const rotationchanged = nextProps.rotation !== this.props.rotation;
     const noInfo = nextProps.noInfo !== this.props.noInfo;
     const loaded = this.state.status === "loaded" && nextState.status !== this.state.status;
     const renderCntChanged = this.state.forceToRenderCnt !== nextState.forceToRenderCnt;
+
 
     if (((pdfChanged || pdfPageNoChanged) && this._internal.pdfPageNo > 0) || pageInfoChanged) {
       let size;
@@ -350,10 +355,12 @@ class MixedPageView_module extends React.Component<MixedViewProps, State>  {
       this._internal.pdfSize = { ...size };
     }
 
+    if (this.props.rotation !== nextProps.rotation) {
+        ret_val = true;
+    }
 
-    // ret_val = ret_val || pageInfoChanged || pdfChanged || pdfPageNoChanged
-    //   || pensChanged || viewFitChanged || fixedChanged || rotationchanged || noInfo || loaded;
-    ret_val = ret_val || pageInfoChanged || pensChanged || viewFitChanged || fixedChanged || rotationchanged || noInfo || loaded || renderCntChanged;
+    ret_val = ret_val || pageInfoChanged || viewFitChanged || fixedChanged || noInfo || loaded || renderCntChanged;
+
     return ret_val;
   }
 
@@ -609,7 +616,8 @@ class MixedPageView_module extends React.Component<MixedViewProps, State>  {
             fitMargin={this.props.fitMargin}
             viewFit={this.props.viewFit}
             pens={this.props.pens}
-            rotation={this.props.rotation}
+            rotation={this.props.rotation} 
+            isMainView={this.props.isMainView}
             fromStorage={this.props.fromStorage}
             noInfo={this.props.noInfo}
             parentName={this.props.parentName}

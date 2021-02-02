@@ -6,7 +6,7 @@ import { IRenderWorkerOption } from "./RenderWorkerBase";
 import PenBasedRenderWorker from "./PenBasedRenderWorker";
 import { MixedViewProps } from "../MixedPageView";
 
-import { PenEventName, PLAYSTATE, ZoomFitEnum } from "../../common/enums";
+import { IBrushType, PenEventName, PLAYSTATE, ZoomFitEnum } from "../../common/enums";
 import { IPageSOBP, ISize } from "../../common/structures";
 import { callstackDepth, isSamePage, makeNPageIdStr, uuidv4 } from "../../common/util";
 
@@ -44,6 +44,8 @@ interface Props { // extends MixedViewProps {
   pens: INeoSmartpen[],
 
   rotation: number,
+
+  isMainView: boolean,
 
   pageInfo: IPageSOBP,
 
@@ -285,10 +287,15 @@ class PenBasedRenderer extends React.Component<Props, State> {
       ret_val = true;
     }
 
-    if (nextProps.rotation !== this.props.rotation) {
-      this.renderer.setRotation(nextProps.rotation);
+    if ((this.props.rotation !== nextProps.rotation) && (this.props.basePageInfo === nextProps.basePageInfo)) {
       const degrees = nextProps.rotation - this.props.rotation;
-      this.renderer.rotate(degrees, this.props.pageInfo);
+      this.renderer.setRotation(nextProps.rotation);
+      
+      if (this.props.isMainView) {
+        this.renderer.rotate(degrees, nextProps.pageInfo);
+      }
+
+      this.renderer.redrawStrokes(nextProps.pageInfo);
 
       const tmp = nextProps.pdfSize.width;
       nextProps.pdfSize.width = nextProps.pdfSize.height;
@@ -320,8 +327,9 @@ class PenBasedRenderer extends React.Component<Props, State> {
       if (this.renderer) {
         // const { section, owner, book, page } = nextProps.pageInfo;
         console.log(`VIEW SIZE PAGE CHANGE 1: ${makeNPageIdStr(pageInfo)}`);
-
+        
         this.renderer.changePage(pageInfo, nextProps.pdfSize, false);
+        
         this.renderer.onPageSizeChanged(nextProps.pdfSize);
         this.pdfSize = { ...nextProps.pdfSize, scale: this.pdfSize.scale };
 
@@ -337,7 +345,6 @@ class PenBasedRenderer extends React.Component<Props, State> {
       console.error("`VIEW SIZE (comp) page size change");
       this.renderer.onPageSizeChanged(nextProps.pdfSize);
       this.pdfSize = { ...nextProps.pdfSize, scale: this.pdfSize.scale };
-      // pageResized = true;
       ret_val = true;
     }
 
@@ -366,7 +373,6 @@ class PenBasedRenderer extends React.Component<Props, State> {
     const renderer = new PenBasedRenderWorker(options);
     return renderer;
   }
-
 
   onViewResized = ({ width, height }) => {
     const rect = { x: 0, y: 0, width, height };

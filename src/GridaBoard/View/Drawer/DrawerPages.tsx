@@ -31,7 +31,7 @@ const DrawerPages = (props: Props, state:State) => {
       </Box>
       {pages.map((page, i) =>
         // ""
-        <ThumbnailItem key={i} noInfo={props.noInfo} pageNo={i} active={activePageNo == i} />
+        <ThumbnailItem key={i} noInfo={props.noInfo} pageNo={i} active={activePageNo === i} />
       )}
     </div>
   );

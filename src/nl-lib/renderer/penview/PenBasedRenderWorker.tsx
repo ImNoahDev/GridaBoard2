@@ -491,6 +491,17 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
     }, REMOVE_HOVER_POINTS_INTERVAL);
   }
 
+  redrawStrokes = (pageInfo) => {
+    this.removeAllCanvasObject();
+    this.resetLocalPathArray();
+    this.resetPageDependentData();
+
+    const strokesAll = this.storage.getPageStrokes(pageInfo);
+    const strokes = strokesAll.filter(stroke => stroke.brushType !== IBrushType.ERASER);
+
+    this.addStrokePaths(strokes);
+  }
+  
   rotate = (degrees, pageInfo) => {
     const ins = InkStorage.getInstance();
     const pageId = InkStorage.makeNPageIdStr(pageInfo);
@@ -499,14 +510,11 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
 
     const canvasCenterSrc = new fabric.Point(this._opt.pageSize.width/2, this._opt.pageSize.height/2)
     const canvasCenterDst = new fabric.Point(this._opt.pageSize.height/2, this._opt.pageSize.width/2)
+    const radians = fabric.util.degreesToRadians(degrees)
 
     strokeArr.forEach((stroke) => {
       stroke.dotArray.forEach((dot) => {
         let pdf_xy = this.ncodeToPdfXy(dot);
-
-        const radians = fabric.util.degreesToRadians(degrees)
-
-        const objectOrigin = new fabric.Point(pdf_xy.x, pdf_xy.y)
 
         // 1. subtractEquals
         pdf_xy.x -= canvasCenterSrc.x;
@@ -525,15 +533,6 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
         dot.y = ncode_xy.y;
       })
     })
-  
-    this.removeAllCanvasObject();
-    this.resetLocalPathArray();
-    this.resetPageDependentData();
-
-    const strokesAll = this.storage.getPageStrokes(pageInfo);
-    const strokes = strokesAll.filter(stroke => stroke.brushType !== IBrushType.ERASER);
-
-    this.addStrokePaths(strokes);
   }
 
   changePage = (pageInfo: IPageSOBP, pageSize: ISize, forceToRefresh: boolean): boolean => {

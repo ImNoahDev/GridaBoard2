@@ -3,17 +3,29 @@ import '../../styles/buttons.css';
 import Tooltip, { TooltipProps } from '@material-ui/core/Tooltip';
 import GridaToolTip from "../../styles/GridaToolTip";
 import { RootState } from '../../store/rootReducer';
-import { setRotationAngle } from '../../store/reducers/rotate';
-import { useSelector, useDispatch } from 'react-redux';
+import { setRotationTrigger } from '../../store/reducers/rotate';
+import { useSelector } from 'react-redux';
+import GridaDoc from "../../GridaBoard/GridaDoc";
 
 const RotateButton = () => {
-  const rotationAngle = useSelector((state: RootState) => state.rotate.rotationAngle);
-  const dispatch = useDispatch();
+  const doc = GridaDoc.getInstance();
+
+  const rotationTrigger = useSelector((state: RootState) => state.rotate.rotationTrigger);
+  const activePageNo_store = useSelector((state: RootState) => state.activePage.activePageNo);
 
   const onToggleRotate = () => {
-    console.log(rotationAngle);
-    const angle = rotationAngle < 270 ? rotationAngle + 90 : 0;
-    setRotationAngle(angle);
+    setRotationTrigger(!rotationTrigger);
+
+    let page = doc.getPageAt(activePageNo_store);
+    if (page.pageOverview.rotation >= 270) {
+      page._rotation = 0;
+    } else {
+      page._rotation += 90;
+    }
+    
+    const tmp = page.pageOverview.sizePu.width ;
+    page.pageOverview.sizePu.width = page.pageOverview.sizePu.height;
+    page.pageOverview.sizePu.height = tmp;
   }
 
   return (

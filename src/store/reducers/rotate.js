@@ -1,25 +1,25 @@
 import { store } from "../../client/Root";
-const SET_ROTATE = 'rotate/SET_ROTATE';
+const SET_ROTATION_TRRIGER = 'rotate/SET_ROTATION_TRIGGER';
 
 // 액션 생성 함수
-export const setRotationAngle = (rotationAngle) => {
+export const setRotationTrigger = (rotationTrigger) => {
   store.dispatch({ 
-    type: SET_ROTATE, rotationAngle 
+    type: SET_ROTATION_TRRIGER, rotationTrigger 
   });
 };
 
 // 초기 상태
 const initialState = {
-  rotationAngle: 0,
+  rotationTrigger: false,
 };
 
 // 리듀서 작성
 export default function rotate(state = initialState, action) {
   switch (action.type) {
-    case SET_ROTATE:
+    case SET_ROTATION_TRRIGER:
       return {
         ...state,
-        rotationAngle: action.rotationAngle,
+        rotationTrigger: action.rotationTrigger,
       };
     default:
       return state;
