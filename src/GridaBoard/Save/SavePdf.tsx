@@ -1,11 +1,11 @@
 import { saveAs } from "file-saver";
-import { degrees, PDFDocument, rgb, StandardFonts } from 'pdf-lib';
+import { degrees, degreesToRadians, PDFDocument, rgb, StandardFonts } from 'pdf-lib';
 
 import GridaDoc from "../GridaDoc";
 
 import { InkStorage } from "../../nl-lib/common/penstorage";
 import { drawPath } from "../../nl-lib/common/util";
-
+import { fabric } from "fabric";
 
 const PDF_TO_SCREEN_SCALE = 6.72; // (56/600)*72
 
@@ -37,7 +37,7 @@ export async function savePDF(saveName: string) {
     } 
     else {
       //pdf인 경우 
-      if (pdfUrl !== page.pdf.url) {
+      if (pdfUrl !== page.pdf.url) { 
         pdfUrl = page.pdf.url;
         const existingPdfBytes = await fetch(page.pdf.url).then(res => res.arrayBuffer());
         let pdfDocSrc = await PDFDocument.load(existingPdfBytes);
@@ -72,6 +72,9 @@ export async function savePDF(saveName: string) {
 
   let i = 0;
   for (const [key, NeoStrokes] of sortedCompletedOnPage.entries()) {
+    
+    let rotation = 0;
+    let isPdf = true;
 
     for (const docPage of docPages) {
       //page info를 grida doc의 그것과 비교해서 어떤 pdf doc에 stroke를 그릴지 결정
@@ -80,6 +83,11 @@ export async function savePDF(saveName: string) {
       
       if (pageId === key) {
         i = docPage.pageNo;
+        rotation = docPage._rotation
+
+        if (docPage._pdf === undefined) {
+          isPdf = false;
+        }
       }
     }
 
@@ -96,17 +104,50 @@ export async function savePDF(saveName: string) {
         opacity = 0.3;
       }
 
-      const pointArray = [];
-      for (let k = 0; k < dotArr.length; k++) {
-        const dot = dotArr[k];
-        const x = dot.x * PDF_TO_SCREEN_SCALE;
-        const y = dot.y * PDF_TO_SCREEN_SCALE;
+      let canvasCenterSrc = new fabric.Point(page.getHeight()/2, page.getWidth()/2)
+      let canvasCenterDst = new fabric.Point(page.getWidth()/2, page.getHeight()/2)
+      const radians = fabric.util.degreesToRadians(-rotation)
 
-        pointArray.push({ x, y, f: dot.f });
+      if (rotation === 0) {
+        canvasCenterDst = canvasCenterSrc;
+      } else if (rotation === 180) {
+        canvasCenterSrc = canvasCenterDst;
+      }
+
+      const pointArray = [];
+
+      if (isPdf) {
+        for (let k = 0; k < dotArr.length; k++) {
+          const dot = dotArr[k];
+          const pdf_xy = { x: dot.x * PDF_TO_SCREEN_SCALE, y: dot.y * PDF_TO_SCREEN_SCALE};
+
+          // 1. subtractEquals
+          pdf_xy.x -= canvasCenterSrc.x;
+          pdf_xy.y -= canvasCenterSrc.y;
+          
+          // 2. rotateVector
+          var v = fabric.util.rotateVector(pdf_xy, radians);
+
+          // 3. addEquals
+          v.x += canvasCenterDst.x;
+          v.y += canvasCenterDst.y;
+
+          pointArray.push({ x: v.x, y: v.y, f: dot.f });
+        }
+
+        page.setRotation(degrees(rotation));
+        
+      } else { //ncode page 일 때
+        for (let k = 0; k < dotArr.length; k++) {
+          const dot = dotArr[k];
+          const pdf_xy = { x: dot.x * PDF_TO_SCREEN_SCALE, y: dot.y * PDF_TO_SCREEN_SCALE};
+
+          pointArray.push({ x: pdf_xy.x, y: pdf_xy.y, f: dot.f });
+        }
       }
       const strokeThickness = thickness / 64;
       const pathData = drawPath(pointArray, strokeThickness);
-
+      
       page.moveTo(0, pageHeight);
       page.drawSvgPath(pathData, {
         color: rgb(
@@ -115,7 +156,7 @@ export async function savePDF(saveName: string) {
           Number(rgbStrArr[2]) / 255
         ),
         opacity: opacity,
-        scale: 1
+        scale: 1,
       });
     }
   }
