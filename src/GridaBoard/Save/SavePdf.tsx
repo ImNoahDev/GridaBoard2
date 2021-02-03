@@ -27,12 +27,13 @@ export async function savePDF(saveName: string) {
       //ncode page일 경우
       if (pdfDoc === undefined) {
         pdfDoc = await PDFDocument.create();
-        await pdfDoc.addPage();
-      } else {
-        const lastPrevPageNo = pdfDoc.getPages().length-1;
-        const lastPrevPage = await pdfDoc.getPages()[lastPrevPageNo];
-        const {width, height} = await lastPrevPage.getSize();
-        await pdfDoc.addPage([width, height]);
+      }
+
+      const pdfPage = await pdfDoc.addPage();
+      if (page._rotation === 90 || page._rotation === 270) {
+        const tmpWidth = pdfPage.getWidth();
+        pdfPage.setWidth(pdfPage.getHeight());
+        pdfPage.setHeight(tmpWidth);
       }
     } 
     else {
