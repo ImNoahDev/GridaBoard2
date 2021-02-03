@@ -101,7 +101,7 @@ const ThumbnailItem = (props: Props) => {
       <div id={`thumbnail-pageInfo-${pn}`} style={{ position: "absolute", margin: 0, padding: 0, right: 0, left: 0, top: 0, height: "100%", zIndex: 999 }}>
         {!props.noInfo
           ? <Typography style={{ color: "#f00" }}> {makeNPageIdStr(page.pageInfos[0])}</Typography>
-          : <Typography style={{ color: "rgba(0,0,0,255)" }}> {makeNPageIdStr(page.pageInfos[0])}</Typography>
+          : ""
         }
       </div>
 

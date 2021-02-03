@@ -349,14 +349,20 @@ class MixedPageView_module extends React.Component<MixedViewProps, State>  {
       }
       else {
         size = getNPaperSize_pu(this._internal.pageInfo);
+
+        if (nextProps.rotation === 90 || nextProps.rotation === 270) {
+          const tmpWidth = size.width;
+          size.width = size.height;
+          size.height = tmpWidth;
+        }
         console.log(`PDF SIZE: from NCODE ${size.width}, ${size.height}`);
       }
 
       this._internal.pdfSize = { ...size };
     }
 
-    if (this.props.rotation !== nextProps.rotation) {
-        ret_val = true;
+    if (this.props.rotation !== nextProps.rotation && this.props.activePageNo === nextProps.activePageNo) {
+      ret_val = true;
     }
 
     ret_val = ret_val || pageInfoChanged || viewFitChanged || fixedChanged || noInfo || loaded || renderCntChanged;

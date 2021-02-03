@@ -302,6 +302,8 @@ const Home = () => {
             activePageNo={activePageNo_store}
             onNcodePageChanged={onNcodePageChanged}
             handlePageWidthNeeded = {(width) => handlePageWidthNeeded(width)}
+
+            noInfo = {true}
           />
           <div id="navbar_page" style={pageNumberingStyle}>
             <div className="navbar-menu neo_shadow" style={{zIndex: 1000, height: "36px"}}>
@@ -327,7 +329,7 @@ const Home = () => {
         </IconButton>
         <PersistentDrawerRight
           open={drawerOpen} handleDrawerClose={handleDrawerClose} onDrawerResize={onDrawerResize}
-          noInfo
+          noInfo = {true}
         />
       </div>
 

@@ -309,7 +309,7 @@ class PenBasedRenderer extends React.Component<Props, State> {
 
       this.renderer.onPageSizeChanged(nextProps.pdfSize);
       this.pdfSize = { ...nextProps.pdfSize, scale: this.pdfSize.scale };
-      ret_val = false;
+      ret_val = true;
     }
 
     if (nextProps.viewSize.width !== this.viewSize.width || nextProps.viewSize.height !== this.viewSize.height) {
@@ -604,13 +604,8 @@ class PenBasedRenderer extends React.Component<Props, State> {
         < div id={`${this.props.parentName}-fabric_container`} style={inkContainerDiv} >
           <canvas id={this.canvasId} style={inkCanvas} ref={this.setCanvasRef} />
         </div >
-        {/* < div id={`${this.props.parentName}-fabric_container`} style={{ ...inkContainerDiv, border: "dashed blue", }} >
-          <canvas id={this.canvasId} style={{ ...inkCanvas, border: "dashed red", }} ref={this.setCanvasRef} />
-        </div > */}
-        {/* </Paper> */}
 
         {!this.props.noInfo ?
-
           < div id={`${this.props.parentName}-info`} style={inkContainerDiv} >
             <br /> &nbsp; &nbsp;
 
