@@ -13,6 +13,8 @@ import { g_defaultPrintOption } from "../../nl-lib/ncodepod";
 
 import { Button, ButtonGroup } from "@material-ui/core";
 import SavePdfDialog from "../Save/SavePdfDialog";
+import {saveGrida} from "../Save/SaveGrida";
+import LoadGrida from "../Load/LoadGrida";
 
 
 
@@ -94,12 +96,18 @@ function hideAndShowFnc() {
 
 interface Props {
   handlePdfOpen: (event: IFileBrowserReturn) => void,
+
+  handleGridaOpen: (event: IFileBrowserReturn) => void,
 }
 /**
  *
  */
 const ButtonLayerBottom = (props: Props) => {
   const { handlePdfOpen, ...rest } = props;
+
+  const { handleGridaOpen, ...test } = props;
+
+  // const handleGridaOpen = props;
 
   // const [num_pens, setNumPens] = useState(0);
   // const [pens, setPens] = useState(new Array(0) as INeoSmartpen[]);
@@ -121,6 +129,11 @@ const ButtonLayerBottom = (props: Props) => {
   // const [pdfUrl, pdfFilename] = useSelector((state: RootState) => {
   //   return [state.activePage.url, state.activePage.filename];
   // });
+  
+  // let saveGridaName = '';
+  // const gridaSave = (gridaName: string) => {
+  //   saveGridaName = gridaName;
+  // }
 
 
   return (
@@ -151,6 +164,10 @@ const ButtonLayerBottom = (props: Props) => {
             <button id="read_mapping_info" className="btn btn-neo" style={{marginLeft: "-5px"}}>
               <SavePdfDialog />
             </button>
+            <button onClick={() => saveGrida('hello.grida')}>
+              그리다 저장
+            </button>
+            <LoadGrida handleGridaOpen={handleGridaOpen}/>
           </ButtonGroup>
         </div>
 

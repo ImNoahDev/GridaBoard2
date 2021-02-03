@@ -25,6 +25,7 @@ import { nullNcode } from "../../nl-lib/common/constants";
 import { PLAYSTATE, ZoomFitEnum } from "../../nl-lib/common/enums";
 import { PenManager } from "../../nl-lib/neosmartpen";
 import PageNumbering from "../../components/navbar/PageNumbering";
+import * as PdfJs from "pdfjs-dist";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -215,6 +216,43 @@ const Home = () => {
     }
   };
 
+  const handleGridaOpen = async (event: IFileBrowserReturn, pageInfo?: IPageSOBP, basePageInfo?: IPageSOBP) => {
+    console.log(event.url)
+    if (event.result === "success") {
+
+      let jsonFile = null
+
+      var reader = new FileReader();
+      reader.readAsText(event.file);
+
+      reader.onload = function(e) {  // load한 다음에 실행된다.
+        console.log('hihi');
+        jsonFile = e.target.result;
+
+        const gridaStruct = JSON.parse(jsonFile);
+        const gridaRawData = gridaStruct.pdf.pdfInfo.rawData;
+        const neoStroke = gridaStruct.stroke.strokeInfo;
+        
+        const docInitParams = { data: gridaRawData, neoStroke };
+        PdfJs.getDocument(docInitParams).promise.then(function (pdf) {
+          console.log(pdf);
+          console.log(docInitParams);
+
+          const doc = GridaDoc.getInstance();
+          doc.openGridaFile({ url: event.url, filename: event.file.name, fingerprint: pdf.fingerprint }, pageInfo, basePageInfo, gridaRawData, neoStroke);
+          // doc.openPdfFile({ url: event.url, filename: event.file.name }, pageInfo, basePageInfo);
+          // doc.openGridaFile({ url: event.url, filename: event.file.name }, pageInfo, basePageInfo, pdf);
+          
+        });
+        
+
+      }
+      
+    }
+    else if (event.result === "canceled") {
+      alert("file open cancelled");
+    }
+  };
 
   const handleNoMoreAutoLoad = () => {
     setNoMoreAutoLoad(true);
@@ -278,7 +316,7 @@ const Home = () => {
         </div>
 
         <div style={{ position: "absolute", top: 0, left: 0, bottom: 0, right: drawerOpen ? drawerWidth : 0 }}>
-          <ButtonLayer handlePdfOpen={handlePdfOpen} />
+          <ButtonLayer handlePdfOpen={handlePdfOpen} handleGridaOpen={handleGridaOpen} />
         </div>
 
         <div style={{ position: "absolute", top: 0, left: 0, bottom: 0, right: drawerOpen ? drawerWidth : 0 }}>

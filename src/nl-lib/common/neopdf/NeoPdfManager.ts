@@ -48,18 +48,16 @@ export class NeoPdfManager {
   //   // pdfs.forEach(pdf => pdf.addNcodeMapping(docMap));
   //   pdfs.forEach(pdf => pdf.refreshNcodeMappingTable());
   // }
-
-
-  public getDocument = async (options: IPdfOpenOption) => {
+  
+  public getDocument =async (options: IPdfOpenOption) => {
     if (options.url && !options.fingerprint) {
       const pdf = new NeoPdfDocument();
-      await pdf.load(options);
-
+      await pdf.load(options); 
+      console.log(pdf);
       this.dispatcher.dispatch(PdfManagerEventName.ON_PDF_LOADED, { pdf });
       return pdf;
 
-    }
-    else {
+    } else {
       if (!options.fingerprint) {
         throw new Error(`PDF Manager: URL or fingerprint should be passed to load a document`);
       }
@@ -82,7 +80,36 @@ export class NeoPdfManager {
       return null;
     }
   }
+  public getGrida = async (options: IPdfOpenOption, gridaRawData: any, neoStroke: any) => {
+    if (options.fingerprint) {
+      const pdf = new NeoPdfDocument();
+      await pdf.gridaLoad(options, gridaRawData, neoStroke); // 여기서 load를 갔다 온 후 멈춤(gridaOpen) -> 더 이상 진행이 되지 않는 이유
+      console.log(pdf);
+      this.dispatcher.dispatch(PdfManagerEventName.ON_PDF_LOADED, { pdf });
+      return pdf;
+    } else {
+      if (!options.fingerprint) {
+        throw new Error(`PDF Manager: URL or fingerprint should be passed to load a document`);
+      }
 
+      // 이 부분을 수정할 것 (구글 드라이브에서 로드하려면)
+      // google drive, 2020/12/05
+      const status = await NeoPdfManager.getUrl(options);
+
+      if (status.result === "success") {
+        const doc = new NeoPdfDocument();
+        // return await doc.load({ url: status.url, filename: status.file.name, purpose: "to be opened from Google Drive by NeoPdfManager " });
+      }
+
+      if (status.result === "not match") {
+        console.log("같은 파일이 아닙니다. 다시 여시겠습니까...라는 다이얼로그를 넣어서 루프를 돌 것");
+        alert("같은 파일이 아닙니다. 다시 여시겠습니까...라는 다이얼로그를 넣어서 루프를 돌 것");
+        return null;
+      }
+
+      return null;
+    }
+  }
 
   static getUrl = async (options: IPdfOpenOption) => {
     const fingerprint = options.fingerprint;

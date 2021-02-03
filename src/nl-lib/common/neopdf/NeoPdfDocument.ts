@@ -1,8 +1,9 @@
 import * as PdfJs from "pdfjs-dist";
-import { IPageOverview, IPageSOBP, IPdfToNcodeMapItem } from "../structures";
+import { IFileBrowserReturn, IPageOverview, IPageSOBP, IPdfToNcodeMapItem } from "../structures";
 import { uuidv4 } from "../util";
 import { MappingStorage } from "../mapper";
 import { NeoPdfPage, PDF_VIEWPORT_DESC } from "./NeoPdfPage";
+import { resolve } from "path";
 
 // import PdfJsWorker from "../../../../public/pdf.worker.2.5.207.js/index.js";
 console.log(`PDFjs version=${PdfJs.version}`);
@@ -73,7 +74,39 @@ export class NeoPdfDocument {
 
   load = async (options: IPdfOpenOption) => {
     console.log("~GRIDA DOC~,   load, step 1")
-    const pdfDoc = await pdfJsOpenDocument(options);
+   const pdfDoc = await pdfJsOpenDocument(options);
+    console.log("~GRIDA DOC~,   load, step 2")
+
+
+    const { url, filename, cMapUrl, cMapPacked, purpose } = options;
+
+    this._url = url;
+    this._filename = filename;
+    this._purpose = purpose;
+    this._fingerprint = pdfDoc.fingerprint;
+    this._numPages = pdfDoc.numPages;
+    this._pdfDoc = pdfDoc;
+    _doc_fingerprint = pdfDoc.fingerprint;
+
+    // page를 로드한다
+    if (pdfDoc) {
+      this._pages = [];
+      for (let i = 0; i < this._pdfDoc.numPages; i++) {
+        // const page = await pdf.getPageAsync(i + 1);
+        const neoPage = new NeoPdfPage(this, i + 1);
+        this._pages.push(neoPage);
+      }
+
+      await this.setPageOverview();
+      return this;
+    }
+
+    return undefined;
+  }
+
+  gridaLoad = async (options: IPdfOpenOption, gridaStruct: any, neoStroke: any) => {
+    console.log("~GRIDA DOC~,   load, step 1")
+    const pdfDoc = await gridaJsOpenDocument(options, gridaStruct, neoStroke);
     console.log("~GRIDA DOC~,   load, step 2")
 
 
@@ -377,12 +410,34 @@ export class NeoPdfDocument {
   }
 }
 
-
-
-
 const max_concurrent = 16;
 let pdf_loader_idx = 0;
 const pdf_fingerprint: string[] = new Array(16);
+
+function gridaJsOpenDocument(_options: IPdfOpenOption, _gridaRawData: any, _neoStroke: any): Promise<PdfJs.PDFDocumentProxy> {
+  const { url, filename, cMapUrl, cMapPacked, purpose } = _options;
+
+  pdf_loader_idx = (pdf_loader_idx + 1) % max_concurrent;
+  pdf_fingerprint[pdf_loader_idx] = "";
+
+  console.log(":GRIDA DOC:,     gridaJsOpenDocument, step 1")
+
+  const openOption = {
+    url: url,
+    cMapUrl: cMapUrl ? cMapUrl : CMAP_URL,
+    cMapPacked: cMapPacked ? cMapPacked : CMAP_PACKED,
+  };
+
+  return new Promise (resolve => {
+    const docInitParams = { data: _gridaRawData, _neoStroke };
+    PdfJs.getDocument(docInitParams).promise.then(function (pdf) {
+      resolve(pdf);
+      pdf_fingerprint[pdf_loader_idx] = pdf.fingerprint
+    })
+  })
+}
+
+
 function pdfJsOpenDocument(options: IPdfOpenOption): Promise<PdfJs.PDFDocumentProxy> {
   const { url, filename, cMapUrl, cMapPacked, purpose } = options;
 
@@ -397,42 +452,44 @@ function pdfJsOpenDocument(options: IPdfOpenOption): Promise<PdfJs.PDFDocumentPr
     cMapPacked: cMapPacked ? cMapPacked : CMAP_PACKED,
   };
 
-
+  
   console.log(`:GRIDA DOC:,     pdfJsOpenDocument, step 2  fingerprint=${pdf_fingerprint} `);
   const loadingTask = PdfJs.getDocument(openOption);
 
-  /**
-   * 왜, 아래의 부분의 await 다음이 두번 콜백 실행되지? callback에 등록이 희안하게 되는 모양인데 말이지.
-   * 마치 thread가 나뉘어 진 것 같이 동작한다.
-   * NeoPdfDocument도 객체가 두번 생긴다. 이건 버그가 아닌가 싶은데 말이지?
-   *
-   * 2020/12/27, kitty
-   */
-  // // eslint-disable-next-line no-constant-condition
-  // if (1 === 0) {
-  //   const pdfDoc = await loadingTask.promise;
-  //   console.log(`:GRIDA DOC:,     pdfJsOpenDocument, step 3  fingerprint=${pdf_fingerprint} `);
-  //   pdf_fingerprint = pdfDoc.fingerprint;
-  //   return pdfDoc;
-  // }
+    /**
+     * 왜, 아래의 부분의 await 다음이 두번 콜백 실행되지? callback에 등록이 희안하게 되는 모양인데 말이지.
+     * 마치 thread가 나뉘어 진 것 같이 동작한다.
+     * NeoPdfDocument도 객체가 두번 생긴다. 이건 버그가 아닌가 싶은데 말이지?
+     *
+     * 2020/12/27, kitty
+     */
+    // // eslint-disable-next-line no-constant-condition
+    // if (1 === 0) {
+    //   const pdfDoc = await loadingTask.promise;
+    //   console.log(`:GRIDA DOC:,     pdfJsOpenDocument, step 3  fingerprint=${pdf_fingerprint} `);
+    //   pdf_fingerprint = pdfDoc.fingerprint;
+    //   return pdfDoc;
+    // }
 
 
-  /**
-   * 아래는 임시 방편으로 하나만 리턴하도록 했다. 즉, 꼼수다.
-   * 2020/12/27, kitty
-   */
-  return new Promise(resolve => {
-    loadingTask.promise.then(pdf => {
-      resolve(pdf);
-      // if (pdf_fingerprint[pdf_loader_idx] === "" || pdf_fingerprint[pdf_loader_idx] !== pdf.fingerprint) {
-      //   resolve(pdf);
-      // }
-      // else {
-      //   pdf.destroy();
-      // }
-      console.log(`:GRIDA DOC:,     pdfJsOpenDocument, step 3  fingerprint=${pdf_fingerprint} `);
-      pdf_fingerprint[pdf_loader_idx] = pdf.fingerprint;
-    });
-  })
-}
+    /**
+     * 아래는 임시 방편으로 하나만 리턴하도록 했다. 즉, 꼼수다.
+     * 2020/12/27, kitty
+     */
+    return new Promise(resolve => {
+      loadingTask.promise.then(pdf => {
+        console.log(pdf);
+        resolve(pdf);
+        // if (pdf_fingerprint[pdf_loader_idx] === "" || pdf_fingerprint[pdf_loader_idx] !== pdf.fingerprint) {
+        //   resolve(pdf);
+        // }
+        // else {
+        //   pdf.destroy();
+        // }
+        console.log(`:GRIDA DOC:,     pdfJsOpenDocument, step 3  fingerprint=${pdf_fingerprint} `);
+        pdf_fingerprint[pdf_loader_idx] = pdf.fingerprint;
+      });
+    })
+  }
+
 

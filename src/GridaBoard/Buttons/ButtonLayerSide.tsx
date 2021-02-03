@@ -11,7 +11,7 @@ import TracePointButton from "../../components/buttons/TracePointButton";
 import { RootState } from "../../store/rootReducer";
 import { useSelector } from "react-redux";
 import GridaApp from "../GridaApp";
-import { Box, Button, Paper } from "@material-ui/core";
+import { Box, Button, IconButton, makeStyles, Paper } from "@material-ui/core";
 import PostAddIcon from '@material-ui/icons/PostAdd';
 import GridaDoc from "../GridaDoc";
 import { setActivePageNo } from "../../store/reducers/activePageReducer";
@@ -33,6 +33,17 @@ const mainFrameStyle = {
   marginLeft: "-1px",
 } as React.CSSProperties;
 
+const useStyles = makeStyles(theme => ({
+  iconContainer: {
+      "&:hover $icon": {
+          color: 'red',
+      }
+  },
+  icon: {
+      color: 'black',
+  },
+}));
+
 const addBlankPage = async (event) => {
   const doc = GridaDoc.getInstance();
   const pageNo = await doc.addBlankPage();
@@ -48,7 +59,9 @@ const ButtonLayerSide = () => {
     return state.activePage.activePageNo
   });
 
-
+  const [showForm, setShowForm] = React.useState(false)
+  const classes = useStyles();
+  
   const handleTrashBtn = () => {
     const doc = GridaDoc.getInstance();
     const basePageInfo = doc.getPage(activePageNo_store).basePageInfo;
@@ -93,9 +106,12 @@ const ButtonLayerSide = () => {
               <div className="d-flex flex-column justify-content-between" style={{ zIndex: 1030 }}>
                 <ConnectButton onPenLinkChanged={e => onPenLinkChanged(e)} />
                 <div className="btn-group-vertical neo_shadow" style={{ fontSize: "20px", fontWeight: "bold" }}>
-                  <button className="btn btn-neo btn-neo-vertical" onClick={(event) => addBlankPage(event)} >
-                    <PostAddIcon fontSize="large">빈 페이지 추가</PostAddIcon>
-                  </button>
+                <IconButton className={classes.iconContainer} onClick={(event) => addBlankPage(event)} style={{padding: "4px"}} >
+                    {!showForm
+                      ? <PostAddIcon fontSize="large" className={classes.icon}>빈 페이지 추가</PostAddIcon>
+                      : <PostAddIcon fontSize="large" className={classes.icon}>빈 페이지 추가</PostAddIcon>
+                    }
+                  </IconButton>
                 </div>
                 <div className="btn-group-vertical neo_shadow" style={{ marginBottom: 10 }}>
                   <div className="btn-group dropright" role="group">

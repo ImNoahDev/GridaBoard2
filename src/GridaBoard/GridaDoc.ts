@@ -104,8 +104,27 @@ export default class GridaDoc {
 
     const pdfDoc = await NeoPdfManager.getInstance().getDocument({ url: option.url, filename: option.filename, purpose: "open pdf by GridaDoc" });
     // setActivePdf(pdfDoc);
+    console.log(pdfDoc);
 
     if (pdfDoc) {
+      const activatePageNo = await this.appendPdfDocument(pdfDoc, pageInfo, basePageInfo);
+      scrollToBottom("drawer_content");
+      this.setActivePageNo(activatePageNo);
+    }
+  }
+
+  public openGridaFile = async (option: { url: string, filename: string,
+    fingerprint: string },  pageInfo: IPageSOBP = undefined, basePageInfo: IPageSOBP = undefined, gridaRawData, neoStroke) => {
+  // public openGridaFile = async (option: { url: string, filename: string,
+  //    }, pageInfo: IPageSOBP = undefined, basePageInfo: IPageSOBP = undefined, pdf: any) => {
+    const pdfDoc = await NeoPdfManager.getInstance().getGrida({ url: option.url, filename: option.filename, purpose: "open pdf by GridaDoc", fingerprint: option.fingerprint }, gridaRawData, neoStroke);
+    // const pdfDoc = await NeoPdfManager.getInstance().getDocument({ url: option.url, filename: option.filename, purpose: "open pdf by GridaDoc"});
+    console.log(pdfDoc);
+    // const grida = new NeoPdfDocument();
+    // grida.load(pdfDoc);
+
+    if (pdfDoc) {
+      // const activatePageNo = await this.appendPdfDocument(pdfDoc, pageInfo, basePageInfo);
       const activatePageNo = await this.appendPdfDocument(pdfDoc, pageInfo, basePageInfo);
       scrollToBottom("drawer_content");
       this.setActivePageNo(activatePageNo);

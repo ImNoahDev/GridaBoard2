@@ -13,6 +13,7 @@ interface Props extends ButtonProps {
 
 const FileBrowserButton = (props: Props) => {
   const { handlePdfOpen, ...rest } = props;
+  
   async function fileOpenHandler() {
     const selectedFile = await openFileBrowser();
     console.log(selectedFile.result);
