@@ -6,7 +6,7 @@ import { IRenderWorkerOption } from "./RenderWorkerBase";
 import PenBasedRenderWorker from "./PenBasedRenderWorker";
 import { MixedViewProps } from "../MixedPageView";
 
-import { IBrushType, PenEventName, PLAYSTATE, ZoomFitEnum } from "../../common/enums";
+import { IBrushType, PenEventName, PageEventName, PLAYSTATE, ZoomFitEnum } from "../../common/enums";
 import { IPageSOBP, ISize } from "../../common/structures";
 import { callstackDepth, isSamePage, makeNPageIdStr, uuidv4 } from "../../common/util";
 
@@ -169,6 +169,8 @@ class PenBasedRenderer extends React.Component<Props, State> {
       inkStorage.addEventListener(PenEventName.ON_PEN_PAGEINFO, this.onLivePenPageInfo_byStorage, filter);
       inkStorage.addEventListener(PenEventName.ON_PEN_MOVE, this.onLivePenMove_byStorage, filter);
       inkStorage.addEventListener(PenEventName.ON_PEN_UP, this.onLivePenUp_byStorage, filter);
+      
+      inkStorage.addEventListener(PageEventName.PAGE_CLEAR, this.removeAllCanvasObjectOnActivePage, filter);
     }
   }
 
@@ -180,6 +182,8 @@ class PenBasedRenderer extends React.Component<Props, State> {
       inkStorage.removeEventListener(PenEventName.ON_PEN_PAGEINFO, this.onLivePenPageInfo_byStorage);
       inkStorage.removeEventListener(PenEventName.ON_PEN_MOVE, this.onLivePenMove_byStorage);
       inkStorage.removeEventListener(PenEventName.ON_PEN_UP, this.onLivePenUp_byStorage);
+      
+      inkStorage.removeEventListener(PageEventName.PAGE_CLEAR, this.removeAllCanvasObjectOnActivePage);
     }
   }
 
@@ -488,6 +492,11 @@ class PenBasedRenderer extends React.Component<Props, State> {
 
   }
 
+  removeAllCanvasObjectOnActivePage = (pageInfo: IPageSOBP) => {
+    if (this.renderer && isSamePage(this.props.pageInfo, pageInfo)) {
+      this.renderer.removeAllCanvasObject();
+    }
+  }
 
   onLiveHoverPageInfo = (event: IPenToViewerEvent) => {
     if (this.renderer) {

@@ -54,7 +54,7 @@ const ButtonLayerSide = () => {
     const basePageInfo = doc.getPage(activePageNo_store).basePageInfo;
 
     const inkStorage = InkStorage.getInstance();
-    inkStorage.dispatcher.dispatch(PageEventName.PAGE_CLEAR, null);
+    inkStorage.dispatcher.dispatch(PageEventName.PAGE_CLEAR, basePageInfo);
     inkStorage.removeStrokeFromPage(basePageInfo);
   }
 

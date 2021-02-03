@@ -87,9 +87,6 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
     const penManager = PenManager.getInstance();
     penManager.addEventListener(PenEventName.ON_COLOR_CHANGED, this.changeDrawCursor);
 
-    const filter = { mac: null };
-    this.storage.addEventListener(PageEventName.PAGE_CLEAR, this.removeAllCanvasObject, filter);
-
     this.changePage(this.pageInfo, options.pageSize, true);
     console.log(`PAGE CHANGE (worker constructor):                             ${makeNPageIdStr(this.pageInfo as IPageSOBP)}`);
 
@@ -99,8 +96,6 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
   prepareUnmount = () => {
     const penManager = PenManager.getInstance();
     penManager.removeEventListener(PenEventName.ON_COLOR_CHANGED, this.changeDrawCursor);
-
-    this.storage.removeEventListener(PageEventName.PAGE_CLEAR, this.removeAllCanvasObject);
   }
 
   /**
