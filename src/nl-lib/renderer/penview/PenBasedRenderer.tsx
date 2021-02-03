@@ -170,7 +170,6 @@ class PenBasedRenderer extends React.Component<Props, State> {
       inkStorage.addEventListener(PenEventName.ON_PEN_MOVE, this.onLivePenMove_byStorage, filter);
       inkStorage.addEventListener(PenEventName.ON_PEN_UP, this.onLivePenUp_byStorage, filter);
       
-      inkStorage.addEventListener(PageEventName.PAGE_CLEAR, this.removeAllCanvasObjectOnActivePage, filter);
     }
   }
 
@@ -183,7 +182,6 @@ class PenBasedRenderer extends React.Component<Props, State> {
       inkStorage.removeEventListener(PenEventName.ON_PEN_MOVE, this.onLivePenMove_byStorage);
       inkStorage.removeEventListener(PenEventName.ON_PEN_UP, this.onLivePenUp_byStorage);
       
-      inkStorage.removeEventListener(PageEventName.PAGE_CLEAR, this.removeAllCanvasObjectOnActivePage);
     }
   }
 
@@ -274,6 +272,10 @@ class PenBasedRenderer extends React.Component<Props, State> {
     if (this.props.fromStorage) {
       // console.log(`Renderer(${this.props.parentName}): componentDidMount`);
       this.subScriptStorageEvent();
+    }
+
+    if (this.renderer) {
+      this.inkStorage.addEventListener(PageEventName.PAGE_CLEAR, this.removeAllCanvasObjectOnActivePage, null);
     }
   }
 
@@ -397,9 +399,10 @@ class PenBasedRenderer extends React.Component<Props, State> {
   componentWillUnmount() {
     this.unsubscribeAllPensEvent();
     if (this.props.fromStorage) this.unsubScriptStorageEvent();
-
+    
     if (this.renderer) {
       this.renderer.prepareUnmount();
+      this.inkStorage.removeEventListener(PageEventName.PAGE_CLEAR, this.removeAllCanvasObjectOnActivePage);
     }
   }
 
