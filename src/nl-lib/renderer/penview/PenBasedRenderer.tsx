@@ -366,6 +366,7 @@ class PenBasedRenderer extends React.Component<Props, State> {
       ret_val = true;
     }
 
+    
     return ret_val;
   }
 
