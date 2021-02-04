@@ -345,7 +345,12 @@ class PenBasedRenderer extends React.Component<Props, State> {
 
       }
     }
+    
     const pageInfo = nextProps.pageInfo;
+
+    if (this.props.pdfPageNo !== nextProps.pdfPageNo) { //빈 ncode page만 첫 load 할 때 worker에 pageInfo를 set해주기 위함
+      this.renderer.pageInfo = { ...pageInfo };
+    }
 
     if (pageInfo.section !== -1 && (nextProps.pdfSize.width !== this.props.pdfSize.width || nextProps.pdfSize.height !== this.props.pdfSize.height)) {
       console.error("`VIEW SIZE (comp) page size change");
