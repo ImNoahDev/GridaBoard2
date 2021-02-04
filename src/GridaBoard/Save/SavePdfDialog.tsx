@@ -6,6 +6,7 @@ import React from 'react';
 import PictureAsPdfIcon from '@material-ui/icons/PictureAsPdf';
 import { savePDF } from "./SavePdf";
 import PdfDialogTextArea from './PdfDialogTextArea';
+import { turnOnGlobalKeyShortCut } from '../../GridaBoard/GlobalFunctions';
 
 const useStyles = makeStyles({
   title: {
@@ -37,10 +38,12 @@ const SavePdfDialog = () => {
 
   const onReset = () => {
     pdfSaveName = '';
+    turnOnGlobalKeyShortCut(true);
   };
 
   const handlePdfDialogOpen = () => {
     setOpen(true);
+    turnOnGlobalKeyShortCut(false);
   };
 
   const handlePdfDialogClose = () => {
