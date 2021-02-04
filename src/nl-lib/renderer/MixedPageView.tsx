@@ -13,6 +13,7 @@ import { MappingStorage } from "../common/mapper";
 import { getNPaperSize_pu } from "../common/noteserver";
 import { PLAYSTATE, ZoomFitEnum } from "../common/enums";
 import { INeoSmartpen } from "../common/neopen";
+import { setZoomStore } from "../../store/reducers/zoomReducer";
 
 
 export const ZINDEX_INK_LAYER = 3;
@@ -546,6 +547,10 @@ class MixedPageView_module extends React.Component<MixedViewProps, State>  {
     this._internal.viewPos = { ...arg };
     this.setState({ forceToRenderCnt: this.state.forceToRenderCnt + 1 });
 
+    if (this.props.isMainView) {
+      setZoomStore(arg.zoom);
+    }
+    
     this.handlePageWidthNeeded(this._internal.width);
     // const r = this._internal.renderCount;
     // this.setState({ renderCount: r + 1 });

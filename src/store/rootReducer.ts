@@ -10,7 +10,7 @@ import uiReducer from './reducers/ui';
 import progressDlgReducer from "./reducers/progressDlgReducer";
 import calibrationReducer from "./reducers/calibrationReducer";
 import appConfigReducer from './reducers/appConfigReducer';
-
+import zoomReducer from './reducers/zoomReducer';
 
 const rootReducer = combineReducers({
   progress: progressDlgReducer,
@@ -24,7 +24,7 @@ const rootReducer = combineReducers({
   rotate,
   viewFitReducer,
   activePage: activePageReducer,
-
+  zoomReducer,
 });
 
 export default rootReducer;
