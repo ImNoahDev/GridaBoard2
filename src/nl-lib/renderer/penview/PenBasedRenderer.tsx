@@ -319,6 +319,13 @@ class PenBasedRenderer extends React.Component<Props, State> {
       ret_val = true;
     }
 
+    if (this.props.viewFit !== nextProps.viewFit) {
+      this.viewSize = { ...nextProps.viewSize };
+      this.renderer._opt.viewFit = nextProps.viewFit;
+      this.onViewResized(this.viewSize);
+      ret_val = true;
+    }
+
     // if (nextProps.pdfUrl !== this.props.pdfUrl) {
     //   this.shouldSendPageInfo = true;
     //   ret_val = true;

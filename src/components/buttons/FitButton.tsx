@@ -2,6 +2,8 @@ import React from "react";
 import '../../styles/buttons.css';
 import { Popover } from '@material-ui/core';
 import GridaToolTip from "../../styles/GridaToolTip";
+import { setViewFit } from '../../store/reducers/viewFitReducer';
+import { ZoomFitEnum } from "../../nl-lib/common/enums";
 
 export default function FitButton() {
 
@@ -11,8 +13,9 @@ export default function FitButton() {
     setAnchorEl(event.currentTarget);
   };
 
-  const handleClose = () => {
+  const handleClose = (viewFit: ZoomFitEnum) => {
     setAnchorEl(null);
+    setViewFit(viewFit);
   };
 
   const open = Boolean(anchorEl);
@@ -49,28 +52,28 @@ export default function FitButton() {
               horizontal: 'left',
             }}
           >
-            <a id="btn_fit_width" className="dropdown-item" href="#" onClick={handleClose}>
+            <a id="btn_fit_width" className="dropdown-item" href="#" onClick={() => handleClose(ZoomFitEnum.WIDTH)}>
               <div className="c2">
                 <img src="/icons/icon_fit_width_n.png" className="normal-image"></img>
                 <img src="/icons/icon_fit_width_p.png" className="hover-image"></img>
                 <span className="bg-dropmenu" data-l10n-id="page_scale_width">Fit to width</span>
               </div>
             </a>
-            <a id="btn_fit_height" className="dropdown-item" href="#" onClick={handleClose}>
+            <a id="btn_fit_height" className="dropdown-item" href="#" onClick={() => handleClose(ZoomFitEnum.HEIGHT)}>
               <div className="c2">
                 <img src="/icons/icon_fit_height_n.png" className="normal-image"></img>
                 <img src="/icons/icon_fit_height_p.png" className="hover-image"></img>
                 <span className="bg-dropmenu" data-l10n-id="page_scale_fit">Fit to height</span>
               </div>
             </a>
-            <a id="btn_fit_canvas" className="dropdown-item" href="#" onClick={handleClose}>
+            <a id="btn_fit_canvas" className="dropdown-item" href="#" onClick={() => handleClose(ZoomFitEnum.FULL)}>
               <div className="c2">
                 <img src="/icons/icon_fit_canvas_n.png" className="normal-image"></img>
                 <img src="/icons/icon_fit_canvas_p.png" className="hover-image"></img>
                 <span className="bg-dropmenu" data-l10n-id="page_scale_auto">Fit to full page</span>
               </div>
             </a>
-            <a id="btn_fit_paper" className="dropdown-item" href="#" onClick={handleClose}>
+            <a id="btn_fit_paper" className="dropdown-item" href="#" onClick={() => handleClose(ZoomFitEnum.ACTUAL)}>
               <div className="c2">
                 <img src="/icons/icon_fit_paper_n.png" className="normal-image"></img>
                 <img src="/icons/icon_fit_paper_p.png" className="hover-image"></img>

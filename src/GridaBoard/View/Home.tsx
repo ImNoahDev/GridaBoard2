@@ -73,7 +73,8 @@ const Home = () => {
   let basePageInfo = nullNcode();
   const activePageNo_store = useSelector((state: RootState) => state.activePage.activePageNo);
   const rotationTrigger = useSelector((state: RootState) => state.rotate.rotationTrigger);
-  
+  const viewFit_store = useSelector((state: RootState) => state.viewFitReducer.viewFit);
+
   useEffect(() => {
     if (rotationTrigger !== toggleRotation) {
       setToggleRotation(rotationTrigger);
@@ -332,7 +333,7 @@ const Home = () => {
             basePageInfo={basePageInfo}
 
             parentName={"grida-main-home"}
-            viewFit={ZoomFitEnum.FULL}
+            viewFit={viewFit_store}
             autoPageChange={true}
             fromStorage={false}
             fitMargin={100}

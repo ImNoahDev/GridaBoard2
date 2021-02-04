@@ -13,6 +13,7 @@ import { callstackDepth, convertNuToPu, convertPuToNu, isSamePage, makeNPageId, 
 
 import { PATH_THICKNESS_SCALE } from "../../common/util";
 import { PDFVIEW_ZOOM_MAX, PDFVIEW_ZOOM_MIN } from "../RendererConstants";
+import { setViewFit } from '../../../store/reducers/viewFitReducer';
 
 // const timeTickDuration = 20; // ms
 // const DISABLED_STROKE_COLOR = "rgba(0, 0, 0, 0.1)";
@@ -568,6 +569,7 @@ export default abstract class RenderWorkerBase {
    */
   onCanvasMouseWheel = (opt: any) => {
 
+    setViewFit(ZoomFitEnum.FREE);
     this._opt.viewFit = ZoomFitEnum.FREE;
 
     const evt: MouseEvent = opt.e;

@@ -68,7 +68,6 @@ const ThumbnailItem = (props: Props) => {
   
   const height = drawerWidth / wh_ratio * 0.9;
   const playState = PLAYSTATE.live;
-  const viewFit = ZoomFitEnum.FULL;
 
   // console.log(`thumbnail - ${pn}: pageNo: ${pdfPageNo} pdf: ${pdf} pdfUrl: ${pdfUrl} fingerprint: ${pdfFingerprint} `)
   return (
@@ -86,7 +85,7 @@ const ThumbnailItem = (props: Props) => {
           basePageInfo={basePageInfo}
 
           parentName={`thumbnail - ${pn} `}
-          viewFit={viewFit}
+          viewFit={ZoomFitEnum.FULL}
           autoPageChange={false}
           fromStorage={true}
           fitMargin={5}
