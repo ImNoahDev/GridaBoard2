@@ -495,7 +495,7 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
   }
 
   redrawStrokes = (pageInfo) => {
-    if (isSamePage(this.pageInfo, pageInfo)) {
+    if (isSamePage(this.pageInfo, pageInfo) || this.pageInfo === undefined) {
       this.removeAllCanvasObject();
       this.resetLocalPathArray();
       this.resetPageDependentData();
