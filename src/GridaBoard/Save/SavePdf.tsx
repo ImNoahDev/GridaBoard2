@@ -97,6 +97,7 @@ export async function savePDF(saveName: string) {
 
     for (let j = 0; j < NeoStrokes.length; j++) {
       const thickness = NeoStrokes[j].thickness;
+      const brushType = NeoStrokes[j].brushType;
       const dotArr = NeoStrokes[j].dotArray;
       const rgbStrArr = NeoStrokes[j].color.match(/\d+/g);
 
@@ -146,7 +147,12 @@ export async function savePDF(saveName: string) {
           pointArray.push({ x: pdf_xy.x, y: pdf_xy.y, f: dot.f });
         }
       }
-      const strokeThickness = thickness / 64;
+      let strokeThickness = thickness / 64;
+      switch (brushType) {
+        case 1: strokeThickness *= 5; break;
+        default: break;
+      }
+
       const pathData = drawPath(pointArray, strokeThickness);
       
       page.moveTo(0, pageHeight);
