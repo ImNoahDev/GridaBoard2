@@ -38,6 +38,8 @@ export enum PenEventName {
   ON_CONNECTED = "connected",
   ON_DISCONNECTED = "disconnected",
 
+  ON_ERASER_MOVE = "erasermove",
+  
   ON_UPGRADE_NEEDED = "fw_up",
 
 

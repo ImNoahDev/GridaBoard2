@@ -3,7 +3,7 @@ import { fabric } from "fabric";
 
 import RenderWorkerBase, { IRenderWorkerOption } from "./RenderWorkerBase";
 
-import { callstackDepth, drawPath, drawPath_arr, makeNPageIdStr, uuidv4 } from "../../common/util";
+import { callstackDepth, drawPath, drawPath_arr, makeNPageIdStr, isSamePage, uuidv4 } from "../../common/util";
 import { IBrushType, PenEventName, PageEventName } from "../../common/enums";
 import { IPoint, NeoStroke, NeoDot, IPageSOBP, INeoStrokeProps, StrokeStatus, ISize } from "../../common/structures";
 import { INeoSmartpen, IPenToViewerEvent } from "../../common/neopen";
@@ -199,7 +199,6 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
 
     const cursor = this.penCursors[event.mac];
     if (pen && pen.penRendererType === IBrushType.ERASER) {
-      console.log('ERASE');
       if (cursor.eraserLastPoint !== undefined) {
         this.eraseOnLine(
           cursor.eraserLastPoint.x, cursor.eraserLastPoint.y,
@@ -305,17 +304,26 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
       x0_pu: pdf_x0, y0_pu: pdf_y0, x1_pu: pdf_x1, y1_pu: pdf_y1
     }
 
+    
     for (let i = 0; i < this.localPathArray.length; i++) {
       const fabricPath = this.localPathArray[i];
       const pathDataStr = fabricPath.path.join();
+      
+      let needThumbnailRedraw = false;
 
       if (this.storage.collisionTest(pathDataStr, eraserLine)) {
         this.canvasFb.remove(fabricPath);
+        needThumbnailRedraw = true;
 
         const pageId = InkStorage.makeNPageIdStr(pageInfo);
-        this.storage.completed = this.storage.completedOnPage.get(pageId)
-        const idx = this.storage.completed.findIndex(ns => ns.key === fabricPath.key);
-        this.storage.completed.splice(idx, 1);
+        const completed = this.storage.completedOnPage.get(pageId);
+        const idx = completed.findIndex(ns => ns.key === fabricPath.key);
+        completed.splice(idx, 1);
+
+        if (needThumbnailRedraw) {
+          this.storage.dispatcher.dispatch(PenEventName.ON_ERASER_MOVE, 
+            {section: pageInfo.section, owner: pageInfo.owner, book: pageInfo.book, page: pageInfo.page});
+        }
       }
     }
   }
@@ -487,14 +495,16 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
   }
 
   redrawStrokes = (pageInfo) => {
-    this.removeAllCanvasObject();
-    this.resetLocalPathArray();
-    this.resetPageDependentData();
-
-    const strokesAll = this.storage.getPageStrokes(pageInfo);
-    const strokes = strokesAll.filter(stroke => stroke.brushType !== IBrushType.ERASER);
-
-    this.addStrokePaths(strokes);
+    if (isSamePage(this.pageInfo, pageInfo)) {
+      this.removeAllCanvasObject();
+      this.resetLocalPathArray();
+      this.resetPageDependentData();
+  
+      const strokesAll = this.storage.getPageStrokes(pageInfo);
+      const strokes = strokesAll.filter(stroke => stroke.brushType !== IBrushType.ERASER);
+  
+      this.addStrokePaths(strokes);
+    }
   }
   
   rotate = (degrees, pageInfo) => {
@@ -759,6 +769,7 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
     switch (brushType) {
       case 0: opacity = 1; break;
       case 1: opacity = 0.3; break;
+      case 3: opacity = 0; break;
       default: opacity = 1; break;
     }
 

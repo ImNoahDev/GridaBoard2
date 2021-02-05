@@ -16,7 +16,6 @@ import { InkStorage } from "../../common/penstorage";
 import { NeoSmartpen } from "../../neosmartpen";
 import { nullNcode } from "../../common/constants";
 
-
 /**
  * Properties
  */
@@ -169,7 +168,7 @@ class PenBasedRenderer extends React.Component<Props, State> {
       inkStorage.addEventListener(PenEventName.ON_PEN_PAGEINFO, this.onLivePenPageInfo_byStorage, filter);
       inkStorage.addEventListener(PenEventName.ON_PEN_MOVE, this.onLivePenMove_byStorage, filter);
       inkStorage.addEventListener(PenEventName.ON_PEN_UP, this.onLivePenUp_byStorage, filter);
-      
+
     }
   }
 
@@ -181,7 +180,7 @@ class PenBasedRenderer extends React.Component<Props, State> {
       inkStorage.removeEventListener(PenEventName.ON_PEN_PAGEINFO, this.onLivePenPageInfo_byStorage);
       inkStorage.removeEventListener(PenEventName.ON_PEN_MOVE, this.onLivePenMove_byStorage);
       inkStorage.removeEventListener(PenEventName.ON_PEN_UP, this.onLivePenUp_byStorage);
-      
+
     }
   }
 
@@ -276,6 +275,7 @@ class PenBasedRenderer extends React.Component<Props, State> {
 
     if (this.renderer) {
       this.inkStorage.addEventListener(PageEventName.PAGE_CLEAR, this.removeAllCanvasObjectOnActivePage, null);
+      this.inkStorage.addEventListener(PenEventName.ON_ERASER_MOVE, this.renderer.redrawStrokes, null);
     }
   }
 
@@ -415,7 +415,9 @@ class PenBasedRenderer extends React.Component<Props, State> {
     
     if (this.renderer) {
       this.renderer.prepareUnmount();
+
       this.inkStorage.removeEventListener(PageEventName.PAGE_CLEAR, this.removeAllCanvasObjectOnActivePage);
+      this.inkStorage.removeEventListener(PenEventName.ON_ERASER_MOVE, this.renderer.redrawStrokes);
     }
   }
 
