@@ -15,7 +15,7 @@ import { Button, ButtonGroup } from "@material-ui/core";
 import SavePdfDialog from "../Save/SavePdfDialog";
 import {saveGrida} from "../Save/SaveGrida";
 import LoadGrida from "../Load/LoadGrida";
-
+import { PDFDocument } from 'pdf-lib';
 
 
 const localStyle = {
@@ -120,21 +120,72 @@ const ButtonLayerBottom = (props: Props) => {
     if (activePageNo >= 0) {
       const doc = GridaDoc.getInstance();
       const page = doc.getPageAt(activePageNo)
-      setPdfUrl(doc.getPdfUrlAt(activePageNo));
       setPdfFilename(doc.getPdfFilenameAt(activePageNo));
     }
   }, [activePageNo]);
-
+  //pdf file name을 설정하는건 사용자가 지정한 gridaboard 이름이어야 함. 미지정시에는 '그리다보드1'
+  //store에 따로 가지고 있어야 한다
 
   // const [pdfUrl, pdfFilename] = useSelector((state: RootState) => {
   //   return [state.activePage.url, state.activePage.filename];
   // });
   
-  // let saveGridaName = '';
-  // const gridaSave = (gridaName: string) => {
-  //   saveGridaName = gridaName;
-  // }
+  const makePdfUrl = async () => {
+    const doc = GridaDoc.getInstance();
+    const docPages = doc.pages;
 
+    let pdfUrl, pdfDoc = undefined;
+
+    for (const page of docPages)
+    {
+      if (page.pdf === undefined) {
+        //ncode page일 경우
+        if (pdfDoc === undefined) {
+          pdfDoc = await PDFDocument.create();
+        }
+  
+        const pdfPage = await pdfDoc.addPage();
+        if (page._rotation === 90 || page._rotation === 270) {
+          const tmpWidth = pdfPage.getWidth();
+          pdfPage.setWidth(pdfPage.getHeight());
+          pdfPage.setHeight(tmpWidth);
+        }
+      } 
+      else {
+        //pdf인 경우 
+        if (pdfUrl !== page.pdf.url) { 
+          pdfUrl = page.pdf.url;
+          const existingPdfBytes = await fetch(page.pdf.url).then(res => res.arrayBuffer());
+          let pdfDocSrc = await PDFDocument.load(existingPdfBytes);
+  
+          if (pdfDoc !== undefined) {
+            //ncode 페이지가 미리 생성돼서 그 뒤에다 붙여야하는 경우
+            const srcLen = pdfDocSrc.getPages().length;
+            let totalPageArr = [];
+            for (let i = 0; i<srcLen; i++) {
+              totalPageArr.push(i);
+            }
+  
+            const copiedPages = await pdfDoc.copyPages(pdfDocSrc, totalPageArr);
+  
+            for (const copiedPage of copiedPages) {
+              await pdfDoc.addPage(copiedPage);
+            }
+          } else {
+            pdfDoc = pdfDocSrc;
+          }
+        } else {
+          continue;
+        }
+      }
+    }
+
+    const pdfBytes = await pdfDoc.save();
+    const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+
+    const url = await URL.createObjectURL(blob);
+    return url;
+  }
 
   return (
     <div style={localStyle}>
@@ -159,7 +210,7 @@ const ButtonLayerBottom = (props: Props) => {
 
         <div id="navbar_center" style={{marginLeft: "220px"}}>          
           <ButtonGroup className="navbar-menu neo_shadow" style={centerStyle}>   
-            <PrintButton targetId={printBtnId} url={pdfUrl} filename={pdfFilename} />
+            <PrintButton targetId={printBtnId} url={pdfUrl} filename={pdfFilename} handlePdfUrl={makePdfUrl}/>
             <FileBrowserButton handlePdfOpen={handlePdfOpen} />
             <button id="read_mapping_info" className="btn btn-neo" style={{marginLeft: "-5px"}}>
               <SavePdfDialog />

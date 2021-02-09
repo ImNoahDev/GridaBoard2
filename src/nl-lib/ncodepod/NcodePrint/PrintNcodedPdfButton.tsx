@@ -10,7 +10,6 @@ import CancelWaitingDialog from "./CancelWaitingDialog";
 import { cloneObj } from "../../common/util";
 import Button from '@material-ui/core/Button';
 
-
 interface Props extends ButtonProps {
   /** 인쇄될 문서의 url, printOption.url로 들어간다. */
   url: string,
@@ -24,6 +23,9 @@ interface Props extends ButtonProps {
 
   /** 앱이 key event를 바인딩하고 있으면, form에 입력이 안된다, 그래서, dialog가 control 할 수 있도록 전달 */
   handkeTurnOnAppShortCutKey: (on: boolean) => void,
+
+  /** 버튼 클릭시에 pdf url을 직접 생성하고 싶을 때 사용. 기생성된 url을 쓰고 싶으면 props.url에 값을 받으면 됨 */
+  handlePdfUrl?: () => string,
 }
 
 /**
@@ -71,12 +73,11 @@ export default function PrintNcodedPdfButton(props: Props) {
   }, [status, progressPercent]);
 
 
-
   /**
    * 인쇄의 시작, worker가 PDF를 만들고 viewer를 띄우는 등 모든 작업을 한다.
    */
   const startPrint = async () => {
-    if (props.url && props.filename) {
+    // if (props.url && props.filename) {
       // setStart(true);
       const worker = new PrintNcodedPdfWorker(props, onProgress);
       setWorker(worker);
@@ -91,15 +92,18 @@ export default function PrintNcodedPdfButton(props: Props) {
        * 4) worker가 exit하고 나면 worker.startPrint 다음의 행이 실행된다.
        */
 
-      await worker.startPrint(props.url, props.filename, onConfigurePrintOption);
+      let url = '';
+      if (props.url === undefined) {
+        url = await props.handlePdfUrl();
+      } else {
+        url = props.url;
+      }
+      await worker.startPrint(url, 'GridaBoard', onConfigurePrintOption);
 
       console.log("CANCEL, worker canceled");
       setProgressOn(false);
       setWaitingOn(false);
-    }
   }
-
-
 
   /**
    * worker에서 callback으로 불려지는, printOption의 개인 설정 다이얼로그를 처리하는 부분
