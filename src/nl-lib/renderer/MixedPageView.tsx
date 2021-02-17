@@ -108,6 +108,8 @@ export interface MixedViewProps {
 
   handlePageWidthNeeded?: any;
 
+  renderCountNo: number;
+
 }
 
 interface State {
@@ -181,7 +183,9 @@ const defaultMixedPageViewProps: MixedViewProps = {
   noMorePdfSignal: false,
   handlePageWidthNeeded: undefined,
 
-  activePageNo: 0
+  activePageNo: 0,
+
+  renderCountNo: undefined
 }
 
 
@@ -367,6 +371,10 @@ class MixedPageView_module extends React.Component<MixedViewProps, State>  {
     }
 
     ret_val = ret_val || pageInfoChanged || viewFitChanged || fixedChanged || noInfo || loaded || renderCntChanged;
+
+    if(this.props.renderCountNo !== nextProps.renderCountNo) {
+      ret_val = true;
+    }
 
     return ret_val;
   }
@@ -621,6 +629,8 @@ class MixedPageView_module extends React.Component<MixedViewProps, State>  {
             pageInfo={this._internal.pageInfo}
             onNcodePageChanged={this.onNcodePageChanged}
             onCanvasPositionChanged={this.onCanvasPositionChanged}
+
+            renderCountNo={this.props.renderCountNo}
 
             fixed={this.props.fixed}
             playState={this.props.playState}

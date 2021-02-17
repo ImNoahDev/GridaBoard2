@@ -113,25 +113,23 @@ export default class GridaDoc {
     }
   }
 
-  public openGridaFile = async (option: { url: string, filename: string,
-    fingerprint: string },  pageInfo: IPageSOBP = undefined, basePageInfo: IPageSOBP = undefined, gridaRawData, neoStroke) => {
-  // public openGridaFile = async (option: { url: string, filename: string,
-  //    }, pageInfo: IPageSOBP = undefined, basePageInfo: IPageSOBP = undefined, pdf: any) => {
-    const pdfDoc = await NeoPdfManager.getInstance().getGrida({ url: option.url, filename: option.filename, purpose: "open pdf by GridaDoc", fingerprint: option.fingerprint }, gridaRawData, neoStroke);
-    // const pdfDoc = await NeoPdfManager.getInstance().getDocument({ url: option.url, filename: option.filename, purpose: "open pdf by GridaDoc"});
-    console.log(pdfDoc);
-    // const grida = new NeoPdfDocument();
-    // grida.load(pdfDoc);
+  public openGridaFile = async (option: { url: string, filename: string }
+    , gridaRawData, neoStroke, gridaInfo) => {
+    const pdfDoc = await NeoPdfManager.getInstance().getGrida({ url: option.url, filename: option.filename, purpose: "open pdf by GridaDoc" }, gridaRawData, neoStroke);
+
+    this._pages = [];
 
     if (pdfDoc) {
-      // const activatePageNo = await this.appendPdfDocument(pdfDoc, pageInfo, basePageInfo);
-      const activatePageNo = await this.appendPdfDocument(pdfDoc, pageInfo, basePageInfo);
+      const activatePageNo = await this.appendPdfDocument(pdfDoc, gridaInfo);
       scrollToBottom("drawer_content");
       this.setActivePageNo(activatePageNo);
+
+      const msi = MappingStorage.getInstance();
+      msi.dispatcher.dispatch(MappingStorageEventName.ON_MAPINFO_REFRESHED, null);
     }
   }
 
-  private appendPdfDocument = (pdfDoc: NeoPdfDocument, pageInfo: IPageSOBP, basePageInfo: IPageSOBP) => {
+  private appendPdfDocument = (pdfDoc: NeoPdfDocument, pageInfo: IPageSOBP, basePageInfo?: IPageSOBP) => {
     // 0) PDF가 있는지 찾아보고 있으면 return, (없으면 1, 2를 통해서 넣는다)
     const found = this._pdfd.find(item => item.fingerprint === pdfDoc.fingerprint);
     if (found) {
@@ -166,6 +164,18 @@ export default class GridaDoc {
 
       basePageInfo = theBase.basePageInfo;
       pageInfo = theBase.printPageInfo;
+    } else if (!basePageInfo) {
+
+
+      const msi = MappingStorage.getInstance();
+      let theBase = msi.findAssociatedBaseNcode(pdfDoc.fingerprint);
+      if (!theBase) {
+        const { url, filename, fingerprint, numPages } = pdfDoc;
+        theBase = msi.makeTemporaryAssociateMapItem({ pdf: { url, filename, fingerprint, numPages }, n_paper: undefined, numBlankPages: undefined });
+      }
+      basePageInfo = pageInfo;
+
+      console.log(pageInfo.section);
     }
 
     const m0 = g_availablePagesInSection[pageInfo.section];

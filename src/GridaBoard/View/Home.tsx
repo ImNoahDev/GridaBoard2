@@ -71,7 +71,13 @@ const Home = () => {
   let rotation = 0;
 
   let basePageInfo = nullNcode();
-  const activePageNo_store = useSelector((state: RootState) => state.activePage.activePageNo);
+  const {activePageNo_store} = useSelector((state: RootState) =>({
+    activePageNo_store: state.activePage.activePageNo,
+  }));
+
+  const {renderCountNo_store} = useSelector((state: RootState) =>({
+    renderCountNo_store: state.activePage.renderCount,
+  }));
   const rotationTrigger = useSelector((state: RootState) => state.rotate.rotationTrigger);
   const viewFit_store = useSelector((state: RootState) => state.viewFitReducer.viewFit);
 
@@ -217,44 +223,6 @@ const Home = () => {
     }
   };
 
-  const handleGridaOpen = async (event: IFileBrowserReturn, pageInfo?: IPageSOBP, basePageInfo?: IPageSOBP) => {
-    console.log(event.url)
-    if (event.result === "success") {
-
-      let jsonFile = null
-
-      var reader = new FileReader();
-      reader.readAsText(event.file);
-
-      reader.onload = function(e) {  // load한 다음에 실행된다.
-        console.log('hihi');
-        jsonFile = e.target.result;
-
-        const gridaStruct = JSON.parse(jsonFile);
-        const gridaRawData = gridaStruct.pdf.pdfInfo.rawData;
-        const neoStroke = gridaStruct.stroke.strokeInfo;
-        
-        const docInitParams = { data: gridaRawData, neoStroke };
-        PdfJs.getDocument(docInitParams).promise.then(function (pdf) {
-          console.log(pdf);
-          console.log(docInitParams);
-
-          const doc = GridaDoc.getInstance();
-          doc.openGridaFile({ url: event.url, filename: event.file.name, fingerprint: pdf.fingerprint }, pageInfo, basePageInfo, gridaRawData, neoStroke);
-          // doc.openPdfFile({ url: event.url, filename: event.file.name }, pageInfo, basePageInfo);
-          // doc.openGridaFile({ url: event.url, filename: event.file.name }, pageInfo, basePageInfo, pdf);
-          
-        });
-        
-
-      }
-      
-    }
-    else if (event.result === "canceled") {
-      alert("file open cancelled");
-    }
-  };
-
   const handleNoMoreAutoLoad = () => {
     setNoMoreAutoLoad(true);
     setLoadConfirmDlgOn(false);
@@ -317,7 +285,7 @@ const Home = () => {
         </div>
 
         <div style={{ position: "absolute", top: 0, left: 0, bottom: 0, right: drawerOpen ? drawerWidth : 0 }}>
-          <ButtonLayer handlePdfOpen={handlePdfOpen} handleGridaOpen={handleGridaOpen} />
+          <ButtonLayer handlePdfOpen={handlePdfOpen} />
         </div>
 
         <div style={{ position: "absolute", top: 0, left: 0, bottom: 0, right: drawerOpen ? drawerWidth : 0 }}>
@@ -341,6 +309,8 @@ const Home = () => {
             activePageNo={activePageNo_store}
             onNcodePageChanged={onNcodePageChanged}
             handlePageWidthNeeded = {(width) => handlePageWidthNeeded(width)}
+
+            renderCountNo={renderCountNo_store}
 
             noInfo = {true}
           />
@@ -377,7 +347,7 @@ const Home = () => {
 
 
       {/* 파일 인풋을 위한 것 */}
-      <input type="file" id={g_hiddenFileInputBtnId} onChange={onFileInputChanged} onClick={onFileInputClicked} style={{ display: "none" }} name="pdf" accept="application/pdf" />
+      <input type="file" id={g_hiddenFileInputBtnId} onChange={onFileInputChanged} onClick={onFileInputClicked} style={{ display: "none" }} name="pdf" accept=".pdf,.grida" />
       {/* <input type="file" id={"pdf_file_append"} onChange={onFileInputChanged} onClick={onFileInputClicked} style={{ display: "none" }} name="pdf" accept="application/pdf" /> */}
     </div >
   );

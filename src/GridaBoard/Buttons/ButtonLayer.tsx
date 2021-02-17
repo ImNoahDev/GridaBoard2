@@ -10,8 +10,6 @@ import { IFileBrowserReturn } from "../../nl-lib/common/structures";
  */
 interface Props extends ButtonProps {
   handlePdfOpen: (event: IFileBrowserReturn) => void,
-
-  handleGridaOpen: (event: IFileBrowserReturn) => void,
 }
 
 

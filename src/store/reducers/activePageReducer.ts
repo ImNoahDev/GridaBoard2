@@ -104,10 +104,10 @@ export default (state = initialState, action) => {
     }
 
     case UrlActionType.RENDER: {
-      const cnt = state.renderCount + 1;
+      const cnt = state.renderCount;
       return {
         ...state,
-        renderCount: cnt,
+        renderCount: cnt + action.value,
       };
     }
 

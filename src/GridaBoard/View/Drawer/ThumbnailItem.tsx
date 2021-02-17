@@ -28,6 +28,8 @@ const ThumbnailItem = (props: Props) => {
   const drawerWidth = useSelector((state: RootState) => state.ui.drawer.width);
   const activePageNo = useSelector((state: RootState) => state.activePage.activePageNo);
 
+  const renderCountNo = useSelector((state: RootState) => state.activePage.renderCount);
+
   const pdfUrl = undefined;
   const pdfFilename = undefined;
   const pdfFingerprint = undefined;
@@ -94,6 +96,8 @@ const ThumbnailItem = (props: Props) => {
 
           onNcodePageChanged={undefined}
           activePageNo={activePageNo}
+
+          renderCountNo={renderCountNo}
         />
       </div>
 
