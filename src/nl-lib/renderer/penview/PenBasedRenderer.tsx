@@ -56,6 +56,7 @@ interface Props { // extends MixedViewProps {
 
   basePageInfo: IPageSOBP,
   pdfPageNo: number,
+  renderCountNo: number,
 }
 
 
@@ -366,6 +367,16 @@ class PenBasedRenderer extends React.Component<Props, State> {
       ret_val = true;
     }
 
+    if (this.props.renderCountNo !== nextProps.renderCountNo) {
+      if (this.renderer) {
+        this.renderer.changePage(pageInfo, nextProps.pdfSize, false);
+        this.renderer.onPageSizeChanged(nextProps.pdfSize);
+        this.pdfSize = { ...nextProps.pdfSize, scale: this.pdfSize.scale };
+        const transform = MappingStorage.getInstance().getNPageTransform(pageInfo);
+        this.renderer.setTransformParameters(transform.h);
+        ret_val = true;
+      }
+    }
     
     return ret_val;
   }

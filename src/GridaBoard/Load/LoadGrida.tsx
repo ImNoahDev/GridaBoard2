@@ -1,17 +1,11 @@
 import React from 'react';
-import { ButtonProps } from '@material-ui/core';
-
 import { openFileBrowser } from "../../nl-lib/common/neopdf/FileBrowser";
-import { IFileBrowserReturn } from '../../nl-lib/common/structures';
+import { InkStorage } from '../../nl-lib/common/penstorage';
+import GridaDoc from '../GridaDoc';
 
+const LoadGrida = () => {
 
-interface Props extends ButtonProps {
-  handleGridaOpen: (event: IFileBrowserReturn) => void,
-}
-
-
-const LoadGrida = (props: Props) => {
-  const { handleGridaOpen, ...test } = props;
+  let gridaRawData, neoStroke, gridaPageInfo, gridaInfo;
   
   async function fileOpenHandler() {
     const selectedFile = await openFileBrowser();
@@ -19,20 +13,49 @@ const LoadGrida = (props: Props) => {
 
     if (selectedFile.result === "success") {
       const { url, file } = selectedFile;
-      if (handleGridaOpen) {
-        handleGridaOpen({ result: "success", url, file });
+      let jsonFile = null;
+      var reader = new FileReader();
+      reader.readAsText(file);
+      reader.onload = function(e) {
+        jsonFile = e.target.result;
+
+        const gridaStruct = JSON.parse(jsonFile);
+        const gridaRawData = gridaStruct.pdf.pdfInfo.rawData;
+        const neoStroke = gridaStruct.stroke;
+        const gridaPageInfo = gridaStruct.pdf.pdfInfo.pageInfo;
+
+        const pageInfo = {
+          section: gridaPageInfo.s,
+          book: gridaPageInfo.b,
+          owner: gridaPageInfo.o,
+          page: gridaPageInfo.p
+        };
+
+        const pageId = InkStorage.makeNPageIdStr(pageInfo);
+        const completed = InkStorage.getInstance().completedOnPage;
+
+        if (!completed.has(pageId)) {
+          completed.set(pageId, new Array(0));
+        }
+
+        const gridaArr = completed.get(pageId);
+
+        if(neoStroke !== null) {
+          for (let i = 0; i < neoStroke.length; i++) {
+            gridaArr.push(neoStroke[i]);
+          }
+        }
+        const doc = GridaDoc.getInstance();
+        doc.openGridaFile({ url: url, filename: file.name }, gridaRawData, neoStroke, pageInfo); 
       }
     } else {
-      if (handleGridaOpen) {
-        handleGridaOpen({ result: "canceled", url: null, file: null, });
-      }
+        alert("file open cancelled");
     }
   }
 
   return (
-      <button  {...test} onClick={fileOpenHandler}>
+      <button onClick={fileOpenHandler}>
         그리다 로드
-        {/* {props.children} */}
       </button>
   );
 }

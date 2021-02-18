@@ -96,18 +96,12 @@ function hideAndShowFnc() {
 
 interface Props {
   handlePdfOpen: (event: IFileBrowserReturn) => void,
-
-  handleGridaOpen: (event: IFileBrowserReturn) => void,
 }
 /**
  *
  */
 const ButtonLayerBottom = (props: Props) => {
   const { handlePdfOpen, ...rest } = props;
-
-  const { handleGridaOpen, ...test } = props;
-
-  // const handleGridaOpen = props;
 
   // const [num_pens, setNumPens] = useState(0);
   // const [pens, setPens] = useState(new Array(0) as INeoSmartpen[]);
@@ -218,7 +212,7 @@ const ButtonLayerBottom = (props: Props) => {
             <button onClick={() => saveGrida('hello.grida')}>
               그리다 저장
             </button>
-            <LoadGrida handleGridaOpen={handleGridaOpen}/>
+            <LoadGrida />
           </ButtonGroup>
         </div>
 

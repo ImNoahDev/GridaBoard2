@@ -110,7 +110,7 @@ export class NeoPdfDocument {
     console.log("~GRIDA DOC~,   load, step 2")
 
 
-    const { url, filename, cMapUrl, cMapPacked, purpose } = options;
+    const { url, filename, purpose } = options;
 
     this._url = url;
     this._filename = filename;
@@ -120,11 +120,11 @@ export class NeoPdfDocument {
     this._pdfDoc = pdfDoc;
     _doc_fingerprint = pdfDoc.fingerprint;
 
+
     // page를 로드한다
     if (pdfDoc) {
       this._pages = [];
       for (let i = 0; i < this._pdfDoc.numPages; i++) {
-        // const page = await pdf.getPageAsync(i + 1);
         const neoPage = new NeoPdfPage(this, i + 1);
         this._pages.push(neoPage);
       }
@@ -414,25 +414,27 @@ const max_concurrent = 16;
 let pdf_loader_idx = 0;
 const pdf_fingerprint: string[] = new Array(16);
 
-function gridaJsOpenDocument(_options: IPdfOpenOption, _gridaRawData: any, _neoStroke: any): Promise<PdfJs.PDFDocumentProxy> {
-  const { url, filename, cMapUrl, cMapPacked, purpose } = _options;
+function gridaJsOpenDocument(options: IPdfOpenOption, _gridaRawData: any, _neoStroke: any): Promise<PdfJs.PDFDocumentProxy> {
+  
+  const { url, cMapUrl, cMapPacked } = options;
 
   pdf_loader_idx = (pdf_loader_idx + 1) % max_concurrent;
   pdf_fingerprint[pdf_loader_idx] = "";
 
   console.log(":GRIDA DOC:,     gridaJsOpenDocument, step 1")
 
-  const openOption = {
+  const docInitParams = { 
+    data: _gridaRawData, 
+    neostroke: _neoStroke,
     url: url,
     cMapUrl: cMapUrl ? cMapUrl : CMAP_URL,
     cMapPacked: cMapPacked ? cMapPacked : CMAP_PACKED,
   };
 
   return new Promise (resolve => {
-    const docInitParams = { data: _gridaRawData, _neoStroke };
-    PdfJs.getDocument(docInitParams).promise.then(function (pdf) {
+    PdfJs.getDocument(docInitParams).promise.then(function (pdf) { 
       resolve(pdf);
-      pdf_fingerprint[pdf_loader_idx] = pdf.fingerprint
+      pdf_fingerprint[pdf_loader_idx] = pdf.fingerprint;
     })
   })
 }

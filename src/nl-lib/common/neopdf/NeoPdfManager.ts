@@ -81,24 +81,18 @@ export class NeoPdfManager {
     }
   }
   public getGrida = async (options: IPdfOpenOption, gridaRawData: any, neoStroke: any) => {
-    if (options.fingerprint) {
+    if (options.url && !options.fingerprint) {
       const pdf = new NeoPdfDocument();
-      await pdf.gridaLoad(options, gridaRawData, neoStroke); // 여기서 load를 갔다 온 후 멈춤(gridaOpen) -> 더 이상 진행이 되지 않는 이유
-      console.log(pdf);
-      this.dispatcher.dispatch(PdfManagerEventName.ON_PDF_LOADED, { pdf });
+      await pdf.gridaLoad(options, gridaRawData, neoStroke);
       return pdf;
     } else {
       if (!options.fingerprint) {
         throw new Error(`PDF Manager: URL or fingerprint should be passed to load a document`);
       }
-
-      // 이 부분을 수정할 것 (구글 드라이브에서 로드하려면)
-      // google drive, 2020/12/05
       const status = await NeoPdfManager.getUrl(options);
 
       if (status.result === "success") {
         const doc = new NeoPdfDocument();
-        // return await doc.load({ url: status.url, filename: status.file.name, purpose: "to be opened from Google Drive by NeoPdfManager " });
       }
 
       if (status.result === "not match") {
