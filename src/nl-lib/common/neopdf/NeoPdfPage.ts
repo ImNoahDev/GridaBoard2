@@ -99,7 +99,7 @@ export class NeoPdfPage {
     this._ready.then(_pdfPage => {
       this._pdfPage = _pdfPage;
       this._loaded = true;
-      this._defaultViewport = _pdfPage.getViewport({ scale: 1 });
+      this._defaultViewport = _pdfPage.getViewport({ scale: 1, rotation: _pdfPage.rotate });
     });
   }
 

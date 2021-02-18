@@ -364,6 +364,7 @@ class MixedPageView_module extends React.Component<MixedViewProps, State>  {
       }
 
       this._internal.pdfSize = { ...size };
+      ret_val = true;
     }
 
     if (this.props.rotation !== nextProps.rotation && this.props.activePageNo === nextProps.activePageNo) {

@@ -96,7 +96,11 @@ const Home = () => {
   if (activePageNo_store >= 0) {
     const doc = GridaDoc.getInstance();
     const page = doc.getPageAt(activePageNo_store)
-    rotation = page.pageOverview.rotation;
+    if (page._pdfPage !== undefined) {
+      rotation = page._pdfPage.viewport.rotation;
+    } else {
+      rotation = page.pageOverview.rotation;
+    }
     pdf = page.pdf;
 
     // setPdfUrl(doc.getPdfUrlAt(activePageNo));

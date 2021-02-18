@@ -9,7 +9,7 @@ import { setActivePageNo } from '../../../store/reducers/activePageReducer';
 import { MixedPageView } from "../../../nl-lib/renderer";
 import { makeNPageIdStr } from "../../../nl-lib/common/util";
 import { PLAYSTATE, ZoomFitEnum } from "../../../nl-lib/common/enums";
-
+import { nullNcode } from "../../../nl-lib/common/constants";
 
 interface Props {
   pageNo: number,
@@ -36,15 +36,18 @@ const ThumbnailItem = (props: Props) => {
   let pdfPageNo = 1;
   let pdf = undefined;
   let rotation = 0;
+  let basePageInfo = nullNcode();
   const page = doc.getPageAt(pn)
 
   if (activePageNo >= 0) {
-    // pdfUrl = doc.getPdfUrlAt(pn);
-    // pdfFilename = doc.getPdfFilenameAt(pn);
-    // pdfFingerprint = doc.getPdfFingerprintAt(pn);
     pdfPageNo = doc.getPdfPageNoAt(pn);
     pdf = page.pdf;
-    rotation = page.pageOverview.rotation;
+    if (page._pdfPage !== undefined) {
+      rotation = page._pdfPage.viewport.rotation;
+    } else {
+      rotation = page.pageOverview.rotation;
+    }
+    basePageInfo = page.basePageInfo;
   }
 
   const handleMouseDown = e => {
@@ -53,21 +56,16 @@ const ThumbnailItem = (props: Props) => {
     setActivePageNo(pageNo);
   };
 
-  const numPages = doc.numPages;
-
-
   let bgColor = `rgb(255, 255,255)`;
-  // if (props.active)
   if (activePageNo === pn)
     bgColor = `rgb(0, 255, 255)`;
 
   const pageOverview = page.pageOverview;
   const sizePu = pageOverview.sizePu;
   const pageInfo = page.pageInfos[0];
-  const basePageInfo = page.basePageInfo;
-  
+
   const wh_ratio = sizePu.width / sizePu.height;
-  
+
   const height = drawerWidth / wh_ratio * 0.9;
   const playState = PLAYSTATE.live;
 

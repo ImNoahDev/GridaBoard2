@@ -87,11 +87,14 @@ export default class GridaPage {
     const pageInfo = this.getPageInfoAt(0);
     // undefined인 경우도 있을 것 같긴하다. 아래의 getNPaperSize_pu에서 예외처리 하고 있다.
     let pageSize = getNPaperSize_pu(pageInfo);
+
+    //ncode 페이지는 NPaperSize_pu 안에서 회전 처리를 안하기 때문에 여기서 따로 바꿔준다
     if (this._rotation === 90 || this._rotation === 270) {
       const tmp = pageSize.width;
       pageSize.width = pageSize.height;
       pageSize.height = tmp;
     }
+    
     const landscape = pageSize.width > pageSize.height;
     const retVal: IPageOverview = {
       sizePu: pageSize,

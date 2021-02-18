@@ -17,6 +17,15 @@ const RotateButton = () => {
     setRotationTrigger(!rotationTrigger);
 
     let page = doc.getPageAt(activePageNo_store);
+    
+    if (page._pdfPage !== undefined) {
+      if (page._pdfPage.viewport.rotation >= 270) {
+        page._pdfPage.viewport.rotation = 0;
+      } else {
+        page._pdfPage.viewport.rotation += 90;
+      }
+    }
+
     if (page.pageOverview.rotation >= 270) {
       page._rotation = 0;
     } else {

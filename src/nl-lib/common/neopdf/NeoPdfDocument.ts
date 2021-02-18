@@ -357,22 +357,17 @@ export class NeoPdfDocument {
   }
 
   setPageOverview = async () => {
-    // const pdf = this;
-
-    // const pdf = this.props.pdf;
     this._pagesOverview = new Array(this.numPages);
-    // const { pagesPerSheet } = this.printOption;
 
     let numPortraitPages = 0;
     let numLandscapePages = 0;
 
     for (let i = 0; i < this.numPages; i++) {
-      // const page = await pdf.getPageAsync(i + 1);
       const page = await this._pdfDoc.getPage(i + 1);
 
-      const vpt: PDF_VIEWPORT_DESC = page.getViewport({ scale: 1, rotation: 0 });
-      const { width, height } = vpt;
-
+      const vpt: PDF_VIEWPORT_DESC = page.getViewport({ scale: 1, rotation: page.rotate });
+      let { width, height } = vpt;
+      
       const landscape = width > height;
       landscape ? numLandscapePages++ : numPortraitPages++;
 

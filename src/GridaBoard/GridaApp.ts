@@ -43,8 +43,14 @@ export default class GridaApp {
 
   start = async () => {
     const doc = GridaDoc.getInstance();
-    const filename = "___1page.pdf";
-    const url = "./___1page.pdf";
+    // const filename = "___1page.pdf";
+    // const url = "./___1page.pdf";
+
+    const filename = "Mixed, rotation.pdf";
+    const url = "./Mixed, rotation.pdf";
+
+    // const filename = "2P_test.pdf";
+    // const url = "./2P_test.pdf";
 
     // const filename = "0. 네오랩컨버전스 초당위치전송율, 각도에 따른 정확도, 정밀도, 필기왜곡도, 필기편차(F121).pdf";
     // const url = "./0. 네오랩컨버전스 초당위치전송율, 각도에 따른 정확도, 정밀도, 필기왜곡도, 필기편차(F121).pdf";
@@ -52,10 +58,10 @@ export default class GridaApp {
     // const filename = "A4_Pirates-of-the-Caribbean-Hes-a-Pirate-Klaus-Badelt.pdf";
     // const url = "./A4_Pirates-of-the-Caribbean-Hes-a-Pirate-Klaus-Badelt.pdf";
 
-    // doc.openPdfFile({ url, filename });
+    doc.openPdfFile({ url, filename });
 
-    const pageNo = await doc.addBlankPage();
-    setActivePageNo(pageNo);
+    // const pageNo = await doc.addBlankPage();
+    // setActivePageNo(pageNo);
   }
 
 
