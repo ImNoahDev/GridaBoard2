@@ -185,7 +185,7 @@ const defaultMixedPageViewProps: MixedViewProps = {
 
   activePageNo: 0,
 
-  renderCountNo: undefined
+  renderCountNo: 0
 }
 
 

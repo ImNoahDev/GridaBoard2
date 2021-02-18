@@ -20,36 +20,18 @@ const LoadGrida = () => {
         jsonFile = e.target.result;
 
         const gridaStruct = JSON.parse(jsonFile);
-        gridaRawData = gridaStruct.pdf.pdfInfo.rawData;
-        neoStroke = gridaStruct.stroke;
-        gridaPageInfo = gridaStruct.pdf.pdfInfo.pageInfo;
+        const gridaRawData = gridaStruct.pdf.pdfInfo.rawData;
+        const neoStroke = gridaStruct.stroke;
+        const gridaPageInfo = gridaStruct.pdf.pdfInfo.pageInfo;
 
-        let gridaSection, gridaOwner, gridaBook, gridaPage;
-
-        if (neoStroke !== null) {
-          for (let i = 0; i < neoStroke.length; i++) {
-            gridaSection = neoStroke[i].section;
-            gridaOwner = neoStroke[i].owner;
-            gridaBook = neoStroke[i].book;
-            gridaPage = neoStroke[i].page;
-          }
-        } else {
-          for (let i = 0; i < gridaPageInfo.length; i++) {
-            gridaSection = gridaPageInfo.section;
-            gridaOwner = gridaPageInfo.owner;
-            gridaBook = gridaPageInfo.book;
-            gridaPage = gridaPageInfo.page;
-          }
-        }
-
-        gridaInfo = {
-          section: gridaSection,
-          book: gridaBook,
-          owner: gridaOwner,
-          page: gridaPage
+        const pageInfo = {
+          section: gridaPageInfo.s,
+          book: gridaPageInfo.b,
+          owner: gridaPageInfo.o,
+          page: gridaPageInfo.p
         };
 
-        const pageId = InkStorage.makeNPageIdStr(gridaInfo);
+        const pageId = InkStorage.makeNPageIdStr(pageInfo);
         const completed = InkStorage.getInstance().completedOnPage;
 
         if (!completed.has(pageId)) {
@@ -64,7 +46,7 @@ const LoadGrida = () => {
           }
         }
         const doc = GridaDoc.getInstance();
-        doc.openGridaFile({ url: url, filename: file.name }, gridaRawData, neoStroke, gridaInfo); 
+        doc.openGridaFile({ url: url, filename: file.name }, gridaRawData, neoStroke, pageInfo); 
       }
     } else {
         alert("file open cancelled");

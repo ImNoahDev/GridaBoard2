@@ -27,6 +27,7 @@ export async function saveGrida(gridaName: string) {
   let cnt = 0;
   let infoCnt = 0;
 
+  let existingPdfBytes = null;
   for (const page of docPages) //병렬처리
   {
     pdfSection[cnt] = page.pageInfos[0].section;
@@ -52,7 +53,7 @@ export async function saveGrida(gridaName: string) {
       //pdf인 경우
       if (pdfUrl !== page.pdf.url) {
         pdfUrl = page.pdf.url;
-        const existingPdfBytes = await fetch(page.pdf.url).then(res => res.arrayBuffer());
+        existingPdfBytes = await fetch(page.pdf.url).then(res => res.arrayBuffer());
         let pdfDocSrc = await PDFDocument.load(existingPdfBytes); // 다시 저장하면 여기서 오류
   
         if (pdfDoc !== undefined) {
@@ -214,7 +215,7 @@ export async function saveGrida(gridaName: string) {
 
   const mappingInfoStr = JSON.stringify(gridaJson);
 
-  const blob = new Blob([mappingInfoStr], { type: 'application/json' });
+  const blob = new Blob([mappingInfoStr], { type: 'eapplication/json' });
   saveAs(blob, gridaName);
   
 }

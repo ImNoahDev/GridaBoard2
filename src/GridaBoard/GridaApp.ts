@@ -54,8 +54,8 @@ export default class GridaApp {
 
     // doc.openPdfFile({ url, filename });
 
-    // const pageNo = await doc.addBlankPage();
-    // setActivePageNo(pageNo);
+    const pageNo = await doc.addBlankPage();
+    setActivePageNo(pageNo);
   }
 
 

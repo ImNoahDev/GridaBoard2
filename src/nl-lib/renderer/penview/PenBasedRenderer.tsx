@@ -56,7 +56,7 @@ interface Props { // extends MixedViewProps {
 
   basePageInfo: IPageSOBP,
   pdfPageNo: number,
-  renderCountNo: any,
+  renderCountNo: number,
 }
 
 

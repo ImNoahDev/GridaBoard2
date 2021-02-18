@@ -114,13 +114,13 @@ export default class GridaDoc {
   }
 
   public openGridaFile = async (option: { url: string, filename: string }
-    , gridaRawData, neoStroke, gridaInfo) => {
+    , gridaRawData, neoStroke, pageInfo) => {
     const pdfDoc = await NeoPdfManager.getInstance().getGrida({ url: option.url, filename: option.filename, purpose: "open pdf by GridaDoc" }, gridaRawData, neoStroke);
 
     this._pages = [];
 
     if (pdfDoc) {
-      const activatePageNo = await this.appendPdfDocument(pdfDoc, gridaInfo);
+      const activatePageNo = await this.appendPdfDocument(pdfDoc, pageInfo);
       scrollToBottom("drawer_content");
       this.setActivePageNo(activatePageNo);
 
@@ -165,16 +165,7 @@ export default class GridaDoc {
       basePageInfo = theBase.basePageInfo;
       pageInfo = theBase.printPageInfo;
     } else if (!basePageInfo) {
-
-
-      const msi = MappingStorage.getInstance();
-      let theBase = msi.findAssociatedBaseNcode(pdfDoc.fingerprint);
-      if (!theBase) {
-        const { url, filename, fingerprint, numPages } = pdfDoc;
-        theBase = msi.makeTemporaryAssociateMapItem({ pdf: { url, filename, fingerprint, numPages }, n_paper: undefined, numBlankPages: undefined });
-      }
       basePageInfo = pageInfo;
-
       console.log(pageInfo.section);
     }
 
