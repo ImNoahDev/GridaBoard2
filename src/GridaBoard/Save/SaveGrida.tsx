@@ -1,12 +1,8 @@
 import { saveAs } from "file-saver";
-import { degrees, degreesToRadians, PDFDocument, rgb, StandardFonts } from 'pdf-lib';
+import { degrees, PDFDocument } from 'pdf-lib';
 import GridaDoc from "../GridaDoc";
 import { InkStorage } from "../../nl-lib/common/penstorage";
 import { fabric } from "fabric";
-import { drawPath } from "../../nl-lib/common/util";
-import GridaPage from "../GridaPage";
-
-import fs from 'fs';
 
 const PDF_TO_SCREEN_SCALE = 6.72; // (56/600)*72
 
@@ -29,7 +25,6 @@ export async function saveGrida(gridaName: string) {
   let cnt = 0;
   let infoCnt = 0;
 
-  let existingPdfBytes = null;
   for (const page of docPages) //병렬처리
   {
     pdfSection[cnt] = page.pageInfos[0].section;
@@ -43,7 +38,6 @@ export async function saveGrida(gridaName: string) {
       //ncode page일 경우
       if (pdfDoc === undefined) {
         pdfDoc = await PDFDocument.create();
-        // await pdfDoc.addPage();
       } 
       const pdfPage = await pdfDoc.addPage();
       if (page._rotation === 90 || page._rotation === 270) {
@@ -55,34 +49,8 @@ export async function saveGrida(gridaName: string) {
       //pdf인 경우
       if (pdfUrl !== page.pdf.url) {
         pdfUrl = page.pdf.url;
-        // existingPdfBytes = await fetch(page.pdf.url).then(res => res.arrayBuffer());
-
-        var _fileLen = page.pdf.filename.length;
-
-        var _lastDot = page.pdf.filename.lastIndexOf('.');
-    
-        var _fileExt = page.pdf.filename.substring(_lastDot, _fileLen).toLowerCase();
-
-        var _fileName = page.pdf.filename;
-
-        let pdfDocSrc;
-        if (_fileExt === '.pdf') {
-          existingPdfBytes = await fetch(page.pdf.url).then(res => res.arrayBuffer());
-          pdfDocSrc = await PDFDocument.load(existingPdfBytes); // 다시 저장하면 여기서 오류
-        } else if (_fileExt === '.grida') {
-          // existingPdfBytes = await fetch(_fileName).then(res => res.arrayBuffer());
-          // const bufViewUint8 = new Uint8Array(existingPdfBytes);
-          // existingPdfBytes = fs.readFile(_fileName, 'utf-8', function (err, data) {
-          //   console.log(existingPdfBytes);
-          // });
-          // let buffer = existingPdfBytes.decode(page.pdf.url);
-          // var uint8View = new Uint8Array(buffer);
-          // var request = new XMLHttpRequest();
-          // request.open('GET', pdfUrl);
-          existingPdfBytes = await fetch(page.pdf.url).then(res => res.arrayBuffer());
-          pdfDocSrc = await PDFDocument.load(existingPdfBytes);
-        }
-        // let pdfDocSrc = await PDFDocument.load(existingPdfBytes);
+        const existingPdfBytes = await fetch(page.pdf.url).then(res => res.arrayBuffer());
+        let pdfDocSrc = await PDFDocument.load(existingPdfBytes); // 다시 저장하면 여기서 오류
   
         if (pdfDoc !== undefined) {
           //ncode 페이지가 미리 생성돼서 그 뒤에다 붙여야하는 경우
@@ -138,17 +106,9 @@ export async function saveGrida(gridaName: string) {
     }
     
     const page = pages[i];
-    const pageHeight = page.getHeight();
 
     for (let j = 0; j < NeoStrokes.length; j++) {
-      const thickness = NeoStrokes[j].thickness;
       const dotArr = NeoStrokes[j].dotArray;
-      const rgbStrArr = NeoStrokes[j].color.match(/\d+/g);
-
-      let opacity = 1;
-      if (NeoStrokes[j].brushType === 1) {
-        opacity = 0.3;
-      }
 
       let canvasCenterSrc = new fabric.Point(page.getHeight()/2, page.getWidth()/2)
       let canvasCenterDst = new fabric.Point(page.getWidth()/2, page.getHeight()/2)
@@ -180,8 +140,6 @@ export async function saveGrida(gridaName: string) {
 
           pointArray.push({ x: v.x, y: v.y, f: dot.f });
         }
-
-        // 만약 stroke가 안돌아가면 이 부분에서 stroke 받아서 json에 넣는다.
         page.setRotation(degrees(rotation));
         
       } else { //ncode page 일 때
@@ -194,9 +152,9 @@ export async function saveGrida(gridaName: string) {
       }
     }
   }
-
-  let newRawData;
+  
   //하나의 pdf로 완성됨 pdfDocument에 새로운 그리다 전체 pdf가 포함되어있음
+  let newRawData;
   const pdfBytes = await pdfDoc.save();
   const arrayBuffer = new Uint8Array(pdfBytes);
   for (let i = 0; i < arrayBuffer.length; i++) {

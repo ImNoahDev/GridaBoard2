@@ -4,7 +4,6 @@ import { InkStorage } from '../../nl-lib/common/penstorage';
 import GridaDoc from '../GridaDoc';
 
 const LoadGrida = () => {
-  
   async function fileOpenHandler() {
     const selectedFile = await openFileBrowser();
     console.log(selectedFile.result);
@@ -22,45 +21,34 @@ const LoadGrida = () => {
         const neoStroke = gridaStruct.stroke;
         const gridaPageInfo = gridaStruct.pdf.pdfInfo.pageInfo;
 
+        const completed = InkStorage.getInstance().completedOnPage;
+        completed.clear();
+
+        let gridaArr = [];
         let pageInfo = []
         let pageId = []
 
         for (let i = 0; i < neoStroke.length; i++) {
+
           pageInfo[i] = {
             section: gridaPageInfo.s,
             book: gridaPageInfo.b,
             owner: gridaPageInfo.o,
             page: gridaPageInfo.p
           };
-
           gridaPageInfo.p++;
-        }
 
-        for (let i = 0; i < neoStroke.length; i++) {
-          pageId[i] = InkStorage.makeNPageIdStr(pageInfo[i]);
-        }
-        
-        const completed = InkStorage.getInstance().completedOnPage;
-
-        for (let i = 0; i < neoStroke.length; i++) {
+          pageId[i] = InkStorage.makeNPageIdStr(neoStroke[i][0]);
           if (!completed.has(pageId[i])) {
             completed.set(pageId[i], new Array(0));
           }
-        }
 
-        let gridaArr = [];
-
-        for (let i = 0; i < neoStroke.length; i++) {
           gridaArr[i] = completed.get(pageId[i]);
+          for (let j = 0; j < neoStroke[i].length; j++){
+            gridaArr[i].push(neoStroke[i][j]);
+          } 
         }
 
-        if(neoStroke !== null) {
-          for (let i = 0; i < neoStroke.length; i++) {
-            for (let j = 0; j < neoStroke[i].length; j++){
-              gridaArr[i].push(neoStroke[i][j]);
-            }
-          }
-        }
         const doc = GridaDoc.getInstance();
         doc.openGridaFile({ url: url, filename: file.name }, gridaRawData, neoStroke, pageInfo[0]); 
       }
