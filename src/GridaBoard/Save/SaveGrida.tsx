@@ -6,6 +6,8 @@ import { fabric } from "fabric";
 import { drawPath } from "../../nl-lib/common/util";
 import GridaPage from "../GridaPage";
 
+import fs from 'fs';
+
 const PDF_TO_SCREEN_SCALE = 6.72; // (56/600)*72
 
 const inkSt = InkStorage.getInstance();
@@ -53,8 +55,34 @@ export async function saveGrida(gridaName: string) {
       //pdf인 경우
       if (pdfUrl !== page.pdf.url) {
         pdfUrl = page.pdf.url;
-        existingPdfBytes = await fetch(page.pdf.url).then(res => res.arrayBuffer());
-        let pdfDocSrc = await PDFDocument.load(existingPdfBytes); // 다시 저장하면 여기서 오류
+        // existingPdfBytes = await fetch(page.pdf.url).then(res => res.arrayBuffer());
+
+        var _fileLen = page.pdf.filename.length;
+
+        var _lastDot = page.pdf.filename.lastIndexOf('.');
+    
+        var _fileExt = page.pdf.filename.substring(_lastDot, _fileLen).toLowerCase();
+
+        var _fileName = page.pdf.filename;
+
+        let pdfDocSrc;
+        if (_fileExt === '.pdf') {
+          existingPdfBytes = await fetch(page.pdf.url).then(res => res.arrayBuffer());
+          pdfDocSrc = await PDFDocument.load(existingPdfBytes); // 다시 저장하면 여기서 오류
+        } else if (_fileExt === '.grida') {
+          // existingPdfBytes = await fetch(_fileName).then(res => res.arrayBuffer());
+          // const bufViewUint8 = new Uint8Array(existingPdfBytes);
+          // existingPdfBytes = fs.readFile(_fileName, 'utf-8', function (err, data) {
+          //   console.log(existingPdfBytes);
+          // });
+          // let buffer = existingPdfBytes.decode(page.pdf.url);
+          // var uint8View = new Uint8Array(buffer);
+          // var request = new XMLHttpRequest();
+          // request.open('GET', pdfUrl);
+          existingPdfBytes = await fetch(page.pdf.url).then(res => res.arrayBuffer());
+          pdfDocSrc = await PDFDocument.load(existingPdfBytes);
+        }
+        // let pdfDocSrc = await PDFDocument.load(existingPdfBytes);
   
         if (pdfDoc !== undefined) {
           //ncode 페이지가 미리 생성돼서 그 뒤에다 붙여야하는 경우
@@ -164,19 +192,6 @@ export async function saveGrida(gridaName: string) {
           pointArray.push({ x: pdf_xy.x, y: pdf_xy.y, f: dot.f });
         }
       }
-      const strokeThickness = thickness / 64;
-      const pathData = drawPath(pointArray, strokeThickness);
-      
-      page.moveTo(0, pageHeight);
-      page.drawSvgPath(pathData, {
-        color: rgb(
-          Number(rgbStrArr[0]) / 255,
-          Number(rgbStrArr[1]) / 255,
-          Number(rgbStrArr[2]) / 255
-        ),
-        opacity: opacity,
-        scale: 1,
-      });
     }
   }
 
@@ -197,7 +212,7 @@ export async function saveGrida(gridaName: string) {
     } 
   };
 
-  let stroke = strokeInfos[0];
+  let stroke = strokeInfos;
 
   let gridaInfo = {
     gridaDate : gridaDate,

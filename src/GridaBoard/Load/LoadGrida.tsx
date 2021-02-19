@@ -4,8 +4,6 @@ import { InkStorage } from '../../nl-lib/common/penstorage';
 import GridaDoc from '../GridaDoc';
 
 const LoadGrida = () => {
-
-  let gridaRawData, neoStroke, gridaPageInfo, gridaInfo;
   
   async function fileOpenHandler() {
     const selectedFile = await openFileBrowser();
@@ -24,29 +22,47 @@ const LoadGrida = () => {
         const neoStroke = gridaStruct.stroke;
         const gridaPageInfo = gridaStruct.pdf.pdfInfo.pageInfo;
 
-        const pageInfo = {
-          section: gridaPageInfo.s,
-          book: gridaPageInfo.b,
-          owner: gridaPageInfo.o,
-          page: gridaPageInfo.p
-        };
+        let pageInfo = []
+        let pageId = []
 
-        const pageId = InkStorage.makeNPageIdStr(pageInfo);
-        const completed = InkStorage.getInstance().completedOnPage;
+        for (let i = 0; i < neoStroke.length; i++) {
+          pageInfo[i] = {
+            section: gridaPageInfo.s,
+            book: gridaPageInfo.b,
+            owner: gridaPageInfo.o,
+            page: gridaPageInfo.p
+          };
 
-        if (!completed.has(pageId)) {
-          completed.set(pageId, new Array(0));
+          gridaPageInfo.p++;
         }
 
-        const gridaArr = completed.get(pageId);
+        for (let i = 0; i < neoStroke.length; i++) {
+          pageId[i] = InkStorage.makeNPageIdStr(pageInfo[i]);
+        }
+        
+        const completed = InkStorage.getInstance().completedOnPage;
+
+        for (let i = 0; i < neoStroke.length; i++) {
+          if (!completed.has(pageId[i])) {
+            completed.set(pageId[i], new Array(0));
+          }
+        }
+
+        let gridaArr = [];
+
+        for (let i = 0; i < neoStroke.length; i++) {
+          gridaArr[i] = completed.get(pageId[i]);
+        }
 
         if(neoStroke !== null) {
           for (let i = 0; i < neoStroke.length; i++) {
-            gridaArr.push(neoStroke[i]);
+            for (let j = 0; j < neoStroke[i].length; j++){
+              gridaArr[i].push(neoStroke[i][j]);
+            }
           }
         }
         const doc = GridaDoc.getInstance();
-        doc.openGridaFile({ url: url, filename: file.name }, gridaRawData, neoStroke, pageInfo); 
+        doc.openGridaFile({ url: url, filename: file.name }, gridaRawData, neoStroke, pageInfo[0]); 
       }
     } else {
         alert("file open cancelled");

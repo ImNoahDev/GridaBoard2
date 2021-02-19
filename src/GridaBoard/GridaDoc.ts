@@ -165,8 +165,14 @@ export default class GridaDoc {
       basePageInfo = theBase.basePageInfo;
       pageInfo = theBase.printPageInfo;
     } else if (!basePageInfo) {
-      basePageInfo = pageInfo;
-      console.log(pageInfo.section);
+      const msi = MappingStorage.getInstance();
+      let theBase = msi.findAssociatedBaseNcode(pdfDoc.fingerprint);
+      if (!theBase) {
+        const { url, filename, fingerprint, numPages } = pdfDoc;
+        theBase = msi.makeTemporaryAssociateMapItem({ pdf: { url, filename, fingerprint, numPages }, n_paper: undefined, numBlankPages: undefined });
+      }
+
+      basePageInfo = theBase.basePageInfo;
     }
 
     const m0 = g_availablePagesInSection[pageInfo.section];
