@@ -103,9 +103,6 @@ interface Props {
 const ButtonLayerBottom = (props: Props) => {
   const { handlePdfOpen, ...rest } = props;
 
-  // const [num_pens, setNumPens] = useState(0);
-  // const [pens, setPens] = useState(new Array(0) as INeoSmartpen[]);
-
   const [pdfUrl, setPdfUrl] = useState(undefined as string);
   const [pdfFilename, setPdfFilename] = useState(undefined as string);
 
@@ -114,6 +111,7 @@ const ButtonLayerBottom = (props: Props) => {
     if (activePageNo >= 0) {
       const doc = GridaDoc.getInstance();
       const page = doc.getPageAt(activePageNo)
+      setPdfUrl(doc.getPdfUrlAt(activePageNo));
       setPdfFilename(doc.getPdfFilenameAt(activePageNo));
     }
   }, [activePageNo]);
