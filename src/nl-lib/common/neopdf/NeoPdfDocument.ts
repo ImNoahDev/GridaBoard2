@@ -109,7 +109,6 @@ export class NeoPdfDocument {
     const pdfDoc = await gridaJsOpenDocument(options, gridaStruct, neoStroke);
     console.log("~GRIDA DOC~,   load, step 2")
 
-
     const { url, filename, purpose } = options;
 
     this._url = url;
@@ -120,7 +119,6 @@ export class NeoPdfDocument {
     this._pdfDoc = pdfDoc;
     _doc_fingerprint = pdfDoc.fingerprint;
 
-
     // page를 로드한다
     if (pdfDoc) {
       this._pages = [];
@@ -128,11 +126,9 @@ export class NeoPdfDocument {
         const neoPage = new NeoPdfPage(this, i + 1);
         this._pages.push(neoPage);
       }
-
       await this.setPageOverview();
       return this;
     }
-
     return undefined;
   }
 
