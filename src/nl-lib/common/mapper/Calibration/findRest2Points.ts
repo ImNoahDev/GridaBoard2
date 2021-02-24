@@ -8,7 +8,7 @@ import { IPageSOBP, IPdfPageDesc, IPoint, IPolygonArea } from "../../structures"
  * 아래의 p0, p1, p2, p3에 각각 적당한 값을 넣을 것
  * 특히 PDF는 MARK_POS_RATIO와 관련된 값일 것
  *
- * 아래 함수에서 p1과 p3의 방향을 판단하는 부분이 있으므로. p1, p3에 너무 신경 쓰지 말 것
+ * 아래 함수에서 p1과 p3의 방향을 판단하는 부분이 있으므로. p1, p3의 방향에 너무 신경 쓰지 말 것
  *
  * @param pu - p0(좌상단), p1(우상단이면 좋음), p2(우하단), p3(좌하단이면 좋음)
  * @param nu - p0(좌상단), p2(우하단)
