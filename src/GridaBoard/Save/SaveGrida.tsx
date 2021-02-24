@@ -50,7 +50,7 @@ export async function saveGrida(gridaName: string) {
       if (pdfUrl !== page.pdf.url) {
         pdfUrl = page.pdf.url;
         const existingPdfBytes = await fetch(page.pdf.url).then(res => res.arrayBuffer());
-        let pdfDocSrc = await PDFDocument.load(existingPdfBytes); // 다시 저장하면 여기서 오류
+        let pdfDocSrc = await PDFDocument.load(existingPdfBytes);
   
         if (pdfDoc !== undefined) {
           //ncode 페이지가 미리 생성돼서 그 뒤에다 붙여야하는 경우
@@ -188,7 +188,7 @@ export async function saveGrida(gridaName: string) {
 
   const mappingInfoStr = JSON.stringify(gridaJson);
 
-  const blob = new Blob([mappingInfoStr], { type: 'eapplication/json' });
+  const blob = new Blob([mappingInfoStr], { type: 'application/json' });
   saveAs(blob, gridaName);
   
 }

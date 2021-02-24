@@ -171,7 +171,6 @@ export default class GridaDoc {
         const { url, filename, fingerprint, numPages } = pdfDoc;
         theBase = msi.makeTemporaryAssociateMapItem({ pdf: { url, filename, fingerprint, numPages }, n_paper: undefined, numBlankPages: undefined });
       }
-
       basePageInfo = theBase.basePageInfo;
     }
 
