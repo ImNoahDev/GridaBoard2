@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Box, Button, Paper } from "@material-ui/core";
+import { Avatar, Box, Button, IconButton, Paper, Popover } from "@material-ui/core";
 import { useSelector } from "react-redux";
 import ReactJson from "react-json-view";
 
@@ -134,21 +134,74 @@ const ButtonLayer_forTest = () => {
     docJson.pages.push(obj);
   }
 
+  const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null);
+
+  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const open = Boolean(anchorEl);
+  const id = open ? 'simple-popover' : undefined;
+
 
   return (
     <div id={"button_div"} style={buttonDivStyle}>
 
       <div style={{ flex: 1 }}> </div>
 
+      <IconButton onClick={handleClick} aria-describedby={id} style={{marginLeft: 1700}}>
+        <Avatar style={{marginTop: 5}}>
+          H
+        </Avatar>
+      </IconButton>
+      <Popover
+          id={id}
+          open={open}
+          anchorEl={anchorEl}
+          onClose={handleClose}
+          anchorOrigin={{
+            vertical: 'top',
+            horizontal: 'right'
+          }}
+          transformOrigin={{
+            vertical: 'top',
+            horizontal: 'left'
+          }}
+        >
+          <div>
+            <a>User Name</a>
+          </div>
+          <div className="dropdown-divider"></div>
+          <div>
+            <a>개인정보처리방침</a>
+          </div>
+          <div className="dropdown-divider"></div>
+          <div>
+            <a>이용약관</a>
+          </div>
+          <div className="dropdown-divider"></div>
+          <div>
+            <a>기타 개인설정</a>
+          </div>
+          <div className="dropdown-divider"></div>
+          <div>
+            <a>로그아웃</a>
+          </div>
+        </Popover>
+
       {/* 매핑 정보 살펴보기 */}
-      <div style={{ fontSize: "20px", fontWeight: "bold" }}>
+      {/* <div style={{ fontSize: "20px", fontWeight: "bold" }}>
         <Button variant="contained" color="primary"
           onClick={(event) => setMapViewDetail((mapViewDetail + 1) % 3)} >
           <Box fontSize={14} fontWeight="fontWeightBold" >매핑 테이블</Box>
         </Button>
-      </div>
+      </div> */}
 
-      { mapViewDetail
+      {/* { mapViewDetail
         ? <Paper style={{ position: "absolute", top: 100, minWidth: 800, maxHeight: 800, overflow: 'auto' }}>
           <ReactJson src={mapJson}
             displayDataTypes={false}
@@ -156,9 +209,9 @@ const ButtonLayer_forTest = () => {
         </Paper>
         : ""}
 
-      <div style={{ flex: 1 }}> </div>
+      <div style={{ flex: 1 }}> </div> */}
       {/* GridaDoc 내부 */}
-      <div style={{ fontSize: "20px", fontWeight: "bold" }}>
+      {/* <div style={{ fontSize: "20px", fontWeight: "bold" }}>
         <Button variant="contained" color="primary"
           onClick={(event) => setDocViewDetail((docViewDetail + 1) % 2)} >
           <Box fontSize={14} fontWeight="fontWeightBold" >GridaDoc</Box>
@@ -173,9 +226,9 @@ const ButtonLayer_forTest = () => {
         </Paper>
         : ""}
 
-      <div style={{ flex: 1 }}> </div>
+      <div style={{ flex: 1 }}> </div> */}
       {/* 공책 정보 가져오기 테스트 버튼 */}
-      <div style={{ flex: 1 }}> </div>
+      {/* <div style={{ flex: 1 }}> </div> */}
 
       {/* 공책 정보 가져오기 테스트 버튼 */}
       {/* <div style={{ fontSize: "20px", fontWeight: "bold" }}>
@@ -186,7 +239,7 @@ const ButtonLayer_forTest = () => {
       <div style={{ flex: 1 }}> </div> */}
 
       {/* 이미지 버튼 테스트 */}
-      <NeoImage src="/icons/icon_trash_n.png" />
+      {/* <NeoImage src="/icons/icon_trash_n.png" /> */}
 
       {/* 인쇄 테스트 버튼 */}
       {/* <div style={{ fontSize: "20px", fontWeight: "bold" }}>
@@ -203,7 +256,7 @@ const ButtonLayer_forTest = () => {
 
 
       {/* High-speed 인쇄 테스트 버튼 */}
-      <div style={{ fontSize: "20px", fontWeight: "bold" }}>
+      {/* <div style={{ fontSize: "20px", fontWeight: "bold" }}>
         <PrintNcodedPdfButton variant="contained" color="primary"
           id={printBtnId}
           url={pdfUrl} filename={pdfFilename}
@@ -213,25 +266,25 @@ const ButtonLayer_forTest = () => {
           <Box fontSize={14} fontWeight="fontWeightBold" >Ncode PDF</Box>
         </PrintNcodedPdfButton>
       </div>
-      <div style={{ flex: 1 }}> </div>
+      <div style={{ flex: 1 }}> </div> */}
 
 
       {/* 칼리브레이션 */}
-      <CalibrationButton url={pdfUrl} filename={pdfFilename} printOption={printOption} cancelCallback={undefined}>
+      {/* <CalibrationButton url={pdfUrl} filename={pdfFilename} printOption={printOption} cancelCallback={undefined}>
         <Box fontSize={14} fontWeight="fontWeightBold" >Calibration</Box>
-      </CalibrationButton>
+      </CalibrationButton> */}
 
 
       {/* 매핑 정보 지우기 버튼 */}
-      <div style={{ fontSize: "20px", fontWeight: "bold" }}>
+      {/* <div style={{ fontSize: "20px", fontWeight: "bold" }}>
         <ClearLocalMappingButton variant="contained" color="secondary" >
           <Box fontSize={14} fontWeight="fontWeightBold" >매핑정보 지우기</Box>
         </ClearLocalMappingButton>
       </div>
-      <div style={{ flex: 1 }}> </div>
+      <div style={{ flex: 1 }}> </div> */}
 
       {/* [신] 인쇄 옵션 다이얼로그 테스트 버튼 */}
-      <div style={{ fontSize: "14px" }}>
+      {/* <div style={{ fontSize: "14px" }}>
         <OptionDialogButton
           printOption={printOption}
           handkeTurnOnAppShortCutKey={turnOnGlobalKeyShortCut}
@@ -241,13 +294,13 @@ const ButtonLayer_forTest = () => {
         </OptionDialogButton>
       </div>
 
-      <div style={{ flex: 1 }}> </div>
+      <div style={{ flex: 1 }}> </div> */}
 
       {/* 구글 업로드 테스트 버튼 */}
-      <Upload />
+      {/* <Upload />
       <div style={{ flex: 1 }}> </div>
       <GoogleBtn />
-      <div style={{ flex: 11 }}> </div>
+      <div style={{ flex: 11 }}> </div> */}
     </div>
   );
 }

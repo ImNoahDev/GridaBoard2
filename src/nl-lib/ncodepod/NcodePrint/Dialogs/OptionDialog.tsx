@@ -25,7 +25,7 @@ const useStyles = makeStyles({
 
 
 export const MAX_PRINTOPTION_LEVEL = 1;    // 2: debug mode
-export const DEFAULT_PRINTOPTION_LEVEL = 1;    // 2: debug mode
+export const DEFAULT_PRINTOPTION_LEVEL = 0;    // 2: debug mode
 
 interface IDialogProps extends DialogProps {
   open: boolean,

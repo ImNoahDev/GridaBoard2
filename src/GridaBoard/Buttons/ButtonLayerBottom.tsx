@@ -11,12 +11,13 @@ import { FileBrowserButton } from "../../nl-lib/common/neopdf";
 import { IFileBrowserReturn } from "../../nl-lib/common/structures";
 import { g_defaultPrintOption } from "../../nl-lib/ncodepod";
 
-import { Button, ButtonGroup } from "@material-ui/core";
+import { Button, ButtonGroup, createStyles, Fab, IconButton, makeStyles, Popover, Theme } from "@material-ui/core";
 import SavePdfDialog from "../Save/SavePdfDialog";
 import {saveGrida} from "../Save/SaveGrida";
 import LoadGrida from "../Load/LoadGrida";
 import { PDFDocument } from 'pdf-lib';
-
+import HelpIcon from '@material-ui/icons/Help';
+import SaveAltIcon from '@material-ui/icons/SaveAlt';
 
 const localStyle = {
   position: "absolute",
@@ -72,6 +73,30 @@ const navStyle = {
   zIndex: 1030
 } as React.CSSProperties;
 
+const useStyles = makeStyles({
+  iconContainer: {
+    "&:hover $icon": {
+        color: 'red',
+    }
+  },
+  icon: {
+      color: 'black',
+  },
+});
+
+const btnStyles = makeStyles((theme: Theme) =>
+createStyles({
+  fab: {
+    margin: theme.spacing(2),
+  },
+  absolute: {
+    position: 'absolute',
+    bottom: theme.spacing(2),
+    right: theme.spacing(3),
+  },
+}),
+);
+
 
 function hideAndShowFnc() {
   const colorMenu = document.getElementById('color_bar');
@@ -105,6 +130,10 @@ const ButtonLayerBottom = (props: Props) => {
 
   const [pdfUrl, setPdfUrl] = useState(undefined as string);
   const [pdfFilename, setPdfFilename] = useState(undefined as string);
+
+  const classes = useStyles();
+  const buttonClasses = btnStyles();
+  const [showForm, setShowForm] = React.useState(false)
 
   const activePageNo = useSelector((state: RootState) => state.activePage.activePageNo);
   useEffect(() => {
@@ -179,6 +208,19 @@ const ButtonLayerBottom = (props: Props) => {
     return url;
   }
 
+  const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null);
+
+  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const open = Boolean(anchorEl);
+  const id = open ? 'simple-popover' : undefined;
+
   return (
     <div style={localStyle}>
       <nav id="colornav" className="navRoot" style={navStyle}>
@@ -207,8 +249,19 @@ const ButtonLayerBottom = (props: Props) => {
             <button id="read_mapping_info" className="btn btn-neo" style={{marginLeft: "-5px"}}>
               <SavePdfDialog />
             </button>
-            <button onClick={() => saveGrida('hello.grida')}>
-              그리다 저장
+            <button id="read_mapping_info" className="btn btn-neo" style={{marginLeft: "-10px"}} onClick={() => saveGrida('hello.grida')}>
+              <GridaToolTip open={true} placement="top-end" tip={{
+                head: "Grida Save",
+                msg: ".grida 파일을 로컬에 저장합니다.",
+                tail: "키보드 버튼 ?로 선택 가능합니다"
+              }} title={undefined}>
+                <IconButton className={classes.iconContainer} style={{width: 36, height: 36}}>
+                  {!showForm
+                    ? <SaveAltIcon className={classes.icon}/>
+                    : <SaveAltIcon className={classes.icon}/>
+                  }
+                </IconButton>   
+              </GridaToolTip>
             </button>
             <LoadGrida />
           </ButtonGroup>
@@ -219,6 +272,50 @@ const ButtonLayerBottom = (props: Props) => {
             <ManualCalibration url={pdfUrl} filename={pdfFilename} printOption={printOption} />
           </div>
         </div>
+
+        {/* 도움말 Helper 버튼 */}
+        {/* <GridaToolTip open={true} placement="top-end" tip={{
+          head: "Helper",
+          msg: "도움말 기능들을 보여줍니다.",
+          tail: "키보드 버튼 ?로 선택 가능합니다"
+        }} title={undefined}>
+            <IconButton className={classes.iconContainer} style={{width: 36, height: 36, marginLeft: "-50px"}} onClick={handleClick} aria-describedby={id}>
+              {!showForm
+                ? <HelpIcon className={classes.icon} color="primary" fontSize="large"/>
+                : <HelpIcon className={classes.icon} color="primary" fontSize="large"/>
+              }
+            </IconButton>
+        </GridaToolTip>
+        <Popover
+          id={id}
+          open={open}
+          anchorEl={anchorEl}
+          onClose={handleClose}
+          anchorOrigin={{
+            vertical: 'bottom',
+            horizontal: 'left'
+          }}
+          transformOrigin={{
+            vertical: 'bottom',
+            horizontal: 'right'
+          }}
+        >
+          <div>
+            <a>고객센터</a>
+          </div>
+          <div className="dropdown-divider"></div>
+          <div>
+            <a>단축키 안내</a>
+          </div>
+          <div className="dropdown-divider"></div>
+          <div>
+            <a>튜토리얼</a>
+          </div>
+          <div className="dropdown-divider"></div>
+          <div>
+            <a>FAQ</a>
+          </div>
+        </Popover> */}
       </nav>
     </div>
   );
