@@ -16,9 +16,9 @@ export default function BackgroundButton() {
     } else if(background === 2) {
       themeManager.setT2();
     } else if(background === 3) {
-      themeManager.setT3();
-    } else {
       themeManager.setT4();
+    } else {
+      themeManager.setT5();
     }
     handleClose();
   }

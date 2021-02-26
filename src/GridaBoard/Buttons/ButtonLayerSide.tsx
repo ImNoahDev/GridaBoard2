@@ -106,12 +106,18 @@ const ButtonLayerSide = () => {
               <div className="d-flex flex-column justify-content-between" style={{ zIndex: 1030 }}>
                 <ConnectButton onPenLinkChanged={e => onPenLinkChanged(e)} />
                 <div className="btn-group-vertical neo_shadow" style={{ fontSize: "20px", fontWeight: "bold" }}>
-                <IconButton className={classes.iconContainer} onClick={(event) => addBlankPage(event)} style={{padding: "4px"}} >
-                    {!showForm
-                      ? <PostAddIcon fontSize="large" className={classes.icon}>빈 페이지 추가</PostAddIcon>
-                      : <PostAddIcon fontSize="large" className={classes.icon}>빈 페이지 추가</PostAddIcon>
-                    }
-                  </IconButton>
+                  <GridaToolTip open={true} placement="left" tip={{
+                    head: "Add Page",
+                    msg: "ncode 페이지를 추가하는 버튼입니다.",
+                    tail: "키보드 버튼 ?로 선택 가능합니다"
+                  }} title={undefined}>
+                    <IconButton className={classes.iconContainer} onClick={(event) => addBlankPage(event)} style={{padding: "4px"}} >
+                      {!showForm
+                        ? <PostAddIcon fontSize="large" className={classes.icon}>빈 페이지 추가</PostAddIcon>
+                        : <PostAddIcon fontSize="large" className={classes.icon}>빈 페이지 추가</PostAddIcon>
+                      }
+                    </IconButton> 
+                  </GridaToolTip>
                 </div>
                 <div className="btn-group-vertical neo_shadow" style={{ marginBottom: 10 }}>
                   <div className="btn-group dropright" role="group">
