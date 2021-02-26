@@ -59,7 +59,7 @@ const ButtonLayerSide = () => {
     return state.activePage.activePageNo
   });
 
-  const [showForm, setShowForm] = React.useState(false)
+  const showForm = React.useState(false)
   const classes = useStyles();
   
   const handleTrashBtn = () => {

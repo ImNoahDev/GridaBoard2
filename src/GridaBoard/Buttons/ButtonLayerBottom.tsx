@@ -133,7 +133,7 @@ const ButtonLayerBottom = (props: Props) => {
 
   const classes = useStyles();
   const buttonClasses = btnStyles();
-  const [showForm, setShowForm] = React.useState(false)
+  const showForm = React.useState(false)
 
   const activePageNo = useSelector((state: RootState) => state.activePage.activePageNo);
   useEffect(() => {

@@ -38,7 +38,7 @@ const SavePdfDialog = () => {
   const classes = useStyles();
 
   const [open, setOpen] = React.useState(false);
-  const [showForm, setShowForm] = React.useState(false)
+  const showForm = React.useState(false)
 
   let pdfSaveName = '';
 

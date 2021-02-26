@@ -20,7 +20,7 @@ const useStyles = makeStyles({
 const LoadGrida = () => {
 
   const classes = useStyles();
-  const [showForm, setShowForm] = React.useState(false)
+  const showForm = React.useState(false)
 
   async function fileOpenHandler() {
     const selectedFile = await openFileBrowser();
