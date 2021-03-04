@@ -9,11 +9,14 @@ const ACTION_TYPE = Object.freeze({
 });
 //]
 
+const SET_CALIBRATION_MODE = 'SET_CALIBRATION_MODE';
+
 type Action = {
   type: any,
   option?: ICalibrationState,
   progress?: number,
   show?: boolean,
+  calibrationMode?: boolean,
 }
 //[Action Methods
 export const showCalibrationDialog = async (option: ICalibrationState) => {
@@ -43,18 +46,24 @@ export const calibrationMoveToPage = async (pageNo: number) => {
 }
 //]
 
-
-
-
+export const setCalibrationMode = async (calibrationMode) => {
+  store.dispatch({
+    type: SET_CALIBRATION_MODE, calibrationMode
+  })
+}
 
 //[Reducer
 const initialState = {
+  url: undefined as string,
+  
   show: false as boolean,
 
   targetPages: [] as number[],
 
   /** 0:page 1 top left,  1:page 1 bottom right,  2:page 2,  3: page 3,  ... */
   progress: 0 as number,
+
+  calibrationMode: false as boolean,
 };
 
 export type ICalibrationState = typeof initialState;
@@ -83,7 +92,12 @@ export default (state = initialState, action: Action) => {
         progress: action.progress,
       };
     }
-
+    case SET_CALIBRATION_MODE: {
+      return {
+        ...state,
+        calibrationMode: action.calibrationMode
+      }
+    }
     default: {
       return state;
     }
