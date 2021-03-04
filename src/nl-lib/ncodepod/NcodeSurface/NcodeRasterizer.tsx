@@ -264,11 +264,6 @@ export default class NcodeRasterizer {
           this.printOption.ncodeMargin.top = ncodeSurfaceDesc.margin.Ymin;
         }
 
-        // Calibration 십자가를 그린다.
-        if (drawCalibrationMark && pagesPerSheet <= maxPagesPerSheetToDrawMark) {
-          this.drawCrossMark(drawingContext, drawMarkRatio, null);
-        }
-
         // 코드 정보를 넣는다
         this.putNcodeInfo(drawingContext, assignedNcode, baseNcode, printOption);
 
@@ -283,6 +278,12 @@ export default class NcodeRasterizer {
         ncodeAreas.push(ncodeArea);
 
       }
+
+      // Calibration 십자가를 그린다.
+      if (drawCalibrationMark && pagesPerSheet <= maxPagesPerSheetToDrawMark) {
+        this.drawCrossMark(drawingContext, drawMarkRatio, null);
+      }
+      
     }
     ctx.restore();
 
