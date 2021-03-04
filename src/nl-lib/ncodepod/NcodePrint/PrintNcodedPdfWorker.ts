@@ -2,7 +2,7 @@ import { PageSizes, PDFDict, PDFDocument, PDFHexString, PDFName } from "pdf-lib"
 import { saveAs } from "file-saver";
 import printJS from "print-js";
 
-
+import { showCalibrationDialog } from '../../../store/reducers/calibrationReducer';
 import { IPrintingEvent, IPrintingReport, IPrintOption, IUnitString, IProgressCallbackFunction, IPrintingSheetDesc } from "../../common/structures";
 
 import { MappingStorage, PdfDocMapper } from "../../common/mapper";
@@ -267,7 +267,7 @@ export default class PrintNcodedPdfWorker {
     this.setStatus("completed");
 
     // tempMapper 정보를 등록
-    if (printOption.needToIssuePrintCode) {
+    if (printOption.hasToPutNcode) {
       const msi = MappingStorage.getInstance();
       msi.register(tempMapping);
     }
@@ -502,6 +502,14 @@ export default class PrintNcodedPdfWorker {
   }
 
   private printByPrintJs = (ncodedUrl: string) => {
+    const option = {
+      url: ncodedUrl,
+      show: true,
+      targetPages: [],
+      progress: 0,
+      calibrationMode: true,
+    };
+
     printJS({
       printable: ncodedUrl,
       type: 'pdf',
@@ -509,8 +517,12 @@ export default class PrintNcodedPdfWorker {
         alert('Error found => ' + error.message)
       },
       showModal: false,
+      onPrintDialogClose: function () {
+        console.log('onPrintDialogClose'); 
+        showCalibrationDialog(option);
+        
+      }
     });
-
   }
 
   private printByIFrame = (ncodedUrl: string) => {

@@ -45,6 +45,9 @@ export interface INeoSmartpen {
 
   dispatcher: EventDispatcher;
 
+  calibrationPoint?: any;
+  calibrationData?: any;
+
   getMac(): string;
   getBtDevice(): BluetoothDevice;
 

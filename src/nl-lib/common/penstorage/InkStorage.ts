@@ -131,7 +131,7 @@ export default class InkStorage {
 
   public collisionTest = (pathDataStr: string, line: { x0_pu: number, y0_pu: number, x1_pu: number, y1_pu: number }) => {
     const eraserSvgPathData = 'M ' + line.x0_pu + ' ' + line.y0_pu + ' L ' + line.x1_pu + ' ' + line.y1_pu + 'z';
-    var intersection = intersect(eraserSvgPathData, pathDataStr);
+    const intersection = intersect(eraserSvgPathData, pathDataStr);
     return intersection.length
   }
 

@@ -1,10 +1,10 @@
 import React from "react";
+import {connect} from "react-redux";
 import { CSSProperties } from "@material-ui/core/styles/withStyles";
 import { Typography } from "@material-ui/core";
 
 import { IRenderWorkerOption } from "./RenderWorkerBase";
 import PenBasedRenderWorker from "./PenBasedRenderWorker";
-import { MixedViewProps } from "../MixedPageView";
 
 import { IBrushType, PenEventName, PageEventName, PLAYSTATE, ZoomFitEnum } from "../../common/enums";
 import { IPageSOBP, ISize } from "../../common/structures";
@@ -13,8 +13,8 @@ import { callstackDepth, isSamePage, makeNPageIdStr, uuidv4 } from "../../common
 import { INeoSmartpen, IPenToViewerEvent } from "../../common/neopen";
 import { MappingStorage } from "../../common/mapper";
 import { InkStorage } from "../../common/penstorage";
-import { NeoSmartpen } from "../../neosmartpen";
-import { nullNcode } from "../../common/constants";
+
+import { setCalibrationData } from '../../../store/reducers/calibrationDataReducer';
 
 /**
  * Properties
@@ -57,14 +57,16 @@ interface Props { // extends MixedViewProps {
   basePageInfo: IPageSOBP,
   pdfPageNo: number,
   renderCountNo: number,
-}
 
+  calibrationData: any,
+  setCalibrationData2: any,
+  calibrationMode: boolean,
+}
 
 /**
  * State
  */
 interface State {
-
   sizeUpdate: number,
   penEventCount: number,
   strokeCount: number,
@@ -75,8 +77,7 @@ interface State {
   playState: PLAYSTATE,
 
   renderCount: number,
-
-
+  
 }
 
 /**
@@ -274,7 +275,7 @@ class PenBasedRenderer extends React.Component<Props, State> {
       this.subScriptStorageEvent();
     }
 
-    if (this.renderer) {
+    if (this.renderer && !this.props.calibrationMode) {
       this.inkStorage.addEventListener(PageEventName.PAGE_CLEAR, this.removeAllCanvasObjectOnActivePage, null);
       this.inkStorage.addEventListener(PenEventName.ON_ERASER_MOVE, this.renderer.redrawStrokes, null);
     }
@@ -340,7 +341,7 @@ class PenBasedRenderer extends React.Component<Props, State> {
 
       console.log("`VIEW SIZE        PAGE CHANGE 0");
 
-      if (this.renderer) {
+      if (this.renderer && !this.props.calibrationMode) {
         // const { section, owner, book, page } = nextProps.pageInfo;
         console.log(`VIEW SIZE PAGE CHANGE 1: ${makeNPageIdStr(pageInfo)}`);
         
@@ -369,7 +370,7 @@ class PenBasedRenderer extends React.Component<Props, State> {
       ret_val = true;
     }
 
-    if (this.props.renderCountNo !== nextProps.renderCountNo) {
+    if (this.props.renderCountNo !== nextProps.renderCountNo && !this.props.calibrationMode) {
       if (this.renderer) {
         this.renderer.changePage(pageInfo, nextProps.pdfSize, false);
         this.renderer.onPageSizeChanged(nextProps.pdfSize);
@@ -467,6 +468,9 @@ class PenBasedRenderer extends React.Component<Props, State> {
     }
     this.shouldSendPageInfo = false;
 
+    if (this.props.calibrationMode) {
+      return;
+    }
     /** pdf pageNo를 바꿀 수 있게, container에게 전달한다. */
     if (this.props.onNcodePageChanged) {
       this.props.onNcodePageChanged({ section, owner, book, page });
@@ -504,9 +508,87 @@ class PenBasedRenderer extends React.Component<Props, State> {
    */
   onLivePenUp = (event: IPenToViewerEvent) => {
     // console.log("Pen Up");
-    if (this.renderer) {
+    if (this.props.calibrationMode) {
+      this.onCalibrationUp(event);
+    }
+    else if (this.renderer) {
       this.renderer.closeLiveStroke(event);
     }
+  }
+
+  onCalibrationUp = (event: IPenToViewerEvent) => {
+    let i;
+
+    let penCalibrationPoint = event.pen.calibrationPoint;
+
+    const pts = event.pen.calibrationData.points;
+    const len = pts.length;
+
+    // 점 수가 너무 적다
+    if (len < 2) return;
+
+    let x_min = 99999,
+        y_min = 99999,
+        x_max = -99999,
+        y_max = -99999;
+
+    for (i = 0; i < len; i++) {
+      x_min = Math.min(x_min, pts[i].x);
+      x_max = Math.max(x_max, pts[i].x);
+
+      y_min = Math.min(y_min, pts[i].y);
+      y_max = Math.max(y_max, pts[i].y);
+    }
+
+    const x_range = x_max - x_min;
+    const y_range = y_max - y_min;
+
+    // 점이 너무 넓게 들어왔다.
+    if (x_range > 2 || y_range > 2) {
+      event.pen.calibrationData = {
+        section: -1,
+        owner: -1,
+        book: -1,
+        page: -1,
+        points: new Array(0),
+      };
+      return;
+    }
+
+    const nu = {x: (x_max + x_min) / 2, y: (y_max + y_min) / 2}
+    const pu = this._renderer.ncodeToPdfXy_default({x: nu.x, y: nu.y});
+    
+    const clicked_point = {
+      section: penCalibrationPoint.section,
+      owner: penCalibrationPoint.owner,
+      book: penCalibrationPoint.book,
+      page: penCalibrationPoint.page,
+      nu: {x: nu.x, y: nu.y},
+      pu: {x: pu.x, y: pu.y}
+    };
+    
+    const { section, owner, book, page } = event;
+    const pageInfo = { section, owner, book, page } as IPageSOBP;
+    const { setCalibrationData2 } = this.props;
+
+    const cali = {
+      section : section, 
+      owner: owner, 
+      book: book, 
+      page: page, 
+      nu: {x: clicked_point.nu.x, y: clicked_point.nu.y},
+      pu: {x: clicked_point.pu.x, y: clicked_point.pu.y}
+    };
+
+    setCalibrationData2(cali);
+
+    event.pen.calibrationData = {
+      section: -1,
+      owner: -1,
+      book: -1,
+      page: -1,
+      points: new Array(0),
+    };
   }
 
   onLivePenUp_byStorage = (event: IPenToViewerEvent) => {
@@ -544,25 +626,10 @@ class PenBasedRenderer extends React.Component<Props, State> {
     if (this.renderer) {
       this.renderer.moveHoverPoint(event);
     }
-    // const { liveDotCount } = this.state;
-
-    // this.setState({ liveDotCount: liveDotCount + 1 });
-    // console.log(event);
   }
 
   render() {
-
     let { zoom } = this.props.position;
-
-    // const rect = { x: 0, y: 0, width, height };
-    // const { rect } = this.state;
-    // const { penEventCount } = this.state;
-
-    // const manager = PenManager.getInstance();
-    // let connected_pens = manager.getConnectedPens();
-
-    // const cssWidth = this.props.pdfSize.width * zoom;
-    // const cssHeight = this.props.pdfSize.height * zoom;
 
     zoom = 1;
 
@@ -575,16 +642,6 @@ class PenBasedRenderer extends React.Component<Props, State> {
       overflow: "hidden",
     }
 
-    // const inkContainerInfo: CSSProperties = {
-    //   position: "absolute",
-    //   zoom: zoom,
-    //   left: this.props.position.offsetX / zoom,
-    //   top: this.props.position.offsetY / zoom,
-    //   zIndex: 9,
-    //   overflow: "hidden",
-    // }
-
-
     const inkCanvas: CSSProperties = {
       position: "absolute",
       zoom: 1,
@@ -593,32 +650,6 @@ class PenBasedRenderer extends React.Component<Props, State> {
       zIndex: 10,
 
     }
-
-
-    // if (fixed) {
-    //   inkContainerDiv = {
-    //     position: "absolute",
-    //     zoom: zoom,
-    //     left: 0,
-    //     top: 0,
-    //     right: 0,
-    //     height: "100%",
-    //     zIndex: 10,
-    //     overflow: "hidden",
-    //   };
-
-    //   inkCanvas = {
-    //     position: "absolute",
-    //     zoom: 1,
-    //     left: 0,
-    //     top: 0,
-    //     right: 0,
-    //     height: "100%",
-    //     zIndex: 10,
-    //   }
-    // }
-
-    // console.log(`THUMB, renderer viewFit = ${this.props.viewFit}`);
 
     const shadowStyle: CSSProperties = {
       color: "#a20",
@@ -643,7 +674,6 @@ class PenBasedRenderer extends React.Component<Props, State> {
           <Typography style={{ ...shadowStyle, fontSize: 10 }}>Page:</Typography>
             <Typography style={{ ...shadowStyle, fontSize: 14, }}> {makeNPageIdStr(this.props.pageInfo)} </Typography>
 
-
             <br /> &nbsp; &nbsp;
           <Typography style={{ ...shadowStyle, fontSize: 10 }}>Base:</Typography>
             <Typography style={{ ...shadowStyle, fontSize: 14, fontStyle: "initial" }}> {makeNPageIdStr(this.props.basePageInfo)} </Typography>
@@ -659,14 +689,15 @@ class PenBasedRenderer extends React.Component<Props, State> {
   }
 }
 
-// const AdaptiveWithDetector = PenBasedRenderer_module;
+const mapStateToProps = (state) => ({
+    calibrationData: state.calibrationDataReducer.calibrationData,
+    calibrationMode: state.calibration.calibrationMode
+});
 
-// const PenBasedRenderer = (props: Props) => {
-//   return (
-//     <React.Fragment>
-//       <AdaptiveWithDetector {...props} />
-//     </React.Fragment>
-//   )
-// }
+const mapDispatchToProps = (dispatch) => ({
+  setCalibrationData2: cali => setCalibrationData(cali),
+});
 
-export default PenBasedRenderer;
+export default connect(mapStateToProps, mapDispatchToProps)(PenBasedRenderer);
+
+// export default PenBasedRenderer;

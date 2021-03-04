@@ -362,7 +362,7 @@ export class NeoPdfDocument {
       const page = await this._pdfDoc.getPage(i + 1);
 
       const vpt: PDF_VIEWPORT_DESC = page.getViewport({ scale: 1, rotation: page.rotate });
-      let { width, height } = vpt;
+      const { width, height } = vpt;
       
       const landscape = width > height;
       landscape ? numLandscapePages++ : numPortraitPages++;

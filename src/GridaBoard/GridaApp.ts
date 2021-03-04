@@ -6,9 +6,6 @@ import { INeoSmartpen, IPenToViewerEvent } from "../nl-lib/common/neopen";
 import { setPens } from "../store/reducers/appConfigReducer";
 import GridaDoc from "./GridaDoc";
 import PenManager from "../nl-lib/neosmartpen/PenManager";
-import { VirtualPen } from "../nl-lib/neosmartpen";
-import { uuidv4 } from "../nl-lib/common/util";
-import { setActivePageNo } from "../store/reducers/activePageReducer";
 
 let _app_instance = undefined as GridaApp;
 
@@ -43,11 +40,11 @@ export default class GridaApp {
 
   start = async () => {
     const doc = GridaDoc.getInstance();
-    // const filename = "___1page.pdf";
-    // const url = "./___1page.pdf";
+    const filename = "Portrait, codeError_test.pdf";
+    const url = "./Portrait, codeError_test.pdf";
 
-    const filename = "Mixed, rotation.pdf";
-    const url = "./Mixed, rotation.pdf";
+    // const filename = "Mixed, rotation.pdf";
+    // const url = "./Mixed, rotation.pdf";
 
     // const filename = "2P_test.pdf";
     // const url = "./2P_test.pdf";
@@ -66,6 +63,9 @@ export default class GridaApp {
 
 
   onNcodePageChanged = (event: IPenToViewerEvent) => {
+    const calibraionMode = store.getState().calibration.calibrationMode;
+    if (calibraionMode) return;
+
     const pageInfo = { section: event.section, owner: event.owner, book: event.book, page: event.page } as IPageSOBP;
 
     const msi = MappingStorage.getInstance();

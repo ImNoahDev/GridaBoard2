@@ -510,7 +510,7 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
   rotate = (degrees, pageInfo) => {
     const ins = InkStorage.getInstance();
     const pageId = InkStorage.makeNPageIdStr(pageInfo);
-    let strokeArr = ins.completedOnPage.get(pageId);
+    const strokeArr = ins.completedOnPage.get(pageId);
     if (strokeArr === undefined) return;
 
     const canvasCenterSrc = new fabric.Point(this._opt.pageSize.width/2, this._opt.pageSize.height/2)
@@ -519,14 +519,14 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
 
     strokeArr.forEach((stroke) => {
       stroke.dotArray.forEach((dot) => {
-        let pdf_xy = this.ncodeToPdfXy(dot);
+        const pdf_xy = this.ncodeToPdfXy(dot);
 
         // 1. subtractEquals
         pdf_xy.x -= canvasCenterSrc.x;
         pdf_xy.y -= canvasCenterSrc.y;
         
         // 2. rotateVector
-        var v = fabric.util.rotateVector(pdf_xy, radians);
+        const v = fabric.util.rotateVector(pdf_xy, radians);
 
         // 3. addEquals
         v.x += canvasCenterDst.x;

@@ -420,6 +420,21 @@ export class MappingStorage {
     return basePdfToNcodeMap;
   }
 
+  registerTemporary = (mapper: PdfDocMapper) => {
+    mapper.makeSummary();
+
+    const docMap: IPdfToNcodeMapItem = cloneObj(mapper.docMap);
+    docMap.timeString = getNowTimeStr();
+
+    this._temporary.arrDocMap.unshift(docMap);
+    // 최신순으로 소팅
+    // this._data.arrDocMap.sort((a, b) => (b.timeString > a.timeString ? 1 : (b.timeString === a.timeString ? 0 : -1)));
+
+    //ON_MAPINFO_ADDED하면 render만 새로
+    this.dispatcher.dispatch(MappingStorageEventName.ON_MAPINFO_ADDED, { status: "new map added", mapper });
+
+    if (_debug) this.dump("mapping");
+  }
 
   register = (mapper: PdfDocMapper) => {
     mapper.makeSummary();
@@ -432,7 +447,6 @@ export class MappingStorage {
     // this._data.arrDocMap.sort((a, b) => (b.timeString > a.timeString ? 1 : (b.timeString === a.timeString ? 0 : -1)));
 
     this.dispatcher.dispatch(MappingStorageEventName.ON_MAPINFO_ADDED, { status: "new map added", mapper });
-
     this.storeMappingInfo();
     if (_debug) this.dump("mapping");
   }
@@ -477,12 +491,19 @@ export class MappingStorage {
    * pen down시에 새로운 SOBP라면, 관련된 PDF가 있는지 찾을 때 쓰인다
    */
   findPdfPage = (ncodeXy: INcodeSOBPxy) => {
-    const found = this._data.arrDocMap.find(m => isPageInRange(ncodeXy, m.printPageInfo, m.numPages));
+    const tempFound = this._temporary.arrDocMap.find(m => isPageInRange(ncodeXy, m.printPageInfo, m.numPages));
+    
+    if (tempFound) {
+      const pageMap = tempFound.params.find(param => isSamePage(ncodeXy, param.pageInfo));
+      return { pdf: tempFound, pageMapping: pageMap } as IAutoLoadDocDesc;
+    }
+    
+    const dataFound = this._data.arrDocMap.find(m => isPageInRange(ncodeXy, m.printPageInfo, m.numPages));
 
-    if (found) {
+    if (dataFound) {
       /** 원래는 폴리곤에 속했는지 점검해야 하지만, 현재는 같은 페이지인지만 점검한다  2020/12/06 */
-      const pageMap = found.params.find(param => isSamePage(ncodeXy, param.pageInfo));
-      return { pdf: found, pageMapping: pageMap } as IAutoLoadDocDesc;
+      const pageMap = dataFound.params.find(param => isSamePage(ncodeXy, param.pageInfo));
+      return { pdf: dataFound, pageMapping: pageMap } as IAutoLoadDocDesc;
     }
 
     return undefined;
