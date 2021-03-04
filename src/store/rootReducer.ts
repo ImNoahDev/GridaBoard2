@@ -9,6 +9,7 @@ import viewFitReducer from './reducers/viewFitReducer';
 import uiReducer from './reducers/ui';
 import progressDlgReducer from "./reducers/progressDlgReducer";
 import calibrationReducer from "./reducers/calibrationReducer";
+import calibrationDataReducer from "./reducers/calibrationDataReducer";
 import appConfigReducer from './reducers/appConfigReducer';
 import zoomReducer from './reducers/zoomReducer';
 
@@ -16,6 +17,7 @@ const rootReducer = combineReducers({
   progress: progressDlgReducer,
 
   calibration: calibrationReducer,
+  calibrationDataReducer,
   appConfig: appConfigReducer,
 
   auth: authorizationReducer,
