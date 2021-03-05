@@ -4,10 +4,9 @@ import PenManager, {DEFAULT_PEN_THICKNESS} from "./PenManager";
 import PUIController from "../../components/PUIController";
 import { IBrushState, INoteServerItem, IPenEvent, NeoDot, NeoStroke, StrokePageAttr } from "../common/structures";
 import { IBrushType, PEN_STATE, PenEventName } from "../common/enums";
-import { PaperInfo } from "../common/noteserver/PaperInfo";
 import { InkStorage, IOpenStrokeArg } from "../common/penstorage";
 import { IPenToViewerEvent, INeoSmartpen } from "../common/neopen/INeoSmartpen";
-
+import { store } from "../../client/Root";
 
 interface IPenMovement {
   downEvent: IPenEvent,
@@ -46,21 +45,11 @@ export default class NeoSmartpen implements INeoSmartpen {
 
   lastState: PEN_STATE = PEN_STATE.NONE;
 
-  // surfaceInfo: INoteServerItem = {
-  //   id: "3.27.168",
-  //   section: 3,
-  //   owner: 27,
-  //   book: 168,
+  calibrationPoint: any = { section: 0, owner: 0, book: 0, page: 0, x: 0, y: 0 };
 
-  //   margin: {
-  //     Xmin: 3.12,
-  //     Ymin: 3.12,
-  //     Xmax: 91.68,
-  //     Ymax: 128.36,
-  //   },
-
-  //   Mag: 1,
-  // }
+  calibrationData: any = {
+    section: 0, owner: 0, book: 0, page: 0, points: new Array(0),
+  };
 
   storage: InkStorage = InkStorage.getInstance();
   manager: PenManager = PenManager.getInstance();
@@ -246,14 +235,13 @@ export default class NeoSmartpen implements INeoSmartpen {
    * @param hover
    */
   onPageInfo = (event: IPenEvent, hover: boolean) => {
-    // // console.log(event);
+
     // this.lastInfoEvent = event;
 
 
     // // margin 값을 가져오기 위해서
     // const info = PaperInfo.getPaperInfo({ section: event.section, book: event.book, owner: event.owner, page: event.page });
     // if (info) this.surfaceInfo = info;
-
     // 이전에 펜 down이 있었으면
     if (this.lastState === PEN_STATE.PEN_DOWN) {
       this.currPenMovement.infoEvent = event;
@@ -348,9 +336,12 @@ export default class NeoSmartpen implements INeoSmartpen {
 
 
     if (hover) {
+
       const { section, owner, book, page, timeStamp } = event;
       const mac = this.mac;
-
+      if (store.getState().calibration.calibrationMode) {
+        return;
+      }
       this.dispatcher.dispatch(PenEventName.ON_PEN_HOVER_PAGEINFO, {
         mac, section, owner, book, page, time: timeStamp, pen: this
       });
@@ -394,6 +385,15 @@ export default class NeoSmartpen implements INeoSmartpen {
       // throw new Error( `Get PEN_MOVE without PEN_INFO`);
     }
 
+    if (store.getState().calibration.calibrationMode) {
+      this.calibrationData.points.push({
+        x: event.x,
+        y: event.y,
+        f: event.force,
+      })
+      return;
+    }
+    
     this.currPenMovement.numMovement++;
     event.isFirstDot = (this.currPenMovement.numMovement === 1);
 
@@ -411,18 +411,13 @@ export default class NeoSmartpen implements INeoSmartpen {
       y: event.y,
     });
 
-    const stroke = this.currPenMovement.stroke;
-    const strokeKey = stroke.key;
-    this.storage.appendDot(strokeKey, dot);
-    const pen = this;
-
     if (event.owner === 1013 && event.book === 1116 && event.page === 1) {
       console.log("asdfasdfasfa");
       console.log(event.isFirstDot);
       event.isFirstDot = true;
       if (event.isFirstDot) {
         console.log("===================================");
-        // var puis = window._pui;
+        // let puis = window._pui;
         const puis = window._pui
         console.log(puis);
         let i;
@@ -442,8 +437,13 @@ export default class NeoSmartpen implements INeoSmartpen {
       }
     }
 
+    const stroke = this.currPenMovement.stroke;
+    const strokeKey = stroke.key;
+    const pen = this;
+    
     // hand the event
     this.dispatcher.dispatch(PenEventName.ON_PEN_MOVE, { strokeKey, mac: stroke.mac, stroke, dot, pen, event } as IPenToViewerEvent);
+    this.storage.appendDot(strokeKey, dot);
 
     // 이벤트 전달
     // console.log("    -> onPenMove" + event);
@@ -457,6 +457,9 @@ export default class NeoSmartpen implements INeoSmartpen {
    */
   onHoverMove = (event: IPenEvent) => {
     this.lastState = PEN_STATE.HOVER_MOVE;
+    if (store.getState().calibration.calibrationMode) {
+      return;
+    }
 
     // margin을 paperInfo의 Xmin, Ymin 값에 따라 조정
     // event = this.adjustPaperXminYmin(event);
@@ -478,6 +481,9 @@ export default class NeoSmartpen implements INeoSmartpen {
   */
   onHoverPageInfo = (event: IPenEvent) => {
     this.lastState = PEN_STATE.HOVER_MOVE;
+    if (store.getState().calibration.calibrationMode) {
+      return;
+    }
 
     const mac = this.mac;
     if (!mac) {
@@ -502,6 +508,8 @@ export default class NeoSmartpen implements INeoSmartpen {
    */
   onPenUp = (event: IPenEvent) => {
     this.lastState = PEN_STATE.PEN_UP;
+    
+    const calibraionMode = store.getState().calibration.calibrationMode;
 
     this.currPenMovement.upEvent = event;
 
@@ -509,12 +517,6 @@ export default class NeoSmartpen implements INeoSmartpen {
     if (!this.storage) {
       console.error("Ink Storage has not been initialized");
     }
-
-    // const stroke = this.currPenMovement.stroke;
-    // const strokeKey = stroke.key;
-    // this.storage.closeStroke(strokeKey);
-    // const { mac, section, owner, book, page } = penUpStrokeInfo.stroke;
-    // this.dispatcher.dispatch(PenEventName.ON_PEN_UP, { strokeKey, mac, pen: this, stroke, section, owner, book, page });
 
     const penUpStrokeInfo = this.processPenUp(event);
     const { mac, section, owner, book, page } = penUpStrokeInfo.stroke;
@@ -651,3 +653,4 @@ export default class NeoSmartpen implements INeoSmartpen {
     this.dispatcher.off(eventName, listener);
   }
 }
+

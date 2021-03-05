@@ -7,9 +7,12 @@ import "./pen_touch.css";
 
 import { theme } from '../../../../styles/theme';
 import { RootState } from '../../../../store/rootReducer';
-import { hideCalibrationDialog, showCalibrationDialog, updateCalibrationDialog } from '../../../../store/reducers/calibrationReducer';
-import { IPrintOption } from '../../../common/structures';
+import { hideCalibrationDialog, showCalibrationDialog, updateCalibrationDialog, setCalibrationMode } from '../../../../store/reducers/calibrationReducer';
+import { IPageSOBP, IPoint, IPrintOption } from '../../../common/structures';
 import { NeoPdfDocument, NeoPdfManager } from '../../../common/neopdf';
+import CalibrationData from '../../../common/mapper/Calibration/CalibrationData';
+import { MappingStorage } from '../../../common/mapper/MappingStorage';
+
 
 const _penImageUrl = "/icons/image_calibration.png";
 
@@ -27,7 +30,6 @@ const useStyles = makeStyles({
 // }
 
 interface IDialogProps {
-  url: string,
   filename: string,
   printOption: IPrintOption,
   cancelCallback: (e) => void,
@@ -37,7 +39,11 @@ const imgWidth = 400;
 const imgHeight = 400;
 const imgDensity = 2;
 
-function CalibrationDialog(props: IDialogProps) {
+const nu = { p0: {x: 0, y: 0} as IPoint, p2: {x: 0, y: 0} as IPoint };
+const pu = { p0: {x: 0, y: 0} as IPoint, p2: {x: 0, y: 0} as IPoint };
+const pageInfos: IPageSOBP[] = [];
+
+const CalibrationDialog = (props: IDialogProps) => {
   const classes = useStyles();
   const [pdf, setPdf] = useState(undefined as NeoPdfDocument);
   const [numPages, setNumPages] = useState(0);
@@ -49,7 +55,12 @@ function CalibrationDialog(props: IDialogProps) {
   let pageNo = 0;
   let numProgresses = numPages + 1;
 
+  const {calibrationData} = useSelector((state: RootState) => ({
+    calibrationData: state.calibrationDataReducer.calibrationData
+  }));
+
   const progress = useSelector((state: RootState) => state.calibration.progress);
+  const url = useSelector((state: RootState) => state.calibration.url);
   // console.log(`calibration: loaded ${progress}`)
 
   const show = useSelector((state: RootState) => state.calibration.show);
@@ -71,10 +82,7 @@ function CalibrationDialog(props: IDialogProps) {
     // hideCalibrationDialog();
     console.log("testing: closing");
     initState();
-
-
   }
-
 
   const handleCancel = (e) => {
     hideCalibrationDialog();
@@ -94,84 +102,124 @@ function CalibrationDialog(props: IDialogProps) {
     updateCalibrationDialog(nextProgress);
   }
 
-
-  // useEffect(() => {
-  //   NeoPdfManager.getInstance().getDocument({ url: props.url }).then(loadedPdf => {
-  //     if (loadedPdf) {
-  //       const w = imgWidth * imgDensity;
-  //       const h = imgHeight * imgDensity;
-  //       loadedPdf.generatePageThumbnails(w, h, "rgb(220,220,220)", true).then(() => {
-  //         setPdf(loadedPdf);
-  //         const t = Array.from({ length: loadedPdf.numPages }, (_, i) => i + 1);
-  //         setTargetPages(t);
-  //         console.log(`testing: pdf loaded, pages=${t}`)
-  //         setNumPages(t.length);
-  //       })
-  //     }
-  //   });
-  // }, [props.url]);
-
   useEffect(() => {
-    // console.log(`calibration: progress`)
     if (pdf && targetPages.length > 0) {
       const w = imgWidth * imgDensity;
       const h = imgHeight * imgDensity;
       const markPos = progress < 2 ? progress : 2;
-      pdf.getPageThumbnailUrl(pageNo, w, h, "rgb(220,220,220)", true, markPos).then(thumbnail => {
-        setImgSrc(thumbnail.url);
-        setMarkPosRatio({ xr: thumbnail.markPos.x / thumbnail.canvas.w, yr: thumbnail.markPos.y / thumbnail.canvas.h });
-      });
-
-
+      if (pageNo !== undefined) {
+        pdf.getPageThumbnailUrl(pageNo, w, h, "rgb(220,220,220)", true, markPos).then(thumbnail => {
+          setImgSrc(thumbnail.url);
+          setMarkPosRatio({ xr: thumbnail.markPos.x / thumbnail.canvas.w, yr: thumbnail.markPos.y / thumbnail.canvas.h });
+        });
+      }
     }
   }, [progress, status]);
 
   useEffect(() => {
     if (show) {
-      NeoPdfManager.getInstance().getDocument(
-        {
-          url: props.url,
-          filename: props.filename,
-          purpose: "to be used by CalibrationDialog"
-        })
-        .then(loadedPdf => {
-          if (loadedPdf) {
-            const w = imgWidth * imgDensity;
-            const h = imgHeight * imgDensity;
-            // loadedPdf.generatePageThumbnails(w, h, "rgb(220,220,220)", true).then(() => {
-            setPdf(loadedPdf);
-            const t = Array.from({ length: loadedPdf.numPages }, (_, i) => i + 1);
-            setTargetPages(t);
-            console.log(`calibration: pdf loaded, pages=${t}`)
-            setNumPages(t.length);
+      setCalibrationMode(true);
+      NeoPdfManager.getInstance().getDocument({
+        url: url,
+        filename: props.filename,
+        purpose: "to be used by CalibrationDialog"
+      }).then(loadedPdf => {
+        if (loadedPdf) {
+          const w = imgWidth * imgDensity;
+          const h = imgHeight * imgDensity;
+          // loadedPdf.generatePageThumbnails(w, h, "rgb(220,220,220)", true).then(() => {
+          setPdf(loadedPdf);
+          const t = Array.from({ length: loadedPdf.numPages }, (_, i) => i + 1);
+          setTargetPages(t);
+          console.log(`calibration: pdf loaded, pages=${t}`)
+          setNumPages(t.length);
 
-            updateCalibrationDialog(0);
-            setStatus("progress");
-            // })
-          }
-        });
+          updateCalibrationDialog(0);
+          setStatus("progress");
+          // })
+        }
+      });
     }
     else {
       initState();
+      setCalibrationMode(false);
     }
   }, [show]);
+  
+  useEffect(() => {
+    if (!(calibrationData.section === -1 && calibrationData.owner === -1 && calibrationData.page === -1 && calibrationData.book === -1)) {
+      
+      const pageInfo: IPageSOBP = {
+        section: calibrationData.section, 
+        book: calibrationData.book, 
+        owner: calibrationData.owner, 
+        page: calibrationData.page
+      };
+      const filename = 'pdf_file_name';
 
+      switch (progress) {
+        case 0: {
+          nu.p0.x = calibrationData.nu.x;
+          nu.p0.y = calibrationData.nu.y;
 
+          pu.p0.x = calibrationData.pu.x;
+          pu.p0.y = calibrationData.pu.y;
+
+          pageInfos.push(pageInfo);
+          break;
+        }
+        case 1: {
+          nu.p2.x = calibrationData.nu.x;
+          nu.p2.y = calibrationData.nu.y;
+
+          pu.p2.x = calibrationData.pu.x;
+          pu.p2.y = calibrationData.pu.y;
+
+          break;
+        }
+        default: {
+          pageInfos.push(pageInfo);
+          break;
+        } //default end
+      } //switch end
+
+      if (progress === numPages) {
+        const pdfPagesDesc = {
+          url: pdf.url,
+          filename: pdf.filename,
+          fingerprint: pdf.fingerprint,
+          id: pdf.fingerprint + '/1',
+          numPages: numPages,
+          pageNo: pageNo
+        }
+        const worker = new CalibrationData();
+        const mapper = worker.createDocMapperItemOneStep(
+          nu, pu, pageInfos, pdfPagesDesc, pdfPagesDesc.filename, numPages, 1
+        );
+
+        const msi = MappingStorage.getInstance();
+        msi.registerTemporary(mapper);
+
+        hideCalibrationDialog();
+      }
+
+      updateCalibrationDialog(progress+1);
+    } //if end
+  }, [calibrationData]);
+ 
   useEffect(() => {
     if (pdf) {
       console.log("calibration: pdf loaded");
     }
   }, [pdf]);
 
-
-
-  // useEffect(() => {
-  //   console.log(`testing: imageRef  current=${imageRef.current}`)
-  // }, [imgSrc]);
   if (!pdf) return (<></>);
 
   if (pdf && targetPages.length > 0) {
-    pageNo = progress > 0 ? targetPages[progress - 1] : targetPages[0];
+    pageNo = progress > 1 ? targetPages[progress-1] : targetPages[0];
+
+    // let tmpPageNo = progress > 0 ? targetPages[progress - 1] : targetPages[0];
+    // setPageNo(tmpPageNo);
     numProgresses = targetPages.length + 1;
   }
 
@@ -191,9 +239,7 @@ function CalibrationDialog(props: IDialogProps) {
   const open = show && (pdf !== undefined);
   console.log(`testing: render  imgSrc=${imgSrc.length}`);
 
-
-
-  const { url: propsUrl, filename: propsFilename, printOption: propsPrintOption, cancelCallback: propsCancelCallback, ...rest } = props;
+  const { filename: propsFilename, printOption: propsPrintOption, cancelCallback: propsCancelCallback, ...rest } = props;
 
   return (
     <React.Fragment>
@@ -237,30 +283,24 @@ function CalibrationDialog(props: IDialogProps) {
   );
 }
 
-
-
-
-
-
-
-
 interface Props extends ButtonProps {
-  url: string,
   filename: string,
   printOption: IPrintOption,
+  handlePdfUrl: any,
   cancelCallback: (e) => void,
 }
 
-
 export default function CalibrationButton(props: Props) {
-  const { url, filename, printOption, cancelCallback, ...rest } = props;
-  // console.log(`calibration: ${props.url}`)
-  const startCalibration = (e) => {
-    if (props.url) {
+  const { filename, printOption, handlePdfUrl, cancelCallback, ...rest } = props;
+  const startCalibration = async (e) => {
+    const new_url = await handlePdfUrl();
+    if (new_url) {
       const option = {
+        url: new_url,
         show: true,
         targetPages: props.printOption.targetPages,
         progress: 0,
+        calibrationMode: true,
       };
 
       showCalibrationDialog(option);
@@ -272,32 +312,8 @@ export default function CalibrationButton(props: Props) {
       <Button {...rest} onClick={startCalibration}>
         {props.children}
       </Button>
-
-      { props.url ? <CalibrationDialog {...props} /> : ""}
+      <CalibrationDialog {...props} />
+      {/* { new_url ? <CalibrationDialog {...props, url = new_url} /> : ""} */}
     </React.Fragment>
   );
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -733,7 +733,7 @@ export default abstract class RenderWorkerBase {
    * @protected
    * @param {{x:number, y:number, f?:number}} ncodeXY
    */
-  protected ncodeToPdfXy_default = (ncodeXY: { x: number, y: number, f?: number }) => {
+  public ncodeToPdfXy_default = (ncodeXY: { x: number, y: number, f?: number }) => {
     const { x, y, f } = ncodeXY;
     const { Xmin, Ymin } = this.paperBase;
     const px = (x - Xmin) * NU_TO_PU;
@@ -754,7 +754,7 @@ export default abstract class RenderWorkerBase {
 
 
 
-  protected ncodeToPdfXy_homography = (ncodeXY: { x: number, y: number, f?: number }) => {
+  public ncodeToPdfXy_homography = (ncodeXY: { x: number, y: number, f?: number }) => {
     const { x, y } = ncodeXY;
     const { a, b, c, d, e, f, g, h } = this.h;
 

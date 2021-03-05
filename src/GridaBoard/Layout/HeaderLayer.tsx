@@ -152,7 +152,7 @@ const HeaderLayer = () => {
       </Button>
       <LoadGrida />
       <PrintButton targetId={printBtnId} url={pdfUrl} filename={pdfFilename} handlePdfUrl={makePdfUrl}/>
-      <ManualCalibration url={pdfUrl} filename={pdfFilename} printOption={printOption}/>
+      <ManualCalibration filename={pdfFilename} printOption={printOption}/>
       <KeyboardArrowDownRoundedIcon style={{float: "right", marginTop: "25px", marginRight: "31px"}}/>
       <p style={{float: "right"}}>구글 이메일</p>
       <ConnectButton onPenLinkChanged={e => onPenLinkChanged(e)} />

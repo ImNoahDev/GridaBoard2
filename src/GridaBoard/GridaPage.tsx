@@ -1,6 +1,7 @@
 import { NeoPdfDocument, NeoPdfPage } from "../nl-lib/common/neopdf";
 import { IPageMapBase, IPageSOBP, IPageOverview } from "../nl-lib/common/structures";
 import { getNPaperSize_pu } from "../nl-lib/common/noteserver";
+import { isSamePage } from "../nl-lib/common/util";
 
 export default class GridaPage {
   _pageNo: number;
@@ -41,18 +42,18 @@ export default class GridaPage {
   }
 
   // // 여기서 부터는 mapping item에 대한 내용
-  // addPageToNcodeMaps = (pageMaps: IPageMapBase[]) => {
-  //   // this._pageToNcodeMaps 자체가 바뀌는 것을 막자, GridaDoc에서 쓴다.
-  //   //
-  //   // 이걸, pointer로 복사하게 된다면,
-  //   // GridaDoc와 GridaPage의 pageInfo 관련된 항목을 자동 업데이트 되게 수정해야 한다.
-  //   const storedMaps = this._pageToNcodeMaps;
-  //   pageMaps.forEach(pageMap => {
-  //     const isIncluded =
-  //       storedMaps.findIndex(storedMap => isSamePage(storedMap.pageInfo, pageMap.pageInfo)) >= 0;
-  //     if (!isIncluded) storedMaps.push(pageMap);
-  //   });
-  // }
+  addPageToNcodeMaps = (pageMaps: IPageMapBase[]) => {
+    // this._pageToNcodeMaps 자체가 바뀌는 것을 막자, GridaDoc에서 쓴다.
+    //
+    // 이걸, pointer로 복사하게 된다면,
+    // GridaDoc와 GridaPage의 pageInfo 관련된 항목을 자동 업데이트 되게 수정해야 한다.
+    const storedMaps = this._pageToNcodeMaps;
+    pageMaps.forEach(pageMap => {
+      const isIncluded =
+        storedMaps.findIndex(storedMap => isSamePage(storedMap.pageInfo, pageMap.pageInfo)) >= 0;
+      if (!isIncluded) storedMaps.unshift(pageMap);
+    });
+  }
 
   addPageInfo = (pageInfo: IPageSOBP, basePageInfo: IPageSOBP) => {
     if (!basePageInfo)
@@ -66,9 +67,19 @@ export default class GridaPage {
     return pageInfos;
   }
 
+  set pageInfos(pageInfos: IPageSOBP[]) {
+    let i = 0;
+    this._pageToNcodeMaps.forEach(pageMap => {
+      pageMap.pageInfo = pageInfos[i++];
+    });
+  }
+
   get basePageInfo() {
     return this._pageToNcodeMaps[0].basePageInfo;
+  }
 
+  set basePageInfo(basePageInfo: IPageSOBP) {
+    this._pageToNcodeMaps[0].basePageInfo = basePageInfo; 
   }
 
   getPageInfoAt = (index: number) => {

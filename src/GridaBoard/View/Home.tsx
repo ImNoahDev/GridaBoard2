@@ -354,7 +354,7 @@ const Home = () => {
 
             renderCountNo={renderCountNo_store}
 
-            noInfo = {true}
+            noInfo = {false}
           />
           <div id="navbar_page" style={pageNumberingStyle}>
             <div className="navbar-menu neo_shadow" style={{zIndex: 1000, height: "36px"}}>
@@ -380,7 +380,7 @@ const Home = () => {
         </IconButton>
         <PersistentDrawerRight
           open={drawerOpen} handleDrawerClose={handleDrawerClose} onDrawerResize={onDrawerResize}
-          noInfo = {true}
+          noInfo = {false}
         />
       </div> */}
 

@@ -438,7 +438,7 @@ const ContentsLayer = (props: Props) => {
 
         <div id="navbar_end">
           <div className="navbar-menu neo_shadow" style={endStyle}>
-            <ManualCalibration url={pdfUrl} filename={pdfFilename} printOption={printOption} />
+            <ManualCalibration filename={pdfFilename} printOption={printOption} handlePdfUrl={makePdfUrl}/>
           </div>
         </div>
 

@@ -241,8 +241,8 @@ const NavLayer = () => {
         <Avatar style={{marginTop: 5}}>
           H
         </Avatar>
-      </IconButton>
-      <Popover
+      </IconButton> */}
+      {/* <Popover
           id={id}
           open={open}
           anchorEl={anchorEl}
@@ -278,14 +278,14 @@ const NavLayer = () => {
         </Popover> */}
 
       {/* 매핑 정보 살펴보기 */}
-      {/* <div style={{ fontSize: "20px", fontWeight: "bold" }}>
+      <div style={{ fontSize: "20px", fontWeight: "bold" }}>
         <Button variant="contained" color="primary"
           onClick={(event) => setMapViewDetail((mapViewDetail + 1) % 3)} >
           <Box fontSize={14} fontWeight="fontWeightBold" >매핑 테이블</Box>
         </Button>
-      </div> */}
+      </div>
 
-      {/* { mapViewDetail
+      { mapViewDetail
         ? <Paper style={{ position: "absolute", top: 100, minWidth: 800, maxHeight: 800, overflow: 'auto' }}>
           <ReactJson src={mapJson}
             displayDataTypes={false}
@@ -293,7 +293,7 @@ const NavLayer = () => {
         </Paper>
         : ""}
 
-      <div style={{ flex: 1 }}> </div> */}
+      <div style={{ flex: 1 }}> </div>
       {/* GridaDoc 내부 */}
       {/* <div style={{ fontSize: "20px", fontWeight: "bold" }}>
         <Button variant="contained" color="primary"

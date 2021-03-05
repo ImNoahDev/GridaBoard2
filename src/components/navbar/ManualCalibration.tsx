@@ -32,17 +32,17 @@ const mappingStyle = {
 } as React.CSSProperties;
 
 type Props = {
-  url: string,
   filename: string,
   printOption: IPrintOption,
+  handlePdfUrl?: any,
   cancelCallback?: (e) => void,
 }
 
 const ManualCalibration = (props: Props) => {
-  const { url, filename, printOption, cancelCallback, ...rest } = props;
+  const { filename, printOption, cancelCallback, ...rest } = props;
 
   return (
-    <CalibrationButton {...props} cancelCallback={cancelCallback} style={{marginRight: "33px"}}>
+    <CalibrationButton {...props} cancelCallback={cancelCallback} style={{marginRight: "33px"}} handlePdfUrl={props.handlePdfUrl}>
       <GridaToolTip open={true} placement="left-end" tip={{
         head: "인쇄된 페이지 수동 등록",
         msg: "Ncode A4에 인쇄된 페이지를 프로그램에 수동 등록합니다.",

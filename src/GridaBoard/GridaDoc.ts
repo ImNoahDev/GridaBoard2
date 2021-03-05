@@ -63,7 +63,18 @@ export default class GridaDoc {
     // const docMap = event.mapper.docMap;
     // const pdfDescs = this._pdfd.filter(pdfDesc => pdfDesc.fingerprint === docMap.fingerprint);
     // pdfDescs.forEach(pdfDesc => pdfDesc.pdf.refreshNcodeMappingTable());
+    const docMap = event.mapper.docMap;
 
+    docMap.params.forEach(param => {
+      this._pages.forEach(page => {
+        // if (page.fingerprint === docMap.fingerprint && params.pdfDesc.pageNo === page.pdfPageNo) { 새로운 pdf를 만드는거니 fingerprint가 다를 수 밖에
+        if (param.pdfDesc.pageNo === page.pageNo + 1) { //두번째로 추가된 pdf의 pdfPageNo는 자기자신 pdf만의 pageNo이니까 page의 pageNo으로 비교해야됨
+          page.addPageToNcodeMaps([param]);
+        }
+      });
+    })
+    //param.pdfDesc.pageNo은 1부터 시작
+    //page.pageNo은 0부터 시작
     forceToRenderPanes();
   }
 

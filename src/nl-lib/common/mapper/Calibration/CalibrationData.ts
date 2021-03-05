@@ -28,7 +28,7 @@ type CalibrationInputPtsType = {
  * msi.register(tempMapping);
  *
  */
-class CalibrationData {
+export default class CalibrationData {
 
   pts = {
     nu: {
@@ -48,19 +48,17 @@ class CalibrationData {
   pdfPageDesc: IPdfPageDesc;
   pageInfos: IPageSOBP[];
 
-
-
   /**
    * 문서를 매핑 정보를 등록할, 최종의 Item을 한방에구한다
    *
    * usage:
    *    const worker = new CalibrationData();
-   *    const mapper = worker.createDocMapperItemOneClick(
+   *    const mapper = worker.createDocMapperItemOneStep(
    *          nu, pu, pageInfos, filename, numPages, 1
    *    );
    *
    *    const msi = MappingStorage.getInstance();
-   *    msi.register(mapper);
+   *    msi.registerTemporary(mapper);
    *
    * @param numPages
    **/
