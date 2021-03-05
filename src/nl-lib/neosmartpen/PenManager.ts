@@ -17,7 +17,7 @@ let _active_pen: INeoSmartpen = null;
 
 
 
-export const DEFAULT_PEN_COLOR_NUM = 4;
+export const DEFAULT_PEN_COLOR_NUM = 3;
 export const DEFAULT_PEN_THICKNESS = 2;
 export const DEFAULT_PEN_RENDERER_TYPE: IBrushType = IBrushType.PEN;
 
@@ -30,20 +30,20 @@ export default class PenManager {
   // render = [];
 
   pen_colors: string[] = [
-    "rgb(169, 169, 169)", // 0 DARK_GARY #FFAAAAAA #A9A9A9
-    "rgb(255, 0, 0)", // 1 RED #FFFF0200 #FF0000  rgb(255, 0, 0, 0)
-    "rgb(255, 255, 2)", // 2 YELLOW #FFFFD001 #FFFF02
-    "rgb(0, 0, 128)", // 3 NAVY #FF012EE2 #000080
+    "rgb(255,101,0)", // 0 DARK_GARY #FFAAAAAA #A9A9A9
+    "rgb(229,229,229)", // 1 RED #FFFF0200 #FF0000  rgb(255, 0, 0, 0)
+    "rgb(151,151,151)", // 2 YELLOW #FFFFD001 #FFFF02
+    "rgb(0,0,0)", // 3 NAVY #FF012EE2 #000080
 
-    "rgb(0, 0, 0)", // 4 BLACK #FF000000 #000000
+    "rgb(108,0,226)", // 4 BLACK #FF000000 #000000
 
-    "rgb(255, 255, 255)", // 5 LIGHT_GRAY #FFE5E5E5 #D3D3D3
-    "rgb(255, 165, 0)", // 6 ORANGE #FFFF6500 #FFA500
-    "rgb(0, 128, 0)", // 7 GREEN #FF3CDD00 #008000
+    "rgb(240,168,60)", // 5 LIGHT_GRAY #FFE5E5E5 #D3D3D3
+    "rgb(0,171,235)", // 6 ORANGE #FFFF6500 #FFA500
+    "rgb(60,221,0)", // 7 GREEN #FF3CDD00 #008000
 
-    "rgb(0, 0, 255)", // 8 BLUE #FF00ABEB #0000FF
-    "rgb(128, 0, 128)", // 9 PURPLE #FF6C00E2 #800080
-    "rgb(169, 169, 169)" // 10 DARK_GARY #FFAAAAAA #A9A9A9
+    "rgb(255,208,1)", // 8 BLUE #FF00ABEB #0000FF
+    "rgb(255,101,0)", // 9 PURPLE #FF6C00E2 #800080
+    "rgb(255,101,0)" // 10 DARK_GARY #FFAAAAAA #A9A9A9
   ];
 
   marker_colors: string[] = [
@@ -177,7 +177,7 @@ export default class PenManager {
   }
 
   setColor(color_num: number) {
-    this.toggleColorRadioButton(color_num);
+    // this.toggleColorRadioButton(color_num);
     this.color = this.pen_colors[color_num];
 
     if (_active_pen) {

@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { IconButton, makeStyles, createStyles, } from "@material-ui/core";
+import { IconButton, makeStyles, createStyles, SvgIcon, Popover } from "@material-ui/core";
 import { useSelector, shallowEqual } from "react-redux";
 import { Theme } from '@material-ui/core';
 import MenuIcon from '@material-ui/icons/Menu';
@@ -9,7 +9,7 @@ import { theme } from "../../styles/theme";
 import PUIController from '../../components/PUIController';
 import { turnOnGlobalKeyShortCut } from "../GlobalFunctions";
 import PersistentDrawerRight from "./Drawer/PersistentDrawerRight";
-import ButtonLayer from "../Buttons/ButtonLayer";
+import ViewLayer from "../Layout/ViewLayer";
 import AutoLoadConfirmDialog from "../Dialog/AutoLoadConfirmDialog";
 import { RootState } from "../../store/rootReducer";
 import { updateDrawerWidth } from "../../store/reducers/ui";
@@ -26,11 +26,13 @@ import { PLAYSTATE, ZoomFitEnum } from "../../nl-lib/common/enums";
 import { PenManager } from "../../nl-lib/neosmartpen";
 import PageNumbering from "../../components/navbar/PageNumbering";
 import * as PdfJs from "pdfjs-dist";
+import GridaToolTip from "../../styles/GridaToolTip";
+import HelpIcon from '@material-ui/icons/Help';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {
-      display: "flex"
+      // display: "block"
     },
 
     hide: {
@@ -38,6 +40,17 @@ const useStyles = makeStyles((theme: Theme) =>
     },
   }),
 );
+
+const helpStyles = makeStyles({
+  iconContainer: {
+    "&:hover $icon": {
+        color: 'red',
+    }
+  },
+  icon: {
+      color: 'black',
+  },
+});
 
 const Home = () => {
   const [drawerOpen, setDrawerOpen] = useState(true);
@@ -242,7 +255,7 @@ const Home = () => {
   //https://css-tricks.com/controlling-css-animations-transitions-javascript/
 
   let mainStyle = {
-    flexGrow: 1,
+    // flexGrow: 1,
     // padding: theme.spacing(3),
     transition: theme.transitions.create('margin', {
       easing: theme.transitions.easing.sharp,
@@ -253,7 +266,7 @@ const Home = () => {
 
   if (drawerOpen) {
     mainStyle = {
-      flexGrow: 1,
+      // flexGrow: 1,
       // padding: theme.spacing(3),
       transition: theme.transitions.create('margin', {
         easing: theme.transitions.easing.easeOut,
@@ -273,26 +286,51 @@ const Home = () => {
     width: pageWidth,
   } as React.CSSProperties;
 
+  const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null);
+
+  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const open = Boolean(anchorEl);
+  const id = open ? 'simple-popover' : undefined;
+
+  const helpClasees = helpStyles();
+  const showForm = React.useState(false)
+
   console.log(`HOME: docPageNo:${activePageNo}, pdfUrl=${pdfUrl}, fingerPrint: ${pdfFingerprint}, pdfPageNo:${pdfPageNo}`);
   return (
+    <React.Fragment>
+    {/* <div>
+      맨 위쪽
+    </div> */}
+    {/* <div style={{border: "1px solid black"}}>
+      맨 위쪽
+    </div> */}
     <div className={classes.root}>
+      {/* <div style={{backgroundColor: "white"}}> */}
       {/* <CssBaseline /> */}
-      <main style={mainStyle}>
-        <div style={{ position: "absolute", top: 0, left: 0 }}>
+      {/* <div id="wrap" style={{textTransform: "uppercase"}}>
+        <div id="header" style={{width: "100%", height: "70px", border: "1px solid black"}}></div>
+        <div id="nav" style={{width: "100%", height: "50px", border: "1px solid black"}}>
           <nav id="uppernav" className="navbar navbar-light bg-transparent" style={{ float: "left", zIndex: 3 }}>
-            <a id="grida_board" className="navbar-brand" href="#">Grida board
-          <small id="neo_smartpen" className="text-muted">
-                <span data-l10n-id="by_neosmart_pen"> by Neo smartpen </span>
-              </small>
-            </a>
+            <a id="grida_board" className="navbar-brand" href="#">Grida board</a>
           </nav>
         </div>
+        <div id="side" style={{float: "left", width: "180px", height: "900px", border: "1px solid black"}}></div>
+        <div id="contents" style={{width: "100%", height: "900px", border: "1px solid black"}}></div>
+      </div> */}
+      <main>
 
-        <div style={{ position: "absolute", top: 0, left: 0, bottom: 0, right: drawerOpen ? drawerWidth : 0 }}>
-          <ButtonLayer handlePdfOpen={handlePdfOpen} />
+        <div id="layer" style={{ position: "static", top: 0, left: 0, bottom: 0, right: drawerOpen ? drawerWidth : 0 }}>
+          <ViewLayer handlePdfOpen={handlePdfOpen} style={{display: "block"}}/>
         </div>
 
-        <div style={{ position: "absolute", top: 0, left: 0, bottom: 0, right: drawerOpen ? drawerWidth : 0 }}>
+        {/* <div style={{ position: "absolute", top: 0, left: 0, bottom: 0, right: drawerOpen ? drawerWidth : 0 }}>
           <MixedPageView
             pdf={pdf}
             pdfUrl={pdfUrl} filename={pdfFilename}
@@ -323,11 +361,11 @@ const Home = () => {
               <PageNumbering />
             </div>
           </div>
-        </div>
+        </div> */}
       </main >
 
       {/* Drawer 구현 */}
-      <div id="drawer-icon"
+      {/* <div id="drawer-icon"
         style={{ position: "absolute", right: 10, top: 0, zIndex: 4 }}
       >
         <IconButton
@@ -344,16 +382,58 @@ const Home = () => {
           open={drawerOpen} handleDrawerClose={handleDrawerClose} onDrawerResize={onDrawerResize}
           noInfo = {true}
         />
-      </div>
+      </div> */}
 
-      <AutoLoadConfirmDialog open={loadConfirmDlgOn} step={loadConfirmDlgStep}
-        onOk={handleAppendFileOk} onCancel={handleCancelAutoLoad} onNoMore={handleNoMoreAutoLoad} />
-
+      {/* <AutoLoadConfirmDialog open={loadConfirmDlgOn} step={loadConfirmDlgStep}
+        onOk={handleAppendFileOk} onCancel={handleCancelAutoLoad} onNoMore={handleNoMoreAutoLoad} /> */}
+        <GridaToolTip open={true} placement="top-end" tip={{
+          head: "Helper",
+          msg: "도움말 기능들을 보여줍니다.",
+          tail: "키보드 버튼 ?로 선택 가능합니다"
+        }} title={undefined}>
+            <IconButton id="help_btn" className={helpClasees.iconContainer} style={{width: 36, height: 36, position: "relative"}} onClick={handleClick} aria-describedby={id}>
+              {!showForm
+                ? <HelpIcon className={helpClasees.icon} color="primary" fontSize="large" style={{position: "absolute", bottom: 0, right: 0}}/>
+                : <HelpIcon className={helpClasees.icon} color="primary" fontSize="large" style={{position: "absolute", bottom: 0, right: 0}}/>
+              }
+            </IconButton>
+        </GridaToolTip>
+        <Popover
+          id={id}
+          open={open}
+          anchorEl={anchorEl}
+          onClose={handleClose}
+          anchorOrigin={{
+            vertical: 'bottom',
+            horizontal: 'left'
+          }}
+          transformOrigin={{
+            vertical: 'bottom',
+            horizontal: 'right'
+          }}
+        >
+          <div>
+            <a>고객센터</a>
+          </div>
+          <div className="dropdown-divider"></div>
+          <div>
+            <a>단축키 안내</a>
+          </div>
+          <div className="dropdown-divider"></div>
+          <div>
+            <a>튜토리얼</a>
+          </div>
+          <div className="dropdown-divider"></div>
+          <div>
+            <a>FAQ</a>
+          </div>
+        </Popover>
 
       {/* 파일 인풋을 위한 것 */}
       <input type="file" id={g_hiddenFileInputBtnId} onChange={onFileInputChanged} onClick={onFileInputClicked} style={{ display: "none" }} name="pdf" accept=".pdf,.grida" />
       {/* <input type="file" id={"pdf_file_append"} onChange={onFileInputChanged} onClick={onFileInputClicked} style={{ display: "none" }} name="pdf" accept="application/pdf" /> */}
     </div >
+    </React.Fragment>
   );
 };
 

@@ -573,6 +573,8 @@ class PenBasedRenderer extends React.Component<Props, State> {
       top: this.props.position.offsetY / zoom,
       zIndex: 10,
       overflow: "hidden",
+      width: "500px",
+      height: "734px"
     }
 
     // const inkContainerInfo: CSSProperties = {
@@ -591,7 +593,8 @@ class PenBasedRenderer extends React.Component<Props, State> {
       left: 0,
       top: 0,
       zIndex: 10,
-
+      width: "500px",
+      height: "734px"
     }
 
 

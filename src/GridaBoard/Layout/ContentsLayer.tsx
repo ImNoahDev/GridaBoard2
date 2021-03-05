@@ -7,26 +7,62 @@ import GridaToolTip from "../../styles/GridaToolTip";
 import ColorButtons from "../../components/navbar/ColorButtons";
 import { RootState } from "../../store/rootReducer";
 import GridaDoc from "../GridaDoc";
-import { FileBrowserButton } from "../../nl-lib/common/neopdf";
-import { IFileBrowserReturn } from "../../nl-lib/common/structures";
+import { FileBrowserButton, NeoPdfDocument } from "../../nl-lib/common/neopdf";
+import { IFileBrowserReturn, IGetNPageTransformType, IPageSOBP } from "../../nl-lib/common/structures";
 import { g_defaultPrintOption } from "../../nl-lib/ncodepod";
 
-import { Button, ButtonGroup, createStyles, Fab, IconButton, makeStyles, Popover, Theme } from "@material-ui/core";
+import { Button, ButtonGroup, createStyles, Fab, IconButton, makeStyles, Popover, SvgIcon, Theme } from "@material-ui/core";
 import SavePdfDialog from "../Save/SavePdfDialog";
 import {saveGrida} from "../Save/SaveGrida";
 import LoadGrida from "../Load/LoadGrida";
 import { PDFDocument } from 'pdf-lib';
 import HelpIcon from '@material-ui/icons/Help';
 import SaveAltIcon from '@material-ui/icons/SaveAlt';
+import { MixedPageView } from "../../nl-lib/renderer";
+import { PenManager } from "../../nl-lib/neosmartpen";
+import { PLAYSTATE } from "../../nl-lib/common/enums";
+import { nullNcode } from "../../nl-lib/common/constants";
+import PageNumbering from "../../components/navbar/PageNumbering";
 
 const localStyle = {
-  position: "absolute",
-  left: "0px", top: "0px",
+  width: "90.625vw",
+  height: "87.8vh",
+  border: "1px solid black",
+  // float: "left"
+  // clear: "both",
+  float: "left"
+} as React.CSSProperties;
+
+const rotateStyle = {
+  float: "right",
+  // display: "flex",
+  // flexDirection: "row",
+  // justifyContent: "center",
+  // alignItems: "center",
+  // padding: "16px",
+  // position: "static",
+  width: "56px",
+  height: "56px",
+  background: "rgba(255, 255, 255, 0.8)",
+  boxShadow: "2px 0px 24px rgba(0, 0, 0, 0.15), inset 0px 2px 0px rgba(255, 255, 255, 0.15)",
+  borderRadius: "40px",
+  marginRight: "16px",
+  marginTop: "16px"
+} as React.CSSProperties;
+
+const helpStyle = {
+  // position: "absolute",
+  float: "right",
+  width: "56px",
+  height: "56px",
+  background: "rgba(255, 255, 255, 0.8)",
+  boxShadow: "2px 0px 24px rgba(0, 0, 0, 0.15), inset 0px 2px 0px rgba(255, 255, 255, 0.15)",
+  borderRadius: "40px",
+  marginRight: "16px",
+  marginTop: "50px",
+  // zIndex: 100
   bottom: 0,
-  flexDirection: "row-reverse",
-  display: "flex",
-  alignItems: "center",
-  zIndex: 3,
+  right: 0
 } as React.CSSProperties;
 
 const printBtnId = "printTestButton";
@@ -125,7 +161,7 @@ interface Props {
 /**
  *
  */
-const ButtonLayerBottom = (props: Props) => {
+const ContentsLayer = (props: Props) => {
   const { handlePdfOpen, ...rest } = props;
 
   const [pdfUrl, setPdfUrl] = useState(undefined as string);
@@ -221,9 +257,142 @@ const ButtonLayerBottom = (props: Props) => {
   const open = Boolean(anchorEl);
   const id = open ? 'simple-popover' : undefined;
 
+  let pdf = undefined as NeoPdfDocument;
+  let pdfPageNo = 1;
+  let rotation = 0;
+  let pageInfos = [nullNcode()];
+  let basePageInfo = nullNcode();
+
+  const [drawerOpen, setDrawerOpen] = useState(true);
+  const [pageWidth, setPageWidth] = useState(0);
+
+  const drawerWidth = useSelector((state: RootState) => state.ui.drawer.width);
+  const pens = useSelector((state: RootState) => state.appConfig.pens);
+  const viewFit_store = useSelector((state: RootState) => state.viewFitReducer.viewFit);
+  const {activePageNo_store} = useSelector((state: RootState) =>({
+    activePageNo_store: state.activePage.activePageNo,
+  }));
+  const {renderCountNo_store} = useSelector((state: RootState) =>({
+    renderCountNo_store: state.activePage.renderCount,
+  }));
+  const virtualPen = PenManager.getInstance().virtualPen;
+
+  const onNcodePageChanged = (pageInfo: IPageSOBP, found: IGetNPageTransformType) => {
+    // const doc = GridaDoc.getInstance();
+    // const result = doc.handleActivePageChanged(pageInfo, found);
+
+    // if (!noMoreAutoLoad && result.needToLoadPdf) {
+    //   handleFileLoadNeeded(found, result.pageInfo, result.basePageInfo);
+    // }
+  }
+
+  const handlePageWidthNeeded = (width: number) => {
+    setPageWidth(width);
+  }
+
+  const pageNumberingStyle = {
+    position: "absolute",
+    bottom: 8,
+    flexDirection: "row-reverse",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    width: pageWidth,
+  } as React.CSSProperties;
+
   return (
     <div style={localStyle}>
-      <nav id="colornav" className="navRoot" style={navStyle}>
+
+      <IconButton style={rotateStyle}>
+        <SvgIcon>
+          <path
+            d="M8.55 4.9l2.667-2a.5.5 0 000-.8L8.55.1a.5.5 0 00-.8.4v1.25C5.105 1.75 3 3.956 3 6.627c0 .793.185 1.544.514 2.208a.75.75 0 001.344-.666A3.462 3.462 0 014.5 6.626C4.5 4.74 5.977 3.25 7.75 3.25V4.5a.5.5 0 00.8.4z"
+          />
+            <path
+              fillRule="evenodd"
+              clipRule="evenodd"
+              d="M8.733 9v13h9.534V9H8.733zm-.866-2C7.388 7 7 7.448 7 8v15c0 .552.388 1 .867 1h11.266c.479 0 .867-.448.867-1V8c0-.552-.388-1-.867-1H7.867z"
+            />
+        </SvgIcon>
+      </IconButton>
+      
+      {/* <div style={{ position: "static", top: 0, left: 0, bottom: 0, right: drawerOpen ? drawerWidth : 0 }}>
+          <MixedPageView
+            pdf={pdf}
+            pdfUrl={pdfUrl} filename={pdfFilename}
+            pdfPageNo={pdfPageNo} pens={[...pens, virtualPen]} 
+            playState={PLAYSTATE.live}
+            rotation={rotation}
+            isMainView={true}
+
+            pageInfo={pageInfos[0]}
+            basePageInfo={basePageInfo}
+
+            parentName={"grida-main-home"}
+            viewFit={viewFit_store}
+            autoPageChange={true}
+            fromStorage={false}
+            fitMargin={100}
+            
+            activePageNo={activePageNo_store}
+            onNcodePageChanged={onNcodePageChanged}
+            handlePageWidthNeeded = {(width) => handlePageWidthNeeded(width)}
+
+            renderCountNo={renderCountNo_store}
+
+            noInfo = {true}
+          />
+          <div id="navbar_page" style={pageNumberingStyle}>
+            <div className="navbar-menu neo_shadow" style={{zIndex: 1000, height: "36px"}}>
+              <PageNumbering />
+            </div>
+          </div>
+        </div> */}
+
+        <GridaToolTip open={true} placement="top-end" tip={{
+          head: "Helper",
+          msg: "도움말 기능들을 보여줍니다.",
+          tail: "키보드 버튼 ?로 선택 가능합니다"
+        }} title={undefined}>
+            <IconButton id="help_btn" className={classes.iconContainer} style={helpStyle} onClick={handleClick} aria-describedby={id}>
+              {!showForm
+                ? <HelpIcon className={classes.icon} color="primary" fontSize="large"/>
+                : <HelpIcon className={classes.icon} color="primary" fontSize="large"/>
+              }
+            </IconButton>
+        </GridaToolTip>
+        <Popover
+          id={id}
+          open={open}
+          anchorEl={anchorEl}
+          onClose={handleClose}
+          anchorOrigin={{
+            vertical: 'bottom',
+            horizontal: 'left'
+          }}
+          transformOrigin={{
+            vertical: 'bottom',
+            horizontal: 'right'
+          }}
+        >
+          <div>
+            <a>고객센터</a>
+          </div>
+          <div className="dropdown-divider"></div>
+          <div>
+            <a>단축키 안내</a>
+          </div>
+          <div className="dropdown-divider"></div>
+          <div>
+            <a>튜토리얼</a>
+          </div>
+          <div className="dropdown-divider"></div>
+          <div>
+            <a>FAQ</a>
+          </div>
+        </Popover>
+        
+      {/* <nav id="colornav" className="navRoot" style={navStyle}>
         <div className="navbar-menu d-flex justify-content-start align-items-end neo_shadow ">
           <Button id="btn_menu" type="button" className="btn btn-neo" style={buttonStyle} onClick={hideAndShowFnc}>
             <GridaToolTip open={true} placement="top-end" tip={{
@@ -273,8 +442,7 @@ const ButtonLayerBottom = (props: Props) => {
           </div>
         </div>
 
-        {/* 도움말 Helper 버튼 */}
-        {/* <GridaToolTip open={true} placement="top-end" tip={{
+        <GridaToolTip open={true} placement="top-end" tip={{
           head: "Helper",
           msg: "도움말 기능들을 보여줍니다.",
           tail: "키보드 버튼 ?로 선택 가능합니다"
@@ -315,10 +483,10 @@ const ButtonLayerBottom = (props: Props) => {
           <div>
             <a>FAQ</a>
           </div>
-        </Popover> */}
-      </nav>
+        </Popover>
+      </nav> */}
     </div>
   );
 }
 
-export default ButtonLayerBottom;
+export default ContentsLayer;

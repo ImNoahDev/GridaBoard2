@@ -124,8 +124,9 @@ const Root = () => {
   return (
     <Provider store={store}>
       <MuiThemeProvider theme={theme}>
-        {paperInfoInited ? 
-        <Home /> : <></>}
+        {/* {paperInfoInited ? 
+        <Home /> : <></>} */}
+        <Home />
 
         <Backdrop style={styles.backdrop} open={shouldWait} >
           <CircularProgress color="inherit" />

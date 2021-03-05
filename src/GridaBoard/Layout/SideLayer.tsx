@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import BackgroundButton from "../../components/buttons/BackgroundButton";
 import ConnectButton from "../../components/buttons/ConnectButton";
 import FitButton from "../../components/buttons/FitButton";
@@ -18,19 +18,44 @@ import { setActivePageNo } from "../../store/reducers/activePageReducer";
 import InkStorage from "../../nl-lib/common/penstorage/InkStorage";
 import { PageEventName } from "../../nl-lib/common/enums";
 import { scrollToBottom } from "../../nl-lib/common/util";
+import MenuIcon from '@material-ui/icons/Menu';
+import PersistentDrawerRight from "../View/Drawer/PersistentDrawerRight";
+import { updateDrawerWidth } from "../../store/reducers/ui";
+import KeyboardArrowRightIcon from '@material-ui/icons/KeyboardArrowRight';
 
 const mainFrameStyle = {
-  position: "absolute",
-  flexDirection: "row-reverse",
-  display: "flex",
+  position: "static",
+  // flexDirection: "row-reverse",
+  // display: "block",
 
-  left: "0%",
-  top: "10%",
-  bottom: "10%",
+  // left: "0%",
+  // top: "10%",
+  // bottom: "10%",
 
   alignItems: "center",
-  zIndex: 3,
-  marginLeft: "-1px",
+  // zIndex: 3,
+  // marginLeft: "-1px",
+  border: "1px solid black",
+  height: "87.8vh",
+  width: "9.375vw",
+  float: "left",
+} as React.CSSProperties;
+
+const arrowRightStyle = {
+  display: "flex",
+  // flexDirection: "row",
+  // justifyContent: "center",
+  // alignItems: "center",
+  padding: "8px",
+  width: "40px",
+  height: "40px",
+  // left: "16px",
+  top: "16px",
+  background: "rgba(255,255,255,0.25)",
+  // boxShadow: "2px 0px 24px rgba(0, 0, 0, 0.15), inset 0px 2px 0px rgba(255, 255, 255, 0.15)",
+  borderRadius: "40px",
+  marginLeft: "16px",
+  zIndex: 1000
 } as React.CSSProperties;
 
 const useStyles = makeStyles(theme => ({
@@ -54,7 +79,7 @@ const addBlankPage = async (event) => {
 /**
  *
  */
-const ButtonLayerSide = () => {
+const SideLayer = () => {
   const activePageNo_store = useSelector((state: RootState) => {
     return state.activePage.activePageNo
   });
@@ -94,13 +119,45 @@ const ButtonLayerSide = () => {
     // }
   }
 
+  const [drawerOpen, setDrawerOpen] = useState(true);
+  const setDrawerWidth = (width: number) => updateDrawerWidth({ width });
+
+  const handleDrawerOpen = () => {
+    setDrawerOpen(true);
+  };
+
+  const handleDrawerClose = () => {
+    setDrawerOpen(false);
+  };
+
+  const onDrawerResize = (size) => {
+    setDrawerWidth(size);
+  }
+
   return (
-    <div style={{ zIndex: 0 }}>
-
       <div id="mainFrame" style={mainFrameStyle}>
-        {/* <nav id="sidenav" className="navbar fixed-left navbar-light bg-transparent"> */}
 
-        <div className="d-flex flex-column h-100">
+        {/* Drawer 구현 */}
+        {/* <div id="drawer-icon"
+          style={{ position: "absolute", right: 10, top: 0, zIndex: 4 }}
+        > */}
+          <IconButton
+            color="inherit"
+            aria-label="open drawer"
+            edge="end"
+            onClick={handleDrawerOpen}
+            style={arrowRightStyle}
+          // className={clsx(drawerOpen && classes.hide)}
+          >
+            <KeyboardArrowRightIcon/>
+          </IconButton>
+          <PersistentDrawerRight
+            open={drawerOpen} handleDrawerClose={handleDrawerClose} onDrawerResize={onDrawerResize}
+            noInfo = {true}
+          />
+        {/* </div> */}
+
+        {/* <div className="d-flex flex-column h-100">
           <div id="leftmenu" className="main-container flex-grow-1">
             <div id="menu-wide" className="d-flex menu-container float-left h-100">
               <div className="d-flex flex-column justify-content-between" style={{ zIndex: 1030 }}>
@@ -124,7 +181,6 @@ const ButtonLayerSide = () => {
                     <PenTypeButton />
                   </div>
 
-                  {/* Trash Button  */}
                   <button id="btn_trash" type="button" className="btn btn-neo btn-neo-dropdown"
                     onClick={() => handleTrashBtn()}>
                     <GridaToolTip open={true} placement="left" tip={{
@@ -153,12 +209,9 @@ const ButtonLayerSide = () => {
               </div>
             </div>
           </div>
-        </div>
-        {/* </nav> */}
+        </div> */}
       </div>
-
-    </div>
   );
 }
 
-export default ButtonLayerSide;
+export default SideLayer;

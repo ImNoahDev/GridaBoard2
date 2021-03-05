@@ -3,8 +3,14 @@ import '../../styles/buttons.css';
 import ThemeManager from "../../styles/ThemeManager";
 import GridaToolTip from "../../styles/GridaToolTip";
 import Popover from "@material-ui/core/Popover";
+import { Button } from "@material-ui/core";
 
 const themeManager: ThemeManager = ThemeManager.getInstance();
+
+const backgroundStyle = {
+  // marginTop: "11px",
+  float: "right"
+} as React.CSSProperties;
 
 export default function BackgroundButton() {
 
@@ -35,9 +41,9 @@ export default function BackgroundButton() {
   const id = open ? 'simple-popover' : undefined;
 
     return (
-      <div className="btn-group dropright" role="group">
-        <button type="button" id="btn_background" className="btn btn-neo btn-neo-vertical"
-          data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" onClick={handleClick} aria-describedby={id}>
+      // <div className="btn-group dropright" role="group">
+      <React.Fragment>
+        <Button type="button" id="btn_background" style={backgroundStyle} onClick={handleClick} aria-describedby={id}>
           <GridaToolTip open={true} placement="left" tip={{
               head: "Background",
               msg: "화면의 배경색을 선택합니다.",
@@ -48,7 +54,7 @@ export default function BackgroundButton() {
               <img src="/icons/icon_background_p.png" className="hover-image"></img>
             </div>
           </GridaToolTip>
-        </button>
+        </Button>
         <Popover
           id={id}
           open={open}
@@ -63,35 +69,16 @@ export default function BackgroundButton() {
             horizontal: 'left',
           }}
         >
+
           <a id="btn_bg_gd" className="dropdown-item" href="#" onClick={() => setBackground(1)}>
             <div className="c2">
-              <img src="/icons/icon_bg_gd01_n.png" className="normal-image"></img>
-              <img src="/icons/icon_bg_gd01_p.png" className="hover-image"></img>
-              <span className="bg-dropmenu">Gurodong</span>
+              <span className="bg-dropmenu">Basic</span>
             </div>
           </a>
 
           <a id="btn_bg_avan" className="dropdown-item" href="#" onClick={() => setBackground(2)}>
             <div className="c2">
-              <img src="/icons/icon_bg_gd02_n.png" className="normal-image"></img>
-              <img src="/icons/icon_bg_gd02_p.png" className="hover-image"></img>
-              <span className="bg-dropmenu">Aubergine</span>
-            </div>
-          </a>
-
-          <a id="btn_bg_white" className="dropdown-item" href="#" onClick={() => setBackground(3)}>
-            <div className="c2">
-              <img src="/icons/icon_bg_wh_n.png" className="normal-image"></img>
-              <img src="/icons/icon_bg_wh_p.png" className="hover-image"></img>
-              <span className="bg-dropmenu">White</span>
-            </div>
-          </a>
-
-          <a id="btn_bg_black" className="dropdown-item" href="#" onClick={() => setBackground(4)}>
-            <div className="c2">
-              <img src="/icons/icon_bg_bk_n.png" className="normal-image"></img>
-              <img src="/icons/icon_bg_bk_p.png" className="hover-image"></img>
-              <span className="bg-dropmenu">Black</span>
+              <span className="bg-dropmenu">Neo-prism</span>
             </div>
           </a>
         </Popover>
@@ -100,7 +87,8 @@ export default function BackgroundButton() {
 
           
           {/* </a> */}
-        </div>
+        {/* </div> */}
       </div>
+      </React.Fragment>
     );
 }

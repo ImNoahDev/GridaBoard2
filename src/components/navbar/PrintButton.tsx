@@ -3,6 +3,7 @@ import '../../styles/main.css';
 import GridaToolTip from '../../styles/GridaToolTip';
 import { PrintNcodedPdfButton } from '../../nl-lib/ncodepod';
 import { turnOnGlobalKeyShortCut } from '../../GridaBoard/GlobalFunctions';
+import { Button } from '@material-ui/core';
 
 type Props = {
   targetId: string,
@@ -10,6 +11,20 @@ type Props = {
   filename: string,
   handlePdfUrl?: any,
 }
+
+const buttonStyle = {
+  // width: "53px",
+  height: "1.6vh",
+  left: "0.8vw",
+  fontFamily: "Roboto",
+  fontStyle: "normal",
+  fontWeight: "normal",
+  fontSize: "1.44vh",
+  // lineHeight: "16px",
+  textAlign: "right",
+  letterSpacing: "0.25px",
+  marginRight: "2vw"
+} as React.CSSProperties;
 
 const PrintButton = (props: Props) => {
   return (
@@ -25,10 +40,9 @@ const PrintButton = (props: Props) => {
           msg: "PDF파일을 프린트하는 버튼입니다.",
           tail: "단축키 Q로 선택가능합니다."
         }} title={undefined}>
-          <div className="c2">
-            <img src='/icons/icon_print_n.png' className="normal-image"></img>
-            <img src='/icons/icon_print_p.png' className="hover-image"></img>
-          </div>
+          <Button style={buttonStyle}>
+            프린트
+          </Button>
         </GridaToolTip>
       </PrintNcodedPdfButton>
     </React.Fragment>

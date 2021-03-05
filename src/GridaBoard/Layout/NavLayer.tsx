@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Avatar, Box, Button, IconButton, Paper, Popover } from "@material-ui/core";
+import { Avatar, Box, Button, IconButton, Paper, Popover, SvgIcon } from "@material-ui/core";
 import { useSelector } from "react-redux";
 import ReactJson from "react-json-view";
 
@@ -23,20 +23,70 @@ import { turnOnGlobalKeyShortCut } from "../GlobalFunctions";
 import { savePDF } from "../Save/SavePdf";
 import { setActivePageNo } from "../../store/reducers/activePageReducer";
 import PictureAsPdfIcon from '@material-ui/icons/PictureAsPdf';
+import GridaToolTip from "../../styles/GridaToolTip";
+import KeyboardArrowDownRoundedIcon from '@material-ui/icons/KeyboardArrowDownRounded';
+import ZoomButton from "../../components/buttons/ZoomButton";
+import PenTypeButton from "../../components/buttons/PenTypeButton";
+import ThicknessButton from "../../components/buttons/ThicknessButton";
+import TracePointButton from "../../components/buttons/TracePointButton";
+import ColorButtons from "../../components/navbar/ColorButtons";
+import BackgroundButton from "../../components/buttons/BackgroundButton";
+import FitButton from "../../components/buttons/FitButton";
+import AddIcon from '@material-ui/icons/Add';
 
 
-const buttonDivStyle = {
-  position: "absolute",
-  display: "flex",
+const navStyle = {
+  position: "static",
+  display: "block",
   flexDirection: "row-reverse",
   alignItems: "center",
   left: 0,
   top: 0,
   right: 50,
-  height: "40px",
-  zIndex: 3,
+  height: "5.2vh",
+  zIndex: 0,
+  border: "1px solid black",
+  width: "100%",
 } as React.CSSProperties;
 
+const penTypeStyle = {
+  // marginTop: "11px",
+  float: "left",
+  marginLeft: "30px"
+} as React.CSSProperties;
+
+const colorStyle = {
+  padding: "0px",
+  margin: "0px",
+  border: "0px",
+  minWidth: "24px",
+  marginTop: "6px",
+  lineHeight: "36px",
+  float: "left",
+  marginLeft: "27px"
+} as React.CSSProperties;
+
+const thicknessStyle = {
+  marginTop: "11px",
+  float: "left",
+  marginLeft: "34px"
+} as React.CSSProperties;
+
+const pointerStyle = {
+  marginTop: "11px",
+  float: "left",
+  marginLeft: "34px"
+} as React.CSSProperties;
+
+const zoomStyle = {
+  marginTop: "11px",
+  float: "right"
+} as React.CSSProperties;
+
+const backgroundStyle = {
+  marginTop: "11px",
+  float: "right"
+} as React.CSSProperties;
 
 const printBtnId = "printTestButton";
 const printOption = g_defaultPrintOption;
@@ -52,7 +102,7 @@ const getNoteInfo = (event) => {
 /**
  *
  */
-const ButtonLayer_forTest = () => {
+const NavLayer = () => {
   const [num_pens, setNumPens] = useState(0);
   const [mapViewDetail, setMapViewDetail] = useState(0);
   const [docViewDetail, setDocViewDetail] = useState(0);
@@ -147,13 +197,47 @@ const ButtonLayer_forTest = () => {
   const open = Boolean(anchorEl);
   const id = open ? 'simple-popover' : undefined;
 
+  const zoom = useSelector((state: RootState) => state.zoomReducer.zoom);
+  const zoomPercent = Math.round(zoom * 100);
 
   return (
-    <div id={"button_div"} style={buttonDivStyle}>
+    <div id={"button_div"} style={navStyle}>
 
-      <div style={{ flex: 1 }}> </div>
+      <PenTypeButton />
+      {/* 나중에 colorButton으로 연결해서 호출하기 */}
+      <ColorButtons />
+      {/* <Button id="clr_1" type="button" className="color_btn" style={colorStyle}
+        // onClick={() => manager.setColor(1)}
+        >
+        <GridaToolTip open={true} placement="top" tip={{
+            head: "RED",
+            msg: "표시되는 펜의 색상을 선택합니다",
+            tail: "키보드 버튼 1로 선택 가능합니다"
+          }} title={undefined}>
+          <div className="color_icon color_1">
+          </div>
+        </GridaToolTip>
+      </Button> */}
+      <KeyboardArrowDownRoundedIcon style={{float: "left", marginTop: "14px", marginLeft: "-5px"}}/>
+      {/* 나중에 pentype thickness로 연결해서 호출하기 */}
+      <ThicknessButton />
+      <KeyboardArrowDownRoundedIcon style={{float: "left", marginTop: "14px", marginLeft: "-5px"}}/>
+      {/* 나중에 pointer로 연결해서 호출하기 */}
+      <TracePointButton />
+      
 
-      <IconButton onClick={handleClick} aria-describedby={id} style={{marginLeft: 1700}}>
+      <KeyboardArrowDownRoundedIcon style={{float: "right", marginTop: "14px", marginLeft: "-5px", marginRight: "-30px"}}/>   
+       {/* 나중에 fit과 zomm에 연결해서 호출하기 */}
+      {/* <span id="zoom-ratio" style={zoomStyle}>{zoomPercent}%</span> */}
+      <FitButton />
+
+      <KeyboardArrowDownRoundedIcon style={{float: "right", marginTop: "14px", marginLeft: "-5px", marginRight: "31px"}}/>
+      {/* 나중에 background에 연결해서 호출하기 */}
+      <BackgroundButton />
+
+      {/* <div style={{ flex: 1 }}> </div> */}
+
+      {/* <IconButton onClick={handleClick} aria-describedby={id} style={{marginLeft: 1700}}>
         <Avatar style={{marginTop: 5}}>
           H
         </Avatar>
@@ -191,7 +275,7 @@ const ButtonLayer_forTest = () => {
           <div>
             <a>로그아웃</a>
           </div>
-        </Popover>
+        </Popover> */}
 
       {/* 매핑 정보 살펴보기 */}
       {/* <div style={{ fontSize: "20px", fontWeight: "bold" }}>
@@ -305,4 +389,4 @@ const ButtonLayer_forTest = () => {
   );
 }
 
-export default ButtonLayer_forTest;
+export default NavLayer;

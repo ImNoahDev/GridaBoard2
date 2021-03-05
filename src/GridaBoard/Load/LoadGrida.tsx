@@ -3,7 +3,7 @@ import { openFileBrowser } from "../../nl-lib/common/neopdf/FileBrowser";
 import { InkStorage } from '../../nl-lib/common/penstorage';
 import GridaDoc from '../GridaDoc';
 import PublishIcon from '@material-ui/icons/Publish';
-import { IconButton, makeStyles } from '@material-ui/core';
+import { Button, IconButton, makeStyles } from '@material-ui/core';
 import GridaToolTip from "../../styles/GridaToolTip";
 
 const useStyles = makeStyles({
@@ -16,6 +16,20 @@ const useStyles = makeStyles({
       color: 'black',
   },
 });
+
+const buttonStyle = {
+  // width: "53px",
+  height: "1.6vh",
+  left: "0.8vw",
+  fontFamily: "Roboto",
+  fontStyle: "normal",
+  fontWeight: "normal",
+  fontSize: "1.44vh",
+  // lineHeight: "16px",
+  textAlign: "right",
+  letterSpacing: "0.25px",
+  marginRight: "2vw"
+} as React.CSSProperties;
 
 const LoadGrida = () => {
 
@@ -83,20 +97,23 @@ const LoadGrida = () => {
   }
 
   return (
-      <button className="btn btn-neo" style={{marginLeft: "-10px"}} onClick={fileOpenHandler}>
-        <GridaToolTip open={true} placement="top-end" tip={{
-          head: "Grida Load",
-          msg: ".grida 파일을 로컬에서 불러옵니다.",
-          tail: "키보드 버튼 ?로 선택 가능합니다"
-        }} title={undefined}>
-          <IconButton className={classes.iconContainer} style={{width: 36, height: 36}}>
-            {!showForm
-              ? <PublishIcon className={classes.icon}/>
-              : <PublishIcon className={classes.icon}/>
-            }
-          </IconButton>
-        </GridaToolTip> 
-      </button>
+      // <button className="btn btn-neo" style={{marginLeft: "-10px"}} onClick={fileOpenHandler}>
+      //   <GridaToolTip open={true} placement="top-end" tip={{
+      //     head: "Grida Load",
+      //     msg: ".grida 파일을 로컬에서 불러옵니다.",
+      //     tail: "키보드 버튼 ?로 선택 가능합니다"
+      //   }} title={undefined}>
+      //     <IconButton className={classes.iconContainer} style={{width: 36, height: 36}}>
+      //       {!showForm
+      //         ? <PublishIcon className={classes.icon}/>
+      //         : <PublishIcon className={classes.icon}/>
+      //       }
+      //     </IconButton>
+      //   </GridaToolTip> 
+      // </button>
+      <Button style={buttonStyle}>
+        내보내기
+      </Button>
   );
 }
 
