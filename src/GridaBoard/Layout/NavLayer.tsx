@@ -47,6 +47,8 @@ const navStyle = {
   zIndex: 0,
   border: "1px solid black",
   width: "100%",
+  margin: 0,
+  background: "rgba(255, 255, 255, 0.5)",
 } as React.CSSProperties;
 
 const penTypeStyle = {

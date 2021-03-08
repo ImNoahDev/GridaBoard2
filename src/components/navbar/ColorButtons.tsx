@@ -63,12 +63,10 @@ const ColorButtons = () => {
 
   const changeColor = (color: number) => {
     if (color === 1) {
-      // selectColor.classList.remove();
       $('.select_color').removeAttr('id');
       $('.select_color').attr('id', 'clr_1');
       $('#select_color').removeAttr('class');
       $('#select_color').attr('class', 'color_icon color_1');
-      // selectColor.classList.add('olor_icon color_1');
     } else if (color === 2) {
       $('.select_color').removeAttr('id');
       $('.select_color').attr('id', 'clr_2');
@@ -115,8 +113,8 @@ const ColorButtons = () => {
       $('#select_color').removeAttr('class');
       $('#select_color').attr('class', 'color_icon color_0');
     }
-    handleClose();
     manager.setColor(color);
+    handleClose();
   }
 
   const open = Boolean(anchorEl);
@@ -135,8 +133,8 @@ const ColorButtons = () => {
         anchorEl={anchorEl}
         onClose={handleClose}
         anchorOrigin={{
-          vertical: 'top',
-          horizontal: 'right'
+          vertical: 'bottom',
+          horizontal: 'center'
         }}
         transformOrigin={{
           vertical: 'top',

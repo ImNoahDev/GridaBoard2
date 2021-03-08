@@ -75,8 +75,8 @@ export default function ThicknessButton () {
           anchorEl={anchorEl}
           onClose={handleClose}
           anchorOrigin={{
-            vertical: 'top',
-            horizontal: 'right'
+            vertical: 'bottom',
+            horizontal: 'center'
           }}
           transformOrigin={{
             vertical: 'top',

@@ -128,30 +128,56 @@ const useStyles = makeStyles((theme: Theme) =>
       // right:0,
       bottom: 0,
       zIndex: 100,
-      backgroundColor: "#f4f7f9"
+      // backgroundColor: "#f4f7f9"
       // backgroundColor: "#ff0000"
     },
     drawerFooter: {
       marginTop: "74vh",
       // marginLeft: "0.8vw",
       background: "rgba(104,143,255,1)",
-      display: 'flex',
+      // display: 'fii',
+      position: "fixed",
       flexDirection: "row",
       alignItems: 'center',
       // padding: "8px 24px",
       // padding: theme.spacing(0, 1),
       // necessary for content to be below app bar
-      ...theme.mixins.toolbar,
+      // ...theme.mixins.toolbar,
       justifyContent: 'center',
       boxShadow: "2px 0px 24px rgba(0, 0, 0, 0.15)",
       borderRadius: "60px",
       width: 140,
       height: 40,
-      bottom: 24
-      // zIndex: 1200
+      bottom: 24,
+      left: 20,
+      // marginBottom: "-50vh"
+      zIndex: 1100,
     }
   }),
 );
+
+const drawerFooter = {
+  marginTop: "74vh",
+  // marginLeft: "0.8vw",
+  background: "rgba(104,143,255,1)",
+  // display: 'fii',
+  position: "fixed",
+  flexDirection: "row",
+  alignItems: 'center',
+  // padding: "8px 24px",
+  // padding: theme.spacing(0, 1),
+  // necessary for content to be below app bar
+  // ...theme.mixins.toolbar,
+  justifyContent: 'center',
+  boxShadow: "2px 0px 24px rgba(0, 0, 0, 0.15)",
+  borderRadius: "60px",
+  width: 140,
+  height: 40,
+  bottom: 24,
+  left: 20,
+  // marginBottom: "-50vh"
+  zIndex: 1100,
+} as React.CSSProperties;
 
 const minDrawerWidth = 50;
 const maxDrawerWidth = 1000;
@@ -219,10 +245,12 @@ export default function PersistentDrawerRight(props: Props) {
         </div>
         <div onMouseDown={e => handleMouseDown(e)} className={classes.dragger} />
         < DrawerPages noInfo={props.noInfo} />
-        <Button className={classes.drawerFooter} onClick={(evnet) => addBlankPage(event)}>
-          <AddIcon style={{width: "12px", height: "12px"}}/>
-          <span style={{fontSize: "12px"}}>페이지 추가</span>
-        </Button>
+        {/* <div > */}
+          <Button onClick={(evnet) => addBlankPage(event)} style={drawerFooter}>
+            <AddIcon style={{width: "12px", height: "12px", color: "rgba(255,255,255,1)"}}/>
+            <span style={{fontSize: "12px", color: "rgba(255,255,255,1)"}}>페이지 추가</span>
+          </Button>
+        {/* </div> */}
       </div>
       </Drawer>
     </div>

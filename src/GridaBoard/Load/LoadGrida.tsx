@@ -111,7 +111,7 @@ const LoadGrida = () => {
       //     </IconButton>
       //   </GridaToolTip> 
       // </button>
-      <Button style={buttonStyle}>
+      <Button style={buttonStyle} onClick={fileOpenHandler}>
         내보내기
       </Button>
   );

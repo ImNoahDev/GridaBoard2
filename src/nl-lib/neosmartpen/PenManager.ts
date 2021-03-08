@@ -30,7 +30,7 @@ export default class PenManager {
   // render = [];
 
   pen_colors: string[] = [
-    "rgb(255,101,0)", // 0 DARK_GARY #FFAAAAAA #A9A9A9
+    "rgb(255,2,0)", // 0 DARK_GARY #FFAAAAAA #A9A9A9
     "rgb(229,229,229)", // 1 RED #FFFF0200 #FF0000  rgb(255, 0, 0, 0)
     "rgb(151,151,151)", // 2 YELLOW #FFFFD001 #FFFF02
     "rgb(0,0,0)", // 3 NAVY #FF012EE2 #000080
@@ -43,7 +43,7 @@ export default class PenManager {
 
     "rgb(255,208,1)", // 8 BLUE #FF00ABEB #0000FF
     "rgb(255,101,0)", // 9 PURPLE #FF6C00E2 #800080
-    "rgb(255,101,0)" // 10 DARK_GARY #FFAAAAAA #A9A9A9
+    "rgb(255,2,0)" // 10 DARK_GARY #FFAAAAAA #A9A9A9
   ];
 
   marker_colors: string[] = [

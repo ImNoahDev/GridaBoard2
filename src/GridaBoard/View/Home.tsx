@@ -324,7 +324,7 @@ const Home = () => {
         <div id="side" style={{float: "left", width: "180px", height: "900px", border: "1px solid black"}}></div>
         <div id="contents" style={{width: "100%", height: "900px", border: "1px solid black"}}></div>
       </div> */}
-      <main>
+      {/* <main> */}
 
         <div id="layer" style={{ position: "static", top: 0, left: 0, bottom: 0, right: drawerOpen ? drawerWidth : 0 }}>
           <ViewLayer handlePdfOpen={handlePdfOpen} style={{display: "block"}}/>
@@ -362,7 +362,7 @@ const Home = () => {
             </div>
           </div>
         </div> */}
-      </main >
+      {/* </main > */}
 
       {/* Drawer 구현 */}
       {/* <div id="drawer-icon"

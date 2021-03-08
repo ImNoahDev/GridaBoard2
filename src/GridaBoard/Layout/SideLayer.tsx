@@ -22,6 +22,7 @@ import MenuIcon from '@material-ui/icons/Menu';
 import PersistentDrawerRight from "../View/Drawer/PersistentDrawerRight";
 import { updateDrawerWidth } from "../../store/reducers/ui";
 import KeyboardArrowRightIcon from '@material-ui/icons/KeyboardArrowRight';
+import $ from "jquery";
 
 const mainFrameStyle = {
   position: "static",
@@ -119,14 +120,16 @@ const SideLayer = () => {
     // }
   }
 
-  const [drawerOpen, setDrawerOpen] = useState(true);
+  const [drawerOpen, setDrawerOpen] = useState(false);
   const setDrawerWidth = (width: number) => updateDrawerWidth({ width });
 
   const handleDrawerOpen = () => {
+    $('#arrow-btn').css('display', 'none');
     setDrawerOpen(true);
   };
 
   const handleDrawerClose = () => {
+    $('#arrow-btn').css('display', 'block');
     setDrawerOpen(false);
   };
 
@@ -142,6 +145,7 @@ const SideLayer = () => {
           style={{ position: "absolute", right: 10, top: 0, zIndex: 4 }}
         > */}
           <IconButton
+            id="arrow-btn"
             color="inherit"
             aria-label="open drawer"
             edge="end"

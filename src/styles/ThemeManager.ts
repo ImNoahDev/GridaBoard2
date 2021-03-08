@@ -80,8 +80,7 @@ export default class ThemeManager {
 
   // Theme 1: Basic
   public setT1() {
-    document.body.style.backgroundColor = "rgba(245,245,245,1)";
-    // document.body.style.backgroundImage = "-webkit-linear-gradient(bottom, rgb(255, 255, 255) 0%, rgb(230, 230, 230) 100%)";
+    document.body.style.background = "rgba(0,0,0,0.05)";
     this.setThemeDark(false);
   }
 
@@ -90,7 +89,7 @@ export default class ThemeManager {
     document.body.style.margin = "0";
     document.body.style.width = "100vw";
     document.body.style.height = "100vh";
-    document.body.style.background = "linear-gradient(rgba(255, 255, 255, 0.5) 120px, rgba(0, 0, 0, 0.05) 100%), url(bg_01.png)"
+    document.body.style.backgroundImage = "url(bg_01.png)"
     document.body.style.backgroundSize = "cover";
     this.setThemeDark(false);
   }

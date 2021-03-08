@@ -12,6 +12,32 @@ const zoomStyle = {
   float: "right"
 } as React.CSSProperties;
 
+const dropdownStyle = {
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "flex-start",
+  padding: "8px",
+  position: "relative",
+  width: "240px",
+  height: "176px",
+  background: "rgba(255,255,255,0.9)",
+  boxShadow: "2px 2px 2px rgba(0, 0, 0, 0.25)",
+  borderRadius: "12px",
+} as React.CSSProperties;
+
+const dropContentsStyle = {
+  display: "flex",
+  flexDirection: "row",
+  alignItems: "center",
+  padding: "4px 12px",
+  position: "static",
+  width: "224px",
+  left: "calc(50% - 224px / 2)",
+  top: "8px",
+  marginTop: "8px"
+  // bottom: "128px",
+} as React.CSSProperties;
+
 export default function FitButton() {
 
   const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null);
@@ -58,7 +84,21 @@ export default function FitButton() {
               horizontal: 'left',
             }}
           >
-            <a id="btn_fit_height" className="dropdown-item" href="#">
+            <div style={dropdownStyle}>
+              <div style={dropContentsStyle}>
+                <a>Zoom in</a>
+              </div>
+              <div style={dropContentsStyle}>
+                <a>Zoom out</a>
+              </div>
+              <div style={dropContentsStyle} onClick={() => handleClose(ZoomFitEnum.HEIGHT)}>
+                <a>Fit Screen</a>
+              </div>
+              <div style={dropContentsStyle} onClick={() => handleClose(ZoomFitEnum.WIDTH)}>
+                <a>Fill Screen</a>
+              </div>
+            </div>
+                {/* <a id="btn_fit_height" className="dropdown-item" href="#">
               <div className="c2">
                 <span className="bg-dropmenu" data-l10n-id="page_scale_fit">Zoom in</span>
               </div>
@@ -77,7 +117,7 @@ export default function FitButton() {
               <div className="c2">
                 <span className="bg-dropmenu" data-l10n-id="page_scale_width">Fill Screen</span>
               </div>
-            </a>
+            </a> */}
           </Popover>
 
           {/* <div className="dropdown-menu p-0 border border-0 " aria-labelledby="btn_eraser">

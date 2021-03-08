@@ -19,6 +19,8 @@ const headerStyle = {
   height: "7vh",
   lineHeight: "7vh",
   border: "1px solid black",
+  margin: 0,
+  background: "rgba(255, 255, 255, 0.5)",
 } as React.CSSProperties;
 
 const imgStyle = {
