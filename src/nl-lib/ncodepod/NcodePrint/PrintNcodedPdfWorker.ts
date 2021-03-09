@@ -267,10 +267,11 @@ export default class PrintNcodedPdfWorker {
     this.setStatus("completed");
 
     // tempMapper 정보를 등록
-    if (printOption.hasToPutNcode) {
+    if (printOption.needToIssuePrintCode) {
       const msi = MappingStorage.getInstance();
       msi.register(tempMapping);
     }
+
 
     if (printOption.completedCallback) printOption.completedCallback();
 

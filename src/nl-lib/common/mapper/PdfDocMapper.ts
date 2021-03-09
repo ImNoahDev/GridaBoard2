@@ -59,7 +59,7 @@ export default class PdfDocMapper {
       arr.push(params.pdfDesc.pageNo);
     }
 
-    const head = this._arrMapped[0];
+    const head = this._arrMapped[0]; //tail 인데?
     const { url, fingerprint, numPages } = head.pdfDesc;
     const availablePages = g_availablePagesInSection[pi.section];
     const availablePages_base = g_availablePagesInSection[basePageInfo.section];
@@ -91,16 +91,28 @@ export default class PdfDocMapper {
 
     const { section, owner, book, page } = head.pageInfo;
     const availablePages = g_availablePagesInSection[section];
+
+    let printCodeStartPage = page - (head.pdfDesc.pageNo - 1);
+    if (printCodeStartPage < availablePages) {
+      printCodeStartPage = ((page - (head.pdfDesc.pageNo - 1)) + availablePages) % availablePages;
+    } //ncode a4에서 page가 512보다 커져서 기대하지 않은 값이 들어가는 오류 수정
+
     const printCodeStart: IPageSOBP = {
       section, owner, book,
-      page: ((page - (head.pdfDesc.pageNo - 1)) + availablePages) % availablePages,
+      page: printCodeStartPage,
     }
 
     const { section: s0, owner: o0, book: b0, page: p0 } = head.basePageInfo;
     const availablePages0 = g_availablePagesInSection[s0];
+
+    let baseCodeStartPage = p0 - (head.pdfDesc.pageNo - 1);
+    if (baseCodeStartPage < availablePages0) {
+      baseCodeStartPage = ((page - (head.pdfDesc.pageNo - 1)) + availablePages0) % availablePages0;
+    } //ncode a4에서 page가 512보다 커져서 기대하지 않은 값이 들어가는 오류 수정
+
     const baseCodeStart: IPageSOBP = {
       section: s0, owner: o0, book: b0,
-      page: ((p0 - (head.pdfDesc.pageNo - 1)) + availablePages0) % availablePages0,
+      page: baseCodeStartPage, 
     }
 
 
@@ -120,7 +132,33 @@ export default class PdfDocMapper {
     const head = this._arrMapped[0];
     const { url, fingerprint, numPages } = head.pdfDesc;
     const id = makePdfId(fingerprint, this._pagesPerSheet);
+    
+    this._docMap = {
+      url, numPages,
+      fingerprint, id,
+      pagesPerSheet: this._pagesPerSheet,
+      filename: this._filename,
+      printPageInfo: printCodeStart,
+      basePageInfo: baseCodeStart,
+      params: this._arrMapped,
+      timeString: getNowTimeStr(),
+    }
+  }
 
+  public makeSummaryForTemporary = () => {
+    /** PDF 파일 전체의 첫 페이지에 해당하는 ncode 정보를 가져온다 */
+    // const [printCodeStart, baseCodeStart] = this.getStartingNPageInfo();
+    const printCodeStart = this._arrMapped[this._arrMapped.length-1].basePageInfo;
+    const baseCodeStart = this._arrMapped[this._arrMapped.length-1].basePageInfo;
+    if (!printCodeStart) return;
+
+    /** 빈 페이지에 더미 데이터를 채워 넣는다 */
+    this.insertDummy(printCodeStart, baseCodeStart);
+
+    /** 파일 전체의 매핑 정보를 기록해 둔다 */
+    const head = this._arrMapped[0];
+    const { url, fingerprint, numPages } = head.pdfDesc;
+    const id = makePdfId(fingerprint, this._pagesPerSheet);
 
     this._docMap = {
       url, numPages,
@@ -132,16 +170,7 @@ export default class PdfDocMapper {
       params: this._arrMapped,
       timeString: getNowTimeStr(),
     }
-
-    // console.log(`${numPages}: starting from ${Util.makeNPageIdStr(printCodeStart)}`);
-    // for (let i = 0; i < this._arrMapped.length; i++) {
-    //   const pageNo = this._arrMapped[i].pdfDesc.pageNo;
-    //   const pageInfo = this._arrMapped[i].pageInfo;
-    //   console.log(`         ${pageNo}/${numPages}: ${Util.makeNPageIdStr(pageInfo)}`);
-    // }
-
   }
-
 
   dump = (prefix = "debug") => {
     console.log(`[${prefix}]----------------------------------------------------------------------`);

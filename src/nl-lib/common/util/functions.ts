@@ -1,6 +1,6 @@
 import { sprintf } from "sprintf-js";
 import { g_availablePagesInSection, UNIT_TO_DPI } from "../constants";
-import { IUnitString, IPageSOBP, IPointDpi } from "../structures";
+import { IUnitString, IPageSOBP, IPointDpi, IPdfToNcodeMapItem } from "../structures";
 
 export function compareObject(curr: Object, next: Object, header = "") {
   for (const [key, value] of Object.entries(next)) {
@@ -86,7 +86,19 @@ export function isPageInRange(pg: IPageSOBP, arrStart: IPageSOBP, numPages: numb
   return arr.indexOf(pg.page) >= 0;
 }
 
+export function isPageInMapper(pg: IPageSOBP, m: IPdfToNcodeMapItem, numPages: number): boolean {
+  if (!pg) return false;
 
+  const arr: number[] = [];
+  
+  for (let i = 0; i < numPages; i++) {
+    const availablePages = g_availablePagesInSection[m.params[i].pageInfo.section];
+    let page = m.params[i].pageInfo.page;
+    arr.push(page);
+  }
+
+  return arr.indexOf(pg.page) >= 0;
+}
 
 export function deepClone(obj) {
   if (obj === null || typeof obj !== 'object') {

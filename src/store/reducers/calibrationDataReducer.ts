@@ -18,7 +18,6 @@ const initialState = {
     book: -1, 
     page: -1, 
     nu: {x: -1, y: -1},
-    pu: {x: -1, y: -1}
   }
 };
 

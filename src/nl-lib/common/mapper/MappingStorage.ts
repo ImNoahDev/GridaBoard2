@@ -3,7 +3,7 @@ import * as cloud_util_func from "../../../cloud_util_func";
 
 import { getNPaperInfo, getNPaperSize_pu } from "../noteserver";
 import { EventDispatcher, EventCallbackType } from "../event";
-import { cloneObj, convertNuToPu, getNextNcodePage, getNowTimeStr, isPageInRange, isSamePage, makePdfId } from "../util";
+import { cloneObj, convertNuToPu, getNextNcodePage, getNowTimeStr, isPageInRange, isPageInMapper, isSamePage, makePdfId } from "../util";
 import { g_availablePagesInSection, g_defaultNcode, g_defaultTemporaryNcode, nullNcode } from "../constants";
 import {
   IPageSOBP, TransformParameters, INoteServerItem_forPOD, IPrintOption, IPdfToNcodeMapItem,
@@ -13,6 +13,7 @@ import {
 import PdfDocMapper from "./PdfDocMapper";
 import { MappingItem } from "./MappingItem";
 import CoordinateTanslater from "./CoordinateTanslater";
+import { store } from "../../../client/Root";
 
 export const BASECODE_PAGES_PER_SHEET = 16384;
 
@@ -329,21 +330,8 @@ export class MappingStorage {
       }
     };
 
-    // 1) Ncode 페이지 맵에 있는지 확인한다.
-    const noteItem = getNPaperInfo(pageInfo);
-    if (!noteItem.isDefault) {
-      h = this.calcHfromNote({ ...noteItem.margin, pageNo: pageInfo.page });
-      ret.h = h;
-      ret.type = "note";
-      ret.pageInfo = pageInfo;
-      ret.basePageInfo = pageInfo;
-
-      ret.pdf.filename = noteItem.pdf_name;
-
-      return ret;
-    }
-
-    // 2) Mapping된 PDF 페이지인지 확인한다.
+    // 제 생각에는 얘가 1)로 와야하는거 같은데.. temporary를 먼저 봐야해서요
+    // 2) Mapping된 PDF 페이지인지 확인한다. 
     const pdfItem = this.findPdfPage({ ...pageInfo, x: 10, y: 10 });
     if (pdfItem) {
       const pageMap = pdfItem.pageMapping;
@@ -361,6 +349,21 @@ export class MappingStorage {
         pdfPageNo: pageMap.pdfPageNo,
         pagesPerSheet: pdfItem.pdf.pagesPerSheet,
       }
+      return ret;
+    }
+
+    // 1) Ncode 페이지 맵에 있는지 확인한다.
+    const noteItem = getNPaperInfo(pageInfo);
+    const isCalibrationMode = store.getState().calibration.calibrationMode;
+    if (!noteItem.isDefault && !isCalibrationMode) {
+      h = this.calcHfromNote({ ...noteItem.margin, pageNo: pageInfo.page });
+      ret.h = h;
+      ret.type = "note";
+      ret.pageInfo = pageInfo;
+      ret.basePageInfo = pageInfo;
+
+      ret.pdf.filename = noteItem.pdf_name;
+
       return ret;
     }
 
@@ -421,7 +424,7 @@ export class MappingStorage {
   }
 
   registerTemporary = (mapper: PdfDocMapper) => {
-    mapper.makeSummary();
+    mapper.makeSummaryForTemporary();
 
     const docMap: IPdfToNcodeMapItem = cloneObj(mapper.docMap);
     docMap.timeString = getNowTimeStr();
@@ -491,7 +494,7 @@ export class MappingStorage {
    * pen down시에 새로운 SOBP라면, 관련된 PDF가 있는지 찾을 때 쓰인다
    */
   findPdfPage = (ncodeXy: INcodeSOBPxy) => {
-    const tempFound = this._temporary.arrDocMap.find(m => isPageInRange(ncodeXy, m.printPageInfo, m.numPages));
+    const tempFound = this._temporary.arrDocMap.find(m => isPageInMapper(ncodeXy, m, m.numPages));
     
     if (tempFound) {
       const pageMap = tempFound.params.find(param => isSamePage(ncodeXy, param.pageInfo));

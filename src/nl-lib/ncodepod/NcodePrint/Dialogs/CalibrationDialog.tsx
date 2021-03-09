@@ -157,13 +157,15 @@ const CalibrationDialog = (props: IDialogProps) => {
       };
       const filename = 'pdf_file_name';
 
+      const pageSize = pdf.getPageSize(pageNo);
+
       switch (progress) {
         case 0: {
           nu.p0.x = calibrationData.nu.x;
           nu.p0.y = calibrationData.nu.y;
 
-          pu.p0.x = calibrationData.pu.x;
-          pu.p0.y = calibrationData.pu.y;
+          pu.p0.x = pageSize.width * 0.1;
+          pu.p0.y = pageSize.height * 0.1
 
           pageInfos.push(pageInfo);
           break;
@@ -172,9 +174,8 @@ const CalibrationDialog = (props: IDialogProps) => {
           nu.p2.x = calibrationData.nu.x;
           nu.p2.y = calibrationData.nu.y;
 
-          pu.p2.x = calibrationData.pu.x;
-          pu.p2.y = calibrationData.pu.y;
-
+          pu.p2.x = pageSize.width * 0.9;
+          pu.p2.y = pageSize.height * 0.9 
           break;
         }
         default: {
@@ -192,6 +193,7 @@ const CalibrationDialog = (props: IDialogProps) => {
           numPages: numPages,
           pageNo: pageNo
         }
+        
         const worker = new CalibrationData();
         const mapper = worker.createDocMapperItemOneStep(
           nu, pu, pageInfos, pdfPagesDesc, pdfPagesDesc.filename, numPages, 1
