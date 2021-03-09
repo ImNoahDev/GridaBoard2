@@ -278,12 +278,6 @@ export default class NcodeRasterizer {
         ncodeAreas.push(ncodeArea);
 
       }
-
-      // Calibration 십자가를 그린다.
-      if (drawCalibrationMark && pagesPerSheet <= maxPagesPerSheetToDrawMark) {
-        this.drawCrossMark(drawingContext, drawMarkRatio, null);
-      }
-      
     }
     ctx.restore();
 
@@ -318,28 +312,6 @@ export default class NcodeRasterizer {
   //   // 코드를 그린다
   //   await this.drawNcode(context, ncodeSurfaceDesc, 600);
   // }
-
-  private drawSingleCrossMark = (context: INcodeDrawContext, x: number, y: number, line_len: number) => {
-    const ctx = context.ctx;
-    const line_width = 5;
-
-
-    ctx.strokeStyle = "rgb(255, 0, 0)";
-    ctx.save();
-
-    ctx.beginPath();
-    ctx.lineWidth = line_width;
-    // 2020/08/31 kitty
-    // canvas_context.arc(x, y, r, r, 0, Math.PI * 2, true); // Outer circle
-    ctx.moveTo(x, y - line_len);
-    ctx.lineTo(x, y + line_len);
-    ctx.moveTo(x - line_len, y);
-    ctx.lineTo(x + line_len, y);
-    ctx.stroke();
-
-    ctx.restore();
-  }
-
 
   private drawFrame = (context: INcodeDrawContext, srcMapped: IPdfPixelArea = null) => {
 
@@ -385,29 +357,6 @@ export default class NcodeRasterizer {
     ctx.fillText(info_str, -height + 30, width - 20);
     ctx.restore();
   }
-
-  private drawCrossMark = (context: INcodeDrawContext, drawMarkRatio: number, srcMapped: IPdfPixelArea = null) => {
-
-    // 이전 버전과 호환성을 위해
-    if (srcMapped === null) {
-      srcMapped = { dx: context.x, dy: context.y, dw: context.width, dh: context.height };
-    }
-
-    const ratio = drawMarkRatio;
-    const d = srcMapped.dw * ratio;
-    const x0 = srcMapped.dx + d;
-    const y0 = srcMapped.dy + d;
-    const x1 = srcMapped.dx + srcMapped.dw - d;
-    const y1 = srcMapped.dy + srcMapped.dh - d;
-    let line_len = srcMapped.dw * 0.05;
-    if (line_len > 100) line_len = 100;
-
-    this.drawSingleCrossMark(context, x0, y0, line_len);
-    // this.drawSingleCrossMark(canvas, x0, y1);
-    this.drawSingleCrossMark(context, x1, y1, line_len);
-    // this.drawSingleCrossMark(canvas, x1, y0);
-  }
-
 
   /**
    *

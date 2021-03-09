@@ -355,6 +355,12 @@ class PenBasedRenderer extends React.Component<Props, State> {
         ret_val = true;
 
       }
+
+      if (this.props.calibrationMode) {
+        const transform = MappingStorage.getInstance().getNPageTransform(pageInfo);
+        this.renderer.setTransformParameters(transform.h);
+        ret_val = true;
+      }
     }
     
     const pageInfo = nextProps.pageInfo;
@@ -370,7 +376,7 @@ class PenBasedRenderer extends React.Component<Props, State> {
       ret_val = true;
     }
 
-    if (this.props.renderCountNo !== nextProps.renderCountNo && !this.props.calibrationMode) {
+    if (this.props.renderCountNo !== nextProps.renderCountNo) {
       if (this.renderer) {
         this.renderer.changePage(pageInfo, nextProps.pdfSize, false);
         this.renderer.onPageSizeChanged(nextProps.pdfSize);
@@ -556,7 +562,6 @@ class PenBasedRenderer extends React.Component<Props, State> {
     }
 
     const nu = {x: (x_max + x_min) / 2, y: (y_max + y_min) / 2}
-    const pu = this._renderer.ncodeToPdfXy_default({x: nu.x, y: nu.y});
     
     const clicked_point = {
       section: penCalibrationPoint.section,
@@ -564,7 +569,6 @@ class PenBasedRenderer extends React.Component<Props, State> {
       book: penCalibrationPoint.book,
       page: penCalibrationPoint.page,
       nu: {x: nu.x, y: nu.y},
-      pu: {x: pu.x, y: pu.y}
     };
     
     const { section, owner, book, page } = event;
@@ -574,10 +578,9 @@ class PenBasedRenderer extends React.Component<Props, State> {
     const cali = {
       section : section, 
       owner: owner, 
-      book: book, 
+      book: book,  
       page: page, 
       nu: {x: clicked_point.nu.x, y: clicked_point.nu.y},
-      pu: {x: clicked_point.pu.x, y: clicked_point.pu.y}
     };
 
     setCalibrationData2(cali);

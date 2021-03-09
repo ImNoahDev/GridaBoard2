@@ -472,6 +472,8 @@ export class SheetRenderer {
         const convertResult = await pdfPage.convertColor(canvasDesc, colorMode, luminanceMaxRatio);
         if (progressCallback) progressCallback();
 
+        this.drawCrossMark(canvasDesc);
+
         return convertResult;
       })
       promises.push(pr);
@@ -493,7 +495,43 @@ export class SheetRenderer {
     return pageImageDescs;
   }
 
+  private drawCrossMark = (canvasDesc: IPdfPageCanvasDesc) => {
+    const canvas = canvasDesc.canvas;
 
+    const { width, height } = canvas;
+
+    const x0 = width * 0.1;
+    const y0 = height * 0.1;
+
+    const x1 = width * 0.9;
+    const y1 = height * 0.9;
+
+    let line_len = width * 0.05;
+    if (line_len > 100) line_len = 100;
+
+    this.drawSingleCrossMark(canvasDesc, x0, y0, line_len);
+    this.drawSingleCrossMark(canvasDesc, x1, y1, line_len);
+  }
+
+  private drawSingleCrossMark = (canvasDesc: IPdfPageCanvasDesc, x: number, y: number, line_len: number) => {
+    const canvas = canvasDesc.canvas;
+    const ctx = canvas.getContext("2d");
+ 
+    ctx.strokeStyle = "rgb(255, 0, 0)";
+    ctx.save();
+ 
+    ctx.beginPath();
+    const line_width = 5;
+    ctx.lineWidth = line_width;
+ 
+    ctx.moveTo(x, y - line_len);
+    ctx.lineTo(x, y + line_len);
+    ctx.moveTo(x - line_len, y);
+    ctx.lineTo(x + line_len, y);
+    ctx.stroke();
+ 
+    ctx.restore();
+  }
 
   private generateMappingItems = (pageImagesDesc: IPdfPageCanvasDesc[], ncodePlane: ICellsOnSheetDesc, needToIssuePrintCode: boolean) => {
     const array: CoordinateTanslater[] = [];

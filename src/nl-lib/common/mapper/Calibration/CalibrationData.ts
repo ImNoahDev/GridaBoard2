@@ -3,6 +3,7 @@ import CoordinateTanslater from "../CoordinateTanslater";
 import { MappingItem } from "../MappingItem";
 import { MappingStorage } from "../MappingStorage";
 import PdfDocMapper from "../PdfDocMapper";
+import { calculateCalibrationData } from './findRest2Points'
 
 const DUMMY = 0;      // 이 코드는 sample에서만 필요
 
@@ -226,15 +227,23 @@ export default class CalibrationData {
     pu: { p0: IPoint, p2: IPoint, }
   ) => {
 
+    const pu_4points = {
+      p0: pu.p0,
+      p1: { x: pu.p2.x, y: pu.p0.y },
+      p2: pu.p2,
+      p3: { x: pu.p0.x, y: pu.p2.y }
+    }
+    const ret = calculateCalibrationData(pu_4points, nu);
+
     // 아래 코드는 sample에서만 필요 (p1, p3의 더미 값)
     const pts = {
       nu: {
-        p1: { x: DUMMY, y: DUMMY } as IPoint,
-        p3: { x: DUMMY, y: DUMMY } as IPoint,
+        p1: { x: ret.nu.p1.x, y: ret.nu.p1.y } as IPoint,
+        p3: { x: ret.nu.p3.x, y: ret.nu.p3.y } as IPoint,
       },
       pu: {
-        p1: { x: DUMMY, y: DUMMY } as IPoint,
-        p3: { x: DUMMY, y: DUMMY } as IPoint,
+        p1: { x: pu.p2.x, y: pu.p0.y } as IPoint,
+        p3: { x: pu.p0.x, y: pu.p2.y } as IPoint,
       }
     }
     // 여기까지
