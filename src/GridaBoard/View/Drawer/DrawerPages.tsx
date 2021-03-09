@@ -26,9 +26,9 @@ const DrawerPages = (props: Props, state:State) => {
 
   return (
     <div >
-      <Box style={{ margin: 10 }}>
+      {/* <Box style={{ margin: 10 }}>
         <h5>index : {activePageNo} (#{activePageNo + 1}/{numPages})</h5>
-      </Box>
+      </Box> */}
       {pages.map((page, i) =>
         // ""
         <ThumbnailItem key={i} noInfo={props.noInfo} pageNo={i} active={activePageNo === i} />

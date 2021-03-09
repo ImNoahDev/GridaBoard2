@@ -25,9 +25,9 @@ import KeyboardArrowRightIcon from '@material-ui/icons/KeyboardArrowRight';
 import $ from "jquery";
 
 const mainFrameStyle = {
-  position: "static",
+  // position: "static",
   // flexDirection: "row-reverse",
-  // display: "block",
+  display: "block",
 
   // left: "0%",
   // top: "10%",
@@ -36,7 +36,7 @@ const mainFrameStyle = {
   alignItems: "center",
   // zIndex: 3,
   // marginLeft: "-1px",
-  border: "1px solid black",
+  // border: "1px solid rgba(255, 255, 255, 0.8)",
   height: "87.8vh",
   width: "9.375vw",
   float: "left",

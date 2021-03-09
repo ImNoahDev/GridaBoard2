@@ -324,13 +324,13 @@ const Home = () => {
         <div id="side" style={{float: "left", width: "180px", height: "900px", border: "1px solid black"}}></div>
         <div id="contents" style={{width: "100%", height: "900px", border: "1px solid black"}}></div>
       </div> */}
-      {/* <main> */}
+      <main>
 
         <div id="layer" style={{ position: "static", top: 0, left: 0, bottom: 0, right: drawerOpen ? drawerWidth : 0 }}>
           <ViewLayer handlePdfOpen={handlePdfOpen} style={{display: "block"}}/>
         </div>
 
-        {/* <div style={{ position: "absolute", top: 0, left: 0, bottom: 0, right: drawerOpen ? drawerWidth : 0 }}>
+        <div style={{ position: "absolute", top: 120, left: 170, bottom: 0, right: drawerOpen ? drawerWidth : 0 }}>
           <MixedPageView
             pdf={pdf}
             pdfUrl={pdfUrl} filename={pdfFilename}
@@ -354,15 +354,15 @@ const Home = () => {
 
             renderCountNo={renderCountNo_store}
 
-            noInfo = {false}
+            noInfo = {true}
           />
           <div id="navbar_page" style={pageNumberingStyle}>
             <div className="navbar-menu neo_shadow" style={{zIndex: 1000, height: "36px"}}>
               <PageNumbering />
             </div>
           </div>
-        </div> */}
-      {/* </main > */}
+        </div>
+      </main >
 
       {/* Drawer 구현 */}
       {/* <div id="drawer-icon"
@@ -386,48 +386,6 @@ const Home = () => {
 
       {/* <AutoLoadConfirmDialog open={loadConfirmDlgOn} step={loadConfirmDlgStep}
         onOk={handleAppendFileOk} onCancel={handleCancelAutoLoad} onNoMore={handleNoMoreAutoLoad} /> */}
-        <GridaToolTip open={true} placement="top-end" tip={{
-          head: "Helper",
-          msg: "도움말 기능들을 보여줍니다.",
-          tail: "키보드 버튼 ?로 선택 가능합니다"
-        }} title={undefined}>
-            <IconButton id="help_btn" className={helpClasees.iconContainer} style={{width: 36, height: 36, position: "relative"}} onClick={handleClick} aria-describedby={id}>
-              {!showForm
-                ? <HelpIcon className={helpClasees.icon} color="primary" fontSize="large" style={{position: "absolute", bottom: 0, right: 0}}/>
-                : <HelpIcon className={helpClasees.icon} color="primary" fontSize="large" style={{position: "absolute", bottom: 0, right: 0}}/>
-              }
-            </IconButton>
-        </GridaToolTip>
-        <Popover
-          id={id}
-          open={open}
-          anchorEl={anchorEl}
-          onClose={handleClose}
-          anchorOrigin={{
-            vertical: 'bottom',
-            horizontal: 'left'
-          }}
-          transformOrigin={{
-            vertical: 'bottom',
-            horizontal: 'right'
-          }}
-        >
-          <div>
-            <a>고객센터</a>
-          </div>
-          <div className="dropdown-divider"></div>
-          <div>
-            <a>단축키 안내</a>
-          </div>
-          <div className="dropdown-divider"></div>
-          <div>
-            <a>튜토리얼</a>
-          </div>
-          <div className="dropdown-divider"></div>
-          <div>
-            <a>FAQ</a>
-          </div>
-        </Popover>
 
       {/* 파일 인풋을 위한 것 */}
       <input type="file" id={g_hiddenFileInputBtnId} onChange={onFileInputChanged} onClick={onFileInputClicked} style={{ display: "none" }} name="pdf" accept=".pdf,.grida" />

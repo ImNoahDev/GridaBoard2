@@ -6,6 +6,7 @@ import { setViewFit } from '../../store/reducers/viewFitReducer';
 import { ZoomFitEnum } from "../../nl-lib/common/enums";
 import { useSelector } from "react-redux";
 import { RootState } from "../../store/rootReducer";
+import $ from "jquery";
 
 const zoomStyle = {
   marginTop: "8px",
@@ -56,6 +57,12 @@ export default function FitButton() {
 
   const zoom = useSelector((state: RootState) => state.zoomReducer.zoom);
   const zoomPercent = Math.round(zoom * 100);
+
+  $('#btn_fit').hover(function() {
+    $(this).css("color", "rgba(104,143,255,1)")
+  },function() {
+    $(this).css("color", "rgba(18,18,18,1)")
+  });
 
     return (
       <React.Fragment>

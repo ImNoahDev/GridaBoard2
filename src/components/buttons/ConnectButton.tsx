@@ -52,6 +52,18 @@ const ConnectButton = (props: Props) => {
     $('#btn_connected').css('display', 'none')
   }
 
+  $('#btn_connect').hover(function() {
+    $(this).css("color", "rgba(104,143,255,1)")
+  },function() {
+    $(this).css("color", "rgba(18,18,18,1)")
+  });
+
+  $('#btn_connected').hover(function() {
+    $(this).css("color", "rgba(104,143,255,1)")
+  },function() {
+    $(this).css("color", "rgba(18,18,18,1)")
+  });
+
   return (
     // <div className="btn-group-vertical neo_shadow" style={{ marginBottom: 10 }}>
     <React.Fragment>

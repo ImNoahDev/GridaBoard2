@@ -52,6 +52,18 @@ export default function BackgroundButton() {
   const open = Boolean(anchorEl);
   const id = open ? 'simple-popover' : undefined;
 
+  $('#basic_background').hover(function() {
+    $(this).css("color", "rgba(104,143,255,1)")
+  },function() {
+    $(this).css("color", "rgba(18,18,18,1)")
+  });
+
+  $('#neo_background').hover(function() {
+    $(this).css("color", "rgba(104,143,255,1)")
+  },function() {
+    $(this).css("color", "rgba(18,18,18,1)")
+  });
+
     return (
       // <div className="btn-group dropright" role="group">
       <React.Fragment>

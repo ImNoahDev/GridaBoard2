@@ -83,6 +83,18 @@ const RotateButton = () => {
     page.pageOverview.sizePu.height = tmp;
   }
 
+  $('#vertical_rotate').hover(function() {
+    $(this).css("color", "rgba(104,143,255,1)")
+  },function() {
+    $(this).css("color", "rgba(18,18,18,1)")
+  });
+
+  $('#horizontal_rotate').hover(function() {
+    $(this).css("color", "rgba(104,143,255,1)")
+  },function() {
+    $(this).css("color", "rgba(18,18,18,1)")
+  });
+
   return (
     // <div className="btn-group dropright" role="group">
     //   <button type="button" id="btn_rotate" className="btn btn-neo btn-neo-vertical" >

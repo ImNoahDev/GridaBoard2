@@ -5,6 +5,7 @@ import GridaDoc from '../GridaDoc';
 import PublishIcon from '@material-ui/icons/Publish';
 import { Button, IconButton, makeStyles } from '@material-ui/core';
 import GridaToolTip from "../../styles/GridaToolTip";
+import $ from "jquery";
 
 const useStyles = makeStyles({
   iconContainer: {
@@ -96,6 +97,12 @@ const LoadGrida = () => {
     }
   }
 
+  $('#load').hover(function() {
+    $(this).css("color", "rgba(104,143,255,1)")
+  },function() {
+    $(this).css("color", "rgba(18,18,18,1)")
+  })
+
   return (
       // <button className="btn btn-neo" style={{marginLeft: "-10px"}} onClick={fileOpenHandler}>
       //   <GridaToolTip open={true} placement="top-end" tip={{
@@ -111,7 +118,7 @@ const LoadGrida = () => {
       //     </IconButton>
       //   </GridaToolTip> 
       // </button>
-      <Button style={buttonStyle} onClick={fileOpenHandler}>
+      <Button id="load" style={buttonStyle} onClick={fileOpenHandler}>
         내보내기
       </Button>
   );

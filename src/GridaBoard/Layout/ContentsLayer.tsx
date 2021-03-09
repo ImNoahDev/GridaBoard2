@@ -25,30 +25,16 @@ import { nullNcode } from "../../nl-lib/common/constants";
 import PageNumbering from "../../components/navbar/PageNumbering";
 import RotateButton from "../../components/buttons/RotateButton";
 
+// 0.0520833333333333
 const localStyle = {
   width: "90.625vw",
+  // width: "90.67708333333333vw",
   height: "87.8vh",
-  border: "1px solid black",
+  // border: "1px solid black",
   // float: "left"
   // clear: "both",
-  float: "left"
-} as React.CSSProperties;
-
-const rotateStyle = {
-  float: "right",
-  // display: "flex",
-  // flexDirection: "row",
-  // justifyContent: "center",
-  // alignItems: "center",
-  // padding: "16px",
-  // position: "static",
-  width: "56px",
-  height: "56px",
-  background: "rgba(255, 255, 255, 0.8)",
-  boxShadow: "2px 0px 24px rgba(0, 0, 0, 0.15), inset 0px 2px 0px rgba(255, 255, 255, 0.15)",
-  borderRadius: "40px",
-  marginRight: "16px",
-  marginTop: "16px"
+  float: "left",
+  zIndex: 1100
 } as React.CSSProperties;
 
 const helpStyle = {
@@ -95,47 +81,6 @@ const dropContentsStyle = {
 
 const printBtnId = "printTestButton";
 const printOption = g_defaultPrintOption;
-
-const menuStyle = {
-  width: '36px',
-  height: '36px',
-  padding: '4px',
-}
-
-const buttonStyle = {
-  padding: "0px",
-  margin: "0px",
-  border: "0px",
-  minWidth: "24px"
-}
-
-const centerStyle = {
-  display: 'flex',
-  justifyContent: 'center',
-  alignItems: 'center',
-  height: '36px',
-  minWidth: '36px',
-  outline: 'none',
-  textDecoration: 'none'
-}
-
-const endStyle = {
-  display: 'flex',
-  justifyContent: 'end',
-  alignItems: 'end',
-  height: '36px',
-  minWidth: '36px',
-  outline: 'none',
-  textDecoration: 'none'
-}
-
-const navStyle = {
-  position: 'fixed',
-  right: 0,
-  bottom: 0,
-  left: 0,
-  zIndex: 1030
-} as React.CSSProperties;
 
 const useStyles = makeStyles({
   iconContainer: {
@@ -368,7 +313,7 @@ const ContentsLayer = (props: Props) => {
     <div style={localStyle}>
       <RotateButton />
       {/* <main>
-        <div style={{ position: "static", top: 0, left: 0, bottom: 0, right: drawerOpen ? drawerWidth : 0 }}>
+        <div style={{ position: "static", top: 0, left: 0, bottom: 0, right: drawerOpen ? drawerWidth : 0, clear: "both" }}>
           <MixedPageView
             pdf={pdf}
             pdfUrl={pdfUrl} filename={pdfFilename}
@@ -392,7 +337,7 @@ const ContentsLayer = (props: Props) => {
 
             renderCountNo={renderCountNo_store}
 
-            noInfo = {true}
+            noInfo = {false}
           />
             <PageNumbering />
         </div>

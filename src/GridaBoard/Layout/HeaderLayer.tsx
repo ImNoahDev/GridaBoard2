@@ -10,6 +10,7 @@ import ConnectButton from "../../components/buttons/ConnectButton";
 import GridaApp from "../GridaApp";
 import ManualCalibration from "../../components/navbar/ManualCalibration";
 import { g_defaultPrintOption } from "../../nl-lib/ncodepod";
+import $ from "jquery";
 
 const headerStyle = {
   position: "static",
@@ -18,7 +19,7 @@ const headerStyle = {
   alignItems: "center",
   height: "7vh",
   lineHeight: "7vh",
-  border: "1px solid black",
+  // border: "1px solid black",
   margin: 0,
   background: "rgba(255, 255, 255, 0.5)",
 } as React.CSSProperties;
@@ -26,9 +27,12 @@ const headerStyle = {
 const imgStyle = {
   float: "left",
   verticalAlign: "middle",
-  width: "4.3vw",
-  height: "6.3vh",
-  marginTop: "2px"
+  // width: "4.3vw",
+  // height: "6.3vh",
+  marginTop: "14px",
+  marginLeft: "10px",
+  marginRight: "10px",
+  borderRadius: "8px",
 } as React.CSSProperties;
 
 const aStyle = {
@@ -145,21 +149,29 @@ const HeaderLayer = () => {
     // }
   }
 
+  $('#save').hover(function() {
+    $(this).css("color", "rgba(104,143,255,1)")
+  },function() {
+    $(this).css("color", "rgba(18,18,18,1)")
+  });
+
   return (
-    <div id="header" style={headerStyle}>
-      <img src="/icons/favicon-32x32.png" style={imgStyle}></img>
-      <a id="grida_board" href="#" style={aStyle}>Grida board</a>
-      <Button style={buttonStyle} onClick={() => saveGrida('hello.grida')}>
-        저장하기
-      </Button>
-      <LoadGrida />
-      <PrintButton targetId={printBtnId} url={pdfUrl} filename={pdfFilename} handlePdfUrl={makePdfUrl}/>
-      <ManualCalibration filename={pdfFilename} printOption={printOption}/>
-      <KeyboardArrowDownRoundedIcon style={{float: "right", marginTop: "25px", marginRight: "31px"}}/>
-      <p style={{float: "right"}}>구글 이메일</p>
-      <ConnectButton onPenLinkChanged={e => onPenLinkChanged(e)} />
-      {/* 나중에 calibration에 적용시켜 호출하기 */}
-    </div>
+    <React.Fragment>
+      <div id="header" style={headerStyle}>
+        <img src="image 5.png" style={imgStyle}></img>
+        <a id="grida_board" href="#" style={aStyle}>Grida board</a>
+        <Button id="save" style={buttonStyle} onClick={() => saveGrida('hello.grida')}>
+          저장하기
+        </Button>
+        <LoadGrida />
+        <PrintButton targetId={printBtnId} url={pdfUrl} filename={pdfFilename} handlePdfUrl={makePdfUrl}/>
+        <ManualCalibration filename={pdfFilename} printOption={printOption}/>
+        <KeyboardArrowDownRoundedIcon style={{float: "right", marginTop: "25px", marginRight: "31px"}}/>
+        <p style={{float: "right"}}>구글 이메일</p>
+        <ConnectButton onPenLinkChanged={e => onPenLinkChanged(e)} />
+      </div>
+      <div style={{height: "1px", background: "rgba(255,255,255,1)"}}></div>
+    </React.Fragment>
   );
 }
 

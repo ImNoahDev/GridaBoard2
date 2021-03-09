@@ -108,6 +108,7 @@ const useStyles = makeStyles((theme: Theme) =>
       // necessary for content to be below app bar
       ...theme.mixins.toolbar,
       justifyContent: 'flex-start',
+      zIndex: 15000
     },
 
     contentShift: {
@@ -227,7 +228,7 @@ export default function PersistentDrawerRight(props: Props) {
 
 
   return (
-    <div>
+    <div style={{float: "left"}}>
       {/* <CssBaseline /> */}
 
       <Drawer
@@ -235,7 +236,7 @@ export default function PersistentDrawerRight(props: Props) {
         variant="persistent"
         anchor="left"
         open={open}
-        PaperProps={{ style: { width: drawerWidth, flexShrink: 0, zIndex: 1100, marginTop: "12.2vh", height: "87.8vh", background: "rgba(255, 255, 255, 0.25)" } }}
+        PaperProps={{ style: { width: drawerWidth, flexShrink: 0, zIndex: 1100, marginTop: "12.2vh", height: "87.8vh", background: "rgba(255, 255, 255, 0.25)", float: "left" } }}
       >
       <div id="drawer_content">
         <div className={classes.drawerHeader}>

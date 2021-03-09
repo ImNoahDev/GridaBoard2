@@ -28,19 +28,43 @@ const colorStyle = {
   padding: "0px",
   margin: "0px",
   border: "0px",
-  minWidth: "24px",
-  marginTop: "6px",
-  lineHeight: "36px",
+  // minWidth: "24px",
+  width: "18px",
+  height: "18px",
+  marginTop: "16px",
+  // lineHeight: "36px",
   float: "left",
   marginLeft: "27px"
 } as React.CSSProperties;
 
+const colorDropDownStyle = {
+  display: "flex",
+  flexDirection: "row",
+  justifyContent: "center",
+  alignItems: "center",
+  padding: "4px 8px",
+  position: "relative",
+  width: "488px",
+  height: "48px",
+  background: "rgba(255,255,255,0.9)",
+  boxShadow: "2px 2px 2px rgba(0, 0, 0, 0.25)",
+  borderRadius: "12px"
+} as React.CSSProperties;
+
 const groupStyle = {
   padding: "0px",
-  margin: "0px",
+  // margin: "0px",
   border: "0px",
-  minWidth: "24px"
-}
+  marginLeft: "-16px",
+  paddingLeft: "12px"
+  // minWidth: "24px"
+  // position: "static",
+  // width: "24px",
+  // height: "24px",
+  // left: "8px",
+  // top: "8px",
+  // background: "rgba(229,229,229,1)"
+} as React.CSSProperties;
 
 const ColorButtons = () => {
 
@@ -141,7 +165,7 @@ const ColorButtons = () => {
           horizontal: 'left'
         }}
       >
-        <div className="btn-group">
+        <div style={colorDropDownStyle}>
           <Button id="clr_1" type="button" className="color_btn" style={groupStyle}
             onClick={() => changeColor(1)}>
             <GridaToolTip open={true} placement="top" tip={{

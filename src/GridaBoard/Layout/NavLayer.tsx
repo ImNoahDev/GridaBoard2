@@ -45,49 +45,10 @@ const navStyle = {
   right: 50,
   height: "5.2vh",
   zIndex: 0,
-  border: "1px solid black",
+  // border: "1px solid black",
   width: "100%",
   margin: 0,
   background: "rgba(255, 255, 255, 0.5)",
-} as React.CSSProperties;
-
-const penTypeStyle = {
-  // marginTop: "11px",
-  float: "left",
-  marginLeft: "30px"
-} as React.CSSProperties;
-
-const colorStyle = {
-  padding: "0px",
-  margin: "0px",
-  border: "0px",
-  minWidth: "24px",
-  marginTop: "6px",
-  lineHeight: "36px",
-  float: "left",
-  marginLeft: "27px"
-} as React.CSSProperties;
-
-const thicknessStyle = {
-  marginTop: "11px",
-  float: "left",
-  marginLeft: "34px"
-} as React.CSSProperties;
-
-const pointerStyle = {
-  marginTop: "11px",
-  float: "left",
-  marginLeft: "34px"
-} as React.CSSProperties;
-
-const zoomStyle = {
-  marginTop: "11px",
-  float: "right"
-} as React.CSSProperties;
-
-const backgroundStyle = {
-  marginTop: "11px",
-  float: "right"
 } as React.CSSProperties;
 
 const printBtnId = "printTestButton";
@@ -99,11 +60,6 @@ const getNoteInfo = (event) => {
   // note_info.getNoteInfo({});
 };
 
-
-
-/**
- *
- */
 const NavLayer = () => {
   const [num_pens, setNumPens] = useState(0);
   const [mapViewDetail, setMapViewDetail] = useState(0);
@@ -206,78 +162,20 @@ const NavLayer = () => {
     <div id={"button_div"} style={navStyle}>
 
       <PenTypeButton />
-      {/* 나중에 colorButton으로 연결해서 호출하기 */}
+
       <ColorButtons />
-      {/* <Button id="clr_1" type="button" className="color_btn" style={colorStyle}
-        // onClick={() => manager.setColor(1)}
-        >
-        <GridaToolTip open={true} placement="top" tip={{
-            head: "RED",
-            msg: "표시되는 펜의 색상을 선택합니다",
-            tail: "키보드 버튼 1로 선택 가능합니다"
-          }} title={undefined}>
-          <div className="color_icon color_1">
-          </div>
-        </GridaToolTip>
-      </Button> */}
+
       <KeyboardArrowDownRoundedIcon style={{float: "left", marginTop: "14px", marginLeft: "-5px"}}/>
-      {/* 나중에 pentype thickness로 연결해서 호출하기 */}
       <ThicknessButton />
+
       <KeyboardArrowDownRoundedIcon style={{float: "left", marginTop: "14px", marginLeft: "-5px"}}/>
-      {/* 나중에 pointer로 연결해서 호출하기 */}
       <TracePointButton />
       
-
-      <KeyboardArrowDownRoundedIcon style={{float: "right", marginTop: "14px", marginLeft: "-5px", marginRight: "-30px"}}/>   
-       {/* 나중에 fit과 zomm에 연결해서 호출하기 */}
-      {/* <span id="zoom-ratio" style={zoomStyle}>{zoomPercent}%</span> */}
+      <KeyboardArrowDownRoundedIcon style={{float: "right", marginTop: "14px", marginLeft: "-5px", marginRight: "-30px"}}/>
       <FitButton />
 
       <KeyboardArrowDownRoundedIcon style={{float: "right", marginTop: "14px", marginLeft: "-5px", marginRight: "31px"}}/>
-      {/* 나중에 background에 연결해서 호출하기 */}
       <BackgroundButton />
-
-      {/* <div style={{ flex: 1 }}> </div> */}
-
-      {/* <IconButton onClick={handleClick} aria-describedby={id} style={{marginLeft: 1700}}>
-        <Avatar style={{marginTop: 5}}>
-          H
-        </Avatar>
-      </IconButton> */}
-      {/* <Popover
-          id={id}
-          open={open}
-          anchorEl={anchorEl}
-          onClose={handleClose}
-          anchorOrigin={{
-            vertical: 'top',
-            horizontal: 'right'
-          }}
-          transformOrigin={{
-            vertical: 'top',
-            horizontal: 'left'
-          }}
-        >
-          <div>
-            <a>User Name</a>
-          </div>
-          <div className="dropdown-divider"></div>
-          <div>
-            <a>개인정보처리방침</a>
-          </div>
-          <div className="dropdown-divider"></div>
-          <div>
-            <a>이용약관</a>
-          </div>
-          <div className="dropdown-divider"></div>
-          <div>
-            <a>기타 개인설정</a>
-          </div>
-          <div className="dropdown-divider"></div>
-          <div>
-            <a>로그아웃</a>
-          </div>
-        </Popover> */}
 
       {/* 매핑 정보 살펴보기 */}
       <div style={{ fontSize: "20px", fontWeight: "bold" }}>
