@@ -371,7 +371,7 @@ class MixedPageView_module extends React.Component<MixedViewProps, State>  {
       ret_val = true;
     }
 
-    ret_val = ret_val || pageInfoChanged || viewFitChanged || fixedChanged || noInfo || loaded || renderCntChanged;
+    ret_val = ret_val || pensChanged || pageInfoChanged || viewFitChanged || fixedChanged || noInfo || loaded || renderCntChanged;
 
     if(this.props.renderCountNo !== nextProps.renderCountNo) {
       ret_val = true;
