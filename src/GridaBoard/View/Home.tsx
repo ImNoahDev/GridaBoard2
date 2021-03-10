@@ -2,7 +2,6 @@ import React, { useState, useRef, useEffect } from "react";
 import { IconButton, makeStyles, createStyles, SvgIcon, Popover } from "@material-ui/core";
 import { useSelector, shallowEqual } from "react-redux";
 import { Theme } from '@material-ui/core';
-import MenuIcon from '@material-ui/icons/Menu';
 import '../../styles/main.css'
 import { theme } from "../../styles/theme";
 
@@ -25,9 +24,6 @@ import { nullNcode } from "../../nl-lib/common/constants";
 import { PLAYSTATE, ZoomFitEnum } from "../../nl-lib/common/enums";
 import { PenManager } from "../../nl-lib/neosmartpen";
 import PageNumbering from "../../components/navbar/PageNumbering";
-import * as PdfJs from "pdfjs-dist";
-import GridaToolTip from "../../styles/GridaToolTip";
-import HelpIcon from '@material-ui/icons/Help';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -51,6 +47,10 @@ const helpStyles = makeStyles({
       color: 'black',
   },
 });
+
+const viewStyle = {
+  
+} as React.CSSProperties;
 
 const Home = () => {
   const [drawerOpen, setDrawerOpen] = useState(true);
@@ -278,12 +278,20 @@ const Home = () => {
 
   const pageNumberingStyle = {
     position: "absolute",
-    bottom: 8,
+    bottom: 0,
     flexDirection: "row-reverse",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    width: pageWidth,
+    // width: pageWidth,
+    width: "191px",
+    height: "46px",
+    left: "calc(50% - 191px / 2)",
+    // top: "calc(50% - 46px / 2)",
+    background: "rgba(255,255,255,0.25)",
+    boxShadow: "rgba(156,156,156,0.48)",
+    borderRadius: "100px",
+    zIndex: 1500
   } as React.CSSProperties;
 
   const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null);
@@ -304,33 +312,16 @@ const Home = () => {
 
   console.log(`HOME: docPageNo:${activePageNo}, pdfUrl=${pdfUrl}, fingerPrint: ${pdfFingerprint}, pdfPageNo:${pdfPageNo}`);
   return (
-    <React.Fragment>
-    {/* <div>
-      맨 위쪽
-    </div> */}
-    {/* <div style={{border: "1px solid black"}}>
-      맨 위쪽
-    </div> */}
+
     <div className={classes.root}>
-      {/* <div style={{backgroundColor: "white"}}> */}
-      {/* <CssBaseline /> */}
-      {/* <div id="wrap" style={{textTransform: "uppercase"}}>
-        <div id="header" style={{width: "100%", height: "70px", border: "1px solid black"}}></div>
-        <div id="nav" style={{width: "100%", height: "50px", border: "1px solid black"}}>
-          <nav id="uppernav" className="navbar navbar-light bg-transparent" style={{ float: "left", zIndex: 3 }}>
-            <a id="grida_board" className="navbar-brand" href="#">Grida board</a>
-          </nav>
-        </div>
-        <div id="side" style={{float: "left", width: "180px", height: "900px", border: "1px solid black"}}></div>
-        <div id="contents" style={{width: "100%", height: "900px", border: "1px solid black"}}></div>
-      </div> */}
-      <main>
+
+      <main style={viewStyle}>
 
         <div id="layer" style={{ position: "static", top: 0, left: 0, bottom: 0, right: drawerOpen ? drawerWidth : 0 }}>
           <ViewLayer handlePdfOpen={handlePdfOpen} style={{display: "block"}}/>
         </div>
 
-        <div style={{ position: "absolute", top: 120, left: 170, bottom: 0, right: drawerOpen ? drawerWidth : 0 }}>
+        <div style={{ position: "absolute", top: 120, left: 200, bottom: 0, right: drawerOpen ? drawerWidth : 0}}>
           <MixedPageView
             pdf={pdf}
             pdfUrl={pdfUrl} filename={pdfFilename}
@@ -356,10 +347,8 @@ const Home = () => {
 
             noInfo = {true}
           />
-          <div id="navbar_page" style={pageNumberingStyle}>
-            <div className="navbar-menu neo_shadow" style={{zIndex: 1000, height: "36px"}}>
-              <PageNumbering />
-            </div>
+          <div style={pageNumberingStyle}>
+            <PageNumbering />
           </div>
         </div>
       </main >
@@ -391,7 +380,6 @@ const Home = () => {
       <input type="file" id={g_hiddenFileInputBtnId} onChange={onFileInputChanged} onClick={onFileInputClicked} style={{ display: "none" }} name="pdf" accept=".pdf,.grida" />
       {/* <input type="file" id={"pdf_file_append"} onChange={onFileInputChanged} onClick={onFileInputClicked} style={{ display: "none" }} name="pdf" accept="application/pdf" /> */}
     </div >
-    </React.Fragment>
   );
 };
 

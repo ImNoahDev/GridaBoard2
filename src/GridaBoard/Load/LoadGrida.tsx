@@ -2,41 +2,10 @@ import React from 'react';
 import { openFileBrowser } from "../../nl-lib/common/neopdf/FileBrowser";
 import { InkStorage } from '../../nl-lib/common/penstorage';
 import GridaDoc from '../GridaDoc';
-import PublishIcon from '@material-ui/icons/Publish';
-import { Button, IconButton, makeStyles } from '@material-ui/core';
+import { Button } from '@material-ui/core';
 import GridaToolTip from "../../styles/GridaToolTip";
-import $ from "jquery";
-
-const useStyles = makeStyles({
-  iconContainer: {
-    "&:hover $icon": {
-        color: 'red',
-    }
-  },
-  icon: {
-      color: 'black',
-  },
-});
-
-const buttonStyle = {
-  // width: "53px",
-  height: "1.6vh",
-  left: "0.8vw",
-  fontFamily: "Roboto",
-  fontStyle: "normal",
-  fontWeight: "normal",
-  fontSize: "1.44vh",
-  // lineHeight: "16px",
-  textAlign: "right",
-  letterSpacing: "0.25px",
-  marginRight: "2vw"
-} as React.CSSProperties;
 
 const LoadGrida = () => {
-
-  const classes = useStyles();
-  const showForm = React.useState(false)
-
   async function fileOpenHandler() {
     const selectedFile = await openFileBrowser();
     console.log(selectedFile.result);
@@ -97,30 +66,16 @@ const LoadGrida = () => {
     }
   }
 
-  $('#load').hover(function() {
-    $(this).css("color", "rgba(104,143,255,1)")
-  },function() {
-    $(this).css("color", "rgba(18,18,18,1)")
-  })
-
   return (
-      // <button className="btn btn-neo" style={{marginLeft: "-10px"}} onClick={fileOpenHandler}>
-      //   <GridaToolTip open={true} placement="top-end" tip={{
-      //     head: "Grida Load",
-      //     msg: ".grida 파일을 로컬에서 불러옵니다.",
-      //     tail: "키보드 버튼 ?로 선택 가능합니다"
-      //   }} title={undefined}>
-      //     <IconButton className={classes.iconContainer} style={{width: 36, height: 36}}>
-      //       {!showForm
-      //         ? <PublishIcon className={classes.icon}/>
-      //         : <PublishIcon className={classes.icon}/>
-      //       }
-      //     </IconButton>
-      //   </GridaToolTip> 
-      // </button>
-      <Button id="load" style={buttonStyle} onClick={fileOpenHandler}>
-        내보내기
-      </Button>
+      <GridaToolTip open={true} placement="top-end" tip={{
+        head: "Grida Load",
+        msg: ".grida 파일을 로컬에서 불러옵니다.",
+        tail: "키보드 버튼 ?로 선택 가능합니다"
+      }} title={undefined}>
+        <Button onClick={fileOpenHandler}>
+          .grida 불러오기
+        </Button>
+      </GridaToolTip> 
   );
 }
 

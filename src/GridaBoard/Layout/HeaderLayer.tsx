@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Button, SvgIcon } from "@material-ui/core";
+import { Button, Popover } from "@material-ui/core";
 import KeyboardArrowDownRoundedIcon from '@material-ui/icons/KeyboardArrowDownRounded';
 import { saveGrida } from "../Save/SaveGrida";
 import LoadGrida from "../Load/LoadGrida";
@@ -11,6 +11,9 @@ import GridaApp from "../GridaApp";
 import ManualCalibration from "../../components/navbar/ManualCalibration";
 import { g_defaultPrintOption } from "../../nl-lib/ncodepod";
 import $ from "jquery";
+import SavePdfDialog from "../Save/SavePdfDialog";
+import { FileBrowserButton } from "../../nl-lib/common/neopdf";
+import { IFileBrowserReturn } from "../../nl-lib/common/structures";
 
 const headerStyle = {
   position: "static",
@@ -19,7 +22,6 @@ const headerStyle = {
   alignItems: "center",
   height: "7vh",
   lineHeight: "7vh",
-  // border: "1px solid black",
   margin: 0,
   background: "rgba(255, 255, 255, 0.5)",
 } as React.CSSProperties;
@@ -27,8 +29,6 @@ const headerStyle = {
 const imgStyle = {
   float: "left",
   verticalAlign: "middle",
-  // width: "4.3vw",
-  // height: "6.3vh",
   marginTop: "14px",
   marginLeft: "10px",
   marginRight: "10px",
@@ -36,15 +36,12 @@ const imgStyle = {
 } as React.CSSProperties;
 
 const aStyle = {
-  // width: "4.9vw",
   height: "2.1vh",
   left: "4.2vw",
-  // top: ""
   fontFamily: "Roboto",
   fontStyle: "normal",
   fontWeight: "bold",
   fontSize: "1.85vh",
-  // lineHeight: "21px",
   textAlign: "right",
   letterSpacing: "0.25px",
   textDecoration: "none",
@@ -52,14 +49,12 @@ const aStyle = {
 } as React.CSSProperties;
 
 const buttonStyle = {
-  // width: "53px",
   height: "1.6vh",
   left: "0.8vw",
   fontFamily: "Roboto",
   fontStyle: "normal",
   fontWeight: "normal",
   fontSize: "1.44vh",
-  // lineHeight: "16px",
   textAlign: "right",
   letterSpacing: "0.25px",
   marginRight: "2vw"
@@ -68,7 +63,13 @@ const buttonStyle = {
 const printBtnId = "printTestButton";
 const printOption = g_defaultPrintOption;
 
-const HeaderLayer = () => {
+interface Props {
+  handlePdfOpen: (event: IFileBrowserReturn) => void,
+}
+
+const HeaderLayer = (props: Props) => {
+
+  const { handlePdfOpen, ...rest } = props;
 
   const [pdfUrl, setPdfUrl] = useState(undefined as string);
   const [pdfFilename, setPdfFilename] = useState(undefined as string);
@@ -155,15 +156,96 @@ const HeaderLayer = () => {
     $(this).css("color", "rgba(18,18,18,1)")
   });
 
+  $('#load').hover(function() {
+    $(this).css("color", "rgba(104,143,255,1)")
+  },function() {
+    $(this).css("color", "rgba(18,18,18,1)")
+  });
+
+  const [saveAnchorEl, saveSetAnchorEl] = React.useState<HTMLButtonElement | null>(null);
+
+  const [loadAnchorEl, loadSetAnchorEl] = React.useState<HTMLButtonElement | null>(null);
+
+  const handleClickSave = (event: React.MouseEvent<HTMLButtonElement>) => {
+    saveSetAnchorEl(event.currentTarget);
+  };
+
+  const handleClickLoad = (event: React.MouseEvent<HTMLButtonElement>) => {
+    loadSetAnchorEl(event.currentTarget);
+  };
+
+  const handleCloseSave = () => {
+    saveSetAnchorEl(null);
+  };
+
+  const handleCloseLoad = () => {
+    loadSetAnchorEl(null);
+  };
+
+  const saveOpen = Boolean(saveAnchorEl);
+
+  const loadOpen = Boolean(loadAnchorEl);
+
+  const saveId = saveOpen ? 'simple-popover-save' : undefined;
+
+  const loadId = loadOpen ? 'simple-popover-load' : undefined;
+
   return (
     <React.Fragment>
       <div id="header" style={headerStyle}>
         <img src="image 5.png" style={imgStyle}></img>
         <a id="grida_board" href="#" style={aStyle}>Grida board</a>
-        <Button id="save" style={buttonStyle} onClick={() => saveGrida('hello.grida')}>
+        <Button id="save" style={buttonStyle} onClick={handleClickSave} aria-describedby={saveId}>
           저장하기
         </Button>
-        <LoadGrida />
+        <Popover
+          id={saveId}
+          open={saveOpen}
+          anchorEl={saveAnchorEl}
+          onClose={handleCloseSave}
+          anchorOrigin={{
+            vertical: 'top',
+            horizontal: 'right'
+          }}
+          transformOrigin={{
+            vertical: 'top',
+            horizontal: 'left',
+          }}
+        >
+          <div onClick={() => saveGrida('hello.grida')}>
+            <Button>
+              .grida 저장
+            </Button>
+          </div>
+          <div>
+            <SavePdfDialog />
+          </div>
+        </Popover>
+        <Button id="load" style={buttonStyle} onClick={handleClickLoad} aria-describedby={loadId}>
+          내보내기
+        </Button>
+        <Popover
+          id={loadId}
+          open={loadOpen}
+          anchorEl={loadAnchorEl}
+          onClose={handleCloseLoad}
+          anchorOrigin={{
+            vertical: 'top',
+            horizontal: 'right'
+          }}
+          transformOrigin={{
+            vertical: 'top',
+            horizontal: 'left',
+          }}
+        >
+          <div>
+            <LoadGrida />
+          </div>
+          <div>
+            <FileBrowserButton handlePdfOpen={handlePdfOpen} />
+          </div>
+        </Popover>
+        
         <PrintButton targetId={printBtnId} url={pdfUrl} filename={pdfFilename} handlePdfUrl={makePdfUrl}/>
         <ManualCalibration filename={pdfFilename} printOption={printOption} handlePdfUrl={makePdfUrl}/>
         <KeyboardArrowDownRoundedIcon style={{float: "right", marginTop: "25px", marginRight: "31px"}}/>

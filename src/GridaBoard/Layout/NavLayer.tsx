@@ -32,8 +32,6 @@ import TracePointButton from "../../components/buttons/TracePointButton";
 import ColorButtons from "../../components/navbar/ColorButtons";
 import BackgroundButton from "../../components/buttons/BackgroundButton";
 import FitButton from "../../components/buttons/FitButton";
-import AddIcon from '@material-ui/icons/Add';
-
 
 const navStyle = {
   position: "static",
@@ -45,7 +43,6 @@ const navStyle = {
   right: 50,
   height: "5.2vh",
   zIndex: 0,
-  // border: "1px solid black",
   width: "100%",
   margin: 0,
   background: "rgba(255, 255, 255, 0.5)",
@@ -141,19 +138,6 @@ const NavLayer = () => {
     }
     docJson.pages.push(obj);
   }
-
-  const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null);
-
-  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
-
-  const open = Boolean(anchorEl);
-  const id = open ? 'simple-popover' : undefined;
 
   const zoom = useSelector((state: RootState) => state.zoomReducer.zoom);
   const zoomPercent = Math.round(zoom * 100);

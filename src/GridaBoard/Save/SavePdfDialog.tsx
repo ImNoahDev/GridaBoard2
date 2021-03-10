@@ -1,9 +1,8 @@
 import { 
   Box, Button, Dialog, DialogActions,
-  DialogTitle, IconButton, makeStyles 
+  DialogTitle, makeStyles 
 } from '@material-ui/core';
 import React from 'react';
-import PictureAsPdfIcon from '@material-ui/icons/PictureAsPdf';
 import { savePDF } from "./SavePdf";
 import PdfDialogTextArea from './PdfDialogTextArea';
 import { turnOnGlobalKeyShortCut } from '../../GridaBoard/GlobalFunctions';
@@ -38,7 +37,6 @@ const SavePdfDialog = () => {
   const classes = useStyles();
 
   const [open, setOpen] = React.useState(false);
-  const showForm = React.useState(false)
 
   let pdfSaveName = '';
 
@@ -74,12 +72,9 @@ const SavePdfDialog = () => {
         msg: "PDF 파일을 로컬에 저장하는 버튼입니다.",
         tail: "키보드 버튼 ?로 선택 가능합니다"
       }} title={undefined}>
-        <IconButton className={classes.iconContainer} onClick={handlePdfDialogOpen} style={{width: 36, height: 36}}>
-          {!showForm
-            ? <PictureAsPdfIcon className={classes.icon}/>
-            : <PictureAsPdfIcon className={classes.icon}/>
-          }
-        </IconButton>
+        <Button onClick={handlePdfDialogOpen}>
+          .PDF 저장
+        </Button>
       </GridaToolTip>
       <Dialog open={open} onClose={handlePdfDialogClose} aria-labelledby="form-dialog-title">
         <DialogTitle id="form-dialog-title" className={classes.title}>
