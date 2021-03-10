@@ -200,7 +200,6 @@ export default class VirtualPen implements INeoSmartpen {
       console.error("Ink Storage has not been initialized");
     }
     
-    this.setColor(this.manager.color);
     const penDownStrokeInfo = this.processPenDown(event);
     // const mac = this.mac;
     // const time = event.timeStamp;
@@ -220,7 +219,6 @@ export default class VirtualPen implements INeoSmartpen {
     console.log(`NeoSmartpen dispatch event ON_PEN_DOWN`);
     this.dispatcher.dispatch(PenEventName.ON_PEN_DOWN, penDownStrokeInfo);
 
-    this.manager.setActivePen(event.penId);
     // event 전달
     // let ph = this.appPen;
     // ph.onPenDown(event);

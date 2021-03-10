@@ -121,6 +121,7 @@ export default class PenManager {
   public createVirtualPen = (): INeoSmartpen => {
     const pen = new VirtualPen();
     this.add(pen, { id: pen.id });
+    this.setActivePen(pen.id);
     this.virtualPenSerial++;
 
     return pen;
