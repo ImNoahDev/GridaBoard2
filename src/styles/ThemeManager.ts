@@ -78,21 +78,19 @@ export default class ThemeManager {
     }
   }
 
-  // Theme 1: Gurodong
+  // Theme 1: Basic
   public setT1() {
-    document.body.style.backgroundColor = "rgb(255,229,237)";
-    document.body.style.backgroundImage = "-o-linear-gradient(bottom, rgb(255,229,237) 0%, rgb(224,255,233) 100%)";
-    document.body.style.backgroundImage = "-moz-linear-gradient(bottom, rgb(255,229,237) 0%, rgb(224,255,233) 100%)";
-    document.body.style.backgroundImage = "-webkit-linear-gradient(bottom, rgb(255,229,237) 0%, rgb(224,255,233) 100%)";
-    document.body.style.backgroundImage = "-ms-linear-gradient(bottom, rgb(255,229,237) 0%, rgb(224,255,233) 100%)";
-    document.body.style.backgroundImage = "linear-gradient(bottom, rgb(255,229,237) 0%, rgb(224,255,233) 100%)";
+    document.body.style.background = "rgba(0,0,0,0.05)";
     this.setThemeDark(false);
   }
 
-  // Theme 2: Aubergine
+  // Theme 2: Neo-prism
   public setT2() {
-    document.body.style.backgroundColor = "#cc2b5e";
-    document.body.style.backgroundImage = "-webkit-linear-gradient(bottom, #cc2b5e 0%, #753a88 100%)";
+    document.body.style.margin = "0";
+    document.body.style.width = "100vw";
+    document.body.style.height = "100vh";
+    document.body.style.backgroundImage = "url(bg_01.png)"
+    document.body.style.backgroundSize = "cover";
     this.setThemeDark(false);
   }
 

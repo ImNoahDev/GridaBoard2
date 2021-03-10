@@ -4,6 +4,7 @@ import { NeoImage } from '../CustomElement/NeoImage';
 import GridaToolTip from '../../styles/GridaToolTip';
 import { IPrintOption } from '../../nl-lib/common/structures';
 import { CalibrationButton } from '../../nl-lib/ncodepod';
+import { Button } from '@material-ui/core';
 
 
 const style = {
@@ -11,6 +12,25 @@ const style = {
   height: '36px',
   padding: '4px'
 }
+
+const mappingStyle = {
+  display: "flex",
+  position: "static",
+  width: "7vw",
+  height: "4vh",
+  flexDirection: "row",
+  justifyContent: "center",
+  background: "rgba(255, 255, 255, 0.5)",
+  border: "1px solid #CFCFCF",
+  boxSizing: "border-box",
+  // boxShadow: "2px 0px 24px rgba(255,255,255,0.5)",
+  borderRadius: "4px",
+  // float: "left",
+  fontSize: "1.4vh"
+  // marginTop: "2px",
+  // marginRight: "33px"
+} as React.CSSProperties;
+
 type Props = {
   filename: string,
   printOption: IPrintOption,
@@ -22,17 +42,13 @@ const ManualCalibration = (props: Props) => {
   const { filename, printOption, cancelCallback, ...rest } = props;
 
   return (
-    <CalibrationButton {...props} cancelCallback={cancelCallback} id="btn_start_calibration" type="button" className="btn btn-neo" handlePdfUrl={props.handlePdfUrl}>
+    <CalibrationButton {...props} cancelCallback={cancelCallback} style={{marginRight: "33px"}} handlePdfUrl={props.handlePdfUrl}>
       <GridaToolTip open={true} placement="left-end" tip={{
         head: "인쇄된 페이지 수동 등록",
         msg: "Ncode A4에 인쇄된 페이지를 프로그램에 수동 등록합니다.",
         tail: "단축키 Q로 선택가능합니다."
       }} title={undefined}>
-        <div><NeoImage style={style} src='/icons/icon_calibration_n.png' /></div>
-        {/* <div className="c2">
-          <img style={style} src='/icons/icon_calibration_n.png' className="normal-image"></img>
-          <img style={style} src='/icons/icon_calibration_p.png' className="hover-image"></img>
-        </div> */}
+        <Button style={mappingStyle}>nCode 맵핑</Button>
       </GridaToolTip>
     </CalibrationButton>
   )

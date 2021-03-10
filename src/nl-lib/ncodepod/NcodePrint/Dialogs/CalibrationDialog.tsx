@@ -22,12 +22,12 @@ const useStyles = makeStyles({
   },
 });
 
-const calibrationStyle = {
-  padding: "0px",
-  margin: "0px",
-  border: "0px",
-  minWidth: "24px"
-}
+// const calibrationStyle = {
+//   padding: "0px",
+//   margin: "0px",
+//   border: "0px",
+//   minWidth: "24px"
+// }
 
 interface IDialogProps {
   filename: string,
@@ -311,7 +311,7 @@ export default function CalibrationButton(props: Props) {
 
   return (
     <React.Fragment>
-      <Button {...rest} onClick={startCalibration} style={calibrationStyle}>
+      <Button {...rest} onClick={startCalibration}>
         {props.children}
       </Button>
       <CalibrationDialog {...props} />

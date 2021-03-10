@@ -4,11 +4,15 @@ import Drawer from '@material-ui/core/Drawer';
 import IconButton from '@material-ui/core/IconButton';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
-import { BoxProps } from '@material-ui/core';
+import { BoxProps, Button } from '@material-ui/core';
 import DrawerPages from './DrawerPages';
 import { updateDrawerWidth } from '../../../store/reducers/ui';
 import { RootState } from '../../../store/rootReducer';
 import { useSelector } from "react-redux";
+import AddIcon from '@material-ui/icons/Add';
+import GridaDoc from '../../GridaDoc';
+import { setActivePageNo } from "../../../store/reducers/activePageReducer";
+import { scrollToBottom } from "../../../nl-lib/common/util";
 
 
 // const useStyles_HOME_TSX = makeStyles((theme: Theme) =>
@@ -64,13 +68,24 @@ import { useSelector } from "react-redux";
 
 // https://codesandbox.io/s/resizable-drawer-34ife?from-embed=&file=/src/CustomDrawer.js:649-948
 
+const addPageStyle = {
+  
+} as React.CSSProperties;
+
+const addBlankPage = async (event) => {
+  const doc = GridaDoc.getInstance();
+  const pageNo = await doc.addBlankPage();
+  setActivePageNo(pageNo);
+  scrollToBottom("drawer_content");
+}
+
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {
-      display: 'flex',
+      display: 'block',
     },
     drawer: {
-      flexShrink: 0
+      flexShrink: 0,
     },
     toolbar: theme.mixins.toolbar,
     appBar: {
@@ -87,12 +102,13 @@ const useStyles = makeStyles((theme: Theme) =>
     },
 
     drawerHeader: {
-      display: 'flex',
+      display: 'block',
       alignItems: 'center',
       padding: theme.spacing(0, 1),
       // necessary for content to be below app bar
       ...theme.mixins.toolbar,
       justifyContent: 'flex-start',
+      zIndex: 15000
     },
 
     contentShift: {
@@ -113,12 +129,56 @@ const useStyles = makeStyles((theme: Theme) =>
       // right:0,
       bottom: 0,
       zIndex: 100,
-      backgroundColor: "#f4f7f9"
+      // backgroundColor: "#f4f7f9"
       // backgroundColor: "#ff0000"
+    },
+    drawerFooter: {
+      marginTop: "74vh",
+      // marginLeft: "0.8vw",
+      background: "rgba(104,143,255,1)",
+      // display: 'fii',
+      position: "fixed",
+      flexDirection: "row",
+      alignItems: 'center',
+      // padding: "8px 24px",
+      // padding: theme.spacing(0, 1),
+      // necessary for content to be below app bar
+      // ...theme.mixins.toolbar,
+      justifyContent: 'center',
+      boxShadow: "2px 0px 24px rgba(0, 0, 0, 0.15)",
+      borderRadius: "60px",
+      width: 140,
+      height: 40,
+      bottom: 24,
+      left: 20,
+      // marginBottom: "-50vh"
+      zIndex: 1100,
     }
-
   }),
 );
+
+const drawerFooter = {
+  marginTop: "74vh",
+  // marginLeft: "0.8vw",
+  background: "rgba(104,143,255,1)",
+  // display: 'fii',
+  position: "fixed",
+  flexDirection: "row",
+  alignItems: 'center',
+  // padding: "8px 24px",
+  // padding: theme.spacing(0, 1),
+  // necessary for content to be below app bar
+  // ...theme.mixins.toolbar,
+  justifyContent: 'center',
+  boxShadow: "2px 0px 24px rgba(0, 0, 0, 0.15)",
+  borderRadius: "60px",
+  width: 140,
+  height: 40,
+  bottom: 24,
+  left: 20,
+  // marginBottom: "-50vh"
+  zIndex: 1100,
+} as React.CSSProperties;
 
 const minDrawerWidth = 50;
 const maxDrawerWidth = 1000;
@@ -168,26 +228,30 @@ export default function PersistentDrawerRight(props: Props) {
 
 
   return (
-    <div className={classes.root}>
+    <div style={{float: "left"}}>
       {/* <CssBaseline /> */}
 
       <Drawer
         className={classes.drawer}
         variant="persistent"
-        anchor="right"
+        anchor="left"
         open={open}
-
-        PaperProps={{ style: { width: drawerWidth, flexShrink: 0 } }}
+        PaperProps={{ style: { width: drawerWidth, flexShrink: 0, zIndex: 1100, marginTop: "12.2vh", height: "87.8vh", background: "rgba(255, 255, 255, 0.25)", float: "left" } }}
       >
       <div id="drawer_content">
         <div className={classes.drawerHeader}>
-          <IconButton onClick={props.handleDrawerClose}>
-            {theme.direction === 'rtl' ? <ChevronLeftIcon /> : <ChevronRightIcon />}
+          <IconButton onClick={props.handleDrawerClose} style={{float: "right"}}>
+            {theme.direction === 'rtl' ? <ChevronRightIcon /> : <ChevronLeftIcon />}
           </IconButton>
         </div>
         <div onMouseDown={e => handleMouseDown(e)} className={classes.dragger} />
         < DrawerPages noInfo={props.noInfo} />
-
+        {/* <div > */}
+          <Button onClick={(evnet) => addBlankPage(event)} style={drawerFooter}>
+            <AddIcon style={{width: "12px", height: "12px", color: "rgba(255,255,255,1)"}}/>
+            <span style={{fontSize: "12px", color: "rgba(255,255,255,1)"}}>페이지 추가</span>
+          </Button>
+        {/* </div> */}
       </div>
       </Drawer>
     </div>

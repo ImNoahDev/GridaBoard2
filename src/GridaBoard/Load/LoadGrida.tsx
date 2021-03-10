@@ -2,26 +2,10 @@ import React from 'react';
 import { openFileBrowser } from "../../nl-lib/common/neopdf/FileBrowser";
 import { InkStorage } from '../../nl-lib/common/penstorage';
 import GridaDoc from '../GridaDoc';
-import PublishIcon from '@material-ui/icons/Publish';
-import { IconButton, makeStyles } from '@material-ui/core';
+import { Button } from '@material-ui/core';
 import GridaToolTip from "../../styles/GridaToolTip";
 
-const useStyles = makeStyles({
-  iconContainer: {
-    "&:hover $icon": {
-        color: 'red',
-    }
-  },
-  icon: {
-      color: 'black',
-  },
-});
-
 const LoadGrida = () => {
-
-  const classes = useStyles();
-  const showForm = React.useState(false)
-
   async function fileOpenHandler() {
     const selectedFile = await openFileBrowser();
     console.log(selectedFile.result);
@@ -83,20 +67,15 @@ const LoadGrida = () => {
   }
 
   return (
-      <button className="btn btn-neo" style={{marginLeft: "-10px"}} onClick={fileOpenHandler}>
-        <GridaToolTip open={true} placement="top-end" tip={{
-          head: "Grida Load",
-          msg: ".grida 파일을 로컬에서 불러옵니다.",
-          tail: "키보드 버튼 ?로 선택 가능합니다"
-        }} title={undefined}>
-          <IconButton className={classes.iconContainer} style={{width: 36, height: 36}}>
-            {!showForm
-              ? <PublishIcon className={classes.icon}/>
-              : <PublishIcon className={classes.icon}/>
-            }
-          </IconButton>
-        </GridaToolTip> 
-      </button>
+      <GridaToolTip open={true} placement="top-end" tip={{
+        head: "Grida Load",
+        msg: ".grida 파일을 로컬에서 불러옵니다.",
+        tail: "키보드 버튼 ?로 선택 가능합니다"
+      }} title={undefined}>
+        <Button onClick={fileOpenHandler}>
+          .grida 불러오기
+        </Button>
+      </GridaToolTip> 
   );
 }
 

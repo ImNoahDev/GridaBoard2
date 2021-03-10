@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Avatar, Box, Button, IconButton, Paper, Popover } from "@material-ui/core";
+import { Avatar, Box, Button, IconButton, Paper, Popover, SvgIcon } from "@material-ui/core";
 import { useSelector } from "react-redux";
 import ReactJson from "react-json-view";
 
@@ -23,20 +23,30 @@ import { turnOnGlobalKeyShortCut } from "../GlobalFunctions";
 import { savePDF } from "../Save/SavePdf";
 import { setActivePageNo } from "../../store/reducers/activePageReducer";
 import PictureAsPdfIcon from '@material-ui/icons/PictureAsPdf';
+import GridaToolTip from "../../styles/GridaToolTip";
+import KeyboardArrowDownRoundedIcon from '@material-ui/icons/KeyboardArrowDownRounded';
+import ZoomButton from "../../components/buttons/ZoomButton";
+import PenTypeButton from "../../components/buttons/PenTypeButton";
+import ThicknessButton from "../../components/buttons/ThicknessButton";
+import TracePointButton from "../../components/buttons/TracePointButton";
+import ColorButtons from "../../components/navbar/ColorButtons";
+import BackgroundButton from "../../components/buttons/BackgroundButton";
+import FitButton from "../../components/buttons/FitButton";
 
-
-const buttonDivStyle = {
-  position: "absolute",
-  display: "flex",
+const navStyle = {
+  position: "static",
+  display: "block",
   flexDirection: "row-reverse",
   alignItems: "center",
   left: 0,
   top: 0,
   right: 50,
-  height: "40px",
-  zIndex: 3,
+  height: "5.2vh",
+  zIndex: 0,
+  width: "100%",
+  margin: 0,
+  background: "rgba(255, 255, 255, 0.5)",
 } as React.CSSProperties;
-
 
 const printBtnId = "printTestButton";
 const printOption = g_defaultPrintOption;
@@ -47,12 +57,7 @@ const getNoteInfo = (event) => {
   // note_info.getNoteInfo({});
 };
 
-
-
-/**
- *
- */
-const ButtonLayer_forTest = () => {
+const NavLayer = () => {
   const [num_pens, setNumPens] = useState(0);
   const [mapViewDetail, setMapViewDetail] = useState(0);
   const [docViewDetail, setDocViewDetail] = useState(0);
@@ -134,64 +139,27 @@ const ButtonLayer_forTest = () => {
     docJson.pages.push(obj);
   }
 
-  const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null);
-
-  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
-
-  const open = Boolean(anchorEl);
-  const id = open ? 'simple-popover' : undefined;
-
+  const zoom = useSelector((state: RootState) => state.zoomReducer.zoom);
+  const zoomPercent = Math.round(zoom * 100);
 
   return (
-    <div id={"button_div"} style={buttonDivStyle}>
+    <div id={"button_div"} style={navStyle}>
 
-      <div style={{ flex: 1 }}> </div>
+      <PenTypeButton />
 
-      {/* <IconButton onClick={handleClick} aria-describedby={id} style={{marginLeft: 1700}}>
-        <Avatar style={{marginTop: 5}}>
-          H
-        </Avatar>
-      </IconButton> */}
-      {/* <Popover
-          id={id}
-          open={open}
-          anchorEl={anchorEl}
-          onClose={handleClose}
-          anchorOrigin={{
-            vertical: 'top',
-            horizontal: 'right'
-          }}
-          transformOrigin={{
-            vertical: 'top',
-            horizontal: 'left'
-          }}
-        >
-          <div>
-            <a>User Name</a>
-          </div>
-          <div className="dropdown-divider"></div>
-          <div>
-            <a>개인정보처리방침</a>
-          </div>
-          <div className="dropdown-divider"></div>
-          <div>
-            <a>이용약관</a>
-          </div>
-          <div className="dropdown-divider"></div>
-          <div>
-            <a>기타 개인설정</a>
-          </div>
-          <div className="dropdown-divider"></div>
-          <div>
-            <a>로그아웃</a>
-          </div>
-        </Popover> */}
+      <ColorButtons />
+
+      <KeyboardArrowDownRoundedIcon style={{float: "left", marginTop: "14px", marginLeft: "-5px"}}/>
+      <ThicknessButton />
+
+      <KeyboardArrowDownRoundedIcon style={{float: "left", marginTop: "14px", marginLeft: "-5px"}}/>
+      <TracePointButton />
+      
+      <KeyboardArrowDownRoundedIcon style={{float: "right", marginTop: "14px", marginLeft: "-5px", marginRight: "-30px"}}/>
+      <FitButton />
+
+      <KeyboardArrowDownRoundedIcon style={{float: "right", marginTop: "14px", marginLeft: "-5px", marginRight: "31px"}}/>
+      <BackgroundButton />
 
       {/* 매핑 정보 살펴보기 */}
       <div style={{ fontSize: "20px", fontWeight: "bold" }}>
@@ -305,4 +273,4 @@ const ButtonLayer_forTest = () => {
   );
 }
 
-export default ButtonLayer_forTest;
+export default NavLayer;

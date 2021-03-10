@@ -3,145 +3,116 @@ import '../../styles/buttons.css';
 import GridaToolTip from "../../styles/GridaToolTip";
 import PenManager from "../../nl-lib/neosmartpen/PenManager";
 import { IBrushType } from "../../nl-lib/common/enums";
-import { Popover } from "@material-ui/core";
+import { IconButton, Popover, SvgIcon } from "@material-ui/core";
 
 
 const manager: PenManager = PenManager.getInstance();
 
+const penTypeStyle = {
+  // marginTop: "11px",
+  color: "#58627D",
+  float: "left",
+  marginLeft: "30px",
+  // background: "white"
+} as React.CSSProperties;
+
 export default function PenTypeButton () {
 
-  const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null);
-
   const setPenType = (penType: IBrushType) => {
+    const penIconStyle = document.getElementById('btn_pen');
+    const penStyle = document.getElementById('pen_svg_icon');
+
+    const markerIconStyle = document.getElementById('btn_marker');
+    const markerStyle = document.getElementById('marker_svg_icon');
+
+    const eraserIconStyle = document.getElementById('btn_eraser');
+    const eraserStyle = document.getElementById('eraser_svg_icon');
+
+    if (penType === IBrushType.PEN) {
+      penIconStyle.style.background = "white";
+      penStyle.style.color = "#688FFF";
+    } else {
+      penIconStyle.style.background = "none";
+      penStyle.style.color = "#58627D";
+    }
+
+    if (penType === IBrushType.MARKER) {
+      markerIconStyle.style.background = "white";
+      markerStyle.style.color = "#688FFF";
+    } else {
+      markerIconStyle.style.background = "none";
+      markerStyle.style.color = "#58627D";
+    }
+
+    if (penType === IBrushType.ERASER) {
+      eraserIconStyle.style.background = "white";
+      eraserStyle.style.color = "#688FFF";
+    } else {
+      eraserIconStyle.style.background = "none";
+      eraserStyle.style.color = "#58627D";
+    }
     manager.setPenRendererType(penType);
-    handleClose();
   }
-
-  const setThickness = (thickness: number) => {
-    manager.setThickness(thickness);
-    handleClose();
-  }
-
-  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
-
-  const open = Boolean(anchorEl);
-  const id = open ? 'simple-popover' : undefined;
   
     return (
       <React.Fragment>
-        <button id="btn_brush" type="button"
-          className="bind-popover btn btn-neo btn-neo-vertical" data-toggle="dropdown" aria-haspopup="true"
-          aria-expanded="false" onClick={handleClick} aria-describedby={id}>
-          <GridaToolTip open={true} placement="left" tip={{
-            head: "Pen Type",
-            msg: "펜과 형광펜, 지우개 중 하나를 선택하는 버튼입니다.",
-            tail: "Q 펜, W 형광펜, E 지우개, A~G 굵기 선택"
-          }} title={undefined}>
-            <div className="c2 state_0">
-              <img src="/icons/icon_pen_n.png" className="state_0 normal-image"></img>
-              <img src="/icons/icon_pen_p.png" className="state_0 hover-image"></img>
-
-              <img src="/icons/icon_highlight_n.png" className="state_1 normal-image"></img>
-              <img src="/icons/icon_highlight_p.png" className="state_1 hover-image"></img>
-
-              <img src="/icons/icon_eraser_n.png" className="state_2 normal-image"></img>
-              <img src="/icons/icon_eraser_p.png" className="state_2 hover-image"></img>
-
-              <span id="thickness_num" className="thickness-badge badge badge-pill badge-secondary">2</span>
-            </div>
-          </GridaToolTip>
-        </button>
-
-        <Popover
-          id={id}
-          open={open}
-          anchorEl={anchorEl}
-          onClose={handleClose}
-          anchorOrigin={{
-            vertical: 'top',
-            horizontal: 'right'
-          }}
-          transformOrigin={{
-            vertical: 'top',
-            horizontal: 'left',
-          }}
-        >
-          <div className="btn-group">
-            <button id="btn_pen" type="button" className="btn btn-neo btn-neo-dropdown"
-              onClick={() => setPenType(IBrushType.PEN)}>
-              <GridaToolTip open={true} placement="left" tip={{
-                head: "Pen Type[Pen]",
-                msg: "펜을 선택하는 버튼입니다.",
-                tail: "단축키 Q로 선택가능합니다."
-              }} title={undefined}>
-                <div className="c2">
-                  <img src="/icons/icon_pen_n.png" className="normal-image"></img>
-                  <img src="/icons/icon_pen_p.png" className="hover-image"></img>
-                </div>
-              </GridaToolTip>
-            </button>
-            <button id="btn_marker" type="button" className="btn btn-neo btn-neo-dropdown"
-              onClick={() => setPenType(IBrushType.MARKER)}>
-              <GridaToolTip open={true} placement="left" tip={{
-                head: "Pen Type[Marker]",
-                msg: "형광펜을 선택하는 버튼입니다.",
-                tail: "단축키 W로 선택가능합니다."
-              }} title={undefined}>
-                <div className="c2">
-                  <img src="/icons/icon_highlight_n.png" className="normal-image"></img>
-                  <img src="/icons/icon_highlight_p.png" className="hover-image"></img>
-                </div>
-              </GridaToolTip>
-            </button>
-            <button id="btn_eraser" type="button" className="btn btn-neo btn-neo-dropdown"
-              onClick={() => setPenType(IBrushType.ERASER)}>
-              <GridaToolTip open={true} placement="left" tip={{
-                head: "Pen Type[Eraser]",
-                msg: "지우개를 선택하는 버튼입니다.",
-                tail: "단축키 E로 선택가능합니다."
-              }} title={undefined}>
-                <div className="c2">
-                  <img src="/icons/icon_eraser_n.png" className="normal-image"></img>
-                  <img src="/icons/icon_eraser_p.png" className="hover-image"></img>
-                </div>
-              </GridaToolTip>
-            </button>
-          </div>
-
-          {/* 선 굵기 */}
-          <div className="dropdown-divider"></div>
-          <div className="btn-group">
-            <button id="btn_thick_1" type="button" className="btn btn-neo btn-neo-dropdown" onClick={() => setThickness(1)}>
-              <div className="c2">
-                <img src="/icons/icon_thickness_01_n.png" className="normal-image"></img>
-                <img src="/icons/icon_thickness_01_p.png" className="hover-image"></img>
-              </div>
-            </button>
-            <button id="btn_thick_2" type="button" className="btn btn-neo btn-neo-dropdown" onClick={() => setThickness(2)}>
-              <div className="c2">
-                <img src="/icons/icon_thickness_02_n.png" className="normal-image"></img>
-                <img src="/icons/icon_thickness_02_p.png" className="hover-image"></img>
-              </div>
-            </button>
-            <button id="btn_thick_3" type="button" className="btn btn-neo btn-neo-dropdown" onClick={() => setThickness(3)}>
-              <div className="c2">
-                <img src="/icons/icon_thickness_03_n.png" className="normal-image"></img>
-                <img src="/icons/icon_thickness_03_p.png" className="hover-image"></img>
-              </div>
-            </button>
-          </div>
-        </Popover>
-
-        <div className="dropdown-menu dropdown-menu-right p-0 border border-0" aria-labelledby="btn_brush">
-          {/* 펜/형광펜 */}
-          
-        </div>
+          <IconButton id="btn_pen" style={penTypeStyle} onClick={() => setPenType(IBrushType.PEN)}>
+            <GridaToolTip open={true} placement="left" tip={{
+              head: "Pen Type[Pen]",
+              msg: "펜을 선택하는 버튼입니다.",
+              tail: "단축키 Q로 선택가능합니다."
+            }} title={undefined}>
+              {/* <div className="c2">
+                <img src="/icons/icon_pen_n.png" className="normal-image"></img>
+                <img src="/icons/icon_pen_p.png" className="hover-image"></img>
+              </div> */}
+              <SvgIcon id="pen_svg_icon" style={{width: "1.25vw", height: "2.5vh"}}>
+                <path
+                  fillRule="evenodd"
+                  clipRule="evenodd"
+                  d="M3.152 18.969a1 1 0 001.244 1.243l11.312-3.363 2.121-2.121 1.414-1.414 2.122-2.122a1 1 0 00-1.415-1.414L17.83 11.9l-1.415 1.415L15 14.728 8.637 8.364 10.05 6.95l1.414-1.415 2.829-2.828a1 1 0 10-1.415-1.414L10.051 4.12 8.637 5.535 6.515 7.657 3.152 18.969zM7.8 10.355l-1.62 5.45 1.379 1.38 5.45-1.62-5.21-5.21zM18 21H3v2h15a1 1 0 100-2z"
+                />
+              </SvgIcon>
+            </GridaToolTip>
+          </IconButton>
+          <IconButton id="btn_marker" style={penTypeStyle} onClick={() => setPenType(IBrushType.MARKER)}>
+            <GridaToolTip open={true} placement="left" tip={{
+              head: "Pen Type[Marker]",
+              msg: "형광펜을 선택하는 버튼입니다.",
+              tail: "단축키 W로 선택가능합니다."
+            }} title={undefined}>
+              {/* <div className="c2">
+                <img src="/icons/icon_highlight_n.png" className="normal-image"></img>
+                <img src="/icons/icon_highlight_p.png" className="hover-image"></img>
+              </div> */}
+              <SvgIcon id="marker_svg_icon" style={{width: "1.25vw", height: "2.5vh"}}>
+                <path
+                  fillRule="evenodd"
+                  clipRule="evenodd"
+                  d="M2.697 19.489h4.276l.578-.578 1.147 1.148a1 1 0 001.415 0l2.006-2.007c.076-.076.164-.139.26-.187l5.367-2.683a.999.999 0 00.26-.188l.592-.592 2.121-2.121 1.415-1.415a1 1 0 10-1.415-1.414l-.707.707-6.364-6.364 1.06-1.06a1 1 0 10-1.413-1.415l-1.768 1.768L9.406 5.21l-.593.592a1 1 0 00-.187.26l-2.683 5.366a1 1 0 01-.188.26L3.75 13.695a1 1 0 000 1.414l1.06 1.061-2.465 2.465a.5.5 0 00.353.854zM10.82 6.624l1.414-1.414 6.364 6.363-1.414 1.415-6.364-6.364zm-.115 10.014l-1.3 1.3-3.535-3.536 1.3-1.3a3 3 0 00.561-.78L9.718 8.35l5.74 5.74-3.973 1.986a3 3 0 00-.78.562zM17 21H2v2h15a1 1 0 100-2z"
+                />
+              </SvgIcon>
+            </GridaToolTip>
+          </IconButton>
+          <IconButton id="btn_eraser" style={penTypeStyle} onClick={() => setPenType(IBrushType.ERASER)}>
+            <GridaToolTip open={true} placement="left" tip={{
+              head: "Pen Type[Eraser]",
+              msg: "지우개를 선택하는 버튼입니다.",
+              tail: "단축키 E로 선택가능합니다."
+            }} title={undefined}>
+              {/* <div className="c2">
+                <img src="/icons/icon_eraser_n.png" className="normal-image"></img>
+                <img src="/icons/icon_eraser_p.png" className="hover-image"></img>
+              </div> */}
+              <SvgIcon id="eraser_svg_icon" style={{width: "1.25vw", height: "2.5vh"}}>
+                <path
+                  fillRule="evenodd"
+                  clipRule="evenodd"
+                  d="M20.238 10.333l-6.381 6.382-7.071-7.071 6.381-6.382c.371-.37.988-.355 1.38.035l5.656 5.657c.39.391.406 1.008.035 1.38zM3.763 12.667l1.68-1.68 7.03 7.031-4.826-.123-3.849-3.85c-.39-.39-.406-1.007-.035-1.378zm10.202 6.768a1.853 1.853 0 01-1.364.535l-4.904-.125a2.055 2.055 0 01-1.393-.607l-3.85-3.849c-1.171-1.172-1.218-3.024-.105-4.137l9.404-9.404c1.113-1.113 2.965-1.066 4.137.106l5.657 5.657c1.171 1.172 1.219 3.023.106 4.136l-7.688 7.688zM19 21H4v2h15a1 1 0 000-2z"
+                />
+              </SvgIcon>
+            </GridaToolTip>
+          </IconButton>
       </React.Fragment>
     );
 }

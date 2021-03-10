@@ -651,7 +651,6 @@ class PenBasedRenderer extends React.Component<Props, State> {
       left: 0,
       top: 0,
       zIndex: 10,
-
     }
 
     const shadowStyle: CSSProperties = {

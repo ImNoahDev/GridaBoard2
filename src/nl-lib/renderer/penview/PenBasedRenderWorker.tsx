@@ -129,16 +129,16 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
 
     let brushColor;
     switch (foundIdx) {
-      case 1: brushColor = 'red'; break;
-      case 2: brushColor = 'yellow'; break;
-      case 3: brushColor = 'navy'; break;
-      case 4: brushColor = 'black'; break;
-      case 5: brushColor = 'white'; break;
-      case 6: brushColor = 'orange'; break;
-      case 7: brushColor = 'green'; break;
-      case 8: brushColor = 'blue'; break;
-      case 9: brushColor = 'purple'; break;
-      case 0: brushColor = 'darkgray'; break;
+      case 1: brushColor = 'rgb(229,229,229)'; break;
+      case 2: brushColor = 'rgb(151,151,151)'; break;
+      case 3: brushColor = 'rgb(0,0,0)'; break;
+      case 4: brushColor = 'rgb(108,0,226)'; break;
+      case 5: brushColor = 'rgb(240,168,60)'; break;
+      case 6: brushColor = 'rgb(0,171,235)'; break;
+      case 7: brushColor = 'rgb(60,221,0)'; break;
+      case 8: brushColor = 'rgb(255,208,1)'; break;
+      case 9: brushColor = 'rgb(255,101,0)'; break;
+      case 0: brushColor = 'rgb(255,2,0)'; break;
     }
     const circle = `
       <svg
