@@ -823,11 +823,14 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
    *
    * 2021/01/12 PointerEvent도 처리할 수 있도록 추가해야 함
    */
-  onTouchStrokePenMove = (event: MouseEvent, force: number) => {
-    const screen_xy = { x: event.clientX, y: event.clientY };
+  onTouchStrokePenMove = (event: MouseEvent & {layerX: number, layerY:number}, force: number) => {
+    // const screen_xy = { x: event.clientX, y: event.clientY };
+    // const pdf_xy = this.screenToPdfXy(screen_xy);
 
-    const pdf_xy = this.screenToPdfXy(screen_xy);
+    const pdf_xy =  this.layerToPdfXy( { x: event.layerX, y: event.layerY });
     const ncode_xy = this.pdfToNcodeXy(pdf_xy);
+
+    // event.path[6].offsetLeft
 
     const vp = PenManager.getInstance().virtualPen;
     const timeStamp = Date.now();

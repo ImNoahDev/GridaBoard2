@@ -31,7 +31,7 @@ export interface IRenderWorkerOption {
   canvasId: string,
 
   canvas: HTMLCanvasElement,
-
+  // position: { offsetX: number, offsetY: number, zoom: number },
   /** screen width, height in pixel */
   viewSize: ISize,
 
@@ -821,6 +821,18 @@ export default abstract class RenderWorkerBase {
   }
 
 
+  protected layerToPdfXy = (layerXY: { x: number, y: number }) => {
+    const { x, y } = layerXY;
+
+    const zoom = this.offset.zoom;
+
+    const px = x / zoom;
+    const py = y / zoom;
+
+    return { x: px, y: py };
+    // return { x: offset_x, y: offset_y };
+  }
+
 
   protected screenToPdfXy = (screenXY: { x: number, y: number }) => {
     const { x, y } = screenXY;
@@ -829,13 +841,14 @@ export default abstract class RenderWorkerBase {
     const vpt = canvasFb.viewportTransform;
 
     const zoom = this.offset.zoom;
-    const offset_x = this.offset.x;
-    const offset_y = this.offset.y;
+    // const offset_x = this.offset.x + this._opt.position.offsetX;
+    // const offset_y = this.offset.y + this._opt.position.offsetY;
 
-    const px = (x - offset_x) / zoom;
-    const py = (y - offset_y) / zoom;
+    const px = (x - this.offset.x) / zoom;
+    const py = (y - this.offset.y) / zoom;
 
     return { x: px, y: py };
+    // return { x: offset_x, y: offset_y };
   }
 
 

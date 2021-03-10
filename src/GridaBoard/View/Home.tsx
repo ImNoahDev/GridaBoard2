@@ -313,15 +313,21 @@ const Home = () => {
   console.log(`HOME: docPageNo:${activePageNo}, pdfUrl=${pdfUrl}, fingerPrint: ${pdfFingerprint}, pdfPageNo:${pdfPageNo}`);
   return (
 
-    <div className={classes.root}>
+    <div className={classes.root} style={{position:"absolute", height:"100vh", width:"100%"}}>
 
       <main style={viewStyle}>
 
-        <div id="layer" style={{ position: "static", top: 0, left: 0, bottom: 0, right: drawerOpen ? drawerWidth : 0 }}>
+        <div id="layer" style={
+          { 
+            position: "relative", 
+            top: 0, left: 0, bottom: 0, right: drawerOpen ? drawerWidth : 0 
+          }}>
           <ViewLayer handlePdfOpen={handlePdfOpen} style={{display: "block"}}/>
         </div>
 
-        <div style={{ position: "absolute", top: 120, left: 200, bottom: 0, right: drawerOpen ? drawerWidth : 0}}>
+        <div id="mixed-viewer-layer" style={{ position: "absolute", top: 120, left: 0, bottom: 0, 
+        right:  0}
+        }>
           <MixedPageView
             pdf={pdf}
             pdfUrl={pdfUrl} filename={pdfFilename}

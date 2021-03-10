@@ -7,6 +7,7 @@ import NavigateBeforeIcon from '@material-ui/icons/NavigateBefore';
 import NavigateNextIcon from '@material-ui/icons/NavigateNext';
 import { IconButton } from '@material-ui/core';
 import $ from "jquery";
+import { turnOnGlobalKeyShortCut } from '../../GridaBoard/GlobalFunctions';
 
 const selectPageStyle = {
   width: "35px",
@@ -28,6 +29,7 @@ const PageNumbering = () => {
     }
     
     const handleChange = (e) => {
+      turnOnGlobalKeyShortCut(false);
       const value = parseInt(e.target.value);
       if (value > numPages) {
         console.log("disChecked")
@@ -56,18 +58,18 @@ const PageNumbering = () => {
     }
 
     return (
-        <div>
-          <IconButton id="pre_btn" onClick={prevChange}>
-            <NavigateBeforeIcon />
-          </IconButton>
-          <input value={pageNo} style={selectPageStyle} onChange={handleChange}/>
-          /
-          &nbsp;
-          <span>{numPages}</span>
-          <IconButton id="next_btn" onClick={nextChange}>
-            <NavigateNextIcon />
-          </IconButton>
-        </div>
+      <div>
+        <IconButton id="pre_btn" onClick={prevChange}>
+          <NavigateBeforeIcon />
+        </IconButton>
+        <input value={pageNo} style={selectPageStyle} onChange={handleChange}/>
+        /
+        &nbsp;
+        <span>{numPages}</span>
+        <IconButton id="next_btn" onClick={nextChange}>
+          <NavigateNextIcon />
+        </IconButton>
+      </div>
     )
 }
 

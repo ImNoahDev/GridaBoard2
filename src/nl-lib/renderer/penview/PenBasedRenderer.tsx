@@ -398,6 +398,7 @@ class PenBasedRenderer extends React.Component<Props, State> {
     const options: IRenderWorkerOption = {
       canvasId: this.canvasId,
       canvas: this.canvas,
+      // position: this.props.position,
       viewSize,
       pageSize,
       mouseAction: !this.fixed,

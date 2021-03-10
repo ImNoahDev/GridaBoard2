@@ -222,7 +222,7 @@ const HeaderLayer = (props: Props) => {
           </div>
         </Popover>
         <Button id="load" style={buttonStyle} onClick={handleClickLoad} aria-describedby={loadId}>
-          내보내기
+          불러오기
         </Button>
         <Popover
           id={loadId}
