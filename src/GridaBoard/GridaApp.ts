@@ -55,7 +55,7 @@ export default class GridaApp {
     // const filename = "A4_Pirates-of-the-Caribbean-Hes-a-Pirate-Klaus-Badelt.pdf";
     // const url = "./A4_Pirates-of-the-Caribbean-Hes-a-Pirate-Klaus-Badelt.pdf";
 
-    // doc.openPdfFile({ url, filename });
+    doc.openPdfFile({ url, filename });
 
     // const pageNo = await doc.addBlankPage();
     // setActivePageNo(pageNo);
