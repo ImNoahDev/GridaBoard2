@@ -267,7 +267,7 @@ export default class PrintNcodedPdfWorker {
     this.setStatus("completed");
 
     // tempMapper 정보를 등록
-    if (printOption.needToIssuePrintCode) {
+    if (printOption.needToIssuePrintCode && printOption.hasToPutNcode) {
       const msi = MappingStorage.getInstance();
       msi.register(tempMapping);
     }
@@ -596,7 +596,15 @@ export default class PrintNcodedPdfWorker {
     const numPages = targetPages.length;
     const numSheets = Math.ceil(numPages / pagesPerSheet);
 
-    const maxCount = (numPages * 4) + (numSheets * 4) + numSheets + 1;
+    let maxCount = 0;
+    if (this.printOption.hasToPutNcode) {
+      //일반 용지에 인쇄하는 경우
+      maxCount = (numPages * 4) + (numSheets * 4) + numSheets + 1; 
+    } else {
+      //ncode a4에 인쇄하는 경우
+      maxCount = (numPages * 3) + (numSheets * 3) + numSheets + 1; //prepareSplittedNcodePlane에서 progressCallback이 빠짐
+    }
+
     // const percent = (eventCount / maxCount) * 100;
     let percent = (this.numReports / maxCount) * 100;
 
