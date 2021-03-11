@@ -345,13 +345,14 @@ class PenBasedRenderer extends React.Component<Props, State> {
         // const { section, owner, book, page } = nextProps.pageInfo;
         console.log(`VIEW SIZE PAGE CHANGE 1: ${makeNPageIdStr(pageInfo)}`);
         
+        const transform = MappingStorage.getInstance().getNPageTransform(pageInfo);
+        this.renderer.setTransformParameters(transform.h);
+        
         this.renderer.changePage(pageInfo, nextProps.pdfSize, false);
         
         this.renderer.onPageSizeChanged(nextProps.pdfSize);
         this.pdfSize = { ...nextProps.pdfSize, scale: this.pdfSize.scale };
 
-        const transform = MappingStorage.getInstance().getNPageTransform(pageInfo);
-        this.renderer.setTransformParameters(transform.h);
         ret_val = true;
 
       }
