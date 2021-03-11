@@ -94,8 +94,7 @@ export interface MixedViewProps {
    * autoChangePage가 true 인 상태에서만 동작한다
    **/
   handleFileLoadNeeded?: (event: IHandleFileLoadNeededEvent) => void,
-  onNcodePageChanged: (pageInfo: IPageSOBP, found: IGetNPageTransformType) => void;
-
+  
   parentName: string;
   activePageNo: number;
 
@@ -182,7 +181,6 @@ const defaultMixedPageViewProps: MixedViewProps = {
   autoPageChange: true,
 
   handleFileLoadNeeded: undefined,
-  onNcodePageChanged: undefined,
 
   noMorePdfSignal: false,
   handlePageWidthNeeded: undefined,
@@ -546,7 +544,6 @@ class MixedPageView_module extends React.Component<MixedViewProps, State>  {
       this.setState({ forceToRenderCnt: this.state.forceToRenderCnt + 1 });
     }
 
-    if (this.props.onNcodePageChanged) this.props.onNcodePageChanged(pageInfo, found);
   }
 
   handlePageWidthNeeded = (width: number) => {

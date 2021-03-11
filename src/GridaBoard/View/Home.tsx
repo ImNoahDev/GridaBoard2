@@ -1,128 +1,34 @@
-import React, { useState, useRef, useEffect } from "react";
-import { IconButton, makeStyles, createStyles, SvgIcon, Popover } from "@material-ui/core";
-import { useSelector, shallowEqual } from "react-redux";
-import { Theme } from '@material-ui/core';
+import React, { useState } from "react";
 import '../../styles/main.css'
-import { theme } from "../../styles/theme";
 
 import PUIController from '../../components/PUIController';
 import { turnOnGlobalKeyShortCut } from "../GlobalFunctions";
-import PersistentDrawerRight from "./Drawer/PersistentDrawerRight";
 import ViewLayer from "../Layout/ViewLayer";
-import AutoLoadConfirmDialog from "../Dialog/AutoLoadConfirmDialog";
-import { RootState } from "../../store/rootReducer";
 import { updateDrawerWidth } from "../../store/reducers/ui";
 import GridaDoc from "../GridaDoc";
 
 import {
-  NeoPdfDocument, NeoPdfManager,
+  NeoPdfManager,
   openFileBrowser2, g_hiddenFileInputBtnId, onFileInputChanged, onFileInputClicked
 } from "../../nl-lib/common/neopdf";
 import { IPageSOBP, IFileBrowserReturn, IGetNPageTransformType } from "../../nl-lib/common/structures";
-import { MixedPageView } from "../../nl-lib/renderer";
-import { nullNcode } from "../../nl-lib/common/constants";
-import { PLAYSTATE, ZoomFitEnum } from "../../nl-lib/common/enums";
-import { PenManager } from "../../nl-lib/neosmartpen";
-import PageNumbering from "../../components/navbar/PageNumbering";
 
-const useStyles = makeStyles((theme: Theme) =>
-  createStyles({
-    root: {
-      // display: "block"
-    },
-
-    hide: {
-      display: 'none',
-    },
-  }),
-);
-
-const helpStyles = makeStyles({
-  iconContainer: {
-    "&:hover $icon": {
-        color: 'red',
-    }
-  },
-  icon: {
-      color: 'black',
-  },
-});
 
 const Home = () => {
   const [drawerOpen, setDrawerOpen] = useState(true);
-  const [rightMargin, setRightMargin] = useState(0);
-  // const [pens, setPens] = useState([] as INeoSmartpen[]);
-
   const [autoLoadOptions, setAutoLoadOptions] = useState(undefined as IGetNPageTransformType);
   const [loadConfirmDlgOn, setLoadConfirmDlgOn] = useState(false);
   const [loadConfirmDlgStep, setLoadConfirmDlgStep] = useState(0);
-  // const [pdfUrl, setPdfUrl] = useState(undefined as string);
-  // const [pdfFilename, setPdfFilename] = useState(undefined as string);
   const [noMoreAutoLoad, setNoMoreAutoLoad] = useState(false);
 
   const [activePageNo, setLocalActivePageNo] = useState(-1);
   const [pageWidth, setPageWidth] = useState(0);
-  const [toggleRotation, setToggleRotation] = useState(false);
-
-  // const [pdfUrl, setPdfUrl] = useState(undefined as string);
-  // const [pdfFilename, setPdfFilename] = useState(undefined as string);
-  // const [pdfFingerprint, setPdfFingerprint] = useState(undefined as string);
-  // const [pdf, setPdf] = useState(undefined as NeoPdfDocument);
-  // const [pageInfos, setPageInfos] = useState([nullNcode()]);
-  // const [basePageInfo, setBasePageInfo] = useState(nullNcode());
 
   const pdfUrl = undefined as string;
   const pdfFilename = undefined as string;
   let pdfFingerprint = undefined as string;
   let pdfPageNo = 1;
-  let pdf = undefined as NeoPdfDocument;
-  let pageInfos = [nullNcode()];
-  let rotation = 0;
 
-  let basePageInfo = nullNcode();
-  const {activePageNo_store} = useSelector((state: RootState) =>({
-    activePageNo_store: state.activePage.activePageNo,
-  }));
-
-  const {renderCountNo_store} = useSelector((state: RootState) =>({
-    renderCountNo_store: state.activePage.renderCount,
-  }));
-  const rotationTrigger = useSelector((state: RootState) => state.rotate.rotationTrigger);
-  const viewFit_store = useSelector((state: RootState) => state.viewFitReducer.viewFit);
-
-  useEffect(() => {
-    if (rotationTrigger !== toggleRotation) {
-      setToggleRotation(rotationTrigger);
-    }
-  }, [rotationTrigger])
-
-  useEffect(() => {
-    if (activePageNo_store !== activePageNo) {
-      setLocalActivePageNo(activePageNo_store);
-    }
-  }, [activePageNo_store])
-
-  if (activePageNo_store >= 0) {
-    const doc = GridaDoc.getInstance();
-    const page = doc.getPageAt(activePageNo_store)
-    if (page._pdfPage !== undefined) {
-      rotation = page._pdfPage.viewport.rotation;
-    } else {
-      rotation = page.pageOverview.rotation;
-    }
-    pdf = page.pdf;
-
-    // setPdfUrl(doc.getPdfUrlAt(activePageNo));
-    // setPdfFilename(doc.getPdfFilenameAt(activePageNo));
-    pdfFingerprint = doc.getPdfFingerprintAt(activePageNo_store);
-    pdfPageNo = doc.getPdfPageNoAt(activePageNo_store);
-    pageInfos = doc.getPageInfosAt(activePageNo_store);
-    basePageInfo = doc.getBasePageInfoAt(activePageNo_store);
-  }
-
-  const drawerWidth = useSelector((state: RootState) => state.ui.drawer.width);
-  const pens = useSelector((state: RootState) => state.appConfig.pens);
-  const virtualPen = PenManager.getInstance().virtualPen;
   const setDrawerWidth = (width: number) => updateDrawerWidth({ width });
 
   const handleDrawerOpen = () => {
@@ -141,20 +47,11 @@ const Home = () => {
     setPageWidth(width);
   }
 
-
   /**
    * PDF 추가 로드 step 1) 페이지 변화 검출
    * @param pageInfo - 펜에서 들어온 페이지, PDF의 시작 페이지가 아닐수도 있다
    * @param found - 위의 pageInfo에 따라 발견된 mapping table 내의 item 정보 일부
    */
-  const onNcodePageChanged = (pageInfo: IPageSOBP, found: IGetNPageTransformType) => {
-    // const doc = GridaDoc.getInstance();
-    // const result = doc.handleActivePageChanged(pageInfo, found);
-
-    // if (!noMoreAutoLoad && result.needToLoadPdf) {
-    //   handleFileLoadNeeded(found, result.pageInfo, result.basePageInfo);
-    // }
-  }
 
   /**
    * PDF 추가 로드 step 2) 다이얼로그 표시
@@ -245,66 +142,7 @@ const Home = () => {
     setLoadConfirmDlgOn(false);
   }
 
-
-  const classes = useStyles();
-
   //https://css-tricks.com/controlling-css-animations-transitions-javascript/
-
-  let mainStyle = {
-    // flexGrow: 1,
-    // padding: theme.spacing(3),
-    transition: theme.transitions.create('margin', {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.leavingScreen,
-    }),
-    marginRight: 0,
-  };
-
-  if (drawerOpen) {
-    mainStyle = {
-      // flexGrow: 1,
-      // padding: theme.spacing(3),
-      transition: theme.transitions.create('margin', {
-        easing: theme.transitions.easing.easeOut,
-        duration: theme.transitions.duration.enteringScreen,
-      }),
-      marginRight: drawerWidth,
-    }
-  }
-
-  const pageNumberingStyle = {
-    position: "absolute",
-    bottom: 0,
-    flexDirection: "row-reverse",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    // width: pageWidth,
-    width: "191px",
-    height: "46px",
-    left: "calc(50% - 191px / 2)",
-    // top: "calc(50% - 46px / 2)",
-    background: "rgba(255,255,255,0.25)",
-    boxShadow: "rgba(156,156,156,0.48)",
-    borderRadius: "100px",
-    zIndex: 1500
-  } as React.CSSProperties;
-
-  const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null);
-
-  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
-
-  const open = Boolean(anchorEl);
-  const id = open ? 'simple-popover' : undefined;
-
-  const helpClasees = helpStyles();
-  const showForm = React.useState(false)
 
   console.log(`HOME: docPageNo:${activePageNo}, pdfUrl=${pdfUrl}, fingerPrint: ${pdfFingerprint}, pdfPageNo:${pdfPageNo}`);
   return (
@@ -314,24 +152,6 @@ const Home = () => {
     </React.Fragment>
   );
 };
-
-
-// const mapStateToProps = (state) => {
-//   const ret = {
-//     fil: state.pdfInfo.filename,
-//   };
-//   return ret;
-// };
-
-// const mapDispatchToProps = (dispatch) => ({
-//   increment: () => dispatch(incrementAction()),
-//   decrement: () => dispatch(decrementAction())
-// });
-
-
-// export default connect(mapStateToProps)(Home);
-
-
 
 declare global {
   interface Window {
@@ -349,6 +169,5 @@ declare global {
   turnOnGlobalKeyShortCut(true);
 
 })(window);
-
 
 export default Home;

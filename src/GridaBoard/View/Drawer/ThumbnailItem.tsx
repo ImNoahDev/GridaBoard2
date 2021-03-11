@@ -91,8 +91,7 @@ const ThumbnailItem = (props: Props) => {
           fitMargin={5}
           // fixed
           noInfo
-
-          onNcodePageChanged={undefined}
+          
           activePageNo={activePageNo}
 
           renderCountNo={renderCountNo}

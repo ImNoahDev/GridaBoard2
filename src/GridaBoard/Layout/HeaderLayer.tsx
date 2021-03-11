@@ -16,7 +16,6 @@ import { FileBrowserButton } from "../../nl-lib/common/neopdf";
 import { IFileBrowserReturn } from "../../nl-lib/common/structures";
 
 const headerStyle = {
-  // position: "static",
   display: "flex",
   flexDirection: "row",
   justifyContent: "space-between",
@@ -27,10 +26,6 @@ const headerStyle = {
 } as React.CSSProperties;
 
 const imgStyle = {
-  // float: "left",
-  // verticalAlign: "middle",
-  // marginTop: "14px",
-  // marginLeft: "10px",
   marginRight: "1vw",
   borderRadius: "8px",
 } as React.CSSProperties;
@@ -134,20 +129,6 @@ const HeaderLayer = (props: Props) => {
   const onPenLinkChanged = e => {
     const app = GridaApp.getInstance();
     app.onPenLinkChanged(e);
-    // const pen = e.pen;
-    // if (e.event.event === 'on_connected') {
-    //   pens.push(pen);
-    //   setPens([...pens]);
-    // }
-    // else if (e.event.event === 'on_disconnected') {
-    //   const mac = pen.getMac();
-    //   console.log(`Home: OnPenDisconnected, mac=${pen.getMac()}`);
-    //   const index = pens.findIndex(p => p.getMac() === mac);
-    //   if (index > -1) {
-    //     const newPens = pens.splice(index, 1);
-    //     setPens([...newPens]);
-    //   }
-    // }
   }
 
   $('#save').hover(function() {

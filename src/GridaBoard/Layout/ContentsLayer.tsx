@@ -3,11 +3,10 @@ import { useSelector } from "react-redux";
 import GridaToolTip from "../../styles/GridaToolTip";
 import { RootState } from "../../store/rootReducer";
 import GridaDoc from "../GridaDoc";
-import { FileBrowserButton, NeoPdfDocument } from "../../nl-lib/common/neopdf";
-import { IFileBrowserReturn, IGetNPageTransformType, IPageSOBP } from "../../nl-lib/common/structures";
+import { NeoPdfDocument } from "../../nl-lib/common/neopdf";
+import { IFileBrowserReturn } from "../../nl-lib/common/structures";
 
-import { colors, IconButton, Popover } from "@material-ui/core";
-import { PDFDocument } from 'pdf-lib';
+import { IconButton, Popover } from "@material-ui/core";
 import HelpIcon from '@material-ui/icons/Help';;
 import { nullNcode } from "../../nl-lib/common/constants";
 import RotateButton from "../../components/buttons/RotateButton";
@@ -17,36 +16,10 @@ import { PenManager } from "../../nl-lib/neosmartpen";
 import PageNumbering from "../../components/navbar/PageNumbering";
 
 const localStyle = {
-  // width: "90.625vw",
-  // height: "87.8vh",
-  // float: "left",
-  // zIndex: 1100,
-  // display: "flex",
-  // flexDirection: "column",
-  // justifyContent: "space-between",
-  // alignItems: "center",
   display: "flex",
   flex: 1,
   overflow: "auto",
   flexDirection: "column",
-  // position: "absolute"
-} as React.CSSProperties;
-
-const helpStyle = {
-  // float: "right",
-  width: "2.604166666666667vw",
-  height: "5.159958720330237vh",
-  borderRadius: "40px",
-  position: "absolute",
-  // bottom: 10,
-  // float: "right",
-  // left: 1660,
-  zIndex: 1500,
-  flexWrap: "wrap",
-  marginLeft: "auto",
-  // bottom: 0,
-  // marginRight: "-3vw",
-  marginTop: "auto",
 } as React.CSSProperties;
 
 const dropdownStyle = {
@@ -75,59 +48,24 @@ const dropContentsStyle = {
 } as React.CSSProperties;
 
 const pageNumberingStyle = {
-  // position: "absolute",
-  // bottom: 0,
-  // flexDirection: "row-reverse",
-  // display: "inline-flex",
-  // alignItems: "center",
-  // justifyContent: "center",
-  // width: pageWidth,
   width: "171px",
   height: "46px",
-  // left: "calc(50% - 171px / 2)",
-  // top: "calc(50% - 46px / 2)",
   background: "rgba(255,255,255,0.25)",
   boxShadow: "rgba(156,156,156,0.48)",
   borderRadius: "100px",
-  // margin: "0 auto",
-  // marginLeft: "59px",
   marginRight: "37.8vw",
   zIndex: 1500
 } as React.CSSProperties;
 
-function hideAndShowFnc() {
-  const colorMenu = document.getElementById('color_bar');
-  const leftMenu = document.getElementById('leftmenu');
-  const navCenter = document.getElementById('navbar_center');
-  const navEnd = document.getElementById('navbar_end');
-
-  if (colorMenu.style.display === 'none' && navCenter.style.display === 'none'
-    && navEnd.style.display === 'none' && leftMenu.style.display) {
-    colorMenu.style.display = 'block';
-    navCenter.style.display = 'block';
-    navEnd.style.display = 'block';
-    leftMenu.style.display = 'block';
-  } else {
-    colorMenu.style.display = 'none';
-    navCenter.style.display = 'none';
-    navEnd.style.display = 'none';
-    leftMenu.style.display = 'none';
-  }
-
-}
-
 interface Props {
   handlePdfOpen: (event: IFileBrowserReturn) => void,
 }
-/**
- *
- */
+
 const ContentsLayer = (props: Props) => {
   const { handlePdfOpen, ...rest } = props;
 
   const [pageWidth, setPageWidth] = useState(0);
 
-  // const activePageNo = useSelector((state: RootState) => state.activePage.activePageNo);
   const rotationTrigger = useSelector((state: RootState) => state.rotate.rotationTrigger);
   const {activePageNo_store} = useSelector((state: RootState) =>({
     activePageNo_store: state.activePage.activePageNo,
@@ -139,67 +77,6 @@ const ContentsLayer = (props: Props) => {
   }, [activePageNo_store])
   //pdf file name을 설정하는건 사용자가 지정한 gridaboard 이름이어야 함. 미지정시에는 '그리다보드1'
   //store에 따로 가지고 있어야 한다
-
-  // const [pdfUrl, pdfFilename] = useSelector((state: RootState) => {
-  //   return [state.activePage.url, state.activePage.filename];
-  // });
-  
-  const makePdfUrl = async () => {
-    const doc = GridaDoc.getInstance();
-    const docPages = doc.pages;
-
-    let pdfUrl, pdfDoc = undefined;
-
-    for (const page of docPages)
-    {
-      if (page.pdf === undefined) {
-        //ncode page일 경우
-        if (pdfDoc === undefined) {
-          pdfDoc = await PDFDocument.create();
-        }
-  
-        const pdfPage = await pdfDoc.addPage();
-        if (page._rotation === 90 || page._rotation === 270) {
-          const tmpWidth = pdfPage.getWidth();
-          pdfPage.setWidth(pdfPage.getHeight());
-          pdfPage.setHeight(tmpWidth);
-        }
-      } 
-      else {
-        //pdf인 경우 
-        if (pdfUrl !== page.pdf.url) { 
-          pdfUrl = page.pdf.url;
-          const existingPdfBytes = await fetch(page.pdf.url).then(res => res.arrayBuffer());
-          let pdfDocSrc = await PDFDocument.load(existingPdfBytes);
-  
-          if (pdfDoc !== undefined) {
-            //ncode 페이지가 미리 생성돼서 그 뒤에다 붙여야하는 경우
-            const srcLen = pdfDocSrc.getPages().length;
-            let totalPageArr = [];
-            for (let i = 0; i<srcLen; i++) {
-              totalPageArr.push(i);
-            }
-  
-            const copiedPages = await pdfDoc.copyPages(pdfDocSrc, totalPageArr);
-  
-            for (const copiedPage of copiedPages) {
-              await pdfDoc.addPage(copiedPage);
-            }
-          } else {
-            pdfDoc = pdfDocSrc;
-          }
-        } else {
-          continue;
-        }
-      }
-    }
-
-    const pdfBytes = await pdfDoc.save();
-    const blob = new Blob([pdfBytes], { type: 'application/pdf' });
-
-    const url = await URL.createObjectURL(blob);
-    return url;
-  }
 
   const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null);
   const [toggleRotation, setToggleRotation] = useState(false);
@@ -249,8 +126,6 @@ const ContentsLayer = (props: Props) => {
     }
     pdf = page.pdf;
 
-    // setPdfUrl(doc.getPdfUrlAt(activePageNo));
-    // setPdfFilename(doc.getPdfFilenameAt(activePageNo));
     pdfFingerprint = doc.getPdfFingerprintAt(activePageNo_store);
     pdfPageNo = doc.getPdfPageNoAt(activePageNo_store);
     pageInfos = doc.getPageInfosAt(activePageNo_store);
@@ -268,15 +143,6 @@ const ContentsLayer = (props: Props) => {
     setPageWidth(width);
   }
 
-  const onNcodePageChanged = (pageInfo: IPageSOBP, found: IGetNPageTransformType) => {
-    // const doc = GridaDoc.getInstance();
-    // const result = doc.handleActivePageChanged(pageInfo, found);
-
-    // if (!noMoreAutoLoad && result.needToLoadPdf) {
-    //   handleFileLoadNeeded(found, result.pageInfo, result.basePageInfo);
-    // }
-  }
-
   return (
     <div style={localStyle}>
       <div id="rotate-box" style={{
@@ -291,9 +157,7 @@ const ContentsLayer = (props: Props) => {
       {/* <main> */}
       <div id="mixed-viewer-layer" style={{ 
         position: "relative",
-        // top: -130
         height: '100%',
-        // top: -50
       }}>
         <MixedPageView
           pdf={pdf}
@@ -313,7 +177,6 @@ const ContentsLayer = (props: Props) => {
           fitMargin={100}
           
           activePageNo={activePageNo_store}
-          onNcodePageChanged={onNcodePageChanged}
           handlePageWidthNeeded = {(width) => handlePageWidthNeeded(width)}
 
           renderCountNo={renderCountNo_store}
@@ -338,7 +201,6 @@ const ContentsLayer = (props: Props) => {
             <IconButton id="help_btn" onClick={handleClick} aria-describedby={id}>
               <HelpIcon fontSize="large" 
                 style={{
-                // width: "2.604166666666667vw", height: "5.159958720330237vh",
                 zIndex: 1500,
                 padding: 0
               }}/>

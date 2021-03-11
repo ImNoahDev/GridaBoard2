@@ -1,11 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { Avatar, Box, Button, IconButton, Paper, Popover, SvgIcon } from "@material-ui/core";
 import { useSelector } from "react-redux";
-import ReactJson from "react-json-view";
 
-import { NeoImage } from "../../components/CustomElement/NeoImage";
-import Upload from "../../components/navbar/Upload";
-import GoogleBtn from "../../components/GoogleBtn";
 import { RootState } from "../../store/rootReducer";
 import GridaDoc from "../GridaDoc";
 
@@ -15,17 +10,9 @@ import { g_defaultPrintOption } from "../../nl-lib/ncodepod";
 
 import { MappingStorage } from "../../nl-lib/common/mapper";
 import { NoteServerClient } from "../../nl-lib/common/noteserver";
-import { CalibrationButton, OptionDialogButton, PrintNcodedPdfButton } from "../../nl-lib/ncodepod";
 
-
-import ClearLocalMappingButton from "../../nl-lib/common/mapper/test/ClearLocalMappingButton";
-import { turnOnGlobalKeyShortCut } from "../GlobalFunctions";
-import { savePDF } from "../Save/SavePdf";
 import { setActivePageNo } from "../../store/reducers/activePageReducer";
-import PictureAsPdfIcon from '@material-ui/icons/PictureAsPdf';
-import GridaToolTip from "../../styles/GridaToolTip";
 import KeyboardArrowDownRoundedIcon from '@material-ui/icons/KeyboardArrowDownRounded';
-import ZoomButton from "../../components/buttons/ZoomButton";
 import PenTypeButton from "../../components/buttons/PenTypeButton";
 import ThicknessButton from "../../components/buttons/ThicknessButton";
 import TracePointButton from "../../components/buttons/TracePointButton";
@@ -34,19 +21,12 @@ import BackgroundButton from "../../components/buttons/BackgroundButton";
 import FitButton from "../../components/buttons/FitButton";
 
 const navStyle = {
-  // position: "static",
   display: "flex",
   flexDirection: "row",
   justifyContent: "space-between",
   alignItems: "center",
   flexWrap: "wrap",
-  // left: 0,
-  // top: 0,
-  // right: 50,
   height: "5.2vh",
-  // zIndex: 0,
-  // width: "100%",
-  // margin: 0,
   background: "rgba(255, 255, 255, 0.5)",
 } as React.CSSProperties;
 
@@ -90,25 +70,6 @@ const NavLayer = () => {
     mapJson = data;
   }
 
-  const [pdfUrl, setPdfUrl] = useState(undefined as string);
-  const [pdfFilename, setPdfFilename] = useState(undefined as string);
-
-  const activePageNo = useSelector((state: RootState) => state.activePage.activePageNo);
-  useEffect(() => {
-    if (activePageNo >= 0) {
-      const doc = GridaDoc.getInstance();
-      const page = doc.getPageAt(activePageNo)
-      setPdfUrl(doc.getPdfUrlAt(activePageNo));
-      setPdfFilename(doc.getPdfFilenameAt(activePageNo));
-    }
-  }, [activePageNo]);
-
-  const addBlankPage = (event) => {
-    const doc = GridaDoc.getInstance();
-    const pageNo = doc.addBlankPage();
-    setActivePageNo(pageNo);
-  }
-
   const docJson = { pdf: [], pages: [] };
   const doc = GridaDoc.getInstance();
 
@@ -140,9 +101,6 @@ const NavLayer = () => {
     }
     docJson.pages.push(obj);
   }
-
-  const zoom = useSelector((state: RootState) => state.zoomReducer.zoom);
-  const zoomPercent = Math.round(zoom * 100);
 
   return (
     <div id={"button_div"} style={navStyle}>
