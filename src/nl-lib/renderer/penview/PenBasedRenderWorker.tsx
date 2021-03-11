@@ -12,6 +12,8 @@ import { NeoSmartpen, PenManager, VirtualPen } from "../../neosmartpen";
 import { MappingStorage } from "../../common/mapper/MappingStorage";
 import { calcRevH } from "../../common/mapper/CoordinateTanslater";
 import { applyTransform } from "../../common/math/echelon/SolveTransform";
+import GridaDoc from "../../../GridaBoard/GridaDoc";
+import { setActivePageNo } from "../../../store/reducers/activePageReducer";
 
 // import { PaperInfo } from "../../common/noteserver";
 
@@ -802,7 +804,7 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
    *
    * 2021/01/12 PointerEvent도 처리할 수 있도록 추가해야 함
    */
-  onTouchStrokePenDown = (event: MouseEvent) => {
+  onTouchStrokePenDown = async (event: MouseEvent) => {
     // const screen_xy = { x: event.clientX, y: event.clientY };
 
     // const pdf_xy = this.screenToPdfXy(screen_xy);
@@ -813,6 +815,10 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
     this._vpPenDownTime = timeStamp;
     vp.onPenDown({ timeStamp, penTipMode: 0, penId: vp.mac });
 
+    if (this.pageInfo === undefined) {
+      const pageNo = await GridaDoc.getInstance().addBlankPage();
+      setActivePageNo(pageNo);
+    }
     const { section, owner, book, page } = this.pageInfo;
     vp.onPageInfo({ timeStamp, section, owner, book, page }, false);
   }
