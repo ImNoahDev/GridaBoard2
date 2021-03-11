@@ -253,7 +253,7 @@ export default class PrintNcodedPdfWorker {
     const ncodedUrl = await new Promise(resolve => {
       const ret = urlCreator.createObjectURL(blob); resolve(ret);
     }) as string;
-    this.printByPrintJs(ncodedUrl);
+    this.printByPrintJs(ncodedUrl, printOption.hasToPutNcode);
 
     // 저장 옵션이 켜져 있으면 저장한다
     if (printOption.downloadNcodedPdf) {
@@ -502,7 +502,7 @@ export default class PrintNcodedPdfWorker {
     this.getInfoDict(pdfDoc).set(pdfKey, PDFHexString.fromText(value));
   }
 
-  private printByPrintJs = (ncodedUrl: string) => {
+  private printByPrintJs = (ncodedUrl: string, hasToPutNcode: boolean) => {
     const option = {
       url: ncodedUrl,
       show: true,
@@ -519,9 +519,9 @@ export default class PrintNcodedPdfWorker {
       },
       showModal: false,
       onPrintDialogClose: function () {
-        console.log('onPrintDialogClose'); 
-        showCalibrationDialog(option);
-        
+        if (!hasToPutNcode) {
+          showCalibrationDialog(option);
+        }
       }
     });
   }
