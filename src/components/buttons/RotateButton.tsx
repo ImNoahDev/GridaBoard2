@@ -17,14 +17,15 @@ const verticalStyle = {
   // alignItems: "center",
   // padding: "16px",
   // position: "static",
-  width: "56px",
-  height: "56px",
+  width: "2.604166666666667vw",
+  height: "5.159958720330237vh",
   background: "rgba(255, 255, 255, 0.8)",
   boxShadow: "2px 0px 24px rgba(0, 0, 0, 0.15), inset 0px 2px 0px rgba(255, 255, 255, 0.15)",
   borderRadius: "40px",
   // marginRight: "16px",
   // marginTop: "16px",
-  display: "block"
+  display: "block",
+  flexWrap: "wrap"
 } as React.CSSProperties;
 
 const horizontalStyle = {
@@ -35,14 +36,15 @@ const horizontalStyle = {
   // alignItems: "center",
   // padding: "16px",
   // position: "static",
-  width: "56px",
-  height: "56px",
+  width: "2.604166666666667vw",
+  height: "5.159958720330237vh",
   background: "rgba(255, 255, 255, 0.8)",
   boxShadow: "2px 0px 24px rgba(0, 0, 0, 0.15), inset 0px 2px 0px rgba(255, 255, 255, 0.15)",
   borderRadius: "40px",
   // marginRight: "16px",
   // marginTop: "16px",
-  display: "none"
+  display: "none",
+  flexWrap: "wrap"
 } as React.CSSProperties;
 
 const RotateButton = () => {

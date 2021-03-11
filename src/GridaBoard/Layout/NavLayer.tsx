@@ -162,11 +162,14 @@ const NavLayer = () => {
       <div style={{display: "inline-flex", flexDirection: "row",
         justifyContent: "flex-end", alignItems: "center"
       }}>
+
+        <BackgroundButton />
+        <KeyboardArrowDownRoundedIcon/>
+        
         <FitButton />
         <KeyboardArrowDownRoundedIcon/>
         
-        <BackgroundButton />
-        <KeyboardArrowDownRoundedIcon/>
+        
       </div>
       
 

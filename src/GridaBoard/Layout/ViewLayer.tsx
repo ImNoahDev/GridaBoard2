@@ -21,9 +21,9 @@ const ViewLayer = (props: Props) => {
       }}>
       <HeaderLayer {...props}/>
       <NavLayer {...props} />
-      <div style={{display: "flex", flex: 1}}>
+      <div style={{display: "flex", flex: 1, flexDirection: "row-reverse", justifyContent: "flex-start"}}>
+        <ContentsLayer {...props}/>
         <SideLayer {...props}/>
-        <ContentsLayer {...props} />
       </div>
     </div>
   );

@@ -67,7 +67,7 @@ const ConnectButton = (props: Props) => {
   return (
     // <div className="btn-group-vertical neo_shadow" style={{ marginBottom: 10 }}>
     <React.Fragment>
-      <IconButton id="btn_connect" style={{display: "block"}}
+      <IconButton id="btn_connect" style={{display: "block", marginRight: "1vw"}}
         onClick={() => handleConnectPen()}>
         <GridaToolTip open={true} placement="left" tip={{
           head: "Pen Connect",

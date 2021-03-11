@@ -196,7 +196,7 @@ const HeaderLayer = (props: Props) => {
         <div style={{display: "inline-flex", flexDirection: "row",
           justifyContent: "flex-start", alignItems: "center", marginLeft: "1vw"
         }}>
-          <img src="image 5.png" style={imgStyle}></img>
+          <img src="grida_logo.png" style={imgStyle}></img>
           <a id="grida_board" href="#" style={aStyle}>Grida board</a>
           <Button id="save" style={buttonStyle} onClick={handleClickSave} aria-describedby={saveId}>
             저장하기
@@ -256,8 +256,9 @@ const HeaderLayer = (props: Props) => {
           justifyContent: "flex-start", alignItems: "center", marginRight: "1vw"
         }}>
           <ConnectButton onPenLinkChanged={e => onPenLinkChanged(e)} />
-          <KeyboardArrowDownRoundedIcon style={{marginRight: "3vw"}}/>
+          
           <div>구글 이메일</div>
+          <KeyboardArrowDownRoundedIcon />
         </div>
         
         

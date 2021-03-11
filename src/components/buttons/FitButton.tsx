@@ -18,9 +18,9 @@ const dropdownStyle = {
   flexDirection: "column",
   alignItems: "flex-start",
   padding: "8px",
-  // position: "relative",
-  width: "12.5vw",
-  height: "18.16305469556244vh",
+  position: "relative",
+  width: "240px",
+  height: "176px",
   background: "rgba(255,255,255,0.9)",
   boxShadow: "2px 2px 2px rgba(0, 0, 0, 0.25)",
   borderRadius: "12px",
@@ -31,12 +31,11 @@ const dropContentsStyle = {
   flexDirection: "row",
   alignItems: "center",
   padding: "4px 12px",
-  // position: "static",
+  position: "static",
   width: "224px",
   left: "calc(50% - 224px / 2)",
   top: "8px",
   marginTop: "8px"
-  // bottom: "128px",
 } as React.CSSProperties;
 
 export default function FitButton() {
@@ -92,18 +91,26 @@ export default function FitButton() {
             }}
           >
             <div style={dropdownStyle}>
-              <div style={dropContentsStyle}>
-                <a>Zoom in</a>
-              </div>
-              <div style={dropContentsStyle}>
-                <a>Zoom out</a>
-              </div>
-              <div style={dropContentsStyle} onClick={() => handleClose(ZoomFitEnum.HEIGHT)}>
-                <a>Fit Screen</a>
-              </div>
-              <div style={dropContentsStyle} onClick={() => handleClose(ZoomFitEnum.WIDTH)}>
-                <a>Fill Screen</a>
-              </div>
+              <a href="#" style={{textDecoration: "none", color: "rgba(18,18,18,1)"}}>
+                <div style={dropContentsStyle}>
+                  <a>Zoom in</a>
+                </div>
+              </a>
+              <a href="#" style={{textDecoration: "none", color: "rgba(18,18,18,1)"}}>
+                <div style={dropContentsStyle}>
+                  <a>Zoom out</a>
+                </div>
+              </a>
+              <a href="#" style={{textDecoration: "none", color: "rgba(18,18,18,1)"}} onClick={() => handleClose(ZoomFitEnum.HEIGHT)}>
+                <div style={dropContentsStyle}>
+                  <a>Fit Screen</a>
+                </div>
+              </a>
+              <a href="#" style={{textDecoration: "none", color: "rgba(18,18,18,1)"}} onClick={() => handleClose(ZoomFitEnum.WIDTH)}>
+                <div style={dropContentsStyle}>
+                  <a>Fill Screen</a>
+                </div>
+              </a>
             </div>
                 {/* <a id="btn_fit_height" className="dropdown-item" href="#">
               <div className="c2">

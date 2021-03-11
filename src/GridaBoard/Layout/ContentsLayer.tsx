@@ -6,7 +6,7 @@ import GridaDoc from "../GridaDoc";
 import { FileBrowserButton, NeoPdfDocument } from "../../nl-lib/common/neopdf";
 import { IFileBrowserReturn, IGetNPageTransformType, IPageSOBP } from "../../nl-lib/common/structures";
 
-import { IconButton, Popover } from "@material-ui/core";
+import { colors, IconButton, Popover } from "@material-ui/core";
 import { PDFDocument } from 'pdf-lib';
 import HelpIcon from '@material-ui/icons/Help';;
 import { nullNcode } from "../../nl-lib/common/constants";
@@ -34,11 +34,19 @@ const localStyle = {
 
 const helpStyle = {
   // float: "right",
-  width: "56px",
-  height: "56px",
+  width: "2.604166666666667vw",
+  height: "5.159958720330237vh",
   borderRadius: "40px",
+  position: "absolute",
+  // bottom: 10,
+  // float: "right",
+  // left: 1660,
+  zIndex: 1500,
+  flexWrap: "wrap",
+  marginLeft: "auto",
+  // bottom: 0,
   // marginRight: "-3vw",
-  // marginTop: "80vh",
+  marginTop: "auto",
 } as React.CSSProperties;
 
 const dropdownStyle = {
@@ -70,18 +78,21 @@ const pageNumberingStyle = {
   // position: "absolute",
   // bottom: 0,
   // flexDirection: "row-reverse",
-  // display: "flex",
+  // display: "inline-flex",
   // alignItems: "center",
   // justifyContent: "center",
   // width: pageWidth,
-  width: "191px",
+  width: "171px",
   height: "46px",
-  // left: "calc(50% - 191px / 2)",
+  // left: "calc(50% - 171px / 2)",
   // top: "calc(50% - 46px / 2)",
   background: "rgba(255,255,255,0.25)",
   boxShadow: "rgba(156,156,156,0.48)",
   borderRadius: "100px",
-  // zIndex: 1500
+  // margin: "0 auto",
+  // marginLeft: "59px",
+  marginRight: "37.8vw",
+  zIndex: 1500
 } as React.CSSProperties;
 
 function hideAndShowFnc() {
@@ -269,45 +280,53 @@ const ContentsLayer = (props: Props) => {
   return (
     <div style={localStyle}>
       <div id="rotate-box" style={{
-        
+        display: "flex",
+        justifyContent: "flex-end",
+        marginRight: 10,
+        marginTop: 10,
+        flexWrap: "wrap"
       }}>
         <RotateButton />
       </div>
       {/* <main> */}
-        <div id="mixed-viewer-layer" style={{ 
-          position: "relative",
-          // top: -130
-          height: '100%',
-          // top: -50
-        }}>
-          <MixedPageView
-            pdf={pdf}
-            pdfUrl={pdfUrl} filename={pdfFilename}
-            pdfPageNo={pdfPageNo} pens={[...pens, virtualPen]} 
-            playState={PLAYSTATE.live}
-            rotation={rotation}
-            isMainView={true}
+      <div id="mixed-viewer-layer" style={{ 
+        position: "relative",
+        // top: -130
+        height: '100%',
+        // top: -50
+      }}>
+        <MixedPageView
+          pdf={pdf}
+          pdfUrl={pdfUrl} filename={pdfFilename}
+          pdfPageNo={pdfPageNo} pens={[...pens, virtualPen]} 
+          playState={PLAYSTATE.live}
+          rotation={rotation}
+          isMainView={true}
 
-            pageInfo={pageInfos[0]}
-            basePageInfo={basePageInfo}
+          pageInfo={pageInfos[0]}
+          basePageInfo={basePageInfo}
 
-            parentName={"grida-main-home"}
-            viewFit={viewFit_store}
-            autoPageChange={true}
-            fromStorage={false}
-            fitMargin={100}
-            
-            activePageNo={activePageNo_store}
-            onNcodePageChanged={onNcodePageChanged}
-            handlePageWidthNeeded = {(width) => handlePageWidthNeeded(width)}
+          parentName={"grida-main-home"}
+          viewFit={viewFit_store}
+          autoPageChange={true}
+          fromStorage={false}
+          fitMargin={100}
+          
+          activePageNo={activePageNo_store}
+          onNcodePageChanged={onNcodePageChanged}
+          handlePageWidthNeeded = {(width) => handlePageWidthNeeded(width)}
 
-            renderCountNo={renderCountNo_store}
+          renderCountNo={renderCountNo_store}
 
-            noInfo = {true}
-          />
-        </div>
-      {/* </main > */}
-      {/* <div>
+          noInfo = {true}
+        />
+      </div>
+      <div style={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "flex-end",
+        flexWrap: "wrap",
+      }}>
         <div style={pageNumberingStyle}>
           <PageNumbering />
         </div>
@@ -316,8 +335,13 @@ const ContentsLayer = (props: Props) => {
           msg: "도움말 기능들을 보여줍니다.",
           tail: "키보드 버튼 ?로 선택 가능합니다"
         }} title={undefined}>
-            <IconButton id="help_btn" style={helpStyle} onClick={handleClick} aria-describedby={id}>
-              <HelpIcon style={{width: "40px", height: "40px"}}/>
+            <IconButton id="help_btn" onClick={handleClick} aria-describedby={id}>
+              <HelpIcon fontSize="large" 
+                style={{
+                // width: "2.604166666666667vw", height: "5.159958720330237vh",
+                zIndex: 1500,
+                padding: 0
+              }}/>
             </IconButton>
         </GridaToolTip>
         <Popover
@@ -335,21 +359,30 @@ const ContentsLayer = (props: Props) => {
           }}
         >
           <div style={dropdownStyle}>
-            <div style={dropContentsStyle}>
-              <a>고객센터</a>
-            </div>
-            <div style={dropContentsStyle}>
-              <a>단축키 안내</a>
-            </div>
-            <div style={dropContentsStyle}>
-              <a>튜토리얼</a>
-            </div>
-            <div style={dropContentsStyle}>
-              <a>FAQ</a>
-            </div>
+            <a href="#" style={{textDecoration: "none", color: "rgba(18,18,18,1)"}}>
+              <div style={dropContentsStyle}>
+                <a>고객센터</a>
+              </div>
+            </a>
+            <a href="#" style={{textDecoration: "none", color: "rgba(18,18,18,1)"}}>
+              <div style={dropContentsStyle}>
+                <a>단축키 안내</a>
+              </div>
+            </a>
+            <a href="#" style={{textDecoration: "none", color: "rgba(18,18,18,1)"}}>
+              <div style={dropContentsStyle}>
+                <a>튜토리얼</a>
+              </div>
+            </a>
+            <a href="#" style={{textDecoration: "none", color: "rgba(18,18,18,1)"}}>
+              <div style={dropContentsStyle}>
+                <a>FAQ</a>
+              </div>
+            </a>
           </div>
         </Popover>
-      </div> */}
+      </div>
+        
     </div>
   );
 }
