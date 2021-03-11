@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-;
 import GridaToolTip from "../../styles/GridaToolTip";
 import { RootState } from "../../store/rootReducer";
 import GridaDoc from "../GridaDoc";
@@ -12,21 +11,34 @@ import { PDFDocument } from 'pdf-lib';
 import HelpIcon from '@material-ui/icons/Help';;
 import { nullNcode } from "../../nl-lib/common/constants";
 import RotateButton from "../../components/buttons/RotateButton";
+import { MixedPageView } from "../../nl-lib/renderer";
+import { PLAYSTATE } from "../../nl-lib/common/enums";
+import { PenManager } from "../../nl-lib/neosmartpen";
+import PageNumbering from "../../components/navbar/PageNumbering";
 
 const localStyle = {
-  width: "90.625vw",
-  height: "87.8vh",
-  float: "left",
-  zIndex: 1100
+  // width: "90.625vw",
+  // height: "87.8vh",
+  // float: "left",
+  // zIndex: 1100,
+  // display: "flex",
+  // flexDirection: "column",
+  // justifyContent: "space-between",
+  // alignItems: "center",
+  display: "flex",
+  flex: 1,
+  overflow: "auto",
+  flexDirection: "column",
+  // position: "absolute"
 } as React.CSSProperties;
 
 const helpStyle = {
-  float: "right",
+  // float: "right",
   width: "56px",
   height: "56px",
   borderRadius: "40px",
-  marginRight: "-3vw",
-  marginTop: "80vh",
+  // marginRight: "-3vw",
+  // marginTop: "80vh",
 } as React.CSSProperties;
 
 const dropdownStyle = {
@@ -52,6 +64,24 @@ const dropContentsStyle = {
   left: "calc(50% - 224px / 2)",
   top: "8px",
   marginTop: "8px"
+} as React.CSSProperties;
+
+const pageNumberingStyle = {
+  // position: "absolute",
+  // bottom: 0,
+  // flexDirection: "row-reverse",
+  // display: "flex",
+  // alignItems: "center",
+  // justifyContent: "center",
+  // width: pageWidth,
+  width: "191px",
+  height: "46px",
+  // left: "calc(50% - 191px / 2)",
+  // top: "calc(50% - 46px / 2)",
+  background: "rgba(255,255,255,0.25)",
+  boxShadow: "rgba(156,156,156,0.48)",
+  borderRadius: "100px",
+  // zIndex: 1500
 } as React.CSSProperties;
 
 function hideAndShowFnc() {
@@ -83,6 +113,8 @@ interface Props {
  */
 const ContentsLayer = (props: Props) => {
   const { handlePdfOpen, ...rest } = props;
+
+  const [pageWidth, setPageWidth] = useState(0);
 
   // const activePageNo = useSelector((state: RootState) => state.activePage.activePageNo);
   const rotationTrigger = useSelector((state: RootState) => state.rotate.rotationTrigger);
@@ -173,12 +205,16 @@ const ContentsLayer = (props: Props) => {
   const open = Boolean(anchorEl);
   const id = open ? 'simple-popover' : undefined;
 
+  const pdfUrl = undefined as string;
+  const pdfFilename = undefined as string;
   let pdf = undefined as NeoPdfDocument;
   let pdfPageNo = 1;
   let rotation = 0;
   let pageInfos = [nullNcode()];
   let basePageInfo = nullNcode();
   let pdfFingerprint = undefined as string;
+
+  const viewFit_store = useSelector((state: RootState) => state.viewFitReducer.viewFit);
 
   useEffect(() => {
     if (rotationTrigger !== toggleRotation) {
@@ -210,48 +246,110 @@ const ContentsLayer = (props: Props) => {
     basePageInfo = doc.getBasePageInfoAt(activePageNo_store);
   }
 
+  const {renderCountNo_store} = useSelector((state: RootState) =>({
+    renderCountNo_store: state.activePage.renderCount,
+  }));
+
+  const pens = useSelector((state: RootState) => state.appConfig.pens);
+  const virtualPen = PenManager.getInstance().virtualPen;
+  
+  const handlePageWidthNeeded = (width: number) => {
+    setPageWidth(width);
+  }
+
+  const onNcodePageChanged = (pageInfo: IPageSOBP, found: IGetNPageTransformType) => {
+    // const doc = GridaDoc.getInstance();
+    // const result = doc.handleActivePageChanged(pageInfo, found);
+
+    // if (!noMoreAutoLoad && result.needToLoadPdf) {
+    //   handleFileLoadNeeded(found, result.pageInfo, result.basePageInfo);
+    // }
+  }
+
   return (
     <div style={localStyle}>
-      <RotateButton />
+      <div id="rotate-box" style={{
+        
+      }}>
+        <RotateButton />
+      </div>
+      {/* <main> */}
+        <div id="mixed-viewer-layer" style={{ 
+          position: "relative",
+          // top: -130
+          height: '100%',
+          // top: -50
+        }}>
+          <MixedPageView
+            pdf={pdf}
+            pdfUrl={pdfUrl} filename={pdfFilename}
+            pdfPageNo={pdfPageNo} pens={[...pens, virtualPen]} 
+            playState={PLAYSTATE.live}
+            rotation={rotation}
+            isMainView={true}
 
-      <GridaToolTip open={true} placement="top-end" tip={{
-        head: "Helper",
-        msg: "도움말 기능들을 보여줍니다.",
-        tail: "키보드 버튼 ?로 선택 가능합니다"
-      }} title={undefined}>
-          <IconButton id="help_btn" style={helpStyle} onClick={handleClick} aria-describedby={id}>
-            <HelpIcon style={{width: "40px", height: "40px"}}/>
-          </IconButton>
-      </GridaToolTip>
-      <Popover
-        id={id}
-        open={open}
-        anchorEl={anchorEl}
-        onClose={handleClose}
-        anchorOrigin={{
-          vertical: 'bottom',
-          horizontal: 'left'
-        }}
-        transformOrigin={{
-          vertical: 'bottom',
-          horizontal: 'right'
-        }}
-      >
-        <div style={dropdownStyle}>
-          <div style={dropContentsStyle}>
-            <a>고객센터</a>
-          </div>
-          <div style={dropContentsStyle}>
-            <a>단축키 안내</a>
-          </div>
-          <div style={dropContentsStyle}>
-            <a>튜토리얼</a>
-          </div>
-          <div style={dropContentsStyle}>
-            <a>FAQ</a>
-          </div>
+            pageInfo={pageInfos[0]}
+            basePageInfo={basePageInfo}
+
+            parentName={"grida-main-home"}
+            viewFit={viewFit_store}
+            autoPageChange={true}
+            fromStorage={false}
+            fitMargin={100}
+            
+            activePageNo={activePageNo_store}
+            onNcodePageChanged={onNcodePageChanged}
+            handlePageWidthNeeded = {(width) => handlePageWidthNeeded(width)}
+
+            renderCountNo={renderCountNo_store}
+
+            noInfo = {true}
+          />
         </div>
-      </Popover>
+      {/* </main > */}
+      {/* <div>
+        <div style={pageNumberingStyle}>
+          <PageNumbering />
+        </div>
+        <GridaToolTip open={true} placement="top-end" tip={{
+          head: "Helper",
+          msg: "도움말 기능들을 보여줍니다.",
+          tail: "키보드 버튼 ?로 선택 가능합니다"
+        }} title={undefined}>
+            <IconButton id="help_btn" style={helpStyle} onClick={handleClick} aria-describedby={id}>
+              <HelpIcon style={{width: "40px", height: "40px"}}/>
+            </IconButton>
+        </GridaToolTip>
+        <Popover
+          id={id}
+          open={open}
+          anchorEl={anchorEl}
+          onClose={handleClose}
+          anchorOrigin={{
+            vertical: 'bottom',
+            horizontal: 'left'
+          }}
+          transformOrigin={{
+            vertical: 'bottom',
+            horizontal: 'right'
+          }}
+        >
+          <div style={dropdownStyle}>
+            <div style={dropContentsStyle}>
+              <a>고객센터</a>
+            </div>
+            <div style={dropContentsStyle}>
+              <a>단축키 안내</a>
+            </div>
+            <div style={dropContentsStyle}>
+              <a>튜토리얼</a>
+            </div>
+            <div style={dropContentsStyle}>
+              <a>FAQ</a>
+            </div>
+          </div>
+        </Popover>
+      </div> */}
     </div>
   );
 }

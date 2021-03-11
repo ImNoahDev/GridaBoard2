@@ -34,17 +34,19 @@ import BackgroundButton from "../../components/buttons/BackgroundButton";
 import FitButton from "../../components/buttons/FitButton";
 
 const navStyle = {
-  position: "static",
-  display: "block",
-  flexDirection: "row-reverse",
+  // position: "static",
+  display: "flex",
+  flexDirection: "row",
+  justifyContent: "space-between",
   alignItems: "center",
-  left: 0,
-  top: 0,
-  right: 50,
+  flexWrap: "wrap",
+  // left: 0,
+  // top: 0,
+  // right: 50,
   height: "5.2vh",
-  zIndex: 0,
-  width: "100%",
-  margin: 0,
+  // zIndex: 0,
+  // width: "100%",
+  // margin: 0,
   background: "rgba(255, 255, 255, 0.5)",
 } as React.CSSProperties;
 
@@ -144,25 +146,32 @@ const NavLayer = () => {
 
   return (
     <div id={"button_div"} style={navStyle}>
+      <div style={{display: "inline-flex", flexDirection: "row",
+        justifyContent: "flex-start", alignItems: "center", 
+      }}>
+        <PenTypeButton />
 
-      <PenTypeButton />
+        <ColorButtons />
+        <KeyboardArrowDownRoundedIcon/>
 
-      <ColorButtons />
+        <ThicknessButton />
+        <KeyboardArrowDownRoundedIcon/>
 
-      <KeyboardArrowDownRoundedIcon style={{float: "left", marginTop: "14px", marginLeft: "-5px"}}/>
-      <ThicknessButton />
-
-      <KeyboardArrowDownRoundedIcon style={{float: "left", marginTop: "14px", marginLeft: "-5px"}}/>
-      <TracePointButton />
+        <TracePointButton />
+      </div>
+      <div style={{display: "inline-flex", flexDirection: "row",
+        justifyContent: "flex-end", alignItems: "center"
+      }}>
+        <FitButton />
+        <KeyboardArrowDownRoundedIcon/>
+        
+        <BackgroundButton />
+        <KeyboardArrowDownRoundedIcon/>
+      </div>
       
-      <KeyboardArrowDownRoundedIcon style={{float: "right", marginTop: "14px", marginLeft: "-5px", marginRight: "-30px"}}/>
-      <FitButton />
-
-      <KeyboardArrowDownRoundedIcon style={{float: "right", marginTop: "14px", marginLeft: "-5px", marginRight: "31px"}}/>
-      <BackgroundButton />
 
       {/* 매핑 정보 살펴보기 */}
-      <div style={{ fontSize: "20px", fontWeight: "bold" }}>
+      {/* <div style={{ fontSize: "20px", fontWeight: "bold" }}>
         <Button variant="contained" color="primary"
           onClick={(event) => setMapViewDetail((mapViewDetail + 1) % 3)} >
           <Box fontSize={14} fontWeight="fontWeightBold" >매핑 테이블</Box>
@@ -177,7 +186,7 @@ const NavLayer = () => {
         </Paper>
         : ""}
 
-      <div style={{ flex: 1 }}> </div>
+      <div style={{ flex: 1 }}> </div> */}
       {/* GridaDoc 내부 */}
       {/* <div style={{ fontSize: "20px", fontWeight: "bold" }}>
         <Button variant="contained" color="primary"

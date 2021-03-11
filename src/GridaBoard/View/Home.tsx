@@ -48,10 +48,6 @@ const helpStyles = makeStyles({
   },
 });
 
-const viewStyle = {
-  
-} as React.CSSProperties;
-
 const Home = () => {
   const [drawerOpen, setDrawerOpen] = useState(true);
   const [rightMargin, setRightMargin] = useState(0);
@@ -312,80 +308,10 @@ const Home = () => {
 
   console.log(`HOME: docPageNo:${activePageNo}, pdfUrl=${pdfUrl}, fingerPrint: ${pdfFingerprint}, pdfPageNo:${pdfPageNo}`);
   return (
-
-    <div className={classes.root} style={{position:"absolute", height:"100vh", width:"100%"}}>
-
-      <main style={viewStyle}>
-
-        <div id="layer" style={
-          { 
-            position: "relative", 
-            top: 0, left: 0, bottom: 0, right: drawerOpen ? drawerWidth : 0 
-          }}>
-          <ViewLayer handlePdfOpen={handlePdfOpen} style={{display: "block"}}/>
-        </div>
-
-        <div id="mixed-viewer-layer" style={{ position: "absolute", top: 120, left: 0, bottom: 0, 
-        right:  0}
-        }>
-          <MixedPageView
-            pdf={pdf}
-            pdfUrl={pdfUrl} filename={pdfFilename}
-            pdfPageNo={pdfPageNo} pens={[...pens, virtualPen]} 
-            playState={PLAYSTATE.live}
-            rotation={rotation}
-            isMainView={true}
-
-            pageInfo={pageInfos[0]}
-            basePageInfo={basePageInfo}
-
-            parentName={"grida-main-home"}
-            viewFit={viewFit_store}
-            autoPageChange={true}
-            fromStorage={false}
-            fitMargin={100}
-            
-            activePageNo={activePageNo_store}
-            onNcodePageChanged={onNcodePageChanged}
-            handlePageWidthNeeded = {(width) => handlePageWidthNeeded(width)}
-
-            renderCountNo={renderCountNo_store}
-
-            noInfo = {true}
-          />
-          <div style={pageNumberingStyle}>
-            <PageNumbering />
-          </div>
-        </div>
-      </main >
-
-      {/* Drawer 구현 */}
-      {/* <div id="drawer-icon"
-        style={{ position: "absolute", right: 10, top: 0, zIndex: 4 }}
-      >
-        <IconButton
-          style={{ position: "absolute", right: 10, top: 0, zIndex: 4 }}
-          color="inherit"
-          aria-label="open drawer"
-          edge="end"
-          onClick={handleDrawerOpen}
-        // className={clsx(drawerOpen && classes.hide)}
-        >
-          <MenuIcon />
-        </IconButton>
-        <PersistentDrawerRight
-          open={drawerOpen} handleDrawerClose={handleDrawerClose} onDrawerResize={onDrawerResize}
-          noInfo = {false}
-        />
-      </div> */}
-
-      {/* <AutoLoadConfirmDialog open={loadConfirmDlgOn} step={loadConfirmDlgStep}
-        onOk={handleAppendFileOk} onCancel={handleCancelAutoLoad} onNoMore={handleNoMoreAutoLoad} /> */}
-
-      {/* 파일 인풋을 위한 것 */}
+    <React.Fragment>
+      <ViewLayer handlePdfOpen={handlePdfOpen} style={{display: "block"}}/>
       <input type="file" id={g_hiddenFileInputBtnId} onChange={onFileInputChanged} onClick={onFileInputClicked} style={{ display: "none" }} name="pdf" accept=".pdf,.grida" />
-      {/* <input type="file" id={"pdf_file_append"} onChange={onFileInputChanged} onClick={onFileInputClicked} style={{ display: "none" }} name="pdf" accept="application/pdf" /> */}
-    </div >
+    </React.Fragment>
   );
 };
 

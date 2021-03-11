@@ -16,11 +16,15 @@ interface Props extends ButtonProps {
 
 const ViewLayer = (props: Props) => {
   return (
-    <div style={{ zIndex: 0 }}>
+    <div style={{ 
+        display: "flex", flexDirection: "column", height: "100%"
+      }}>
       <HeaderLayer {...props}/>
       <NavLayer {...props} />
-      <SideLayer {...props}/>
-      <ContentsLayer {...props} />
+      <div style={{display: "flex", flex: 1}}>
+        <SideLayer {...props}/>
+        <ContentsLayer {...props} />
+      </div>
     </div>
   );
 }

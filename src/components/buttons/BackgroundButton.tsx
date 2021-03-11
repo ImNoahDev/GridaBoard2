@@ -9,14 +9,14 @@ import $ from "jquery";
 const themeManager: ThemeManager = ThemeManager.getInstance();
 
 const basicStyle = {
-  marginTop: "8px",
-  float: "right",
+  // marginTop: "8px",
+  // float: "right",
   display: "block"
 } as React.CSSProperties;
 
 const neoStyle = {
-  marginTop: "8px",
-  float: "right",
+  // marginTop: "8px",
+  // float: "right",
   display: "none"
 } as React.CSSProperties;
 

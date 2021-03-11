@@ -11,13 +11,13 @@ const manager: PenManager = PenManager.getInstance();
 
 const penTypeStyle = {
   // marginTop: "11px",
-  float: "left",
+  // float: "left",
   marginLeft: "30px"
 } as React.CSSProperties;
 
 const thicknessStyle = {
-  marginTop: "4px",
-  float: "left",
+  // marginTop: "4px",
+  // float: "left",
   marginLeft: "34px"
 } as React.CSSProperties;
 

@@ -15,10 +15,10 @@ const style = {
 
 const mappingStyle = {
   display: "flex",
-  position: "static",
+  // position: "static",
   width: "7vw",
   height: "4vh",
-  flexDirection: "row",
+  // flexDirection: "row",
   justifyContent: "center",
   background: "rgba(255, 255, 255, 0.5)",
   border: "1px solid #CFCFCF",
@@ -26,7 +26,10 @@ const mappingStyle = {
   // boxShadow: "2px 0px 24px rgba(255,255,255,0.5)",
   borderRadius: "4px",
   // float: "left",
-  fontSize: "1.4vh"
+  fontSize: "1.4vh",
+  overflow: "hidden",
+  textOverflow: "ellipsis",
+  whiteSpace: "nowrap"
   // marginTop: "2px",
   // marginRight: "33px"
 } as React.CSSProperties;

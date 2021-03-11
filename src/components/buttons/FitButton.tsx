@@ -9,8 +9,8 @@ import { RootState } from "../../store/rootReducer";
 import $ from "jquery";
 
 const zoomStyle = {
-  marginTop: "8px",
-  float: "right"
+  // marginTop: "8px",
+  // float: "right"
 } as React.CSSProperties;
 
 const dropdownStyle = {
@@ -18,9 +18,9 @@ const dropdownStyle = {
   flexDirection: "column",
   alignItems: "flex-start",
   padding: "8px",
-  position: "relative",
-  width: "240px",
-  height: "176px",
+  // position: "relative",
+  width: "12.5vw",
+  height: "18.16305469556244vh",
   background: "rgba(255,255,255,0.9)",
   boxShadow: "2px 2px 2px rgba(0, 0, 0, 0.25)",
   borderRadius: "12px",
@@ -31,7 +31,7 @@ const dropContentsStyle = {
   flexDirection: "row",
   alignItems: "center",
   padding: "4px 12px",
-  position: "static",
+  // position: "static",
   width: "224px",
   left: "calc(50% - 224px / 2)",
   top: "8px",

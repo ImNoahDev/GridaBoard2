@@ -24,12 +24,15 @@ import { updateDrawerWidth } from "../../store/reducers/ui";
 import KeyboardArrowRightIcon from '@material-ui/icons/KeyboardArrowRight';
 import $ from "jquery";
 
-const mainFrameStyle = {
-  display: "block",
-  alignItems: "center",
-  height: "87.8vh",
+const sideStyle = {
+  // display: "block",
+  // alignItems: "center",
+  // height: "87.8vh",
+  // width: "9.375vw",
+  // float: "left",
+  display: "flex",
+  flex: "none",
   width: "9.375vw",
-  float: "left",
 } as React.CSSProperties;
 
 const arrowRightStyle = {
@@ -120,7 +123,7 @@ const SideLayer = () => {
   }
 
   return (
-      <div id="mainFrame" style={mainFrameStyle}>
+      <div id="mainFrame" style={sideStyle}>
 
         {/* Drawer 구현 */}
         {/* <div id="drawer-icon"

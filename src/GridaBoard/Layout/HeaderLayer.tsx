@@ -16,22 +16,22 @@ import { FileBrowserButton } from "../../nl-lib/common/neopdf";
 import { IFileBrowserReturn } from "../../nl-lib/common/structures";
 
 const headerStyle = {
-  position: "static",
-  display: "block",
-  flexDirection: "row-reverse",
+  // position: "static",
+  display: "flex",
+  flexDirection: "row",
+  justifyContent: "space-between",
   alignItems: "center",
+  flexWrap: "wrap",
   height: "7vh",
-  lineHeight: "7vh",
-  margin: 0,
   background: "rgba(255, 255, 255, 0.5)",
 } as React.CSSProperties;
 
 const imgStyle = {
-  float: "left",
-  verticalAlign: "middle",
-  marginTop: "14px",
-  marginLeft: "10px",
-  marginRight: "10px",
+  // float: "left",
+  // verticalAlign: "middle",
+  // marginTop: "14px",
+  // marginLeft: "10px",
+  marginRight: "1vw",
   borderRadius: "8px",
 } as React.CSSProperties;
 
@@ -193,64 +193,74 @@ const HeaderLayer = (props: Props) => {
   return (
     <React.Fragment>
       <div id="header" style={headerStyle}>
-        <img src="image 5.png" style={imgStyle}></img>
-        <a id="grida_board" href="#" style={aStyle}>Grida board</a>
-        <Button id="save" style={buttonStyle} onClick={handleClickSave} aria-describedby={saveId}>
-          저장하기
-        </Button>
-        <Popover
-          id={saveId}
-          open={saveOpen}
-          anchorEl={saveAnchorEl}
-          onClose={handleCloseSave}
-          anchorOrigin={{
-            vertical: 'top',
-            horizontal: 'right'
-          }}
-          transformOrigin={{
-            vertical: 'top',
-            horizontal: 'left',
-          }}
-        >
-          <div onClick={() => saveGrida('hello.grida')}>
-            <Button>
-              .grida 저장
-            </Button>
-          </div>
-          <div>
-            <SavePdfDialog />
-          </div>
-        </Popover>
-        <Button id="load" style={buttonStyle} onClick={handleClickLoad} aria-describedby={loadId}>
-          불러오기
-        </Button>
-        <Popover
-          id={loadId}
-          open={loadOpen}
-          anchorEl={loadAnchorEl}
-          onClose={handleCloseLoad}
-          anchorOrigin={{
-            vertical: 'top',
-            horizontal: 'right'
-          }}
-          transformOrigin={{
-            vertical: 'top',
-            horizontal: 'left',
-          }}
-        >
-          <div>
-            <LoadGrida />
-          </div>
-          <div>
-            <FileBrowserButton handlePdfOpen={handlePdfOpen} />
-          </div>
-        </Popover>
+        <div style={{display: "inline-flex", flexDirection: "row",
+          justifyContent: "flex-start", alignItems: "center", marginLeft: "1vw"
+        }}>
+          <img src="image 5.png" style={imgStyle}></img>
+          <a id="grida_board" href="#" style={aStyle}>Grida board</a>
+          <Button id="save" style={buttonStyle} onClick={handleClickSave} aria-describedby={saveId}>
+            저장하기
+          </Button>
+          <Popover
+            id={saveId}
+            open={saveOpen}
+            anchorEl={saveAnchorEl}
+            onClose={handleCloseSave}
+            anchorOrigin={{
+              vertical: 'top',
+              horizontal: 'right'
+            }}
+            transformOrigin={{
+              vertical: 'top',
+              horizontal: 'left',
+            }}
+          >
+            <div onClick={() => saveGrida('hello.grida')}>
+              <Button>
+                .grida 저장
+              </Button>
+            </div>
+            <div>
+              <SavePdfDialog />
+            </div>
+          </Popover>
+          <Button id="load" style={buttonStyle} onClick={handleClickLoad} aria-describedby={loadId}>
+            불러오기
+          </Button>
+          <Popover
+            id={loadId}
+            open={loadOpen}
+            anchorEl={loadAnchorEl}
+            onClose={handleCloseLoad}
+            anchorOrigin={{
+              vertical: 'top',
+              horizontal: 'right'
+            }}
+            transformOrigin={{
+              vertical: 'top',
+              horizontal: 'left',
+            }}
+          >
+            <div>
+              <LoadGrida />
+            </div>
+            <div>
+              <FileBrowserButton handlePdfOpen={handlePdfOpen} />
+            </div>
+          </Popover>
+          
+          <PrintButton targetId={printBtnId} url={pdfUrl} filename={pdfFilename} handlePdfUrl={makePdfUrl}/>
+          <ManualCalibration filename={pdfFilename} printOption={printOption} handlePdfUrl={makePdfUrl}/>
+        </div>
+        <div style={{display: "inline-flex", flexDirection: "row",
+          justifyContent: "flex-start", alignItems: "center", marginRight: "1vw"
+        }}>
+          <ConnectButton onPenLinkChanged={e => onPenLinkChanged(e)} />
+          <KeyboardArrowDownRoundedIcon style={{marginRight: "3vw"}}/>
+          <div>구글 이메일</div>
+        </div>
         
-        <PrintButton targetId={printBtnId} url={pdfUrl} filename={pdfFilename} handlePdfUrl={makePdfUrl}/>
-        <ManualCalibration filename={pdfFilename} printOption={printOption} handlePdfUrl={makePdfUrl}/>
-        <KeyboardArrowDownRoundedIcon style={{float: "right", marginTop: "25px", marginRight: "31px"}}/>
-        <p style={{float: "right"}}>구글 이메일</p>
-        <ConnectButton onPenLinkChanged={e => onPenLinkChanged(e)} />
+        
       </div>
       <div style={{height: "1px", background: "rgba(255,255,255,1)"}}></div>
     </React.Fragment>

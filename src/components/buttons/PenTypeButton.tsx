@@ -9,11 +9,8 @@ import { IconButton, Popover, SvgIcon } from "@material-ui/core";
 const manager: PenManager = PenManager.getInstance();
 
 const penTypeStyle = {
-  // marginTop: "11px",
   color: "#58627D",
-  float: "left",
-  marginLeft: "30px",
-  // background: "white"
+  marginLeft: "2vw",
 } as React.CSSProperties;
 
 export default function PenTypeButton () {

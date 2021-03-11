@@ -25,16 +25,16 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const colorStyle = {
-  padding: "0px",
-  margin: "0px",
-  border: "0px",
+  // padding: "0px",
+  // margin: "0px",
+  // border: "0px",
   // minWidth: "24px",
   width: "18px",
   height: "18px",
-  marginTop: "16px",
+  // marginTop: "16px",
   // lineHeight: "36px",
-  float: "left",
-  marginLeft: "27px"
+  // float: "left",
+  marginLeft: "2vw"
 } as React.CSSProperties;
 
 const colorDropDownStyle = {

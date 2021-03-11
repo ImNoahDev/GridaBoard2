@@ -28,8 +28,10 @@ const pdfContainer: CSSProperties = {
   top: 0,
   left: 0,
   right: 0,
-  height: "100%",
+  // height: "100%",
   overflow: "visible",
+  width: 500,
+  height: 734
 }
 
 const inkContainer: CSSProperties = {
@@ -37,9 +39,11 @@ const inkContainer: CSSProperties = {
   top: 0,
   left: 0,
   right: 0,
-  height: "100%",
+  // height: "100%",
   overflow: "visible",
   zoom: 1,
+  width: 500,
+  height: 734
 }
 
 

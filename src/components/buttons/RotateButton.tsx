@@ -10,7 +10,7 @@ import { IconButton, SvgIcon } from "@material-ui/core";
 import $ from "jquery";
 
 const verticalStyle = {
-  float: "right",
+  // float: "right",
   // display: "flex",
   // flexDirection: "row",
   // justifyContent: "center",
@@ -22,13 +22,13 @@ const verticalStyle = {
   background: "rgba(255, 255, 255, 0.8)",
   boxShadow: "2px 0px 24px rgba(0, 0, 0, 0.15), inset 0px 2px 0px rgba(255, 255, 255, 0.15)",
   borderRadius: "40px",
-  marginRight: "16px",
-  marginTop: "16px",
+  // marginRight: "16px",
+  // marginTop: "16px",
   display: "block"
 } as React.CSSProperties;
 
 const horizontalStyle = {
-  float: "right",
+  // float: "right",
   // display: "flex",
   // flexDirection: "row",
   // justifyContent: "center",
@@ -40,8 +40,8 @@ const horizontalStyle = {
   background: "rgba(255, 255, 255, 0.8)",
   boxShadow: "2px 0px 24px rgba(0, 0, 0, 0.15), inset 0px 2px 0px rgba(255, 255, 255, 0.15)",
   borderRadius: "40px",
-  marginRight: "16px",
-  marginTop: "16px",
+  // marginRight: "16px",
+  // marginTop: "16px",
   display: "none"
 } as React.CSSProperties;
 

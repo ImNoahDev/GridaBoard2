@@ -67,7 +67,7 @@ const ConnectButton = (props: Props) => {
   return (
     // <div className="btn-group-vertical neo_shadow" style={{ marginBottom: 10 }}>
     <React.Fragment>
-      <IconButton id="btn_connect" style={{float: "right", marginTop: "12px", marginRight: "32px", display: "block"}}
+      <IconButton id="btn_connect" style={{display: "block"}}
         onClick={() => handleConnectPen()}>
         <GridaToolTip open={true} placement="left" tip={{
           head: "Pen Connect",
@@ -86,7 +86,7 @@ const ConnectButton = (props: Props) => {
           </SvgIcon>
         </GridaToolTip>
       </IconButton>
-      <IconButton id="btn_connected" style={{float: "right", marginTop: "12px", marginRight: "32px", display: "none"}}
+      <IconButton id="btn_connected" style={{display: "none"}}
         onClick={() => handleConnectPen()}>
         <GridaToolTip open={true} placement="left" tip={{
           head: "Pen Connect",

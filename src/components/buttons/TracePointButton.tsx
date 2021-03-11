@@ -9,7 +9,7 @@ import { IconButton, SvgIcon, Theme, Typography, withStyles } from '@material-ui
 import GridaToolTip from "../../styles/GridaToolTip";
 
 const pointerStyle = {
-  float: "left",
+  // float: "left",
   marginLeft: "34px"
 } as React.CSSProperties;
 
