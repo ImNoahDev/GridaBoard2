@@ -1,13 +1,7 @@
 import React, { useState } from "react";
 import { RootState } from "../../store/rootReducer";
 import { useSelector } from "react-redux";
-import GridaApp from "../GridaApp";
-import { IconButton, makeStyles, Paper } from "@material-ui/core";
-import GridaDoc from "../GridaDoc";
-import { setActivePageNo } from "../../store/reducers/activePageReducer";
-import InkStorage from "../../nl-lib/common/penstorage/InkStorage";
-import { PageEventName } from "../../nl-lib/common/enums";
-import { scrollToBottom } from "../../nl-lib/common/util";
+import { IconButton } from "@material-ui/core";
 import PersistentDrawerRight from "../View/Drawer/PersistentDrawerRight";
 import { updateDrawerWidth } from "../../store/reducers/ui";
 import KeyboardArrowRightIcon from '@material-ui/icons/KeyboardArrowRight';
@@ -31,14 +25,7 @@ const arrowRightStyle = {
   zIndex: 1000
 } as React.CSSProperties;
 
-const SideLayer = () => {
-  const activePageNo_store = useSelector((state: RootState) => {
-    return state.activePage.activePageNo
-  });
-  
-  const pens = useSelector((state: RootState) => {
-    return state.appConfig.pens;
-  });
+const LeftSideLayer = () => {
 
   const [drawerOpen, setDrawerOpen] = useState(false);
   const setDrawerWidth = (width: number) => updateDrawerWidth({ width });
@@ -78,4 +65,4 @@ const SideLayer = () => {
   );
 }
 
-export default SideLayer;
+export default LeftSideLayer;
