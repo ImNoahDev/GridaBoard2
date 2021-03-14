@@ -41,6 +41,8 @@ export interface INeoSmartpen {
 
   id: string;
 
+  name?: string;
+
   lastState: PEN_STATE;
 
   dispatcher: EventDispatcher;
@@ -50,7 +52,7 @@ export interface INeoSmartpen {
 
   getMac(): string;
   getBtDevice(): BluetoothDevice;
-
+  getPenName(): string;
 
   connect(): Promise<boolean>;
   connectByWebBtDevice(device: BluetoothDevice): Promise<boolean>;

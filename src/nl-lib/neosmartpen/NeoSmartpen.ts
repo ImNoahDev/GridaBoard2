@@ -43,6 +43,8 @@ export default class NeoSmartpen implements INeoSmartpen {
 
   id: string = null;
 
+  name?: string = "NeoSmartPen";
+
   lastState: PEN_STATE = PEN_STATE.NONE;
 
   calibrationPoint: any = { section: 0, owner: 0, book: 0, page: 0, x: 0, y: 0 };
@@ -91,7 +93,9 @@ export default class NeoSmartpen implements INeoSmartpen {
     return this.mac;
   }
 
-
+  getPenName = (): string => {
+    return this.name;
+  }
   /**
    *
    */

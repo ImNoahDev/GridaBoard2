@@ -41,6 +41,7 @@ export default class VirtualPen implements INeoSmartpen {
 
   mac: string = null;
   id: string = null;
+  name?: string = "VirtualPen";
 
   lastState: PEN_STATE = PEN_STATE.NONE;
 
@@ -111,6 +112,9 @@ export default class VirtualPen implements INeoSmartpen {
     return "this.mac";
   }
 
+  getPenName = (): string => {
+    return this.name;
+  }
 
   /**
    *
