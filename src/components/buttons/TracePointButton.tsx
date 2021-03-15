@@ -39,6 +39,8 @@ const TracePointButton = () => {
     setEnable("btn_tracepoint", !isTrace);
   }
 
+  setEnable("btn_tracepoint", isTrace);
+
   return (
     <IconButton id="btn_tracepoint" style={pointerStyle} onClick={() => onTogglePointerTracer()}>
       <GridaToolTip open={true} placement="left" tip={{
