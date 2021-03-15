@@ -4,6 +4,8 @@ import GridaToolTip from '../../styles/GridaToolTip';
 import { PrintNcodedPdfButton } from '../../nl-lib/ncodepod';
 import { turnOnGlobalKeyShortCut } from '../../GridaBoard/GlobalFunctions';
 import { Button } from '@material-ui/core';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../store/rootReducer';
 import $ from "jquery";
 
 type Props = {
@@ -35,6 +37,12 @@ const PrintButton = (props: Props) => {
     $(this).css("color", "rgba(18,18,18,1)")
   })
 
+  const activePageNo_store = useSelector((state: RootState) => state.activePage.activePageNo);
+  let disabled = true;
+  if (activePageNo_store !== -1) {
+    disabled = false;
+  }
+
   return (
     // <div className="navbar-menu d-flex justify-content-center align-items-center neo_shadow">
     <React.Fragment>
@@ -42,13 +50,13 @@ const PrintButton = (props: Props) => {
         id="btn_print_pdf" type="button" className="btn btn-neo "
         handkeTurnOnAppShortCutKey={turnOnGlobalKeyShortCut}
         style={{ margin: 0, padding: 0, }}
-        url={props.url} filename={props.filename} handlePdfUrl={props.handlePdfUrl}>
+        url={props.url} filename={props.filename} handlePdfUrl={props.handlePdfUrl} disabled={disabled}>
         <GridaToolTip open={true} placement="top" tip={{
           head: "Print",
           msg: "PDF파일을 프린트하는 버튼입니다.",
           tail: "단축키 Q로 선택가능합니다."
         }} title={undefined}>
-          <Button id="print" style={buttonStyle}>
+          <Button id="print" style={buttonStyle} disabled={disabled}>
             프린트
           </Button>
         </GridaToolTip>

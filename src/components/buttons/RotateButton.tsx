@@ -26,7 +26,7 @@ const verticalStyle = {
   // marginTop: "16px",
   display: "block",
   flexWrap: "wrap",
-  zIndex: 1500
+  zIndex: 1500,
 } as React.CSSProperties;
 
 const horizontalStyle = {
@@ -46,7 +46,7 @@ const horizontalStyle = {
   // marginTop: "16px",
   display: "none",
   flexWrap: "wrap",
-  zIndex: 1500
+  zIndex: 1500,
 } as React.CSSProperties;
 
 const RotateButton = () => {
@@ -54,6 +54,11 @@ const RotateButton = () => {
 
   const rotationTrigger = useSelector((state: RootState) => state.rotate.rotationTrigger);
   const activePageNo_store = useSelector((state: RootState) => state.activePage.activePageNo);
+
+  let disabled = true;
+  if (activePageNo_store !== -1) {
+    disabled = false;
+  }
 
   const onToggleRotate = () => {
     setRotationTrigger(!rotationTrigger);
@@ -99,6 +104,10 @@ const RotateButton = () => {
     $(this).css("color", "rgba(18,18,18,1)")
   });
 
+  // if (activePageNo_store === -1) {
+    
+  // }
+  
   return (
     // <div className="btn-group dropright" role="group">
     //   <button type="button" id="btn_rotate" className="btn btn-neo btn-neo-vertical" >
@@ -108,7 +117,7 @@ const RotateButton = () => {
             tail: "TAB 가로쓰기/세로쓰기 전환"
           }} title={undefined}>
           <div className="c2">
-            <IconButton id="vertical_rotate" style={verticalStyle} onClick={onToggleRotate}>
+            <IconButton id="vertical_rotate" style={verticalStyle} onClick={onToggleRotate} disabled={disabled}>
               <SvgIcon>
                 <path
                   d="M8.55 4.9l2.667-2a.5.5 0 000-.8L8.55.1a.5.5 0 00-.8.4v1.25C5.105 1.75 3 3.956 3 6.627c0 .793.185 1.544.514 2.208a.75.75 0 001.344-.666A3.462 3.462 0 014.5 6.626C4.5 4.74 5.977 3.25 7.75 3.25V4.5a.5.5 0 00.8.4z"
@@ -120,7 +129,7 @@ const RotateButton = () => {
                   />
               </SvgIcon>
             </IconButton>
-            <IconButton id="horizontal_rotate" style={horizontalStyle} onClick={onToggleRotate}>
+            <IconButton id="horizontal_rotate" style={horizontalStyle} onClick={onToggleRotate} disabled={disabled}>
               <SvgIcon>
               <path
                 d="M8.55 4.9l2.667-2a.5.5 0 000-.8L8.55.1a.5.5 0 00-.8.4v1.25C5.105 1.75 3 3.956 3 6.627c0 .793.185 1.544.514 2.208a.75.75 0 001.344-.666A3.462 3.462 0 014.5 6.626C4.5 4.74 5.977 3.25 7.75 3.25V4.5a.5.5 0 00.8.4z"

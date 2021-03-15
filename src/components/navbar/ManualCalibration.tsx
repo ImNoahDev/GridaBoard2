@@ -5,7 +5,8 @@ import GridaToolTip from '../../styles/GridaToolTip';
 import { IPrintOption } from '../../nl-lib/common/structures';
 import { CalibrationButton } from '../../nl-lib/ncodepod';
 import { Button } from '@material-ui/core';
-
+import { useSelector } from 'react-redux';
+import { RootState } from '../../store/rootReducer';
 
 const style = {
   width: '36px',
@@ -44,6 +45,12 @@ type Props = {
 const ManualCalibration = (props: Props) => {
   const { filename, printOption, cancelCallback, ...rest } = props;
 
+  const activePageNo_store = useSelector((state: RootState) => state.activePage.activePageNo);
+  let disabled = true;
+  if (activePageNo_store !== -1) {
+    disabled = false;
+  }
+  
   return (
     <CalibrationButton {...props} cancelCallback={cancelCallback} style={{marginRight: "33px"}} handlePdfUrl={props.handlePdfUrl}>
       <GridaToolTip open={true} placement="left-end" tip={{
@@ -51,7 +58,7 @@ const ManualCalibration = (props: Props) => {
         msg: "Ncode A4에 인쇄된 페이지를 프로그램에 수동 등록합니다.",
         tail: "단축키 Q로 선택가능합니다."
       }} title={undefined}>
-        <Button style={mappingStyle}>nCode 맵핑</Button>
+        <Button style={mappingStyle} disabled={disabled}>nCode 맵핑</Button>
       </GridaToolTip>
     </CalibrationButton>
   )

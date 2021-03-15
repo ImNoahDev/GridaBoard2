@@ -14,6 +14,8 @@ import $ from "jquery";
 import SavePdfDialog from "../Save/SavePdfDialog";
 import { FileBrowserButton } from "../../nl-lib/common/neopdf";
 import { IFileBrowserReturn } from "../../nl-lib/common/structures";
+import { useSelector } from 'react-redux';
+import { RootState } from '../../store/rootReducer';
 
 const headerStyle = {
   display: "flex",
@@ -212,6 +214,12 @@ const HeaderLayer = (props: Props) => {
 
   const loadId = loadOpen ? 'simple-popover-load' : undefined;
 
+  const activePageNo_store = useSelector((state: RootState) => state.activePage.activePageNo);
+  let disabled = true;
+  if (activePageNo_store !== -1) {
+    disabled = false;
+  }
+  
   return (
     <React.Fragment>
       <div id="header" style={headerStyle}>
@@ -220,7 +228,7 @@ const HeaderLayer = (props: Props) => {
         }}>
           <img src="grida_logo.png" style={imgStyle}></img>
           <a id="grida_board" href="#" style={aStyle}>Grida board</a>
-          <Button id="save" style={buttonStyle} onClick={handleClickSave} aria-describedby={saveId}>
+          <Button id="save" style={buttonStyle} onClick={handleClickSave} aria-describedby={saveId} disabled={disabled}>
             저장하기
           </Button>
           <Popover
