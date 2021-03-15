@@ -73,7 +73,7 @@ const SavePdfDialog = () => {
         tail: "키보드 버튼 ?로 선택 가능합니다"
       }} title={undefined}>
         <Button onClick={handlePdfDialogOpen}>
-          .PDF 저장
+          데이터 저장(.grida)
         </Button>
       </GridaToolTip>
       <Dialog open={open} onClose={handlePdfDialogClose} aria-labelledby="form-dialog-title">

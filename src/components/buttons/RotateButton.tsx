@@ -25,7 +25,8 @@ const verticalStyle = {
   // marginRight: "16px",
   // marginTop: "16px",
   display: "block",
-  flexWrap: "wrap"
+  flexWrap: "wrap",
+  zIndex: 1500
 } as React.CSSProperties;
 
 const horizontalStyle = {
@@ -44,7 +45,8 @@ const horizontalStyle = {
   // marginRight: "16px",
   // marginTop: "16px",
   display: "none",
-  flexWrap: "wrap"
+  flexWrap: "wrap",
+  zIndex: 1500
 } as React.CSSProperties;
 
 const RotateButton = () => {

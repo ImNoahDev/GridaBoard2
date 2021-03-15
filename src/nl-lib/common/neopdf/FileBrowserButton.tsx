@@ -37,7 +37,7 @@ const FileBrowserButton = (props: Props) => {
       tail: "키보드 버튼 Ctrl + O으로 이동 가능합니다"
     }} title={undefined}>
       <Button {...rest} onClick={fileOpenHandler} id="btn_file_open" type="button">
-        .PDF 불러오기
+        파일 업로드(.pdf)
         {props.children}
       </Button>
     </NeoToolTip>

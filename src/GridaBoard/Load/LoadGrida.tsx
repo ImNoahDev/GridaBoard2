@@ -73,7 +73,7 @@ const LoadGrida = () => {
         tail: "키보드 버튼 ?로 선택 가능합니다"
       }} title={undefined}>
         <Button onClick={fileOpenHandler}>
-          .grida 불러오기
+          데이터 불러오기(.grida)
         </Button>
       </GridaToolTip> 
   );

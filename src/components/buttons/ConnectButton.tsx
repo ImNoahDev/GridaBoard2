@@ -16,11 +16,31 @@ const numPenStyle = {
   position: "absolute",
   width: "16px",
   height: "16px",
-  left: "24px",
-  top: "0px",
+  left: "27px",
+  top: "4px",
   // marginTop: "-10px",
-  background: "rgba(88,98,125,1)",
+  // background: "rgba(88,98,125,1)",
+  background: "rgba(0,0,0,1)",
   borderRadius: "50px"
+} as React.CSSProperties;
+
+const numPenCountStyle = {
+    position: "absolute",
+    width: "7px",
+    height: "13px",
+    left: "4px",
+    top: "2px",
+    fontFamily: "Roboto",
+    fontStyle: "normal",
+    fontWeight: "normal",
+    fontSize: "9px",
+    lineHeight: "13px",
+    display: "flex",
+    alignItems: "center",
+    textAlign: "right",
+    letterSpacing: "0.25px",
+    color: "rgba(255,255,255,1)"
+    // color: "red"
 } as React.CSSProperties;
 
 type Props = {
@@ -86,7 +106,7 @@ const ConnectButton = (props: Props) => {
           </SvgIcon>
         </GridaToolTip>
       </IconButton>
-      <IconButton id="btn_connected" style={{display: "none"}}
+      <IconButton id="btn_connected" style={{display: "none", marginRight: "1vw"}}
         onClick={() => handleConnectPen()}>
         <GridaToolTip open={true} placement="left" tip={{
           head: "Pen Connect",
@@ -102,7 +122,7 @@ const ConnectButton = (props: Props) => {
           </SvgIcon>
         </GridaToolTip>
         <div style={numPenStyle}>
-          <span id="pen_id" style={{color: "rgba(255,255,255,1)", fontSize: "9px", width: "7px", height: "13px"}}>{num_pens}</span>
+          <span id="pen_id" style={numPenCountStyle}>{num_pens}</span>
         </div>
         
       </IconButton>

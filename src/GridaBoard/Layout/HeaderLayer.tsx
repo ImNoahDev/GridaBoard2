@@ -198,7 +198,7 @@ const HeaderLayer = (props: Props) => {
           >
             <div onClick={() => saveGrida('hello.grida')}>
               <Button>
-                .grida 저장
+                이미지 저장(.pdf)
               </Button>
             </div>
             <div>
@@ -223,10 +223,10 @@ const HeaderLayer = (props: Props) => {
             }}
           >
             <div>
-              <LoadGrida />
+              <FileBrowserButton handlePdfOpen={handlePdfOpen} />
             </div>
             <div>
-              <FileBrowserButton handlePdfOpen={handlePdfOpen} />
+              <LoadGrida />
             </div>
           </Popover>
           

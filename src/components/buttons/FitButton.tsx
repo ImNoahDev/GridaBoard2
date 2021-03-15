@@ -93,22 +93,22 @@ export default function FitButton() {
             <div style={dropdownStyle}>
               <a href="#" style={{textDecoration: "none", color: "rgba(18,18,18,1)"}}>
                 <div style={dropContentsStyle}>
-                  <a>Zoom in</a>
+                  <a>화면 확대 [Ctrl+(+)]</a>
                 </div>
               </a>
               <a href="#" style={{textDecoration: "none", color: "rgba(18,18,18,1)"}}>
                 <div style={dropContentsStyle}>
-                  <a>Zoom out</a>
+                  <a>화면 축소 [Ctrl+(-)]</a>
                 </div>
               </a>
               <a href="#" style={{textDecoration: "none", color: "rgba(18,18,18,1)"}} onClick={() => handleClose(ZoomFitEnum.HEIGHT)}>
                 <div style={dropContentsStyle}>
-                  <a>Fit Screen</a>
+                  <a>페이지 높이 맞춤 [H]</a>
                 </div>
               </a>
               <a href="#" style={{textDecoration: "none", color: "rgba(18,18,18,1)"}} onClick={() => handleClose(ZoomFitEnum.WIDTH)}>
                 <div style={dropContentsStyle}>
-                  <a>Fill Screen</a>
+                  <a>페이지 너비 맞춤 [W]</a>
                 </div>
               </a>
             </div>

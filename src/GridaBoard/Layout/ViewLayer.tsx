@@ -5,7 +5,6 @@ import LeftSideLayer from "./LeftSideLayer";
 import ContentsLayer from "./ContentsLayer";
 import { ButtonProps } from "@material-ui/core";
 import { IFileBrowserReturn } from "../../nl-lib/common/structures";
-import RightSideLayer from "./RightSideLayer";
 
 /**
  *
@@ -23,7 +22,6 @@ const ViewLayer = (props: Props) => {
       <HeaderLayer {...props}/>
       <NavLayer {...props} />
       <div style={{display: "flex", flex: 1, flexDirection: "row-reverse", justifyContent: "flex-start"}}>
-        <RightSideLayer {...props} />
         <ContentsLayer {...props}/>
         <LeftSideLayer {...props}/>
       </div>
