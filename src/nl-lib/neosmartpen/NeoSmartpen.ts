@@ -555,7 +555,12 @@ export default class NeoSmartpen implements INeoSmartpen {
    */
   onPasscodeRequired = (event: IPenEvent) => {
     console.log("onPasscodeRequired" + event);
-    const passcode = prompt("please enter passcode " + (9 - event.retryCount));
+    const retryCount = event.retryCount === undefined ? 0 : event.retryCount;
+    let guide = "";
+    if (retryCount > 0) {
+      guide = "\n비밀번호를 " + (retryCount) + "회 잘못 입력하셨습니다. \n10회 오류 시 필기 데이터가 초기화됩니다."
+    }
+    const passcode = prompt("비밀번호 입력(4자리)" + guide);
     if (passcode === null) return;
     this.protocolHandler.sendPasscode(passcode);
 
