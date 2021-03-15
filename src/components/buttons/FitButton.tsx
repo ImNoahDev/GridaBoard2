@@ -8,11 +8,6 @@ import { useSelector } from "react-redux";
 import { RootState } from "../../store/rootReducer";
 import $ from "jquery";
 
-const zoomStyle = {
-  // marginTop: "8px",
-  // float: "right"
-} as React.CSSProperties;
-
 const dropdownStyle = {
   display: "flex",
   flexDirection: "column",
@@ -24,18 +19,6 @@ const dropdownStyle = {
   background: "rgba(255,255,255,0.9)",
   boxShadow: "2px 2px 2px rgba(0, 0, 0, 0.25)",
   borderRadius: "12px",
-} as React.CSSProperties;
-
-const dropContentsStyle = {
-  display: "flex",
-  flexDirection: "row",
-  alignItems: "center",
-  padding: "4px 12px",
-  position: "static",
-  width: "224px",
-  left: "calc(50% - 224px / 2)",
-  top: "8px",
-  marginTop: "8px"
 } as React.CSSProperties;
 
 export default function FitButton() {
@@ -63,81 +46,78 @@ export default function FitButton() {
     $(this).css("color", "rgba(18,18,18,1)")
   });
 
+  $(document).ready(function(){
+    $('.help_drop_down').hover(
+      function(event){
+        $(this).addClass('hover');
+        $(this).css("color", "rgba(104,143,255,1)");
+        $(this).css("background", "rgba(232,236,245,1)");
+      },
+      function(){
+        $(this).removeClass('hover');
+        $(this).css("color", "rgba(18,18,18,1)");
+        $(this).css("background", "rgba(255,255,255,0.9)");
+      }
+    );
+  });
+
     return (
       <React.Fragment>
-        {/* <div className="btn-group dropright" role="group"> */}
-          <Button type="button" id="btn_fit" style={zoomStyle} onClick={handleClick} aria-describedby={id}>
-            <GridaToolTip open={true} placement="left" tip={{
-                head: "Fit",
-                msg: "용지의 크기를 맞추는 여러 옵션 중 하나를 선택합니다.",
-                tail: "Z 폭 맞춤, X 높이 맞춤, C 전체 페이지, V 100%"
-              }} title={undefined}>
-              <span id="zoom-ratio">{zoomPercent}%</span>
-            </GridaToolTip>
-          </Button>
+        <Button type="button" id="btn_fit" onClick={handleClick} aria-describedby={id}>
+          <GridaToolTip open={true} placement="left" tip={{
+              head: "Fit",
+              msg: "용지의 크기를 맞추는 여러 옵션 중 하나를 선택합니다.",
+              tail: "Z 폭 맞춤, X 높이 맞춤, C 전체 페이지, V 100%"
+            }} title={undefined}>
+            <span id="zoom-ratio">{zoomPercent}%</span>
+          </GridaToolTip>
+        </Button>
 
-          <Popover
-            id={id}
-            open={open}
-            anchorEl={anchorEl}
-            onClose={handleClose}
-            anchorOrigin={{
-              vertical: 'top',
-              horizontal: 'right'
-            }}
-            transformOrigin={{
-              vertical: 'top',
-              horizontal: 'left',
-            }}
-          >
-            <div style={dropdownStyle}>
-              <a href="#" style={{textDecoration: "none", color: "rgba(18,18,18,1)"}}>
-                <div style={dropContentsStyle}>
-                  <a>화면 확대 [Ctrl+(+)]</a>
-                </div>
-              </a>
-              <a href="#" style={{textDecoration: "none", color: "rgba(18,18,18,1)"}}>
-                <div style={dropContentsStyle}>
-                  <a>화면 축소 [Ctrl+(-)]</a>
-                </div>
-              </a>
-              <a href="#" style={{textDecoration: "none", color: "rgba(18,18,18,1)"}} onClick={() => handleClose(ZoomFitEnum.HEIGHT)}>
-                <div style={dropContentsStyle}>
-                  <a>페이지 높이 맞춤 [H]</a>
-                </div>
-              </a>
-              <a href="#" style={{textDecoration: "none", color: "rgba(18,18,18,1)"}} onClick={() => handleClose(ZoomFitEnum.WIDTH)}>
-                <div style={dropContentsStyle}>
-                  <a>페이지 너비 맞춤 [W]</a>
-                </div>
-              </a>
-            </div>
-                {/* <a id="btn_fit_height" className="dropdown-item" href="#">
-              <div className="c2">
-                <span className="bg-dropmenu" data-l10n-id="page_scale_fit">Zoom in</span>
-              </div>
-            </a>
-            <a id="btn_fit_height" className="dropdown-item" href="#" >
-              <div className="c2">
-                <span className="bg-dropmenu" data-l10n-id="page_scale_fit">Zoom out</span>
-              </div>
-            </a>
-            <a id="btn_fit_height" className="dropdown-item" href="#" onClick={() => handleClose(ZoomFitEnum.HEIGHT)}>
-              <div className="c2">
-                <span className="bg-dropmenu" data-l10n-id="page_scale_fit">Fit Screen</span>
-              </div>
-            </a>
-            <a id="btn_fit_width" className="dropdown-item" href="#" onClick={() => handleClose(ZoomFitEnum.WIDTH)}>
-              <div className="c2">
-                <span className="bg-dropmenu" data-l10n-id="page_scale_width">Fill Screen</span>
-              </div>
-            </a> */}
-          </Popover>
-
-          {/* <div className="dropdown-menu p-0 border border-0 " aria-labelledby="btn_eraser">
-            
-          </div> */}
-        {/* </div> */}
+        <Popover
+          id={id}
+          open={open}
+          anchorEl={anchorEl}
+          onClose={handleClose}
+          anchorOrigin={{
+            vertical: 'top',
+            horizontal: 'right'
+          }}
+          transformOrigin={{
+            vertical: 'top',
+            horizontal: 'left',
+          }}
+        >
+          <div style={dropdownStyle}>
+            <Button id="customer" className="help_drop_down" style={{
+              width: "224px", height: "40px", padding: "4px 12px"
+            }}>
+              <span style={{width: "200px", height: "16px", marginLeft: "-80px"}}>
+                화면 확대 [Ctrl+(+)]
+              </span>
+            </Button>
+            <Button id="shortcut" className="help_drop_down" style={{
+              width: "224px", height: "40px", padding: "4px 12px"
+            }}>
+              <span style={{width: "200px", height: "16px", marginLeft: "-80px"}}>
+                화면 축소 [Ctrl+(-)]
+              </span>
+            </Button>
+            <Button id="tutorial" className="help_drop_down" style={{
+              width: "224px", height: "40px", padding: "4px 12px"
+            }} onClick={() => handleClose(ZoomFitEnum.HEIGHT)}>
+              <span style={{width: "200px", height: "16px", marginLeft: "-80px"}}>
+                페이지 높이 맞춤 [H]
+              </span>
+            </Button>
+            <Button id="faq" className="help_drop_down" style={{
+              width: "224px", height: "40px", padding: "4px 12px"
+            }} onClick={() => handleClose(ZoomFitEnum.WIDTH)}>
+              <span style={{width: "200px", height: "16px", marginLeft: "-80px"}}>
+                페이지 너비 맞춤 [W]
+              </span>
+            </Button>
+          </div>
+        </Popover>
       </React.Fragment>
     );
 }

@@ -12,7 +12,7 @@ import { PenManager } from "../../nl-lib/neosmartpen";
 import PageNumbering from "../../components/navbar/PageNumbering";
 import RotateButton from "../../components/buttons/RotateButton";
 import GridaToolTip from "../../styles/GridaToolTip";
-import { IconButton, Popover } from "@material-ui/core";
+import { Button, IconButton, Popover } from "@material-ui/core";
 import HelpIcon from '@material-ui/icons/Help';
 import $ from "jquery";
 
@@ -53,18 +53,6 @@ const dropdownStyle = {
   background: "rgba(255,255,255,0.9)",
   boxShadow: "2px 2px 2px rgba(0, 0, 0, 0.25)",
   borderRadius: "12px",
-} as React.CSSProperties;
-
-const dropContentsStyle = {
-  display: "flex",
-  flexDirection: "row",
-  alignItems: "center",
-  padding: "4px 12px",
-  position: "static",
-  width: "224px",
-  left: "calc(50% - 224px / 2)",
-  top: "8px",
-  marginTop: "8px"
 } as React.CSSProperties;
 
 interface Props {
@@ -154,29 +142,19 @@ const ContentsLayer = (props: Props) => {
   const open = Boolean(anchorEl);
   const id = open ? 'simple-popover' : undefined;
 
-  $('#customer').hover(function() {
-    $(this).removeAttr("color")
-    $(this).css("color", "rgba(104,143,255,1)")
-  },function() {
-    $(this).css("color", "rgba(18,18,18,1)")
-  });
-
-  $('#shortcut').hover(function() {
-    $(this).css("color", "rgba(104,143,255,1)")
-  },function() {
-    $(this).css("color", "rgba(18,18,18,1)")
-  });
-
-  $('#tutorial').hover(function() {
-    $(this).css("color", "rgba(104,143,255,1)")
-  },function() {
-    $(this).css("color", "rgba(18,18,18,1)")
-  });
-
-  $('#faq').hover(function() {
-    $(this).css("color", "rgba(104,143,255,1)")
-  },function() {
-    $(this).css("color", "rgba(18,18,18,1)")
+  $(document).ready(function(){
+    $('.help_drop_down').hover(
+      function(event){
+        $(this).addClass('hover');
+        $(this).css("color", "rgba(104,143,255,1)");
+        $(this).css("background", "rgba(232,236,245,1)");
+      },
+      function(){
+        $(this).removeClass('hover');
+        $(this).css("color", "rgba(18,18,18,1)");
+        $(this).css("background", "rgba(255,255,255,0.9)");
+      }
+    );
   });
 
   return (
@@ -218,26 +196,34 @@ const ContentsLayer = (props: Props) => {
         }}
       >
         <div style={dropdownStyle}>
-          <a id="customer" href="#" style={{textDecoration: "none", color: "rgba(18,18,18,1)"}}>
-            <div style={dropContentsStyle}>
-              <a>고객센터</a>
-            </div>
-          </a>
-          <a id="shortcut" href="#" style={{textDecoration: "none", color: "rgba(18,18,18,1)"}}>
-            <div style={dropContentsStyle}>
-              <a>단축키 안내</a>
-            </div>
-          </a>
-          <a id="tutorial" href="#" style={{textDecoration: "none", color: "rgba(18,18,18,1)"}}>
-            <div style={dropContentsStyle}>
-              <a>튜토리얼</a>
-            </div>
-          </a>
-          <a id="faq" href="#" style={{textDecoration: "none", color: "rgba(18,18,18,1)"}}>
-            <div style={dropContentsStyle}>
-              <a>FAQ</a>
-            </div>
-          </a>
+          <Button id="customer" className="help_drop_down" style={{
+            width: "224px", height: "40px", padding: "4px 12px"
+          }}>
+            <span style={{width: "200px", height: "16px", marginLeft: "-140px"}}>
+              고객센터
+            </span>
+          </Button>
+          <Button id="shortcut" className="help_drop_down" style={{
+            width: "224px", height: "40px", padding: "4px 12px"
+          }}>
+            <span style={{width: "200px", height: "16px", marginLeft: "-120px"}}>
+              단축키 안내
+            </span>
+          </Button>
+          <Button id="tutorial" className="help_drop_down" style={{
+            width: "224px", height: "40px", padding: "4px 12px"
+          }}>
+            <span style={{width: "200px", height: "16px", marginLeft: "-140px"}}>
+              튜토리얼
+            </span>
+          </Button>
+          <Button id="faq" className="help_drop_down" style={{
+            width: "224px", height: "40px", padding: "4px 12px"
+          }}>
+            <span style={{width: "200px", height: "16px", marginLeft: "-170px"}}>
+              FAQ
+            </span>
+          </Button>
         </div>
       </Popover>
       </div>
@@ -245,8 +231,6 @@ const ContentsLayer = (props: Props) => {
         position: "relative",
         height: '100%',
         float: "right",
-        // flexDirection: "row-reverse", 
-        // justifyContent: "flex-start"
       }}>
         <MixedPageView
           pdf={pdf}

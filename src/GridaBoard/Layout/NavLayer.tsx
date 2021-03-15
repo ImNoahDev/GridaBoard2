@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 
-import { RootState } from "../../store/rootReducer";
 import GridaDoc from "../GridaDoc";
 
 import { makeNPageIdStr } from "../../nl-lib/common/util";
@@ -126,8 +125,7 @@ const NavLayer = () => {
         
         <FitButton />
         <KeyboardArrowDownRoundedIcon/>
-        
-        
+    
       </div>
       
 

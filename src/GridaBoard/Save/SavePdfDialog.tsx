@@ -7,6 +7,7 @@ import { savePDF } from "./SavePdf";
 import PdfDialogTextArea from './PdfDialogTextArea';
 import { turnOnGlobalKeyShortCut } from '../../GridaBoard/GlobalFunctions';
 import GridaToolTip from '../../styles/GridaToolTip';
+import $ from "jquery";
 
 const useStyles = makeStyles({
   title: {
@@ -65,6 +66,21 @@ const SavePdfDialog = () => {
     onReset();
   }
 
+  $(document).ready(function(){
+    $('.save_drop_down').hover(
+      function(event){
+        $(this).addClass('hover');
+        $(this).css("color", "rgba(104,143,255,1)");
+        $(this).css("background", "rgba(232,236,245,1)");
+      },
+      function(){
+        $(this).removeClass('hover');
+        $(this).css("color", "rgba(18,18,18,1)");
+        $(this).css("background", "rgba(255,255,255,0.9)");
+      }
+    );
+  });
+
   return (
     <div>
       <GridaToolTip open={true} placement="top-end" tip={{
@@ -72,8 +88,10 @@ const SavePdfDialog = () => {
         msg: "PDF 파일을 로컬에 저장하는 버튼입니다.",
         tail: "키보드 버튼 ?로 선택 가능합니다"
       }} title={undefined}>
-        <Button onClick={handlePdfDialogOpen}>
-          데이터 저장(.grida)
+        <Button className="save_drop_down" style={{
+          width: "160px", height: "40px", padding: "4px 12px" 
+        }} onClick={handlePdfDialogOpen}>
+          <span style={{marginLeft: "-14px"}}>이미지 저장(.pdf)</span>
         </Button>
       </GridaToolTip>
       <Dialog open={open} onClose={handlePdfDialogClose} aria-labelledby="form-dialog-title">

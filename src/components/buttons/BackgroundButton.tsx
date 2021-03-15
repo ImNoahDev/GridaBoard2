@@ -9,15 +9,24 @@ import $ from "jquery";
 const themeManager: ThemeManager = ThemeManager.getInstance();
 
 const basicStyle = {
-  // marginTop: "8px",
-  // float: "right",
   display: "block"
 } as React.CSSProperties;
 
 const neoStyle = {
-  // marginTop: "8px",
-  // float: "right",
   display: "none"
+} as React.CSSProperties;
+
+const dropdownStyle = {
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "flex-start",
+  padding: "8px",
+  position: "relative",
+  width: "140px",
+  height: "100px",
+  background: "rgba(255,255,255,0.9)",
+  boxShadow: "2px 2px 2px rgba(0, 0, 0, 0.25)",
+  borderRadius: "12px",
 } as React.CSSProperties;
 
 export default function BackgroundButton() {
@@ -64,73 +73,76 @@ export default function BackgroundButton() {
     $(this).css("color", "rgba(18,18,18,1)")
   });
 
-    return (
-      // <div className="btn-group dropright" role="group">
-      <React.Fragment>
-        <Button type="button" id="basic_background" style={basicStyle} onClick={handleClick} aria-describedby={id}>
-          <GridaToolTip open={true} placement="left" tip={{
-              head: "Background",
-              msg: "화면의 배경색을 선택합니다.",
-              tail: "키보드 버튼 1로 선택 가능합니다"
-            }} title={undefined}>
-            {/* <div className="c2"> */}
-              {/* <img src="/icons/icon_background_n.png" className="normal-image"></img>
-              <img src="/icons/icon_background_p.png" className="hover-image"></img> */}
-              <div>
-                Basic
-              </div>
-            {/* </div> */}
-          </GridaToolTip>
-        </Button>
-        <Button type="button" id="neo_background" style={neoStyle} onClick={handleClick} aria-describedby={id}>
-          <GridaToolTip open={true} placement="left" tip={{
-              head: "Background",
-              msg: "화면의 배경색을 선택합니다.",
-              tail: "키보드 버튼 1로 선택 가능합니다"
-            }} title={undefined}>
-            {/* <div className="c2"> */}
-              {/* <img src="/icons/icon_background_n.png" className="normal-image"></img>
-              <img src="/icons/icon_background_p.png" className="hover-image"></img> */}
-              <div>
-                Neo-prism
-              </div>
-            {/* </div> */}
-          </GridaToolTip>
-        </Button>
-        <Popover
-          id={id}
-          open={open}
-          anchorEl={anchorEl}
-          onClose={handleClose}
-          anchorOrigin={{
-            vertical: 'top',
-            horizontal: 'right'
-          }}
-          transformOrigin={{
-            vertical: 'top',
-            horizontal: 'left',
-          }}
-        >
-
-          <a id="btn_bg_gd" className="dropdown-item" href="#" onClick={() => setBackground(1)}>
-            <div className="c2">
-              <span className="bg-dropmenu">Basic</span>
-            </div>
-          </a>
-
-          <a id="btn_bg_avan" className="dropdown-item" href="#" onClick={() => setBackground(2)}>
-            <div className="c2">
-              <span className="bg-dropmenu">Neo-prism</span>
-            </div>
-          </a>
-        </Popover>
-        <div className="dropdown-menu p-0 border border-0 " aria-labelledby="btn_background">
-          {/* <a className="dropdown-item" href="#"> */}
-
-          
-          {/* </a> */}
-        {/* </div> */}
-      </div>
-      </React.Fragment>
+  $(document).ready(function(){
+    $('.background_drop_down').hover(
+      function(event){
+        $(this).addClass('hover');
+        $(this).css("color", "rgba(104,143,255,1)");
+        $(this).css("background", "rgba(232,236,245,1)");
+      },
+      function(){
+        $(this).removeClass('hover');
+        $(this).css("color", "rgba(18,18,18,1)");
+        $(this).css("background", "rgba(255,255,255,0.9)");
+      }
     );
+  });
+
+  return (
+    <React.Fragment>
+      <Button type="button" id="basic_background" style={basicStyle} onClick={handleClick} aria-describedby={id}>
+        <GridaToolTip open={true} placement="left" tip={{
+            head: "Background",
+            msg: "화면의 배경색을 선택합니다.",
+            tail: "키보드 버튼 1로 선택 가능합니다"
+          }} title={undefined}>
+            <span>
+              Basic
+            </span>
+        </GridaToolTip>
+      </Button>
+      <Button type="button" id="neo_background" style={neoStyle} onClick={handleClick} aria-describedby={id}>
+        <GridaToolTip open={true} placement="left" tip={{
+            head: "Background",
+            msg: "화면의 배경색을 선택합니다.",
+            tail: "키보드 버튼 1로 선택 가능합니다"
+          }} title={undefined}>
+            <span>
+              Neo-prism
+            </span>
+        </GridaToolTip>
+      </Button>
+      <Popover
+        id={id}
+        open={open}
+        anchorEl={anchorEl}
+        onClose={handleClose}
+        anchorOrigin={{
+          vertical: 'top',
+          horizontal: 'right'
+        }}
+        transformOrigin={{
+          vertical: 'top',
+          horizontal: 'left',
+        }}
+      >
+        <div style={dropdownStyle}>
+          <div>
+            <Button className="background_drop_down" onClick={() => setBackground(1)} style={{
+              width: "120px", height: "40px", padding: "4px 12px"
+            }}>
+              <span className="bg-dropmenu" style={{marginLeft: "-58px"}}>Basic</span>
+            </Button>
+          </div>
+          <div>
+            <Button className="background_drop_down" onClick={() => setBackground(2)} style={{
+              width: "120px", height: "40px", padding: "4px 12px"
+            }}>
+              <span className="bg-dropmenu" style={{marginLeft: "-20px"}}>Neo-prism</span>
+            </Button>
+          </div>
+        </div>
+      </Popover>
+    </React.Fragment>
+  );
 }

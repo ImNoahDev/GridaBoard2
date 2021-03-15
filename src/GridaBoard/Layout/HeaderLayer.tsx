@@ -55,6 +55,32 @@ const buttonStyle = {
   marginRight: "2vw"
 } as React.CSSProperties;
 
+const saveDropdownStyle = {
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "flex-start",
+  padding: "8px",
+  position: "relative",
+  width: "180px",
+  height: "90px",
+  background: "rgba(255,255,255,0.9)",
+  boxShadow: "2px 2px 2px rgba(0, 0, 0, 0.25)",
+  borderRadius: "12px",
+} as React.CSSProperties;
+
+const loadDropdownStyle = {
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "flex-start",
+  padding: "8px",
+  position: "relative",
+  width: "220px",
+  height: "90px",
+  background: "rgba(255,255,255,0.9)",
+  boxShadow: "2px 2px 2px rgba(0, 0, 0, 0.25)",
+  borderRadius: "12px",
+} as React.CSSProperties;
+
 const printBtnId = "printTestButton";
 const printOption = g_defaultPrintOption;
 
@@ -143,6 +169,21 @@ const HeaderLayer = (props: Props) => {
     $(this).css("color", "rgba(18,18,18,1)")
   });
 
+  $(document).ready(function(){
+    $('.save_drop_down').hover(
+      function(event){
+        $(this).addClass('hover');
+        $(this).css("color", "rgba(104,143,255,1)");
+        $(this).css("background", "rgba(232,236,245,1)");
+      },
+      function(){
+        $(this).removeClass('hover');
+        $(this).css("color", "rgba(18,18,18,1)");
+        $(this).css("background", "rgba(255,255,255,0.9)");
+      }
+    );
+  });
+
   const [saveAnchorEl, saveSetAnchorEl] = React.useState<HTMLButtonElement | null>(null);
 
   const [loadAnchorEl, loadSetAnchorEl] = React.useState<HTMLButtonElement | null>(null);
@@ -196,13 +237,13 @@ const HeaderLayer = (props: Props) => {
               horizontal: 'left',
             }}
           >
-            <div onClick={() => saveGrida('hello.grida')}>
-              <Button>
-                이미지 저장(.pdf)
-              </Button>
-            </div>
-            <div>
+            <div style={saveDropdownStyle}>
               <SavePdfDialog />
+                <Button className="save_drop_down" style={{
+                  width: "160px", height: "40px", padding: "4px 12px"
+                }} onClick={() => saveGrida('hello.grida')}>
+                  <span>데이터 저장(.grida)</span>
+                </Button>
             </div>
           </Popover>
           <Button id="load" style={buttonStyle} onClick={handleClickLoad} aria-describedby={loadId}>
@@ -222,10 +263,8 @@ const HeaderLayer = (props: Props) => {
               horizontal: 'left',
             }}
           >
-            <div>
+            <div style={loadDropdownStyle}>
               <FileBrowserButton handlePdfOpen={handlePdfOpen} />
-            </div>
-            <div>
               <LoadGrida />
             </div>
           </Popover>

@@ -4,6 +4,7 @@ import { InkStorage } from '../../nl-lib/common/penstorage';
 import GridaDoc from '../GridaDoc';
 import { Button } from '@material-ui/core';
 import GridaToolTip from "../../styles/GridaToolTip";
+import $ from "jquery";
 
 const LoadGrida = () => {
   async function fileOpenHandler() {
@@ -66,14 +67,31 @@ const LoadGrida = () => {
     }
   }
 
+  $(document).ready(function(){
+    $('.load_drop_down').hover(
+      function(event){
+        $(this).addClass('hover');
+        $(this).css("color", "rgba(104,143,255,1)");
+        $(this).css("background", "rgba(232,236,245,1)");
+      },
+      function(){
+        $(this).removeClass('hover');
+        $(this).css("color", "rgba(18,18,18,1)");
+        $(this).css("background", "rgba(255,255,255,0.9)");
+      }
+    );
+  });
+
   return (
       <GridaToolTip open={true} placement="top-end" tip={{
         head: "Grida Load",
         msg: ".grida 파일을 로컬에서 불러옵니다.",
         tail: "키보드 버튼 ?로 선택 가능합니다"
       }} title={undefined}>
-        <Button onClick={fileOpenHandler}>
-          데이터 불러오기(.grida)
+        <Button className="load_drop_down" onClick={fileOpenHandler} style={{
+          width: "200px", height: "40px", padding: "4px 12px"
+        }}>
+          <span>데이터 불러오기(.grida)</span>
         </Button>
       </GridaToolTip> 
   );
