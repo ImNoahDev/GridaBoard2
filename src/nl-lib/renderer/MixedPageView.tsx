@@ -99,6 +99,7 @@ export interface MixedViewProps {
   activePageNo: number;
 
   viewFit?: ZoomFitEnum;
+  zoom?: number;
   fitMargin?: number;
 
   fixed?: boolean;
@@ -172,6 +173,7 @@ const defaultMixedPageViewProps: MixedViewProps = {
   isMainView: true,
   parentName: "",
   viewFit: ZoomFitEnum.FULL,
+  zoom: 1,
   fitMargin: 100,
   fixed: false,
   width: undefined,
@@ -342,11 +344,15 @@ class MixedPageView_module extends React.Component<MixedViewProps, State>  {
 
     const pensChanged = nextProps.pens !== this.props.pens;
     const viewFitChanged = nextProps.viewFit !== this.props.viewFit;
+    const zoomChanged = nextProps.zoom !== this.props.zoom;
     const fixedChanged = nextProps.fixed !== this.props.fixed;
     const noInfo = nextProps.noInfo !== this.props.noInfo;
     const loaded = this.state.status === "loaded" && nextState.status !== this.state.status;
     const renderCntChanged = this.state.forceToRenderCnt !== nextState.forceToRenderCnt;
 
+    if (zoomChanged) {
+      // this._internal.viewPos.zoom = nextProps.zoom;
+    }
 
     if (((pdfChanged || pdfPageNoChanged) && this._internal.pdfPageNo > 0) || pageInfoChanged) {
       let size;
@@ -373,7 +379,7 @@ class MixedPageView_module extends React.Component<MixedViewProps, State>  {
       ret_val = true;
     }
 
-    ret_val = ret_val || pensChanged || pageInfoChanged || viewFitChanged || fixedChanged || noInfo || loaded || renderCntChanged;
+    ret_val = ret_val || pensChanged || pageInfoChanged || viewFitChanged || zoomChanged || fixedChanged || noInfo || loaded || renderCntChanged;
 
     if(this.props.renderCountNo !== nextProps.renderCountNo) {
       ret_val = true;
@@ -627,6 +633,7 @@ class MixedPageView_module extends React.Component<MixedViewProps, State>  {
         <div id={`${this.props.parentName}-ink_layer`} style={inkContainer} >
           <PenBasedRenderer
             position={this._internal.viewPos}
+            zoom={this.props.zoom}
             pdfSize={this._internal.pdfSize}
             pageInfo={this._internal.pageInfo}
             onNcodePageChanged={this.onNcodePageChanged}

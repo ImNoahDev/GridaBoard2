@@ -29,6 +29,8 @@ interface Props { // extends MixedViewProps {
   onCanvasPositionChanged: (arg: { offsetX: number, offsetY: number, zoom: number }) => void;
 
   position: { offsetX: number, offsetY: number, zoom: number },
+  
+  zoom: number,
 
   viewSize: ISize;
 
@@ -377,6 +379,10 @@ class PenBasedRenderer extends React.Component<Props, State> {
       ret_val = true;
     }
 
+    if (this.props.zoom !== nextProps.zoom) {
+      this.renderer.setCanvasZoomByButton(nextProps.zoom);
+    }
+
     if (this.props.renderCountNo !== nextProps.renderCountNo) {
       if (this.renderer) {
         this.renderer.changePage(pageInfo, nextProps.pdfSize, false);
@@ -649,7 +655,7 @@ class PenBasedRenderer extends React.Component<Props, State> {
 
     const inkCanvas: CSSProperties = {
       position: "absolute",
-      zoom: 1,
+      zoom: zoom,
       left: 0,
       top: 0,
       zIndex: 10,

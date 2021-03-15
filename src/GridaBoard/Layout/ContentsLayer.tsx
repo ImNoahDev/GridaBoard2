@@ -64,6 +64,9 @@ const ContentsLayer = (props: Props) => {
 
   const [pageWidth, setPageWidth] = useState(0);
 
+  const {zoomStore} = useSelector((state: RootState) =>({
+    zoomStore: state.zoomReducer.zoom as number,
+  }));
   const rotationTrigger = useSelector((state: RootState) => state.rotate.rotationTrigger);
   const {activePageNo_store} = useSelector((state: RootState) =>({
     activePageNo_store: state.activePage.activePageNo,
@@ -245,6 +248,7 @@ const ContentsLayer = (props: Props) => {
 
           parentName={"grida-main-home"}
           viewFit={viewFit_store}
+          zoom={zoomStore}
           autoPageChange={true}
           fromStorage={false}
           fitMargin={100}

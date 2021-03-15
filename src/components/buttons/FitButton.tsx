@@ -3,9 +3,11 @@ import '../../styles/buttons.css';
 import { Button, Popover } from '@material-ui/core';
 import GridaToolTip from "../../styles/GridaToolTip";
 import { setViewFit } from '../../store/reducers/viewFitReducer';
-import { ZoomFitEnum } from "../../nl-lib/common/enums";
+import { PageZoomEnum, ZoomFitEnum } from "../../nl-lib/common/enums";
 import { useSelector } from "react-redux";
 import { RootState } from "../../store/rootReducer";
+import { setZoomStore } from '../../store/reducers/zoomReducer';
+
 import $ from "jquery";
 
 const dropdownStyle = {
@@ -34,11 +36,34 @@ export default function FitButton() {
     setViewFit(viewFit);
   };
 
+
+
   const open = Boolean(anchorEl);
   const id = open ? 'simple-popover' : undefined;
 
   const zoom = useSelector((state: RootState) => state.zoomReducer.zoom);
   const zoomPercent = Math.round(zoom * 100);
+
+  const setZoomByButton = (zoomEnum: PageZoomEnum) => {
+    setAnchorEl(null);
+
+    let newZoom;
+    switch (zoomEnum) {
+      case PageZoomEnum.ZOOM_UP: {
+        const delta = -100;
+        newZoom = zoom * 0.9985 ** delta
+        break;
+      }
+      case PageZoomEnum.ZOOM_DOWN: {
+        const delta = 100;
+        newZoom = zoom * 0.9985 ** delta
+        break;
+      }
+      default: break;
+    }
+
+    setZoomStore(newZoom);
+  };
 
   $('#btn_fit').hover(function() {
     $(this).css("color", "rgba(104,143,255,1)")
@@ -72,7 +97,6 @@ export default function FitButton() {
             <span id="zoom-ratio">{zoomPercent}%</span>
           </GridaToolTip>
         </Button>
-
         <Popover
           id={id}
           open={open}
@@ -90,14 +114,14 @@ export default function FitButton() {
           <div style={dropdownStyle}>
             <Button id="customer" className="help_drop_down" style={{
               width: "224px", height: "40px", padding: "4px 12px"
-            }}>
+            }} onClick={() => setZoomByButton(PageZoomEnum.ZOOM_UP)}>
               <span style={{width: "200px", height: "16px", marginLeft: "-80px"}}>
                 화면 확대 [Ctrl+(+)]
               </span>
             </Button>
             <Button id="shortcut" className="help_drop_down" style={{
               width: "224px", height: "40px", padding: "4px 12px"
-            }}>
+            }} onClick={() => setZoomByButton(PageZoomEnum.ZOOM_DOWN)}>
               <span style={{width: "200px", height: "16px", marginLeft: "-80px"}}>
                 화면 축소 [Ctrl+(-)]
               </span>

@@ -682,6 +682,22 @@ export default abstract class RenderWorkerBase {
     opt.e.stopPropagation();
   }
 
+  setCanvasZoomByButton = (zoom: number) => {
+    if (zoom > PDFVIEW_ZOOM_MAX) zoom = PDFVIEW_ZOOM_MAX;
+    if (zoom < PDFVIEW_ZOOM_MIN) zoom = PDFVIEW_ZOOM_MIN;
+
+    this.offset.zoom = zoom;
+
+    const zoomed_width = Math.round(this._opt.pageSize.width * zoom);
+    const zoomed_height = Math.round(this._opt.pageSize.height * zoom);
+
+    this.canvasFb.setZoom(zoom);
+    this.canvasFb.setWidth(zoomed_width);
+    this.canvasFb.setHeight(zoomed_height);
+
+    this.scrollBoundaryCheck();
+  }
+
   zoomToPoint = (pt: Point, zoom: number, animate = true) => {
     const z1 = this.calcScaleFactor(this._opt.viewFit, zoom);
 
