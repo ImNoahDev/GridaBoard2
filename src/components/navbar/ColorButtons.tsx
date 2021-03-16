@@ -1,39 +1,16 @@
 import React, { useEffect } from 'react';
 import '../../styles/main.css';
 import GridaToolTip from '../../styles/GridaToolTip';
-import PenManager, { DEFAULT_PEN_COLOR_NUM } from '../../nl-lib/neosmartpen/PenManager';
+import PenManager from '../../nl-lib/neosmartpen/PenManager';
 import Button from '@material-ui/core/Button';
-import ButtonGroup from '@material-ui/core/ButtonGroup';
 import { makeStyles } from '@material-ui/core/styles';
 import { Popover } from '@material-ui/core';
-import $ from "jquery";
 
 const manager: PenManager = PenManager.getInstance();
 
-const useStyles = makeStyles((theme) => ({
-  root: {
-    position: 'relative',
-    display: 'inline-flex',
-    // flexDirection: 'column',
-    // alignItems: 'center',
-    height: '36px',
-    verticalAlign: 'middle',
-    // '& > *': {
-    //   margin: theme.spacing(1),
-    // },
-  },
-}));
-
 const colorStyle = {
-  // padding: "0px",
-  // margin: "0px",
-  // border: "0px",
-  // minWidth: "24px",
   width: "18px",
   height: "18px",
-  // marginTop: "16px",
-  // lineHeight: "36px",
-  // float: "left",
   marginLeft: "2vw"
 } as React.CSSProperties;
 
@@ -53,17 +30,9 @@ const colorDropDownStyle = {
 
 const groupStyle = {
   padding: "0px",
-  // margin: "0px",
   border: "0px",
   marginLeft: "-16px",
   paddingLeft: "12px"
-  // minWidth: "24px"
-  // position: "static",
-  // width: "24px",
-  // height: "24px",
-  // left: "8px",
-  // top: "8px",
-  // background: "rgba(229,229,229,1)"
 } as React.CSSProperties;
 
 const ColorButtons = () => {
@@ -86,57 +55,6 @@ const ColorButtons = () => {
   };
 
   const changeColor = (color: number) => {
-    if (color === 1) {
-      $('.select_color').removeAttr('id');
-      $('.select_color').attr('id', 'clr_1');
-      $('#select_color').removeAttr('class');
-      $('#select_color').attr('class', 'color_icon color_1');
-    } else if (color === 2) {
-      $('.select_color').removeAttr('id');
-      $('.select_color').attr('id', 'clr_2');
-      $('#select_color').removeAttr('class');
-      $('#select_color').attr('class', 'color_icon color_2');
-    } else if (color === 3) {
-      $('.select_color').removeAttr('id');
-      $('.select_color').attr('id', 'clr_3');
-      $('#select_color').removeAttr('class');
-      $('#select_color').attr('class', 'color_icon color_3');
-    } else if (color === 4) {
-      $('.select_color').removeAttr('id');
-      $('.select_color').attr('id', 'clr_4');
-      $('#select_color').removeAttr('class');
-      $('#select_color').attr('class', 'color_icon color_4');
-    } else if (color === 5) {
-      $('.select_color').removeAttr('id');
-      $('.select_color').attr('id', 'clr_5');
-      $('#select_color').removeAttr('class');
-      $('#select_color').attr('class', 'color_icon color_5');
-    } else if (color === 6) {
-      $('.select_color').removeAttr('id');
-      $('.select_color').attr('id', 'clr_6');
-      $('#select_color').removeAttr('class');
-      $('#select_color').attr('class', 'color_icon color_6');
-    } else if (color === 7) {
-      $('.select_color').removeAttr('id');
-      $('.select_color').attr('id', 'clr_7');
-      $('#select_color').removeAttr('class');
-      $('#select_color').attr('class', 'color_icon color_7');
-    } else if (color === 8) {
-      $('.select_color').removeAttr('id');
-      $('.select_color').attr('id', 'clr_8');
-      $('#select_color').removeAttr('class');
-      $('#select_color').attr('class', 'color_icon color_8');
-    } else if (color === 9) {
-      $('.select_color').removeAttr('id');
-      $('.select_color').attr('id', 'clr_9');
-      $('#select_color').removeAttr('class');
-      $('#select_color').attr('class', 'color_icon color_9');
-    } else {
-      $('.select_color').removeAttr('id');
-      $('.select_color').attr('id', 'clr_0');
-      $('#select_color').removeAttr('class');
-      $('#select_color').attr('class', 'color_icon color_0');
-    }
     manager.setColor(color);
     handleClose();
   }
@@ -145,7 +63,6 @@ const ColorButtons = () => {
   const id = open ? 'simple-popover' : undefined;
 
   return (
-    // <div className="color_bar neo_shadow float-left bottom_text color_bar">
     <React.Fragment>
       <Button id="clr_3" type="button" className="color_btn select_color" style={colorStyle} onClick={handleClick} aria-describedby={id}>
         <div id="select_color" className="color_icon color_3">
@@ -279,7 +196,6 @@ const ColorButtons = () => {
           </Button>
         </div>
       </Popover>
-      {/* </div> */}
     </React.Fragment>
   );
 }

@@ -178,7 +178,59 @@ export default class PenManager {
   }
 
   setColor(color_num: number) {
-    // this.toggleColorRadioButton(color_num);
+
+    if (color_num === 1) {
+      $('.select_color').removeAttr('id');
+      $('.select_color').attr('id', 'clr_1');
+      $('#select_color').removeAttr('class');
+      $('#select_color').attr('class', 'color_icon color_1');
+    } else if (color_num === 2) {
+      $('.select_color').removeAttr('id');
+      $('.select_color').attr('id', 'clr_2');
+      $('#select_color').removeAttr('class');
+      $('#select_color').attr('class', 'color_icon color_2');
+    } else if (color_num === 3) {
+      $('.select_color').removeAttr('id');
+      $('.select_color').attr('id', 'clr_3');
+      $('#select_color').removeAttr('class');
+      $('#select_color').attr('class', 'color_icon color_3');
+    } else if (color_num === 4) {
+      $('.select_color').removeAttr('id');
+      $('.select_color').attr('id', 'clr_4');
+      $('#select_color').removeAttr('class');
+      $('#select_color').attr('class', 'color_icon color_4');
+    } else if (color_num === 5) {
+      $('.select_color').removeAttr('id');
+      $('.select_color').attr('id', 'clr_5');
+      $('#select_color').removeAttr('class');
+      $('#select_color').attr('class', 'color_icon color_5');
+    } else if (color_num === 6) {
+      $('.select_color').removeAttr('id');
+      $('.select_color').attr('id', 'clr_6');
+      $('#select_color').removeAttr('class');
+      $('#select_color').attr('class', 'color_icon color_6');
+    } else if (color_num === 7) {
+      $('.select_color').removeAttr('id');
+      $('.select_color').attr('id', 'clr_7');
+      $('#select_color').removeAttr('class');
+      $('#select_color').attr('class', 'color_icon color_7');
+    } else if (color_num === 8) {
+      $('.select_color').removeAttr('id');
+      $('.select_color').attr('id', 'clr_8');
+      $('#select_color').removeAttr('class');
+      $('#select_color').attr('class', 'color_icon color_8');
+    } else if (color_num === 9) {
+      $('.select_color').removeAttr('id');
+      $('.select_color').attr('id', 'clr_9');
+      $('#select_color').removeAttr('class');
+      $('#select_color').attr('class', 'color_icon color_9');
+    } else {
+      $('.select_color').removeAttr('id');
+      $('.select_color').attr('id', 'clr_0');
+      $('#select_color').removeAttr('class');
+      $('#select_color').attr('class', 'color_icon color_0');
+    }
+
     this.color = this.pen_colors[color_num];
 
     if (_active_pen) {
@@ -205,8 +257,30 @@ export default class PenManager {
   }
 
   setPenRendererType(type: IBrushType) {
-    const $elem = $("#btn_brush").find(".c2");
-    this.setPenTypeStatus($elem, type);
+
+    if (type == IBrushType.MARKER) {
+      $('#btn_marker').css('background', 'white');
+      $('#marker_svg_icon').css('color', '#688FFF');
+    } else {
+      $('#btn_marker').css('background', 'none');
+      $('#marker_svg_icon').css('color', '#58627D');
+    }
+    
+    if (type == IBrushType.ERASER) {
+      $('#btn_eraser').css('background', 'white');
+      $('#eraser_svg_icon').css('color', '#688FFF');
+    } else {
+      $('#btn_eraser').css('background', 'none');
+      $('#eraser_svg_icon').css('color', '#58627D');
+    }
+    
+    if (type == IBrushType.PEN) {
+      $('#btn_pen').css('background', 'white');
+      $('#pen_svg_icon').css('color', '#688FFF');
+    } else {
+      $('#btn_pen').css('background', 'none');
+      $('#pen_svg_icon').css('color', '#58627D');
+    }
 
     this.penRendererType = type;
 
