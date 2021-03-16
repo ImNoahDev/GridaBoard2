@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import '../../styles/main.css';
 import { setActivePageNo } from '../../store/reducers/activePageReducer';
 import { RootState } from '../../store/rootReducer';
@@ -29,7 +29,6 @@ const PageNumbering = () => {
     }
     
     const handleChange = (e) => {
-      turnOnGlobalKeyShortCut(false);
       const value = parseInt(e.target.value);
       if (value > numPages) {
         console.log("disChecked")
@@ -57,12 +56,23 @@ const PageNumbering = () => {
       }
     }
 
+    useEffect(() => {
+      var form = document.getElementById("page_input");
+      form.addEventListener("focus", function( event ) {
+        turnOnGlobalKeyShortCut(false);
+      }, true);
+      form.addEventListener("blur", function(event) {
+        turnOnGlobalKeyShortCut(true);
+      }, true)
+      
+    }, []); 
+
     return (
       <div>
         <IconButton id="pre_btn" onClick={prevChange}>
           <NavigateBeforeIcon />
         </IconButton>
-        <input value={pageNo} style={selectPageStyle} onChange={handleChange}/>
+        <input id="page_input" value={pageNo} style={selectPageStyle} onChange={handleChange}/>
         /
         &nbsp;
         <span>{numPages}</span>
