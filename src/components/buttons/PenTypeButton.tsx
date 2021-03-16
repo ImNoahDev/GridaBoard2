@@ -16,6 +16,7 @@ const penTypeStyle = {
 const penTypeStyleEnabled = {
   color: "#688FFF",
   marginLeft: "2vw",
+  background: "white"
 } as React.CSSProperties;
 
 export default function PenTypeButton () {

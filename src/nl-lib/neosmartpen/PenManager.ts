@@ -208,17 +208,6 @@ export default class PenManager {
     const $elem = $("#btn_brush").find(".c2");
     this.setPenTypeStatus($elem, type);
 
-    if (type === IBrushType.MARKER) {
-      for (let i = 0; i < 11; i++) {
-        $('#clr_' + [i]).find(".color_" + [i]).css('background-color', this.marker_colors[i]);
-      }
-    }
-    else if (type === IBrushType.PEN) {
-      for (let i = 0; i < 11; i++) {
-        $('#clr_' + [i]).find(".color_" + [i]).css('background-color', this.pen_colors[i]);
-      }
-    }
-
     this.penRendererType = type;
 
     if (_active_pen) {
