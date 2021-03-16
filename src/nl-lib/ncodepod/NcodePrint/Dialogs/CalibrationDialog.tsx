@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import { Box, Button, ButtonProps, Dialog, DialogActions, DialogContent, DialogTitle, LinearProgress } from '@material-ui/core';
+import { Box, Button, ButtonProps, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, LinearProgress } from '@material-ui/core';
 import { useSelector, useDispatch } from 'react-redux';
 
 import "./pen_touch.css";
@@ -12,7 +12,9 @@ import { IPageSOBP, IPoint, IPrintOption } from '../../../common/structures';
 import { NeoPdfDocument, NeoPdfManager } from '../../../common/neopdf';
 import CalibrationData from '../../../common/mapper/Calibration/CalibrationData';
 import { MappingStorage } from '../../../common/mapper/MappingStorage';
-
+import { isSamePage, makeNPageIdStr } from "../../../common/util";
+import GridaApp from "../../../../GridaBoard/GridaApp";
+import ConnectButton from "../../../../components/buttons/ConnectButton";
 
 const _penImageUrl = "/icons/image_calibration.png";
 
@@ -21,13 +23,6 @@ const useStyles = makeStyles({
     width: '100%',
   },
 });
-
-// const calibrationStyle = {
-//   padding: "0px",
-//   margin: "0px",
-//   border: "0px",
-//   minWidth: "24px"
-// }
 
 interface IDialogProps {
   filename: string,
@@ -43,6 +38,9 @@ const nu = { p0: {x: 0, y: 0} as IPoint, p2: {x: 0, y: 0} as IPoint };
 const pu = { p0: {x: 0, y: 0} as IPoint, p2: {x: 0, y: 0} as IPoint };
 const pageInfos: IPageSOBP[] = [];
 
+let AlertGuideTitle = "";
+let AlertGuideText = "";
+
 const CalibrationDialog = (props: IDialogProps) => {
   const classes = useStyles();
   const [pdf, setPdf] = useState(undefined as NeoPdfDocument);
@@ -51,6 +49,7 @@ const CalibrationDialog = (props: IDialogProps) => {
   const [markPosRatio, setMarkPosRatio] = useState({ xr: 0, yr: 0 });
   const [imgSrc, setImgSrc] = useState("//:0");
   const [status, setStatus] = useState("inited");
+  const [openAlert, setOpenAlert] = React.useState(false);
 
   let pageNo = 0;
   let numProgresses = numPages + 1;
@@ -61,13 +60,17 @@ const CalibrationDialog = (props: IDialogProps) => {
 
   const progress = useSelector((state: RootState) => state.calibration.progress);
   const url = useSelector((state: RootState) => state.calibration.url);
-  // console.log(`calibration: loaded ${progress}`)
 
   const show = useSelector((state: RootState) => state.calibration.show);
 
   const percent = Math.ceil(progress / numProgresses * 100);
   const imageRef = useRef(null);
   const dialogRef = useRef(null);
+
+  const onPenLinkChanged = e => {
+    const app = GridaApp.getInstance();
+    app.onPenLinkChanged(e);
+  }
 
   const initState = () => {
     setPdf(undefined);
@@ -77,6 +80,14 @@ const CalibrationDialog = (props: IDialogProps) => {
     setImgSrc("//:0");
     setStatus("inited");
   }
+
+  const handleOpenAlert = () => {
+    setOpenAlert(true);
+  };
+
+  const handleCloseAlert = () => {
+    setOpenAlert(false);
+  };
 
   const handleClose = (e) => {
     // hideCalibrationDialog();
@@ -148,15 +159,38 @@ const CalibrationDialog = (props: IDialogProps) => {
   
   useEffect(() => {
     if (!(calibrationData.section === -1 && calibrationData.owner === -1 && calibrationData.page === -1 && calibrationData.book === -1)) {
-      
-      const pageInfo: IPageSOBP = {
+      const calibratedPageInfo: IPageSOBP = {
         section: calibrationData.section, 
         book: calibrationData.book, 
         owner: calibrationData.owner, 
         page: calibrationData.page
       };
-      const filename = 'pdf_file_name';
 
+      let duplicated = false;
+      let notSamePageForFirstPage = false;
+      
+      pageInfos.forEach((pageInfo) => {
+        if (progress === 1) {
+          if (!isSamePage(pageInfo, calibratedPageInfo)) {
+            notSamePageForFirstPage = true;
+            AlertGuideTitle = "동일한 페이지가 아님";
+            AlertGuideText = "같은 PDF 페이지는 하나의 Ncode 용지에 대응되어야 합니다";
+          }  
+        }
+        if (progress > 1 && isSamePage(pageInfo, calibratedPageInfo)) {
+          duplicated = true;
+          AlertGuideTitle = "등록된 페이지와 겹침";
+          AlertGuideText = "이전에 등록한 페이지와 겹치는 페이지입니다\n인쇄된 용지를 확인해 주십시오";
+        }
+      });
+      
+      if (duplicated || notSamePageForFirstPage) {
+        handleOpenAlert();
+        updateCalibrationDialog(progress);
+        return;
+      }
+
+      const filename = 'pdf_file_name';
       const pageSize = pdf.getPageSize(pageNo);
 
       switch (progress) {
@@ -167,7 +201,7 @@ const CalibrationDialog = (props: IDialogProps) => {
           pu.p0.x = pageSize.width * 0.1;
           pu.p0.y = pageSize.height * 0.1
 
-          pageInfos.push(pageInfo);
+          pageInfos.push(calibratedPageInfo);
           break;
         }
         case 1: {
@@ -179,7 +213,7 @@ const CalibrationDialog = (props: IDialogProps) => {
           break;
         }
         default: {
-          pageInfos.push(pageInfo);
+          pageInfos.push(calibratedPageInfo);
           break;
         } //default end
       } //switch end
@@ -243,6 +277,22 @@ const CalibrationDialog = (props: IDialogProps) => {
 
   const { filename: propsFilename, printOption: propsPrintOption, cancelCallback: propsCancelCallback, ...rest } = props;
 
+  let calibrationGuide = "";
+  switch (progress) {
+    case 0: {
+      calibrationGuide = "인쇄된 문서의 왼쪽 상단에 있는 마크를 스마트 펜으로 터치해 주십시오";
+      break;
+    }
+    case 1: {
+      calibrationGuide = "인쇄된 문서의 오른쪽 하단에 있는 마크를 스마트 펜으로 터치해 주십시오";
+      break;
+    }
+    default : {
+      calibrationGuide = "인쇄된 문서의 아무 곳이나 스마트 펜으로 터치해 주십시오";
+      break;
+    }
+  }
+
   return (
     <React.Fragment>
       { imgSrc.length > 4 ?
@@ -251,36 +301,68 @@ const CalibrationDialog = (props: IDialogProps) => {
 
           <DialogTitle id="form-dialog-title" style={{ float: "left", width: "500px" }}>
             <Box fontSize={20} fontWeight="fontWeightBold" >
-              인쇄물 등록, 페이지 {pageNo}/{numPages} (Step: {progress + 1}/{numProgresses})
-        </Box>
+              인쇄물 등록, 페이지 {pageNo}
+              {/* /{numPages} (Step: {progress + 1}/{numProgresses}) */}
+            </Box>
           </DialogTitle>
 
           <DialogContent ref={dialogRef}>
             <Box component="div" className={classes.root}>
-              <Box fontSize={16} fontWeight="fontWeightRegular" >Processing... {percent}%</Box>
+              <Box fontSize={16} fontWeight="fontWeightRegular" >{calibrationGuide}</Box>
+              <br/>
             </Box>
+            
+            {/* 가이드에 없음 */}
+            {/* <Box component="div" className={classes.root}>
+              <Box fontSize={16} fontWeight="fontWeightRegular" >Processing... {percent}%</Box>
+            </Box> */}
 
             <Box component="div" className={classes.root} style={{ display: "flex", justifyContent: "center" }}>
               <Box borderColor={theme.palette.primary.main} border={1}>
                 <img src={imgSrc} style={{ width: imgWidth + "px", height: imgHeight + "px" }} ref={imageRef} />
               </Box>
             </Box>
+            <br/>
+            <Box component="div" className={classes.root}>
+              <Box fontSize={16} fontWeight="fontWeightRegular" >페이지 등록이 완료되면 팝업이 자동으로 종료됩니다</Box>
+            </Box>
           </DialogContent>
 
           <DialogActions>
-            <Button onClick={handlePrevious} color="primary">
+            {/* <Button onClick={handlePrevious} color="primary">
               Previous
-        </Button>
+            </Button>
             <Button onClick={handleNext} color="primary">
               Next
-        </Button>
+            </Button> */}
             <Button onClick={handleCancel} color="primary">
               Cancel
-        </Button>
+            </Button>
+            <ConnectButton onPenLinkChanged={e => onPenLinkChanged(e)} />
           </DialogActions>
         </Dialog>
         : ""
       }
+
+      <Dialog
+        open={openAlert}
+        onClose={handleCloseAlert}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">{AlertGuideTitle}</DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            {AlertGuideText}
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseAlert} color="primary" autoFocus>
+            닫기
+          </Button>
+        </DialogActions>
+      </Dialog>
+      
     </React.Fragment>
   );
 }
