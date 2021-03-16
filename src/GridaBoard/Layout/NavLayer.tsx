@@ -18,6 +18,7 @@ import TracePointButton from "../../components/buttons/TracePointButton";
 import ColorButtons from "../../components/navbar/ColorButtons";
 import BackgroundButton from "../../components/buttons/BackgroundButton";
 import FitButton from "../../components/buttons/FitButton";
+import PageNumbering from "../../components/navbar/PageNumbering";
 
 const navStyle = {
   display: "flex",
@@ -37,6 +38,12 @@ const getNoteInfo = (event) => {
   const note_info = new NoteServerClient();
   // note_info.getNoteInfo({});
 };
+
+const pageNumberingStyle = {
+  zIndex: 1500,
+  position: "relative",
+  left: "-6%",
+} as React.CSSProperties;
 
 const NavLayer = () => {
   const [num_pens, setNumPens] = useState(0);
@@ -116,6 +123,11 @@ const NavLayer = () => {
 
         <TracePointButton />
       </div>
+
+      <div style={pageNumberingStyle}>
+          <PageNumbering />
+      </div>
+
       <div style={{display: "inline-flex", flexDirection: "row",
         justifyContent: "flex-end", alignItems: "center"
       }}>

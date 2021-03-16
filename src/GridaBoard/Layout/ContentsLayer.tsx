@@ -23,17 +23,7 @@ const localStyle = {
   flexDirection: "column",
 } as React.CSSProperties;
 
-const pageNumberingStyle = {
-  width: "171px",
-  height: "46px",
-  background: "rgba(255,255,255,0.25)",
-  boxShadow: "rgba(156,156,156,0.48)",
-  borderRadius: "100px",
-  zIndex: 1500,
-  position: "absolute",
-  bottom: 5,
-  left: "calc(50%)",
-} as React.CSSProperties;
+
 
 const rotateStyle = {
   position: "absolute",
@@ -61,9 +51,7 @@ interface Props {
 
 const ContentsLayer = (props: Props) => {
   const { handlePdfOpen, ...rest } = props;
-
   const [pageWidth, setPageWidth] = useState(0);
-
   const {zoomStore} = useSelector((state: RootState) =>({
     zoomStore: state.zoomReducer.zoom as number,
   }));
@@ -251,7 +239,7 @@ const ContentsLayer = (props: Props) => {
           zoom={zoomStore}
           autoPageChange={true}
           fromStorage={false}
-          fitMargin={100}
+          fitMargin={10}
           
           activePageNo={activePageNo_store}
           handlePageWidthNeeded = {(width) => handlePageWidthNeeded(width)}
@@ -260,9 +248,6 @@ const ContentsLayer = (props: Props) => {
 
           noInfo = {true}
         />
-      </div>
-      <div style={pageNumberingStyle}>
-          <PageNumbering />
       </div>
     </div>
   );

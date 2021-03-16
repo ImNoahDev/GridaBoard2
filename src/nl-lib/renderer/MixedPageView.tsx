@@ -174,7 +174,7 @@ const defaultMixedPageViewProps: MixedViewProps = {
   parentName: "",
   viewFit: ZoomFitEnum.FULL,
   zoom: 1,
-  fitMargin: 100,
+  fitMargin: 0,
   fixed: false,
   width: undefined,
   height: undefined,
