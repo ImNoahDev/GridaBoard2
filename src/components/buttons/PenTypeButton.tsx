@@ -3,7 +3,7 @@ import '../../styles/buttons.css';
 import GridaToolTip from "../../styles/GridaToolTip";
 import PenManager from "../../nl-lib/neosmartpen/PenManager";
 import { IBrushType } from "../../nl-lib/common/enums";
-import { IconButton, Popover, SvgIcon } from "@material-ui/core";
+import { IconButton, SvgIcon } from "@material-ui/core";
 
 
 const manager: PenManager = PenManager.getInstance();
@@ -16,58 +16,20 @@ const penTypeStyle = {
 const penTypeStyleEnabled = {
   color: "#688FFF",
   marginLeft: "2vw",
+  background: "white"
 } as React.CSSProperties;
 
 export default function PenTypeButton () {
-
-  const setPenType = (penType: IBrushType) => {
-    const penIconStyle = document.getElementById('btn_pen');
-    const penStyle = document.getElementById('pen_svg_icon');
-
-    const markerIconStyle = document.getElementById('btn_marker');
-    const markerStyle = document.getElementById('marker_svg_icon');
-
-    const eraserIconStyle = document.getElementById('btn_eraser');
-    const eraserStyle = document.getElementById('eraser_svg_icon');
-
-    if (penType === IBrushType.PEN) {
-      penIconStyle.style.background = "white";
-      penStyle.style.color = "#688FFF";
-    } else {
-      penIconStyle.style.background = "none";
-      penStyle.style.color = "#58627D";
-    }
-
-    if (penType === IBrushType.MARKER) {
-      markerIconStyle.style.background = "white";
-      markerStyle.style.color = "#688FFF";
-    } else {
-      markerIconStyle.style.background = "none";
-      markerStyle.style.color = "#58627D";
-    }
-
-    if (penType === IBrushType.ERASER) {
-      eraserIconStyle.style.background = "white";
-      eraserStyle.style.color = "#688FFF";
-    } else {
-      eraserIconStyle.style.background = "none";
-      eraserStyle.style.color = "#58627D";
-    }
-    manager.setPenRendererType(penType);
-  }
   
   return (
     <React.Fragment>
-        <IconButton id="btn_pen" style={penTypeStyleEnabled} onClick={() => setPenType(IBrushType.PEN)}>
+        <IconButton id="btn_pen" style={penTypeStyleEnabled} 
+          onClick={() => manager.setPenRendererType(IBrushType.PEN)}>
           <GridaToolTip open={true} placement="left" tip={{
             head: "Pen Type[Pen]",
             msg: "펜을 선택하는 버튼입니다.",
             tail: "단축키 Q로 선택가능합니다."
           }} title={undefined}>
-            {/* <div className="c2">
-              <img src="/icons/icon_pen_n.png" className="normal-image"></img>
-              <img src="/icons/icon_pen_p.png" className="hover-image"></img>
-            </div> */}
             <SvgIcon id="pen_svg_icon" style={{width: "1.25vw", height: "2.5vh"}}>
               <path
                 fillRule="evenodd"
@@ -77,16 +39,13 @@ export default function PenTypeButton () {
             </SvgIcon>
           </GridaToolTip>
         </IconButton>
-        <IconButton id="btn_marker" style={penTypeStyle} onClick={() => setPenType(IBrushType.MARKER)}>
+        <IconButton id="btn_marker" style={penTypeStyle} 
+          onClick={() => manager.setPenRendererType(IBrushType.MARKER)}>
           <GridaToolTip open={true} placement="left" tip={{
             head: "Pen Type[Marker]",
             msg: "형광펜을 선택하는 버튼입니다.",
             tail: "단축키 W로 선택가능합니다."
           }} title={undefined}>
-            {/* <div className="c2">
-              <img src="/icons/icon_highlight_n.png" className="normal-image"></img>
-              <img src="/icons/icon_highlight_p.png" className="hover-image"></img>
-            </div> */}
             <SvgIcon id="marker_svg_icon" style={{width: "1.25vw", height: "2.5vh"}}>
               <path
                 fillRule="evenodd"
@@ -96,16 +55,13 @@ export default function PenTypeButton () {
             </SvgIcon>
           </GridaToolTip>
         </IconButton>
-        <IconButton id="btn_eraser" style={penTypeStyle} onClick={() => setPenType(IBrushType.ERASER)}>
+        <IconButton id="btn_eraser" style={penTypeStyle} 
+          onClick={() => manager.setPenRendererType(IBrushType.ERASER)}>
           <GridaToolTip open={true} placement="left" tip={{
             head: "Pen Type[Eraser]",
             msg: "지우개를 선택하는 버튼입니다.",
             tail: "단축키 E로 선택가능합니다."
           }} title={undefined}>
-            {/* <div className="c2">
-              <img src="/icons/icon_eraser_n.png" className="normal-image"></img>
-              <img src="/icons/icon_eraser_p.png" className="hover-image"></img>
-            </div> */}
             <SvgIcon id="eraser_svg_icon" style={{width: "1.25vw", height: "2.5vh"}}>
               <path
                 fillRule="evenodd"
