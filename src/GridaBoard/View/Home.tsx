@@ -12,7 +12,7 @@ import {
   openFileBrowser2, g_hiddenFileInputBtnId, onFileInputChanged, onFileInputClicked
 } from "../../nl-lib/common/neopdf";
 import { IPageSOBP, IFileBrowserReturn, IGetNPageTransformType } from "../../nl-lib/common/structures";
-
+import { useBeforeunload } from 'react-beforeunload';
 
 const Home = () => {
   const [drawerOpen, setDrawerOpen] = useState(true);
@@ -23,13 +23,14 @@ const Home = () => {
 
   const [activePageNo, setLocalActivePageNo] = useState(-1);
   const [pageWidth, setPageWidth] = useState(0);
-
   const pdfUrl = undefined as string;
   const pdfFilename = undefined as string;
   let pdfFingerprint = undefined as string;
   let pdfPageNo = 1;
-
+  
   const setDrawerWidth = (width: number) => updateDrawerWidth({ width });
+  
+  useBeforeunload(() => "변경사항이 저장되지 않을 수 있습니다."); //edge, chrome에선 broswer 내장 dialog box의 string을 return하여 보여줌
 
   const handleDrawerOpen = () => {
     setDrawerOpen(true);
