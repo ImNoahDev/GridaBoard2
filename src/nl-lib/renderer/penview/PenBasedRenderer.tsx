@@ -505,7 +505,7 @@ class PenBasedRenderer extends React.Component<Props, State> {
 
   onLivePenMove = (event: IPenToViewerEvent) => {
     if (this.renderer) {
-      this.renderer.pushLiveDot(event);
+      this.renderer.pushLiveDot(event, this.props.rotation);
     }
   }
 
