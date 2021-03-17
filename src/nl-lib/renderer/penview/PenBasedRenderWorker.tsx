@@ -211,11 +211,6 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
       cursor.eraserLastPoint = { x: pdf_xy.x, y: pdf_xy.y };
     }
     else {
-
-      if (event.pen.name === 'NeoSmartPen' && rotation !== 0) {
-        console.log('NeoSmartPen');
-      }
-
       if (!live.pathObj) {
         const new_pathObj = this.createFabricPath(live.stroke, false);
         live.pathObj = new_pathObj as IExtendedPathType;
