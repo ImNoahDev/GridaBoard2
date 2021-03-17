@@ -35,7 +35,7 @@ export default class GridaApp {
 
   onStateChanged = () => {
     // const state = store.getState();
-    console.log(`GridaApp: store state changed`);
+    // console.log(`GridaApp: store state changed`);
   }
 
   start = async () => {

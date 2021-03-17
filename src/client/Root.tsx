@@ -10,8 +10,8 @@ import configureStore from "../store/configureStore";
 import { RootState } from '../store/rootReducer';
 
 import GridaApp from "../GridaBoard/GridaApp";
-import { hideUIProgressBackdrop, showUIProgressBackdrop } from "../store/reducers/ui";
-import { fetchGzippedFile } from "../nl-lib/common/util";
+import { hideUIProgressBackdrop, reportBrowserZoomFactor, showUIProgressBackdrop } from "../store/reducers/ui";
+import { fetchGzippedFile, getBrowserZoomFactor } from "../nl-lib/common/util";
 import { g_paperType, g_paperType_default } from "../nl-lib/common/noteserver";
 import Home from "../GridaBoard/View/Home";
 
@@ -156,10 +156,26 @@ const Root = () => {
 // })();
 
 (function () {
+  window.visualViewport.addEventListener("resize", viewportHandler);
+  
   const app = GridaApp.getInstance();
   app.start();
 })();
 
+
+
+function viewportHandler(event) {
+  const brZoom = getBrowserZoomFactor();
+  
+  // console.warn(`window scale =${event.target.scale}  browser zoom=${brZoom}`);
+  reportBrowserZoomFactor(brZoom);
+  // // NOTE: This doesn't actually work at time of writing
+  // if (event.target.scale > 3) {
+  //   document.body.classList.remove("hide-text");  
+  // } else {
+  //   document.body.classList.add("hide-text");
+  // }
+}
 
 
 

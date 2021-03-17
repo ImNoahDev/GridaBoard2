@@ -19,10 +19,21 @@ export const UIActionTypes = Object.freeze({
 
   UPDATE_DRAWER_WITH: `${ActionGroup}.UPDATE_DRAWER_WITH`,
   UPDATED_SELECTD_PAGE: `${ActionGroup}.UPDATED_SELECTD_PAGE`,
+
+  REPORT_BROWSER_ZOOM: `${ActionGroup}.REPORT_BROWSER_ZOOM`,
 });
 //]
 
 //[Action Methods
+export const reportBrowserZoomFactor = (zoom: number) => {
+  store.dispatch({
+    type: UIActionTypes.REPORT_BROWSER_ZOOM,
+    zoom: zoom
+  });
+
+}
+
+
 export const showUIProgressBackdrop = () => {
   store.dispatch({
     type: UIActionTypes.SHOW_UI_PROGRESS
@@ -169,12 +180,24 @@ const initialState = {
   drawer: {
     width: defaultDrawerWidth,
     pageNo: 0,
+  },
+  browser: {
+    zoom: 1,
   }
 }
 
 //[Reducer
 export default (state = initialState, action) => {
   switch (action.type) {
+    case UIActionTypes.REPORT_BROWSER_ZOOM: {
+      return {
+        ...state,
+        browser: {
+          zoom: action.zoom,
+        }
+      };
+    }
+
     case UIActionTypes.SHOW_UI_PROGRESS: {
       return {
         ...state,

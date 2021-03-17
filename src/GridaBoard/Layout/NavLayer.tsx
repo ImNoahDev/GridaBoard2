@@ -19,16 +19,8 @@ import ColorButtons from "../../components/navbar/ColorButtons";
 import BackgroundButton from "../../components/buttons/BackgroundButton";
 import FitButton from "../../components/buttons/FitButton";
 import PageNumbering from "../../components/navbar/PageNumbering";
+import { RootState } from "../../store/rootReducer";
 
-const navStyle = {
-  display: "flex",
-  flexDirection: "row",
-  justifyContent: "space-between",
-  alignItems: "center",
-  flexWrap: "wrap",
-  height: "5.2vh",
-  background: "rgba(255, 255, 255, 0.5)",
-} as React.CSSProperties;
 
 const printBtnId = "printTestButton";
 const printOption = g_defaultPrintOption;
@@ -108,38 +100,54 @@ const NavLayer = () => {
     docJson.pages.push(obj);
   }
 
+  const brZoom = useSelector((state: RootState) => state.ui.browser.zoom);
+
+  const navStyle = {
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    flexWrap: "wrap",
+    height: "5.2vh",
+    background: "rgba(255, 255, 255, 0.5)",
+    zoom: 1 / brZoom,
+  } as React.CSSProperties;
+
+
   return (
     <div id={"button_div"} style={navStyle}>
-      <div style={{display: "inline-flex", flexDirection: "row",
-        justifyContent: "flex-start", alignItems: "center", 
+      <div style={{
+        display: "inline-flex", flexDirection: "row",
+        justifyContent: "flex-start", alignItems: "center",
       }}>
         <PenTypeButton />
 
         <ColorButtons />
-        <KeyboardArrowDownRoundedIcon/>
+        <KeyboardArrowDownRoundedIcon />
 
         <ThicknessButton />
-        <KeyboardArrowDownRoundedIcon/>
+        <KeyboardArrowDownRoundedIcon />
 
         <TracePointButton />
       </div>
 
       <div style={pageNumberingStyle}>
-          <PageNumbering />
+        <PageNumbering />
       </div>
 
-      <div style={{display: "inline-flex", flexDirection: "row",
+      <div style={{
+        display: "inline-flex", flexDirection: "row",
         justifyContent: "flex-end", alignItems: "center"
       }}>
 
         <BackgroundButton />
-        <KeyboardArrowDownRoundedIcon/>
-        
+        <KeyboardArrowDownRoundedIcon />
+
         <FitButton />
-        <KeyboardArrowDownRoundedIcon/>
-    
+        <KeyboardArrowDownRoundedIcon />
+
       </div>
-      
+
 
       {/* 매핑 정보 살펴보기 */}
       {/* <div style={{ fontSize: "20px", fontWeight: "bold" }}>
