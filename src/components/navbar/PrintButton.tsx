@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React from 'react';
 import '../../styles/main.css';
 import GridaToolTip from '../../styles/GridaToolTip';
 import { PrintNcodedPdfButton } from '../../nl-lib/ncodepod';
@@ -16,17 +16,16 @@ type Props = {
 }
 
 const buttonStyle = {
-  // width: "53px",
-  height: "1.6vh",
-  left: "0.8vw",
+  width: "80px",
+  height: "16px",
+  top: "2px",
   fontFamily: "Roboto",
   fontStyle: "normal",
   fontWeight: "normal",
-  fontSize: "1.44vh",
-  // lineHeight: "16px",
+  fontSize: "14px",
   textAlign: "right",
   letterSpacing: "0.25px",
-  marginRight: "2vw"
+  marginRight: "24px"
 } as React.CSSProperties;
 
 const PrintButton = (props: Props) => {
@@ -44,7 +43,6 @@ const PrintButton = (props: Props) => {
   }
 
   return (
-    // <div className="navbar-menu d-flex justify-content-center align-items-center neo_shadow">
     <React.Fragment>
       <PrintNcodedPdfButton
         id="btn_print_pdf" type="button" className="btn btn-neo "
@@ -62,7 +60,6 @@ const PrintButton = (props: Props) => {
         </GridaToolTip>
       </PrintNcodedPdfButton>
     </React.Fragment>
-    // </div>
   )
 }
 

@@ -7,12 +7,6 @@ import { updateDrawerWidth } from "../../store/reducers/ui";
 import KeyboardArrowRightIcon from '@material-ui/icons/KeyboardArrowRight';
 import $ from "jquery";
 
-const sideStyle = {
-  display: "flex",
-  flex: "none",
-  width: "9.375vw",
-} as React.CSSProperties;
-
 const arrowRightStyle = {
   display: "flex",
   padding: "8px",
@@ -43,6 +37,15 @@ const LeftSideLayer = () => {
   const onDrawerResize = (size) => {
     setDrawerWidth(size);
   }
+
+  const brZoom = useSelector((state: RootState) => state.ui.browser.zoom);
+
+  const sideStyle = {
+    display: "flex",
+    width: "180px",
+    height: "816px",
+    zoom: 1 / brZoom,
+  } as React.CSSProperties;
 
   return (
       <div id="mainFrame" style={sideStyle}>

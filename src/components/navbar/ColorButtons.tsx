@@ -11,7 +11,7 @@ const manager: PenManager = PenManager.getInstance();
 const colorStyle = {
   width: "18px",
   height: "18px",
-  marginLeft: "2vw"
+  marginLeft: "30px"
 } as React.CSSProperties;
 
 const colorDropDownStyle = {

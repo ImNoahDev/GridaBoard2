@@ -10,12 +10,12 @@ const manager: PenManager = PenManager.getInstance();
 
 const penTypeStyle = {
   color: "#58627D",
-  marginLeft: "2vw",
+  marginLeft: "30px"
 } as React.CSSProperties;
 
 const penTypeStyleEnabled = {
   color: "#688FFF",
-  marginLeft: "2vw",
+  marginLeft: "30px",
   background: "white"
 } as React.CSSProperties;
 
@@ -30,7 +30,7 @@ export default function PenTypeButton () {
             msg: "펜을 선택하는 버튼입니다.",
             tail: "단축키 Q로 선택가능합니다."
           }} title={undefined}>
-            <SvgIcon id="pen_svg_icon" style={{width: "1.25vw", height: "2.5vh"}}>
+            <SvgIcon id="pen_svg_icon">
               <path
                 fillRule="evenodd"
                 clipRule="evenodd"
@@ -46,7 +46,7 @@ export default function PenTypeButton () {
             msg: "형광펜을 선택하는 버튼입니다.",
             tail: "단축키 W로 선택가능합니다."
           }} title={undefined}>
-            <SvgIcon id="marker_svg_icon" style={{width: "1.25vw", height: "2.5vh"}}>
+            <SvgIcon id="marker_svg_icon">
               <path
                 fillRule="evenodd"
                 clipRule="evenodd"
@@ -62,7 +62,7 @@ export default function PenTypeButton () {
             msg: "지우개를 선택하는 버튼입니다.",
             tail: "단축키 E로 선택가능합니다."
           }} title={undefined}>
-            <SvgIcon id="eraser_svg_icon" style={{width: "1.25vw", height: "2.5vh"}}>
+            <SvgIcon id="eraser_svg_icon">
               <path
                 fillRule="evenodd"
                 clipRule="evenodd"

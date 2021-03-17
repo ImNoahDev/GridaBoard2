@@ -236,7 +236,7 @@ export default function PersistentDrawerRight(props: Props) {
         variant="persistent"
         anchor="left"
         open={open}
-        PaperProps={{ style: { width: drawerWidth, flexShrink: 0, zIndex: 1100, marginTop: "12.2vh", height: "87.8vh", background: "rgba(255, 255, 255, 0.25)", float: "left" } }}
+        PaperProps={{ style: { width: drawerWidth, flexShrink: 0, zIndex: 1100, marginTop: "121px", height: window.outerHeight - 121, background: "rgba(255, 255, 255, 0.25)", float: "left" } }}
       >
       <div id="drawer_content">
         <div className={classes.drawerHeader}>

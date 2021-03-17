@@ -9,7 +9,6 @@ import { nullNcode } from "../../nl-lib/common/constants";
 import { MixedPageView } from "../../nl-lib/renderer";
 import { PLAYSTATE } from "../../nl-lib/common/enums";
 import { PenManager } from "../../nl-lib/neosmartpen";
-import PageNumbering from "../../components/navbar/PageNumbering";
 import RotateButton from "../../components/buttons/RotateButton";
 import GridaToolTip from "../../styles/GridaToolTip";
 import { Button, IconButton, Popover } from "@material-ui/core";
@@ -23,12 +22,10 @@ const localStyle = {
   flexDirection: "column",
 } as React.CSSProperties;
 
-
-
 const rotateStyle = {
   position: "absolute",
   zIndex: 1900,
-  top: "calc(13%)",
+  top: "calc(14%)",
   left: "calc(97%)"
 } as React.CSSProperties;
 
@@ -148,6 +145,8 @@ const ContentsLayer = (props: Props) => {
     );
   });
 
+  const brZoom = useSelector((state: RootState) => state.ui.browser.zoom);
+
   return (
     <div id="main" style={localStyle}>
       <div style={rotateStyle}>
@@ -163,7 +162,8 @@ const ContentsLayer = (props: Props) => {
             position: "absolute",
             zIndex: 1900,
             top: "calc(94%)",
-            left: "calc(97%)"
+            left: "calc(97%)",
+            zoom: 1 / brZoom,
           }}>
             <HelpIcon fontSize="large" 
               style={{

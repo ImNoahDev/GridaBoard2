@@ -1,6 +1,5 @@
 import React from 'react';
 import '../../styles/main.css';
-import { NeoImage } from '../CustomElement/NeoImage';
 import GridaToolTip from '../../styles/GridaToolTip';
 import { IPrintOption } from '../../nl-lib/common/structures';
 import { CalibrationButton } from '../../nl-lib/ncodepod';
@@ -8,31 +7,26 @@ import { Button } from '@material-ui/core';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../store/rootReducer';
 
-const style = {
-  width: '36px',
-  height: '36px',
-  padding: '4px'
-}
-
 const mappingStyle = {
   display: "flex",
-  // position: "static",
-  width: "7vw",
-  height: "4vh",
-  // flexDirection: "row",
+  width: "88px",
+  height: "30px",
   justifyContent: "center",
   background: "rgba(255, 255, 255, 0.5)",
   border: "1px solid #CFCFCF",
   boxSizing: "border-box",
-  // boxShadow: "2px 0px 24px rgba(255,255,255,0.5)",
   borderRadius: "4px",
-  // float: "left",
-  fontSize: "1.4vh",
   overflow: "hidden",
   textOverflow: "ellipsis",
   whiteSpace: "nowrap"
-  // marginTop: "2px",
-  // marginRight: "33px"
+} as React.CSSProperties;
+
+const mappingTextStyle = {
+  width: "68px",
+  height: "14px",
+  fontSize: "12px",
+  lineHeight: "14px",
+  margin: "8px"
 } as React.CSSProperties;
 
 type Props = {
@@ -58,7 +52,11 @@ const ManualCalibration = (props: Props) => {
         msg: "Ncode A4에 인쇄된 페이지를 프로그램에 수동 등록합니다.",
         tail: "단축키 Q로 선택가능합니다."
       }} title={undefined}>
-        <Button style={mappingStyle} disabled={disabled}>nCode 맵핑</Button>
+        <div>
+          <Button style={mappingStyle} disabled={disabled}>
+            <span style={mappingTextStyle}>nCode 맵핑</span>
+          </Button>
+        </div>
       </GridaToolTip>
     </CalibrationButton>
   )

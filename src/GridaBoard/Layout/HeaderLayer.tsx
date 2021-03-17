@@ -19,33 +19,35 @@ import { RootState } from '../../store/rootReducer';
 
 
 const imgStyle = {
-  marginRight: "1vw",
+  marginRight: "8px",
   borderRadius: "8px",
 } as React.CSSProperties;
 
 const aStyle = {
-  height: "2.1vh",
-  left: "4.2vw",
+  width: "110px",
+  height: "24px",
+  left: "48px",
   fontFamily: "Roboto",
   fontStyle: "normal",
   fontWeight: "bold",
-  fontSize: "1.85vh",
+  fontSize: "18px",
   textAlign: "right",
   letterSpacing: "0.25px",
   textDecoration: "none",
-  marginRight: "2.5vw"
+  marginRight: "34px"
 } as React.CSSProperties;
 
 const buttonStyle = {
-  height: "1.6vh",
-  left: "0.8vw",
+  width: "80px",
+  height: "16px",
+  top: "2px",
   fontFamily: "Roboto",
   fontStyle: "normal",
   fontWeight: "normal",
-  fontSize: "1.44vh",
+  fontSize: "14px",
   textAlign: "right",
   letterSpacing: "0.25px",
-  marginRight: "2vw"
+  marginRight: "24px"
 } as React.CSSProperties;
 
 const saveDropdownStyle = {
@@ -214,7 +216,7 @@ const HeaderLayer = (props: Props) => {
     justifyContent: "space-between",
     alignItems: "center",
     flexWrap: "wrap",
-    height: "7vh",
+    height: "70px",
     background: "rgba(255, 255, 255, 0.5)",
     zoom: 1 / brZoom,
   } as React.CSSProperties;
@@ -232,7 +234,7 @@ const HeaderLayer = (props: Props) => {
       <div id="header" style={headerStyle}>
         <div style={{
           display: "inline-flex", flexDirection: "row",
-          justifyContent: "flex-start", alignItems: "center", marginLeft: "1vw"
+          justifyContent: "flex-start", alignItems: "center", marginLeft: "24px"
         }}>
           <img src="grida_logo.png" style={imgStyle}></img>
           <a id="grida_board" href="#" style={aStyle}>Grida board</a>
@@ -290,7 +292,7 @@ const HeaderLayer = (props: Props) => {
         </div>
         <div style={{
           display: "inline-flex", flexDirection: "row",
-          justifyContent: "flex-start", alignItems: "center", marginRight: "1vw"
+          justifyContent: "flex-start", alignItems: "center", marginRight: "31px"
         }}>
           <ConnectButton onPenLinkChanged={e => onPenLinkChanged(e)} />
 
@@ -300,7 +302,7 @@ const HeaderLayer = (props: Props) => {
 
 
       </div>
-      <div style={{ height: "1px", background: "rgba(255,255,255,1)" }}></div>
+      <div style={{ height: "1px", background: "rgba(255,255,255,1)", zoom: 1 / brZoom }}></div>
     </React.Fragment>
   );
 }

@@ -108,7 +108,7 @@ const NavLayer = () => {
     justifyContent: "space-between",
     alignItems: "center",
     flexWrap: "wrap",
-    height: "5.2vh",
+    height: "50px",
     background: "rgba(255, 255, 255, 0.5)",
     zoom: 1 / brZoom,
   } as React.CSSProperties;

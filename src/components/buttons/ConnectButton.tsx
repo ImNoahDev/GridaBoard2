@@ -1,9 +1,8 @@
 /* eslint-disable no-unused-vars */
-import React, { Component, useState } from "react";
+import React from "react";
 
 import '../../styles/buttons.css';
-import Tooltip, { TooltipProps } from '@material-ui/core/Tooltip';
-import { IconButton, SvgIcon, Theme, Typography, withStyles } from '@material-ui/core';
+import { IconButton, SvgIcon } from '@material-ui/core';
 import GridaToolTip from "../../styles/GridaToolTip";
 import { useSelector } from "react-redux";
 import { RootState } from "../../store/rootReducer";
@@ -18,8 +17,6 @@ const numPenStyle = {
   height: "16px",
   left: "27px",
   top: "4px",
-  // marginTop: "-10px",
-  // background: "rgba(88,98,125,1)",
   background: "rgba(0,0,0,1)",
   borderRadius: "50px"
 } as React.CSSProperties;
@@ -40,7 +37,6 @@ const numPenCountStyle = {
     textAlign: "right",
     letterSpacing: "0.25px",
     color: "rgba(255,255,255,1)"
-    // color: "red"
 } as React.CSSProperties;
 
 type Props = {
@@ -85,16 +81,15 @@ const ConnectButton = (props: Props) => {
   });
 
   return (
-    // <div className="btn-group-vertical neo_shadow" style={{ marginBottom: 10 }}>
     <React.Fragment>
-      <IconButton id="btn_connect" style={{display: "block", marginRight: "1vw"}}
+      <IconButton id="btn_connect" style={{display: "block"}}
         onClick={() => handleConnectPen()}>
         <GridaToolTip open={true} placement="left" tip={{
           head: "Pen Connect",
           msg: "블루투스를 통해 펜을 연결합니다. 블루투스 통신이 가능한 환경에서만 동작합니다.",
           tail: "Shift + 1~7 각 펜의 내용을 감추기/보이기, P 모든 펜의 획을 감추기/보이기"
         }} title={undefined}>
-          <SvgIcon style={{width: "1.25vw", height: "2.5vh"}}> 
+          <SvgIcon> 
             <path
               fillRule="evenodd"
               clipRule="evenodd"
@@ -106,14 +101,14 @@ const ConnectButton = (props: Props) => {
           </SvgIcon>
         </GridaToolTip>
       </IconButton>
-      <IconButton id="btn_connected" style={{display: "none", marginRight: "1vw"}}
+      <IconButton id="btn_connected" style={{display: "none"}}
         onClick={() => handleConnectPen()}>
         <GridaToolTip open={true} placement="left" tip={{
           head: "Pen Connect",
           msg: "블루투스를 통해 펜을 연결합니다. 블루투스 통신이 가능한 환경에서만 동작합니다.",
           tail: "Shift + 1~7 각 펜의 내용을 감추기/보이기, P 모든 펜의 획을 감추기/보이기"
         }} title={undefined}>
-          <SvgIcon style={{width: "1.25vw", height: "2.5vh"}}> 
+          <SvgIcon> 
           <path
             fillRule="evenodd"
             clipRule="evenodd" 

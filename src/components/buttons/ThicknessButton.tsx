@@ -1,24 +1,13 @@
 import React from "react";
 import '../../styles/buttons.css';
-import GridaToolTip from "../../styles/GridaToolTip";
 import PenManager from "../../nl-lib/neosmartpen/PenManager";
-import { IBrushType } from "../../nl-lib/common/enums";
 import { IconButton, Popover, SvgIcon } from "@material-ui/core";
 import $ from "jquery";
 
-
 const manager: PenManager = PenManager.getInstance();
 
-const penTypeStyle = {
-  // marginTop: "11px",
-  // float: "left",
-  marginLeft: "30px"
-} as React.CSSProperties;
-
 const thicknessStyle = {
-  // marginTop: "4px",
-  // float: "left",
-  marginLeft: "34px"
+  marginLeft: "30px"
 } as React.CSSProperties;
 
 export default function ThicknessButton () {
