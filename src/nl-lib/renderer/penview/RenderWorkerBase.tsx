@@ -218,7 +218,7 @@ export default abstract class RenderWorkerBase {
     // }
     // PenBasedRenderer에서 rotation 바뀌면 pdfSize를 바꿔주게 했기 때문에 필요없는 로직
 
-    console.log(`VIEW SIZE${callstackDepth()} getPageSize_pu ${this.logCnt++}: ${s.width}, ${s.height}`);
+    // console.log(`VIEW SIZE${callstackDepth()} getPageSize_pu ${this.logCnt++}: ${s.width}, ${s.height}`);
     return s;
   }
 
@@ -321,7 +321,7 @@ export default abstract class RenderWorkerBase {
   }
 
   drawPageLayout = () => {
-    console.log(`VIEW SIZE${callstackDepth()} DrawPageLayout`);
+    // console.log(`VIEW SIZE${callstackDepth()} DrawPageLayout`);
 
     if (!this._opt.shouldDisplayGrid) return;
     const canvasFb = this.canvasFb;
@@ -338,7 +338,7 @@ export default abstract class RenderWorkerBase {
 
     // 그리기
     const size = this.getPageSize_pu();
-    console.log(`VIEW SIZE${callstackDepth()} DrawPageLayout: ${size.width}, ${size.height} = ${size.width / size.height}`);
+    // console.log(`VIEW SIZE${callstackDepth()} DrawPageLayout: ${size.width}, ${size.height} = ${size.width / size.height}`);
 
     // console.log(`Grid: scale=${this.nu_to_pu_scale} (width, height)=(${size.width}, ${size.height})`);
 
@@ -739,7 +739,7 @@ export default abstract class RenderWorkerBase {
 
     // this.canvasFb.renderAll();
 
-    console.log(`VIEW SIZE${callstackDepth()} zoomToPoint: ${oldOffsetZoom} old/new=${oldZoom}(${oldWidth},${oldHeight})/${newZoom}(${newWidth},${newHeight}) zoom=${z} ${zoomed_width}, ${zoomed_height} = ${zoomed_width / zoomed_height}`);
+    // console.log(`VIEW SIZE${callstackDepth()} zoomToPoint: ${oldOffsetZoom} old/new=${oldZoom}(${oldWidth},${oldHeight})/${newZoom}(${newWidth},${newHeight}) zoom=${z} ${zoomed_width}, ${zoomed_height} = ${zoomed_width / zoomed_height}`);
     this.scrollBoundaryCheck();
   }
 

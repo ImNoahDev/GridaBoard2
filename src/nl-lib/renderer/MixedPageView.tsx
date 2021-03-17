@@ -605,7 +605,7 @@ class MixedPageView_module extends React.Component<MixedViewProps, State>  {
       textShadow: "-1px 0 2px #fff, 0 1px 2px #fff, 1px 0 2px #fff, 0 -1px 2px #fff",
     }
 
-    console.log(`VIEW SIZE${callstackDepth()} MixedPageView(component): ${this._internal.pdfSize?.width}, ${this._internal.pdfSize?.height}`);
+    // console.log(`VIEW SIZE${callstackDepth()} MixedPageView(component): ${this._internal.pdfSize?.width}, ${this._internal.pdfSize?.height}`);
 
     // const { position, pdfSize, pdfInfo, onNcodePageChanged, onCanvasPositionChanged, ...rest } = this.props;
     return (

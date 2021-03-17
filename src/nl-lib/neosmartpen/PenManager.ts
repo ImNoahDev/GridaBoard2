@@ -145,11 +145,11 @@ export default class PenManager {
       const penNamePrefix = device.name.split('_', 1)
       if (penNamePrefix[0] === 'BLUE1') {
         pen.setColor("rgb(255,208,1)");
-        pen.setThickness(4);
+        pen.setThickness(2);
       }
       if (penNamePrefix[0] === 'RED1') {
         pen.setColor("rgb(255,101,0)");
-        pen.setThickness(4);
+        pen.setThickness(2);
       }
     }
     

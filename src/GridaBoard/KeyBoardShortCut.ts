@@ -69,7 +69,7 @@ export default function KeyBoardShortCut(evt: KeyboardEvent) {
 
   const cmd = (_isCtrl ? 1 : 0) | (_isAlt ? 2 : 0) | (_isShift ? 4 : 0) | (evt.metaKey ? 8 : 0);
 
-  console.log(`key down cmd=${cmd} ==> code=${evt.code}  key => ${evt.key}`);
+  // console.log(`key down cmd=${cmd} ==> code=${evt.code}  key => ${evt.key}`);
 
   if (cmd == 0) {
     switch (evt.key) {
