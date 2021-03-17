@@ -19,7 +19,24 @@ export const g_paperType_default: IPaperTypeSet = {
     "ncode_end_page": 300,
     "pdf_page_count": 301
   },
-
+  "14.27.1": {
+    "id": "14.27.1",
+    "section": 14,
+    "owner": 27,
+    "book": 1,
+    "margin": {
+      "Xmin": 244,
+      "Ymin": 90,
+      "Xmax": 1040,
+      "Ymax": 540
+    },
+    "title": "whiteboard",
+    "pdf_name": "whiteboard",
+    "nproj_file": "whiteboard.nproj",
+    "ncode_start_page": 0,
+    "ncode_end_page": 300,
+    "pdf_page_count": 301
+  },
   "3.27.205": {
     "owner": 27,
     "pdf_page_count": 210,
