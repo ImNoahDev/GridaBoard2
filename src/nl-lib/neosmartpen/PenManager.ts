@@ -120,7 +120,7 @@ export default class PenManager {
 
   public createVirtualPen = (): INeoSmartpen => {
     const pen = new VirtualPen();
-    this.add(pen, { id: pen.id });
+    this.add(pen, { id: pen.id, name: pen.name });
     this.setActivePen(pen.id);
     this.virtualPenSerial++;
 
@@ -137,8 +137,18 @@ export default class PenManager {
    * @param pen
    * @param device
    */
-  public add = (pen: INeoSmartpen, device: { id: string }) => {
+  public add = (pen: INeoSmartpen, device: { id: string, name: string }) => {
     console.log(device);
+
+    //test code
+    if (pen.name === "NeoSmartPen" && device.name !== undefined) {
+      const penNamePrefix = device.name.split('_', 1)
+      if (penNamePrefix[0] === 'SPECIFIC_PEN_NAME_PREFIX') {
+        pen.setColor("rgb(145, 198, 230)");
+        pen.setThickness(1);
+      }
+    }
+    
     this.penArray.push({
       id: device.id,
       mac: pen.getMac(),
