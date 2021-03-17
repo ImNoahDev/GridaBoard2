@@ -4,7 +4,7 @@ import { sprintf } from "sprintf-js";
 import { NU_TO_PU, PU_TO_NU } from "../../common/constants";
 import { ZoomFitEnum } from "../../common/enums";
 import { MappingStorage } from "../../common/mapper";
-import { calcRevH } from "../../common/mapper/CoordinateTanslater";
+import { calcH1_degree90, calcRevH } from "../../common/mapper/CoordinateTanslater";
 import { applyTransform } from "../../common/math/echelon/SolveTransform";
 import { getNPaperInfo, PaperInfo } from "../../common/noteserver";
 import { InkStorage } from "../../common/penstorage";
@@ -135,10 +135,13 @@ export default abstract class RenderWorkerBase {
 
   zoomAnimateTimer: number = null;
 
+  // h: TransformParameters;
   h: TransformParameters;
+  h2: TransformParameters[] = [];
+
   h_rev: TransformParameters;
 
-  funcNcodeToPdfXy: (ncodeXY: { x: number, y: number, f?: number }) => { x: number, y: number, f: number };
+  funcNcodeToPdfXy: (ncodeXY: { x: number, y: number, f?: number }, rotationIndep: boolean) => { x: number, y: number, f: number };
   funcPdfToNcodeXy: (ncodeXY: { x: number, y: number, f?: number }) => { x: number, y: number, f: number };
 
   // fitMargin = 0;
@@ -159,6 +162,7 @@ export default abstract class RenderWorkerBase {
     this.name = "RenderWorkerBase";
 
     this.funcNcodeToPdfXy = this.ncodeToPdfXy_default;
+    this.h2 = new Array(4);
 
     if (typeof options.canvasId !== "string") {
       throw new Error("canvasId should be a string");
@@ -749,7 +753,7 @@ export default abstract class RenderWorkerBase {
    * @protected
    * @param {{x:number, y:number, f?:number}} ncodeXY
    */
-  public ncodeToPdfXy_default = (ncodeXY: { x: number, y: number, f?: number }) => {
+  public ncodeToPdfXy_default = (ncodeXY: { x: number, y: number, f?: number }, rotatioinIndep?: boolean) => {
     const { x, y, f } = ncodeXY;
     const { Xmin, Ymin } = this.paperBase;
     const px = (x - Xmin) * NU_TO_PU;
@@ -770,13 +774,19 @@ export default abstract class RenderWorkerBase {
 
 
 
-  public ncodeToPdfXy_homography = (ncodeXY: { x: number, y: number, f?: number }) => {
+  public ncodeToPdfXy_homography = (ncodeXY: { x: number, y: number, f?: number }, rotationIndep?: boolean) => {
     const { x, y } = ncodeXY;
-    const { a, b, c, d, e, f, g, h } = this.h;
 
-    const nominator = g * x + h * y + 1;
-    const px = (a * x + b * y + c) / nominator;
-    const py = (d * x + e * y + f) / nominator;
+    let h;
+    if (rotationIndep) {
+      h = this.h2[0];
+    } else {
+      h = this.h2[this._opt.rotation/90];
+    }
+
+    const nominator = h.g * x + h.h * y + 1;
+    const px = (h.a * x + h.b * y + h.c) / nominator;
+    const py = (h.d * x + h.e * y + h.f) / nominator;
 
     return { x: px, y: py, f: ncodeXY.f };
   }
@@ -797,8 +807,8 @@ export default abstract class RenderWorkerBase {
    * @protected
    * @param {{x:number, y:number, f?:number}} ncodeXY
    */
-  protected ncodeToPdfXy = (ncodeXY: { x: number, y: number, f?: number }) => {
-    const ret = this.funcNcodeToPdfXy(ncodeXY);
+  protected ncodeToPdfXy = (ncodeXY: { x: number, y: number, f?: number }, rotationIndep: boolean) => {
+    const ret = this.funcNcodeToPdfXy(ncodeXY, rotationIndep);
     const { x, y, f } = ret;
 
     return { x: x * PATH_THICKNESS_SCALE, y: y * PATH_THICKNESS_SCALE, f };
@@ -916,10 +926,10 @@ export default abstract class RenderWorkerBase {
    * @protected
    * @param {{x:number, y:number}} dot
    */
-  protected focusToDot = (dot: { x: number, y: number }) => {
+  protected focusToDot = (dot: { x: number, y: number }, rotationIndep: boolean) => {
     if (!this._opt.autoFocus) return;
     const margin_to_go_ratio = 0.25;
-    const canvas_xy = this.funcNcodeToPdfXy(dot);
+    const canvas_xy = this.funcNcodeToPdfXy(dot, rotationIndep);
     const screen_xy = this.pdfToScreenXy(canvas_xy);
 
     let dx = 0, dy = 0;
@@ -1026,8 +1036,14 @@ export default abstract class RenderWorkerBase {
     this._opt.rotation = rotation;
   }
 
-  setTransformParameters = (h: TransformParameters) => {
+  setTransformParameters = (h: TransformParameters, r: number) => {
     this.h = { ...h };
+    
+    this.h2[0] = { ...h };
+    this.h2[1] = calcH1_degree90(h); //90
+    this.h2[2] = calcH1_degree90(this.h2[1]); //180
+    this.h2[3] = calcH1_degree90(this.h2[2]); //270
+
     const h_rev = calcRevH(h);
     this.h_rev = { ...h_rev };
 

@@ -114,7 +114,7 @@ class PenBasedRenderer extends React.Component<Props, State> {
       this._renderer = this.initRenderer(this.viewSize, this.pdfSize as ISize);
       const transform = MappingStorage.getInstance().getNPageTransform(this.props.pageInfo);
       const r = this._renderer;
-      r.setTransformParameters(transform.h);
+      r.setTransformParameters(transform.h, this.props.rotation/90);
     }
 
     return this._renderer;
@@ -348,7 +348,7 @@ class PenBasedRenderer extends React.Component<Props, State> {
         console.log(`VIEW SIZE PAGE CHANGE 1: ${makeNPageIdStr(pageInfo)}`);
         
         const transform = MappingStorage.getInstance().getNPageTransform(pageInfo);
-        this.renderer.setTransformParameters(transform.h);
+        this.renderer.setTransformParameters(transform.h, this.props.rotation/90);
         
         this.renderer.changePage(pageInfo, nextProps.pdfSize, false);
         
@@ -361,7 +361,7 @@ class PenBasedRenderer extends React.Component<Props, State> {
 
       if (this.props.calibrationMode) {
         const transform = MappingStorage.getInstance().getNPageTransform(pageInfo);
-        this.renderer.setTransformParameters(transform.h);
+        this.renderer.setTransformParameters(transform.h, this.props.rotation/90);
         ret_val = true;
       }
     }
@@ -389,7 +389,7 @@ class PenBasedRenderer extends React.Component<Props, State> {
         this.renderer.onPageSizeChanged(nextProps.pdfSize);
         this.pdfSize = { ...nextProps.pdfSize, scale: this.pdfSize.scale };
         const transform = MappingStorage.getInstance().getNPageTransform(pageInfo);
-        this.renderer.setTransformParameters(transform.h);
+        this.renderer.setTransformParameters(transform.h, this.props.rotation/90);
         ret_val = true;
       }
     }

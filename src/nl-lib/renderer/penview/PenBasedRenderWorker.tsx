@@ -196,7 +196,7 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
     const dot = event.dot;
 
     //지우개 구현
-    const pdf_xy = this.ncodeToPdfXy(dot);
+    const pdf_xy = this.ncodeToPdfXy(dot, event.pen.rotationIndep);
     const pen = event.pen;
 
     const cursor = this.penCursors[event.mac];
@@ -217,12 +217,12 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
         this.canvasFb.add(new_pathObj);
       }
       else {
-        const pathData = this.createPathData_arr(live.stroke, rotation, event.pen.name);
+        const pathData = this.createPathData_arr(live.stroke, rotation, event.pen.rotationIndep);
         const pathObj = live.pathObj as fabric.Path;
         pathObj.path = pathData as any;
       }
 
-      this.focusToDot(dot);
+      this.focusToDot(dot, event.pen.rotationIndep);
     }
   }
 
@@ -241,19 +241,19 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
     const dot = event.dot;
 
     //지우개 구현
-    const canvas_xy = this.ncodeToPdfXy(dot);
+    const canvas_xy = this.ncodeToPdfXy(dot, event.pen.rotationIndep);
     if (!live.pathObj) {
       const new_pathObj = this.createFabricPath(live.stroke, false);
       live.pathObj = new_pathObj as IExtendedPathType;
       this.canvasFb.add(new_pathObj);
     }
     else {
-      const pathData = this.createPathData_arr(live.stroke, 0, event.pen.name);
+      const pathData = this.createPathData_arr(live.stroke, 0, event.pen.rotationIndep);
       const pathObj = live.pathObj as fabric.Path;
       pathObj.path = pathData as any;
     }
 
-    this.focusToDot(dot);
+    this.focusToDot(dot, event.pen.rotationIndep);
   }
 
 
@@ -404,7 +404,7 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
     }
 
     const dot = event.dot;
-    const canvas_xy = this.funcNcodeToPdfXy(dot);
+    const canvas_xy = this.funcNcodeToPdfXy(dot, event.pen.rotationIndep);
 
     const obj = cursor.penTracker;
     obj.visible = true;
@@ -441,7 +441,7 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
     const isPointerVisible = $("#btn_tracepoint").find(".c2").hasClass("checked");
 
     const dot = { x: e.event.x, y: e.event.y }
-    const canvas_xy = this.funcNcodeToPdfXy(dot);
+    const canvas_xy = this.funcNcodeToPdfXy(dot, e.pen.rotationIndep);
 
     // hover point를 쉬프트해서 옮겨 놓는다
     for (let i = NUM_HOVER_POINTERS - 1; i > 0; i--) {
@@ -521,7 +521,7 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
 
     strokeArr.forEach((stroke) => {
       stroke.dotArray.forEach((dot) => {
-        const pdf_xy = this.ncodeToPdfXy(dot);
+        const pdf_xy = this.ncodeToPdfXy(dot, true);
 
         // 1. subtractEquals
         pdf_xy.x -= canvasCenterSrc.x;
@@ -721,7 +721,7 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
     });
   }
 
-  createPathData_arr = (stroke: NeoStroke, rotation: number, penName: string) => {
+  createPathData_arr = (stroke: NeoStroke, rotation: number, rotationIndep: boolean) => {
     const { dotArray, brushType, thickness } = stroke;
 
     let canvasCenterSrc = new fabric.Point(this._opt.pageSize.height/2, this._opt.pageSize.width/2)
@@ -738,22 +738,22 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
 
     const pointArray = [];
     dotArray.forEach((dot) => {
-      const pt = this.ncodeToPdfXy(dot);
+      const pt = this.ncodeToPdfXy(dot, rotationIndep);
 
-      // fabric js의 rotatePoint 로직 flow인데 여기다 풀어 쓴 이유는 fabric.util.rotatePoint는 canvas는 도는 상황이 아니기 때문에 subtractEquals와 addEquals에 다른 origin을 넣을 수 없기 때문
-      // 1. subtractEquals
-      pt.x -= canvasCenterSrc.x;
-      pt.y -= canvasCenterSrc.y;
+      // // fabric js의 rotatePoint 로직 flow인데 여기다 풀어 쓴 이유는 fabric.util.rotatePoint는 canvas는 도는 상황이 아니기 때문에 subtractEquals와 addEquals에 다른 origin을 넣을 수 없기 때문
+      // // 1. subtractEquals
+      // pt.x -= canvasCenterSrc.x;
+      // pt.y -= canvasCenterSrc.y;
       
-      // 2. rotateVector
-      const v = fabric.util.rotateVector(pt, radians);
+      // // 2. rotateVector
+      // const v = fabric.util.rotateVector(pt, radians);
 
-      // 3. addEquals
-      v.x += canvasCenterDst.x;
-      v.y += canvasCenterDst.y;
+      // // 3. addEquals
+      // v.x += canvasCenterDst.x;
+      // v.y += canvasCenterDst.y;
 
-      pt.x = v.x;
-      pt.y = v.y;
+      // pt.x = v.x;
+      // pt.y = v.y;
 
       pointArray.push(pt);
     });
@@ -777,7 +777,7 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
 
     const pointArray = [];
     dotArray.forEach((dot) => {
-      const pt = this.ncodeToPdfXy(dot);
+      const pt = this.ncodeToPdfXy(dot, true); //여기 어차피 안탐
       pointArray.push(pt);
     });
 

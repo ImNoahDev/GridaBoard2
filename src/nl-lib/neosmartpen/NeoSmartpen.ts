@@ -43,6 +43,8 @@ export default class NeoSmartpen implements INeoSmartpen {
 
   id: string = null;
 
+  rotationIndep: boolean = false;
+
   name?: string = "NeoSmartPen";
 
   lastState: PEN_STATE = PEN_STATE.NONE;
