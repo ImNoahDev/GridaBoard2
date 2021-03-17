@@ -43,7 +43,7 @@ export interface INeoSmartpen {
 
   name?: string;
 
-  // rotationIndep: boolean;   // ture = force not to apply rotation
+  rotationIndep: boolean;   // ture = force not to apply rotation
 
   lastState: PEN_STATE;
 

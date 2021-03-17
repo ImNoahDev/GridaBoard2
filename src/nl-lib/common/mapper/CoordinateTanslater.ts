@@ -2,7 +2,7 @@ import { sprintf } from "sprintf-js";
 
 import * as Solve from "../math/echelon/SolveTransform";
 import { MappingItem } from "./MappingItem";
-import { IPoint, TransformPoints, TransformPointPairs, TransformParameters, IPageMapItem } from "../structures";
+import { IPolygonArea, IPoint, TransformPoints, TransformPointPairs, TransformParameters, IPageMapItem } from "../structures";
 
 const solveAffine = Solve.solveAffine;
 const solveHomography = Solve.solveHomography;
@@ -248,23 +248,50 @@ export default class CoordinateTanslater {
 }
 
 
-export function calcH1_degree90(h: TransformParameters) {
+export function calcH1_degree90(h: TransformParameters, pdfSize_nu: any) {
+
+  // let width_nu = 0, height_nu = 0;
+  // if (npageArea !== undefined) {
+  //   width_nu = npageArea[2].x - npageArea[0].x;
+  //   height_nu = npageArea[2].y - npageArea[0].y;
+  // }
+
+  // let width_pu = pdfSize.width, height_pu = pdfSize.height;
+  // const { x: width_nu, y: height_nu } = Solve.applyTransform({ x: width_pu, y: height_pu }, this._mappingParams.h_rev);
+  
+  const width_nu = pdfSize_nu.width, height_nu = pdfSize_nu.height;
+  // const { x: width_pu, y: height_pu } = Solve.applyTransform({ x: width_nu, y: height_nu }, h);
+  
   // 아래는 임의의 숫자
   const srcPts: TransformPoints = {
     type: "homography",
-    unit: "pu",
+    unit: "nu",
     pts: [
-      { x: 0, y: 0 },
-      { x: 100, y: 0 },
-      { x: 100, y: 100 },
-      { x: 0, y: 100 },
+      
+      { x: 0, y: height_nu-100 },
+      { x: 100, y: height_nu-100 },
+      { x: 100, y: height_nu },
+      { x: 0, y: height_nu },
+      
     ]
   };
+
+    // 아래는 임의의 숫자
+    // const srcPts: TransformPoints = {
+    //   type: "homography",
+    //   unit: "nu",
+    //   pts: [
+    //     { x: 0, y: 0 },
+    //     { x: 100, y: 0 },
+    //     { x: 100, y: 100 },
+    //     { x: 0, y: 100 },
+    //   ]
+    // };
 
   // 정방향 파라메터로 역방향의 대상이 되는 점을 연산
   const dstPts: TransformPoints = {
     type: "homography",
-    unit: "nu",
+    unit: "pu",
     pts: new Array(4),
   };
 

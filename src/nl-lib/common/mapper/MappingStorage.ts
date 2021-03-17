@@ -339,6 +339,7 @@ export class MappingStorage {
       ret.type = "pod";
       ret.pageInfo = pageMap.pageInfo;
       ret.basePageInfo = pageMap.basePageInfo;
+      ret.npageArea = pageMap.npageArea;
 
       ret.pdf = {
         url: pdfItem.pdf.url,
@@ -361,6 +362,12 @@ export class MappingStorage {
       ret.type = "note";
       ret.pageInfo = pageInfo;
       ret.basePageInfo = pageInfo;
+      ret.npageArea = [
+        {x: noteItem.margin.Xmin, y: noteItem.margin.Ymin},
+        {x: noteItem.margin.Xmax - noteItem.margin.Xmin, y: noteItem.margin.Ymin},
+        {x: noteItem.margin.Xmax - noteItem.margin.Xmin, y: noteItem.margin.Ymax - noteItem.margin.Ymin},
+        {x: noteItem.margin.Xmin, y: noteItem.margin.Ymax - noteItem.margin.Ymin},
+      ]
 
       ret.pdf.filename = noteItem.pdf_name;
 

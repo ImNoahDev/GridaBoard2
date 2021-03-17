@@ -8,12 +8,12 @@ import { calcH1_degree90, calcRevH } from "../../common/mapper/CoordinateTanslat
 import { applyTransform } from "../../common/math/echelon/SolveTransform";
 import { getNPaperInfo, PaperInfo } from "../../common/noteserver";
 import { InkStorage } from "../../common/penstorage";
-import { TransformParameters, ISize, INoteServerItem, IPageSOBP } from "../../common/structures";
+import { TransformParameters, ISize, INoteServerItem, IPageSOBP, IPolygonArea } from "../../common/structures";
 import { callstackDepth, convertNuToPu, convertPuToNu, isSamePage, makeNPageId, makeNPageIdStr } from "../../common/util";
-
 import { PATH_THICKNESS_SCALE } from "../../common/util";
 import { PDFVIEW_ZOOM_MAX, PDFVIEW_ZOOM_MIN } from "../RendererConstants";
 import { setViewFit } from '../../../store/reducers/viewFitReducer';
+import * as Solve from "../../common/math/echelon/SolveTransform";
 
 // const timeTickDuration = 20; // ms
 // const DISABLED_STROKE_COLOR = "rgba(0, 0, 0, 0.1)";
@@ -1036,16 +1036,23 @@ export default abstract class RenderWorkerBase {
     this._opt.rotation = rotation;
   }
 
-  setTransformParameters = (h: TransformParameters, r: number) => {
+  setTransformParameters = (h: TransformParameters, r: number, pdfSize?: any) => {
     this.h = { ...h };
     
-    this.h2[0] = { ...h };
-    this.h2[1] = calcH1_degree90(h); //90
-    this.h2[2] = calcH1_degree90(this.h2[1]); //180
-    this.h2[3] = calcH1_degree90(this.h2[2]); //270
-
+    
     const h_rev = calcRevH(h);
     this.h_rev = { ...h_rev };
+    
+    let width_pu = pdfSize.width, height_pu = pdfSize.height;
+    const { x: width_nu, y: height_nu } = Solve.applyTransform({ x: width_pu, y: height_pu }, this.h_rev);
+    const pdfSize_nu = {
+      x : width_nu,
+      y : height_nu,
+    }
+    this.h2[0] = { ...h };
+    this.h2[1] = calcH1_degree90(h, pdfSize_nu); //90
+    this.h2[2] = calcH1_degree90(this.h2[1], pdfSize_nu); //180
+    this.h2[3] = calcH1_degree90(this.h2[2], pdfSize_nu); //270
 
     if (h) {
       this.funcNcodeToPdfXy = this.ncodeToPdfXy_homography;
