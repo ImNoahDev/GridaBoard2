@@ -1,7 +1,7 @@
 import { DeviceTypeEnum } from "./pencomm_enum";
 import { IPenEvent } from "../../common/structures";
 
-export const PenEventEnum = {
+export const PenCommEventEnum = {
   PEN_UP: "pen_up",
   PEN_MOVE: "pen_move",
   PEN_MOVE_HOVER: "pen_move_hover",

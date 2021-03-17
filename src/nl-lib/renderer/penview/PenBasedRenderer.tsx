@@ -320,7 +320,7 @@ class PenBasedRenderer extends React.Component<Props, State> {
 
     if (nextProps.viewSize.width !== this.viewSize.width || nextProps.viewSize.height !== this.viewSize.height) {
       this.viewSize = { ...nextProps.viewSize };
-      console.log(`VIEW SIZE${callstackDepth()} WIDTH/HEIGHT:  ${this.viewSize.width}, ${this.viewSize.height}`);
+      // console.log(`VIEW SIZE${callstackDepth()} WIDTH/HEIGHT:  ${this.viewSize.width}, ${this.viewSize.height}`);
       this.onViewResized(this.viewSize);
       ret_val = true;
     }

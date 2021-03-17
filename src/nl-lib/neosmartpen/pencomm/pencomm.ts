@@ -1,6 +1,6 @@
 import { PenCommBase, ProtocolHandlerBase, deviceSelectDlg } from "./pencomm_base";
 import { DeviceTypeEnum } from "./pencomm_enum";
-import { PenEventEnum, makePenEvent } from "./pencomm_event";
+import { PenCommEventEnum, makePenEvent } from "./pencomm_event";
 import { intFromBytes, decimalToHex } from "./pen_util_func";
 import { PEN_PACKET_START, PEN_PACKET_END } from "./pencomm_const";
 import { INeoSmartpen } from "../../common/neopen";
@@ -166,7 +166,7 @@ export default class PenComm extends ProtocolHandlerBase {
 
 
   onDisconnected = () => {
-    const e = makePenEvent(this.deviceInfo.deviceType, PenEventEnum.ON_DISCONNECTED, { timeStamp: this.currentTime });
+    const e = makePenEvent(this.deviceInfo.deviceType, PenCommEventEnum.ON_DISCONNECTED, { timeStamp: this.currentTime });
 
     this.penHandler.onDisconnected(e);
   }
@@ -389,7 +389,7 @@ export default class PenComm extends ProtocolHandlerBase {
     let bufferArray;
     if (isPwLocked === 1) {
 
-      const e = makePenEvent(this.deviceInfo.deviceType, PenEventEnum.PASSWORD_REQUIRED, { timeStamp: this.currentTime });
+      const e = makePenEvent(this.deviceInfo.deviceType, PenCommEventEnum.PASSWORD_REQUIRED, { timeStamp: this.currentTime });
       this.penHandler.onPasscodeRequired(e);
       // const passcode = prompt("please enter passcode");
 
@@ -472,7 +472,7 @@ export default class PenComm extends ProtocolHandlerBase {
       console.log(`    BT protocol #3 <- passcode NG ${retryCount}/${maxCount}`);
       // retry input passcode
       //alert("wrong passcode");
-      const e = makePenEvent(this.deviceInfo.deviceType, PenEventEnum.PASSWORD_REQUIRED, { retryCount, timeStamp: this.currentTime });
+      const e = makePenEvent(this.deviceInfo.deviceType, PenCommEventEnum.PASSWORD_REQUIRED, { retryCount, timeStamp: this.currentTime });
       this.penHandler.onPasscodeRequired(e);
     }
   }
@@ -547,7 +547,7 @@ export default class PenComm extends ProtocolHandlerBase {
       console.log("------------ Pen down --------------");
       this.isPenDown = true;
 
-      const event = makePenEvent(this.deviceInfo.deviceType, PenEventEnum.PEN_DOWN, { penTipMode, timeStamp, penId });
+      const event = makePenEvent(this.deviceInfo.deviceType, PenCommEventEnum.PEN_DOWN, { penTipMode, timeStamp, penId });
       this.penHandler.onPenDown(event);
 
       return;
@@ -555,7 +555,7 @@ export default class PenComm extends ProtocolHandlerBase {
       console.log("^^^^^^^^^^^^^^ pen up ^^^^^^^^^^^^^");
       this.isPenDown = false;
 
-      const event = makePenEvent(this.deviceInfo.deviceType, PenEventEnum.PEN_UP, { penTipMode, timeStamp });
+      const event = makePenEvent(this.deviceInfo.deviceType, PenCommEventEnum.PEN_UP, { penTipMode, timeStamp });
       this.penHandler.onPenUp(event);
 
       return;
@@ -586,15 +586,15 @@ export default class PenComm extends ProtocolHandlerBase {
     const page = intFromBytes(buf, 12, 4);
     //console.log('owner:' + ownerId + ', book:' + bookId + ', page:' + pageId);
 
-    let eventMode = PenEventEnum.PAGE_INFO;
+    let eventMode = PenCommEventEnum.PAGE_INFO;
     if (!this.isPenDown) {
-      eventMode = PenEventEnum.PAGE_INFO_HOVER;
+      eventMode = PenCommEventEnum.PAGE_INFO_HOVER;
     }
 
     const e = makePenEvent(this.deviceInfo.deviceType, eventMode, { section, owner, book, page, timeStamp: this.currentTime });
 
     // console.log("    #1 INFO");
-    const isHover = eventMode === PenEventEnum.PAGE_INFO_HOVER;
+    const isHover = eventMode === PenCommEventEnum.PAGE_INFO_HOVER;
 
     // console.log( "0x64");
     this.penHandler.onPageInfo(e, isHover);
@@ -637,7 +637,7 @@ export default class PenComm extends ProtocolHandlerBase {
     const x = dotX + dotFx / 100;
     const y = dotY + dotFy / 100;
 
-    const e = makePenEvent(this.deviceInfo.deviceType, PenEventEnum.PEN_MOVE, { force, x, y, timediff, timeStamp: this.currentTime });
+    const e = makePenEvent(this.deviceInfo.deviceType, PenCommEventEnum.PEN_MOVE, { force, x, y, timediff, timeStamp: this.currentTime });
     // e.force = force;
     // e.x = x;
     // e.y = y;
@@ -680,7 +680,7 @@ export default class PenComm extends ProtocolHandlerBase {
     const x = dotX + dotFx / 100;
     const y = dotY + dotFy / 100;
 
-    const e = makePenEvent(this.deviceInfo.deviceType, PenEventEnum.PEN_MOVE, { force, x, y, timediff, timeStamp: this.currentTime });
+    const e = makePenEvent(this.deviceInfo.deviceType, PenCommEventEnum.PEN_MOVE, { force, x, y, timediff, timeStamp: this.currentTime });
     // e.force = force;
     // e.x = x;
     // e.y = y;
@@ -728,7 +728,7 @@ export default class PenComm extends ProtocolHandlerBase {
     const ndacClassType = buf[14];
     const penId = this.getMac();
 
-    const e = makePenEvent(this.deviceInfo.deviceType, PenEventEnum.ERROR,
+    const e = makePenEvent(this.deviceInfo.deviceType, PenCommEventEnum.ERROR,
       {
         timeStamp: this.currentTime,
         timediff,
@@ -775,7 +775,7 @@ export default class PenComm extends ProtocolHandlerBase {
 
     this.isPenDown = true;
 
-    const e = makePenEvent(this.deviceInfo.deviceType, PenEventEnum.PEN_DOWN, { penTipMode, color, timeStamp, penId });
+    const e = makePenEvent(this.deviceInfo.deviceType, PenCommEventEnum.PEN_DOWN, { penTipMode, color, timeStamp, penId });
     this.penHandler.onPenDown(e);
   }
 
@@ -820,7 +820,7 @@ export default class PenComm extends ProtocolHandlerBase {
 
     this.isPenDown = false;
 
-    const e = makePenEvent(this.deviceInfo.deviceType, PenEventEnum.PEN_UP, { successRate_ndac, successRate_optical, timeStamp });
+    const e = makePenEvent(this.deviceInfo.deviceType, PenCommEventEnum.PEN_UP, { successRate_ndac, successRate_optical, timeStamp });
     this.penHandler.onPenUp(e);
   }
 
@@ -847,13 +847,13 @@ export default class PenComm extends ProtocolHandlerBase {
     const book = intFromBytes(buf, 9, 4);
     const page = intFromBytes(buf, 13, 4);
 
-    let eventMode = PenEventEnum.PAGE_INFO;
+    let eventMode = PenCommEventEnum.PAGE_INFO;
     if (!this.isPenDown) {
-      eventMode = PenEventEnum.PAGE_INFO_HOVER;
+      eventMode = PenCommEventEnum.PAGE_INFO_HOVER;
     }
 
     const e = makePenEvent(this.deviceInfo.deviceType, eventMode, { section, owner, book, page, timeStamp: this.currentTime });
-    const isHover = eventMode === PenEventEnum.PAGE_INFO_HOVER;
+    const isHover = eventMode === PenCommEventEnum.PAGE_INFO_HOVER;
 
     // console.log("0x6b");
 
@@ -898,7 +898,7 @@ export default class PenComm extends ProtocolHandlerBase {
 
     const x = dotX + dotFx / 100;
     const y = dotY + dotFy / 100;
-    const e = makePenEvent(this.deviceInfo.deviceType, PenEventEnum.PEN_MOVE, { x, y, force, timediff, timeStamp: this.currentTime });
+    const e = makePenEvent(this.deviceInfo.deviceType, PenCommEventEnum.PEN_MOVE, { x, y, force, timediff, timeStamp: this.currentTime });
     this.penHandler.onPenMove(e);
   }
 
@@ -932,7 +932,7 @@ export default class PenComm extends ProtocolHandlerBase {
 
     const x = dotX + dotFx / 100;
     const y = dotY + dotFy / 100;
-    const e = makePenEvent(DeviceTypeEnum.PEN, PenEventEnum.PEN_MOVE_HOVER, { x, y, force, timediff, timeStamp: this.currentTime });
+    const e = makePenEvent(DeviceTypeEnum.PEN, PenCommEventEnum.PEN_MOVE_HOVER, { x, y, force, timediff, timeStamp: this.currentTime });
 
     this.penHandler.onHoverMove(e);
   }
@@ -989,7 +989,7 @@ export default class PenComm extends ProtocolHandlerBase {
       continuousErrorCount,
     }
 
-    const e = makePenEvent(this.deviceInfo.deviceType, PenEventEnum.CODE_ERROR, options);
+    const e = makePenEvent(this.deviceInfo.deviceType, PenCommEventEnum.CODE_ERROR, options);
     this.penHandler.onNcodeError(e);
   }
 
@@ -1045,7 +1045,7 @@ export default class PenComm extends ProtocolHandlerBase {
         infoMessage = `need to upgrade firmware greater than 2.18 (current version=${this.deviceInfo.protocolVer / 100})`;
       }
 
-      const e = makePenEvent(this.deviceInfo.deviceType, PenEventEnum.ON_CONNECTED, { errorCode, infoMessage, timeStamp: this.currentTime });
+      const e = makePenEvent(this.deviceInfo.deviceType, PenCommEventEnum.ON_CONNECTED, { errorCode, infoMessage, timeStamp: this.currentTime });
       this.penHandler.onConnected(e);
 
       // set auto hover mode

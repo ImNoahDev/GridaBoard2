@@ -17,15 +17,6 @@ import { IFileBrowserReturn } from "../../nl-lib/common/structures";
 import { useSelector } from 'react-redux';
 import { RootState } from '../../store/rootReducer';
 
-const headerStyle = {
-  display: "flex",
-  flexDirection: "row",
-  justifyContent: "space-between",
-  alignItems: "center",
-  flexWrap: "wrap",
-  height: "7vh",
-  background: "rgba(255, 255, 255, 0.5)",
-} as React.CSSProperties;
 
 const imgStyle = {
   marginRight: "1vw",
@@ -103,38 +94,37 @@ const HeaderLayer = (props: Props) => {
 
     let pdfUrl, pdfDoc = undefined;
 
-    for (const page of docPages)
-    {
+    for (const page of docPages) {
       if (page.pdf === undefined) {
         //ncode page일 경우
         if (pdfDoc === undefined) {
           pdfDoc = await PDFDocument.create();
         }
-  
+
         const pdfPage = await pdfDoc.addPage();
         if (page._rotation === 90 || page._rotation === 270) {
           const tmpWidth = pdfPage.getWidth();
           pdfPage.setWidth(pdfPage.getHeight());
           pdfPage.setHeight(tmpWidth);
         }
-      } 
+      }
       else {
         //pdf인 경우 
-        if (pdfUrl !== page.pdf.url) { 
+        if (pdfUrl !== page.pdf.url) {
           pdfUrl = page.pdf.url;
           const existingPdfBytes = await fetch(page.pdf.url).then(res => res.arrayBuffer());
-          let pdfDocSrc = await PDFDocument.load(existingPdfBytes);
-  
+          const pdfDocSrc = await PDFDocument.load(existingPdfBytes);
+
           if (pdfDoc !== undefined) {
             //ncode 페이지가 미리 생성돼서 그 뒤에다 붙여야하는 경우
             const srcLen = pdfDocSrc.getPages().length;
-            let totalPageArr = [];
-            for (let i = 0; i<srcLen; i++) {
+            const totalPageArr = [];
+            for (let i = 0; i < srcLen; i++) {
               totalPageArr.push(i);
             }
-  
+
             const copiedPages = await pdfDoc.copyPages(pdfDocSrc, totalPageArr);
-  
+
             for (const copiedPage of copiedPages) {
               await pdfDoc.addPage(copiedPage);
             }
@@ -159,26 +149,26 @@ const HeaderLayer = (props: Props) => {
     app.onPenLinkChanged(e);
   }
 
-  $('#save').hover(function() {
+  $('#save').hover(function () {
     $(this).css("color", "rgba(104,143,255,1)")
-  },function() {
+  }, function () {
     $(this).css("color", "rgba(18,18,18,1)")
   });
 
-  $('#load').hover(function() {
+  $('#load').hover(function () {
     $(this).css("color", "rgba(104,143,255,1)")
-  },function() {
+  }, function () {
     $(this).css("color", "rgba(18,18,18,1)")
   });
 
-  $(document).ready(function(){
+  $(document).ready(function () {
     $('.save_drop_down').hover(
-      function(event){
+      function (event) {
         $(this).addClass('hover');
         $(this).css("color", "rgba(104,143,255,1)");
         $(this).css("background", "rgba(232,236,245,1)");
       },
-      function(){
+      function () {
         $(this).removeClass('hover');
         $(this).css("color", "rgba(18,18,18,1)");
         $(this).css("background", "rgba(255,255,255,0.9)");
@@ -215,15 +205,33 @@ const HeaderLayer = (props: Props) => {
   const loadId = loadOpen ? 'simple-popover-load' : undefined;
 
   const activePageNo_store = useSelector((state: RootState) => state.activePage.activePageNo);
+
+  const brZoom = useSelector((state: RootState) => state.ui.browser.zoom);
+
+  const headerStyle = {
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    flexWrap: "wrap",
+    height: "7vh",
+    background: "rgba(255, 255, 255, 0.5)",
+    zoom: 1 / brZoom,
+  } as React.CSSProperties;
+
+
+  console.log(`browser zoom level changed = ${brZoom}`);
+
   let disabled = true;
   if (activePageNo_store !== -1) {
     disabled = false;
   }
-  
+
   return (
     <React.Fragment>
       <div id="header" style={headerStyle}>
-        <div style={{display: "inline-flex", flexDirection: "row",
+        <div style={{
+          display: "inline-flex", flexDirection: "row",
           justifyContent: "flex-start", alignItems: "center", marginLeft: "1vw"
         }}>
           <img src="grida_logo.png" style={imgStyle}></img>
@@ -247,11 +255,11 @@ const HeaderLayer = (props: Props) => {
           >
             <div style={saveDropdownStyle}>
               <SavePdfDialog />
-                <Button className="save_drop_down" style={{
-                  width: "160px", height: "40px", padding: "4px 12px"
-                }} onClick={() => saveGrida('hello.grida')}>
-                  <span>데이터 저장(.grida)</span>
-                </Button>
+              <Button className="save_drop_down" style={{
+                width: "160px", height: "40px", padding: "4px 12px"
+              }} onClick={() => saveGrida('hello.grida')}>
+                <span>데이터 저장(.grida)</span>
+              </Button>
             </div>
           </Popover>
           <Button id="load" style={buttonStyle} onClick={handleClickLoad} aria-describedby={loadId}>
@@ -276,22 +284,23 @@ const HeaderLayer = (props: Props) => {
               <LoadGrida />
             </div>
           </Popover>
-          
-          <PrintButton targetId={printBtnId} url={pdfUrl} filename={pdfFilename} handlePdfUrl={makePdfUrl}/>
-          <ManualCalibration filename={pdfFilename} printOption={printOption} handlePdfUrl={makePdfUrl}/>
+
+          <PrintButton targetId={printBtnId} url={pdfUrl} filename={pdfFilename} handlePdfUrl={makePdfUrl} />
+          <ManualCalibration filename={pdfFilename} printOption={printOption} handlePdfUrl={makePdfUrl} />
         </div>
-        <div style={{display: "inline-flex", flexDirection: "row",
+        <div style={{
+          display: "inline-flex", flexDirection: "row",
           justifyContent: "flex-start", alignItems: "center", marginRight: "1vw"
         }}>
           <ConnectButton onPenLinkChanged={e => onPenLinkChanged(e)} />
-          
+
           <div>구글 이메일</div>
           <KeyboardArrowDownRoundedIcon />
         </div>
-        
-        
+
+
       </div>
-      <div style={{height: "1px", background: "rgba(255,255,255,1)"}}></div>
+      <div style={{ height: "1px", background: "rgba(255,255,255,1)" }}></div>
     </React.Fragment>
   );
 }

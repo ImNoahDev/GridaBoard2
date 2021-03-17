@@ -3,7 +3,7 @@ import { fabric } from "fabric";
 
 import RenderWorkerBase, { IRenderWorkerOption } from "./RenderWorkerBase";
 
-import { callstackDepth, drawPath, drawPath_arr, makeNPageIdStr, isSamePage, uuidv4 } from "../../common/util";
+import { callstackDepth, drawPath, drawPath_arr, makeNPageIdStr, isSamePage, uuidv4, drawPath_chiselNip } from "../../common/util";
 import { IBrushType, PenEventName, PageEventName } from "../../common/enums";
 import { IPoint, NeoStroke, NeoDot, IPageSOBP, INeoStrokeProps, StrokeStatus, ISize } from "../../common/structures";
 import { INeoSmartpen, IPenToViewerEvent } from "../../common/neopen";
@@ -765,6 +765,7 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
     }
 
     const pathData_arr = drawPath_arr(pointArray, strokeThickness);
+    // const pathData_arr = drawPath_chiselNip(pointArray, strokeThickness);
 
     return pathData_arr;
   }
@@ -899,7 +900,7 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
 
   onViewSizeChanged = (viewSize: { width: number, height: number }) => {
     this._opt.viewSize = { ...viewSize };
-    console.log(`VIEW SIZE${callstackDepth()} onViewSizeChanged ${this.logCnt++}: ${viewSize.width}, ${viewSize.height}`);
+    // console.log(`VIEW SIZE${callstackDepth()} onViewSizeChanged ${this.logCnt++}: ${viewSize.width}, ${viewSize.height}`);
 
     const zoom = this.calcScaleFactor(this._opt.viewFit, this.offset.zoom);
     this.drawPageLayout();

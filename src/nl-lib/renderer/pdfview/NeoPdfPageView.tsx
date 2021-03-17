@@ -104,13 +104,13 @@ export default class NeoPdfPageView extends Component<PageProps, PageState> {
     // const loaded = nextState.status === "loaded" && (this.state.status !== nextState.status);
     const loaded = nextState.page !== this.state.page;
     if (loaded) {
-      console.log(`*State PageView ${nextProps.pdfPageNo}:* LOADED ${this.state.page?.pageNo} => ${nextState.page?.pageNo}, zoom ${nextState.zoom}, status=${this.state.status} => ${nextState.status}`);
+      // console.log(`*State PageView ${nextProps.pdfPageNo}:* LOADED ${this.state.page?.pageNo} => ${nextState.page?.pageNo}, zoom ${nextState.zoom}, status=${this.state.status} => ${nextState.status}`);
       if (nextState.page && nextProps.pdf && nextState.zoom > 0)
         this.renderPage(nextState.page, nextState.zoom, nextState.pdfPageNo, nextProps.pdf.fingerprint, rotationChanged);
     }
 
     if (this.state.zoom !== nextState.zoom && nextState.page && nextProps.pdf) {
-      console.log(`*State PageView ${nextProps.pdfPageNo}:* ZOOM CHANGED ${nextState.zoom}, status=${this.state.status} => ${nextState.status}`);
+      // console.log(`*State PageView ${nextProps.pdfPageNo}:* ZOOM CHANGED ${nextState.zoom}, status=${this.state.status} => ${nextState.status}`);
       this.renderPage(nextState.page, nextState.zoom, nextState.pdfPageNo, nextProps.pdf.fingerprint, rotationChanged);
     }
 
@@ -120,7 +120,7 @@ export default class NeoPdfPageView extends Component<PageProps, PageState> {
     }
 
     const rendered = this.state.renderCount !== nextState.renderCount;
-    console.log(`*State PageView ${nextProps.pdfPageNo}:* rendered=${rendered}  this.state.status=${this.state.status} => ${nextState.status}`);
+    // console.log(`*State PageView ${nextProps.pdfPageNo}:* rendered=${rendered}  this.state.status=${this.state.status} => ${nextState.status}`);
     return rendered;
   }
 
@@ -201,7 +201,7 @@ export default class NeoPdfPageView extends Component<PageProps, PageState> {
       return;
     }
 
-    console.log(`PDFVIEWER, LOAD  fingerprint= ${pdf.fingerprint}`)
+    // console.log(`PDFVIEWER, LOAD  fingerprint= ${pdf.fingerprint}`)
 
     this.setState({ status: 'loading' });
     const page = await pdf.getPageAsync(pageNo);
@@ -315,10 +315,10 @@ export default class NeoPdfPageView extends Component<PageProps, PageState> {
 
     let noLazyUpdate = false;
     if (!this.backPlane.inited) {
-      console.log(`PDFVIEWER, BACKPLANE DRAWING start fingerprint=${fingerprint} / ${this.lastPdfFingerprint}`)
+      // console.log(`PDFVIEWER, BACKPLANE DRAWING start fingerprint=${fingerprint} / ${this.lastPdfFingerprint}`)
 
       const result = await this.renderToCanvasSafe(page, dpi, zoom, fingerprint);
-      console.log(`PDFVIEWER, BACKPLANE DRAWING end fingerprint=${fingerprint} / ${this.lastPdfFingerprint}`)
+      // console.log(`PDFVIEWER, BACKPLANE DRAWING end fingerprint=${fingerprint} / ${this.lastPdfFingerprint}`)
       this.backPlane.inited = result.result;
       this.backPlane.size = { ...result };
       noLazyUpdate = true;
@@ -356,7 +356,7 @@ export default class NeoPdfPageView extends Component<PageProps, PageState> {
       if (result.result) {
         // this.backPlane.size = { ...result };
 
-        console.log(`PDFVIEWER, LAZY fingerprint=${fingerprint} / ${this.lastPdfFingerprint}`)
+        // console.log(`PDFVIEWER, LAZY fingerprint=${fingerprint} / ${this.lastPdfFingerprint}`)
         const { px_width, px_height } = result;
         ctx.drawImage(this.backPlane.canvas, 0, 0, px_width, px_height, 0, 0, dw, dh);
         this.zoomQueue = [];

@@ -33,7 +33,7 @@ export function makeNPageId(pageInfo: IPageSOBP) {
 export function makeNPageIdStr(pageInfo: IPageSOBP) {
   if (pageInfo) {
     const { section, book, owner, page } = pageInfo;
-    if ( section === undefined ) return "section undefined";
+    if (section === undefined) return "section undefined";
     return `${section}.${owner}.${book}.${page}`;
   }
   return "undefined";
@@ -90,10 +90,10 @@ export function isPageInMapper(pg: IPageSOBP, m: IPdfToNcodeMapItem, numPages: n
   if (!pg) return false;
 
   const arr: number[] = [];
-  
+
   for (let i = 0; i < numPages; i++) {
     const availablePages = g_availablePagesInSection[m.params[i].pageInfo.section];
-    let page = m.params[i].pageInfo.page;
+    const page = m.params[i].pageInfo.page;
     arr.push(page);
   }
 
@@ -428,6 +428,56 @@ export function callstackDepth() {
 }
 
 export function scrollToBottom(id: string) {
-  const ele = document.querySelector("#"+id);
+  const ele = document.querySelector("#" + id);
   ele.scrollIntoView({ behavior: "smooth", block: "end" });
+}
+
+
+const stableRatios = [
+  0,
+  0.25,
+  0.333333333,
+  0.5,
+  0.666666667,
+  0.75,
+  0.8,
+  0.9,
+  1.0,
+  1.1,
+  1.25,
+  1.5,
+  1.75,
+  2.0,
+  2.5,
+  3.0,
+  4.0,
+  5.0,
+  7.0,
+  10.0
+];
+
+
+const fixZoomRatio = function (ratio: number) {
+
+  for (let i = 1; i < stableRatios.length - 1; i++) {
+    const left = (stableRatios[i - 1] + stableRatios[i]) / 2;
+    const right = (stableRatios[i] + stableRatios[i + 1]) / 2;
+
+    if (left < ratio && ratio < right) {
+      return stableRatios[i];
+    }
+  }
+
+  return ratio;
+};
+
+
+export function getBrowserZoomFactor() {
+
+  // https://codepen.io/reinis/pen/RooGOE
+  const ratio = Math.round((window.outerWidth / window.innerWidth) * 100) / 100;
+  const BrowserZoom = fixZoomRatio(ratio);
+
+  // console.log( "detected ratio:" + ratio + "    stable zoom level:" + BrowserZoom );
+  return BrowserZoom;
 }
