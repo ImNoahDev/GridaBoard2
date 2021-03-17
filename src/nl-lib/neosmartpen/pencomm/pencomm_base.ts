@@ -23,7 +23,9 @@ export async function deviceSelectDlg(): Promise<BluetoothDevice> {
       // { services: [PEN_SERVICE_UUID_128] },
       { namePrefix: "Neosmartpen" },
       { namePrefix: "LAMY" },
-      { namePrefix: "Smartpen" }
+      { namePrefix: "Smartpen" },
+      { namePrefix: "RED1" },
+      { namePrefix: "BLUE1" }
     ]
   }
   // let result = await Bluetooth.requestDeviceAsync(options);
