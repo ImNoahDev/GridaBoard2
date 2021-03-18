@@ -534,7 +534,7 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
         v.x += canvasCenterDst.x;
         v.y += canvasCenterDst.y;
 
-        const ncode_xy = this.pdfToNcodeXy(v);
+        const ncode_xy = this.pdfToNcodeXy(v, true);
 
         dot.x = ncode_xy.x;
         dot.y = ncode_xy.y;
@@ -777,7 +777,7 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
 
     const pointArray = [];
     dotArray.forEach((dot) => {
-      const pt = this.ncodeToPdfXy(dot, true); //여기 어차피 안탐
+      const pt = this.ncodeToPdfXy(dot, true);
       pointArray.push(pt);
     });
 
@@ -863,7 +863,7 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
     // const pdf_xy = this.screenToPdfXy(screen_xy);
 
     const pdf_xy =  this.layerToPdfXy( { x: event.layerX, y: event.layerY });
-    const ncode_xy = this.pdfToNcodeXy(pdf_xy);
+    const ncode_xy = this.pdfToNcodeXy(pdf_xy, true);
 
     // event.path[6].offsetLeft
 
@@ -894,9 +894,6 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
 
     vp.onPenUp({ timeStamp });
   }
-
-
-
 
   onViewSizeChanged = (viewSize: { width: number, height: number }) => {
     this._opt.viewSize = { ...viewSize };

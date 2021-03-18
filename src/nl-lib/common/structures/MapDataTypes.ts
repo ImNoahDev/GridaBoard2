@@ -18,7 +18,6 @@ export type IGetNPageTransformType = {
   pageInfo: IPageSOBP;
   basePageInfo: IPageSOBP;
   h: TransformParameters;
-  npageArea?: IPolygonArea;
 
   pdf: {
     url: string;

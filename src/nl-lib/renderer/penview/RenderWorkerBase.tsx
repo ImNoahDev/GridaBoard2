@@ -1,19 +1,16 @@
-import { fabric } from "fabric";
-import { Point } from "fabric/fabric-impl";
-import { sprintf } from "sprintf-js";
-import { NU_TO_PU, PU_TO_NU } from "../../common/constants";
-import { ZoomFitEnum } from "../../common/enums";
-import { MappingStorage } from "../../common/mapper";
-import { calcH1_degree90, calcRevH } from "../../common/mapper/CoordinateTanslater";
-import { applyTransform } from "../../common/math/echelon/SolveTransform";
-import { getNPaperInfo, PaperInfo } from "../../common/noteserver";
-import { InkStorage } from "../../common/penstorage";
-import { TransformParameters, ISize, INoteServerItem, IPageSOBP, IPolygonArea } from "../../common/structures";
-import { callstackDepth, convertNuToPu, convertPuToNu, isSamePage, makeNPageId, makeNPageIdStr } from "../../common/util";
-import { PATH_THICKNESS_SCALE } from "../../common/util";
-import { PDFVIEW_ZOOM_MAX, PDFVIEW_ZOOM_MIN } from "../RendererConstants";
+import { fabric } from 'fabric';
+import { Point } from 'fabric/fabric-impl';
+import { sprintf } from 'sprintf-js';
+import { NU_TO_PU, PU_TO_NU } from '../../common/constants';
+import { ZoomFitEnum } from '../../common/enums';
+import { calcRotatedH, calcRevH } from '../../common/mapper/CoordinateTanslater';
+import { InkStorage } from '../../common/penstorage';
+import { TransformParameters, ISize, IPageSOBP } from '../../common/structures';
+import { makeNPageIdStr } from '../../common/util';
+import { PATH_THICKNESS_SCALE } from '../../common/util';
+import { PDFVIEW_ZOOM_MAX, PDFVIEW_ZOOM_MIN } from '../RendererConstants';
 import { setViewFit } from '../../../store/reducers/viewFitReducer';
-import * as Solve from "../../common/math/echelon/SolveTransform";
+import * as Solve from '../../common/math/echelon/SolveTransform';
 
 // const timeTickDuration = 20; // ms
 // const DISABLED_STROKE_COLOR = "rgba(0, 0, 0, 0.1)";
@@ -28,28 +25,30 @@ let instanceNum = 0;
  */
 
 export interface IRenderWorkerOption {
-  canvasId: string,
+  canvasId: string;
 
-  canvas: HTMLCanvasElement,
+  canvas: HTMLCanvasElement;
   // position: { offsetX: number, offsetY: number, zoom: number },
   /** screen width, height in pixel */
-  viewSize: ISize,
+  viewSize: ISize;
 
   /** PDF width, height in PU */
-  pageSize: ISize,
+  pageSize: ISize;
 
-  viewFit: ZoomFitEnum,
-  fitMargin: number,
-  bgColor?: string,
-  mouseAction: boolean,
-  shouldDisplayGrid: boolean,
-  storage?: InkStorage,
+  viewFit: ZoomFitEnum;
+  fitMargin: number;
+  bgColor?: string;
+  mouseAction: boolean;
+  shouldDisplayGrid: boolean;
+  storage?: InkStorage;
 
-  rotation: number,
+  rotation: number;
+  // h?: TransformParameters;
+  // h_rev?: TransformParameters;
 
-  autoFocus: boolean,
+  autoFocus: boolean;
 
-  onCanvasPositionChanged: (arg: { offsetX, offsetY, zoom }) => void,
+  onCanvasPositionChanged: (arg: { offsetX; offsetY; zoom }) => void;
 }
 
 /**
@@ -57,12 +56,10 @@ export interface IRenderWorkerOption {
  */
 
 // const STROKE_OBJECT_ID = "ns";
-const GRID_OBJECT_ID = "g";
-const GRID_TEXT_ID = "tt";
-
+const GRID_OBJECT_ID = 'g';
+const GRID_TEXT_ID = 'tt';
 
 export default abstract class RenderWorkerBase {
-
   name: string;
   /** canvas element ID */
   // canvasId = "";
@@ -79,7 +76,7 @@ export default abstract class RenderWorkerBase {
   // viewSize: { width: number, height: number } = { width: 0, height: 0 };
 
   /** <canvas>내의 drawing canvas(fabric canvas)의 offset, 현재는 안 씀 - 2020/11/08*/
-  offset: { x: number, y: number, zoom: number } = { x: 0, y: 0, zoom: 1 };
+  offset: { x: number; y: number; zoom: number } = { x: 0, y: 0, zoom: 1 };
 
   /** FabricJs canvas */
   canvasFb: fabric.Canvas = null;
@@ -88,13 +85,13 @@ export default abstract class RenderWorkerBase {
   // mouseAction = true;
 
   /** mouse drag & panning 을 위해 */
-  pan: { isDragging: boolean, lastPosX: number, lastPosY: number } = {
+  pan: { isDragging: boolean; lastPosX: number; lastPosY: number } = {
     isDragging: false,
     lastPosX: 0,
     lastPosY: 0,
   };
 
-  drawing: { isDragging: boolean, lastPosX: number, lastPosY: number } = {
+  drawing: { isDragging: boolean; lastPosX: number; lastPosY: number } = {
     isDragging: false,
     lastPosX: 0,
     lastPosY: 0,
@@ -103,11 +100,9 @@ export default abstract class RenderWorkerBase {
   /** pen stroke에 따라 자동 focus를 맞추도록 */
   // autoFocus = true;
 
-
-
   // /** 종이 정보 */
   paperBase = {
-    Xmin: 3.12,   // code unit
+    Xmin: 3.12, // code unit
     Ymin: 3.12,
   };
 
@@ -138,14 +133,14 @@ export default abstract class RenderWorkerBase {
   // h: TransformParameters;
   h: TransformParameters;
   h2: TransformParameters[] = [];
+  h2_rev: TransformParameters[] = [];
 
   h_rev: TransformParameters;
 
-  funcNcodeToPdfXy: (ncodeXY: { x: number, y: number, f?: number }, rotationIndep: boolean) => { x: number, y: number, f: number };
-  funcPdfToNcodeXy: (ncodeXY: { x: number, y: number, f?: number }) => { x: number, y: number, f: number };
+  funcNcodeToPdfXy: (ncodeXY: { x: number; y: number; f?: number }, rotationIndep: boolean) => { x: number; y: number; f: number };
+  funcPdfToNcodeXy: (ncodeXY: { x: number; y: number; f?: number }, rotationIndep: boolean) => { x: number; y: number; f: number };
 
   // fitMargin = 0;
-
 
   logCnt = 0;
 
@@ -159,20 +154,18 @@ export default abstract class RenderWorkerBase {
    */
   constructor(options: IRenderWorkerOption) {
     instanceNum++;
-    this.name = "RenderWorkerBase";
+    this.name = 'RenderWorkerBase';
 
     this.funcNcodeToPdfXy = this.ncodeToPdfXy_default;
     this.h2 = new Array(4);
 
-    if (typeof options.canvasId !== "string") {
-      throw new Error("canvasId should be a string");
+    if (typeof options.canvasId !== 'string') {
+      throw new Error('canvasId should be a string');
     }
 
     this._opt = { ...options };
     this.canvasFb = null;
     this.initFabricCanvas();
-
-
   }
 
   /**
@@ -189,13 +182,12 @@ export default abstract class RenderWorkerBase {
     console.log(`Fabric canvas inited: size(${size.width}, ${size.height})`);
 
     this.canvasFb = new fabric.Canvas(this._opt.canvasId, {
-      backgroundColor: this._opt.bgColor ? this._opt.bgColor : "rgba(125,137,239,0.1)",
+      backgroundColor: this._opt.bgColor ? this._opt.bgColor : 'rgba(125,137,239,0.1)',
       selection: false,
       controlsAboveOverlay: false,
       selectionLineWidth: 4,
       width: size.width * dpr,
       height: size.height * dpr,
-
     });
 
     const canvasFb = this.canvasFb;
@@ -210,7 +202,7 @@ export default abstract class RenderWorkerBase {
 
     // this.drawPageLayout();
     // this.scrollBoundaryCheck();
-  }
+  };
 
   getPageSize_pu = (): ISize => {
     const { rotation } = this._opt;
@@ -224,8 +216,7 @@ export default abstract class RenderWorkerBase {
 
     // console.log(`VIEW SIZE${callstackDepth()} getPageSize_pu ${this.logCnt++}: ${s.width}, ${s.height}`);
     return s;
-  }
-
+  };
 
   // changePage_base(pageInfo: IPageSOBP, pdfSize: ISize, forceToRefresh: boolean): boolean {
   //   this.pageInfo = {...pageInfo};
@@ -292,11 +283,12 @@ export default abstract class RenderWorkerBase {
     const objects = canvasFb.getObjects();
     const texts = objects.filter(obj => obj.data === GRID_TEXT_ID);
 
-    texts.forEach((obj) => {
+    texts.forEach(obj => {
       this.canvasFb.remove(obj);
     });
 
-    const msg = sprintf("instance:%d, zoom:%.2f, pageInfo:%s, viewSize:(%d,%d) pageSize:(%d,%d)\n",
+    const msg = sprintf(
+      'instance:%d, zoom:%.2f, pageInfo:%s, viewSize:(%d,%d) pageSize:(%d,%d)\n',
       instanceNum,
       this.offset.zoom,
       makeNPageIdStr(this.pageInfo),
@@ -304,25 +296,24 @@ export default abstract class RenderWorkerBase {
       Math.round(this._opt.viewSize.height),
 
       Math.round(this._opt.pageSize.width),
-      Math.round(this._opt.pageSize.height));
+      Math.round(this._opt.pageSize.height)
+    );
 
     this.infoTexts.unshift(msg);
 
     const len = this.infoTexts.length;
 
     for (let i = 0; i < 25 && i < len; i++) {
-      const text = new fabric.Text(this.infoTexts[i],
-        {
-          left: 10,
-          top: 10 + i * 20,
-          fill: "black",
-          fontSize: 12,
-          data: GRID_TEXT_ID
-        });
+      const text = new fabric.Text(this.infoTexts[i], {
+        left: 10,
+        top: 10 + i * 20,
+        fill: 'black',
+        fontSize: 12,
+        data: GRID_TEXT_ID,
+      });
       canvasFb.add(text);
-
     }
-  }
+  };
 
   drawPageLayout = () => {
     // console.log(`VIEW SIZE${callstackDepth()} DrawPageLayout`);
@@ -335,7 +326,7 @@ export default abstract class RenderWorkerBase {
       const objects = this.canvasFb.getObjects();
       const strokes = objects.filter(obj => obj.data === GRID_OBJECT_ID);
 
-      strokes.forEach((obj) => {
+      strokes.forEach(obj => {
         this.canvasFb.remove(obj);
       });
     }
@@ -360,19 +351,16 @@ export default abstract class RenderWorkerBase {
       // lockMovementY: true,
       selectable: false,
       data: GRID_OBJECT_ID,
-      name: 'page_layout'
-
+      name: 'page_layout',
     });
     canvasFb.add(rect);
 
     this.drawInfoText();
 
-
-
     let sw = true;
     for (let x = 0; x < size.width; x += size.width / 4) {
-      let color = "rgba(0,0,0,0.3)";
-      if (sw) color = "rgba(0,0,0,0.8)"
+      let color = 'rgba(0,0,0,0.3)';
+      if (sw) color = 'rgba(0,0,0,0.8)';
       sw = !sw;
       const line = new fabric.Line([x, 0, x, size.height], {
         strokeWidth: 0.5,
@@ -382,7 +370,7 @@ export default abstract class RenderWorkerBase {
         lockMovementX: true,
         lockMovementY: true,
         data: GRID_OBJECT_ID,
-        name: 'page_layout'
+        name: 'page_layout',
       });
 
       canvasFb.add(line);
@@ -390,8 +378,8 @@ export default abstract class RenderWorkerBase {
 
     sw = true;
     for (let y = 0; y < size.height; y += size.height / 4) {
-      let color = "rgba(0,0,0,0.3)";
-      if (sw) color = "rgba(0,0,0,0.8)"
+      let color = 'rgba(0,0,0,0.3)';
+      if (sw) color = 'rgba(0,0,0,0.8)';
       sw = !sw;
       const line = new fabric.Line([0, y, size.width, y], {
         strokeWidth: 0.5,
@@ -401,16 +389,12 @@ export default abstract class RenderWorkerBase {
         lockMovementX: true,
         lockMovementY: true,
         data: GRID_OBJECT_ID,
-        name: 'page_layout'
+        name: 'page_layout',
       });
 
       canvasFb.add(line);
     }
-
-
-
-
-  }
+  };
 
   /**
    * enable/disable mouse drag panning and zoom in/out
@@ -424,15 +408,13 @@ export default abstract class RenderWorkerBase {
       const canvasFb = this.canvasFb;
 
       if (sw === false) {
-
         this.onCanvasMousUp();
 
         canvasFb.off('mouse:down', this.onCanvasMouseDown);
         canvasFb.off('mouse:move', this.onCanvasMouseMove);
         canvasFb.off('mouse:up', this.onCanvasMousUp);
         canvasFb.off('mouse:wheel', this.onCanvasMouseWheel);
-      }
-      else {
+      } else {
         canvasFb.on('mouse:down', this.onCanvasMouseDown);
         canvasFb.on('mouse:move', this.onCanvasMouseMove);
         canvasFb.on('mouse:up', this.onCanvasMousUp);
@@ -440,7 +422,7 @@ export default abstract class RenderWorkerBase {
       }
     }
     this._opt.mouseAction = sw;
-  }
+  };
 
   /**
    * enable/disable auto set focus at current stroke point
@@ -451,7 +433,7 @@ export default abstract class RenderWorkerBase {
    */
   enableAutoFocus = (sw: boolean) => {
     this._opt.autoFocus = sw;
-  }
+  };
 
   /**
    * @protected
@@ -483,8 +465,7 @@ export default abstract class RenderWorkerBase {
       this.drawing.lastPosX = evt.clientX;
       this.drawing.lastPosY = evt.clientY;
     }
-
-  }
+  };
 
   abstract onTouchStrokePenDown(event: MouseEvent): void;
 
@@ -510,8 +491,6 @@ export default abstract class RenderWorkerBase {
         this.pan.lastPosX = evt.clientX;
         this.pan.lastPosY = evt.clientY;
 
-
-
         // this.canvasBoundaryCheck();
       }
     }
@@ -533,14 +512,14 @@ export default abstract class RenderWorkerBase {
         this.onTouchStrokePenMove(evt, 800);
       }
     }
-  }
+  };
 
   abstract onTouchStrokePenMove(event: MouseEvent, force: number): void;
 
   reportCanvasChanged = () => {
     const { x: offsetX, y: offsetY, zoom } = this.offset;
     this._opt.onCanvasPositionChanged({ offsetX, offsetY, zoom });
-  }
+  };
 
   /**
    * @protected
@@ -561,18 +540,15 @@ export default abstract class RenderWorkerBase {
       this.drawing.isDragging = false;
       this.onTouchStrokePenUp(evt);
     }
-  }
-
+  };
 
   abstract onTouchStrokePenUp(event: MouseEvent): void;
-
 
   /**
    * @protected
    * @param {Object} opt
    */
   onCanvasMouseWheel = (opt: any) => {
-
     setViewFit(ZoomFitEnum.FREE);
     this._opt.viewFit = ZoomFitEnum.FREE;
 
@@ -584,7 +560,7 @@ export default abstract class RenderWorkerBase {
 
       this.setCanvasZoom(zoom, opt);
     }
-  }
+  };
 
   scrollBoundaryCheck = () => {
     // const zoom = this.calcScaleFactor(this.viewFit, this.offset.zoom);
@@ -611,10 +587,9 @@ export default abstract class RenderWorkerBase {
     //   height: szPaper.height * this.nu_to_pu_scale,
     // }
 
-
     const pageSize = {
       width: this._opt.pageSize.width * zoom,
-      height: this._opt.pageSize.height * zoom
+      height: this._opt.pageSize.height * zoom,
     };
 
     let shouldReset = false;
@@ -622,13 +597,11 @@ export default abstract class RenderWorkerBase {
     if (pageSize.width <= this._opt.viewSize.width) {
       offsetX = Math.round((this._opt.viewSize.width - pageSize.width) / 2);
       shouldReset = true;
-    }
-    else {
+    } else {
       if (offsetX > 0) {
         offsetX = 0;
         shouldReset = true;
-      }
-      else if (offsetX + pageSize.width < this._opt.viewSize.width) {
+      } else if (offsetX + pageSize.width < this._opt.viewSize.width) {
         offsetX = this._opt.viewSize.width - pageSize.width;
         shouldReset = true;
       }
@@ -637,14 +610,11 @@ export default abstract class RenderWorkerBase {
     if (pageSize.height <= this._opt.viewSize.height) {
       offsetY = Math.round((this._opt.viewSize.height - pageSize.height) / 2);
       shouldReset = true;
-    }
-
-    else {
+    } else {
       if (offsetY > 0) {
         offsetY = 0;
         shouldReset = true;
-      }
-      else if (offsetY + pageSize.height < this._opt.viewSize.height) {
+      } else if (offsetY + pageSize.height < this._opt.viewSize.height) {
         offsetY = this._opt.viewSize.height - pageSize.height;
         shouldReset = true;
       }
@@ -656,10 +626,7 @@ export default abstract class RenderWorkerBase {
     }
     this.reportCanvasChanged();
     return shouldReset;
-
-  }
-
-
+  };
 
   /**
    * @protected
@@ -676,15 +643,14 @@ export default abstract class RenderWorkerBase {
     const pt = new fabric.Point(evt.offsetX, evt.offsetY);
     if (opt) {
       this.zoomToPoint(pt, zoom);
-    }
-    else {
+    } else {
       // canvasFb.setZoom(zoom);
       this.zoomToPoint(null, zoom);
     }
 
     opt.e.preventDefault();
     opt.e.stopPropagation();
-  }
+  };
 
   setCanvasZoomByButton = (zoom: number) => {
     if (zoom > PDFVIEW_ZOOM_MAX) zoom = PDFVIEW_ZOOM_MAX;
@@ -700,7 +666,7 @@ export default abstract class RenderWorkerBase {
     this.canvasFb.setHeight(zoomed_height);
 
     this.scrollBoundaryCheck();
-  }
+  };
 
   zoomToPoint = (pt: Point, zoom: number, animate = true) => {
     const z1 = this.calcScaleFactor(this._opt.viewFit, zoom);
@@ -713,8 +679,8 @@ export default abstract class RenderWorkerBase {
 
       const x0 = this.offset.x;
       const y0 = this.offset.y;
-      x1 = pt.x * (z0 - z1) / z0 + x0;
-      y1 = pt.y * (z0 - z1) / z0 + y0;
+      x1 = (pt.x * (z0 - z1)) / z0 + x0;
+      y1 = (pt.y * (z0 - z1)) / z0 + y0;
     }
 
     const z = zoom;
@@ -740,93 +706,94 @@ export default abstract class RenderWorkerBase {
     const newWidth = this.canvasFb.getWidth();
     const newHeight = this.canvasFb.getHeight();
 
-
     // this.canvasFb.renderAll();
 
     // console.log(`VIEW SIZE${callstackDepth()} zoomToPoint: ${oldOffsetZoom} old/new=${oldZoom}(${oldWidth},${oldHeight})/${newZoom}(${newWidth},${newHeight}) zoom=${z} ${zoomed_width}, ${zoomed_height} = ${zoomed_width / zoomed_height}`);
     this.scrollBoundaryCheck();
-  }
-
-
+  };
 
   /**
    * @protected
    * @param {{x:number, y:number, f?:number}} ncodeXY
    */
-  public ncodeToPdfXy_default = (ncodeXY: { x: number, y: number, f?: number }, rotatioinIndep?: boolean) => {
+  public ncodeToPdfXy_default = (ncodeXY: { x: number; y: number; f?: number }, rotatioinIndep?: boolean) => {
     const { x, y, f } = ncodeXY;
     const { Xmin, Ymin } = this.paperBase;
     const px = (x - Xmin) * NU_TO_PU;
     const py = (y - Ymin) * NU_TO_PU;
 
     return { x: px, y: py, f };
-  }
+  };
 
-  protected pdfToNcodeXy_default = (ncodeXY: { x: number, y: number, f?: number }) => {
+  protected pdfToNcodeXy_default = (ncodeXY: { x: number; y: number; f?: number }) => {
     const { x, y, f } = ncodeXY;
     const { Xmin, Ymin } = this.paperBase;
     const nx = x * PU_TO_NU + Xmin;
     const ny = y * PU_TO_NU + Ymin;
 
     return { x: nx, y: ny, f };
-  }
+  };
 
-
-
-
-  public ncodeToPdfXy_homography = (ncodeXY: { x: number, y: number, f?: number }, rotationIndep?: boolean) => {
+  public ncodeToPdfXy_homography = (ncodeXY: { x: number; y: number; f?: number }, rotationIndep?: boolean) => {
     const { x, y } = ncodeXY;
 
-    let h;
-    if (rotationIndep) {
-      h = this.h2[0];
-    } else {
-      h = this.h2[this._opt.rotation/90];
-    }
+    let h = this.h;
+    // let h;
+    // if (rotationIndep) {
+    //   h = this.h2[0];
+    // } else {
+    //   h = this.h2[this._opt.rotation / 90];
+    // }
 
     const nominator = h.g * x + h.h * y + 1;
     const px = (h.a * x + h.b * y + h.c) / nominator;
     const py = (h.d * x + h.e * y + h.f) / nominator;
 
     return { x: px, y: py, f: ncodeXY.f };
-  }
+  };
 
-  protected pdfToNcodeXy_homography = (ncodeXY: { x: number, y: number, f?: number }) => {
+  protected pdfToNcodeXy_homography = (ncodeXY: { x: number; y: number; f?: number }, rotationIndep: boolean) => {
     const { x, y } = ncodeXY;
-    const { a, b, c, d, e, f, g, h } = this.h_rev;
 
-    const nominator = g * x + h * y + 1;
-    const px = (a * x + b * y + c) / nominator;
-    const py = (d * x + e * y + f) / nominator;
+    let h = this.h_rev;
+
+    // let h;
+    // if (rotationIndep) {
+    //   h = this.h2_rev[0];
+    // } else {
+    //   h = this.h2_rev[this._opt.rotation / 90];
+    // }
+
+    const nominator = h.g * x + h.h * y + 1;
+    const px = (h.a * x + h.b * y + h.c) / nominator;
+    const py = (h.d * x + h.e * y + h.f) / nominator;
 
     return { x: px, y: py, f: ncodeXY.f };
-  }
-
+  };
 
   /**
    * @protected
    * @param {{x:number, y:number, f?:number}} ncodeXY
    */
-  protected ncodeToPdfXy = (ncodeXY: { x: number, y: number, f?: number }, rotationIndep: boolean) => {
+  protected ncodeToPdfXy = (ncodeXY: { x: number; y: number; f?: number }, rotationIndep: boolean) => {
     const ret = this.funcNcodeToPdfXy(ncodeXY, rotationIndep);
     const { x, y, f } = ret;
 
     return { x: x * PATH_THICKNESS_SCALE, y: y * PATH_THICKNESS_SCALE, f };
-  }
+  };
 
-  protected pdfToNcodeXy = (pdfXY: { x: number, y: number, f?: number }) => {
-    const ret = this.funcPdfToNcodeXy(pdfXY);
+  protected pdfToNcodeXy = (pdfXY: { x: number; y: number; f?: number }, rotationIndep: boolean) => {
+    const ret = this.funcPdfToNcodeXy(pdfXY, rotationIndep);
     const { x, y, f } = ret;
 
     return { x: x * PATH_THICKNESS_SCALE, y: y * PATH_THICKNESS_SCALE, f };
-  }
-
+  };
 
   /**
    * @protected
    * @param {{x:number, y:number}} pdfXY
    */
-  protected pdfToScreenXy = (pdfXY: { x: number, y: number }) => {
+  protected pdfToScreenXy = (pdfXY: { x: number; y: number }) => {
     const { x, y } = pdfXY;
 
     const canvasFb = this.canvasFb;
@@ -844,10 +811,9 @@ export default abstract class RenderWorkerBase {
     const sy = y * zoom + offset_y;
 
     return { x: sx, y: sy };
-  }
+  };
 
-
-  protected layerToPdfXy = (layerXY: { x: number, y: number }) => {
+  protected layerToPdfXy = (layerXY: { x: number; y: number }) => {
     const { x, y } = layerXY;
 
     const zoom = this.offset.zoom;
@@ -857,10 +823,9 @@ export default abstract class RenderWorkerBase {
 
     return { x: px, y: py };
     // return { x: offset_x, y: offset_y };
-  }
+  };
 
-
-  protected screenToPdfXy = (screenXY: { x: number, y: number }) => {
+  protected screenToPdfXy = (screenXY: { x: number; y: number }) => {
     const { x, y } = screenXY;
 
     const canvasFb = this.canvasFb;
@@ -875,8 +840,7 @@ export default abstract class RenderWorkerBase {
 
     return { x: px, y: py };
     // return { x: offset_x, y: offset_y };
-  }
-
+  };
 
   /**
    *
@@ -888,7 +852,7 @@ export default abstract class RenderWorkerBase {
     const szPaper = this._opt.pageSize;
     if (!szPaper.width) return currScale;
 
-    const szCanvas = { ... this._opt.viewSize };
+    const szCanvas = { ...this._opt.viewSize };
     szCanvas.width -= this._opt.fitMargin;
     szCanvas.height -= this._opt.fitMargin;
 
@@ -914,25 +878,22 @@ export default abstract class RenderWorkerBase {
         scale = currScale;
 
         break;
-
     }
     return scale;
   }
-
-
-
 
   /**
    * @protected
    * @param {{x:number, y:number}} dot
    */
-  protected focusToDot = (dot: { x: number, y: number }, rotationIndep: boolean) => {
+  protected focusToDot = (dot: { x: number; y: number }, rotationIndep: boolean) => {
     if (!this._opt.autoFocus) return;
     const margin_to_go_ratio = 0.25;
     const canvas_xy = this.funcNcodeToPdfXy(dot, rotationIndep);
     const screen_xy = this.pdfToScreenXy(canvas_xy);
 
-    let dx = 0, dy = 0;
+    let dx = 0,
+      dy = 0;
     let shouldScroll = false;
 
     const canvasFb = this.canvasFb;
@@ -969,20 +930,19 @@ export default abstract class RenderWorkerBase {
     }
 
     if (shouldScroll) {
-
       const new_offset_x = offset_x + dx;
       const new_offset_y = offset_y + dy;
 
       this.scrollCanvasToPoint({ x: new_offset_x, y: new_offset_y }, false);
     }
-  }
+  };
 
   /**
    *
    * @param {{x:number, y:number}} point
    * @param {boolean} animate
    */
-  protected scrollCanvasToPoint = (point: { x: number, y: number }, animate: boolean) => {
+  protected scrollCanvasToPoint = (point: { x: number; y: number }, animate: boolean) => {
     const canvasFb = this.canvasFb;
 
     if (animate) {
@@ -1017,8 +977,7 @@ export default abstract class RenderWorkerBase {
           canvasFb.setViewportTransform(canvasFb.viewportTransform);
         }
       }, 20);
-    }
-    else {
+    } else {
       this.offset.x = point.x;
       this.offset.y = point.y;
 
@@ -1026,41 +985,43 @@ export default abstract class RenderWorkerBase {
       canvasFb.requestRenderAll();
       canvasFb.setViewportTransform(canvasFb.viewportTransform);
     }
-
-  }
-
-
+  };
 
   setRotation = (rotation: number) => {
     console.log(`RenderWorkerBase: setRotation to ${rotation}`);
     this._opt.rotation = rotation;
-  }
 
-  setTransformParameters = (h: TransformParameters, r: number, pdfSize?: any) => {
-    this.h = { ...h };
-    
-    
+    const rot_idx = Math.floor(rotation / 90);
+    // this._opt.h = this.h2[rot_idx];
+    // this._opt.h_rev = this.h2_rev[rot_idx];
+  };
+
+  setTransformParameters = (h: TransformParameters, pdfSize_pu: ISize) => {
+    this.h = { ...h};
     const h_rev = calcRevH(h);
     this.h_rev = { ...h_rev };
-    
-    let width_pu = pdfSize.width, height_pu = pdfSize.height;
-    const { x: width_nu, y: height_nu } = Solve.applyTransform({ x: width_pu, y: height_pu }, this.h_rev);
-    const pdfSize_nu = {
-      x : width_nu,
-      y : height_nu,
-    }
-    this.h2[0] = { ...h };
-    this.h2[1] = calcH1_degree90(h, pdfSize_nu); //90
-    this.h2[2] = calcH1_degree90(this.h2[1], pdfSize_nu); //180
-    this.h2[3] = calcH1_degree90(this.h2[2], pdfSize_nu); //270
 
     if (h) {
+
+      if (this._opt.rotation === 90 || this._opt.rotation === 270) {
+        const tmpWidth = pdfSize_pu.width;
+        pdfSize_pu.width = pdfSize_pu.height;
+        pdfSize_pu.height = tmpWidth;
+      }
+
+      this.h2 = calcRotatedH(h, pdfSize_pu);
+
+      this.h2_rev = [];
+      this.h2.forEach(h_temp => {
+        const h2_temp = calcRevH(h_temp);
+        this.h2_rev.push(h2_temp);
+      });
+
       this.funcNcodeToPdfXy = this.ncodeToPdfXy_homography;
       this.funcPdfToNcodeXy = this.pdfToNcodeXy_homography;
-    }
-    else {
+    } else {
       this.funcNcodeToPdfXy = this.ncodeToPdfXy_default;
       this.funcPdfToNcodeXy = this.pdfToNcodeXy_default;
     }
-  }
+  };
 }

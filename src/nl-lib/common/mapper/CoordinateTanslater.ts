@@ -2,7 +2,7 @@ import { sprintf } from "sprintf-js";
 
 import * as Solve from "../math/echelon/SolveTransform";
 import { MappingItem } from "./MappingItem";
-import { IPolygonArea, IPoint, TransformPoints, TransformPointPairs, TransformParameters, IPageMapItem } from "../structures";
+import { IPoint, TransformPoints, TransformPointPairs, TransformParameters, IPageMapItem, ISize } from "../structures";
 
 const solveAffine = Solve.solveAffine;
 const solveHomography = Solve.solveHomography;
@@ -248,77 +248,94 @@ export default class CoordinateTanslater {
 }
 
 
-export function calcH1_degree90(h: TransformParameters, pdfSize_nu: any) {
-
-  // let width_nu = 0, height_nu = 0;
-  // if (npageArea !== undefined) {
-  //   width_nu = npageArea[2].x - npageArea[0].x;
-  //   height_nu = npageArea[2].y - npageArea[0].y;
-  // }
-
-  // let width_pu = pdfSize.width, height_pu = pdfSize.height;
-  // const { x: width_nu, y: height_nu } = Solve.applyTransform({ x: width_pu, y: height_pu }, this._mappingParams.h_rev);
+export function calcRotatedH(h: TransformParameters, pdfSize_pu: ISize) {
   
-  const width_nu = pdfSize_nu.width, height_nu = pdfSize_nu.height;
-  // const { x: width_pu, y: height_pu } = Solve.applyTransform({ x: width_nu, y: height_nu }, h);
-  
-  // 아래는 임의의 숫자
-  const srcPts: TransformPoints = {
-    type: "homography",
-    unit: "nu",
-    pts: [
-      
-      { x: 0, y: height_nu-100 },
-      { x: 100, y: height_nu-100 },
-      { x: 100, y: height_nu },
-      { x: 0, y: height_nu },
-      
-    ]
-  };
+  const d = 100;
+  const c = { x: pdfSize_pu.width / 2, y: pdfSize_pu.height / 2 };
 
-    // 아래는 임의의 숫자
-    // const srcPts: TransformPoints = {
-    //   type: "homography",
-    //   unit: "nu",
-    //   pts: [
-    //     { x: 0, y: 0 },
-    //     { x: 100, y: 0 },
-    //     { x: 100, y: 100 },
-    //     { x: 0, y: 100 },
-    //   ]
-    // };
-
-  // 정방향 파라메터로 역방향의 대상이 되는 점을 연산
   const dstPts: TransformPoints = {
     type: "homography",
     unit: "pu",
-    pts: new Array(4),
-  };
-
-  for (let i = 0; i < 4; i++) {
-    const dstPt = Solve.applyTransform(srcPts.pts[i], h);
-    dstPts.pts[i] = dstPt;
-  }
-
-
-  const dstPts2: TransformPoints = {
-    ...dstPts,
     pts: [
-      dstPts.pts[1],
-      dstPts.pts[2],
-      dstPts.pts[3],
-      dstPts.pts[0],
+      { x: c.x - d, y: c.y - d },
+      { x: c.x + d, y: c.y - d },
+      { x: c.x + d, y: c.y + d },
+      { x: c.x - d, y: c.y + d },
     ]
   };
 
-  /** src:PU, dst:NU */
-  const pts = {
-    src: { ...srcPts, },
-    dst: { ...dstPts2, }
-  } as TransformPointPairs;
+  const c_90 = { x: pdfSize_pu.height / 2, y: pdfSize_pu.width / 2 };
 
-  const h1 = Solve.solveHomography(pts);
-  return h1;
+  const dstPts_c_90: TransformPoints = {
+    type: "homography",
+    unit: "pu",
+    pts: [
+      { x: c_90.x - d, y: c_90.y - d },
+      { x: c_90.x + d, y: c_90.y - d },
+      { x: c_90.x + d, y: c_90.y + d },
+      { x: c_90.x - d, y: c_90.y + d },
+    ]
+  };
+
+  const srcPts: TransformPoints = {
+    type: "homography",
+    unit: "nu",
+    pts: new Array(4),
+  };
+
+  const h_rev = calcRevH(h);
+
+  for (let i = 0; i < 4; i++) {
+    const srcPt = Solve.applyTransform(dstPts.pts[i], h_rev);
+    srcPts.pts[i] = srcPt;
+  }
+
+  const dstPts90: TransformPoints = {
+    ...dstPts_c_90,
+    pts: [
+      dstPts_c_90.pts[1],
+      dstPts_c_90.pts[2],
+      dstPts_c_90.pts[3],
+      dstPts_c_90.pts[0],
+    ]
+  };
+  const pts90 = {
+    src: { ...srcPts, },
+    dst: { ...dstPts90, }
+  } as TransformPointPairs;
+  const h_90 = Solve.solveHomography(pts90);
+
+  const dstPts180: TransformPoints = {
+    ...dstPts,
+    pts: [
+      dstPts.pts[2],
+      dstPts.pts[3],
+      dstPts.pts[0],
+      dstPts.pts[1],
+    ]
+  };
+  const pts180 = {
+    src: { ...srcPts, },
+    dst: { ...dstPts180, }
+  } as TransformPointPairs;
+  const h_180 = Solve.solveHomography(pts180);
+
+  const dstPts270: TransformPoints = {
+    ...dstPts_c_90,
+    pts: [
+      dstPts_c_90.pts[3],
+      dstPts_c_90.pts[0],
+      dstPts_c_90.pts[1],
+      dstPts_c_90.pts[2],
+    ]
+  };
+  const pts270 = {
+    src: { ...srcPts, },
+    dst: { ...dstPts270, }
+  } as TransformPointPairs;
+  const h_270 = Solve.solveHomography(pts270);
+
+  return [h, h_90, h_180, h_270];
 }
 
 

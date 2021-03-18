@@ -114,7 +114,7 @@ class PenBasedRenderer extends React.Component<Props, State> {
       this._renderer = this.initRenderer(this.viewSize, this.pdfSize as ISize);
       const transform = MappingStorage.getInstance().getNPageTransform(this.props.pageInfo);
       const r = this._renderer;
-      r.setTransformParameters(transform.h, this.props.rotation/90, this.pdfSize);
+      r.setTransformParameters(transform.h, this.pdfSize);
     }
 
     return this._renderer;
@@ -301,14 +301,19 @@ class PenBasedRenderer extends React.Component<Props, State> {
       //회전 버튼을 누를 경우만 들어와야 하는 로직, 회전된 pdf를 로드할 때는 들어오면 안됨
       //로드할 경우에는 this.props의 basePageInfo가 nullNCode로 세팅돼있기 때문에 들어오지 않음
       const degrees = nextProps.rotation - this.props.rotation;
+      
       this.renderer.setRotation(nextProps.rotation);
       
+      // const ctx = this.canvas.getContext('2d');
+      // ctx.rotate(180 * Math.PI / 180);
+
       if (this.props.isMainView) {
         this.renderer.rotate(degrees, nextProps.pageInfo);
       }
 
       this.renderer.redrawStrokes(nextProps.pageInfo);
 
+      //이건 pen viewer의 실제 rotate 처리
       const tmp = nextProps.pdfSize.width;
       nextProps.pdfSize.width = nextProps.pdfSize.height;
       nextProps.pdfSize.height = tmp;
@@ -348,7 +353,7 @@ class PenBasedRenderer extends React.Component<Props, State> {
         console.log(`VIEW SIZE PAGE CHANGE 1: ${makeNPageIdStr(pageInfo)}`);
         
         const transform = MappingStorage.getInstance().getNPageTransform(pageInfo);
-        this.renderer.setTransformParameters(transform.h, this.props.rotation/90, this.pdfSize);
+        this.renderer.setTransformParameters(transform.h, this.pdfSize);
         
         this.renderer.changePage(pageInfo, nextProps.pdfSize, false);
         
@@ -361,7 +366,7 @@ class PenBasedRenderer extends React.Component<Props, State> {
 
       if (this.props.calibrationMode) {
         const transform = MappingStorage.getInstance().getNPageTransform(pageInfo);
-        this.renderer.setTransformParameters(transform.h, this.props.rotation/90, this.pdfSize);
+        this.renderer.setTransformParameters(transform.h, this.pdfSize);
         ret_val = true;
       }
     }
@@ -389,7 +394,7 @@ class PenBasedRenderer extends React.Component<Props, State> {
         this.renderer.onPageSizeChanged(nextProps.pdfSize);
         this.pdfSize = { ...nextProps.pdfSize, scale: this.pdfSize.scale };
         const transform = MappingStorage.getInstance().getNPageTransform(pageInfo);
-        this.renderer.setTransformParameters(transform.h, this.props.rotation/90, this.pdfSize);
+        this.renderer.setTransformParameters(transform.h, this.pdfSize);
         ret_val = true;
       }
     }
