@@ -173,6 +173,7 @@ const ContentsLayer = (props: Props) => {
           </IconButton>
       </GridaToolTip>
       <Popover
+        style={{zoom: 1 / brZoom}}
         id={id}
         open={open}
         anchorEl={anchorEl}

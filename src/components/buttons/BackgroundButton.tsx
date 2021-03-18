@@ -5,6 +5,8 @@ import GridaToolTip from "../../styles/GridaToolTip";
 import Popover from "@material-ui/core/Popover";
 import { Button } from "@material-ui/core";
 import $ from "jquery";
+import { useSelector } from "react-redux";
+import { RootState } from "../../store/rootReducer";
 
 const themeManager: ThemeManager = ThemeManager.getInstance();
 
@@ -13,20 +15,7 @@ const basicStyle = {
 } as React.CSSProperties;
 
 const neoStyle = {
-  display: "none"
-} as React.CSSProperties;
-
-const dropdownStyle = {
-  display: "flex",
-  flexDirection: "column",
-  alignItems: "flex-start",
-  padding: "8px",
-  position: "relative",
-  width: "140px",
-  height: "100px",
-  background: "rgba(255,255,255,0.9)",
-  boxShadow: "2px 2px 2px rgba(0, 0, 0, 0.25)",
-  borderRadius: "12px",
+  display: "none",
 } as React.CSSProperties;
 
 export default function BackgroundButton() {
@@ -88,8 +77,25 @@ export default function BackgroundButton() {
     );
   });
 
+  console.log(window.innerWidth)
+
+  const brZoom = useSelector((state: RootState) => state.ui.browser.zoom);
+
+  const dropdownStyle = {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "flex-start",
+    padding: "8px",
+    position: "relative",
+    width: "140px",
+    height: "100px",
+    background: "rgba(255,255,255,0.9)",
+    boxShadow: "2px 2px 2px rgba(0, 0, 0, 0.25)",
+    borderRadius: "12px",
+  } as React.CSSProperties;
+
   return (
-    <React.Fragment>
+    <div>
       <Button type="button" id="basic_background" style={basicStyle} onClick={handleClick} aria-describedby={id}>
         <GridaToolTip open={true} placement="left" tip={{
             head: "Background",
@@ -119,12 +125,13 @@ export default function BackgroundButton() {
         onClose={handleClose}
         anchorOrigin={{
           vertical: 'top',
-          horizontal: 'right'
+          horizontal: 'left'
         }}
         transformOrigin={{
           vertical: 'top',
-          horizontal: 'left',
+          horizontal: 'right',
         }}
+        style={{zoom: 1 / brZoom}}
       >
         <div style={dropdownStyle}>
           <div>
@@ -143,6 +150,6 @@ export default function BackgroundButton() {
           </div>
         </div>
       </Popover>
-    </React.Fragment>
+    </div>
   );
 }

@@ -50,32 +50,6 @@ const buttonStyle = {
   marginRight: "24px"
 } as React.CSSProperties;
 
-const saveDropdownStyle = {
-  display: "flex",
-  flexDirection: "column",
-  alignItems: "flex-start",
-  padding: "8px",
-  position: "relative",
-  width: "180px",
-  height: "90px",
-  background: "rgba(255,255,255,0.9)",
-  boxShadow: "2px 2px 2px rgba(0, 0, 0, 0.25)",
-  borderRadius: "12px",
-} as React.CSSProperties;
-
-const loadDropdownStyle = {
-  display: "flex",
-  flexDirection: "column",
-  alignItems: "flex-start",
-  padding: "8px",
-  position: "relative",
-  width: "220px",
-  height: "90px",
-  background: "rgba(255,255,255,0.9)",
-  boxShadow: "2px 2px 2px rgba(0, 0, 0, 0.25)",
-  borderRadius: "12px",
-} as React.CSSProperties;
-
 const printBtnId = "printTestButton";
 const printOption = g_defaultPrintOption;
 
@@ -220,6 +194,32 @@ const HeaderLayer = (props: Props) => {
     background: "rgba(255, 255, 255, 0.5)",
     zoom: 1 / brZoom,
   } as React.CSSProperties;
+  
+  const saveDropdownStyle = {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "flex-start",
+    padding: "8px",
+    position: "relative",
+    width: "180px",
+    height: "90px",
+    background: "rgba(255,255,255,0.9)",
+    boxShadow: "2px 2px 2px rgba(0, 0, 0, 0.25)",
+    borderRadius: "12px",
+  } as React.CSSProperties;
+  
+  const loadDropdownStyle = {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "flex-start",
+    padding: "8px",
+    position: "relative",
+    width: "220px",
+    height: "90px",
+    background: "rgba(255,255,255,0.9)",
+    boxShadow: "2px 2px 2px rgba(0, 0, 0, 0.25)",
+    borderRadius: "12px",
+  } as React.CSSProperties;
 
 
   console.log(`browser zoom level changed = ${brZoom}`);
@@ -242,6 +242,7 @@ const HeaderLayer = (props: Props) => {
             저장하기
           </Button>
           <Popover
+            style={{zoom: 1 / brZoom}}
             id={saveId}
             open={saveOpen}
             anchorEl={saveAnchorEl}
@@ -258,7 +259,7 @@ const HeaderLayer = (props: Props) => {
             <div style={saveDropdownStyle}>
               <SavePdfDialog />
               <Button className="save_drop_down" style={{
-                width: "160px", height: "40px", padding: "4px 12px"
+                width: "160px", height: "40px", padding: "4px 12px",
               }} onClick={() => saveGrida('hello.grida')}>
                 <span>데이터 저장(.grida)</span>
               </Button>
@@ -268,6 +269,7 @@ const HeaderLayer = (props: Props) => {
             불러오기
           </Button>
           <Popover
+            style={{zoom: 1 / brZoom}}
             id={loadId}
             open={loadOpen}
             anchorEl={loadAnchorEl}

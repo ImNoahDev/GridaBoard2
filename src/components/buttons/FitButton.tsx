@@ -13,6 +13,7 @@ import $ from "jquery";
 const dropdownStyle = {
   display: "flex",
   flexDirection: "column",
+  justifyContent: "center",
   alignItems: "flex-start",
   padding: "8px",
   position: "relative",
@@ -86,62 +87,65 @@ export default function FitButton() {
     );
   });
 
-    return (
-      <React.Fragment>
-        <Button type="button" id="btn_fit" onClick={handleClick} aria-describedby={id}>
-          <GridaToolTip open={true} placement="left" tip={{
-              head: "Fit",
-              msg: "용지의 크기를 맞추는 여러 옵션 중 하나를 선택합니다.",
-              tail: "Z 폭 맞춤, X 높이 맞춤, C 전체 페이지, V 100%"
-            }} title={undefined}>
-            <span id="zoom-ratio">{zoomPercent}%</span>
-          </GridaToolTip>
-        </Button>
-        <Popover
-          id={id}
-          open={open}
-          anchorEl={anchorEl}
-          onClose={handleClose}
-          anchorOrigin={{
-            vertical: 'top',
-            horizontal: 'right'
-          }}
-          transformOrigin={{
-            vertical: 'top',
-            horizontal: 'left',
-          }}
-        >
-          <div style={dropdownStyle}>
-            <Button id="customer" className="help_drop_down" style={{
-              width: "224px", height: "40px", padding: "4px 12px"
-            }} onClick={() => setZoomByButton(PageZoomEnum.ZOOM_UP)}>
-              <span style={{width: "200px", height: "16px", marginLeft: "-80px"}}>
-                화면 확대 [Ctrl+(+)]
-              </span>
-            </Button>
-            <Button id="shortcut" className="help_drop_down" style={{
-              width: "224px", height: "40px", padding: "4px 12px"
-            }} onClick={() => setZoomByButton(PageZoomEnum.ZOOM_DOWN)}>
-              <span style={{width: "200px", height: "16px", marginLeft: "-80px"}}>
-                화면 축소 [Ctrl+(-)]
-              </span>
-            </Button>
-            <Button id="tutorial" className="help_drop_down" style={{
-              width: "224px", height: "40px", padding: "4px 12px"
-            }} onClick={() => handleClose(ZoomFitEnum.HEIGHT)}>
-              <span style={{width: "200px", height: "16px", marginLeft: "-80px"}}>
-                페이지 높이 맞춤 [H]
-              </span>
-            </Button>
-            <Button id="faq" className="help_drop_down" style={{
-              width: "224px", height: "40px", padding: "4px 12px"
-            }} onClick={() => handleClose(ZoomFitEnum.WIDTH)}>
-              <span style={{width: "200px", height: "16px", marginLeft: "-80px"}}>
-                페이지 너비 맞춤 [W]
-              </span>
-            </Button>
-          </div>
-        </Popover>
-      </React.Fragment>
-    );
+  const brZoom = useSelector((state: RootState) => state.ui.browser.zoom);
+
+  return (
+    <React.Fragment>
+      <Button type="button" id="btn_fit" onClick={handleClick} aria-describedby={id}>
+        <GridaToolTip open={true} placement="left" tip={{
+            head: "Fit",
+            msg: "용지의 크기를 맞추는 여러 옵션 중 하나를 선택합니다.",
+            tail: "Z 폭 맞춤, X 높이 맞춤, C 전체 페이지, V 100%"
+          }} title={undefined}>
+          <span id="zoom-ratio">{zoomPercent}%</span>
+        </GridaToolTip>
+      </Button>
+      <Popover
+        style={{zoom: 1 / brZoom}}
+        id={id}
+        open={open}
+        anchorEl={anchorEl}
+        onClose={handleClose}
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'left'
+        }}
+        transformOrigin={{
+          vertical: 'bottom',
+          horizontal: 'right'
+        }}
+      >
+        <div id="test" style={dropdownStyle}>
+          <Button id="customer" className="help_drop_down" style={{
+            width: "224px", height: "40px", padding: "4px 12px"
+          }} onClick={() => setZoomByButton(PageZoomEnum.ZOOM_UP)}>
+            <span style={{width: "200px", height: "16px", marginLeft: "-80px"}}>
+              화면 확대 [Ctrl+(+)]
+            </span>
+          </Button>
+          <Button id="shortcut" className="help_drop_down" style={{
+            width: "224px", height: "40px", padding: "4px 12px"
+          }} onClick={() => setZoomByButton(PageZoomEnum.ZOOM_DOWN)}>
+            <span style={{width: "200px", height: "16px", marginLeft: "-80px"}}>
+              화면 축소 [Ctrl+(-)]
+            </span>
+          </Button>
+          <Button id="tutorial" className="help_drop_down" style={{
+            width: "224px", height: "40px", padding: "4px 12px"
+          }} onClick={() => handleClose(ZoomFitEnum.HEIGHT)}>
+            <span style={{width: "200px", height: "16px", marginLeft: "-80px"}}>
+              페이지 높이 맞춤 [H]
+            </span>
+          </Button>
+          <Button id="faq" className="help_drop_down" style={{
+            width: "224px", height: "40px", padding: "4px 12px"
+          }} onClick={() => handleClose(ZoomFitEnum.WIDTH)}>
+            <span style={{width: "200px", height: "16px", marginLeft: "-80px"}}>
+              페이지 너비 맞춤 [W]
+            </span>
+          </Button>
+        </div>
+      </Popover>
+    </React.Fragment>
+  );
 }

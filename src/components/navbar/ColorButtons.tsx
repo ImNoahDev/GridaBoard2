@@ -1,10 +1,11 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import '../../styles/main.css';
 import GridaToolTip from '../../styles/GridaToolTip';
 import PenManager from '../../nl-lib/neosmartpen/PenManager';
 import Button from '@material-ui/core/Button';
-import { makeStyles } from '@material-ui/core/styles';
 import { Popover } from '@material-ui/core';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../store/rootReducer';
 
 const manager: PenManager = PenManager.getInstance();
 
@@ -62,6 +63,8 @@ const ColorButtons = () => {
   const open = Boolean(anchorEl);
   const id = open ? 'simple-popover' : undefined;
 
+  const brZoom = useSelector((state: RootState) => state.ui.browser.zoom);
+
   return (
     <React.Fragment>
       <Button id="clr_3" type="button" className="color_btn select_color" style={colorStyle} onClick={handleClick} aria-describedby={id}>
@@ -69,6 +72,7 @@ const ColorButtons = () => {
         </div>
       </Button>
       <Popover
+        style={{zoom: 1 / brZoom}}
         id={id}
         open={open}
         anchorEl={anchorEl}
