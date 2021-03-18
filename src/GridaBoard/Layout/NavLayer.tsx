@@ -10,7 +10,6 @@ import { g_defaultPrintOption } from "../../nl-lib/ncodepod";
 import { MappingStorage } from "../../nl-lib/common/mapper";
 import { NoteServerClient } from "../../nl-lib/common/noteserver";
 
-import { setActivePageNo } from "../../store/reducers/activePageReducer";
 import KeyboardArrowDownRoundedIcon from '@material-ui/icons/KeyboardArrowDownRounded';
 import PenTypeButton from "../../components/buttons/PenTypeButton";
 import ThicknessButton from "../../components/buttons/ThicknessButton";
@@ -32,7 +31,7 @@ const getNoteInfo = (event) => {
 };
 
 const pageNumberingStyle = {
-  zIndex: 1500,
+  zIndex: 100,
   position: "relative",
   left: "-6%",
 } as React.CSSProperties;

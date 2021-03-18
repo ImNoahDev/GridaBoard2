@@ -26,7 +26,7 @@ const rotateStyle = {
   position: "absolute",
   zIndex: 1900,
   top: "calc(14%)",
-  left: "calc(97%)"
+  left: "calc(96%)"
 } as React.CSSProperties;
 
 const dropdownStyle = {
