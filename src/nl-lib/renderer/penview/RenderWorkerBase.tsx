@@ -737,13 +737,13 @@ export default abstract class RenderWorkerBase {
   public ncodeToPdfXy_homography = (ncodeXY: { x: number; y: number; f?: number }, rotationIndep?: boolean) => {
     const { x, y } = ncodeXY;
 
-    let h = this.h;
-    // let h;
-    // if (rotationIndep) {
-    //   h = this.h2[0];
-    // } else {
-    //   h = this.h2[this._opt.rotation / 90];
-    // }
+    // let h = this.h;
+    let h;
+    if (rotationIndep) {
+      h = this.h2[0];
+    } else {
+      h = this.h2[this._opt.rotation / 90];
+    }
 
     const nominator = h.g * x + h.h * y + 1;
     const px = (h.a * x + h.b * y + h.c) / nominator;
@@ -755,14 +755,14 @@ export default abstract class RenderWorkerBase {
   protected pdfToNcodeXy_homography = (ncodeXY: { x: number; y: number; f?: number }, rotationIndep: boolean) => {
     const { x, y } = ncodeXY;
 
-    let h = this.h_rev;
+    // let h = this.h_rev;
 
-    // let h;
-    // if (rotationIndep) {
-    //   h = this.h2_rev[0];
-    // } else {
-    //   h = this.h2_rev[this._opt.rotation / 90];
-    // }
+    let h;
+    if (rotationIndep) {
+      h = this.h2_rev[0];
+    } else {
+      h = this.h2_rev[this._opt.rotation / 90];
+    }
 
     const nominator = h.g * x + h.h * y + 1;
     const px = (h.a * x + h.b * y + h.c) / nominator;

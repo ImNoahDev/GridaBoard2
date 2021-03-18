@@ -212,7 +212,7 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
     }
     else {
       if (!live.pathObj) {
-        const new_pathObj = this.createFabricPath(live.stroke, false);
+        const new_pathObj = this.createFabricPath(live.stroke, false, event.pen.rotationIndep);
         live.pathObj = new_pathObj as IExtendedPathType;
         this.canvasFb.add(new_pathObj);
       }
@@ -243,7 +243,7 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
     //지우개 구현
     const canvas_xy = this.ncodeToPdfXy(dot, event.pen.rotationIndep);
     if (!live.pathObj) {
-      const new_pathObj = this.createFabricPath(live.stroke, false);
+      const new_pathObj = this.createFabricPath(live.stroke, false, event.pen.rotationIndep);
       live.pathObj = new_pathObj as IExtendedPathType;
       this.canvasFb.add(new_pathObj);
     }
@@ -285,7 +285,7 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
    * @param {{strokeKey:string, mac:string, stroke, section:number, owner:number, book:number, page:number}} event
    */
   closeLiveStroke_byStorage = (event: IPenToViewerEvent) => {
-    const new_pathObj = this.createFabricPath(event.stroke, false) as IExtendedPathType;
+    const new_pathObj = this.createFabricPath(event.stroke, false, false) as IExtendedPathType;
     // new_pathObj.fill = new_pathObj.color;
     // new_pathObj.stroke = new_pathObj.color;
 
@@ -496,7 +496,7 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
     }, REMOVE_HOVER_POINTS_INTERVAL);
   }
 
-  redrawStrokes = (pageInfo) => {
+  redrawStrokes = (pageInfo, rotationIndep: boolean) => {
     if (isSamePage(this.pageInfo, pageInfo) || this.pageInfo === undefined) {
       this.removeAllCanvasObject();
       this.resetLocalPathArray();
@@ -505,7 +505,7 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
       const strokesAll = this.storage.getPageStrokes(pageInfo);
       const strokes = strokesAll.filter(stroke => stroke.brushType !== IBrushType.ERASER);
   
-      this.addStrokePaths(strokes);
+      this.addStrokePaths(strokes, rotationIndep);
     }
   }
   
@@ -519,27 +519,27 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
     const canvasCenterDst = new fabric.Point(this._opt.pageSize.height/2, this._opt.pageSize.width/2)
     const radians = fabric.util.degreesToRadians(degrees)
 
-    strokeArr.forEach((stroke) => {
-      stroke.dotArray.forEach((dot) => {
-        const pdf_xy = this.ncodeToPdfXy(dot, true);
+    // strokeArr.forEach((stroke) => {
+    //   stroke.dotArray.forEach((dot) => {
+    //     const pdf_xy = this.ncodeToPdfXy(dot, true);
 
-        // 1. subtractEquals
-        pdf_xy.x -= canvasCenterSrc.x;
-        pdf_xy.y -= canvasCenterSrc.y;
+    //     // 1. subtractEquals
+    //     pdf_xy.x -= canvasCenterSrc.x;
+    //     pdf_xy.y -= canvasCenterSrc.y;
         
-        // 2. rotateVector
-        const v = fabric.util.rotateVector(pdf_xy, radians);
+    //     // 2. rotateVector
+    //     const v = fabric.util.rotateVector(pdf_xy, radians);
 
-        // 3. addEquals
-        v.x += canvasCenterDst.x;
-        v.y += canvasCenterDst.y;
+    //     // 3. addEquals
+    //     v.x += canvasCenterDst.x;
+    //     v.y += canvasCenterDst.y;
 
-        const ncode_xy = this.pdfToNcodeXy(v, true);
+    //     const ncode_xy = this.pdfToNcodeXy(v, true);
 
-        dot.x = ncode_xy.x;
-        dot.y = ncode_xy.y;
-      })
-    })
+    //     dot.x = ncode_xy.x;
+    //     dot.y = ncode_xy.y;
+    //   })
+    // })
   }
 
   changePage = (pageInfo: IPageSOBP, pageSize: ISize, forceToRefresh: boolean): boolean => {
@@ -586,7 +586,7 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
     // strokes.push(testStroke);
 
     // 페이지의 stroke를 fabric.Path로 바꾼다.
-    this.addStrokePaths(strokes);
+    this.addStrokePaths(strokes, false);
 
     // page refresh
     this.canvasFb.requestRenderAll();
@@ -709,12 +709,12 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
    * @private
    * @param {Array<NeoStroke>} strokes
    */
-  addStrokePaths = (strokes) => {
+  addStrokePaths = (strokes, rotationIndep) => {
     if (!this.canvasFb) return;
 
     strokes.forEach((stroke) => {
       if (stroke.dotArray.length > 0) {
-        const path = this.createFabricPath(stroke, true) as IExtendedPathType;
+        const path = this.createFabricPath(stroke, true, rotationIndep) as IExtendedPathType;
         this.canvasFb.add(path);
         this.localPathArray.push(path);
       }
@@ -740,8 +740,8 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
     dotArray.forEach((dot) => {
       const pt = this.ncodeToPdfXy(dot, rotationIndep);
 
-      // // fabric js의 rotatePoint 로직 flow인데 여기다 풀어 쓴 이유는 fabric.util.rotatePoint는 canvas는 도는 상황이 아니기 때문에 subtractEquals와 addEquals에 다른 origin을 넣을 수 없기 때문
-      // // 1. subtractEquals
+      // fabric js의 rotatePoint 로직 flow인데 여기다 풀어 쓴 이유는 fabric.util.rotatePoint는 canvas는 도는 상황이 아니기 때문에 subtractEquals와 addEquals에 다른 origin을 넣을 수 없기 때문
+      // 1. subtractEquals
       // pt.x -= canvasCenterSrc.x;
       // pt.y -= canvasCenterSrc.y;
       
@@ -772,12 +772,12 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
 
 
 
-  createPathData = (stroke: NeoStroke) => {
+  createPathData = (stroke: NeoStroke, rotationIndep: boolean) => {
     const { dotArray, brushType, thickness } = stroke;
 
     const pointArray = [];
     dotArray.forEach((dot) => {
-      const pt = this.ncodeToPdfXy(dot, true);
+      const pt = this.ncodeToPdfXy(dot, rotationIndep);
       pointArray.push(pt);
     });
 
@@ -792,9 +792,9 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
     return pathData;
   }
 
-  createFabricPath = (stroke: NeoStroke, cache: boolean) => {
+  createFabricPath = (stroke: NeoStroke, cache: boolean, rotationIndep: boolean) => {
     const { color, brushType, key } = stroke;
-    const pathData = this.createPathData(stroke);
+    const pathData = this.createPathData(stroke, rotationIndep);
 
     let opacity = 0;
     switch (brushType) {

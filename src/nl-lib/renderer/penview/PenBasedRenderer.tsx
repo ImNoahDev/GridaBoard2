@@ -311,7 +311,7 @@ class PenBasedRenderer extends React.Component<Props, State> {
         this.renderer.rotate(degrees, nextProps.pageInfo);
       }
 
-      this.renderer.redrawStrokes(nextProps.pageInfo);
+      this.renderer.redrawStrokes(nextProps.pageInfo, false);
 
       //이건 pen viewer의 실제 rotate 처리
       const tmp = nextProps.pdfSize.width;

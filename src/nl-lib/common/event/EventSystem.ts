@@ -1,4 +1,4 @@
-export type EventCallbackType = (data) => void;
+export type EventCallbackType = (data, flag?) => void;
 
 export interface PenEventFilter {
   mac: string[] | undefined;
