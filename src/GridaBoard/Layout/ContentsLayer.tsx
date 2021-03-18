@@ -162,7 +162,7 @@ const ContentsLayer = (props: Props) => {
             position: "absolute",
             zIndex: 1900,
             top: "calc(94%)",
-            left: "calc(97%)",
+            left: "calc(96%)",
             zoom: 1 / brZoom,
           }}>
             <HelpIcon fontSize="large" 
