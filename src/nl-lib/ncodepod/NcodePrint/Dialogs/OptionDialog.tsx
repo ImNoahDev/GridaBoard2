@@ -286,11 +286,11 @@ export function OptionDialog(props: IDialogProps) {
           <Box fontSize={20} fontWeight="fontWeightBold" style={{float: "left", marginRight: "100px"}}>
             인쇄 옵션
           </Box>
-          <TableCell colSpan={1} style={cellRadioStyle}>
+          {/* <TableCell colSpan={1} style={cellRadioStyle}>
               <RadioField showHelp={help} colSpan={1} checked={printOption.showTooltip} handleChange={handleChange2} color="primary" name="showTooltip">
                 도움말 표시: {printOption.showTooltip ? "true" : "false"}
               </RadioField >
-            </TableCell>
+          </TableCell> */}
         </DialogTitle>
 
         <DialogContent ref={dialogRef}>

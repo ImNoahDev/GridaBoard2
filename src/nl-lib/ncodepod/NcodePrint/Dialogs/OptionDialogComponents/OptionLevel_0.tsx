@@ -130,13 +130,13 @@ function OptionLevel_0(props: ILeveledDialogProps) {
 
 
           <TableRow className={classes.tr}>
-            <TableCell colSpan={1} style={cellRadioStyle}>
+            {/* <TableCell colSpan={1} style={cellRadioStyle}>
               <SelectField showHelp={help} colSpan={2} handleChange={handleChange2}
                 candidates={[1, 2, 4, 8, 9, 16, 18, 25, 32]}
                 value={printOption.pagesPerSheet} color={color} name="pagesPerSheet">
                 한 장당 인쇄할 페이지수:
               </SelectField >
-            </TableCell>
+            </TableCell> */}
 
             {/* <TableCell colSpan={1} style={cellRadioStyle}>
               <RadioField showHelp={help} colSpan={1} checked={printOption.showTooltip} handleChange={handleChange2} color={color} name="showTooltip">

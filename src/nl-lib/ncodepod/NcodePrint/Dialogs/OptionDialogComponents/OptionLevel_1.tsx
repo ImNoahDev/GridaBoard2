@@ -110,7 +110,7 @@ function OptionLevel_1(props: ILeveledDialogProps) {
 
 
 
-      <Table style={{ borderCollapse: "collapse", border: "0" }}>
+      {/* <Table style={{ borderCollapse: "collapse", border: "0" }}>
         <TableBody>
           <TableRow className={classes.tr}>
             <TableCell style={cellRadioStyle} colSpan={2}>
@@ -181,7 +181,7 @@ function OptionLevel_1(props: ILeveledDialogProps) {
           </TableRow>
 
         </TableBody>
-      </Table>
+      </Table> */}
 
 
     </React.Fragment >
