@@ -177,9 +177,9 @@ var scale = 1;
 
 document.addEventListener('wheel', function(e) {
   var box = document.getElementById('view-layer');
-  e.preventDefault();
-  e.stopPropagation();
   if (e.ctrlKey) {
+      e.preventDefault();
+      e.stopPropagation();
       var s = Math.exp(-e.deltaY / 100);
       scale *= s;
   } else {
