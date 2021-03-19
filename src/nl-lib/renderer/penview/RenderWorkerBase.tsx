@@ -344,7 +344,7 @@ export default abstract class RenderWorkerBase {
       height: size.height * ratio - 0,
       strokeWidth: 0,
       stroke: 'rgba(0,0,0,1)',
-      fill: 'rgb(100,100,200, 0.1)',
+      fill: 'rgb(0,0,0,0)',
       left: size.width * (1 - ratio) * 0.5,
       top: size.height * (1 - ratio) * 0.5,
       // lockMovementX: true,
