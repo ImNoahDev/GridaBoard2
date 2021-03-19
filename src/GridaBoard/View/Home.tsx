@@ -148,7 +148,7 @@ const Home = () => {
   console.log(`HOME: docPageNo:${activePageNo}, pdfUrl=${pdfUrl}, fingerPrint: ${pdfFingerprint}, pdfPageNo:${pdfPageNo}`);
   return (
     <React.Fragment>
-      <ViewLayer handlePdfOpen={handlePdfOpen} style={{display: "block"}}/>
+      <ViewLayer id="view-layer" handlePdfOpen={handlePdfOpen} style={{display: "block"}}/>
       <input type="file" id={g_hiddenFileInputBtnId} onChange={onFileInputChanged} onClick={onFileInputClicked} style={{ display: "none" }} name="pdf" accept=".pdf,.grida" />
     </React.Fragment>
   );
@@ -170,5 +170,28 @@ declare global {
   turnOnGlobalKeyShortCut(true);
 
 })(window);
+
+var tx = 0;
+var ty = 0;
+var scale = 1;
+
+document.addEventListener('wheel', function(e) {
+  var box = document.getElementById('view-layer');
+  e.preventDefault();
+  e.stopPropagation();
+  if (e.ctrlKey) {
+      var s = Math.exp(-e.deltaY / 100);
+      scale *= s;
+  } else {
+      var direction = 1; //natural.checked ? -1 : 1;
+      tx += e.deltaX * direction;
+      ty += e.deltaY * direction;
+  }
+  // var transform = 'translate(' + tx + 'px, ' + ty + 'px) scale(' + scale + ')';
+  // box.style.webkitTransform = transform;
+  // box.style.transform = transform;
+}, {
+  passive: false // Add this
+});
 
 export default Home;
