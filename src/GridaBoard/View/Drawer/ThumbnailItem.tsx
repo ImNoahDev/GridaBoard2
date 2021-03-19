@@ -10,6 +10,7 @@ import { MixedPageView } from "../../../nl-lib/renderer";
 import { makeNPageIdStr } from "../../../nl-lib/common/util";
 import { PLAYSTATE, ZoomFitEnum } from "../../../nl-lib/common/enums";
 import { nullNcode } from "../../../nl-lib/common/constants";
+import { red } from "@material-ui/core/colors";
 
 interface Props {
   pageNo: number,
@@ -57,8 +58,12 @@ const ThumbnailItem = (props: Props) => {
   };
 
   let bgColor = `rgb(255, 255,255)`;
+  // if (activePageNo === pn)
+  //   bgColor = `rgb(0, 255, 255)`;
+
+  let thumbBorderColor = `rgb(255, 255,255)`;
   if (activePageNo === pn)
-    bgColor = `rgb(0, 255, 255)`;
+    thumbBorderColor = `rgb(255, 0, 0)`;
 
   const pageOverview = page.pageOverview;
   const sizePu = pageOverview.sizePu;
@@ -72,7 +77,7 @@ const ThumbnailItem = (props: Props) => {
   // console.log(`thumbnail - ${pn}: pageNo: ${pdfPageNo} pdf: ${pdf} pdfUrl: ${pdfUrl} fingerprint: ${pdfFingerprint} `)
   return (
     <Paper id={`thumbnail-item-${pn}`} key={props.key} onMouseDown={e => handleMouseDown(e)} elevation={3} style={{ height: height, margin: 10, overflow: "hidden", position: "relative" }} >
-      <div id={`thumbnail-div-${pn}`} style={{ position: "absolute", margin: 0, padding: 0, right: 0, left: 0, top: 0, height: "100%", backgroundColor: bgColor }}>
+      <div id={`thumbnail-div-${pn}`} style={{ position: "absolute", margin: 0, padding: 0, right: 0, left: 0, top: 0, height: "100%", borderWidth: 3, border: 'solid', borderColor: thumbBorderColor, }}>
         <MixedPageView
           pdf={pdf}
           pdfUrl={pdfUrl} filename={pdfFilename}

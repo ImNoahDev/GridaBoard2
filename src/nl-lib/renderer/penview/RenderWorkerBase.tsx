@@ -339,61 +339,64 @@ export default abstract class RenderWorkerBase {
 
     const ratio = 1;
 
-    const rect = new fabric.Rect({
-      width: size.width * ratio - 5,
-      height: size.height * ratio - 5,
-      strokeWidth: 5,
-      stroke: 'rgba(0,0,0,1)',
-      fill: 'rgb(100,100,200, 0.1)',
-      left: size.width * (1 - ratio) * 0.5,
-      top: size.height * (1 - ratio) * 0.5,
-      // lockMovementX: true,
-      // lockMovementY: true,
-      selectable: false,
-      data: GRID_OBJECT_ID,
-      name: 'page_layout',
-    });
-    canvasFb.add(rect);
+    // 테두리 그리기
+    // const rect = new fabric.Rect({
+    //   width: size.width * ratio - 5,
+    //   height: size.height * ratio - 5,
+    //   strokeWidth: 5,
+    //   stroke: 'rgba(0,0,0,1)',
+    //   fill: 'rgb(100,100,200, 0.1)',
+    //   left: size.width * (1 - ratio) * 0.5,
+    //   top: size.height * (1 - ratio) * 0.5,
+    //   // lockMovementX: true,
+    //   // lockMovementY: true,
+    //   selectable: false,
+    //   data: GRID_OBJECT_ID,
+    //   name: 'page_layout',
+    // });
+    // canvasFb.add(rect);
 
     this.drawInfoText();
 
     let sw = true;
-    for (let x = 0; x < size.width; x += size.width / 4) {
-      let color = 'rgba(0,0,0,0.3)';
-      if (sw) color = 'rgba(0,0,0,0.8)';
-      sw = !sw;
-      const line = new fabric.Line([x, 0, x, size.height], {
-        strokeWidth: 0.5,
-        stroke: color,
-        hasControls: false,
-        hasBorders: false,
-        lockMovementX: true,
-        lockMovementY: true,
-        data: GRID_OBJECT_ID,
-        name: 'page_layout',
-      });
+    // 세로 grid 그리기
+    // for (let x = 0; x < size.width; x += size.width / 4) {
+    //   let color = 'rgba(0,0,0,0.3)';
+    //   if (sw) color = 'rgba(0,0,0,0.8)';
+    //   sw = !sw;
+    //   const line = new fabric.Line([x, 0, x, size.height], {
+    //     strokeWidth: 0.5,
+    //     stroke: color,
+    //     hasControls: false,
+    //     hasBorders: false,
+    //     lockMovementX: true,
+    //     lockMovementY: true,
+    //     data: GRID_OBJECT_ID,
+    //     name: 'page_layout',
+    //   });
 
-      canvasFb.add(line);
-    }
+    //   canvasFb.add(line);
+    // }
 
-    sw = true;
-    for (let y = 0; y < size.height; y += size.height / 4) {
-      let color = 'rgba(0,0,0,0.3)';
-      if (sw) color = 'rgba(0,0,0,0.8)';
-      sw = !sw;
-      const line = new fabric.Line([0, y, size.width, y], {
-        strokeWidth: 0.5,
-        stroke: color,
-        hasControls: false,
-        hasBorders: false,
-        lockMovementX: true,
-        lockMovementY: true,
-        data: GRID_OBJECT_ID,
-        name: 'page_layout',
-      });
+    // 가로 grid 그리기
+    // sw = true;
+    // for (let y = 0; y < size.height; y += size.height / 4) {
+    //   let color = 'rgba(0,0,0,0.3)';
+    //   if (sw) color = 'rgba(0,0,0,0.8)';
+    //   sw = !sw;
+    //   const line = new fabric.Line([0, y, size.width, y], {
+    //     strokeWidth: 0.5,
+    //     stroke: color,
+    //     hasControls: false,
+    //     hasBorders: false,
+    //     lockMovementX: true,
+    //     lockMovementY: true,
+    //     data: GRID_OBJECT_ID,
+    //     name: 'page_layout',
+    //   });
 
-      canvasFb.add(line);
-    }
+    //   canvasFb.add(line);
+    // }
   };
 
   /**
