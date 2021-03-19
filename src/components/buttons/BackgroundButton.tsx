@@ -76,9 +76,6 @@ export default function BackgroundButton() {
       }
     );
   });
-
-  console.log(window.innerWidth)
-
   const brZoom = useSelector((state: RootState) => state.ui.browser.zoom);
 
   const dropdownStyle = {

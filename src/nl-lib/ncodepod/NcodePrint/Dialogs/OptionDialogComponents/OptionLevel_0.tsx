@@ -138,11 +138,11 @@ function OptionLevel_0(props: ILeveledDialogProps) {
               </SelectField >
             </TableCell>
 
-            <TableCell colSpan={1} style={cellRadioStyle}>
+            {/* <TableCell colSpan={1} style={cellRadioStyle}>
               <RadioField showHelp={help} colSpan={1} checked={printOption.showTooltip} handleChange={handleChange2} color={color} name="showTooltip">
                 도움말 표시: {printOption.showTooltip ? "true" : "false"}
               </RadioField >
-            </TableCell>
+            </TableCell> */}
           </TableRow>
 
           <TableRow className={classes.tr}>

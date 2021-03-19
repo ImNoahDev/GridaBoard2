@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import { Box, Button, ButtonProps, Dialog, DialogActions, DialogContent, DialogProps, DialogTitle, Grid, useTheme } from '@material-ui/core';
+import { Box, Button, ButtonProps, Dialog, DialogActions, DialogContent, DialogProps, DialogTitle, Grid, TableCell, useTheme } from '@material-ui/core';
 import OptionLevel_debug from "./OptionDialogComponents/OptionLevel_debug";
 import OptionLevel_0 from "./OptionDialogComponents/OptionLevel_0";
 import OptionLevel_1 from "./OptionDialogComponents/OptionLevel_1";
@@ -11,6 +11,9 @@ import { MappingStorage } from '../../../common/mapper';
 import { cloneObj } from '../../../common/util';
 import { IPrintOption } from '../../../common/structures';
 import { MediaSize } from '../../../common/constants';
+import { RadioField } from './OptionDialogComponents/RadioField';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../../../store/rootReducer';
 
 
 const useStyles = makeStyles({
@@ -22,6 +25,14 @@ const useStyles = makeStyles({
     width: "100%"
   }
 });
+
+export const cellRadioStyle = {
+  paddingBottom: 2, paddingTop: 2,
+  paddingLeft: 0, paddingRight: 0,
+
+  border: "none",
+  boxShadow: "none",
+};
 
 
 export const MAX_PRINTOPTION_LEVEL = 1;    // 2: debug mode
@@ -260,17 +271,26 @@ export function OptionDialog(props: IDialogProps) {
   let msg = levelButtonText[optionLevel];
   if (optionLevel === MAX_PRINTOPTION_LEVEL) msg = levelButtonText[levelButtonText.length - 1];
 
+  const help = printOption ? printOption.showTooltip : true;
+
+  const brZoom = useSelector((state: RootState) => state.ui.browser.zoom);
+
   return (
     <React.Fragment>
       {
         console.log(open)
       }
-      <Dialog open={open} {...rest} onClose={handleClose} classes={{ scrollPaper: classes.scrollPaper }} >
+      <Dialog open={open} {...rest} onClose={handleClose} classes={{ scrollPaper: classes.scrollPaper }} style={{zoom: 1 / brZoom}}>
 
         <DialogTitle id="form-dialog-title" style={{ float: "left", width: "600px" }}>
-          <Box fontSize={20} fontWeight="fontWeightBold" >
+          <Box fontSize={20} fontWeight="fontWeightBold" style={{float: "left", marginRight: "100px"}}>
             인쇄 옵션
-        </Box>
+          </Box>
+          <TableCell colSpan={1} style={cellRadioStyle}>
+              <RadioField showHelp={help} colSpan={1} checked={printOption.showTooltip} handleChange={handleChange2} color="primary" name="showTooltip">
+                도움말 표시: {printOption.showTooltip ? "true" : "false"}
+              </RadioField >
+            </TableCell>
         </DialogTitle>
 
         <DialogContent ref={dialogRef}>
