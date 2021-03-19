@@ -10,8 +10,6 @@ import { RootState } from '../../store/rootReducer';
 const manager: PenManager = PenManager.getInstance();
 
 const colorStyle = {
-  width: "18px",
-  height: "18px",
   marginLeft: "30px"
 } as React.CSSProperties;
 
