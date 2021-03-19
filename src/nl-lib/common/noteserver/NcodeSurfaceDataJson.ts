@@ -407,10 +407,10 @@ export const g_paperType_default: IPaperTypeSet = {
     "owner": 1013,
     "pdf_page_count": 2,
     "margin": {
-      "Ymax": 49.775295,
-      "Xmin": 0,
-      "Ymin": 0,
-      "Xmax": 88.583336
+      "Ymax": 128,
+      "Xmin": 9,
+      "Ymin": 9,
+      "Xmax": 91
     },
     "nproj_file": "3_1013_2.nproj",
     "book": 2,

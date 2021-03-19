@@ -39,6 +39,15 @@ export function makeNPageIdStr(pageInfo: IPageSOBP) {
   return "undefined";
 }
 
+export function makeNCodeIdStr(pageInfo: IPageSOBP) {
+  if (pageInfo) {
+    const { section, book, owner } = pageInfo;
+    if (section === undefined) return "section undefined";
+    return `${section}.${owner}.${book}`;
+  }
+  return "undefined";
+}
+
 export function cloneObj(obj) {
   return JSON.parse(JSON.stringify(obj));
 }
@@ -64,6 +73,17 @@ export function isSamePage(pg1: IPageSOBP, pg2: IPageSOBP): boolean {
   if (!pg1 && pg2) return false;
 
   if (pg1.page !== pg2.page || pg1.book !== pg2.book || pg1.owner !== pg2.owner || pg1.section !== pg2.section) {
+    return false;
+  }
+  return true;
+}
+
+export function isSameNcode(pg1: IPageSOBP, pg2: IPageSOBP): boolean {
+  if (pg1 === undefined && pg2 === undefined) return true;
+  if (pg1 && !pg2) return false;
+  if (!pg1 && pg2) return false;
+
+  if (pg1.book !== pg2.book || pg1.owner !== pg2.owner || pg1.section !== pg2.section) {
     return false;
   }
   return true;

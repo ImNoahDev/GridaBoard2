@@ -8,10 +8,11 @@ import PenBasedRenderWorker from "./PenBasedRenderWorker";
 
 import { IBrushType, PenEventName, PageEventName, PLAYSTATE, ZoomFitEnum } from "../../common/enums";
 import { IPageSOBP, ISize } from "../../common/structures";
-import { callstackDepth, isSamePage, makeNPageIdStr, uuidv4 } from "../../common/util";
+import { callstackDepth, isSamePage, isSameNcode, makeNPageIdStr, makeNCodeIdStr, uuidv4 } from "../../common/util";
 
 import { INeoSmartpen, IPenToViewerEvent } from "../../common/neopen";
 import { MappingStorage } from "../../common/mapper";
+import { DefaultFilmNcode } from "../../common/constants";
 import { InkStorage } from "../../common/penstorage";
 
 import { setCalibrationData } from '../../../store/reducers/calibrationDataReducer';
@@ -347,10 +348,14 @@ class PenBasedRenderer extends React.Component<Props, State> {
       const pageInfo = nextProps.pageInfo;
 
       console.log("`VIEW SIZE        PAGE CHANGE 0");
-
+      
       if (this.renderer && !this.props.calibrationMode) {
         // const { section, owner, book, page } = nextProps.pageInfo;
         console.log(`VIEW SIZE PAGE CHANGE 1: ${makeNPageIdStr(pageInfo)}`);
+
+        if (isSameNcode(nextProps.pageInfo, DefaultFilmNcode)) {
+          return;
+        }
         
         const transform = MappingStorage.getInstance().getNPageTransform(pageInfo);
         this.renderer.setTransformParameters(transform.h, this.pdfSize);

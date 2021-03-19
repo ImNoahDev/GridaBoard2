@@ -13,3 +13,10 @@ export const g_defaultTemporaryNcode: IPageSOBP = {
   book: 1068,
   page: 0,
 }
+
+export const DefaultFilmNcode: IPageSOBP = {
+  section: 3,
+  owner: 1013,
+  book: 2,
+  page: 0,
+}

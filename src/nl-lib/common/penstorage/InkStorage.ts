@@ -1,7 +1,11 @@
 import { EventDispatcher, EventCallbackType } from "../event";
 import { IBrushType, PenEventName } from "../enums";
 import { NeoStroke, IPageSOBP, StrokeStatus, INeoStrokeProps, NeoDot } from "../structures";
+import { isSameNcode } from "../../common/util";
+import { DefaultFilmNcode } from "../../common/constants";
 import intersect from 'path-intersection';
+import { store } from "../../../client/Root";
+import GridaDoc from "../../../GridaBoard/GridaDoc";
 
 /** @type {InkStorage} */
 let _storage_instance = null;
@@ -152,7 +156,14 @@ export default class InkStorage {
    */
   private addCompletedToPage(stroke: NeoStroke) {
     const { section, book, owner, page } = stroke;
-    const pageId = InkStorage.makeNPageIdStr({ section, book, owner, page });
+    let pageId = InkStorage.makeNPageIdStr({ section, book, owner, page });
+
+    const activePageNo = store.getState().activePage.activePageNo;
+    const basePageInfo = GridaDoc.getInstance().getPage(activePageNo).basePageInfo;
+
+    if (isSameNcode(DefaultFilmNcode, {section, book, owner, page})) {
+      pageId = InkStorage.makeNPageIdStr({ section: basePageInfo.section, book: basePageInfo.book, owner: basePageInfo.owner, page: basePageInfo.page });
+    }
     // console.log( `add completed: ${mac},  ${pageId} = ${section}.${book}.${owner}.${page} `);
 
     // stroke에 점이 하나라도 있어야 옮긴다.
