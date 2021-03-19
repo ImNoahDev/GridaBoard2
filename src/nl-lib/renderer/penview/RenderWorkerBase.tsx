@@ -339,22 +339,21 @@ export default abstract class RenderWorkerBase {
 
     const ratio = 1;
 
-    // 테두리 그리기
-    // const rect = new fabric.Rect({
-    //   width: size.width * ratio - 5,
-    //   height: size.height * ratio - 5,
-    //   strokeWidth: 5,
-    //   stroke: 'rgba(0,0,0,1)',
-    //   fill: 'rgb(100,100,200, 0.1)',
-    //   left: size.width * (1 - ratio) * 0.5,
-    //   top: size.height * (1 - ratio) * 0.5,
-    //   // lockMovementX: true,
-    //   // lockMovementY: true,
-    //   selectable: false,
-    //   data: GRID_OBJECT_ID,
-    //   name: 'page_layout',
-    // });
-    // canvasFb.add(rect);
+    const rect = new fabric.Rect({
+      width: size.width * ratio - 0,
+      height: size.height * ratio - 0,
+      strokeWidth: 0,
+      stroke: 'rgba(0,0,0,1)',
+      fill: 'rgb(100,100,200, 0.1)',
+      left: size.width * (1 - ratio) * 0.5,
+      top: size.height * (1 - ratio) * 0.5,
+      // lockMovementX: true,
+      // lockMovementY: true,
+      selectable: false,
+      data: GRID_OBJECT_ID,
+      name: 'page_layout',
+    });
+    canvasFb.add(rect);
 
     this.drawInfoText();
 
