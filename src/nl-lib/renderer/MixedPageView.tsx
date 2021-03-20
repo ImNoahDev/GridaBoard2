@@ -206,7 +206,6 @@ class MixedPageView_module extends React.Component<MixedViewProps, State>  {
 
   _internal: InternalState;
 
-
   constructor(props: MixedViewProps) {
     super(props);
 
@@ -577,7 +576,6 @@ class MixedPageView_module extends React.Component<MixedViewProps, State>  {
   //   this.setState({ showFileOpenDlg: false });
   // };
 
-
   render() {
     const { pdf } = this._internal;
 
@@ -603,6 +601,11 @@ class MixedPageView_module extends React.Component<MixedViewProps, State>  {
     const shadowStyle: CSSProperties = {
       color: "#00f",
       textShadow: "-1px 0 2px #fff, 0 1px 2px #fff, 1px 0 2px #fff, 0 -1px 2px #fff",
+    }
+
+    let isBlankPage = false;
+    if (this._internal.pdf === undefined) {
+      isBlankPage = true;
     }
 
     // console.log(`VIEW SIZE${callstackDepth()} MixedPageView(component): ${this._internal.pdfSize?.width}, ${this._internal.pdfSize?.height}`);
@@ -654,6 +657,7 @@ class MixedPageView_module extends React.Component<MixedViewProps, State>  {
             basePageInfo={this.props.basePageInfo}
             pdfPageNo={this._internal.pdfPageNo}
             viewSize={{ ...{ width: this._internal.width, height: this._internal.height } }}
+            isBlankPage={isBlankPage}
           />
         </div>
 

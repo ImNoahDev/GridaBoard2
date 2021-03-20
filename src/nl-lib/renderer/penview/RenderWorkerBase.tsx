@@ -182,7 +182,7 @@ export default abstract class RenderWorkerBase {
     console.log(`Fabric canvas inited: size(${size.width}, ${size.height})`);
 
     this.canvasFb = new fabric.Canvas(this._opt.canvasId, {
-      backgroundColor: this._opt.bgColor ? this._opt.bgColor : 'rgba(125,137,239,0.1)',
+      backgroundColor: this._opt.bgColor,
       selection: false,
       controlsAboveOverlay: false,
       selectionLineWidth: 4,

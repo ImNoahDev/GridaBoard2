@@ -64,6 +64,8 @@ interface Props { // extends MixedViewProps {
   calibrationData: any,
   setCalibrationData2: any,
   calibrationMode: boolean,
+
+  isBlankPage: boolean,
 }
 
 /**
@@ -298,6 +300,14 @@ class PenBasedRenderer extends React.Component<Props, State> {
       ret_val = true;
     }
     
+    if (this.props.isBlankPage !== nextProps.isBlankPage) {
+      if (nextProps.isBlankPage) {
+        this.renderer.canvasFb.setBackgroundColor('rgba(255,255,255,1)', null);
+      } else {
+        this.renderer.canvasFb.setBackgroundColor('rgba(255,255,255,0.1)', null);
+      }
+    }
+
     if ((this.props.rotation !== nextProps.rotation) && isSamePage(this.props.basePageInfo, nextProps.basePageInfo)) {
       //회전 버튼을 누를 경우만 들어와야 하는 로직, 회전된 pdf를 로드할 때는 들어오면 안됨
       //로드할 경우에는 this.props의 basePageInfo가 nullNCode로 세팅돼있기 때문에 들어오지 않음
@@ -412,6 +422,11 @@ class PenBasedRenderer extends React.Component<Props, State> {
     /** @type {{width:number, height:number}} */
     console.log(`VIEW SIZE${callstackDepth()} initRenderer:   view(${viewSize.width}, ${viewSize.height})  page(${pageSize.width}, ${pageSize.height})`);
 
+    let bgColor = 'rgba(255,255,255,0.1)';
+    if (this.props.isBlankPage) {
+      bgColor = 'rgba(255,255,255,1)';
+    }
+
     const options: IRenderWorkerOption = {
       canvasId: this.canvasId,
       canvas: this.canvas,
@@ -425,6 +440,7 @@ class PenBasedRenderer extends React.Component<Props, State> {
       rotation: this.props.rotation,
       autoFocus: true,
       shouldDisplayGrid: true,
+      bgColor: bgColor,
     };
 
     const renderer = new PenBasedRenderWorker(options);
