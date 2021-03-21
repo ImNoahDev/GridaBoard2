@@ -9,11 +9,11 @@ import { theme } from "../styles/theme";
 import configureStore from "../store/configureStore";
 import { RootState } from '../store/rootReducer';
 
-import GridaApp from "../GridaBoard/GridaApp";
+import GridaApp from "../GridaApp";
 import { hideUIProgressBackdrop, reportBrowserZoomFactor, showUIProgressBackdrop } from "../store/reducers/ui";
-import { fetchGzippedFile, getBrowserZoomFactor } from "../nl-lib/common/util";
-import { g_paperType, g_paperType_default } from "../nl-lib/common/noteserver";
-import Home from "../GridaBoard/View/Home";
+import { fetchGzippedFile, getBrowserZoomFactor } from "../../nl-lib/common/util";
+import { g_paperType, g_paperType_default } from "../../nl-lib/common/noteserver";
+import Home from "../View/Home";
 
 
 
@@ -124,7 +124,7 @@ const Root = () => {
   return (
     <Provider store={store}>
       <MuiThemeProvider theme={theme}>
-        {/* {paperInfoInited ? 
+        {/* {paperInfoInited ?
         <Home /> : <></>} */}
         <Home />
 
@@ -157,7 +157,7 @@ const Root = () => {
 
 (function () {
   window.visualViewport.addEventListener("resize", viewportHandler);
-  
+
   const app = GridaApp.getInstance();
   app.start();
 })();
@@ -166,12 +166,12 @@ const Root = () => {
 
 function viewportHandler(event) {
   const brZoom = getBrowserZoomFactor();
-  
+
   // console.warn(`window scale =${event.target.scale}  browser zoom=${brZoom}`);
   reportBrowserZoomFactor(brZoom);
   // // NOTE: This doesn't actually work at time of writing
   // if (event.target.scale > 3) {
-  //   document.body.classList.remove("hide-text");  
+  //   document.body.classList.remove("hide-text");
   // } else {
   //   document.body.classList.add("hide-text");
   // }

@@ -4,7 +4,7 @@ import { NeoStroke, IPageSOBP, StrokeStatus, INeoStrokeProps, NeoDot } from "../
 import { isSameNcode } from "../../common/util";
 import { DefaultFilmNcode } from "../../common/constants";
 import intersect from 'path-intersection';
-import { store } from "../../../client/Root";
+import { store } from "../../../GridaBoard/client/Root";
 import GridaDoc from "../../../GridaBoard/GridaDoc";
 
 /** @type {InkStorage} */

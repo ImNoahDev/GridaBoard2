@@ -3,7 +3,7 @@ import { openFileBrowser } from "../../nl-lib/common/neopdf/FileBrowser";
 import { InkStorage } from '../../nl-lib/common/penstorage';
 import GridaDoc from '../GridaDoc';
 import { Button } from '@material-ui/core';
-import GridaToolTip from "../../styles/GridaToolTip";
+import GridaToolTip from "../styles/GridaToolTip";
 import $ from "jquery";
 
 const LoadGrida = () => {
@@ -56,11 +56,11 @@ const LoadGrida = () => {
           gridaArr[i] = completed.get(pageId[i]);
           for (let j = 0; j < neoStroke[i].length; j++){
             gridaArr[i].push(neoStroke[i][j]);
-          } 
+          }
         }
 
         const doc = GridaDoc.getInstance();
-        doc.openGridaFile({ url: url, filename: file.name }, gridaRawData, neoStroke, pageInfo); 
+        doc.openGridaFile({ url: url, filename: file.name }, gridaRawData, neoStroke, pageInfo);
       }
     } else {
         alert("file open cancelled");
@@ -93,7 +93,7 @@ const LoadGrida = () => {
         }}>
           <span>데이터 불러오기(.grida)</span>
         </Button>
-      </GridaToolTip> 
+      </GridaToolTip>
   );
 }
 

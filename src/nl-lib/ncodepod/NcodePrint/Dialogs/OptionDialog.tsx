@@ -13,7 +13,7 @@ import { IPrintOption } from '../../../common/structures';
 import { MediaSize } from '../../../common/constants';
 import { RadioField } from './OptionDialogComponents/RadioField';
 import { useSelector } from 'react-redux';
-import { RootState } from '../../../../store/rootReducer';
+import { RootState } from '../../../../GridaBoard/store/rootReducer';
 
 
 const useStyles = makeStyles({

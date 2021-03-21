@@ -1,9 +1,9 @@
 import React, { useState } from "react";
-import { RootState } from "../../store/rootReducer";
+import { RootState } from "../store/rootReducer";
 import { useSelector } from "react-redux";
 import { IconButton } from "@material-ui/core";
 import PersistentDrawerRight from "../View/Drawer/PersistentDrawerRight";
-import { updateDrawerWidth } from "../../store/reducers/ui";
+import { updateDrawerWidth } from "../store/reducers/ui";
 import KeyboardArrowRightIcon from '@material-ui/icons/KeyboardArrowRight';
 import $ from "jquery";
 

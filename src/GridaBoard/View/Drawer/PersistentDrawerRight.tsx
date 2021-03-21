@@ -6,13 +6,14 @@ import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import { BoxProps, Button } from '@material-ui/core';
 import DrawerPages from './DrawerPages';
-import { updateDrawerWidth } from '../../../store/reducers/ui';
-import { RootState } from '../../../store/rootReducer';
+import { updateDrawerWidth } from '../../store/reducers/ui';
+import { RootState } from '../../store/rootReducer';
 import { useSelector } from "react-redux";
 import AddIcon from '@material-ui/icons/Add';
 import GridaDoc from '../../GridaDoc';
-import { setActivePageNo } from "../../../store/reducers/activePageReducer";
-import { scrollToBottom } from "../../../nl-lib/common/util";
+import { setActivePageNo } from "../../store/reducers/activePageReducer";
+import { scrollToBottom } from '../../../nl-lib/common/util';
+
 
 
 // const useStyles_HOME_TSX = makeStyles((theme: Theme) =>
@@ -69,7 +70,7 @@ import { scrollToBottom } from "../../../nl-lib/common/util";
 // https://codesandbox.io/s/resizable-drawer-34ife?from-embed=&file=/src/CustomDrawer.js:649-948
 
 const addPageStyle = {
-  
+
 } as React.CSSProperties;
 
 const addBlankPage = async (event) => {

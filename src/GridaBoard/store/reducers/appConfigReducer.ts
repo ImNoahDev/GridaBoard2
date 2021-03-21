@@ -1,10 +1,10 @@
 import { store } from "../../client/Root";
-import GridaDoc from "../../GridaBoard/GridaDoc";
-import { INeoSmartpen } from "../../nl-lib/common/neopen";
+import GridaDoc from "../../GridaDoc";
+import { INeoSmartpen } from "../../../nl-lib/common/neopen";
 
-import { IPrintOption } from "../../nl-lib/common/structures";
-import { g_defaultPrintOption } from "../../nl-lib/ncodepod";
-import { NeoSmartpen } from "../../nl-lib/neosmartpen";
+import { IPrintOption } from "../../../nl-lib/common/structures";
+import { g_defaultPrintOption } from "../../../nl-lib/ncodepod";
+import { NeoSmartpen } from "../../../nl-lib/neosmartpen";
 //[Define Action Types
 const ActionGroup = "APP_CONFIG";
 

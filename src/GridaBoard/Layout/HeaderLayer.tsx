@@ -3,19 +3,19 @@ import { Button, Popover } from "@material-ui/core";
 import KeyboardArrowDownRoundedIcon from '@material-ui/icons/KeyboardArrowDownRounded';
 import { saveGrida } from "../Save/SaveGrida";
 import LoadGrida from "../Load/LoadGrida";
-import PrintButton from "../../components/navbar/PrintButton";
+import PrintButton from "../components/navbar/PrintButton";
 import GridaDoc from "../GridaDoc";
 import { PDFDocument } from 'pdf-lib';
-import ConnectButton from "../../components/buttons/ConnectButton";
+import ConnectButton from "../components/buttons/ConnectButton";
 import GridaApp from "../GridaApp";
-import ManualCalibration from "../../components/navbar/ManualCalibration";
+import ManualCalibration from "../components/navbar/ManualCalibration";
 import { g_defaultPrintOption } from "../../nl-lib/ncodepod";
 import $ from "jquery";
 import SavePdfDialog from "../Save/SavePdfDialog";
 import { FileBrowserButton } from "../../nl-lib/common/neopdf";
 import { IFileBrowserReturn } from "../../nl-lib/common/structures";
 import { useSelector } from 'react-redux';
-import { RootState } from '../../store/rootReducer';
+import { RootState } from '../store/rootReducer';
 
 
 const imgStyle = {
@@ -85,7 +85,7 @@ const HeaderLayer = (props: Props) => {
         }
       }
       else {
-        //pdf인 경우 
+        //pdf인 경우
         if (pdfUrl !== page.pdf.url) {
           pdfUrl = page.pdf.url;
           const existingPdfBytes = await fetch(page.pdf.url).then(res => res.arrayBuffer());
@@ -194,7 +194,7 @@ const HeaderLayer = (props: Props) => {
     background: "rgba(255, 255, 255, 0.5)",
     zoom: 1 / brZoom,
   } as React.CSSProperties;
-  
+
   const saveDropdownStyle = {
     display: "flex",
     flexDirection: "column",
@@ -207,7 +207,7 @@ const HeaderLayer = (props: Props) => {
     boxShadow: "2px 2px 2px rgba(0, 0, 0, 0.25)",
     borderRadius: "12px",
   } as React.CSSProperties;
-  
+
   const loadDropdownStyle = {
     display: "flex",
     flexDirection: "column",

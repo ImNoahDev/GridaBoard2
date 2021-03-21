@@ -1,8 +1,8 @@
 import React from 'react';
 import '../../styles/main.css';
 import GridaToolTip from '../../styles/GridaToolTip';
-import { PrintNcodedPdfButton } from '../../nl-lib/ncodepod';
-import { turnOnGlobalKeyShortCut } from '../../GridaBoard/GlobalFunctions';
+import { PrintNcodedPdfButton } from '../../../nl-lib/ncodepod';
+import { turnOnGlobalKeyShortCut } from '../../GlobalFunctions';
 import { Button } from '@material-ui/core';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../store/rootReducer';

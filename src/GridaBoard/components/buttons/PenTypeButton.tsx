@@ -1,8 +1,8 @@
 import React from "react";
 import '../../styles/buttons.css';
 import GridaToolTip from "../../styles/GridaToolTip";
-import PenManager from "../../nl-lib/neosmartpen/PenManager";
-import { IBrushType } from "../../nl-lib/common/enums";
+import PenManager from "../../../nl-lib/neosmartpen/PenManager";
+import { IBrushType } from "../../../nl-lib/common/enums";
 import { IconButton, SvgIcon } from "@material-ui/core";
 
 
@@ -20,10 +20,10 @@ const penTypeStyleEnabled = {
 } as React.CSSProperties;
 
 export default function PenTypeButton () {
-  
+
   return (
     <React.Fragment>
-        <IconButton id="btn_pen" style={penTypeStyleEnabled} 
+        <IconButton id="btn_pen" style={penTypeStyleEnabled}
           onClick={() => manager.setPenRendererType(IBrushType.PEN)}>
           <GridaToolTip open={true} placement="left" tip={{
             head: "Pen Type[Pen]",
@@ -39,7 +39,7 @@ export default function PenTypeButton () {
             </SvgIcon>
           </GridaToolTip>
         </IconButton>
-        <IconButton id="btn_marker" style={penTypeStyle} 
+        <IconButton id="btn_marker" style={penTypeStyle}
           onClick={() => manager.setPenRendererType(IBrushType.MARKER)}>
           <GridaToolTip open={true} placement="left" tip={{
             head: "Pen Type[Marker]",
@@ -55,7 +55,7 @@ export default function PenTypeButton () {
             </SvgIcon>
           </GridaToolTip>
         </IconButton>
-        <IconButton id="btn_eraser" style={penTypeStyle} 
+        <IconButton id="btn_eraser" style={penTypeStyle}
           onClick={() => manager.setPenRendererType(IBrushType.ERASER)}>
           <GridaToolTip open={true} placement="left" tip={{
             head: "Pen Type[Eraser]",

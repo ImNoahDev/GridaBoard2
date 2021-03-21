@@ -1,10 +1,10 @@
 
 // 2020-12-09 현재 구현되어 있는 기능까지 단축키 완성(추가 구현된 기능 넣고 다른 버튼들 단축키 지정하기)
 
-import { store } from "../client/Root";
+import { store } from "./client/Root";
 import { IBrushType } from "../nl-lib/common/enums";
 import PenManager from "../nl-lib/neosmartpen/PenManager";
-import { setActivePageNo } from "../store/reducers/activePageReducer";
+import { setActivePageNo } from "./store/reducers/activePageReducer";
 import GridaDoc from "./GridaDoc";
 
 

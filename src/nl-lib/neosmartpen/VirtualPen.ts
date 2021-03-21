@@ -1,6 +1,6 @@
 import { EventDispatcher, EventCallbackType } from "../common/event";
 import PenManager from "./PenManager";
-import PUIController from "../../components/PUIController";
+import PUIController from "../../GridaBoard/components/PUIController";
 import { IBrushState, IPenEvent, NeoDot, NeoStroke } from "../common/structures";
 import { IBrushType, PEN_STATE, PenEventName } from "../common/enums";
 import { InkStorage, IOpenStrokeArg } from "../common/penstorage";
@@ -43,7 +43,7 @@ export default class VirtualPen implements INeoSmartpen {
   id: string = null;
   name?: string = "VirtualPen";
   rotationIndep: boolean = true;
-  
+
   lastState: PEN_STATE = PEN_STATE.NONE;
 
   // surfaceInfo: INoteServerItem = {
@@ -204,7 +204,7 @@ export default class VirtualPen implements INeoSmartpen {
     if (!this.storage) {
       console.error("Ink Storage has not been initialized");
     }
-    
+
     const penDownStrokeInfo = this.processPenDown(event);
     // const mac = this.mac;
     // const time = event.timeStamp;

@@ -4,7 +4,7 @@ import GridaToolTip from "../../styles/GridaToolTip";
 import { RootState } from '../../store/rootReducer';
 import { setRotationTrigger } from '../../store/reducers/rotate';
 import { useSelector } from 'react-redux';
-import GridaDoc from "../../GridaBoard/GridaDoc";
+import GridaDoc from "../../GridaDoc";
 import { IconButton, SvgIcon } from "@material-ui/core";
 import $ from "jquery";
 
@@ -23,7 +23,7 @@ const RotateButton = () => {
     setRotationTrigger(!rotationTrigger);
 
     let page = doc.getPageAt(activePageNo_store);
-    
+
     if (page._pdfPage !== undefined) {
       if (page._pdfPage.viewport.rotation >= 270) {
         page._pdfPage.viewport.rotation = 0;
@@ -45,7 +45,7 @@ const RotateButton = () => {
       $('#vertical_rotate').css('display', 'block');
       $('#horizontal_rotate').css('display', 'none');
     }
-    
+
     const tmp = page.pageOverview.sizePu.width ;
     page.pageOverview.sizePu.width = page.pageOverview.sizePu.height;
     page.pageOverview.sizePu.height = tmp;
@@ -74,7 +74,7 @@ const RotateButton = () => {
     zIndex: 1500,
     zoom: 1 / brZoom,
   } as React.CSSProperties;
-  
+
   const horizontalStyle = {
     background: "rgba(255, 255, 255, 0.8)",
     boxShadow: "2px 0px 24px rgba(0, 0, 0, 0.15), inset 0px 2px 0px rgba(255, 255, 255, 0.15)",
@@ -85,9 +85,9 @@ const RotateButton = () => {
     zoom: 1 / brZoom,
   } as React.CSSProperties;
   // if (activePageNo_store === -1) {
-    
+
   // }
-  
+
   return (
     <GridaToolTip open={true} placement="left" tip={{
         head: "Rotate",

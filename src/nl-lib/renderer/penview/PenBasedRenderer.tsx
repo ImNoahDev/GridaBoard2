@@ -15,7 +15,7 @@ import { MappingStorage } from "../../common/mapper";
 import { DefaultFilmNcode } from "../../common/constants";
 import { InkStorage } from "../../common/penstorage";
 
-import { setCalibrationData } from '../../../store/reducers/calibrationDataReducer';
+import { setCalibrationData } from '../../../GridaBoard/store/reducers/calibrationDataReducer';
 
 /**
  * Properties
@@ -30,7 +30,7 @@ interface Props { // extends MixedViewProps {
   onCanvasPositionChanged: (arg: { offsetX: number, offsetY: number, zoom: number }) => void;
 
   position: { offsetX: number, offsetY: number, zoom: number },
-  
+
   zoom: number,
 
   viewSize: ISize;
@@ -82,7 +82,7 @@ interface State {
   playState: PLAYSTATE,
 
   renderCount: number,
-  
+
 }
 
 /**
@@ -299,7 +299,7 @@ class PenBasedRenderer extends React.Component<Props, State> {
       this.makeUpPenEvents(nextProps.pens);
       ret_val = true;
     }
-    
+
     if (this.props.isBlankPage !== nextProps.isBlankPage) {
       if (nextProps.isBlankPage) {
         this.renderer.canvasFb.setBackgroundColor('rgba(255,255,255,1)', null);
@@ -312,9 +312,9 @@ class PenBasedRenderer extends React.Component<Props, State> {
       //회전 버튼을 누를 경우만 들어와야 하는 로직, 회전된 pdf를 로드할 때는 들어오면 안됨
       //로드할 경우에는 this.props의 basePageInfo가 nullNCode로 세팅돼있기 때문에 들어오지 않음
       const degrees = nextProps.rotation - this.props.rotation;
-      
+
       this.renderer.setRotation(nextProps.rotation);
-      
+
       // const ctx = this.canvas.getContext('2d');
       // ctx.rotate(180 * Math.PI / 180);
 
@@ -358,7 +358,7 @@ class PenBasedRenderer extends React.Component<Props, State> {
       const pageInfo = nextProps.pageInfo;
 
       console.log("`VIEW SIZE        PAGE CHANGE 0");
-      
+
       if (this.renderer && !this.props.calibrationMode) {
         // const { section, owner, book, page } = nextProps.pageInfo;
         console.log(`VIEW SIZE PAGE CHANGE 1: ${makeNPageIdStr(pageInfo)}`);
@@ -366,12 +366,12 @@ class PenBasedRenderer extends React.Component<Props, State> {
         if (isSameNcode(nextProps.pageInfo, DefaultFilmNcode)) {
           return;
         }
-        
+
         const transform = MappingStorage.getInstance().getNPageTransform(pageInfo);
         this.renderer.setTransformParameters(transform.h, this.pdfSize);
-        
+
         this.renderer.changePage(pageInfo, nextProps.pdfSize, false);
-        
+
         this.renderer.onPageSizeChanged(nextProps.pdfSize);
         this.pdfSize = { ...nextProps.pdfSize, scale: this.pdfSize.scale };
 
@@ -385,7 +385,7 @@ class PenBasedRenderer extends React.Component<Props, State> {
         ret_val = true;
       }
     }
-    
+
     const pageInfo = nextProps.pageInfo;
 
     if (this.props.pdfPageNo !== nextProps.pdfPageNo) { //빈 ncode page만 첫 load 할 때 worker에 pageInfo를 set해주기 위함
@@ -413,7 +413,7 @@ class PenBasedRenderer extends React.Component<Props, State> {
         ret_val = true;
       }
     }
-    
+
     return ret_val;
   }
 
@@ -466,7 +466,7 @@ class PenBasedRenderer extends React.Component<Props, State> {
   componentWillUnmount() {
     this.unsubscribeAllPensEvent();
     if (this.props.fromStorage) this.unsubScriptStorageEvent();
-    
+
     if (this.renderer) {
       this.renderer.prepareUnmount();
 
@@ -596,7 +596,7 @@ class PenBasedRenderer extends React.Component<Props, State> {
     }
 
     const nu = {x: (x_max + x_min) / 2, y: (y_max + y_min) / 2}
-    
+
     const clicked_point = {
       section: penCalibrationPoint.section,
       owner: penCalibrationPoint.owner,
@@ -604,16 +604,16 @@ class PenBasedRenderer extends React.Component<Props, State> {
       page: penCalibrationPoint.page,
       nu: {x: nu.x, y: nu.y},
     };
-    
+
     const { section, owner, book, page } = event;
     const pageInfo = { section, owner, book, page } as IPageSOBP;
     const { setCalibrationData2 } = this.props;
 
     const cali = {
-      section : section, 
-      owner: owner, 
-      book: book,  
-      page: page, 
+      section : section,
+      owner: owner,
+      book: book,
+      page: page,
       nu: {x: clicked_point.nu.x, y: clicked_point.nu.y},
     };
 

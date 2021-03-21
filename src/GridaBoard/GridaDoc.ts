@@ -1,7 +1,7 @@
 import GridaPage from "./GridaPage";
-import { store } from "../client/Root";
-import { forceToRenderPanes, setActivePageNo, setActivePdf, setDocNumPages, setUrlAndFilename } from "../store/reducers/activePageReducer";
-import { RootState } from "../store/rootReducer";
+import { store } from "./client/Root";
+import { forceToRenderPanes, setActivePageNo, setActivePdf, setDocNumPages, setUrlAndFilename } from "./store/reducers/activePageReducer";
+import { RootState } from "./store/rootReducer";
 
 import { g_availablePagesInSection, nullNcode } from "../nl-lib/common/constants";
 import { NeoPdfDocument, IPdfOpenOption, NeoPdfManager, PdfManagerEventName, IPdfManagerEvent } from "../nl-lib/common/neopdf";

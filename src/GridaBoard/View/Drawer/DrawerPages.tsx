@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { Box } from "@material-ui/core";
-import { RootState } from "../../../store/rootReducer";
+import { RootState } from "../../store/rootReducer";
 import { useSelector } from "react-redux";
 import GridaDoc from "../../GridaDoc";
 import ThumbnailItem from "./ThumbnailItem";

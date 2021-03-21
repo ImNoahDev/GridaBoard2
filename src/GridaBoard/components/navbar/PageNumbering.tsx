@@ -7,7 +7,7 @@ import NavigateBeforeIcon from '@material-ui/icons/NavigateBefore';
 import NavigateNextIcon from '@material-ui/icons/NavigateNext';
 import { IconButton } from '@material-ui/core';
 import $ from "jquery";
-import { turnOnGlobalKeyShortCut } from '../../GridaBoard/GlobalFunctions';
+import { turnOnGlobalKeyShortCut } from '../../GlobalFunctions';
 
 const selectPageStyle = {
   width: "35px",
@@ -18,16 +18,16 @@ const selectPageStyle = {
 const PageNumbering = () => {
     const numPages_store = useSelector((state: RootState) => state.activePage.numDocPages);
     const activePageNo_store = useSelector((state: RootState) => state.activePage.activePageNo);
-    
+
     let numPages, pageNo;
-    if (numPages_store < 1) { 
+    if (numPages_store < 1) {
       numPages = 1;
       pageNo = 1;
     } else {
       numPages = numPages_store;
       pageNo = activePageNo_store+1;
     }
-    
+
     const handleChange = (e) => {
       const value = parseInt(e.target.value);
       if (value > numPages) {
@@ -45,7 +45,7 @@ const PageNumbering = () => {
         $('#pre_btn').css('disabled')
       } else {
         setActivePageNo(pageNo - 2);
-      } 
+      }
     }
 
     const nextChange = (e) => {
@@ -64,8 +64,8 @@ const PageNumbering = () => {
       form.addEventListener("blur", function(event) {
         turnOnGlobalKeyShortCut(true);
       }, true)
-      
-    }, []); 
+
+    }, []);
 
     return (
       <div>

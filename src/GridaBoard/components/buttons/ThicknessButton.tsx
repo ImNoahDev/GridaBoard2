@@ -1,6 +1,6 @@
 import React from "react";
 import '../../styles/buttons.css';
-import PenManager from "../../nl-lib/neosmartpen/PenManager";
+import PenManager from "../../../nl-lib/neosmartpen/PenManager";
 import { IconButton, Popover, SvgIcon } from "@material-ui/core";
 import $ from "jquery";
 import { useSelector } from "react-redux";
@@ -50,7 +50,7 @@ export default function ThicknessButton () {
   const id = open ? 'simple-popover' : undefined;
 
   const brZoom = useSelector((state: RootState) => state.ui.browser.zoom);
-  
+
   return (
     <React.Fragment>
       <IconButton style={thicknessStyle} onClick={handleClick} aria-describedby={id}>
@@ -97,7 +97,7 @@ export default function ThicknessButton () {
                 d="M21.574 7.453a1.5 1.5 0 01-.027 2.121l-6.158 6a1.5 1.5 0 01-2.122-.028l-4.781-4.91L3.56 15.56a1.5 1.5 0 01-2.122-2.122l6-6a1.5 1.5 0 012.136.015l4.795 4.925 5.083-4.953a1.5 1.5 0 012.121.027z"
               />
             </SvgIcon>
-          </IconButton> 
+          </IconButton>
           <IconButton onClick={() => setThickness(3)}>
             <SvgIcon style={{width: "32px", height: "18px"}}>
               <path

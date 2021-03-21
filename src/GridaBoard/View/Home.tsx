@@ -1,10 +1,10 @@
 import React, { useState } from "react";
-import '../../styles/main.css'
+import '../styles/main.css'
 
-import PUIController from '../../components/PUIController';
+import PUIController from '../components/PUIController';
 import { turnOnGlobalKeyShortCut } from "../GlobalFunctions";
 import ViewLayer from "../Layout/ViewLayer";
-import { updateDrawerWidth } from "../../store/reducers/ui";
+import { updateDrawerWidth } from "../store/reducers/ui";
 import GridaDoc from "../GridaDoc";
 
 import {
@@ -27,9 +27,9 @@ const Home = () => {
   const pdfFilename = undefined as string;
   let pdfFingerprint = undefined as string;
   let pdfPageNo = 1;
-  
+
   const setDrawerWidth = (width: number) => updateDrawerWidth({ width });
-  
+
   useBeforeunload(() => "변경사항이 저장되지 않을 수 있습니다."); //edge, chrome에선 broswer 내장 dialog box의 string을 return하여 보여줌
 
   const handleDrawerOpen = () => {

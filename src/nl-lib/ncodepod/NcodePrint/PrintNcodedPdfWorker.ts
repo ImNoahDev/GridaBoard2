@@ -2,7 +2,7 @@ import { PageSizes, PDFDict, PDFDocument, PDFHexString, PDFName } from "pdf-lib"
 import { saveAs } from "file-saver";
 import printJS from "print-js";
 
-import { showCalibrationDialog } from '../../../store/reducers/calibrationReducer';
+import { showCalibrationDialog } from '../../../GridaBoard/store/reducers/calibrationReducer';
 import { IPrintingEvent, IPrintingReport, IPrintOption, IUnitString, IProgressCallbackFunction, IPrintingSheetDesc } from "../../common/structures";
 
 import { MappingStorage, PdfDocMapper } from "../../common/mapper";
@@ -599,7 +599,7 @@ export default class PrintNcodedPdfWorker {
     let maxCount = 0;
     if (this.printOption.hasToPutNcode) {
       //일반 용지에 인쇄하는 경우
-      maxCount = (numPages * 4) + (numSheets * 4) + numSheets + 1; 
+      maxCount = (numPages * 4) + (numSheets * 4) + numSheets + 1;
     } else {
       //ncode a4에 인쇄하는 경우
       maxCount = (numPages * 3) + (numSheets * 3) + numSheets + 1; //prepareSplittedNcodePlane에서 progressCallback이 빠짐

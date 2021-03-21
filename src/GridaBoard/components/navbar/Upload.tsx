@@ -4,7 +4,7 @@ import { gapi } from 'gapi-script';
 import { GoogleLogin } from 'react-google-login';
 import * as PdfJs from "pdfjs-dist";
 import { resolve } from 'path';
-import { MappingStorage } from '../../nl-lib/common/mapper/MappingStorage';
+import { MappingStorage } from '../../../nl-lib/common/mapper/MappingStorage';
 
 const st = MappingStorage.getInstance()
 const FOLDER_ID = "root";

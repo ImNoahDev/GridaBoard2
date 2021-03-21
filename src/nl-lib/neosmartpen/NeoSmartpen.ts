@@ -1,12 +1,12 @@
 import PenComm, { deviceSelectDlg } from "./pencomm/pencomm";
 import { EventDispatcher, EventCallbackType } from "../common/event";
 import PenManager, {DEFAULT_PEN_THICKNESS} from "./PenManager";
-import PUIController from "../../components/PUIController";
+import PUIController from "../../GridaBoard/components/PUIController";
 import { IBrushState, INoteServerItem, IPenEvent, NeoDot, NeoStroke, StrokePageAttr } from "../common/structures";
 import { IBrushType, PEN_STATE, PenEventName } from "../common/enums";
 import { InkStorage, IOpenStrokeArg } from "../common/penstorage";
 import { IPenToViewerEvent, INeoSmartpen } from "../common/neopen/INeoSmartpen";
-import { store } from "../../client/Root";
+import { store } from "../../GridaBoard/client/Root";
 
 interface IPenMovement {
   downEvent: IPenEvent,
@@ -399,7 +399,7 @@ export default class NeoSmartpen implements INeoSmartpen {
       })
       return;
     }
-    
+
     this.currPenMovement.numMovement++;
     event.isFirstDot = (this.currPenMovement.numMovement === 1);
 
@@ -446,7 +446,7 @@ export default class NeoSmartpen implements INeoSmartpen {
     const stroke = this.currPenMovement.stroke;
     const strokeKey = stroke.key;
     const pen = this;
-    
+
     // hand the event
     this.dispatcher.dispatch(PenEventName.ON_PEN_MOVE, { strokeKey, mac: stroke.mac, stroke, dot, pen, event } as IPenToViewerEvent);
     this.storage.appendDot(strokeKey, dot);
@@ -514,7 +514,7 @@ export default class NeoSmartpen implements INeoSmartpen {
    */
   onPenUp = (event: IPenEvent) => {
     this.lastState = PEN_STATE.PEN_UP;
-    
+
     const calibraionMode = store.getState().calibration.calibrationMode;
 
     this.currPenMovement.upEvent = event;

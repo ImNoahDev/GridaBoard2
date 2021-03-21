@@ -9,7 +9,7 @@ import { TransformParameters, ISize, IPageSOBP } from '../../common/structures';
 import { makeNPageIdStr } from '../../common/util';
 import { PATH_THICKNESS_SCALE } from '../../common/util';
 import { PDFVIEW_ZOOM_MAX, PDFVIEW_ZOOM_MIN } from '../RendererConstants';
-import { setViewFit } from '../../../store/reducers/viewFitReducer';
+import { setViewFit } from '../../../GridaBoard/store/reducers/viewFitReducer';
 import * as Solve from '../../common/math/echelon/SolveTransform';
 
 // const timeTickDuration = 20; // ms

@@ -13,7 +13,7 @@ import {
 import PdfDocMapper from "./PdfDocMapper";
 import { MappingItem } from "./MappingItem";
 import CoordinateTanslater from "./CoordinateTanslater";
-import { store } from "../../../client/Root";
+import { store } from "../../../GridaBoard/client/Root";
 
 export const BASECODE_PAGES_PER_SHEET = 16384;
 
@@ -331,7 +331,7 @@ export class MappingStorage {
     };
 
     // 제 생각에는 얘가 1)로 와야하는거 같은데.. temporary를 먼저 봐야해서요
-    // 2) Mapping된 PDF 페이지인지 확인한다. 
+    // 2) Mapping된 PDF 페이지인지 확인한다.
     const pdfItem = this.findPdfPage({ ...pageInfo, x: 10, y: 10 });
     if (pdfItem) {
       const pageMap = pdfItem.pageMapping;
@@ -410,7 +410,7 @@ export class MappingStorage {
       basePdfToNcodeMap = this.makeDummyParamsForBasePageInfo(basePageInfo, pi.pdf_name, pi.pdf_name, pi.pdf_name, pi.pdf_page_count + 1, false);
     }
     else {
-      // 
+      //
       const nextCode = getNextNcodePage(this._temporary.nextIssuable, 0);
       this._temporary.nextIssuable = getNextNcodePage(this._temporary.nextIssuable, numBlankPages);
 
@@ -494,12 +494,12 @@ export class MappingStorage {
    */
   findPdfPage = (ncodeXy: INcodeSOBPxy) => {
     const tempFound = this._temporary.arrDocMap.find(m => isPageInMapper(ncodeXy, m, m.numPages));
-    
+
     if (tempFound) {
       const pageMap = tempFound.params.find(param => isSamePage(ncodeXy, param.pageInfo));
       return { pdf: tempFound, pageMapping: pageMap } as IAutoLoadDocDesc;
     }
-    
+
     const dataFound = this._data.arrDocMap.find(m => isPageInRange(ncodeXy, m.printPageInfo, m.numPages));
 
     if (dataFound) {

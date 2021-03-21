@@ -4,7 +4,7 @@ import { IBrushType, PenEventName } from "../common/enums";
 import { IPenEvent } from "../common/structures";
 
 
-import ThemeManager from "../../styles/ThemeManager"
+import ThemeManager from "../../GridaBoard/styles/ThemeManager"
 import { INeoSmartpen, IPenToViewerEvent } from "../common/neopen/INeoSmartpen";
 import NeoSmartpen from "./NeoSmartpen";
 import { IPenManager } from "../common/neopen/IPenManager";
@@ -152,7 +152,7 @@ export default class PenManager {
         pen.setThickness(2);
       }
     }
-    
+
     this.penArray.push({
       id: device.id,
       mac: pen.getMac(),
@@ -279,7 +279,7 @@ export default class PenManager {
       $('#btn_marker').css('background', 'none');
       $('#marker_svg_icon').css('color', '#58627D');
     }
-    
+
     if (type == IBrushType.ERASER) {
       $('#btn_eraser').css('background', 'white');
       $('#eraser_svg_icon').css('color', '#688FFF');
@@ -287,7 +287,7 @@ export default class PenManager {
       $('#btn_eraser').css('background', 'none');
       $('#eraser_svg_icon').css('color', '#58627D');
     }
-    
+
     if (type == IBrushType.PEN) {
       $('#btn_pen').css('background', 'white');
       $('#pen_svg_icon').css('color', '#688FFF');

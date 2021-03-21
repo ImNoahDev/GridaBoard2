@@ -1,12 +1,12 @@
-import { 
+import {
   Box, Button, Dialog, DialogActions,
-  DialogTitle, makeStyles 
+  DialogTitle, makeStyles
 } from '@material-ui/core';
 import React from 'react';
 import { savePDF } from "./SavePdf";
 import PdfDialogTextArea from './PdfDialogTextArea';
-import { turnOnGlobalKeyShortCut } from '../../GridaBoard/GlobalFunctions';
-import GridaToolTip from '../../styles/GridaToolTip';
+import { turnOnGlobalKeyShortCut } from '../GlobalFunctions';
+import GridaToolTip from '../styles/GridaToolTip';
 import $ from "jquery";
 
 const useStyles = makeStyles({
@@ -89,7 +89,7 @@ const SavePdfDialog = () => {
         tail: "키보드 버튼 ?로 선택 가능합니다"
       }} title={undefined}>
         <Button className="save_drop_down" style={{
-          width: "160px", height: "40px", padding: "4px 12px" 
+          width: "160px", height: "40px", padding: "4px 12px"
         }} onClick={handlePdfDialogOpen}>
           <span style={{marginLeft: "-14px"}}>이미지 저장(.pdf)</span>
         </Button>

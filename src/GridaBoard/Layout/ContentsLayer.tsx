@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { RootState } from "../../store/rootReducer";
+import { RootState } from "../store/rootReducer";
 import GridaDoc from "../GridaDoc";
 import { NeoPdfDocument } from "../../nl-lib/common/neopdf";
 import { IFileBrowserReturn } from "../../nl-lib/common/structures";
@@ -9,8 +9,8 @@ import { nullNcode } from "../../nl-lib/common/constants";
 import { MixedPageView } from "../../nl-lib/renderer";
 import { PLAYSTATE } from "../../nl-lib/common/enums";
 import { PenManager } from "../../nl-lib/neosmartpen";
-import RotateButton from "../../components/buttons/RotateButton";
-import GridaToolTip from "../../styles/GridaToolTip";
+import RotateButton from "../components/buttons/RotateButton";
+import GridaToolTip from "../styles/GridaToolTip";
 import { Button, IconButton, Popover } from "@material-ui/core";
 import HelpIcon from '@material-ui/icons/Help';
 import $ from "jquery";
@@ -112,7 +112,7 @@ const ContentsLayer = (props: Props) => {
 
   const pens = useSelector((state: RootState) => state.appConfig.pens);
   const virtualPen = PenManager.getInstance().virtualPen;
-  
+
   const handlePageWidthNeeded = (width: number) => {
     setPageWidth(width);
   }
@@ -165,7 +165,7 @@ const ContentsLayer = (props: Props) => {
             left: "calc(96%)",
             zoom: 1 / brZoom,
           }}>
-            <HelpIcon fontSize="large" 
+            <HelpIcon fontSize="large"
               style={{
               zIndex: 1500,
               padding: 0,
@@ -219,7 +219,7 @@ const ContentsLayer = (props: Props) => {
         </div>
       </Popover>
       </div>
-      <div id="mixed-viewer-layer" style={{ 
+      <div id="mixed-viewer-layer" style={{
         position: "relative",
         height: '100%',
         float: "right",
@@ -227,7 +227,7 @@ const ContentsLayer = (props: Props) => {
         <MixedPageView
           pdf={pdf}
           pdfUrl={pdfUrl} filename={pdfFilename}
-          pdfPageNo={pdfPageNo} pens={[...pens, virtualPen]} 
+          pdfPageNo={pdfPageNo} pens={[...pens, virtualPen]}
           playState={PLAYSTATE.live}
           rotation={rotation}
           isMainView={true}
@@ -241,7 +241,7 @@ const ContentsLayer = (props: Props) => {
           autoPageChange={true}
           fromStorage={false}
           fitMargin={10}
-          
+
           activePageNo={activePageNo_store}
           handlePageWidthNeeded = {(width) => handlePageWidthNeeded(width)}
 

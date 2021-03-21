@@ -13,7 +13,7 @@ import "./index.css";
 
 import React from 'react';
 import ReactDOM from 'react-dom';
-import Root from './client/Root';
+import Root from './GridaBoard/client/Root';
 import './index.css';
 import * as serviceWorker from './serviceWorker';
 import { getBrowserZoomFactor} from "./nl-lib/common/util";

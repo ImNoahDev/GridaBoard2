@@ -5,16 +5,17 @@ import { useSelector, useDispatch } from 'react-redux';
 
 import "./pen_touch.css";
 
-import { theme } from '../../../../styles/theme';
-import { RootState } from '../../../../store/rootReducer';
-import { hideCalibrationDialog, showCalibrationDialog, updateCalibrationDialog, setCalibrationMode } from '../../../../store/reducers/calibrationReducer';
+// import { theme } from '../../../../styles/theme';
+import { theme } from '../../../../GridaBoard/styles/theme';
+import { RootState } from '../../../../GridaBoard/store/rootReducer';
+import { hideCalibrationDialog, showCalibrationDialog, updateCalibrationDialog, setCalibrationMode } from '../../../../GridaBoard/store/reducers/calibrationReducer';
 import { IPageSOBP, IPoint, IPrintOption } from '../../../common/structures';
 import { NeoPdfDocument, NeoPdfManager } from '../../../common/neopdf';
 import CalibrationData from '../../../common/mapper/Calibration/CalibrationData';
 import { MappingStorage } from '../../../common/mapper/MappingStorage';
 import { isSamePage, makeNPageIdStr } from "../../../common/util";
 import GridaApp from "../../../../GridaBoard/GridaApp";
-import ConnectButton from "../../../../components/buttons/ConnectButton";
+import ConnectButton from "../../../../GridaBoard/components/buttons/ConnectButton";
 
 const _penImageUrl = "/icons/image_calibration.png";
 
@@ -156,26 +157,26 @@ const CalibrationDialog = (props: IDialogProps) => {
       setCalibrationMode(false);
     }
   }, [show]);
-  
+
   useEffect(() => {
     if (!(calibrationData.section === -1 && calibrationData.owner === -1 && calibrationData.page === -1 && calibrationData.book === -1)) {
       const calibratedPageInfo: IPageSOBP = {
-        section: calibrationData.section, 
-        book: calibrationData.book, 
-        owner: calibrationData.owner, 
+        section: calibrationData.section,
+        book: calibrationData.book,
+        owner: calibrationData.owner,
         page: calibrationData.page
       };
 
       let duplicated = false;
       let notSamePageForFirstPage = false;
-      
+
       pageInfos.forEach((pageInfo) => {
         if (progress === 1) {
           if (!isSamePage(pageInfo, calibratedPageInfo)) {
             notSamePageForFirstPage = true;
             AlertGuideTitle = "동일한 페이지가 아님";
             AlertGuideText = "같은 PDF 페이지는 하나의 Ncode 용지에 대응되어야 합니다";
-          }  
+          }
         }
         if (progress > 1 && isSamePage(pageInfo, calibratedPageInfo)) {
           duplicated = true;
@@ -183,7 +184,7 @@ const CalibrationDialog = (props: IDialogProps) => {
           AlertGuideText = "이전에 등록한 페이지와 겹치는 페이지입니다\n인쇄된 용지를 확인해 주십시오";
         }
       });
-      
+
       if (duplicated || notSamePageForFirstPage) {
         handleOpenAlert();
         updateCalibrationDialog(progress);
@@ -209,7 +210,7 @@ const CalibrationDialog = (props: IDialogProps) => {
           nu.p2.y = calibrationData.nu.y;
 
           pu.p2.x = pageSize.width * 0.9;
-          pu.p2.y = pageSize.height * 0.9 
+          pu.p2.y = pageSize.height * 0.9
           break;
         }
         default: {
@@ -227,7 +228,7 @@ const CalibrationDialog = (props: IDialogProps) => {
           numPages: numPages,
           pageNo: pageNo
         }
-        
+
         const worker = new CalibrationData();
         const mapper = worker.createDocMapperItemOneStep(
           nu, pu, pageInfos, pdfPagesDesc, pdfPagesDesc.filename, numPages, 1
@@ -242,7 +243,7 @@ const CalibrationDialog = (props: IDialogProps) => {
       updateCalibrationDialog(progress+1);
     } //if end
   }, [calibrationData]);
- 
+
   useEffect(() => {
     if (pdf) {
       console.log("calibration: pdf loaded");
@@ -311,7 +312,7 @@ const CalibrationDialog = (props: IDialogProps) => {
               <Box fontSize={16} fontWeight="fontWeightRegular" >{calibrationGuide}</Box>
               <br/>
             </Box>
-            
+
             {/* 가이드에 없음 */}
             {/* <Box component="div" className={classes.root}>
               <Box fontSize={16} fontWeight="fontWeightRegular" >Processing... {percent}%</Box>
@@ -362,7 +363,7 @@ const CalibrationDialog = (props: IDialogProps) => {
           </Button>
         </DialogActions>
       </Dialog>
-      
+
     </React.Fragment>
   );
 }

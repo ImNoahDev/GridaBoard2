@@ -1,8 +1,8 @@
 import React from 'react';
 import '../../styles/main.css';
 import GridaToolTip from '../../styles/GridaToolTip';
-import { IPrintOption } from '../../nl-lib/common/structures';
-import { CalibrationButton } from '../../nl-lib/ncodepod';
+import { IPrintOption } from '../../../nl-lib/common/structures';
+import { CalibrationButton } from '../../../nl-lib/ncodepod';
 import { Button } from '@material-ui/core';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../store/rootReducer';
@@ -44,7 +44,7 @@ const ManualCalibration = (props: Props) => {
   if (activePageNo_store !== -1) {
     disabled = false;
   }
-  
+
   return (
     <CalibrationButton {...props} cancelCallback={cancelCallback} style={{marginRight: "33px"}} handlePdfUrl={props.handlePdfUrl}>
       <GridaToolTip open={true} placement="left-end" tip={{

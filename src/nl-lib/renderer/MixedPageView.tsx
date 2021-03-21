@@ -13,7 +13,7 @@ import { MappingStorage } from "../common/mapper";
 import { getNPaperSize_pu } from "../common/noteserver";
 import { PLAYSTATE, ZoomFitEnum } from "../common/enums";
 import { INeoSmartpen } from "../common/neopen";
-import { setZoomStore } from "../../store/reducers/zoomReducer";
+import { setZoomStore } from "../../GridaBoard/store/reducers/zoomReducer";
 
 
 export const ZINDEX_INK_LAYER = 3;
@@ -94,7 +94,7 @@ export interface MixedViewProps {
    * autoChangePage가 true 인 상태에서만 동작한다
    **/
   handleFileLoadNeeded?: (event: IHandleFileLoadNeededEvent) => void,
-  
+
   parentName: string;
   activePageNo: number;
 
@@ -565,7 +565,7 @@ class MixedPageView_module extends React.Component<MixedViewProps, State>  {
     if (this.props.isMainView) {
       setZoomStore(arg.zoom);
     }
-    
+
     this.handlePageWidthNeeded(this._internal.width);
     // const r = this._internal.renderCount;
     // this.setState({ renderCount: r + 1 });
@@ -649,7 +649,7 @@ class MixedPageView_module extends React.Component<MixedViewProps, State>  {
             fitMargin={this.props.fitMargin}
             viewFit={this.props.viewFit}
             pens={this.props.pens}
-            rotation={this.props.rotation} 
+            rotation={this.props.rotation}
             isMainView={this.props.isMainView}
             fromStorage={this.props.fromStorage}
             noInfo={this.props.noInfo}

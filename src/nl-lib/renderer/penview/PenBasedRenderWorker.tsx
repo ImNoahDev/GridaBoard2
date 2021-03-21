@@ -13,7 +13,7 @@ import { MappingStorage } from "../../common/mapper/MappingStorage";
 import { calcRevH } from "../../common/mapper/CoordinateTanslater";
 import { applyTransform } from "../../common/math/echelon/SolveTransform";
 import GridaDoc from "../../../GridaBoard/GridaDoc";
-import { setActivePageNo } from "../../../store/reducers/activePageReducer";
+import { setActivePageNo } from "../../../GridaBoard/store/reducers/activePageReducer";
 
 // import { PaperInfo } from "../../common/noteserver";
 
@@ -306,11 +306,11 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
       x0_pu: pdf_x0, y0_pu: pdf_y0, x1_pu: pdf_x1, y1_pu: pdf_y1
     }
 
-    
+
     for (let i = 0; i < this.localPathArray.length; i++) {
       const fabricPath = this.localPathArray[i];
       const pathDataStr = fabricPath.path.join();
-      
+
       let needThumbnailRedraw = false;
 
       if (this.storage.collisionTest(pathDataStr, eraserLine)) {
@@ -323,7 +323,7 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
         completed.splice(idx, 1);
 
         if (needThumbnailRedraw) {
-          this.storage.dispatcher.dispatch(PenEventName.ON_ERASER_MOVE, 
+          this.storage.dispatcher.dispatch(PenEventName.ON_ERASER_MOVE,
             {section: pageInfo.section, owner: pageInfo.owner, book: pageInfo.book, page: pageInfo.page});
         }
       }
@@ -501,14 +501,14 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
       this.removeAllCanvasObject();
       this.resetLocalPathArray();
       this.resetPageDependentData();
-  
+
       const strokesAll = this.storage.getPageStrokes(pageInfo);
       const strokes = strokesAll.filter(stroke => stroke.brushType !== IBrushType.ERASER);
-  
+
       this.addStrokePaths(strokes, rotationIndep);
     }
   }
-  
+
   rotate = (degrees, pageInfo) => {
     const ins = InkStorage.getInstance();
     const pageId = InkStorage.makeNPageIdStr(pageInfo);
@@ -526,7 +526,7 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
     //     // 1. subtractEquals
     //     pdf_xy.x -= canvasCenterSrc.x;
     //     pdf_xy.y -= canvasCenterSrc.y;
-        
+
     //     // 2. rotateVector
     //     const v = fabric.util.rotateVector(pdf_xy, radians);
 
@@ -744,7 +744,7 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
       // 1. subtractEquals
       // pt.x -= canvasCenterSrc.x;
       // pt.y -= canvasCenterSrc.y;
-      
+
       // // 2. rotateVector
       // const v = fabric.util.rotateVector(pt, radians);
 

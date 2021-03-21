@@ -3,8 +3,8 @@ import { useSelector } from "react-redux";
 import { Paper, Typography } from "@material-ui/core";
 
 import GridaDoc from "../../GridaDoc";
-import { RootState } from "../../../store/rootReducer";
-import { setActivePageNo } from '../../../store/reducers/activePageReducer';
+import { RootState } from "../../store/rootReducer";
+import { setActivePageNo } from '../../store/reducers/activePageReducer';
 
 import { MixedPageView } from "../../../nl-lib/renderer";
 import { makeNPageIdStr } from "../../../nl-lib/common/util";
@@ -85,7 +85,7 @@ const ThumbnailItem = (props: Props) => {
           playState={playState} pens={[]}
           rotation={rotation}
           isMainView={false}
-          
+
           pageInfo={pageInfo}
           basePageInfo={basePageInfo}
 
@@ -96,7 +96,7 @@ const ThumbnailItem = (props: Props) => {
           fitMargin={5}
           // fixed
           noInfo
-          
+
           activePageNo={activePageNo}
 
           renderCountNo={renderCountNo}

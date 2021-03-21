@@ -1,5 +1,5 @@
 import jQuery from "jquery";
-import PenManager from "../nl-lib/neosmartpen/PenManager";
+import PenManager from "../../nl-lib/neosmartpen/PenManager";
 
 const $ = jQuery;
 let _thememanager_instance = null;

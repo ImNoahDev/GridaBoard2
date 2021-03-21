@@ -1,7 +1,7 @@
 import React from 'react';
 import '../../styles/main.css';
 import GridaToolTip from '../../styles/GridaToolTip';
-import PenManager from '../../nl-lib/neosmartpen/PenManager';
+import PenManager from '../../../nl-lib/neosmartpen/PenManager';
 import Button from '@material-ui/core/Button';
 import { Popover } from '@material-ui/core';
 import { useSelector } from 'react-redux';

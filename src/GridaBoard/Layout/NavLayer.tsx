@@ -11,14 +11,14 @@ import { MappingStorage } from "../../nl-lib/common/mapper";
 import { NoteServerClient } from "../../nl-lib/common/noteserver";
 
 import KeyboardArrowDownRoundedIcon from '@material-ui/icons/KeyboardArrowDownRounded';
-import PenTypeButton from "../../components/buttons/PenTypeButton";
-import ThicknessButton from "../../components/buttons/ThicknessButton";
-import TracePointButton from "../../components/buttons/TracePointButton";
-import ColorButtons from "../../components/navbar/ColorButtons";
-import BackgroundButton from "../../components/buttons/BackgroundButton";
-import FitButton from "../../components/buttons/FitButton";
-import PageNumbering from "../../components/navbar/PageNumbering";
-import { RootState } from "../../store/rootReducer";
+import PenTypeButton from "../components/buttons/PenTypeButton";
+import ThicknessButton from "../components/buttons/ThicknessButton";
+import TracePointButton from "../components/buttons/TracePointButton";
+import ColorButtons from "../components/navbar/ColorButtons";
+import BackgroundButton from "../components/buttons/BackgroundButton";
+import FitButton from "../components/buttons/FitButton";
+import PageNumbering from "../components/navbar/PageNumbering";
+import { RootState } from "../store/rootReducer";
 
 
 const printBtnId = "printTestButton";
