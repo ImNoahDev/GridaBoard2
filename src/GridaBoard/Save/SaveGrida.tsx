@@ -38,7 +38,7 @@ export async function saveGrida(gridaName: string) {
       //ncode page일 경우
       if (pdfDoc === undefined) {
         pdfDoc = await PDFDocument.create();
-      } 
+      }
       const pdfPage = await pdfDoc.addPage();
       if (page._rotation === 90 || page._rotation === 270) {
         const tmpWidth = pdfPage.getWidth();
@@ -51,7 +51,7 @@ export async function saveGrida(gridaName: string) {
         pdfUrl = page.pdf.url;
         const existingPdfBytes = await fetch(page.pdf.url).then(res => res.arrayBuffer());
         let pdfDocSrc = await PDFDocument.load(existingPdfBytes);
-  
+
         if (pdfDoc !== undefined) {
           //ncode 페이지가 미리 생성돼서 그 뒤에다 붙여야하는 경우
           const srcLen = pdfDocSrc.getPages().length;
@@ -59,9 +59,9 @@ export async function saveGrida(gridaName: string) {
           for (let i = 0; i<srcLen; i++) {
             totalPageArr.push(i);
           }
-  
+
           const copiedPages = await pdfDoc.copyPages(pdfDocSrc, totalPageArr);
-  
+
           for (const copiedPage of copiedPages) {
             await pdfDoc.addPage(copiedPage);
           }
@@ -92,9 +92,9 @@ export async function saveGrida(gridaName: string) {
 
     for (const docPage of docPages) {
       //page info를 grida doc의 그것과 비교해서 어떤 pdf doc에 stroke를 그릴지 결정
-      const { section, book, owner, page } = docPage.basePageInfo;
-      const pageId = InkStorage.makeNPageIdStr({ section, book, owner, page });
-      
+      const { section, owner, book, page } = docPage.basePageInfo;
+      const pageId = InkStorage.makeNPageIdStr({ section, owner, book, page });
+
       if (pageId === key) {
         i = docPage.pageNo;
         rotation = docPage._rotation
@@ -104,7 +104,7 @@ export async function saveGrida(gridaName: string) {
         }
       }
     }
-    
+
     const page = pages[i];
 
     for (let j = 0; j < NeoStrokes.length; j++) {
@@ -130,7 +130,7 @@ export async function saveGrida(gridaName: string) {
           // 1. subtractEquals
           pdf_xy.x -= canvasCenterSrc.x;
           pdf_xy.y -= canvasCenterSrc.y;
-          
+
           // 2. rotateVector
           var v = fabric.util.rotateVector(pdf_xy, radians);
 
@@ -141,7 +141,7 @@ export async function saveGrida(gridaName: string) {
           pointArray.push({ x: v.x, y: v.y, f: dot.f });
         }
         page.setRotation(degrees(rotation));
-        
+
       } else { //ncode page 일 때
         for (let k = 0; k < dotArr.length; k++) {
           const dot = dotArr[k];
@@ -152,7 +152,7 @@ export async function saveGrida(gridaName: string) {
       }
     }
   }
-  
+
   //하나의 pdf로 완성됨 pdfDocument에 새로운 그리다 전체 pdf가 포함되어있음
   let newRawData;
   const pdfBytes = await pdfDoc.save();
@@ -167,7 +167,7 @@ export async function saveGrida(gridaName: string) {
     pdfInfo : {
       pageInfo: { "s": pdfSection[0], "o": pdfOwner[0], "b": pdfBook[0], "p": pdfPage[0] },
       rawData: newRawData
-    } 
+    }
   };
 
   let stroke = strokeInfos;
@@ -190,9 +190,9 @@ export async function saveGrida(gridaName: string) {
 
   const blob = new Blob([mappingInfoStr], { type: 'application/json' });
   saveAs(blob, gridaName);
-  
+
 }
- 
+
 
 
 

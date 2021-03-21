@@ -35,10 +35,10 @@ export async function savePDF(saveName: string) {
         pdfPage.setWidth(pdfPage.getHeight());
         pdfPage.setHeight(tmpWidth);
       }
-    } 
+    }
     else {
-      //pdf인 경우 
-      if (pdfUrl !== page.pdf.url) { 
+      //pdf인 경우
+      if (pdfUrl !== page.pdf.url) {
         pdfUrl = page.pdf.url;
         const existingPdfBytes = await fetch(page.pdf.url).then(res => res.arrayBuffer());
         let pdfDocSrc = await PDFDocument.load(existingPdfBytes);
@@ -73,15 +73,15 @@ export async function savePDF(saveName: string) {
 
   let i = 0;
   for (const [key, NeoStrokes] of sortedCompletedOnPage.entries()) {
-    
+
     let rotation = 0;
     let isPdf = true;
 
     for (const docPage of docPages) {
       //page info를 grida doc의 그것과 비교해서 어떤 pdf doc에 stroke를 그릴지 결정
-      const { section, book, owner, page } = docPage.basePageInfo;
-      const pageId = InkStorage.makeNPageIdStr({ section, book, owner, page });
-      
+      const { section, owner, book, page } = docPage.basePageInfo;
+      const pageId = InkStorage.makeNPageIdStr({ section, owner, book, page });
+
       if (pageId === key) {
         i = docPage.pageNo;
         rotation = docPage._rotation
@@ -126,7 +126,7 @@ export async function savePDF(saveName: string) {
           // 1. subtractEquals
           pdf_xy.x -= canvasCenterSrc.x;
           pdf_xy.y -= canvasCenterSrc.y;
-          
+
           // 2. rotateVector
           var v = fabric.util.rotateVector(pdf_xy, radians);
 
@@ -138,7 +138,7 @@ export async function savePDF(saveName: string) {
         }
 
         page.setRotation(degrees(rotation));
-        
+
       } else { //ncode page 일 때
         for (let k = 0; k < dotArr.length; k++) {
           const dot = dotArr[k];
@@ -154,7 +154,7 @@ export async function savePDF(saveName: string) {
       }
 
       const pathData = drawPath(pointArray, strokeThickness);
-      
+
       page.moveTo(0, pageHeight);
       page.drawSvgPath(pathData, {
         color: rgb(

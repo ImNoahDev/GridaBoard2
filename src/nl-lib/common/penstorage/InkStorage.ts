@@ -88,8 +88,8 @@ export default class InkStorage {
    * @param pageInfo
    */
   public getPageStrokes(pageInfo: IPageSOBP): NeoStroke[] {
-    const { section, book, owner, page } = pageInfo;
-    const pageId = InkStorage.makeNPageIdStr({ section, book, owner, page });
+    const { section, owner, book, page } = pageInfo;
+    const pageId = InkStorage.makeNPageIdStr({ section, owner, book, page });
 
     const completed = this.completedOnPage;
     const arr = completed.get(pageId);
@@ -99,8 +99,8 @@ export default class InkStorage {
   }
 
   public removeStrokeFromPage(pageInfo: IPageSOBP) {
-    const { section, book, owner, page } = pageInfo;
-    const pageId = InkStorage.makeNPageIdStr({ section, book, owner, page });
+    const { section, owner, book, page } = pageInfo;
+    const pageId = InkStorage.makeNPageIdStr({ section, owner, book, page });
 
     const completed = this.completedOnPage;
     completed.delete(pageId);
@@ -110,8 +110,8 @@ export default class InkStorage {
    * @param pageInfo
    */
   public getPageStrokes_live(pageInfo: IPageSOBP): NeoStroke[] {
-    const { section, book, owner, page } = pageInfo;
-    const pageId = InkStorage.makeNPageIdStr({ section, book, owner, page });
+    const { section, owner, book, page } = pageInfo;
+    const pageId = InkStorage.makeNPageIdStr({ section, owner, book, page });
 
 
     /** @type {Map.<string, Map>} - (pageId) ==> (strokeKey ==> NeoStroke) */
@@ -155,16 +155,16 @@ export default class InkStorage {
    * @param stroke
    */
   private addCompletedToPage(stroke: NeoStroke) {
-    const { section, book, owner, page } = stroke;
-    let pageId = InkStorage.makeNPageIdStr({ section, book, owner, page });
+    const { section, owner, book, page } = stroke;
+    let pageId = InkStorage.makeNPageIdStr({ section, owner, book, page });
 
     const activePageNo = store.getState().activePage.activePageNo;
     const basePageInfo = GridaDoc.getInstance().getPage(activePageNo).basePageInfo;
 
-    if (isSameNcode(DefaultFilmNcode, {section, book, owner, page})) {
+    if (isSameNcode(DefaultFilmNcode, {section, owner, book, page})) {
       pageId = InkStorage.makeNPageIdStr({ section: basePageInfo.section, book: basePageInfo.book, owner: basePageInfo.owner, page: basePageInfo.page });
     }
-    // console.log( `add completed: ${mac},  ${pageId} = ${section}.${book}.${owner}.${page} `);
+    // console.log( `add completed: ${mac},  ${pageId} = ${section}.${owner}.${book}.${page} `);
 
     // stroke에 점이 하나라도 있어야 옮긴다.
     if (stroke.dotArray.length > 0) {
@@ -181,7 +181,7 @@ export default class InkStorage {
       const arr = completed.get(pageId);
       arr.push(stroke);
 
-      this.lastPageInfo = { section, book, owner, page };
+      this.lastPageInfo = { section, owner, book, page };
       // console.log(completed);
     }
   }
@@ -191,8 +191,8 @@ export default class InkStorage {
    * @param stroke
    */
   private addRealtimeToPage(stroke: NeoStroke) {
-    const { section, book, owner, page, key } = stroke;
-    const pageId = InkStorage.makeNPageIdStr({ section, book, owner, page });
+    const { section, owner, book, page, key } = stroke;
+    const pageId = InkStorage.makeNPageIdStr({ section, owner, book, page });
 
 
     /** @type {Map.<string, Map>} - (pageId) ==> (strokeKey ==> NeoStroke) */
@@ -211,8 +211,8 @@ export default class InkStorage {
    * @param stroke
    */
   private removeFromRealtime(stroke: NeoStroke) {
-    const { section, book, owner, page, key } = stroke;
-    const pageId = InkStorage.makeNPageIdStr({ section, book, owner, page });
+    const { section, owner, book, page, key } = stroke;
+    const pageId = InkStorage.makeNPageIdStr({ section, owner, book, page });
 
     /** @type {Map.<string, Map>} - (pageId) ==> (strokeKey ==> NeoStroke) */
     const realtime = this.realtimeOnPage;
@@ -233,8 +233,8 @@ export default class InkStorage {
    * @param info
    */
   static makeNPageIdStr(pageInfo: IPageSOBP): string {
-    const { section, book, owner, page } = pageInfo;
-    return `${section}.${book}.${owner}.${page}`;
+    const { section, owner, book, page } = pageInfo;
+    return `${section}.${owner}.${book}.${page}`;
   }
 
   static getPageSOBP(pageId: string): IPageSOBP {

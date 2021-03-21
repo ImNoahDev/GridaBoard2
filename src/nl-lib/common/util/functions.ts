@@ -32,7 +32,7 @@ export function makeNPageId(pageInfo: IPageSOBP) {
 
 export function makeNPageIdStr(pageInfo: IPageSOBP) {
   if (pageInfo) {
-    const { section, book, owner, page } = pageInfo;
+    const { section, owner, book, page } = pageInfo;
     if (section === undefined) return "section undefined";
     return `${section}.${owner}.${book}.${page}`;
   }

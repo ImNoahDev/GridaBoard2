@@ -294,7 +294,7 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
   }
 
   eraseOnLine(pdf_x0, pdf_y0, pdf_x1, pdf_y1, stroke) {
-    const { section, book, owner, page } = stroke;
+    const { section, owner, book, page } = stroke;
     const pageInfo = {
       section: section,
       book: book,
