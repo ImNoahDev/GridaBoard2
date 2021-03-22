@@ -89,9 +89,9 @@ const SavePdfDialog = () => {
         tail: "키보드 버튼 ?로 선택 가능합니다"
       }} title={undefined}>
         <Button className="save_drop_down" style={{
-          width: "160px", height: "40px", padding: "4px 12px"
+          width: "200px", height: "40px", padding: "4px 12px"
         }} onClick={handlePdfDialogOpen}>
-          <span style={{marginLeft: "-14px"}}>이미지 저장(.pdf)</span>
+          <span style={{marginLeft: "-54px"}}>이미지 저장(.pdf)</span>
         </Button>
       </GridaToolTip>
       <Dialog open={open} onClose={handlePdfDialogClose} aria-labelledby="form-dialog-title">

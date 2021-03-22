@@ -40,7 +40,6 @@ const aStyle = {
 const buttonStyle = {
   width: "80px",
   height: "16px",
-  top: "2px",
   fontFamily: "Roboto",
   fontStyle: "normal",
   fontWeight: "normal",
@@ -213,7 +212,7 @@ const HeaderLayer = (props: Props) => {
     alignItems: "flex-start",
     padding: "8px",
     position: "absolute",
-    width: "180px",
+    width: "220px",
     height: "90px",
     background: "rgba(255,255,255,0.9)",
     boxShadow: "2px 2px 2px rgba(0, 0, 0, 0.25)",
@@ -259,37 +258,13 @@ const HeaderLayer = (props: Props) => {
             <div id="saveDrop" className="saveDropDownContent" style={saveDropdownStyle}>
               <SavePdfDialog />
               <Button className="save_drop_down" style={{
-                width: "160px", height: "40px", padding: "4px 12px",
+                width: "200px", height: "40px", padding: "4px 12px",
               }} onClick={() => saveGrida('hello.grida')}>
-                <span>데이터 저장(.grida)</span>
+                <span style={{marginLeft: "-40px"}}>데이터 저장(.grida)</span>
               </Button>
             </div>
           </div>
           
-          {/* <Popover
-            style={{zoom: 1 / brZoom}}
-            id={saveId}
-            open={saveOpen}
-            anchorEl={saveAnchorEl}
-            onClose={handleCloseSave}
-            anchorOrigin={{
-              vertical: 'top',
-              horizontal: 'right'
-            }}
-            transformOrigin={{
-              vertical: 'top',
-              horizontal: 'left',
-            }}
-          >
-            <div style={saveDropdownStyle}>
-              <SavePdfDialog />
-              <Button className="save_drop_down" style={{
-                width: "160px", height: "40px", padding: "4px 12px",
-              }} onClick={() => saveGrida('hello.grida')}>
-                <span>데이터 저장(.grida)</span>
-              </Button>
-            </div>
-          </Popover> */}
           <div>
             <Button id="load" className="loadDropDown" style={buttonStyle} onClick={handleClickLoad} aria-describedby={loadId}>
               불러오기
@@ -299,27 +274,6 @@ const HeaderLayer = (props: Props) => {
               <LoadGrida />
             </div>
           </div>
-          
-          {/* <Popover
-            style={{zoom: 1 / brZoom}}
-            id={loadId}
-            open={loadOpen}
-            anchorEl={loadAnchorEl}
-            onClose={handleCloseLoad}
-            anchorOrigin={{
-              vertical: 'top',
-              horizontal: 'right'
-            }}
-            transformOrigin={{
-              vertical: 'top',
-              horizontal: 'left',
-            }}
-          >
-            <div style={loadDropdownStyle}>
-              <FileBrowserButton handlePdfOpen={handlePdfOpen} />
-              <LoadGrida />
-            </div>
-          </Popover> */}
 
           <PrintButton targetId={printBtnId} url={pdfUrl} filename={pdfFilename} handlePdfUrl={makePdfUrl} />
           <ManualCalibration filename={pdfFilename} printOption={printOption} handlePdfUrl={makePdfUrl} />
