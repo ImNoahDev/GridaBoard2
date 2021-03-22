@@ -89,11 +89,11 @@ const RotateButton = () => {
   // }
 
   return (
-    <GridaToolTip open={true} placement="left" tip={{
-        head: "Rotate",
-        msg: "종이 또는 스마트 플레이트의 입력이 회전되어 반영될지 아닐지를 선택합니다.",
-        tail: "TAB 가로쓰기/세로쓰기 전환"
-      }} title={undefined}>
+    // <GridaToolTip open={true} placement="left" tip={{
+    //     head: "Rotate",
+    //     msg: "종이 또는 스마트 플레이트의 입력이 회전되어 반영될지 아닐지를 선택합니다.",
+    //     tail: "TAB 가로쓰기/세로쓰기 전환"
+    //   }} title={undefined}>
       <div className="c2">
         <IconButton id="vertical_rotate" style={verticalStyle} onClick={onToggleRotate} disabled={disabled}>
           <SvgIcon>
@@ -120,7 +120,7 @@ const RotateButton = () => {
           </SvgIcon>
         </IconButton>
       </div>
-    </GridaToolTip>
+    // </GridaToolTip>
   );
 }
 

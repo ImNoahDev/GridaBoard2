@@ -8,8 +8,8 @@ import { useSelector } from 'react-redux';
 import { RootState } from '../../store/rootReducer';
 
 const mappingStyle = {
-  display: "flex",
-  width: "88px",
+  // display: "flex",
+  width: "140px",
   height: "30px",
   justifyContent: "center",
   background: "rgba(255, 255, 255, 0.5)",
@@ -22,11 +22,12 @@ const mappingStyle = {
 } as React.CSSProperties;
 
 const mappingTextStyle = {
-  width: "68px",
+  width: "80px",
   height: "14px",
   fontSize: "12px",
   lineHeight: "14px",
-  margin: "8px"
+  marginLeft: "-40px"
+  // margin: "8px"
 } as React.CSSProperties;
 
 type Props = {
@@ -47,17 +48,17 @@ const ManualCalibration = (props: Props) => {
 
   return (
     <CalibrationButton {...props} cancelCallback={cancelCallback} style={{marginRight: "33px"}} handlePdfUrl={props.handlePdfUrl}>
-      <GridaToolTip open={true} placement="left-end" tip={{
+      {/* <GridaToolTip open={true} placement="left-end" tip={{
         head: "인쇄된 페이지 수동 등록",
         msg: "Ncode A4에 인쇄된 페이지를 프로그램에 수동 등록합니다.",
         tail: "단축키 Q로 선택가능합니다."
-      }} title={undefined}>
+      }} title={undefined}> */}
         <div>
           <Button style={mappingStyle} disabled={disabled}>
-            <span style={mappingTextStyle}>nCode 맵핑</span>
+            <span style={mappingTextStyle}>인쇄 페이지 순서 등록</span>
           </Button>
         </div>
-      </GridaToolTip>
+      {/* </GridaToolTip> */}
     </CalibrationButton>
   )
 }

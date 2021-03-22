@@ -83,17 +83,20 @@ const LoadGrida = () => {
   });
 
   return (
-      <GridaToolTip open={true} placement="top-end" tip={{
-        head: "Grida Load",
-        msg: ".grida 파일을 로컬에서 불러옵니다.",
-        tail: "키보드 버튼 ?로 선택 가능합니다"
-      }} title={undefined}>
-        <Button className="load_drop_down" onClick={fileOpenHandler} style={{
+      // <GridaToolTip open={true} placement="top-end" tip={{
+      //   head: "Grida Load",
+      //   msg: ".grida 파일을 로컬에서 불러옵니다.",
+      //   tail: "키보드 버튼 ?로 선택 가능합니다"
+      // }} title={undefined}>
+        <Button className="load_drop_down" 
+        // onClick={fileOpenHandler}
+        onClick={() => alert('미구현된 기능입니다.')} 
+        style={{
           width: "200px", height: "40px", padding: "4px 12px"
         }}>
           <span>데이터 불러오기(.grida)</span>
         </Button>
-      </GridaToolTip>
+      // </GridaToolTip>
   );
 }
 

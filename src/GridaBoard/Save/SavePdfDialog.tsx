@@ -83,17 +83,17 @@ const SavePdfDialog = () => {
 
   return (
     <div>
-      <GridaToolTip open={true} placement="top-end" tip={{
+      {/* <GridaToolTip open={true} placement="top-end" tip={{
         head: "PDF File Save",
         msg: "PDF 파일을 로컬에 저장하는 버튼입니다.",
         tail: "키보드 버튼 ?로 선택 가능합니다"
-      }} title={undefined}>
+      }} title={undefined}> */}
         <Button className="save_drop_down" style={{
           width: "200px", height: "40px", padding: "4px 12px"
         }} onClick={handlePdfDialogOpen}>
           <span style={{marginLeft: "-54px"}}>이미지 저장(.pdf)</span>
         </Button>
-      </GridaToolTip>
+      {/* </GridaToolTip> */}
       <Dialog open={open} onClose={handlePdfDialogClose} aria-labelledby="form-dialog-title">
         <DialogTitle id="form-dialog-title" className={classes.title}>
           <Box fontSize={20} fontWeight="fontWeightBold" className={classes.titleBox}>

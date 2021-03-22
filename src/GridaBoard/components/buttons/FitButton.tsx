@@ -94,13 +94,13 @@ export default function FitButton() {
     <React.Fragment>
       <div>
         <Button type="button" id="btn_fit" className="fitDropDown" onClick={handleClickFit}>
-          <GridaToolTip open={true} placement="left" tip={{
+          {/* <GridaToolTip open={true} placement="left" tip={{
               head: "Fit",
               msg: "용지의 크기를 맞추는 여러 옵션 중 하나를 선택합니다.",
               tail: "Z 폭 맞춤, X 높이 맞춤, C 전체 페이지, V 100%"
-            }} title={undefined}>
+            }} title={undefined}> */}
             <span id="zoom-ratio" className="fitDropDown">{zoomPercent}%</span>
-          </GridaToolTip>
+          {/* </GridaToolTip> */}
         </Button>
       </div>
 
