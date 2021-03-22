@@ -49,15 +49,15 @@ const PrintButton = (props: Props) => {
         handkeTurnOnAppShortCutKey={turnOnGlobalKeyShortCut}
         style={{ margin: 0, padding: 0, }}
         url={props.url} filename={props.filename} handlePdfUrl={props.handlePdfUrl} disabled={disabled}>
-        <GridaToolTip open={true} placement="top" tip={{
+        {/* <GridaToolTip open={true} placement="top" tip={{
           head: "Print",
           msg: "PDF파일을 프린트하는 버튼입니다.",
           tail: "단축키 Q로 선택가능합니다."
-        }} title={undefined}>
+        }} title={undefined}> */}
           <Button id="print" style={buttonStyle} disabled={disabled}>
             프린트
           </Button>
-        </GridaToolTip>
+        {/* </GridaToolTip> */}
       </PrintNcodedPdfButton>
     </React.Fragment>
   )

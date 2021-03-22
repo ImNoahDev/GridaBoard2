@@ -76,114 +76,114 @@ const ColorButtons = () => {
         <div id="colorDrop" className="selected_color" style={colorDropDownStyle}>
           <ButtonBase id="clr_1" type="button" className="color_btn" style={groupStyle}
             onClick={() => changeColor(1)}>
-            <GridaToolTip open={true} placement="top" tip={{
+            {/* <GridaToolTip open={true} placement="top" tip={{
                 head: "RED",
                 msg: "표시되는 펜의 색상을 선택합니다",
                 tail: "키보드 버튼 1로 선택 가능합니다"
-              }} title={undefined}>
+              }} title={undefined}> */}
               <div className="color_icon color_1">
               </div>
-            </GridaToolTip>
+            {/* </GridaToolTip> */}
           </ButtonBase>
 
           <ButtonBase id="clr_2" type="button" className="color_btn" style={groupStyle}
             onClick={() => changeColor(2)}>
-            <GridaToolTip open={true} placement="top" tip={{
+            {/* <GridaToolTip open={true} placement="top" tip={{
                 head: "YELLOW",
                 msg: "표시되는 펜의 색상을 선택합니다",
                 tail: "키보드 버튼 2로 선택 가능합니다"
-              }} title={undefined}>
+              }} title={undefined}> */}
               <div className="color_icon color_2">
               </div>
-            </GridaToolTip>
+            {/* </GridaToolTip> */}
           </ButtonBase>
           <ButtonBase id="clr_3" type="button" className="color_btn" style={groupStyle}
             onClick={() => changeColor(3)}>
-            <GridaToolTip open={true} placement="top" tip={{
+            {/* <GridaToolTip open={true} placement="top" tip={{
                 head: "NAVY",
                 msg: "표시되는 펜의 색상을 선택합니다",
                 tail: "키보드 버튼 3로 선택 가능합니다"
-              }} title={undefined}>
+              }} title={undefined}> */}
               <div className="color_icon color_3">
               </div>
-            </GridaToolTip>
+            {/* </GridaToolTip> */}
           </ButtonBase>
           <ButtonBase id="clr_4" type="button" className="color_btn" style={groupStyle}
             onClick={() => changeColor(4)}>
-            <GridaToolTip open={true} placement="top" tip={{
+            {/* <GridaToolTip open={true} placement="top" tip={{
                 head: "BLACK",
                 msg: "표시되는 펜의 색상을 선택합니다",
                 tail: "키보드 버튼 4로 선택 가능합니다"
-              }} title={undefined}>
+              }} title={undefined}> */}
               <div className="color_icon color_4">
               </div>
-            </GridaToolTip>
+            {/* </GridaToolTip> */}
           </ButtonBase>
           <ButtonBase id="clr_5" type="button" className="color_btn" style={groupStyle}
             onClick={() => changeColor(5)}>
-            <GridaToolTip open={true} placement="top" tip={{
+            {/* <GridaToolTip open={true} placement="top" tip={{
                 head: "WHITE",
                 msg: "표시되는 펜의 색상을 선택합니다",
                 tail: "키보드 버튼 5로 선택 가능합니다"
-              }} title={undefined}>
+              }} title={undefined}> */}
               <div className="color_icon color_5">
               </div>
-            </GridaToolTip>
+            {/* </GridaToolTip> */}
           </ButtonBase>
           <ButtonBase id="clr_6" type="button" className="color_btn" style={groupStyle}
             onClick={() => changeColor(6)}>
-            <GridaToolTip open={true} placement="top" tip={{
+            {/* <GridaToolTip open={true} placement="top" tip={{
                 head: "ORANGE",
                 msg: "표시되는 펜의 색상을 선택합니다",
                 tail: "키보드 버튼 6로 선택 가능합니다"
-              }} title={undefined}>
+              }} title={undefined}> */}
               <div className="color_icon color_6">
               </div>
-            </GridaToolTip>
+            {/* </GridaToolTip> */}
           </ButtonBase>
           <ButtonBase id="clr_7" type="button" className="color_btn" style={groupStyle}
             onClick={() => changeColor(7)}>
-            <GridaToolTip open={true} placement="top" tip={{
+            {/* <GridaToolTip open={true} placement="top" tip={{
                 head: "GREEN",
                 msg: "표시되는 펜의 색상을 선택합니다",
                 tail: "키보드 버튼 7로 선택 가능합니다"
-              }} title={undefined}>
+              }} title={undefined}> */}
               <div className="color_icon color_7">
               </div>
-            </GridaToolTip>
+            {/* </GridaToolTip> */}
           </ButtonBase>
           <ButtonBase id="clr_8" type="button" className="color_btn" style={groupStyle}
             onClick={() => changeColor(8)}>
-            <GridaToolTip open={true} placement="top" tip={{
+            {/* <GridaToolTip open={true} placement="top" tip={{
                 head: "BLUE",
                 msg: "표시되는 펜의 색상을 선택합니다",
                 tail: "키보드 버튼 8로 선택 가능합니다"
-              }} title={undefined}>
+              }} title={undefined}> */}
               <div className="color_icon color_8">
               </div>
-            </GridaToolTip>
+            {/* </GridaToolTip> */}
           </ButtonBase>
           <ButtonBase id="clr_9" type="button" className="color_btn" style={groupStyle}
             onClick={() => changeColor(9)}>
-            <GridaToolTip open={true} placement="top" tip={{
+            {/* <GridaToolTip open={true} placement="top" tip={{
                 head: "PURPLE",
                 msg: "표시되는 펜의 색상을 선택합니다",
                 tail: "키보드 버튼 9로 선택 가능합니다"
-              }} title={undefined}>
+              }} title={undefined}> */}
               <div className="color_icon color_9">
               </div>
-            </GridaToolTip>
+            {/* </GridaToolTip> */}
           </ButtonBase>
           <ButtonBase id="clr_0" type="button" className="color_btn" style={groupStyle}
             onClick={() => changeColor(0)}>
-            <GridaToolTip open={true} placement="top" tip={{
+            {/* <GridaToolTip open={true} placement="top" tip={{
                 head: "DARK GRAY",
                 msg: "표시되는 펜의 색상을 선택합니다",
                 tail: "키보드 버튼 0로 선택 가능합니다"
-              }} title={undefined}>
+              }} title={undefined}> */}
               <div className="color_icon color_0">
               </div>
-            </GridaToolTip>
+            {/* </GridaToolTip> */}
           </ButtonBase>
         </div>
       </div>

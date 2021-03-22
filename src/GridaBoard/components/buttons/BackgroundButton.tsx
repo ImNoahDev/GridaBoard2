@@ -96,26 +96,26 @@ export default function BackgroundButton() {
     <React.Fragment>
       <div>
         <Button type="button" id="basic_background" className="backgroundDropDown" style={basicStyle} onClick={handleClickBackground}>
-          <GridaToolTip open={true} placement="left" tip={{
+          {/* <GridaToolTip open={true} placement="left" tip={{
               head: "Background",
               msg: "화면의 배경색을 선택합니다.",
               tail: "키보드 버튼 1로 선택 가능합니다"
-            }} title={undefined}>
+            }} title={undefined}> */}
               <span className="backgroundDropDown">
                 Basic
               </span>
-          </GridaToolTip>
+          {/* </GridaToolTip> */}
         </Button>
         <Button type="button" id="neo_background" className="backgroundDropDown" style={neoStyle} onClick={handleClickBackground}>
-          <GridaToolTip open={true} placement="left" tip={{
+          {/* <GridaToolTip open={true} placement="left" tip={{
               head: "Background",
               msg: "화면의 배경색을 선택합니다.",
               tail: "키보드 버튼 1로 선택 가능합니다"
-            }} title={undefined}>
+            }} title={undefined}> */}
               <span className="backgroundDropDown">
                 Neo-prism
               </span>
-          </GridaToolTip>
+          {/* </GridaToolTip> */}
         </Button>   
       </div>
 
