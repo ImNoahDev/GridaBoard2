@@ -982,19 +982,13 @@ export default abstract class RenderWorkerBase {
     console.log(`RenderWorkerBase: setRotation to ${rotation}`);
     this._opt.rotation = rotation;
 
-    if (this._opt.rotation === 180 || this._opt.rotation === 0) {
-      const tmpWidth = pdfSize.width;
-      pdfSize.width = pdfSize.height;
-      pdfSize.height = tmpWidth;
-    }
-
     switch (rotation) {
       case 90: {
         this._opt.h = calcRotatedH90(this.h, {width: pdfSize.width, height: pdfSize.height});
         break;
       }
       case 180: {
-        this._opt.h = calcRotatedH180(this.h, {width: pdfSize.width, height: pdfSize.height});
+        this._opt.h = calcRotatedH180(this.h, {width: pdfSize.height, height: pdfSize.width});
         break;
       }
       case 270: {
