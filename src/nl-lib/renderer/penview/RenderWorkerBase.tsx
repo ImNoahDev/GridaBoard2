@@ -504,6 +504,10 @@ export default abstract class RenderWorkerBase {
         const dx = evt.clientX - this.drawing.lastPosX;
         const dy = evt.clientY - this.drawing.lastPosY;
 
+        if (!opt.target || opt.target.name !== 'page_layout') {
+          return;
+        }
+
         const distance2 = Math.sqrt(Math.sqrt(dx * dx + dy * dy));
         const distance = Math.max(1, distance2);
         const force = 800 / distance;
