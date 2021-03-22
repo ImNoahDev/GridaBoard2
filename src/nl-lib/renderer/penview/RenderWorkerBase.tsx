@@ -3,7 +3,7 @@ import { Point } from 'fabric/fabric-impl';
 import { sprintf } from 'sprintf-js';
 import { NU_TO_PU, PU_TO_NU } from '../../common/constants';
 import { ZoomFitEnum } from '../../common/enums';
-import { calcRotatedH, calcRevH } from '../../common/mapper/CoordinateTanslater';
+import { calcRotatedH, calcRotatedH90, calcRotatedH180, calcRotatedH270, calcRevH } from '../../common/mapper/CoordinateTanslater';
 import { InkStorage } from '../../common/penstorage';
 import { TransformParameters, ISize, IPageSOBP } from '../../common/structures';
 import { makeNPageIdStr } from '../../common/util';
@@ -43,8 +43,8 @@ export interface IRenderWorkerOption {
   storage?: InkStorage;
 
   rotation: number;
-  // h?: TransformParameters;
-  // h_rev?: TransformParameters;
+  h?: TransformParameters;
+  h_rev?: TransformParameters;
 
   autoFocus: boolean;
 
@@ -743,13 +743,7 @@ export default abstract class RenderWorkerBase {
   public ncodeToPdfXy_homography = (ncodeXY: { x: number; y: number; f?: number }, rotationIndep?: boolean) => {
     const { x, y } = ncodeXY;
 
-    // let h = this.h;
-    let h;
-    if (rotationIndep) {
-      h = this.h2[0];
-    } else {
-      h = this.h2[this._opt.rotation / 90];
-    }
+    const h = this._opt.h;
 
     const nominator = h.g * x + h.h * y + 1;
     const px = (h.a * x + h.b * y + h.c) / nominator;
@@ -761,14 +755,7 @@ export default abstract class RenderWorkerBase {
   protected pdfToNcodeXy_homography = (ncodeXY: { x: number; y: number; f?: number }, rotationIndep: boolean) => {
     const { x, y } = ncodeXY;
 
-    // let h = this.h_rev;
-
-    let h;
-    if (rotationIndep) {
-      h = this.h2_rev[0];
-    } else {
-      h = this.h2_rev[this._opt.rotation / 90];
-    }
+    const h = this._opt.h_rev;
 
     const nominator = h.g * x + h.h * y + 1;
     const px = (h.a * x + h.b * y + h.c) / nominator;
@@ -991,36 +978,47 @@ export default abstract class RenderWorkerBase {
     }
   };
 
-  setRotation = (rotation: number) => {
+  setRotation = (rotation: number, pdfSize: { scale: number, width: number, height: number }) => {
     console.log(`RenderWorkerBase: setRotation to ${rotation}`);
     this._opt.rotation = rotation;
 
-    const rot_idx = Math.floor(rotation / 90);
-    // this._opt.h = this.h2[rot_idx];
-    // this._opt.h_rev = this.h2_rev[rot_idx];
+    if (this._opt.rotation === 180 || this._opt.rotation === 0) {
+      const tmpWidth = pdfSize.width;
+      pdfSize.width = pdfSize.height;
+      pdfSize.height = tmpWidth;
+    }
+
+    switch (rotation) {
+      case 90: {
+        this._opt.h = calcRotatedH90(this.h, {width: pdfSize.width, height: pdfSize.height});
+        break;
+      }
+      case 180: {
+        this._opt.h = calcRotatedH180(this.h, {width: pdfSize.width, height: pdfSize.height});
+        break;
+      }
+      case 270: {
+        this._opt.h = calcRotatedH270(this.h, {width: pdfSize.width, height: pdfSize.height});
+        break;
+      }
+      default : {
+        this._opt.h = this.h;
+        break;
+      }
+    }
+    this._opt.h_rev = calcRevH(this._opt.h);
   };
 
   setTransformParameters = (h: TransformParameters, pdfSize_pu: ISize) => {
     this.h = { ...h};
+    this._opt.h = { ...h};
+
     const h_rev = calcRevH(h);
+
     this.h_rev = { ...h_rev };
+    this._opt.h_rev = { ...h_rev };
 
     if (h) {
-
-      if (this._opt.rotation === 90 || this._opt.rotation === 270) {
-        const tmpWidth = pdfSize_pu.width;
-        pdfSize_pu.width = pdfSize_pu.height;
-        pdfSize_pu.height = tmpWidth;
-      }
-
-      this.h2 = calcRotatedH(h, pdfSize_pu);
-
-      this.h2_rev = [];
-      this.h2.forEach(h_temp => {
-        const h2_temp = calcRevH(h_temp);
-        this.h2_rev.push(h2_temp);
-      });
-
       this.funcNcodeToPdfXy = this.ncodeToPdfXy_homography;
       this.funcPdfToNcodeXy = this.pdfToNcodeXy_homography;
     } else {

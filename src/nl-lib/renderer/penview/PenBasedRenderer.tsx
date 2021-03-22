@@ -313,7 +313,7 @@ class PenBasedRenderer extends React.Component<Props, State> {
       //로드할 경우에는 this.props의 basePageInfo가 nullNCode로 세팅돼있기 때문에 들어오지 않음
       const degrees = nextProps.rotation - this.props.rotation;
 
-      this.renderer.setRotation(nextProps.rotation);
+      this.renderer.setRotation(nextProps.rotation, this.pdfSize);
 
       // const ctx = this.canvas.getContext('2d');
       // ctx.rotate(180 * Math.PI / 180);
