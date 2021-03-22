@@ -121,7 +121,7 @@ export default class PenManager {
   public createVirtualPen = (): INeoSmartpen => {
     const pen = new VirtualPen();
     this.add(pen, { id: pen.id, name: pen.name });
-    this.setActivePen(pen.id);
+    // this.setActivePen(pen.id);
     this.virtualPenSerial++;
 
     return pen;
@@ -250,6 +250,7 @@ export default class PenManager {
     if (_active_pen) {
       _active_pen.setColor(this.color);
     }
+    this._virtualPen.setColor(this.color);
     this.dispatcher.dispatch(PenEventName.ON_COLOR_CHANGED, this);
   }
 
@@ -302,6 +303,9 @@ export default class PenManager {
       _active_pen.setPenRendererType(this.penRendererType);
       _active_pen.setColor(this.color);
     }
+
+    this._virtualPen.setPenRendererType(this.penRendererType);
+    this._virtualPen.setColor(this.color);
   }
 
   setPenTypeStatus($elem, type) {
@@ -332,6 +336,7 @@ export default class PenManager {
     if (_active_pen) {
       _active_pen.setThickness(this.thickness);
     }
+    this._virtualPen.setThickness(this.thickness);
   }
 
   // registerRenderContainer = (renderContainer) => {
