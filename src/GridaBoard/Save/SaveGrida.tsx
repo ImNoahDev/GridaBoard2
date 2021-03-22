@@ -110,15 +110,15 @@ export async function saveGrida(gridaName: string) {
     for (let j = 0; j < NeoStrokes.length; j++) {
       const dotArr = NeoStrokes[j].dotArray;
 
-      let canvasCenterSrc = new fabric.Point(page.getHeight()/2, page.getWidth()/2)
-      let canvasCenterDst = new fabric.Point(page.getWidth()/2, page.getHeight()/2)
-      const radians = fabric.util.degreesToRadians(-rotation)
+      // let canvasCenterSrc = new fabric.Point(page.getHeight()/2, page.getWidth()/2)
+      // let canvasCenterDst = new fabric.Point(page.getWidth()/2, page.getHeight()/2)
+      // const radians = fabric.util.degreesToRadians(-rotation)
 
-      if (rotation === 0) {
-        canvasCenterDst = canvasCenterSrc;
-      } else if (rotation === 180) {
-        canvasCenterSrc = canvasCenterDst;
-      }
+      // if (rotation === 0) {
+      //   canvasCenterDst = canvasCenterSrc;
+      // } else if (rotation === 180) {
+      //   canvasCenterSrc = canvasCenterDst;
+      // }
 
       const pointArray = [];
 
@@ -127,18 +127,18 @@ export async function saveGrida(gridaName: string) {
           const dot = dotArr[k];
           const pdf_xy = { x: dot.x * PDF_TO_SCREEN_SCALE, y: dot.y * PDF_TO_SCREEN_SCALE};
 
-          // 1. subtractEquals
-          pdf_xy.x -= canvasCenterSrc.x;
-          pdf_xy.y -= canvasCenterSrc.y;
+          // // 1. subtractEquals
+          // pdf_xy.x -= canvasCenterSrc.x;
+          // pdf_xy.y -= canvasCenterSrc.y;
+          
+          // // 2. rotateVector
+          // var v = fabric.util.rotateVector(pdf_xy, radians);
 
-          // 2. rotateVector
-          var v = fabric.util.rotateVector(pdf_xy, radians);
+          // // 3. addEquals
+          // v.x += canvasCenterDst.x;
+          // v.y += canvasCenterDst.y;
 
-          // 3. addEquals
-          v.x += canvasCenterDst.x;
-          v.y += canvasCenterDst.y;
-
-          pointArray.push({ x: v.x, y: v.y, f: dot.f });
+          pointArray.push({ x: pdf_xy.x, y: pdf_xy.y, f: dot.f });
         }
         page.setRotation(degrees(rotation));
 
