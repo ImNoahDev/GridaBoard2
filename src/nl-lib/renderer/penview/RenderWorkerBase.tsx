@@ -195,7 +195,7 @@ export default abstract class RenderWorkerBase {
     if (this._opt.mouseAction) {
       canvasFb.on('mouse:down', this.onCanvasMouseDown);
       canvasFb.on('mouse:move', this.onCanvasMouseMove);
-      canvasFb.on('mouse:up', this.onCanvasMousUp);
+      canvasFb.on('mouse:up', this.onCanvasMouseUp);
 
       canvasFb.on('mouse:wheel', this.onCanvasMouseWheel);
     }
@@ -410,16 +410,16 @@ export default abstract class RenderWorkerBase {
       const canvasFb = this.canvasFb;
 
       if (sw === false) {
-        this.onCanvasMousUp();
+        this.onCanvasMouseUp();
 
         canvasFb.off('mouse:down', this.onCanvasMouseDown);
         canvasFb.off('mouse:move', this.onCanvasMouseMove);
-        canvasFb.off('mouse:up', this.onCanvasMousUp);
+        canvasFb.off('mouse:up', this.onCanvasMouseUp);
         canvasFb.off('mouse:wheel', this.onCanvasMouseWheel);
       } else {
         canvasFb.on('mouse:down', this.onCanvasMouseDown);
         canvasFb.on('mouse:move', this.onCanvasMouseMove);
-        canvasFb.on('mouse:up', this.onCanvasMousUp);
+        canvasFb.on('mouse:up', this.onCanvasMouseUp);
         canvasFb.on('mouse:wheel', this.onCanvasMouseWheel);
       }
     }
@@ -527,7 +527,7 @@ export default abstract class RenderWorkerBase {
    * @protected
    * @param {Object} opt
    */
-  onCanvasMousUp = (opt: any = undefined) => {
+  onCanvasMouseUp = (opt: any = undefined) => {
     const evt: MouseEvent = opt.e;
     if (this.pan.isDragging) {
       const canvasFb = this.canvasFb;
