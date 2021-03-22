@@ -330,7 +330,25 @@ export class MappingStorage {
       }
     };
 
-    // 제 생각에는 얘가 1)로 와야하는거 같은데.. temporary를 먼저 봐야해서요
+    const ncodeXy: INcodeSOBPxy = {
+      ...pageInfo, x: 10, y: 10
+    }
+    const tempFound = this._temporary.arrDocMap.find(m => isPageInMapper(ncodeXy, m, m.numPages));
+
+    // 1) Ncode 페이지 맵에 있는지 확인한다.
+    const noteItem = getNPaperInfo(pageInfo);
+    const isCalibrationMode = store.getState().calibration.calibrationMode;
+    if (!noteItem.isDefault && !isCalibrationMode && !tempFound) {
+      h = this.calcHfromNote({ ...noteItem.margin, pageNo: pageInfo.page });
+      ret.h = h;
+      ret.type = "note";
+      ret.pageInfo = pageInfo;
+      ret.basePageInfo = pageInfo;
+      ret.pdf.filename = noteItem.pdf_name;
+
+      return ret;
+    }
+
     // 2) Mapping된 PDF 페이지인지 확인한다.
     const pdfItem = this.findPdfPage({ ...pageInfo, x: 10, y: 10 });
     if (pdfItem) {
@@ -352,19 +370,7 @@ export class MappingStorage {
       return ret;
     }
 
-    // 1) Ncode 페이지 맵에 있는지 확인한다.
-    const noteItem = getNPaperInfo(pageInfo);
-    const isCalibrationMode = store.getState().calibration.calibrationMode;
-    if (!noteItem.isDefault && !isCalibrationMode) {
-      h = this.calcHfromNote({ ...noteItem.margin, pageNo: pageInfo.page });
-      ret.h = h;
-      ret.type = "note";
-      ret.pageInfo = pageInfo;
-      ret.basePageInfo = pageInfo;
-      ret.pdf.filename = noteItem.pdf_name;
 
-      return ret;
-    }
 
     // 3) 아니면 그냥 A4를 리턴한다.
     const defaultItem = getNPaperInfo({ section: -1, owner: -1, book: -1, page: -1 });
