@@ -27,8 +27,8 @@ export const g_paperType_default: IPaperTypeSet = {
     "margin": {
       "Xmin": 244,
       "Ymin": 90,
-      "Xmax": 1040,
-      "Ymax": 540
+      "Xmax": 1045,
+      "Ymax": 550
     },
     "title": "whiteboard",
     "pdf_name": "whiteboard",

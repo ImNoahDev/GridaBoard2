@@ -112,12 +112,13 @@ export function isPageInMapper(pg: IPageSOBP, m: IPdfToNcodeMapItem, numPages: n
   const arr: number[] = [];
 
   for (let i = 0; i < numPages; i++) {
-    const availablePages = g_availablePagesInSection[m.params[i].pageInfo.section];
-    const page = m.params[i].pageInfo.page;
-    arr.push(page);
+    const tmpMapperPageInfo = m.params[i].pageInfo;
+    if (isSamePage(pg, tmpMapperPageInfo)) {
+      return true;
+    }
   }
 
-  return arr.indexOf(pg.page) >= 0;
+  return false;
 }
 
 export function deepClone(obj) {
