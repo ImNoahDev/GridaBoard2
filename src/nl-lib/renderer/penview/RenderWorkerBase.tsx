@@ -902,10 +902,8 @@ export default abstract class RenderWorkerBase {
       dy = 0;
     let shouldScroll = false;
 
-    const canvasFb = this.canvasFb;
-    const vpt = canvasFb.viewportTransform;
-    const offset_x = vpt[4];
-    const offset_y = vpt[5];
+    const offset_x = this.offset.x;
+    const offset_y = this.offset.y;
 
     if (screen_xy.x < 0) {
       // scroll to left

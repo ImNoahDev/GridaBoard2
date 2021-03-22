@@ -160,6 +160,10 @@ export default class PenComm extends ProtocolHandlerBase {
     return this.penCommBase.connect(btDevice, this.onPhysicallyConnected);
   }
 
+  disconnect = () => {
+    this.penCommBase.disconnect();
+  }
+
   write = (buf: Uint8Array): Promise<void> => {
     return this.penCommBase.write(buf);
   }
