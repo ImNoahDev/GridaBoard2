@@ -19,21 +19,25 @@ export default function ThicknessButton () {
   const setThickness = (thickness: number) => {
 
     if (thickness === 1) {
-      $('#svg_thickness > path').remove();
-      $('#svg_thickness').append($('#thickness_1'));
-      $('#svg_thickness_1').append($('#thickness_1'));
+      $('#svg_thickness').empty();
+      const thickness_1_clone = $('#thickness_1').clone();
+      $('#svg_thickness').append(thickness_1_clone);
     } else if (thickness === 2) {
-      $('#svg_thickness > path').remove();
-      $('#svg_thickness').append($('#thickness_2'));
+      $('#svg_thickness').empty();
+      const thickness_2_clone = $('#thickness_2').clone();
+      $('#svg_thickness').append(thickness_2_clone);
     } else if (thickness === 3) {
-      $('#svg_thickness > path').remove();
-      $('#svg_thickness').append($('#thickness_3'));
+      $('#svg_thickness').empty();
+      const thickness_3_clone = $('#thickness_3').clone();
+      $('#svg_thickness').append(thickness_3_clone);
     } else if (thickness === 4) {
-      $('#svg_thickness > path').remove();
-      $('#svg_thickness').append($('#thickness_4'));
+      $('#svg_thickness').empty();
+      const thickness_4_clone = $('#thickness_4').clone();
+      $('#svg_thickness').append(thickness_4_clone);
     } else {
-      $('#svg_thickness > path').remove();
-      $('#svg_thickness').append($('#thickness_5'));
+      $('#svg_thickness').empty();
+      const thickness_5_clone = $('#thickness_5').clone();
+      $('#svg_thickness').append(thickness_5_clone);
     }
     manager.setThickness(thickness);
     handleClose();
@@ -134,25 +138,6 @@ export default function ThicknessButton () {
           </IconButton>
         </div>
       </div>
-      
-      
-      {/* <Popover
-        style={{zoom: 1 / brZoom}}
-        id={id}
-        open={open}
-        anchorEl={anchorEl}
-        onClose={handleClose}
-        anchorOrigin={{
-          vertical: 'bottom',
-          horizontal: 'center'
-        }}
-        transformOrigin={{
-          vertical: 'top',
-          horizontal: 'left'
-        }}
-      >
-        
-      </Popover> */}
     </React.Fragment>
   );
 }
