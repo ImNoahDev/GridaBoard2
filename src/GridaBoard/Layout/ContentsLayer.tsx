@@ -24,23 +24,12 @@ const localStyle = {
 
 const rotateStyle = {
   position: "absolute",
-  zIndex: 1900,
+  zIndex: 100,
   top: "calc(14%)",
   left: "calc(96%)"
 } as React.CSSProperties;
 
-const dropdownStyle = {
-  display: "flex",
-  flexDirection: "column",
-  alignItems: "flex-start",
-  padding: "8px",
-  position: "relative",
-  width: "240px",
-  height: "176px",
-  background: "rgba(255,255,255,0.9)",
-  boxShadow: "2px 2px 2px rgba(0, 0, 0, 0.25)",
-  borderRadius: "12px",
-} as React.CSSProperties;
+
 
 interface Props {
   handlePdfOpen: (event: IFileBrowserReturn) => void,
@@ -121,6 +110,11 @@ const ContentsLayer = (props: Props) => {
 
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
+    if ($(".help_drop_btn").css("display") == "none") {
+      $(".help_drop_btn").show();
+    } else {
+      $(".help_drop_btn").hide();
+    }
   };
 
   const handleClose = () => {
@@ -147,78 +141,81 @@ const ContentsLayer = (props: Props) => {
 
   const brZoom = useSelector((state: RootState) => state.ui.browser.zoom);
 
+  const dropdownStyle = {
+    display: "none",
+    flexDirection: "column",
+    alignItems: "flex-start",
+    padding: "8px",
+    position: "fixed",
+    width: "240px",
+    height: "176px",
+    background: "rgba(255,255,255,0.9)",
+    boxShadow: "2px 2px 2px rgba(0, 0, 0, 0.25)",
+    borderRadius: "12px",
+    zIndex: 100,
+    marginTop: "620px",
+    marginLeft: "1420px",
+    zoom: 1 / brZoom
+  } as React.CSSProperties;
+
   return (
     <div id="main" style={localStyle}>
       <div style={rotateStyle}>
         <RotateButton />
       </div>
       <div>
-      <GridaToolTip open={true} placement="top-start" tip={{
-        head: "Helper",
-        msg: "도움말 기능들을 보여줍니다.",
-        tail: "키보드 버튼 ?로 선택 가능합니다"
-      }} title={undefined}>
-          <IconButton id="help_btn" onClick={handleClick} aria-describedby={id} style={{
-            position: "absolute",
-            zIndex: 1900,
-            top: "calc(94%)",
-            left: "calc(96%)",
-            zoom: 1 / brZoom,
-          }}>
-            <HelpIcon fontSize="large"
-              style={{
-              zIndex: 1500,
-              padding: 0,
-            }}/>
-          </IconButton>
-      </GridaToolTip>
-      <Popover
-        style={{zoom: 1 / brZoom}}
-        id={id}
-        open={open}
-        anchorEl={anchorEl}
-        onClose={handleClose}
-        anchorOrigin={{
-          vertical: 'bottom',
-          horizontal: 'left'
-        }}
-        transformOrigin={{
-          vertical: 'bottom',
-          horizontal: 'right'
-        }}
-      >
-        <div style={dropdownStyle}>
-          <Button id="customer" className="help_drop_down" style={{
-            width: "224px", height: "40px", padding: "4px 12px"
-          }}>
-            <span style={{width: "200px", height: "16px", marginLeft: "-140px"}}>
-              고객센터
-            </span>
-          </Button>
-          <Button id="shortcut" className="help_drop_down" style={{
-            width: "224px", height: "40px", padding: "4px 12px"
-          }}>
-            <span style={{width: "200px", height: "16px", marginLeft: "-120px"}}>
-              단축키 안내
-            </span>
-          </Button>
-          <Button id="tutorial" className="help_drop_down" style={{
-            width: "224px", height: "40px", padding: "4px 12px"
-          }}>
-            <span style={{width: "200px", height: "16px", marginLeft: "-140px"}}>
-              튜토리얼
-            </span>
-          </Button>
-          <Button id="faq" className="help_drop_down" style={{
-            width: "224px", height: "40px", padding: "4px 12px"
-          }}>
-            <span style={{width: "200px", height: "16px", marginLeft: "-170px"}}>
-              FAQ
-            </span>
-          </Button>
-        </div>
-      </Popover>
+        <GridaToolTip open={true} placement="top-start" tip={{
+          head: "Helper",
+          msg: "도움말 기능들을 보여줍니다.",
+          tail: "키보드 버튼 ?로 선택 가능합니다"
+        }} title={undefined}>
+            <IconButton id="help_btn" onClick={handleClick} aria-describedby={id} style={{
+              position: "absolute",
+              zIndex: 1900,
+              top: "calc(94%)",
+              left: "calc(96%)",
+              zoom: 1 / brZoom,
+            }}>
+              <HelpIcon fontSize="large"
+                style={{
+                zIndex: 1500,
+                padding: 0,
+              }}/>
+            </IconButton>
+        </GridaToolTip>
       </div>
+
+      <div className="help_drop_btn" style={dropdownStyle}>
+        <Button id="customer" className="help_drop_down" style={{
+          width: "224px", height: "40px", padding: "4px 12px"
+        }}>
+          <span style={{width: "200px", height: "16px", marginLeft: "-140px"}}>
+            고객센터
+          </span>
+        </Button>
+        <Button id="shortcut" className="help_drop_down" style={{
+          width: "224px", height: "40px", padding: "4px 12px"
+        }}>
+          <span style={{width: "200px", height: "16px", marginLeft: "-120px"}}>
+            단축키 안내
+          </span>
+        </Button>
+        <Button id="tutorial" className="help_drop_down" style={{
+          width: "224px", height: "40px", padding: "4px 12px"
+        }}>
+          <span style={{width: "200px", height: "16px", marginLeft: "-140px"}}>
+            튜토리얼
+          </span>
+        </Button>
+        <Button id="faq" className="help_drop_down" style={{
+          width: "224px", height: "40px", padding: "4px 12px"
+        }}>
+          <span style={{width: "200px", height: "16px", marginLeft: "-170px"}}>
+            FAQ
+          </span>
+        </Button>
+      </div>
+        
       <div id="mixed-viewer-layer" style={{
         position: "relative",
         height: '100%',

@@ -11,7 +11,7 @@ import { RootState } from "../../store/rootReducer";
 const themeManager: ThemeManager = ThemeManager.getInstance();
 
 const basicStyle = {
-  display: "block"
+  display: "block",
 } as React.CSSProperties;
 
 const neoStyle = {
@@ -41,6 +41,11 @@ export default function BackgroundButton() {
 
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
+    if ($(".backgroundDropDown").css("display") == "none") {
+      $(".backgroundDropDown").show();
+    } else {
+      $(".backgroundDropDown").hide();
+    }
   };
 
   const handleClose = () => {
@@ -79,74 +84,60 @@ export default function BackgroundButton() {
   const brZoom = useSelector((state: RootState) => state.ui.browser.zoom);
 
   const dropdownStyle = {
-    display: "flex",
+    display: "none",
     flexDirection: "column",
     alignItems: "flex-start",
     padding: "8px",
-    position: "relative",
+    position: "fixed",
     width: "140px",
     height: "100px",
     background: "rgba(255,255,255,0.9)",
     boxShadow: "2px 2px 2px rgba(0, 0, 0, 0.25)",
     borderRadius: "12px",
+    zindex: 205500,
+    marginRight: "180px",
+    marginTop: "50px"
   } as React.CSSProperties;
 
   return (
-    <div>
-      <Button type="button" id="basic_background" style={basicStyle} onClick={handleClick} aria-describedby={id}>
-        <GridaToolTip open={true} placement="left" tip={{
-            head: "Background",
-            msg: "화면의 배경색을 선택합니다.",
-            tail: "키보드 버튼 1로 선택 가능합니다"
-          }} title={undefined}>
-            <span>
-              Basic
-            </span>
-        </GridaToolTip>
-      </Button>
-      <Button type="button" id="neo_background" style={neoStyle} onClick={handleClick} aria-describedby={id}>
-        <GridaToolTip open={true} placement="left" tip={{
-            head: "Background",
-            msg: "화면의 배경색을 선택합니다.",
-            tail: "키보드 버튼 1로 선택 가능합니다"
-          }} title={undefined}>
-            <span>
-              Neo-prism
-            </span>
-        </GridaToolTip>
-      </Button>
-      <Popover
-        id={id}
-        open={open}
-        anchorEl={anchorEl}
-        onClose={handleClose}
-        anchorOrigin={{
-          vertical: 'top',
-          horizontal: 'left'
-        }}
-        transformOrigin={{
-          vertical: 'top',
-          horizontal: 'right',
-        }}
-        style={{zoom: 1 / brZoom}}
-      >
-        <div style={dropdownStyle}>
-          <div>
-            <Button className="background_drop_down" onClick={() => setBackground(1)} style={{
-              width: "120px", height: "40px", padding: "4px 12px"
-            }}>
-              <span className="bg-dropmenu" style={{marginLeft: "-58px"}}>Basic</span>
-            </Button>
-          </div>
-          <div>
-            <Button className="background_drop_down" onClick={() => setBackground(2)} style={{
-              width: "120px", height: "40px", padding: "4px 12px"
-            }}>
-              <span className="bg-dropmenu" style={{marginLeft: "-20px"}}>Neo-prism</span>
-            </Button>
-          </div>
-        </div>
-      </Popover>
-    </div>
+    <React.Fragment>
+      <div>
+        <Button type="button" id="basic_background" style={basicStyle} onClick={handleClick} aria-describedby={id}>
+          <GridaToolTip open={true} placement="left" tip={{
+              head: "Background",
+              msg: "화면의 배경색을 선택합니다.",
+              tail: "키보드 버튼 1로 선택 가능합니다"
+            }} title={undefined}>
+              <span>
+                Basic
+              </span>
+          </GridaToolTip>
+        </Button>
+        <Button type="button" id="neo_background" style={neoStyle} onClick={handleClick} aria-describedby={id}>
+          <GridaToolTip open={true} placement="left" tip={{
+              head: "Background",
+              msg: "화면의 배경색을 선택합니다.",
+              tail: "키보드 버튼 1로 선택 가능합니다"
+            }} title={undefined}>
+              <span>
+                Neo-prism
+              </span>
+          </GridaToolTip>
+        </Button>   
+      </div>
+
+      <div className="backgroundDropDown" style={dropdownStyle}>
+        <Button className="background_drop_down" onClick={() => setBackground(1)} style={{
+          width: "120px", height: "40px", padding: "4px 12px", zIndex: 5000
+        }}>
+          <span className="bg-dropmenu" style={{marginLeft: "-58px"}}>Basic</span>
+        </Button>
+        <Button className="background_drop_down" onClick={() => setBackground(2)} style={{
+          width: "120px", height: "40px", padding: "4px 12px", zIndex: 5000
+        }}>
+          <span className="bg-dropmenu" style={{marginLeft: "-20px"}}>Neo-prism</span>
+        </Button>
+      </div>  
+    </React.Fragment> 
   );
 }

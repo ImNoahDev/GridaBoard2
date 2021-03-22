@@ -11,17 +11,20 @@ import { setZoomStore } from '../../store/reducers/zoomReducer';
 import $ from "jquery";
 
 const dropdownStyle = {
-  display: "flex",
+  display: "none",
   flexDirection: "column",
   justifyContent: "center",
   alignItems: "flex-start",
   padding: "8px",
-  position: "relative",
+  position: "fixed",
   width: "240px",
   height: "176px",
   background: "rgba(255,255,255,0.9)",
   boxShadow: "2px 2px 2px rgba(0, 0, 0, 0.25)",
   borderRadius: "12px",
+  zIndex: 100,
+  marginRight: "80px",
+  marginTop: "130px"
 } as React.CSSProperties;
 
 export default function FitButton() {
@@ -30,6 +33,11 @@ export default function FitButton() {
 
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
+    if ($(".fit_btn").css("display") == "none") {
+      $(".fit_btn").show();
+    } else {
+      $(".fit_btn").hide();
+    }
   };
 
   const handleClose = (viewFit: ZoomFitEnum) => {
@@ -91,31 +99,19 @@ export default function FitButton() {
 
   return (
     <React.Fragment>
-      <Button type="button" id="btn_fit" onClick={handleClick} aria-describedby={id}>
-        <GridaToolTip open={true} placement="left" tip={{
-            head: "Fit",
-            msg: "용지의 크기를 맞추는 여러 옵션 중 하나를 선택합니다.",
-            tail: "Z 폭 맞춤, X 높이 맞춤, C 전체 페이지, V 100%"
-          }} title={undefined}>
-          <span id="zoom-ratio">{zoomPercent}%</span>
-        </GridaToolTip>
-      </Button>
-      <Popover
-        style={{zoom: 1 / brZoom}}
-        id={id}
-        open={open}
-        anchorEl={anchorEl}
-        onClose={handleClose}
-        anchorOrigin={{
-          vertical: 'bottom',
-          horizontal: 'left'
-        }}
-        transformOrigin={{
-          vertical: 'bottom',
-          horizontal: 'right'
-        }}
-      >
-        <div id="test" style={dropdownStyle}>
+      <div>
+        <Button type="button" id="btn_fit" onClick={handleClick} aria-describedby={id}>
+          <GridaToolTip open={true} placement="left" tip={{
+              head: "Fit",
+              msg: "용지의 크기를 맞추는 여러 옵션 중 하나를 선택합니다.",
+              tail: "Z 폭 맞춤, X 높이 맞춤, C 전체 페이지, V 100%"
+            }} title={undefined}>
+            <span id="zoom-ratio">{zoomPercent}%</span>
+          </GridaToolTip>
+        </Button>
+      </div>
+
+      <div id="test" className="fit_btn" style={dropdownStyle}>
           <Button id="customer" className="help_drop_down" style={{
             width: "224px", height: "40px", padding: "4px 12px"
           }} onClick={() => setZoomByButton(PageZoomEnum.ZOOM_UP)}>
@@ -145,7 +141,6 @@ export default function FitButton() {
             </span>
           </Button>
         </div>
-      </Popover>
     </React.Fragment>
   );
 }

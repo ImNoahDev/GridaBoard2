@@ -71,7 +71,7 @@ const RotateButton = () => {
     borderRadius: "40px",
     display: "block",
     flexWrap: "wrap",
-    zIndex: 1500,
+    zIndex: 100,
     zoom: 1 / brZoom,
   } as React.CSSProperties;
 
@@ -81,7 +81,7 @@ const RotateButton = () => {
     borderRadius: "40px",
     display: "none",
     flexWrap: "wrap",
-    zIndex: 1500,
+    zIndex: 100,
     zoom: 1 / brZoom,
   } as React.CSSProperties;
   // if (activePageNo_store === -1) {

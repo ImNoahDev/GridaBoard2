@@ -40,6 +40,11 @@ export default function ThicknessButton () {
 
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
+    if ($(".btn-group").css("display") == "none") {
+      $(".btn-group").show();
+    } else {
+      $(".btn-group").hide();
+    }
   };
 
   const handleClose = () => {
@@ -51,33 +56,37 @@ export default function ThicknessButton () {
 
   const brZoom = useSelector((state: RootState) => state.ui.browser.zoom);
 
+  const thicknessDropDownStyle = {
+    display: "none",
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    padding: "4px 8px",
+    position: "absolute",
+    width: "288px",
+    height: "48px",
+    background: "rgba(255,255,255,0.9)",
+    boxShadow: "2px 2px 2px rgba(0, 0, 0, 0.25)",
+    borderRadius: "12px",
+    zIndex: 100,
+    marginTop: "40px",
+    marginLeft: "-40px"
+  } as React.CSSProperties;
+
   return (
     <React.Fragment>
-      <IconButton style={thicknessStyle} onClick={handleClick} aria-describedby={id}>
-        <SvgIcon id="svg_thickness" style={{width: "32px", height: "18px"}}>
-          <path
-            fillRule="evenodd"
-            clipRule="evenodd"
-            d="M23.149 6.906a3 3 0 01-.055 4.243l-6.158 6a3 3 0 01-4.243-.056L8.972 13.27l-3.85 3.85A3 3 0 11.878 12.88l6-6a3 3 0 014.27.028l3.749 3.85 4.008-3.906a3 3 0 014.243.055z"
-          />
-        </SvgIcon>
-      </IconButton>
-      <Popover
-        style={{zoom: 1 / brZoom}}
-        id={id}
-        open={open}
-        anchorEl={anchorEl}
-        onClose={handleClose}
-        anchorOrigin={{
-          vertical: 'bottom',
-          horizontal: 'center'
-        }}
-        transformOrigin={{
-          vertical: 'top',
-          horizontal: 'left'
-        }}
-      >
-        <div className="btn-group">
+      <div>
+        <IconButton style={thicknessStyle} onClick={handleClick} aria-describedby={id}>
+          <SvgIcon id="svg_thickness" style={{width: "32px", height: "18px"}}>
+            <path
+              fillRule="evenodd"
+              clipRule="evenodd"
+              d="M23.149 6.906a3 3 0 01-.055 4.243l-6.158 6a3 3 0 01-4.243-.056L8.972 13.27l-3.85 3.85A3 3 0 11.878 12.88l6-6a3 3 0 014.27.028l3.749 3.85 4.008-3.906a3 3 0 014.243.055z"
+            />
+          </SvgIcon>
+        </IconButton>
+
+        <div className="btn-group" style={thicknessDropDownStyle}>
           <IconButton onClick={() => setThickness(1)}>
             <SvgIcon style={{width: "32px", height: "18px"}}>
               <path
@@ -129,7 +138,26 @@ export default function ThicknessButton () {
             </SvgIcon>
           </IconButton>
         </div>
-      </Popover>
+      </div>
+      
+      
+      {/* <Popover
+        style={{zoom: 1 / brZoom}}
+        id={id}
+        open={open}
+        anchorEl={anchorEl}
+        onClose={handleClose}
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'center'
+        }}
+        transformOrigin={{
+          vertical: 'top',
+          horizontal: 'left'
+        }}
+      >
+        
+      </Popover> */}
     </React.Fragment>
   );
 }
