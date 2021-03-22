@@ -227,6 +227,7 @@ export default function PersistentDrawerRight(props: Props) {
     }
   }, []);
 
+  const brZoom = useSelector((state: RootState) => state.ui.browser.zoom);
 
   return (
     <div style={{float: "left"}}>
@@ -247,12 +248,13 @@ export default function PersistentDrawerRight(props: Props) {
         </div>
         <div onMouseDown={e => handleMouseDown(e)} className={classes.dragger} />
         < DrawerPages noInfo={props.noInfo} />
-        {/* <div > */}
+        <div style={{ height: "1px", background: "rgba(255,255,255,1)", zoom: 1 / brZoom }}></div>
+        <div style={{height: "80px"}}>
           <Button onClick={(evnet) => addBlankPage(event)} style={drawerFooter}>
             <AddIcon style={{width: "12px", height: "12px", color: "rgba(255,255,255,1)"}}/>
             <span style={{fontSize: "12px", color: "rgba(255,255,255,1)"}}>페이지 추가</span>
           </Button>
-        {/* </div> */}
+        </div>
       </div>
       </Drawer>
     </div>

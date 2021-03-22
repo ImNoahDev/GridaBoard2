@@ -150,47 +150,6 @@ const HeaderLayer = (props: Props) => {
       }
     );
   });
-
- 
-
-  const [saveAnchorEl, saveSetAnchorEl] = React.useState<HTMLButtonElement | null>(null);
-
-  const [loadAnchorEl, loadSetAnchorEl] = React.useState<HTMLButtonElement | null>(null);
-
-  const handleClickSave = (event: React.MouseEvent<HTMLButtonElement>) => {
-    saveSetAnchorEl(event.currentTarget);
-    if ($(".saveDropDownContent").css("display") == "none") {
-      $(".saveDropDownContent").show();
-    } else {
-      $(".saveDropDownContent").hide();
-    }
-  };
-
-  const handleClickLoad = (event: React.MouseEvent<HTMLButtonElement>) => {
-    loadSetAnchorEl(event.currentTarget);
-    if ($(".loadDropDownContent").css("display") == "none") {
-      $(".loadDropDownContent").show();
-    } else {
-      $(".loadDropDownContent").hide();
-    }
-  };
-
-  const handleCloseSave = () => {
-    saveSetAnchorEl(null);
-  };
-
-  const handleCloseLoad = () => {
-    loadSetAnchorEl(null);
-  };
-
-  const saveOpen = Boolean(saveAnchorEl);
-
-  const loadOpen = Boolean(loadAnchorEl);
-
-  const saveId = saveOpen ? 'simple-popover-save' : undefined;
-
-  const loadId = loadOpen ? 'simple-popover-load' : undefined;
-
   const activePageNo_store = useSelector((state: RootState) => state.activePage.activePageNo);
 
   const brZoom = useSelector((state: RootState) => state.ui.browser.zoom);
@@ -242,6 +201,24 @@ const HeaderLayer = (props: Props) => {
     disabled = false;
   }
 
+  function handleClickSave() {
+    const save = document.getElementById("saveDrop");
+    if (save.style.display == 'none') {
+      save.style.display = 'block'
+    } else {
+      save.style.display = 'none'
+    }
+  }
+
+  function handleClickLoad() {
+    const load = document.getElementById("loadDrop");
+    if (load.style.display == 'none') {
+      load.style.display = 'block'
+    } else {
+      load.style.display = 'none'
+    }
+  }
+
   return (
     <React.Fragment>
       <div id="header" style={headerStyle}>
@@ -252,7 +229,7 @@ const HeaderLayer = (props: Props) => {
           <img src="grida_logo.png" style={imgStyle}></img>
           <a id="grida_board" href="#" style={aStyle}>Grida board</a>
           <div>
-            <Button id="save" className="saveDropDown" style={buttonStyle} onClick={handleClickSave} aria-describedby={saveId} disabled={disabled}>
+            <Button id="save" className="saveDropDown" style={buttonStyle} onClick={handleClickSave} disabled={disabled}>
               저장하기
             </Button>
             <div id="saveDrop" className="saveDropDownContent" style={saveDropdownStyle}>
@@ -266,10 +243,10 @@ const HeaderLayer = (props: Props) => {
           </div>
           
           <div>
-            <Button id="load" className="loadDropDown" style={buttonStyle} onClick={handleClickLoad} aria-describedby={loadId}>
+            <Button id="load" className="loadDropDown" style={buttonStyle} onClick={handleClickLoad}>
               불러오기
             </Button>
-            <div className="loadDropDownContent" style={loadDropdownStyle}>
+            <div id="loadDrop" className="loadDropDownContent" style={loadDropdownStyle}>
               <FileBrowserButton handlePdfOpen={handlePdfOpen} />
               <LoadGrida />
             </div>

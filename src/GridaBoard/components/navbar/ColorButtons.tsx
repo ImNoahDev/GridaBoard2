@@ -3,7 +3,7 @@ import '../../styles/main.css';
 import GridaToolTip from '../../styles/GridaToolTip';
 import PenManager from '../../../nl-lib/neosmartpen/PenManager';
 import Button from '@material-ui/core/Button';
-import { Popover } from '@material-ui/core';
+import { ButtonBase, Popover } from '@material-ui/core';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../store/rootReducer';
 import $ from "jquery";
@@ -11,7 +11,7 @@ import $ from "jquery";
 const manager: PenManager = PenManager.getInstance();
 
 const colorStyle = {
-  marginLeft: "30px"
+  marginLeft: "24px",
 } as React.CSSProperties;
 
 const colorDropDownStyle = {
@@ -19,23 +19,21 @@ const colorDropDownStyle = {
   flexDirection: "row",
   justifyContent: "center",
   alignItems: "center",
-  padding: "4px 8px",
+  padding: "4px 4px",
   position: "absolute",
-  width: "488px",
+  width: "486px",
   height: "48px",
   background: "rgba(255,255,255,0.9)",
   boxShadow: "2px 2px 2px rgba(0, 0, 0, 0.25)",
   borderRadius: "12px",
   zIndex: 100,
-  marginTop: "40px",
-  marginLeft: "40px"
+  marginTop: "30px",
+  marginLeft: "20px"
 } as React.CSSProperties;
 
 const groupStyle = {
-  padding: "0px",
-  border: "0px",
-  marginLeft: "-18px",
-  paddingLeft: "12px"
+  marginTop: "8px",
+  marginLeft: "22px"
 } as React.CSSProperties;
 
 const ColorButtons = () => {
@@ -49,15 +47,6 @@ const ColorButtons = () => {
 
   const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null);
 
-  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    setAnchorEl(event.currentTarget);
-    if ($(".selected_color").css("display") == "none") {
-      $(".selected_color").show();
-    } else {
-      $(".selected_color").hide();
-    }
-  };
-
   const handleClose = () => {
     setAnchorEl(null);
   };
@@ -67,21 +56,25 @@ const ColorButtons = () => {
     handleClose();
   }
 
-  const open = Boolean(anchorEl);
-  const id = open ? 'simple-popover' : undefined;
-
-  const brZoom = useSelector((state: RootState) => state.ui.browser.zoom);
+  function handleClickColor() {
+    const color = document.getElementById("colorDrop");
+    if (color.style.display == 'none') {
+      color.style.display = 'block'
+    } else {
+      color.style.display = 'none'
+    }
+  }
 
   return (
     <React.Fragment>
       <div>
-        <Button id="clr_3" type="button" className="color_btn select_color" style={colorStyle} onClick={handleClick} aria-describedby={id}>
+        <ButtonBase id="clr_3" type="button" className="color_btn select_color" style={colorStyle} onClick={handleClickColor}>
           <div id="select_color" className="color_icon color_3">
           </div>
-        </Button>
+        </ButtonBase>
 
-        <div className="selected_color" style={colorDropDownStyle}>
-          <Button id="clr_1" type="button" className="color_btn" style={groupStyle}
+        <div id="colorDrop" className="selected_color" style={colorDropDownStyle}>
+          <ButtonBase id="clr_1" type="button" className="color_btn" style={groupStyle}
             onClick={() => changeColor(1)}>
             <GridaToolTip open={true} placement="top" tip={{
                 head: "RED",
@@ -91,9 +84,9 @@ const ColorButtons = () => {
               <div className="color_icon color_1">
               </div>
             </GridaToolTip>
-          </Button>
+          </ButtonBase>
 
-          <Button id="clr_2" type="button" className="color_btn" style={groupStyle}
+          <ButtonBase id="clr_2" type="button" className="color_btn" style={groupStyle}
             onClick={() => changeColor(2)}>
             <GridaToolTip open={true} placement="top" tip={{
                 head: "YELLOW",
@@ -103,8 +96,8 @@ const ColorButtons = () => {
               <div className="color_icon color_2">
               </div>
             </GridaToolTip>
-          </Button>
-          <Button id="clr_3" type="button" className="color_btn" style={groupStyle}
+          </ButtonBase>
+          <ButtonBase id="clr_3" type="button" className="color_btn" style={groupStyle}
             onClick={() => changeColor(3)}>
             <GridaToolTip open={true} placement="top" tip={{
                 head: "NAVY",
@@ -114,8 +107,8 @@ const ColorButtons = () => {
               <div className="color_icon color_3">
               </div>
             </GridaToolTip>
-          </Button>
-          <Button id="clr_4" type="button" className="color_btn" style={groupStyle}
+          </ButtonBase>
+          <ButtonBase id="clr_4" type="button" className="color_btn" style={groupStyle}
             onClick={() => changeColor(4)}>
             <GridaToolTip open={true} placement="top" tip={{
                 head: "BLACK",
@@ -125,8 +118,8 @@ const ColorButtons = () => {
               <div className="color_icon color_4">
               </div>
             </GridaToolTip>
-          </Button>
-          <Button id="clr_5" type="button" className="color_btn" style={groupStyle}
+          </ButtonBase>
+          <ButtonBase id="clr_5" type="button" className="color_btn" style={groupStyle}
             onClick={() => changeColor(5)}>
             <GridaToolTip open={true} placement="top" tip={{
                 head: "WHITE",
@@ -136,8 +129,8 @@ const ColorButtons = () => {
               <div className="color_icon color_5">
               </div>
             </GridaToolTip>
-          </Button>
-          <Button id="clr_6" type="button" className="color_btn" style={groupStyle}
+          </ButtonBase>
+          <ButtonBase id="clr_6" type="button" className="color_btn" style={groupStyle}
             onClick={() => changeColor(6)}>
             <GridaToolTip open={true} placement="top" tip={{
                 head: "ORANGE",
@@ -147,8 +140,8 @@ const ColorButtons = () => {
               <div className="color_icon color_6">
               </div>
             </GridaToolTip>
-          </Button>
-          <Button id="clr_7" type="button" className="color_btn" style={groupStyle}
+          </ButtonBase>
+          <ButtonBase id="clr_7" type="button" className="color_btn" style={groupStyle}
             onClick={() => changeColor(7)}>
             <GridaToolTip open={true} placement="top" tip={{
                 head: "GREEN",
@@ -158,8 +151,8 @@ const ColorButtons = () => {
               <div className="color_icon color_7">
               </div>
             </GridaToolTip>
-          </Button>
-          <Button id="clr_8" type="button" className="color_btn" style={groupStyle}
+          </ButtonBase>
+          <ButtonBase id="clr_8" type="button" className="color_btn" style={groupStyle}
             onClick={() => changeColor(8)}>
             <GridaToolTip open={true} placement="top" tip={{
                 head: "BLUE",
@@ -169,8 +162,8 @@ const ColorButtons = () => {
               <div className="color_icon color_8">
               </div>
             </GridaToolTip>
-          </Button>
-          <Button id="clr_9" type="button" className="color_btn" style={groupStyle}
+          </ButtonBase>
+          <ButtonBase id="clr_9" type="button" className="color_btn" style={groupStyle}
             onClick={() => changeColor(9)}>
             <GridaToolTip open={true} placement="top" tip={{
                 head: "PURPLE",
@@ -180,8 +173,8 @@ const ColorButtons = () => {
               <div className="color_icon color_9">
               </div>
             </GridaToolTip>
-          </Button>
-          <Button id="clr_0" type="button" className="color_btn" style={groupStyle}
+          </ButtonBase>
+          <ButtonBase id="clr_0" type="button" className="color_btn" style={groupStyle}
             onClick={() => changeColor(0)}>
             <GridaToolTip open={true} placement="top" tip={{
                 head: "DARK GRAY",
@@ -191,7 +184,7 @@ const ColorButtons = () => {
               <div className="color_icon color_0">
               </div>
             </GridaToolTip>
-          </Button>
+          </ButtonBase>
         </div>
       </div>
       

@@ -2,11 +2,8 @@ import React from "react";
 import '../../styles/buttons.css';
 import ThemeManager from "../../styles/ThemeManager";
 import GridaToolTip from "../../styles/GridaToolTip";
-import Popover from "@material-ui/core/Popover";
 import { Button } from "@material-ui/core";
 import $ from "jquery";
-import { useSelector } from "react-redux";
-import { RootState } from "../../store/rootReducer";
 
 const themeManager: ThemeManager = ThemeManager.getInstance();
 
@@ -39,21 +36,9 @@ export default function BackgroundButton() {
     handleClose();
   }
 
-  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    setAnchorEl(event.currentTarget);
-    if ($(".backgroundDropDown").css("display") == "none") {
-      $(".backgroundDropDown").show();
-    } else {
-      $(".backgroundDropDown").hide();
-    }
-  };
-
   const handleClose = () => {
     setAnchorEl(null);
   };
-
-  const open = Boolean(anchorEl);
-  const id = open ? 'simple-popover' : undefined;
 
   $('#basic_background').hover(function() {
     $(this).css("color", "rgba(104,143,255,1)")
@@ -81,20 +66,28 @@ export default function BackgroundButton() {
       }
     );
   });
-  const brZoom = useSelector((state: RootState) => state.ui.browser.zoom);
+
+  function handleClickBackground() {
+    const background = document.getElementById("backgroundDrop");
+    if (background.style.display == 'none') {
+      background.style.display = 'block'
+    } else {
+      background.style.display = 'none'
+    }
+  }
 
   const dropdownStyle = {
     display: "none",
     flexDirection: "column",
     alignItems: "flex-start",
     padding: "8px",
-    position: "fixed",
+    position: "absolute",
     width: "140px",
     height: "100px",
     background: "rgba(255,255,255,0.9)",
     boxShadow: "2px 2px 2px rgba(0, 0, 0, 0.25)",
     borderRadius: "12px",
-    zindex: 205500,
+    zindex: 500,
     marginRight: "180px",
     marginTop: "50px"
   } as React.CSSProperties;
@@ -102,31 +95,31 @@ export default function BackgroundButton() {
   return (
     <React.Fragment>
       <div>
-        <Button type="button" id="basic_background" style={basicStyle} onClick={handleClick} aria-describedby={id}>
+        <Button type="button" id="basic_background" className="backgroundDropDown" style={basicStyle} onClick={handleClickBackground}>
           <GridaToolTip open={true} placement="left" tip={{
               head: "Background",
               msg: "화면의 배경색을 선택합니다.",
               tail: "키보드 버튼 1로 선택 가능합니다"
             }} title={undefined}>
-              <span>
+              <span className="backgroundDropDown">
                 Basic
               </span>
           </GridaToolTip>
         </Button>
-        <Button type="button" id="neo_background" style={neoStyle} onClick={handleClick} aria-describedby={id}>
+        <Button type="button" id="neo_background" className="backgroundDropDown" style={neoStyle} onClick={handleClickBackground}>
           <GridaToolTip open={true} placement="left" tip={{
               head: "Background",
               msg: "화면의 배경색을 선택합니다.",
               tail: "키보드 버튼 1로 선택 가능합니다"
             }} title={undefined}>
-              <span>
+              <span className="backgroundDropDown">
                 Neo-prism
               </span>
           </GridaToolTip>
         </Button>   
       </div>
 
-      <div className="backgroundDropDown" style={dropdownStyle}>
+      <div id="backgroundDrop" className="backgroundDropDown" style={dropdownStyle}>
         <Button className="background_drop_down" onClick={() => setBackground(1)} style={{
           width: "120px", height: "40px", padding: "4px 12px", zIndex: 5000
         }}>

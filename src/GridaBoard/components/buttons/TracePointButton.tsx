@@ -8,7 +8,8 @@ import { IconButton, SvgIcon } from '@material-ui/core';
 import GridaToolTip from "../../styles/GridaToolTip";
 
 const pointerStyle = {
-  marginLeft: "30px"
+  marginLeft: "24px",
+  backgroundColor: "white"
 } as React.CSSProperties;
 
 const TracePointButton = () => {
@@ -20,18 +21,18 @@ const TracePointButton = () => {
     if (sw) {
       const $elem = $("#btn_tracepoint").find(".c2");
       $elem.addClass("checked");
-      $('btn_tracepoint').css('background', 'white');
+      $('#btn_tracepoint').css('background', 'white');
       $('#tracer_svg_icon').css('color', '#688FFF');
     } else {
       const $elem = $("#btn_tracepoint").find(".c2");
       $elem.removeClass("checked");
-      $('btn_tracepoint').css('background', 'none');
+      $('#btn_tracepoint').css('background', 'none');
       $('#tracer_svg_icon').css('color', '#58627D');
     }
   }
 
   const onTogglePointerTracer = () => {
-    $('btn_tracepoint').css('background', 'white');
+    $('#btn_tracepoint').css('background', 'white');
     $('#tracer_svg_icon').css('color', '#688FFF');
     dispatch(setPointerTracer(!isTrace));
     setEnable("btn_tracepoint", !isTrace);

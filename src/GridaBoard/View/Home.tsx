@@ -194,4 +194,36 @@ document.addEventListener('wheel', function(e) {
   passive: false // Add this
 });
 
+window.onclick = function(event) {
+  if (!event.target.parentNode.matches('.saveDropDown')) {
+    const save = document.getElementById("saveDrop");
+    save.style.display = 'none'
+  }
+  
+  if (!event.target.parentNode.matches('.loadDropDown')) {
+    const load = document.getElementById("loadDrop");
+    load.style.display = 'none'
+  }
+
+  if (!event.target.parentNode.matches('.select_color')) {
+    const color = document.getElementById("colorDrop");
+    color.style.display = 'none'
+  }
+
+  if (!event.target.matches('.thicknessDropDown')) {
+    const thickness = document.getElementById("thicknessDrop");
+    thickness.style.display = 'none'
+  }
+
+  if (!event.target.matches('.backgroundDropDown')) {
+    const background = document.getElementById("backgroundDrop");
+    background.style.display = 'none'
+  }
+
+  if (!event.target.matches('.fitDropDown')) {
+    const fit = document.getElementById("fitDrop");
+    fit.style.display = 'none'
+  }
+}
+
 export default Home;

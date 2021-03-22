@@ -1,7 +1,7 @@
 import React from "react";
 import '../../styles/buttons.css';
 import PenManager from "../../../nl-lib/neosmartpen/PenManager";
-import { IconButton, Popover, SvgIcon } from "@material-ui/core";
+import { IconButton, SvgIcon } from "@material-ui/core";
 import $ from "jquery";
 import { useSelector } from "react-redux";
 import { RootState } from "../../store/rootReducer";
@@ -9,7 +9,7 @@ import { RootState } from "../../store/rootReducer";
 const manager: PenManager = PenManager.getInstance();
 
 const thicknessStyle = {
-  marginLeft: "30px"
+  marginLeft: "24px"
 } as React.CSSProperties;
 
 export default function ThicknessButton () {
@@ -21,6 +21,7 @@ export default function ThicknessButton () {
     if (thickness === 1) {
       $('#svg_thickness > path').remove();
       $('#svg_thickness').append($('#thickness_1'));
+      $('#svg_thickness_1').append($('#thickness_1'));
     } else if (thickness === 2) {
       $('#svg_thickness > path').remove();
       $('#svg_thickness').append($('#thickness_2'));
@@ -38,23 +39,17 @@ export default function ThicknessButton () {
     handleClose();
   }
 
-  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    setAnchorEl(event.currentTarget);
-    if ($(".btn-group").css("display") == "none") {
-      $(".btn-group").show();
-    } else {
-      $(".btn-group").hide();
-    }
-  };
-
   const handleClose = () => {
     setAnchorEl(null);
   };
-
-  const open = Boolean(anchorEl);
-  const id = open ? 'simple-popover' : undefined;
-
-  const brZoom = useSelector((state: RootState) => state.ui.browser.zoom);
+  function handleClickThickness() {
+    const thickness = document.getElementById("thicknessDrop");
+    if (thickness.style.display == 'none') {
+      thickness.style.display = 'block'
+    } else {
+      thickness.style.display = 'none'
+    }
+  }
 
   const thicknessDropDownStyle = {
     display: "none",
@@ -63,22 +58,22 @@ export default function ThicknessButton () {
     alignItems: "center",
     padding: "4px 8px",
     position: "absolute",
-    width: "288px",
+    width: "300px",
     height: "48px",
     background: "rgba(255,255,255,0.9)",
     boxShadow: "2px 2px 2px rgba(0, 0, 0, 0.25)",
     borderRadius: "12px",
     zIndex: 100,
-    marginTop: "40px",
-    marginLeft: "-40px"
+    marginLeft: "20px"
   } as React.CSSProperties;
 
   return (
     <React.Fragment>
       <div>
-        <IconButton style={thicknessStyle} onClick={handleClick} aria-describedby={id}>
-          <SvgIcon id="svg_thickness" style={{width: "32px", height: "18px"}}>
+        <IconButton style={thicknessStyle} className="thicknessDropDown" onClick={handleClickThickness}>
+          <SvgIcon id="svg_thickness" className="thicknessDropDown" style={{width: "32px", height: "18px"}}>
             <path
+              className="thicknessDropDown"
               fillRule="evenodd"
               clipRule="evenodd"
               d="M23.149 6.906a3 3 0 01-.055 4.243l-6.158 6a3 3 0 01-4.243-.056L8.972 13.27l-3.85 3.85A3 3 0 11.878 12.88l6-6a3 3 0 014.27.028l3.749 3.85 4.008-3.906a3 3 0 014.243.055z"
@@ -86,9 +81,9 @@ export default function ThicknessButton () {
           </SvgIcon>
         </IconButton>
 
-        <div className="btn-group" style={thicknessDropDownStyle}>
+        <div id="thicknessDrop" className="btn-group" style={thicknessDropDownStyle}>
           <IconButton onClick={() => setThickness(1)}>
-            <SvgIcon style={{width: "32px", height: "18px"}}>
+            <SvgIcon id="svg_thickness_1" style={{width: "32px", height: "18px"}}>
               <path
                 id="thickness_1"
                 fillRule="evenodd"
