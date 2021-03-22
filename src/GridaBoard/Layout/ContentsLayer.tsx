@@ -163,7 +163,7 @@ const ContentsLayer = (props: Props) => {
       <div style={rotateStyle}>
         <RotateButton />
       </div>
-      <div>
+      {/* <div>
         <GridaToolTip open={true} placement="top-start" tip={{
           head: "Helper",
           msg: "도움말 기능들을 보여줍니다.",
@@ -183,7 +183,7 @@ const ContentsLayer = (props: Props) => {
               }}/>
             </IconButton>
         </GridaToolTip>
-      </div>
+      </div> */}
 
       <div className="help_drop_btn" style={dropdownStyle}>
         <Button id="customer" className="help_drop_down" style={{

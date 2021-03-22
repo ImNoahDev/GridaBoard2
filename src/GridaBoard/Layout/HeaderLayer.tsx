@@ -285,8 +285,8 @@ const HeaderLayer = (props: Props) => {
         }}>
           <ConnectButton onPenLinkChanged={e => onPenLinkChanged(e)} />
 
-          <div>구글 이메일</div>
-          <KeyboardArrowDownRoundedIcon />
+          {/* <div>구글 이메일</div>
+          <KeyboardArrowDownRoundedIcon /> */}
         </div>
 
 
