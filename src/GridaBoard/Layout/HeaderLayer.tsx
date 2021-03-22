@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button, Popover } from "@material-ui/core";
 import KeyboardArrowDownRoundedIcon from '@material-ui/icons/KeyboardArrowDownRounded';
 import { saveGrida } from "../Save/SaveGrida";
@@ -152,16 +152,28 @@ const HeaderLayer = (props: Props) => {
     );
   });
 
+ 
+
   const [saveAnchorEl, saveSetAnchorEl] = React.useState<HTMLButtonElement | null>(null);
 
   const [loadAnchorEl, loadSetAnchorEl] = React.useState<HTMLButtonElement | null>(null);
 
   const handleClickSave = (event: React.MouseEvent<HTMLButtonElement>) => {
     saveSetAnchorEl(event.currentTarget);
+    if ($(".saveDropDownContent").css("display") == "none") {
+      $(".saveDropDownContent").show();
+    } else {
+      $(".saveDropDownContent").hide();
+    }
   };
 
   const handleClickLoad = (event: React.MouseEvent<HTMLButtonElement>) => {
     loadSetAnchorEl(event.currentTarget);
+    if ($(".loadDropDownContent").css("display") == "none") {
+      $(".loadDropDownContent").show();
+    } else {
+      $(".loadDropDownContent").hide();
+    }
   };
 
   const handleCloseSave = () => {
@@ -196,29 +208,31 @@ const HeaderLayer = (props: Props) => {
   } as React.CSSProperties;
 
   const saveDropdownStyle = {
-    display: "flex",
+    display: "none",
     flexDirection: "column",
     alignItems: "flex-start",
     padding: "8px",
-    position: "relative",
+    position: "absolute",
     width: "180px",
     height: "90px",
     background: "rgba(255,255,255,0.9)",
     boxShadow: "2px 2px 2px rgba(0, 0, 0, 0.25)",
     borderRadius: "12px",
+    zIndex: 100
   } as React.CSSProperties;
 
   const loadDropdownStyle = {
-    display: "flex",
+    display: "none",
     flexDirection: "column",
     alignItems: "flex-start",
     padding: "8px",
-    position: "relative",
+    position: "absolute",
     width: "220px",
     height: "90px",
     background: "rgba(255,255,255,0.9)",
     boxShadow: "2px 2px 2px rgba(0, 0, 0, 0.25)",
     borderRadius: "12px",
+    zIndex: 100
   } as React.CSSProperties;
 
 
@@ -238,10 +252,21 @@ const HeaderLayer = (props: Props) => {
         }}>
           <img src="grida_logo.png" style={imgStyle}></img>
           <a id="grida_board" href="#" style={aStyle}>Grida board</a>
-          <Button id="save" style={buttonStyle} onClick={handleClickSave} aria-describedby={saveId} disabled={disabled}>
-            저장하기
-          </Button>
-          <Popover
+          <div>
+            <Button id="save" className="saveDropDown" style={buttonStyle} onClick={handleClickSave} aria-describedby={saveId} disabled={disabled}>
+              저장하기
+            </Button>
+            <div id="saveDrop" className="saveDropDownContent" style={saveDropdownStyle}>
+              <SavePdfDialog />
+              <Button className="save_drop_down" style={{
+                width: "160px", height: "40px", padding: "4px 12px",
+              }} onClick={() => saveGrida('hello.grida')}>
+                <span>데이터 저장(.grida)</span>
+              </Button>
+            </div>
+          </div>
+          
+          {/* <Popover
             style={{zoom: 1 / brZoom}}
             id={saveId}
             open={saveOpen}
@@ -264,11 +289,18 @@ const HeaderLayer = (props: Props) => {
                 <span>데이터 저장(.grida)</span>
               </Button>
             </div>
-          </Popover>
-          <Button id="load" style={buttonStyle} onClick={handleClickLoad} aria-describedby={loadId}>
-            불러오기
-          </Button>
-          <Popover
+          </Popover> */}
+          <div>
+            <Button id="load" className="loadDropDown" style={buttonStyle} onClick={handleClickLoad} aria-describedby={loadId}>
+              불러오기
+            </Button>
+            <div className="loadDropDownContent" style={loadDropdownStyle}>
+              <FileBrowserButton handlePdfOpen={handlePdfOpen} />
+              <LoadGrida />
+            </div>
+          </div>
+          
+          {/* <Popover
             style={{zoom: 1 / brZoom}}
             id={loadId}
             open={loadOpen}
@@ -287,11 +319,12 @@ const HeaderLayer = (props: Props) => {
               <FileBrowserButton handlePdfOpen={handlePdfOpen} />
               <LoadGrida />
             </div>
-          </Popover>
+          </Popover> */}
 
           <PrintButton targetId={printBtnId} url={pdfUrl} filename={pdfFilename} handlePdfUrl={makePdfUrl} />
           <ManualCalibration filename={pdfFilename} printOption={printOption} handlePdfUrl={makePdfUrl} />
         </div>
+
         <div style={{
           display: "inline-flex", flexDirection: "row",
           justifyContent: "flex-start", alignItems: "center", marginRight: "31px"
