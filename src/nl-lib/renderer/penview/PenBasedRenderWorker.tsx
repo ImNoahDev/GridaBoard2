@@ -262,6 +262,14 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
    * @param {{strokeKey:string, mac:string, stroke, section:number, owner:number, book:number, page:number}} event
    */
   closeLiveStroke = (event: IPenToViewerEvent) => {
+    const cursor = this.penCursors[event.mac];
+    const obj = cursor.penTracker;
+    obj.visible = false;
+    
+    obj.set({ left: -100 , top: -100 });
+    obj.setCoords();
+    this.canvasFb.renderAll();
+    
     const live = this.livePaths[event.strokeKey];
 
     if (!live || live.pathObj === undefined) {
