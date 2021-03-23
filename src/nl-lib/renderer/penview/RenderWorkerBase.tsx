@@ -743,11 +743,11 @@ export default abstract class RenderWorkerBase {
   public ncodeToPdfXy_homography = (ncodeXY: { x: number; y: number; f?: number }, rotationIndep?: boolean) => {
     const { x, y } = ncodeXY;
 
-    const h = this._opt.h;
+    const { a, b, c, d, e, f, g, h } = this._opt.h;
 
-    const nominator = h.g * x + h.h * y + 1;
-    const px = (h.a * x + h.b * y + h.c) / nominator;
-    const py = (h.d * x + h.e * y + h.f) / nominator;
+    const nominator = g * x + h * y + 1;
+    const px = (a * x + b * y + c) / nominator;
+    const py = (d * x + e * y + f) / nominator;
 
     return { x: px, y: py, f: ncodeXY.f };
   };
@@ -755,11 +755,11 @@ export default abstract class RenderWorkerBase {
   protected pdfToNcodeXy_homography = (ncodeXY: { x: number; y: number; f?: number }, rotationIndep: boolean) => {
     const { x, y } = ncodeXY;
 
-    const h = this._opt.h_rev;
+    const { a, b, c, d, e, f, g, h } = this._opt.h_rev;
 
-    const nominator = h.g * x + h.h * y + 1;
-    const px = (h.a * x + h.b * y + h.c) / nominator;
-    const py = (h.d * x + h.e * y + h.f) / nominator;
+    const nominator = 1 / (g * x + h * y + 1);
+    const px = (a * x + b * y + c) / nominator;
+    const py = (d * x + e * y + f) / nominator;
 
     return { x: px, y: py, f: ncodeXY.f };
   };
@@ -978,24 +978,24 @@ export default abstract class RenderWorkerBase {
     }
   };
 
-  setRotation = (rotation: number, pdfSize: { scale: number, width: number, height: number }) => {
+  setRotation = (rotation: number, pdfSize: { scale: number; width: number; height: number }) => {
     console.log(`RenderWorkerBase: setRotation to ${rotation}`);
     this._opt.rotation = rotation;
 
     switch (rotation) {
       case 90: {
-        this._opt.h = calcRotatedH90(this.h, {width: pdfSize.width, height: pdfSize.height});
+        this._opt.h = calcRotatedH90(this.h, { width: pdfSize.width, height: pdfSize.height });
         break;
       }
       case 180: {
-        this._opt.h = calcRotatedH180(this.h, {width: pdfSize.height, height: pdfSize.width});
+        this._opt.h = calcRotatedH180(this.h, { width: pdfSize.height, height: pdfSize.width });
         break;
       }
       case 270: {
-        this._opt.h = calcRotatedH270(this.h, {width: pdfSize.width, height: pdfSize.height});
+        this._opt.h = calcRotatedH270(this.h, { width: pdfSize.width, height: pdfSize.height });
         break;
       }
-      default : {
+      default: {
         this._opt.h = this.h;
         break;
       }
@@ -1004,24 +1004,24 @@ export default abstract class RenderWorkerBase {
   };
 
   setTransformParameters = (h: TransformParameters, pdfSize_pu: ISize) => {
-    this.h = { ...h};
-    this.h_rev = calcRevH(h);
+    this.h = { ...h };
+    // this.h_rev = calcRevH(h);
 
     switch (this._opt.rotation) {
       case 90: {
-        this._opt.h = calcRotatedH90(this.h, {width: pdfSize_pu.width, height: pdfSize_pu.height});
+        this._opt.h = calcRotatedH90(this.h, { width: pdfSize_pu.width, height: pdfSize_pu.height });
         break;
       }
       case 180: {
-        this._opt.h = calcRotatedH180(this.h, {width: pdfSize_pu.height, height: pdfSize_pu.width});
+        this._opt.h = calcRotatedH180(this.h, { width: pdfSize_pu.height, height: pdfSize_pu.width });
         break;
       }
       case 270: {
-        this._opt.h = calcRotatedH270(this.h, {width: pdfSize_pu.width, height: pdfSize_pu.height});
+        this._opt.h = calcRotatedH270(this.h, { width: pdfSize_pu.width, height: pdfSize_pu.height });
         break;
       }
-      default : {
-        this._opt.h = this.h;
+      default: {
+        this._opt.h = h;
         break;
       }
     }

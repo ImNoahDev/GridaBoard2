@@ -1,22 +1,21 @@
-import $ from "jquery";
-import { fabric } from "fabric";
+import $ from 'jquery';
+import { fabric } from 'fabric';
 
-import RenderWorkerBase, { IRenderWorkerOption } from "./RenderWorkerBase";
+import RenderWorkerBase, { IRenderWorkerOption } from './RenderWorkerBase';
 
-import { callstackDepth, drawPath, drawPath_arr, makeNPageIdStr, isSamePage, uuidv4, drawPath_chiselNip } from "../../common/util";
-import { IBrushType, PenEventName, PageEventName } from "../../common/enums";
-import { IPoint, NeoStroke, NeoDot, IPageSOBP, INeoStrokeProps, StrokeStatus, ISize } from "../../common/structures";
-import { INeoSmartpen, IPenToViewerEvent } from "../../common/neopen";
-import { InkStorage } from "../../common/penstorage";
-import { NeoSmartpen, PenManager, VirtualPen } from "../../neosmartpen";
-import { MappingStorage } from "../../common/mapper/MappingStorage";
-import { calcRevH } from "../../common/mapper/CoordinateTanslater";
-import { applyTransform } from "../../common/math/echelon/SolveTransform";
-import GridaDoc from "../../../GridaBoard/GridaDoc";
-import { setActivePageNo } from "../../../GridaBoard/store/reducers/activePageReducer";
+import { callstackDepth, drawPath, drawPath_arr, makeNPageIdStr, isSamePage, uuidv4, drawPath_chiselNip } from '../../common/util';
+import { IBrushType, PenEventName, PageEventName } from '../../common/enums';
+import { IPoint, NeoStroke, NeoDot, IPageSOBP, INeoStrokeProps, StrokeStatus, ISize } from '../../common/structures';
+import { INeoSmartpen, IPenToViewerEvent } from '../../common/neopen';
+import { InkStorage } from '../../common/penstorage';
+import { NeoSmartpen, PenManager, VirtualPen } from '../../neosmartpen';
+import { MappingStorage } from '../../common/mapper/MappingStorage';
+import { calcRevH } from '../../common/mapper/CoordinateTanslater';
+import { applyTransform } from '../../common/math/echelon/SolveTransform';
+import GridaDoc from '../../../GridaBoard/GridaDoc';
+import { setActivePageNo } from '../../../GridaBoard/store/reducers/activePageReducer';
 
 // import { PaperInfo } from "../../common/noteserver";
-
 
 // const timeTickDuration = 20; // ms
 // const DISABLED_STROKE_COLOR = "rgba(0, 0, 0, 0.1)";
@@ -29,33 +28,29 @@ const DFAULT_BRUSH_SIZE = 10;
 const REMOVE_HOVER_POINTS_INTERVAL = 50; // 50ms
 const REMOVE_HOVER_POINTS_WAIT = 20; // 20 * 50ms = 1sec
 
-
-const STROKE_OBJECT_ID = "ns";
+const STROKE_OBJECT_ID = 'ns';
 // const GRID_OBJECT_ID = "g";
 
-
 interface IPenHoverCursors {
-
-  visibleHoverPoints: number,
+  visibleHoverPoints: number;
   // pathHoverPoints: Array<fabric.Circle> = new Array(0);
-  intervalHandle: number,
-  waitCount: number,
-  eraserLastPoint: IPoint,
+  intervalHandle: number;
+  waitCount: number;
+  eraserLastPoint: IPoint;
 
-  penTracker: fabric.Circle,
-  hoverPoints: fabric.Circle[],
-
+  penTracker: fabric.Circle;
+  hoverPoints: fabric.Circle[];
 }
 
 type IExtendedPathType = fabric.Path & {
-  key?: string,
-  color?,
-}
+  key?: string;
+  color?;
+};
 
 export default class PenBasedRenderWorker extends RenderWorkerBase {
   localPathArray: IExtendedPathType[] = [];
 
-  livePaths: { [key: string]: { stroke: NeoStroke, pathObj: IExtendedPathType } } = {};
+  livePaths: { [key: string]: { stroke: NeoStroke; pathObj: IExtendedPathType } } = {};
 
   storage = InkStorage.getInstance();
 
@@ -74,12 +69,12 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
   constructor(options: IRenderWorkerOption) {
     super(options);
 
-    this.name = "PenBasedRenderWorker";
+    this.name = 'PenBasedRenderWorker';
 
     const { storage } = options;
     if (storage !== undefined) {
       if (!(storage instanceof InkStorage)) {
-        throw new Error("storage is not an instance of InkStorage");
+        throw new Error('storage is not an instance of InkStorage');
       }
       this.storage = storage;
     }
@@ -98,7 +93,7 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
   prepareUnmount = () => {
     const penManager = PenManager.getInstance();
     penManager.removeEventListener(PenEventName.ON_COLOR_CHANGED, this.changeDrawCursor);
-  }
+  };
 
   /**
    * Pen Down이 들어왔다. 그러나 아직 page 정보가 들어오지 않아서,
@@ -123,7 +118,7 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
 
   changeDrawCursor = () => {
     this.canvasFb.hoverCursor = `url(${this.getDrawCursor()}) ${this.brushSize / 2} ${this.brushSize / 2}, crosshair`;
-  }
+  };
   getDrawCursor = () => {
     const color = PenManager.getInstance().color;
     const pen_colors = PenManager.getInstance().pen_colors;
@@ -131,16 +126,36 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
 
     let brushColor;
     switch (foundIdx) {
-      case 1: brushColor = 'rgb(229,229,229)'; break;
-      case 2: brushColor = 'rgb(151,151,151)'; break;
-      case 3: brushColor = 'rgb(0,0,0)'; break;
-      case 4: brushColor = 'rgb(108,0,226)'; break;
-      case 5: brushColor = 'rgb(240,168,60)'; break;
-      case 6: brushColor = 'rgb(0,171,235)'; break;
-      case 7: brushColor = 'rgb(60,221,0)'; break;
-      case 8: brushColor = 'rgb(255,208,1)'; break;
-      case 9: brushColor = 'rgb(255,101,0)'; break;
-      case 0: brushColor = 'rgb(255,2,0)'; break;
+      case 1:
+        brushColor = 'rgb(229,229,229)';
+        break;
+      case 2:
+        brushColor = 'rgb(151,151,151)';
+        break;
+      case 3:
+        brushColor = 'rgb(0,0,0)';
+        break;
+      case 4:
+        brushColor = 'rgb(108,0,226)';
+        break;
+      case 5:
+        brushColor = 'rgb(240,168,60)';
+        break;
+      case 6:
+        brushColor = 'rgb(0,171,235)';
+        break;
+      case 7:
+        brushColor = 'rgb(60,221,0)';
+        break;
+      case 8:
+        brushColor = 'rgb(255,208,1)';
+        break;
+      case 9:
+        brushColor = 'rgb(255,101,0)';
+        break;
+      case 0:
+        brushColor = 'rgb(255,2,0)';
+        break;
     }
     const circle = `
       <svg
@@ -163,16 +178,13 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
     // console.log(`Stroke created = ${event.strokeKey}`);
     this.livePaths[event.strokeKey] = {
       stroke: event.stroke,
-      pathObj: null
-    }
-  }
-
+      pathObj: null,
+    };
+  };
 
   createLiveStroke_byStorage = (event: IPenToViewerEvent) => {
     this.createLiveStroke(event);
-  }
-
-
+  };
 
   /**
    *
@@ -184,11 +196,11 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
 
     let live = this.livePaths[event.strokeKey];
     if (!live) {
-      console.error("왜 live stroke가 등록 안된게 나오지?");
+      console.error('왜 live stroke가 등록 안된게 나오지?');
 
       live = {
         stroke: event.stroke,
-        pathObj: null
+        pathObj: null,
       };
       this.livePaths[event.strokeKey] = live;
     }
@@ -202,21 +214,16 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
     const cursor = this.penCursors[event.mac];
     if (pen && pen.penRendererType === IBrushType.ERASER) {
       if (cursor.eraserLastPoint !== undefined) {
-        this.eraseOnLine(
-          cursor.eraserLastPoint.x, cursor.eraserLastPoint.y,
-          pdf_xy.x, pdf_xy.y, live.stroke
-        );
+        this.eraseOnLine(cursor.eraserLastPoint.x, cursor.eraserLastPoint.y, pdf_xy.x, pdf_xy.y, live.stroke);
       }
 
       cursor.eraserLastPoint = { x: pdf_xy.x, y: pdf_xy.y };
-    }
-    else {
+    } else {
       if (!live.pathObj) {
         const new_pathObj = this.createFabricPath(live.stroke, false, event.pen.rotationIndep);
         live.pathObj = new_pathObj as IExtendedPathType;
         this.canvasFb.add(new_pathObj);
-      }
-      else {
+      } else {
         const pathData = this.createPathData_arr(live.stroke, rotation, event.pen.rotationIndep);
         const pathObj = live.pathObj as fabric.Path;
         pathObj.path = pathData as any;
@@ -224,17 +231,16 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
 
       this.focusToDot(dot, event.pen.rotationIndep);
     }
-  }
-
+  };
 
   pushLiveDot_byStorage = (event: IPenToViewerEvent) => {
     let live = this.livePaths[event.strokeKey];
     if (!live) {
-      console.error("왜 live stroke가 등록 안된게 나오지?");
+      console.error('왜 live stroke가 등록 안된게 나오지?');
 
       live = {
         stroke: event.stroke,
-        pathObj: null
+        pathObj: null,
       };
       this.livePaths[event.strokeKey] = live;
     }
@@ -246,16 +252,14 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
       const new_pathObj = this.createFabricPath(live.stroke, false, event.pen.rotationIndep);
       live.pathObj = new_pathObj as IExtendedPathType;
       this.canvasFb.add(new_pathObj);
-    }
-    else {
+    } else {
       const pathData = this.createPathData_arr(live.stroke, 0, event.pen.rotationIndep);
       const pathObj = live.pathObj as fabric.Path;
       pathObj.path = pathData as any;
     }
 
     this.focusToDot(dot, event.pen.rotationIndep);
-  }
-
+  };
 
   /**
    *
@@ -265,11 +269,11 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
     const cursor = this.penCursors[event.mac];
     const obj = cursor.penTracker;
     obj.visible = false;
-    
-    obj.set({ left: -100 , top: -100 });
+
+    obj.set({ left: -100, top: -100 });
     obj.setCoords();
     this.canvasFb.renderAll();
-    
+
     const live = this.livePaths[event.strokeKey];
 
     if (!live || live.pathObj === undefined) {
@@ -285,8 +289,7 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
     }
 
     delete this.livePaths[event.strokeKey];
-  }
-
+  };
 
   /**
    *
@@ -299,7 +302,7 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
 
     this.canvasFb.add(new_pathObj);
     this.localPathArray.push(new_pathObj);
-  }
+  };
 
   eraseOnLine(pdf_x0, pdf_y0, pdf_x1, pdf_y1, stroke) {
     const { section, owner, book, page } = stroke;
@@ -307,13 +310,15 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
       section: section,
       book: book,
       owner: owner,
-      page: page
-    }
+      page: page,
+    };
 
     const eraserLine = {
-      x0_pu: pdf_x0, y0_pu: pdf_y0, x1_pu: pdf_x1, y1_pu: pdf_y1
-    }
-
+      x0_pu: pdf_x0,
+      y0_pu: pdf_y0,
+      x1_pu: pdf_x1,
+      y1_pu: pdf_y1,
+    };
 
     for (let i = 0; i < this.localPathArray.length; i++) {
       const fabricPath = this.localPathArray[i];
@@ -331,8 +336,12 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
         completed.splice(idx, 1);
 
         if (needThumbnailRedraw) {
-          this.storage.dispatcher.dispatch(PenEventName.ON_ERASER_MOVE,
-            {section: pageInfo.section, owner: pageInfo.owner, book: pageInfo.book, page: pageInfo.page});
+          this.storage.dispatcher.dispatch(PenEventName.ON_ERASER_MOVE, {
+            section: pageInfo.section,
+            owner: pageInfo.owner,
+            book: pageInfo.book,
+            page: pageInfo.page,
+          });
         }
       }
     }
@@ -344,16 +353,16 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
     if (!Object.prototype.hasOwnProperty.call(this.penCursors, mac)) {
       for (let i = 0; i < NUM_HOVER_POINTERS; i++) {
         const hoverPoint = new fabric.Circle({
-          radius: (NUM_HOVER_POINTERS - i),
-          fill: "#ff2222",
-          stroke: "#ff2222",
+          radius: NUM_HOVER_POINTERS - i,
+          fill: '#ff2222',
+          stroke: '#ff2222',
           opacity: (NUM_HOVER_POINTERS - i) / NUM_HOVER_POINTERS / 2,
           left: -30,
           top: -30,
           hasControls: false,
           dirty: true,
           name: 'hoverPoint',
-          data: 'hps'
+          data: 'hps',
         });
 
         this.canvasFb.add(hoverPoint);
@@ -364,11 +373,11 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
         top: -30,
         radius: 5,
         opacity: 0.3,
-        fill: "#7a7aff",
-        stroke: "#7a7aff",
+        fill: '#7a7aff',
+        stroke: '#7a7aff',
         dirty: true,
         name: 'penTracker',
-        data: 'pt'
+        data: 'pt',
       });
 
       this.canvasFb.add(penTracker);
@@ -385,7 +394,7 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
         hoverPoints: hoverPointsObj as fabric.Circle[],
       };
     }
-  }
+  };
 
   removeHoverCursor = (pen: INeoSmartpen) => {
     const mac = pen.mac;
@@ -401,8 +410,7 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
       }
       delete this.penCursors[mac];
     }
-  }
-
+  };
 
   movePenTracker = (event: IPenToViewerEvent) => {
     const cursor = this.penCursors[event.mac];
@@ -435,8 +443,7 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
       clearInterval(cursor.intervalHandle);
       cursor.intervalHandle = 0;
     }
-  }
-
+  };
 
   moveHoverPoint = (e: IPenToViewerEvent) => {
     const cursor = this.penCursors[e.mac];
@@ -446,9 +453,9 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
     }
 
     const hps = cursor.hoverPoints;
-    const isPointerVisible = $("#btn_tracepoint").find(".c2").hasClass("checked");
+    const isPointerVisible = $('#btn_tracepoint').find('.c2').hasClass('checked');
 
-    const dot = { x: e.event.x, y: e.event.y }
+    const dot = { x: e.event.x, y: e.event.y };
     const canvas_xy = this.funcNcodeToPdfXy(dot, e.pen.rotationIndep);
 
     // hover point를 쉬프트해서 옮겨 놓는다
@@ -502,7 +509,7 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
         }
       }
     }, REMOVE_HOVER_POINTS_INTERVAL);
-  }
+  };
 
   redrawStrokes = (pageInfo, rotationIndep: boolean) => {
     if (isSamePage(this.pageInfo, pageInfo) || this.pageInfo === undefined) {
@@ -515,7 +522,7 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
 
       this.addStrokePaths(strokes, rotationIndep);
     }
-  }
+  };
 
   rotate = (degrees, pageInfo) => {
     const ins = InkStorage.getInstance();
@@ -523,9 +530,9 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
     const strokeArr = ins.completedOnPage.get(pageId);
     if (strokeArr === undefined) return;
 
-    const canvasCenterSrc = new fabric.Point(this._opt.pageSize.width/2, this._opt.pageSize.height/2)
-    const canvasCenterDst = new fabric.Point(this._opt.pageSize.height/2, this._opt.pageSize.width/2)
-    const radians = fabric.util.degreesToRadians(degrees)
+    const canvasCenterSrc = new fabric.Point(this._opt.pageSize.width / 2, this._opt.pageSize.height / 2);
+    const canvasCenterDst = new fabric.Point(this._opt.pageSize.height / 2, this._opt.pageSize.width / 2);
+    const radians = fabric.util.degreesToRadians(degrees);
 
     // strokeArr.forEach((stroke) => {
     //   stroke.dotArray.forEach((dot) => {
@@ -548,7 +555,7 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
     //     dot.y = ncode_xy.y;
     //   })
     // })
-  }
+  };
 
   changePage = (pageInfo: IPageSOBP, pageSize: ISize, forceToRefresh: boolean): boolean => {
     if (!pageInfo) return;
@@ -559,20 +566,20 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
 
     const pdfSize = {
       width: Math.round(pageSize.width),
-      height: Math.round(pageSize.height)
-    }
+      height: Math.round(pageSize.height),
+    };
 
     if (pdfSize.width === 0 || pdfSize.height === 0) return;
 
-
     console.log(`VIEW SIZE`);
-    console.log(`VIEW SIZE${callstackDepth()} changePage (worker):   ${pdfSize?.width}, ${pdfSize?.height}        ${makeNPageIdStr(pageInfo)}`);
+    console.log(
+      `VIEW SIZE${callstackDepth()} changePage (worker):   ${pdfSize?.width}, ${pdfSize?.height}        ${makeNPageIdStr(pageInfo)}`
+    );
 
     const transform = MappingStorage.getInstance().getNPageTransform(pageInfo);
     const h_rev = calcRevH(transform.h);
     const leftTop_nu = applyTransform({ x: 0, y: 0 }, h_rev);
     this.paperBase = { Xmin: leftTop_nu.x, Ymin: leftTop_nu.y };
-
 
     // const szPaper = PaperInfo.getPaperSize_pu({ section, owner, book, page });
 
@@ -600,21 +607,20 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
     this.canvasFb.requestRenderAll();
 
     return true;
-  }
-
+  };
 
   changePage_byStorage = (pageInfo: IPageSOBP, pdfSize: ISize, forceToRefresh: boolean) => {
     return this.changePage(pageInfo, pdfSize, forceToRefresh);
-  }
-
+  };
 
   private generateDotForTest(x: number, y: number): NeoDot {
     const dot = new NeoDot({
-      dotType: 2,   // moving
+      dotType: 2, // moving
       deltaTime: 2,
       time: 0,
       f: 255,
-      x, y,
+      x,
+      y,
     });
 
     return dot;
@@ -624,14 +630,17 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
     // for debug
     const { section, owner, book, page } = pageInfo;
     const strokeArg: INeoStrokeProps = {
-      section, owner, book, page,
+      section,
+      owner,
+      book,
+      page,
       startTime: 0,
-      mac: "00:00:00:00:00:00",
-      color: "rgba(0,0,255,255)",
+      mac: '00:00:00:00:00:00',
+      color: 'rgba(0,0,255,255)',
       brushType: IBrushType.PEN,
       thickness: 1,
       status: StrokeStatus.NORMAL,
-    }
+    };
     const defaultStroke = new NeoStroke(strokeArg);
 
     let dot: NeoDot;
@@ -657,21 +666,19 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
     return defaultStroke;
   }
 
-
   /**
    * @private
    */
   resetLocalPathArray = () => {
     this.localPathArray = new Array(0);
-
-  }
+  };
 
   resetPageDependentData = () => {
     Object.keys(this.penCursors).forEach(key => {
       const cursor = this.penCursors[key];
       cursor.eraserLastPoint = undefined;
     });
-  }
+  };
 
   /**
    * @private
@@ -683,7 +690,7 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
     });
 
     this.localPathArray = new Array(0);
-  }
+  };
 
   /**
    * @private
@@ -693,7 +700,7 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
       const objects = this.canvasFb.getObjects();
       const strokes = objects.filter(obj => obj.data === STROKE_OBJECT_ID);
 
-      strokes.forEach((path) => {
+      strokes.forEach(path => {
         this.canvasFb.remove(path);
       });
     }
@@ -702,16 +709,13 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
   removeAllCanvasObject = () => {
     if (this.canvasFb) {
       const objects = this.canvasFb.getObjects();
-      const needToClear = objects.filter(obj =>
-        (obj.data !== 'hps' && obj.data !== 'pt' && obj.name !== 'page_layout')
-      );
+      const needToClear = objects.filter(obj => obj.data !== 'hps' && obj.data !== 'pt' && obj.name !== 'page_layout');
 
       this.canvasFb.remove(...needToClear);
 
       // this.canvasFb.clear();
     }
   };
-
 
   /**
    * @private
@@ -720,20 +724,20 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
   addStrokePaths = (strokes, rotationIndep) => {
     if (!this.canvasFb) return;
 
-    strokes.forEach((stroke) => {
+    strokes.forEach(stroke => {
       if (stroke.dotArray.length > 0) {
         const path = this.createFabricPath(stroke, true, rotationIndep) as IExtendedPathType;
         this.canvasFb.add(path);
         this.localPathArray.push(path);
       }
     });
-  }
+  };
 
   createPathData_arr = (stroke: NeoStroke, rotation: number, rotationIndep: boolean) => {
     const { dotArray, brushType, thickness } = stroke;
 
-    let canvasCenterSrc = new fabric.Point(this._opt.pageSize.height/2, this._opt.pageSize.width/2)
-    let canvasCenterDst = new fabric.Point(this._opt.pageSize.width/2, this._opt.pageSize.height/2)
+    let canvasCenterSrc = new fabric.Point(this._opt.pageSize.height / 2, this._opt.pageSize.width / 2);
+    let canvasCenterDst = new fabric.Point(this._opt.pageSize.width / 2, this._opt.pageSize.height / 2);
     const radians = fabric.util.degreesToRadians(rotation);
 
     // 바뀌는 rotation이 90, 270 일 때는 width가 길다고 가정하고 src, dst가 처음 세팅한대로 가고
@@ -745,7 +749,7 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
     }
 
     const pointArray = [];
-    dotArray.forEach((dot) => {
+    dotArray.forEach(dot => {
       const pt = this.ncodeToPdfXy(dot, rotationIndep);
 
       // fabric js의 rotatePoint 로직 flow인데 여기다 풀어 쓴 이유는 fabric.util.rotatePoint는 canvas는 도는 상황이 아니기 때문에 subtractEquals와 addEquals에 다른 origin을 넣을 수 없기 때문
@@ -768,37 +772,41 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
 
     let strokeThickness = thickness / 64;
     switch (brushType) {
-      case 1: strokeThickness *= 5; break;
-      default: break;
+      case 1:
+        strokeThickness *= 5;
+        break;
+      default:
+        break;
     }
 
     const pathData_arr = drawPath_arr(pointArray, strokeThickness);
     // const pathData_arr = drawPath_chiselNip(pointArray, strokeThickness);
 
     return pathData_arr;
-  }
-
-
+  };
 
   createPathData = (stroke: NeoStroke, rotationIndep: boolean) => {
     const { dotArray, brushType, thickness } = stroke;
 
     const pointArray = [];
-    dotArray.forEach((dot) => {
+    dotArray.forEach(dot => {
       const pt = this.ncodeToPdfXy(dot, rotationIndep);
       pointArray.push(pt);
     });
 
     let strokeThickness = thickness / 64;
     switch (brushType) {
-      case 1: strokeThickness *= 5; break;
-      default: break;
+      case 1:
+        strokeThickness *= 5;
+        break;
+      default:
+        break;
     }
 
     const pathData = drawPath(pointArray, strokeThickness);
 
     return pathData;
-  }
+  };
 
   createFabricPath = (stroke: NeoStroke, cache: boolean, rotationIndep: boolean) => {
     const { color, brushType, key } = stroke;
@@ -806,10 +814,18 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
 
     let opacity = 0;
     switch (brushType) {
-      case 0: opacity = 1; break;
-      case 1: opacity = 0.3; break;
-      case 3: opacity = 0; break;
-      default: opacity = 1; break;
+      case 0:
+        opacity = 1;
+        break;
+      case 1:
+        opacity = 0.3;
+        break;
+      case 3:
+        opacity = 0;
+        break;
+      default:
+        opacity = 1;
+        break;
     }
 
     const pathOption = {
@@ -822,7 +838,7 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
       originY: 'top',
       selectable: false,
 
-      data: STROKE_OBJECT_ID,    // neostroke
+      data: STROKE_OBJECT_ID, // neostroke
       evented: true,
       key: key,
       objectCaching: cache,
@@ -830,10 +846,7 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
     const path = new fabric.Path(pathData, pathOption);
 
     return path;
-  }
-
-
-
+  };
 
   /**
    * 아래는 마우스로 그림을 그리는 곳 (Pen down)
@@ -858,7 +871,7 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
     }
     const { section, owner, book, page } = this.pageInfo;
     vp.onPageInfo({ timeStamp, section, owner, book, page }, false);
-  }
+  };
 
   /**
    * 아래는 마우스로 그림을 그리는 곳 (Pen move)
@@ -866,14 +879,16 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
    *
    * 2021/01/12 PointerEvent도 처리할 수 있도록 추가해야 함
    */
-  onTouchStrokePenMove = (event: MouseEvent & {layerX: number, layerY:number}, force: number) => {
+  onTouchStrokePenMove = (event: MouseEvent & { layerX: number; layerY: number }, force: number) => {
     // const screen_xy = { x: event.clientX, y: event.clientY };
     // const pdf_xy = this.screenToPdfXy(screen_xy);
 
-    const pdf_xy =  this.layerToPdfXy( { x: event.layerX, y: event.layerY });
+    const mouse_xy = { x: event.layerX, y: event.layerY };
+    const pdf_xy = this.layerToPdfXy(mouse_xy);
     const ncode_xy = this.pdfToNcodeXy(pdf_xy, true);
 
-    // event.path[6].offsetLeft
+    // const _xy = (obj, f=10) => `${Math.floor(obj.x * f) },${Math.floor(obj.y * f) }`;
+    // console.warn(`mouse(${_xy(mouse_xy)}) => pdf_xy(${_xy(pdf_xy)}) => ncode_xy(${_xy(ncode_xy, 10)})`);
 
     const vp = PenManager.getInstance().virtualPen;
     const timeStamp = Date.now();
@@ -883,12 +898,17 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
     const DEFAULT_MOUSE_PEN_FORCE = 512;
 
     vp.onPenMove({
-      timeStamp, timediff, section, owner, book, page,
+      timeStamp,
+      timediff,
+      section,
+      owner,
+      book,
+      page,
       ...ncode_xy,
       force: force,
       isFirstDot: false,
     });
-  }
+  };
 
   /**
    * 아래는 마우스로 그림을 그리는 곳 (Pen up)
@@ -901,9 +921,9 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
     const timeStamp = Date.now();
 
     vp.onPenUp({ timeStamp });
-  }
+  };
 
-  onViewSizeChanged = (viewSize: { width: number, height: number }) => {
+  onViewSizeChanged = (viewSize: { width: number; height: number }) => {
     this._opt.viewSize = { ...viewSize };
     // console.log(`VIEW SIZE${callstackDepth()} onViewSizeChanged ${this.logCnt++}: ${viewSize.width}, ${viewSize.height}`);
 
@@ -912,14 +932,17 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
     this.scrollBoundaryCheck();
 
     this.zoomToPoint(undefined, zoom);
-  }
+  };
 
-  onPageSizeChanged = (pageSize: { width: number, height: number }) => {
+  onPageSizeChanged = (pageSize: { width: number; height: number }) => {
     this._opt.pageSize = { ...pageSize };
-    if (this.pageInfo === undefined || this.pageInfo.section === undefined)
-      return false;
+    if (this.pageInfo === undefined || this.pageInfo.section === undefined) return false;
 
-    console.log(`VIEW SIZE${callstackDepth()} onPageSizeChanged ${makeNPageIdStr(this.pageInfo)}: ${pageSize.width}, ${pageSize.height} = ${pageSize.width / pageSize.height}`);
+    console.log(
+      `VIEW SIZE${callstackDepth()} onPageSizeChanged ${makeNPageIdStr(this.pageInfo)}: ${pageSize.width}, ${pageSize.height} = ${
+        pageSize.width / pageSize.height
+      }`
+    );
     const zoom = this.calcScaleFactor(this._opt.viewFit, this.offset.zoom);
     this.drawPageLayout();
     this.scrollBoundaryCheck();
@@ -927,6 +950,5 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
 
     // this.onViewSizeChanged(this._opt.viewSize);
     return true;
-  }
-
+  };
 }
