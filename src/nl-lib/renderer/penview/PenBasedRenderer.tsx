@@ -367,6 +367,7 @@ class PenBasedRenderer extends React.Component<Props, State> {
           return;
         }
 
+        this.renderer._opt.rotation = nextProps.rotation;
         const transform = MappingStorage.getInstance().getNPageTransform(pageInfo);
         this.renderer.setTransformParameters(transform.h, this.pdfSize);
 

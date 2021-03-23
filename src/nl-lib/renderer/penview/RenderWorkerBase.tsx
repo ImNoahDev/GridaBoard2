@@ -1005,12 +1005,28 @@ export default abstract class RenderWorkerBase {
 
   setTransformParameters = (h: TransformParameters, pdfSize_pu: ISize) => {
     this.h = { ...h};
-    this._opt.h = { ...h};
+    this.h_rev = calcRevH(h);
 
-    const h_rev = calcRevH(h);
+    switch (this._opt.rotation) {
+      case 90: {
+        this._opt.h = calcRotatedH90(this.h, {width: pdfSize_pu.width, height: pdfSize_pu.height});
+        break;
+      }
+      case 180: {
+        this._opt.h = calcRotatedH180(this.h, {width: pdfSize_pu.height, height: pdfSize_pu.width});
+        break;
+      }
+      case 270: {
+        this._opt.h = calcRotatedH270(this.h, {width: pdfSize_pu.width, height: pdfSize_pu.height});
+        break;
+      }
+      default : {
+        this._opt.h = this.h;
+        break;
+      }
+    }
 
-    this.h_rev = { ...h_rev };
-    this._opt.h_rev = { ...h_rev };
+    this._opt.h_rev = calcRevH(this._opt.h);
 
     if (h) {
       this.funcNcodeToPdfXy = this.ncodeToPdfXy_homography;
