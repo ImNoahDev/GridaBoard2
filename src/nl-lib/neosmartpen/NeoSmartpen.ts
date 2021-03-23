@@ -7,6 +7,8 @@ import { IBrushType, PEN_STATE, PenEventName } from "../common/enums";
 import { InkStorage, IOpenStrokeArg } from "../common/penstorage";
 import { IPenToViewerEvent, INeoSmartpen } from "../common/neopen/INeoSmartpen";
 import { store } from "../../GridaBoard/client/Root";
+import { DefaultPUINcode } from "../common/constants";
+import { isSameNcode } from "../common/util";
 
 interface IPenMovement {
   downEvent: IPenEvent,
@@ -417,10 +419,7 @@ export default class NeoSmartpen implements INeoSmartpen {
       y: event.y,
     });
 
-    if (event.owner === 1013 && event.book === 1116 && event.page === 1) {
-      console.log("asdfasdfasfa");
-      console.log(event.isFirstDot);
-      event.isFirstDot = true;
+    if (isSameNcode({section: event.section, owner: event.owner, book: event.book, page: event.page}, DefaultPUINcode)) {
       if (event.isFirstDot) {
         console.log("===================================");
         // let puis = window._pui;
@@ -514,9 +513,6 @@ export default class NeoSmartpen implements INeoSmartpen {
    */
   onPenUp = (event: IPenEvent) => {
     this.lastState = PEN_STATE.PEN_UP;
-
-    const calibraionMode = store.getState().calibration.calibrationMode;
-
     this.currPenMovement.upEvent = event;
 
     // storage에 저장
@@ -524,6 +520,9 @@ export default class NeoSmartpen implements INeoSmartpen {
       console.error("Ink Storage has not been initialized");
     }
 
+    if (isSameNcode({section: event.section, owner: event.owner, book: event.book, page: event.page}, DefaultPUINcode)) {
+      return;
+    }
     const penUpStrokeInfo = this.processPenUp(event);
     const { mac, section, owner, book, page } = penUpStrokeInfo.stroke;
     this.dispatcher.dispatch(PenEventName.ON_PEN_UP, { ...penUpStrokeInfo, mac, pen: this, section, owner, book, page });

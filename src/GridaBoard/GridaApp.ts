@@ -4,7 +4,7 @@ import { IPageSOBP } from "../nl-lib/common/structures";
 import { MappingStorage } from "../nl-lib/common/mapper";
 import { INeoSmartpen, IPenToViewerEvent } from "../nl-lib/common/neopen";
 import { setPens } from "./store/reducers/appConfigReducer";
-import { DefaultFilmNcode } from "../nl-lib/common/constants";
+import { DefaultFilmNcode, DefaultPUINcode } from "../nl-lib/common/constants";
 import { isSameNcode } from "../nl-lib/common/util";
 import GridaDoc from "./GridaDoc";
 import PenManager from "../nl-lib/neosmartpen/PenManager";
@@ -70,7 +70,7 @@ export default class GridaApp {
 
     const pageInfo = { section: event.section, owner: event.owner, book: event.book, page: event.page } as IPageSOBP;
 
-    if (isSameNcode(pageInfo, DefaultFilmNcode)) {
+    if (isSameNcode(pageInfo, DefaultFilmNcode) || isSameNcode(pageInfo, DefaultPUINcode)) {
         return;
     }
 

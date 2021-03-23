@@ -20,3 +20,10 @@ export const DefaultFilmNcode: IPageSOBP = {
   book: 2,
   page: 0,
 }
+
+export const DefaultPUINcode: IPageSOBP = {
+  section: 3,
+  owner: 1013,
+  book: 1116,
+  page: 0,
+}

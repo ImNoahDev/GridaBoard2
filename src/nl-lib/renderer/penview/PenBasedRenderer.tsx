@@ -12,7 +12,7 @@ import { callstackDepth, isSamePage, isSameNcode, makeNPageIdStr, makeNCodeIdStr
 
 import { INeoSmartpen, IPenToViewerEvent } from "../../common/neopen";
 import { MappingStorage } from "../../common/mapper";
-import { DefaultFilmNcode } from "../../common/constants";
+import { DefaultFilmNcode, DefaultPUINcode } from "../../common/constants";
 import { InkStorage } from "../../common/penstorage";
 
 import { setCalibrationData } from '../../../GridaBoard/store/reducers/calibrationDataReducer';
@@ -363,7 +363,7 @@ class PenBasedRenderer extends React.Component<Props, State> {
         // const { section, owner, book, page } = nextProps.pageInfo;
         console.log(`VIEW SIZE PAGE CHANGE 1: ${makeNPageIdStr(pageInfo)}`);
 
-        if (isSameNcode(nextProps.pageInfo, DefaultFilmNcode)) {
+        if (isSameNcode(nextProps.pageInfo, DefaultFilmNcode) || isSameNcode(nextProps.pageInfo, DefaultPUINcode)) {
           return;
         }
 

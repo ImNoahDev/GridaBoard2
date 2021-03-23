@@ -1,39 +1,48 @@
 import $ from 'jquery';
-import { IBrushType } from '../../nl-lib/common/enums';
+import { store } from "../../GridaBoard/client/Root";
+import { IBrushType, PageZoomEnum, ZoomFitEnum } from '../../nl-lib/common/enums';
 import PenManager from '../../nl-lib/neosmartpen/PenManager';
+import { setViewFit } from '../store/reducers/viewFitReducer';
+import { setZoomStore } from '../store/reducers/zoomReducer';
+import { setActivePageNo } from '../store/reducers/activePageReducer';
+import { setPointerTracer } from '../store/reducers/pointerTracer';
 
 
 // 2020-12-09 현재 구현되어 있는 부분까지 PUI 완성(페이지 넘어가는 부분과 스트로크 찍히는 오류 수정할 것)
 export default class PUIController {
-  _ready;
-
-  /** @type {number} */
-  _owner = 0;
-
-  /** @type {number} */
-  _section = 0;
-
-  /** @type {number} */
-  _book = 0;
-
-  /** @type {number} */
-  _startPage = 0;
-
-  /** @type {Array.<number>} */
-  _pages = [];
-
-  /** @type {Array.<{pageDelta:number, type:string, left:number, top:number, width:number, height:number, command:string}>} */
-  _symbols = [];
-
+  _ready: Promise<unknown>;
+  _owner: number;
+  _section: number;
+  _book: number;
+  _startPage: number;
+  _pages: any[];
+  _symbols: any[];
 
   constructor(url) {
     /** @type {Promise} */
     this._ready = this.getPuiXML(url);
 
+    /** @type {number} */
+    this._owner = 0;
+
+    /** @type {number} */
+    this._section = 0;
+
+    /** @type {number} */
+    this._book = 0;
+
+    /** @type {number} */
+    this._startPage = 0;
+
+    /** @type {Array.<number>} */
+    this._pages = [];
+
+    /** @type {Array.<{pageDelta:number, type:string, left:number, top:number, width:number, height:number, command:string}>} */
+    this._symbols = [];
   }
 
   get ready() {
-    return this._ready;
+      return this._ready;
   }
 
   getPuiXML(url) {
@@ -149,6 +158,9 @@ export default class PUIController {
    * @param {string} cmd
    */
   static executeCommand(cmd) {
+
+    const page_num = $('#page_input').val() - 1
+
     switch (cmd) {
       case "strokesize_1":
         PenManager.getInstance().setThickness(1);
@@ -214,29 +226,71 @@ export default class PUIController {
         PenManager.getInstance().setColor(3)
         break;
 
-      case "pointer":
-        break;
+      case "pointer": {
+        const isTrace = store.getState().pointerTracer.isTrace;
+        store.dispatch(setPointerTracer(!isTrace));
 
+        const $elem = $(`#${"btn_tracepoint"}`);
+        if (!isTrace) {
+          const $elem = $("#btn_tracepoint").find(".c2");
+          $elem.addClass("checked");
+          $('#btn_tracepoint').css('background', 'white');
+          $('#tracer_svg_icon').css('color', '#688FFF');
+        } else {
+          const $elem = $("#btn_tracepoint").find(".c2");
+          $elem.removeClass("checked");
+          $('#btn_tracepoint').css('background', 'none');
+          $('#tracer_svg_icon').css('color', '#58627D');
+        }
+        break;
+      }
       case "erase_all":
         break;
 
       case "menu_grida":
         break;
 
+      case "full":
+        setViewFit(ZoomFitEnum.HEIGHT);
+        break;
+
       case "full_screen":
+        setViewFit(ZoomFitEnum.WIDTH);
         break;
 
-      case "zoom_in":
+      case "zoom_in": {
+        setViewFit(ZoomFitEnum.FREE);
+        const zoom = store.getState().zoomReducer.zoom;
+        const delta = -100;
+        const newZoom = zoom * 0.9985 ** delta
+        setZoomStore(newZoom);
         break;
-
-      case "zoom_out":
+      }
+      case "zoom_out": {
+        setViewFit(ZoomFitEnum.FREE);
+        const zoom = store.getState().zoomReducer.zoom;
+        const delta = 100;
+        const newZoom = zoom * 0.9985 ** delta
+        setZoomStore(newZoom);
         break;
-
-      case "previous":
+      }
+      case "previous": {
+        const activePageNo = store.getState().activePage.activePageNo
+        if (activePageNo === 0) {
+          return;
+        }
+        setActivePageNo(activePageNo-1);
         break;
-
-      case "next":
+      }
+      case "next": {
+        const activePageNo = store.getState().activePage.activePageNo;
+        const numDocPages = store.getState().activePage.numDocPages;
+        if (activePageNo === numDocPages-1) {
+          return;
+        }
+        setActivePageNo(activePageNo+1);
         break;
+      }
     }
   }
 }

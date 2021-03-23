@@ -330,6 +330,28 @@ export default class PenManager {
   setThickness(thickness: number) {
     $("#thickness_num").text(thickness);
 
+    if (thickness === 1) {
+      $('#svg_thickness').empty();
+      const thickness_1_clone = $('#thickness_1').clone();
+      $('#svg_thickness').append(thickness_1_clone);
+    } else if (thickness === 2) {
+      $('#svg_thickness').empty();
+      const thickness_2_clone = $('#thickness_2').clone();
+      $('#svg_thickness').append(thickness_2_clone);
+    } else if (thickness === 3) {
+      $('#svg_thickness').empty();
+      const thickness_3_clone = $('#thickness_3').clone();
+      $('#svg_thickness').append(thickness_3_clone);
+    } else if (thickness === 4) {
+      $('#svg_thickness').empty();
+      const thickness_4_clone = $('#thickness_4').clone();
+      $('#svg_thickness').append(thickness_4_clone);
+    } else {
+      $('#svg_thickness').empty();
+      const thickness_5_clone = $('#thickness_5').clone();
+      $('#svg_thickness').append(thickness_5_clone);
+    }
+
     thickness = thickness / 10;
     this.thickness = thickness;
 
