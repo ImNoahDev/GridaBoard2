@@ -457,6 +457,8 @@ export default abstract class RenderWorkerBase {
 
     if (!evt.ctrlKey) {
       // 그리기 시작
+      const p = this.canvasFb.getPointer(opt.e);
+
       // 2021/01/12 PointerEvent도 처리할 수 있도록 추가해야 함
       this.onTouchStrokePenDown(evt);
 
@@ -464,8 +466,8 @@ export default abstract class RenderWorkerBase {
       // this.onTouchStrokePenMove(evt);
 
       this.drawing.isDragging = true;
-      this.drawing.lastPosX = evt.clientX;
-      this.drawing.lastPosY = evt.clientY;
+      this.drawing.lastPosX = p.x;
+      this.drawing.lastPosY = p.y;
     }
   };
 
@@ -501,26 +503,26 @@ export default abstract class RenderWorkerBase {
       // 그리기 중간
       // 2021/01/12 PointerEvent도 처리할 수 있도록 추가해야 함
       if (this.drawing.isDragging) {
-        const dx = evt.clientX - this.drawing.lastPosX;
-        const dy = evt.clientY - this.drawing.lastPosY;
-
         if (!opt.target || opt.target.name !== 'page_layout') {
           return;
         }
 
-        const distance2 = Math.sqrt(Math.sqrt(dx * dx + dy * dy));
-        const distance = Math.max(1, distance2);
-        const force = 800 / distance;
+        const p = this.canvasFb.getPointer(opt.e);
+        // const dx = p.x - this.drawing.lastPosX;
+        // const dy = p.y - this.drawing.lastPosY;
+        // const distance2 = Math.sqrt(Math.sqrt(dx * dx + dy * dy));
+        // const distance = Math.max(1, distance2);
+        // const force = 800 / distance;
 
-        this.drawing.lastPosX = evt.clientX;
-        this.drawing.lastPosY = evt.clientY;
+        this.drawing.lastPosX = p.x;
+        this.drawing.lastPosY = p.y;
 
-        this.onTouchStrokePenMove(evt, 800);
+        this.onTouchStrokePenMove(evt, p, 800);
       }
     }
   };
 
-  abstract onTouchStrokePenMove(event: MouseEvent, force: number): void;
+  abstract onTouchStrokePenMove(event: MouseEvent, canvasXy: { x: number, y: number }, force: number): void;
 
   reportCanvasChanged = () => {
     const { x: offsetX, y: offsetY, zoom } = this.offset;
