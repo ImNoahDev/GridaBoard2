@@ -13,6 +13,8 @@ import AddIcon from '@material-ui/icons/Add';
 import GridaDoc from '../../GridaDoc';
 import { setActivePageNo } from "../../store/reducers/activePageReducer";
 import { scrollToBottom } from '../../../nl-lib/common/util';
+import $ from "jquery";
+import { sum } from 'pdf-lib';
 
 
 
@@ -229,8 +231,16 @@ export default function PersistentDrawerRight(props: Props) {
 
   const brZoom = useSelector((state: RootState) => state.ui.browser.zoom);
 
+  const headerHeight = $('#header').height();
+
+  const navHeight = $('#button_div').height();
+
+  const blockHeight = $('#white_block').height();
+
+  const sumHeight = headerHeight + navHeight + blockHeight;
+
   return (
-    <div style={{float: "left"}}>
+    <div style={{float: "left", display: "flex", height: "816px",}}>
       {/* <CssBaseline /> */}
 
       <Drawer
@@ -238,7 +248,7 @@ export default function PersistentDrawerRight(props: Props) {
         variant="persistent"
         anchor="left"
         open={open}
-        PaperProps={{ style: { width: drawerWidth, flexShrink: 0, zIndex: 1100, marginTop: "121px", height: window.innerHeight - 121, background: "rgba(255, 255, 255, 0.25)", float: "left", display: "flex" } }}
+        PaperProps={{ style: { width: drawerWidth, flexShrink: 0, zIndex: 1100, marginTop: sumHeight, height: window.innerHeight - sumHeight, background: "rgba(255, 255, 255, 0.25)", float: "left", display: "flex" } }}
       >
       <div id="drawer_content">
         <div className={classes.drawerHeader}>
