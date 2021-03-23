@@ -118,9 +118,14 @@ export default class GridaDoc {
     console.log(pdfDoc);
 
     if (pdfDoc) {
-      const activatePageNo = await this.appendPdfDocument(pdfDoc, pageInfo, basePageInfo);
+      let activePageNo = await this.appendPdfDocument(pdfDoc, pageInfo, basePageInfo);
       scrollToBottom("drawer_content");
-      this.setActivePageNo(activatePageNo);
+
+      if (activePageNo === -1) {
+        const state = store.getState() as RootState;
+        activePageNo = state.activePage.activePageNo;
+      }
+      this.setActivePageNo(activePageNo);
     }
   }
 
@@ -128,12 +133,23 @@ export default class GridaDoc {
     , gridaRawData, neoStroke, pageInfo) => {
     const pdfDoc = await NeoPdfManager.getInstance().getGrida({ url: option.url, filename: option.filename, purpose: "open pdf by GridaDoc" }, gridaRawData, neoStroke);
 
-    this._pages = [];
-
     if (pdfDoc) {
-      const activatePageNo = await this.appendPdfDocument(pdfDoc, pageInfo);
+      const found = this._pdfd.find(item => item.fingerprint === pdfDoc.fingerprint);
+      if (!found) {
+        this._pages = [];
+      }
+      let activePageNo = await this.appendPdfDocument(pdfDoc, pageInfo); //이 안에서 doc에 pages를 넣어줌
+      
+      if (activePageNo === -1) {
+        const state = store.getState() as RootState;
+        activePageNo = state.activePage.activePageNo;
+        this.setActivePageNo(activePageNo);
+        return;
+      }
+
+      
       scrollToBottom("drawer_content");
-      this.setActivePageNo(activatePageNo);
+      this.setActivePageNo(activePageNo);
 
       const msi = MappingStorage.getInstance();
       msi.dispatcher.dispatch(MappingStorageEventName.ON_MAPINFO_REFRESHED, null);
@@ -144,7 +160,8 @@ export default class GridaDoc {
     // 0) PDF가 있는지 찾아보고 있으면 return, (없으면 1, 2를 통해서 넣는다)
     const found = this._pdfd.find(item => item.fingerprint === pdfDoc.fingerprint);
     if (found) {
-      return found.startPageInDoc;
+      alert('이미 등록된 PDF가 존재합니다');
+      return -1;
     }
 
     // 1) page와 maps(MappingStorage)에 있는 정보를 매핑해둔다.

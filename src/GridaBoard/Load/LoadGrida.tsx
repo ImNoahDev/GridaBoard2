@@ -89,8 +89,8 @@ const LoadGrida = () => {
       //   tail: "키보드 버튼 ?로 선택 가능합니다"
       // }} title={undefined}>
         <Button className="load_drop_down" 
-        // onClick={fileOpenHandler}
-        onClick={() => alert('미구현된 기능입니다.')} 
+        onClick={fileOpenHandler}
+        // onClick={() => alert('미구현된 기능입니다.')} 
         style={{
           width: "200px", height: "40px", padding: "4px 12px"
         }}>
