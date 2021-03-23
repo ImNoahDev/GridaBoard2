@@ -37,7 +37,7 @@ export default class PenManager {
 
     "rgb(108,0,226)", // 4 BLACK #FF000000 #000000
 
-    "rgb(240,168,60)", // 5 LIGHT_GRAY #FFE5E5E5 #D3D3D3
+    "rgb(1,46,226)", // 5 LIGHT_GRAY #FFE5E5E5 #D3D3D3
     "rgb(0,171,235)", // 6 ORANGE #FFFF6500 #FFA500
     "rgb(60,221,0)", // 7 GREEN #FF3CDD00 #008000
 

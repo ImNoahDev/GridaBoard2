@@ -109,29 +109,29 @@ export default function FitButton() {
           <Button id="customer" className="help_drop_down" style={{
             width: "224px", height: "40px", padding: "4px 12px"
           }} onClick={() => setZoomByButton(PageZoomEnum.ZOOM_UP)}>
-            <span style={{width: "200px", height: "16px", marginLeft: "-80px"}}>
-              화면 확대 [Ctrl+(+)]
+            <span style={{width: "200px", height: "16px", marginLeft: "-128px"}}>
+              화면 확대
             </span>
           </Button>
           <Button id="shortcut" className="help_drop_down" style={{
             width: "224px", height: "40px", padding: "4px 12px"
           }} onClick={() => setZoomByButton(PageZoomEnum.ZOOM_DOWN)}>
-            <span style={{width: "200px", height: "16px", marginLeft: "-80px"}}>
-              화면 축소 [Ctrl+(-)]
+            <span style={{width: "200px", height: "16px", marginLeft: "-128px"}}>
+              화면 축소
             </span>
           </Button>
           <Button id="tutorial" className="help_drop_down" style={{
             width: "224px", height: "40px", padding: "4px 12px"
           }} onClick={() => handleClose(ZoomFitEnum.HEIGHT)}>
             <span style={{width: "200px", height: "16px", marginLeft: "-80px"}}>
-              페이지 높이 맞춤 [H]
+              페이지 높이 맞춤
             </span>
           </Button>
           <Button id="faq" className="help_drop_down" style={{
             width: "224px", height: "40px", padding: "4px 12px"
           }} onClick={() => handleClose(ZoomFitEnum.WIDTH)}>
             <span style={{width: "200px", height: "16px", marginLeft: "-80px"}}>
-              페이지 너비 맞춤 [W]
+              페이지 너비 맞춤
             </span>
           </Button>
         </div>

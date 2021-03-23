@@ -186,44 +186,44 @@ export default class PUIController {
         PenManager.getInstance().setPenRendererType(IBrushType.ERASER);
         break;
 
-      case "#FFE5E5E5":
-        PenManager.getInstance().setColor(5)
-        break;
-
-      case "#FF000000":
-        PenManager.getInstance().setColor(4)
-        break;
-
-      case "#FFAAAAAA":
-        PenManager.getInstance().setColor(0)
-        break;
-
-      case "#FFFFD001":
-        PenManager.getInstance().setColor(2)
-        break;
-
-      case "#FFFF6500":
-        PenManager.getInstance().setColor(6)
-        break;
-
-      case "#FFFF0200":
+      case "#FFE5E5E5": //LG
         PenManager.getInstance().setColor(1)
         break;
 
-      case "#FF00ABEB":
+      case "#FF000000": //BK
+        PenManager.getInstance().setColor(3)
+        break;
+
+      case "#FFAAAAAA": // DG
+        PenManager.getInstance().setColor(2)
+        break;
+
+      case "#FFFFD001": // YE
         PenManager.getInstance().setColor(8)
         break;
 
-      case "#FF3CDD00":
-        PenManager.getInstance().setColor(7)
-        break;
-
-      case "#FF6C00E2":
+      case "#FFFF6500": // OR
         PenManager.getInstance().setColor(9)
         break;
 
-      case "#FF012EE2":
-        PenManager.getInstance().setColor(3)
+      case "#FFFF0200": // RED
+        PenManager.getInstance().setColor(0)
+        break;
+
+      case "#FF00ABEB": // BLU
+        PenManager.getInstance().setColor(6)
+        break;
+
+      case "#FF3CDD00": // GRN
+        PenManager.getInstance().setColor(7)
+        break;
+
+      case "#FF6C00E2": // PPL
+        PenManager.getInstance().setColor(4)
+        break;
+
+      case "#FF012EE2": // NAVY
+        PenManager.getInstance().setColor(5)
         break;
 
       case "pointer": {
