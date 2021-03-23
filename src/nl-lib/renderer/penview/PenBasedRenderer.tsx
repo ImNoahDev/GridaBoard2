@@ -363,13 +363,17 @@ class PenBasedRenderer extends React.Component<Props, State> {
         // const { section, owner, book, page } = nextProps.pageInfo;
         console.log(`VIEW SIZE PAGE CHANGE 1: ${makeNPageIdStr(pageInfo)}`);
 
-        if (isSameNcode(nextProps.pageInfo, DefaultFilmNcode) || isSameNcode(nextProps.pageInfo, DefaultPUINcode)) {
+        if (isSameNcode(nextProps.pageInfo, DefaultPUINcode)) {
           return;
         }
 
         this.renderer._opt.rotation = nextProps.rotation;
         const transform = MappingStorage.getInstance().getNPageTransform(pageInfo);
         this.renderer.setTransformParameters(transform.h, this.pdfSize);
+
+        if (isSameNcode(nextProps.pageInfo, DefaultFilmNcode)){
+          return;
+        }
 
         this.renderer.changePage(pageInfo, nextProps.pdfSize, false);
 
