@@ -219,6 +219,8 @@ const HeaderLayer = (props: Props) => {
     }
   }
 
+  // alert($('#header').height());
+
   return (
     <React.Fragment>
       <div id="header" style={headerStyle}>
@@ -271,7 +273,7 @@ const HeaderLayer = (props: Props) => {
 
 
       </div>
-      <div style={{ height: "1px", background: "rgba(255,255,255,1)", zoom: 1 / brZoom }}></div>
+      <div id="white_block" style={{ height: "1px", background: "rgba(255,255,255,1)", zoom: 1 / brZoom }}></div>
     </React.Fragment>
   );
 }
