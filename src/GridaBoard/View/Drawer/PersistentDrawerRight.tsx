@@ -103,7 +103,7 @@ const useStyles = makeStyles((theme: Theme) =>
     },
 
     drawerHeader: {
-      display: 'block',
+      display: 'fixed',
       alignItems: 'center',
       padding: theme.spacing(0, 1),
       // necessary for content to be below app bar
@@ -160,16 +160,10 @@ const useStyles = makeStyles((theme: Theme) =>
 
 const drawerFooter = {
   marginTop: "74vh",
-  // marginLeft: "0.8vw",
   background: "rgba(104,143,255,1)",
-  // display: 'fii',
   position: "fixed",
   flexDirection: "row",
   alignItems: 'center',
-  // padding: "8px 24px",
-  // padding: theme.spacing(0, 1),
-  // necessary for content to be below app bar
-  // ...theme.mixins.toolbar,
   justifyContent: 'center',
   boxShadow: "2px 0px 24px rgba(0, 0, 0, 0.15)",
   borderRadius: "60px",
@@ -177,8 +171,14 @@ const drawerFooter = {
   height: 40,
   bottom: 24,
   left: 20,
-  // marginBottom: "-50vh"
   zIndex: 1100,
+} as React.CSSProperties;
+
+const drawerHeader = {
+  position: "fixed",
+  zIndex: 1100,
+  marginTop: "5px",
+  marginLeft: "100px"
 } as React.CSSProperties;
 
 const minDrawerWidth = 50;
@@ -238,14 +238,15 @@ export default function PersistentDrawerRight(props: Props) {
         variant="persistent"
         anchor="left"
         open={open}
-        PaperProps={{ style: { width: drawerWidth, flexShrink: 0, zIndex: 1100, marginTop: "121px", height: window.innerHeight - 121, background: "rgba(255, 255, 255, 0.25)", float: "left" } }}
+        PaperProps={{ style: { width: drawerWidth, flexShrink: 0, zIndex: 1100, marginTop: "121px", height: window.innerHeight - 121, background: "rgba(255, 255, 255, 0.25)", float: "left", display: "flex" } }}
       >
       <div id="drawer_content">
         <div className={classes.drawerHeader}>
-          <IconButton onClick={props.handleDrawerClose} style={{float: "right"}}>
+          <IconButton onClick={props.handleDrawerClose} style={drawerHeader}>
             {theme.direction === 'rtl' ? <ChevronRightIcon /> : <ChevronLeftIcon />}
           </IconButton>
         </div>
+        <div style={{ height: "1px", background: "rgba(255,255,255,1)", zoom: 1 / brZoom }}></div>
         <div onMouseDown={e => handleMouseDown(e)} className={classes.dragger} />
         < DrawerPages noInfo={props.noInfo} />
         <div style={{ height: "1px", background: "rgba(255,255,255,1)", zoom: 1 / brZoom }}></div>

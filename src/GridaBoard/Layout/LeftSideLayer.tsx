@@ -42,7 +42,7 @@ const LeftSideLayer = () => {
 
   const sideStyle = {
     display: "flex",
-    width: "180px",
+    width: drawerOpen ? "180px" : 0,
     height: "816px",
     zoom: 1 / brZoom,
   } as React.CSSProperties;
