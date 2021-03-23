@@ -879,14 +879,10 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
    *
    * 2021/01/12 PointerEvent도 처리할 수 있도록 추가해야 함
    */
-  onTouchStrokePenMove = (event: MouseEvent & { layerX: number; layerY: number }, force: number) => {
-    // const screen_xy = { x: event.clientX, y: event.clientY };
-    // const pdf_xy = this.screenToPdfXy(screen_xy);
-
-    const mouse_xy = { x: event.layerX, y: event.layerY };
-    const pdf_xy = this.layerToPdfXy(mouse_xy);
-    const ncode_xy = this.pdfToNcodeXy(pdf_xy, true);
-
+  onTouchStrokePenMove = (event: MouseEvent, canvasXy: { x: number, y: number }, force: number) => {
+    // const mouse_xy = { x: event.layerX, y: event.layerY };
+    // const pdf_xy = this.layerToPdfXy(mouse_xy);
+    const ncode_xy = this.pdfToNcodeXy(canvasXy, true);
     // const _xy = (obj, f=10) => `${Math.floor(obj.x * f) },${Math.floor(obj.y * f) }`;
     // console.warn(`mouse(${_xy(mouse_xy)}) => pdf_xy(${_xy(pdf_xy)}) => ncode_xy(${_xy(ncode_xy, 10)})`);
 
@@ -895,7 +891,7 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
     const timediff = timeStamp - this._vpPenDownTime;
     const { section, owner, book, page } = this.pageInfo;
 
-    const DEFAULT_MOUSE_PEN_FORCE = 512;
+    // const DEFAULT_MOUSE_PEN_FORCE = 512;
 
     vp.onPenMove({
       timeStamp,
@@ -939,8 +935,7 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
     if (this.pageInfo === undefined || this.pageInfo.section === undefined) return false;
 
     console.log(
-      `VIEW SIZE${callstackDepth()} onPageSizeChanged ${makeNPageIdStr(this.pageInfo)}: ${pageSize.width}, ${pageSize.height} = ${
-        pageSize.width / pageSize.height
+      `VIEW SIZE${callstackDepth()} onPageSizeChanged ${makeNPageIdStr(this.pageInfo)}: ${pageSize.width}, ${pageSize.height} = ${pageSize.width / pageSize.height
       }`
     );
     const zoom = this.calcScaleFactor(this._opt.viewFit, this.offset.zoom);
