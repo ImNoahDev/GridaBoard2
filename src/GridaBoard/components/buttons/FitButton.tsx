@@ -41,7 +41,8 @@ export default function FitButton() {
 
   const setZoomByButton = (zoomEnum: PageZoomEnum) => {
     setAnchorEl(null);
-
+    setViewFit(ZoomFitEnum.FREE);
+    
     let newZoom;
     switch (zoomEnum) {
       case PageZoomEnum.ZOOM_UP: {
