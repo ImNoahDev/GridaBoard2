@@ -23,7 +23,9 @@ const LeftSideLayer = () => {
 
   const [drawerOpen, setDrawerOpen] = useState(false);
   const setDrawerWidth = (width: number) => updateDrawerWidth({ width });
-
+  
+  const activePageNo_store = useSelector((state: RootState) => state.activePage.activePageNo);
+  
   const handleDrawerOpen = () => {
     $('#arrow-btn').css('display', 'none');
     setDrawerOpen(true);
@@ -47,6 +49,11 @@ const LeftSideLayer = () => {
     zoom: 1 / brZoom,
   } as React.CSSProperties;
 
+  let disabled = true;
+  if (activePageNo_store !== -1) {
+    disabled = false;
+  }
+
   return (
       <div id="mainFrame" style={sideStyle}>
         {/* Drawer 구현 */}
@@ -57,6 +64,7 @@ const LeftSideLayer = () => {
             edge="end"
             onClick={handleDrawerOpen}
             style={arrowRightStyle}
+            disabled={disabled}
           >
             <KeyboardArrowRightIcon/>
           </IconButton>
