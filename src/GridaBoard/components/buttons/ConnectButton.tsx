@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars */
-import React from "react";
+import React, { useState, useEffect } from "react";
 
 import '../../styles/buttons.css';
 import { IconButton, SvgIcon } from '@material-ui/core';
@@ -44,6 +44,14 @@ type Props = {
 }
 const ConnectButton = (props: Props) => {
 
+  const [numPens, setNumPens] = useState(0);
+
+  const numPens_store = useSelector((state: RootState) => state.appConfig.num_pens);
+
+  useEffect(() => {
+    setNumPens(numPens_store);
+  }, [numPens_store]);
+
   const onPenLinkChanged = e => {
     props.onPenLinkChanged(e);
   };
@@ -58,9 +66,8 @@ const ConnectButton = (props: Props) => {
     }
   };
 
-  const num_pens = useSelector((state: RootState) => state.appConfig.num_pens);
-
-  if (num_pens > 0) {
+  
+  if (numPens > 0) {
     $('#btn_connect').css('display', 'none');
     $('#btn_connected').css('display', 'block')
   } else {
@@ -117,7 +124,7 @@ const ConnectButton = (props: Props) => {
           </SvgIcon>
         {/* </GridaToolTip> */}
         <div style={numPenStyle}>
-          <span id="pen_id" style={numPenCountStyle}>{num_pens}</span>
+          <span id="pen_id" style={numPenCountStyle}>{numPens}</span>
         </div>
 
       </IconButton>

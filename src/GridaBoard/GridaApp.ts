@@ -106,8 +106,8 @@ export default class GridaApp {
       console.log(`Home: OnPenDisconnected, mac=${pen.getMac()}`);
       const index = this._pens.findIndex(p => p.getMac() === mac);
       if (index > -1) {
-        const newPens = this._pens.splice(index, 1);
-        setPens([...newPens]);
+        this._pens.splice(index, 1);
+        setPens([...this._pens]);
       }
     }
   }
