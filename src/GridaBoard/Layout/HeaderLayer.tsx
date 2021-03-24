@@ -9,13 +9,14 @@ import { PDFDocument } from 'pdf-lib';
 import ConnectButton from "../components/buttons/ConnectButton";
 import GridaApp from "../GridaApp";
 import ManualCalibration from "../components/navbar/ManualCalibration";
-import { g_defaultPrintOption } from "../../nl-lib/ncodepod";
+import { g_defaultPrintOption, PrintNcodedPdfButton } from "../../nl-lib/ncodepod";
 import $ from "jquery";
 import SavePdfDialog from "../Save/SavePdfDialog";
 import { FileBrowserButton } from "../../nl-lib/common/neopdf";
 import { IFileBrowserReturn } from "../../nl-lib/common/structures";
 import { useSelector } from 'react-redux';
 import { RootState } from '../store/rootReducer';
+import { turnOnGlobalKeyShortCut } from "../GlobalFunctions";
 
 
 const imgStyle = {
@@ -257,7 +258,14 @@ const HeaderLayer = (props: Props) => {
             </div>
           </div>
 
-          <PrintButton targetId={printBtnId} url={pdfUrl} filename={pdfFilename} handlePdfUrl={makePdfUrl} />
+          <PrintNcodedPdfButton
+            id="btn_print_pdf" type="button" className="btn btn-neo "
+            handkeTurnOnAppShortCutKey={turnOnGlobalKeyShortCut}
+            style={{ margin: 0, padding: 0, }}
+            url={pdfUrl} filename={pdfFilename} handlePdfUrl={makePdfUrl} disabled={disabled}>
+          </PrintNcodedPdfButton>
+
+          {/* <PrintButton targetId={printBtnId} url={pdfUrl} filename={pdfFilename} handlePdfUrl={makePdfUrl} /> */}
           <ManualCalibration filename={pdfFilename} printOption={printOption} handlePdfUrl={makePdfUrl} />
         </div>
 

@@ -9,6 +9,7 @@ import { OptionDialog } from "./Dialogs/OptionDialog";
 import CancelWaitingDialog from "./CancelWaitingDialog";
 import { cloneObj } from "../../common/util";
 import Button from '@material-ui/core/Button';
+import $ from "jquery";
 
 interface Props extends ButtonProps {
   /** 인쇄될 문서의 url, printOption.url로 들어간다. */
@@ -25,7 +26,7 @@ interface Props extends ButtonProps {
   handkeTurnOnAppShortCutKey: (on: boolean) => void,
 
   /** 버튼 클릭시에 pdf url을 직접 생성하고 싶을 때 사용. 기생성된 url을 쓰고 싶으면 props.url에 값을 받으면 됨 */
-  handlePdfUrl?: () => string,
+  handlePdfUrl?: any,
 }
 
 /**
@@ -46,10 +47,10 @@ let _promise: Promise<IPrintOption>;
 let _resolve;
 
 const printStyle = {
-  padding: "0px",
-  margin: "0px",
-  border: "0px",
-  minWidth: "24px"
+  width: "80px",
+  height: "16px",
+  letterSpacing: "0.25px",
+  marginRight: "24px"
 }
 
 /**
@@ -67,6 +68,12 @@ export default function PrintNcodedPdfButton(props: Props) {
 
   const closeOptionDialog = () => setOptionOn(false);
   const openOptionDialog = () => setOptionOn(true);
+
+  $('#printBtn').hover(function() {
+    $(this).css("color", "rgba(104,143,255,1)")
+  },function() {
+    $(this).css("color", "rgba(18,18,18,1)")
+  })
 
   useEffect(() => {
     // console.log(`status = ${status}, progress=${progressPercent}`);
@@ -217,8 +224,8 @@ export default function PrintNcodedPdfButton(props: Props) {
   // _workingOption = g_defaultPrintOption;
   return (
     <React.Fragment>
-      <Button {...rest} onClick={startPrint} style={printStyle}>
-        {props.children}
+      <Button {...rest} id="printBtn"onClick={startPrint} style={printStyle}>
+        {/* {props.children} */}프린트
       </Button>
 
       { optionDialogOn
