@@ -82,7 +82,6 @@ interface State {
   playState: PLAYSTATE,
 
   renderCount: number,
-
 }
 
 /**
@@ -105,7 +104,6 @@ class PenBasedRenderer extends React.Component<Props, State> {
     playState: PLAYSTATE.live,
 
     renderCount: 0,
-
   };
 
   _renderer: PenBasedRenderWorker;
@@ -348,22 +346,17 @@ class PenBasedRenderer extends React.Component<Props, State> {
       ret_val = true;
     }
 
-    // if (nextProps.pdfUrl !== this.props.pdfUrl) {
-    //   this.shouldSendPageInfo = true;
-    //   ret_val = true;
-    // }
-
     if (!isSamePage(nextProps.pageInfo, this.props.pageInfo)) {
-      // this.pageInfo = { ...nextProps.pageInfo };
       const pageInfo = nextProps.pageInfo;
 
       console.log("`VIEW SIZE        PAGE CHANGE 0");
 
       if (this.renderer && !this.props.calibrationMode) {
-        // const { section, owner, book, page } = nextProps.pageInfo;
         console.log(`VIEW SIZE PAGE CHANGE 1: ${makeNPageIdStr(pageInfo)}`);
 
-        if (isSameNcode(nextProps.pageInfo, DefaultPUINcode)) {
+        if (isSameNcode(nextProps.pageInfo, DefaultPUINcode) || isSameNcode(this.props.pageInfo, DefaultFilmNcode)) { 
+          //1. PUI에 쓸 경우 페이지가 바뀌는 것을 막기 위함
+          //2 .필름에 쓰다가 마우스펜으로 쓸 경우 h가 바뀌는 것을 막기 위함
           return;
         }
 

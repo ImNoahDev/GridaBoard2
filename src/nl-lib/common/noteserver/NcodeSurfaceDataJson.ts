@@ -408,8 +408,8 @@ export const g_paperType_default: IPaperTypeSet = {
     "pdf_page_count": 2,
     "margin": {
       "Ymax": 128,
-      "Xmin": 9,
-      "Ymin": 9,
+      "Xmin": 5.28,
+      "Ymin": 5.28,
       "Xmax": 91
     },
     "nproj_file": "3_1013_2.nproj",
