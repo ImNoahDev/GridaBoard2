@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import { Box, Button, ButtonProps, Dialog, DialogActions, DialogContent, DialogProps, DialogTitle, Grid, TableCell, useTheme } from '@material-ui/core';
+import { Box, Button, ButtonProps, Dialog, DialogActions, DialogContent, DialogContentText, DialogProps, DialogTitle, Grid, TableCell, useTheme } from '@material-ui/core';
 import OptionLevel_debug from "./OptionDialogComponents/OptionLevel_debug";
 import OptionLevel_0 from "./OptionDialogComponents/OptionLevel_0";
 import OptionLevel_1 from "./OptionDialogComponents/OptionLevel_1";
@@ -283,9 +283,10 @@ export function OptionDialog(props: IDialogProps) {
       <Dialog open={open} {...rest} onClose={handleClose} classes={{ scrollPaper: classes.scrollPaper }} style={{zoom: 1 / brZoom}}>
 
         <DialogTitle id="form-dialog-title" style={{ float: "left", width: "600px" }}>
-          <Box fontSize={20} fontWeight="fontWeightBold" style={{float: "left", marginRight: "100px"}}>
+          <Box fontSize={20} fontWeight="fontWeightBold" style={{float: "left", marginRight: "100px", marginBottom: "-20px"}}>
             인쇄 옵션
           </Box>
+   
           {/* <TableCell colSpan={1} style={cellRadioStyle}>
               <RadioField showHelp={help} colSpan={1} checked={printOption.showTooltip} handleChange={handleChange2} color="primary" name="showTooltip">
                 도움말 표시: {printOption.showTooltip ? "true" : "false"}
@@ -293,7 +294,14 @@ export function OptionDialog(props: IDialogProps) {
           </TableCell> */}
         </DialogTitle>
 
+
+
         <DialogContent ref={dialogRef}>
+          <DialogContentText>
+            원활한 필기 인식을 위해 인쇄물의 색상이 실제와 다를 수 있습니다.
+            <br/><br/>
+          </DialogContentText>
+
           <OptionLevel_0  {...props} color={"primary"} levelCallback={onLevelChanged} handleChange2={handleChange2} optionLevel={optionLevel} />
 
           {optionLevel > 0 ? <OptionLevel_1 {...props} color={"primary"} levelCallback={onLevelChanged} handleChange2={handleChange2} optionLevel={optionLevel} /> : ""}
