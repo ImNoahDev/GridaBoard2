@@ -51,9 +51,8 @@ export default function ThicknessButton () {
     <React.Fragment>
       <div>
         <IconButton style={thicknessStyle} className="thicknessDropDown" onClick={handleClickThickness}>
-          <SvgIcon id="svg_thickness" className="thicknessDropDown" onClick={handleClickThickness} style={{width: "32px", height: "18px"}}>
+          <SvgIcon id="svg_thickness" className="thicknessDropDown" >
             <path
-              onClick={handleClickThickness}
               className="thicknessDropDown"
               fillRule="evenodd"
               clipRule="evenodd"
