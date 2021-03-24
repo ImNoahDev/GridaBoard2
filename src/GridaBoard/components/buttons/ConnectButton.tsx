@@ -43,9 +43,10 @@ type Props = {
   onPenLinkChanged: (e) => void;
 }
 const ConnectButton = (props: Props) => {
+  let connectDisplayProp: string = "block";
+  let connectedDisplayProp: string= "none";
 
   const [numPens, setNumPens] = useState(0);
-
   const numPens_store = useSelector((state: RootState) => state.appConfig.num_pens);
 
   useEffect(() => {
@@ -66,14 +67,14 @@ const ConnectButton = (props: Props) => {
     }
   };
 
-  if (numPens > 0) {
-    $('#btn_connect').css('display', 'none');
-    $('#btn_connected').css('display', 'block')
+  if (numPens_store > 0) {
+    connectDisplayProp = "none";
+    connectedDisplayProp = "block";
   } else {
-    $('#btn_connect').css('display', 'block');
-    $('#btn_connected').css('display', 'none')
+    connectDisplayProp = "block";
+    connectedDisplayProp = "none";
   }
-
+  
   $('#btn_connect').hover(function() {
     $(this).css("color", "rgba(104,143,255,1)")
   },function() {
@@ -88,7 +89,7 @@ const ConnectButton = (props: Props) => {
 
   return (
     <React.Fragment>
-      <IconButton id="btn_connect" style={{display: "block", padding: "8px"}}
+      <IconButton id="btn_connect" style={{display: connectDisplayProp, padding: "8px"}}
         onClick={() => handleConnectPen()}>
         {/* <GridaToolTip open={true} placement="left" tip={{
           head: "Pen Connect",
@@ -107,7 +108,7 @@ const ConnectButton = (props: Props) => {
           </SvgIcon>
         {/* </GridaToolTip> */}
       </IconButton>
-      <IconButton id="btn_connected" style={{display: "none", padding: "8px"}}
+      <IconButton id="btn_connected" style={{display: connectedDisplayProp, padding: "8px"}}
         onClick={() => handleConnectPen()}>
         {/* <GridaToolTip open={true} placement="left" tip={{
           head: "Pen Connect",
