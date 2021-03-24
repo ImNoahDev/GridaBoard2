@@ -11,9 +11,14 @@ import { turnOnGlobalKeyShortCut } from '../../GlobalFunctions';
 
 const selectPageStyle = {
   width: "35px",
-  height: "20px",
+  // height: "20px",
   marginRight: "10px",
-  marginLeft: "8px"
+  marginLeft: "8px",
+  border: "none",
+  textAlign: "center",
+  paddingTop: "4px",
+  paddingBottom: "6px",
+  // padding: "2px"
 } as React.CSSProperties;
 
 const PageNumbering = () => {

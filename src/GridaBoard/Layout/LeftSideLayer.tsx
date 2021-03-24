@@ -12,7 +12,7 @@ const arrowRightStyle = {
   padding: "8px",
   width: "40px",
   height: "40px",
-  top: "16px",
+  top: "8px",
   background: "rgba(255,255,255,0.25)",
   borderRadius: "40px",
   marginLeft: "16px",
@@ -27,13 +27,19 @@ const LeftSideLayer = () => {
   const activePageNo_store = useSelector((state: RootState) => state.activePage.activePageNo);
   
   const handleDrawerOpen = () => {
-    $('#arrow-btn').css('display', 'none');
+    // $('#arrow-btn').css('display', 'none');
+    $('#arrow-btn').hide(100);
+    $('#show').show(100);
     setDrawerOpen(true);
   };
 
   const handleDrawerClose = () => {
-    $('#arrow-btn').css('display', 'block');
+    
+    // $('#arrow-btn').show(100);
+    // $('#show').hide(100);
     setDrawerOpen(false);
+
+    $('#arrow-btn').show(200);
   };
 
   const onDrawerResize = (size) => {
@@ -69,6 +75,7 @@ const LeftSideLayer = () => {
             <KeyboardArrowRightIcon/>
           </IconButton>
           <PersistentDrawerRight
+            id="show"
             open={drawerOpen} handleDrawerClose={handleDrawerClose} onDrawerResize={onDrawerResize}
             noInfo = {true}
           />

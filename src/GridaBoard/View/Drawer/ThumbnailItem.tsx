@@ -63,7 +63,7 @@ const ThumbnailItem = (props: Props) => {
 
   let thumbBorderColor = `rgb(255, 255,255)`;
   if (activePageNo === pn)
-    thumbBorderColor = `rgb(255, 0, 0)`;
+    thumbBorderColor = `rgb(0, 0, 0)`;
 
   const pageOverview = page.pageOverview;
   const sizePu = pageOverview.sizePu;
@@ -76,7 +76,7 @@ const ThumbnailItem = (props: Props) => {
 
   // console.log(`thumbnail - ${pn}: pageNo: ${pdfPageNo} pdf: ${pdf} pdfUrl: ${pdfUrl} fingerprint: ${pdfFingerprint} `)
   return (
-    <Paper id={`thumbnail-item-${pn}`} key={props.key} onMouseDown={e => handleMouseDown(e)} elevation={3} style={{ height: height, margin: 7, overflow: "hidden", position: "relative" }} >
+    <Paper id={`thumbnail-item-${pn}`} key={props.key} onMouseDown={e => handleMouseDown(e)} elevation={3} style={{ height: height, margin: "10px 16px", overflow: "hidden", position: "relative" }} >
       <div id={`thumbnail-div-${pn}`} style={{ position: "absolute", margin: 0, padding: 0, right: 0, left: 0, top: 0, height: "100%", borderWidth: 3, border: 'solid', borderColor: thumbBorderColor, }}>
         <MixedPageView
           pdf={pdf}

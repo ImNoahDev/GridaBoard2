@@ -7,7 +7,8 @@ import { PEN_THICKNESS } from "../../../nl-lib/common/enums";
 const manager: PenManager = PenManager.getInstance();
 
 const thicknessStyle = {
-  marginLeft: "8px"
+  marginLeft: "8px",
+  zIndex: 100
 } as React.CSSProperties;
 
 export default function ThicknessButton () {

@@ -15,27 +15,27 @@ const numPenStyle = {
   position: "absolute",
   width: "16px",
   height: "16px",
-  left: "27px",
+  left: "22px",
   top: "4px",
-  background: "rgba(0,0,0,1)",
+  background: "rgba(88,98,125,1)",
   borderRadius: "50px",
 } as React.CSSProperties;
 
 const numPenCountStyle = {
     position: "absolute",
-    width: "7px",
-    height: "13px",
+    // width: "7px",
+    // height: "13px",
     left: "4px",
     top: "2px",
     fontFamily: "Roboto",
     fontStyle: "normal",
     fontWeight: "normal",
-    fontSize: "9px",
+    fontSize: "8px",
     lineHeight: "13px",
-    display: "flex",
-    alignItems: "center",
-    textAlign: "right",
-    letterSpacing: "0.25px",
+    // display: "flex",
+    // alignItems: "center",
+    // textAlign: "right",
+    // letterSpacing: "0.25px",
     color: "rgba(255,255,255,1)"
 } as React.CSSProperties;
 
@@ -60,13 +60,13 @@ const ConnectButton = (props: Props) => {
 
   const num_pens = useSelector((state: RootState) => state.appConfig.num_pens);
 
-  if (num_pens > 0) {
-    $('#btn_connect').css('display', 'none');
-    $('#btn_connected').css('display', 'block')
-  } else {
-    $('#btn_connect').css('display', 'block');
-    $('#btn_connected').css('display', 'none')
-  }
+  // if (num_pens > 0) {
+  //   $('#btn_connect').css('display', 'none');
+  //   $('#btn_connected').css('display', 'block')
+  // } else if (num_pens == 0) {
+  //   $('#btn_connect').css('display', 'block');
+  //   $('#btn_connected').css('display', 'none')
+  // }
 
   $('#btn_connect').hover(function() {
     $(this).css("color", "rgba(104,143,255,1)")
@@ -109,11 +109,12 @@ const ConnectButton = (props: Props) => {
           tail: "Shift + 1~7 각 펜의 내용을 감추기/보이기, P 모든 펜의 획을 감추기/보이기"
         }} title={undefined}> */}
           <SvgIcon>
-          <path
-            fillRule="evenodd"
-            clipRule="evenodd"
-            d="M18.997 20.488A10.978 10.978 0 0023 12c0-6.075-4.925-11-11-11S1 5.925 1 12a10.996 10.996 0 0011 11 10.968 10.968 0 006.997-2.512zm-2.749-.552A8.96 8.96 0 0112 21a8.974 8.974 0 01-3.4-.664v-8.29c0-.08.065-.146.146-.146h1.745c.172 0 .311.14.311.31v1.648a4.268 4.268 0 004.268 4.268c.65 0 1.178.527 1.178 1.178v.632zm1.913-1.375a3.18 3.18 0 00-3.091-2.435 2.268 2.268 0 01-2.268-2.268v-1.647a2.312 2.312 0 00-1.837-2.262V8.677l-1.118-3.08a.302.302 0 00-.285-.197.3.3 0 00-.284.197L8.18 8.677v1.299a2.147 2.147 0 00-1.58 2.07v7.155a9 9 0 1111.56-.64z"
-          />
+            <path
+              style={{background: "rgba(88,98,125,1)"}}
+              fillRule="evenodd"
+              clipRule="evenodd"
+              d="M18.997 20.488A10.978 10.978 0 0023 12c0-6.075-4.925-11-11-11S1 5.925 1 12a10.996 10.996 0 0011 11 10.968 10.968 0 006.997-2.512zm-2.749-.552A8.96 8.96 0 0112 21a8.974 8.974 0 01-3.4-.664v-8.29c0-.08.065-.146.146-.146h1.745c.172 0 .311.14.311.31v1.648a4.268 4.268 0 004.268 4.268c.65 0 1.178.527 1.178 1.178v.632zm1.913-1.375a3.18 3.18 0 00-3.091-2.435 2.268 2.268 0 01-2.268-2.268v-1.647a2.312 2.312 0 00-1.837-2.262V8.677l-1.118-3.08a.302.302 0 00-.285-.197.3.3 0 00-.284.197L8.18 8.677v1.299a2.147 2.147 0 00-1.58 2.07v7.155a9 9 0 1111.56-.64z"
+            />
           </SvgIcon>
         {/* </GridaToolTip> */}
         <div style={numPenStyle}>
