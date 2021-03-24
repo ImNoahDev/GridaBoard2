@@ -368,7 +368,7 @@ export default class InkStorage {
   public closeStroke(strokeKey: string) {
     /** @type {NeoStroke} */
     const stroke = this.realtime[strokeKey];
-    if (!stroke) {
+    if (!stroke || stroke.brushType === IBrushType.ERASER) {
       console.error(`stroke was not initiated`);
       return;
     }
