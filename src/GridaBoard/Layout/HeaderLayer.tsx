@@ -20,7 +20,7 @@ import { turnOnGlobalKeyShortCut } from "../GlobalFunctions";
 
 
 const imgStyle = {
-  marginRight: "8px",
+  marginRight: "24px",
   borderRadius: "8px",
 } as React.CSSProperties;
 
@@ -39,15 +39,16 @@ const aStyle = {
 } as React.CSSProperties;
 
 const buttonStyle = {
-  width: "80px",
-  height: "16px",
+  // width: "80px",
+  // height: "16px",
   fontFamily: "Roboto",
   fontStyle: "normal",
-  fontWeight: "normal",
+  fontWeight: "bold",
   fontSize: "14px",
   textAlign: "right",
   letterSpacing: "0.25px",
-  marginRight: "24px"
+  marginRight: "8px",
+  color: '#121212',
 } as React.CSSProperties;
 
 const printBtnId = "printTestButton";
@@ -177,7 +178,7 @@ const HeaderLayer = (props: Props) => {
     background: "rgba(255,255,255,0.9)",
     boxShadow: "2px 2px 2px rgba(0, 0, 0, 0.25)",
     borderRadius: "12px",
-    zIndex: 100
+    zIndex: 10000,
   } as React.CSSProperties;
 
   const loadDropdownStyle = {
@@ -191,7 +192,7 @@ const HeaderLayer = (props: Props) => {
     background: "rgba(255,255,255,0.9)",
     boxShadow: "2px 2px 2px rgba(0, 0, 0, 0.25)",
     borderRadius: "12px",
-    zIndex: 100
+    zIndex: 10000,
   } as React.CSSProperties;
 
 
@@ -230,7 +231,7 @@ const HeaderLayer = (props: Props) => {
           justifyContent: "flex-start", alignItems: "center", marginLeft: "24px"
         }}>
           <img src="grida_logo.png" style={imgStyle}></img>
-          <a id="grida_board" href="#" style={aStyle}>Grida board</a>
+          {/* <a id="grida_board" href="#" style={aStyle}>Grida board</a> */}
           <div>
             <Button id="save" className="saveDropDown" style={buttonStyle} onClick={handleClickSave} disabled={disabled}>
               저장하기
@@ -271,7 +272,7 @@ const HeaderLayer = (props: Props) => {
 
         <div style={{
           display: "inline-flex", flexDirection: "row",
-          justifyContent: "flex-start", alignItems: "center", marginRight: "31px"
+          justifyContent: "flex-start", alignItems: "center", marginRight: "24px"
         }}>
           <ConnectButton onPenLinkChanged={e => onPenLinkChanged(e)} />
 

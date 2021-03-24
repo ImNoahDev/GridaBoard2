@@ -69,7 +69,7 @@ const ColorButtons = () => {
     <React.Fragment>
       <div>
         <ButtonBase id="clr_3" type="button" className="color_btn select_color" style={colorStyle} onClick={handleClickColor}>
-          <div id="select_color" className="color_icon color_3">
+          <div id="select_color" className="color_icon color_3" style={{width: "18px", height: "18px"}}>
           </div>
         </ButtonBase>
 

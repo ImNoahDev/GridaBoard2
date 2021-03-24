@@ -9,8 +9,8 @@ import { RootState } from '../../store/rootReducer';
 
 const mappingStyle = {
   // display: "flex",
-  width: "140px",
-  height: "30px",
+  // width: "140px",
+  // height: "30px",
   justifyContent: "center",
   background: "rgba(255, 255, 255, 0.5)",
   border: "1px solid #CFCFCF",
@@ -22,11 +22,12 @@ const mappingStyle = {
 } as React.CSSProperties;
 
 const mappingTextStyle = {
-  width: "80px",
-  height: "14px",
+  // width: "80px",
+  // height: "14px",
   fontSize: "12px",
   lineHeight: "14px",
-  marginLeft: "-40px"
+  color: '#666666',
+  // marginLeft: "-40px"
   // margin: "8px"
 } as React.CSSProperties;
 

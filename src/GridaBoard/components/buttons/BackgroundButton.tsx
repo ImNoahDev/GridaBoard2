@@ -88,8 +88,8 @@ export default function BackgroundButton() {
     boxShadow: "2px 2px 2px rgba(0, 0, 0, 0.25)",
     borderRadius: "12px",
     zindex: 500,
-    marginRight: "180px",
-    marginTop: "50px"
+    marginRight: "110px",
+    marginTop: "140px"
   } as React.CSSProperties;
 
   return (

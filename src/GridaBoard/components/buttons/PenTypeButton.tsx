@@ -10,13 +10,15 @@ const manager: PenManager = PenManager.getInstance();
 
 const penTypeStyle = {
   color: "#58627D",
-  marginLeft: "24px"
+  marginLeft: "16px",
+  padding: "8px"
 } as React.CSSProperties;
 
 const penTypeStyleEnabled = {
   color: "#688FFF",
   marginLeft: "24px",
-  background: "white"
+  background: "white",
+  padding: "8px"
 } as React.CSSProperties;
 
 export default function PenTypeButton () {

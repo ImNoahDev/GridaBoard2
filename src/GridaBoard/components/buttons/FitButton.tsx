@@ -22,9 +22,9 @@ const dropdownStyle = {
   background: "rgba(255,255,255,0.9)",
   boxShadow: "2px 2px 2px rgba(0, 0, 0, 0.25)",
   borderRadius: "12px",
-  zIndex: 100,
-  marginRight: "80px",
-  marginTop: "130px"
+  zIndex: 10000,
+  marginRight: "20px",
+  marginTop: "210px"
 } as React.CSSProperties;
 
 export default function FitButton() {

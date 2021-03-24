@@ -9,7 +9,7 @@ import { RootState } from "../../store/rootReducer";
 const manager: PenManager = PenManager.getInstance();
 
 const thicknessStyle = {
-  marginLeft: "24px"
+  marginLeft: "8px"
 } as React.CSSProperties;
 
 export default function ThicknessButton () {
@@ -45,7 +45,7 @@ export default function ThicknessButton () {
     background: "rgba(255,255,255,0.9)",
     boxShadow: "2px 2px 2px rgba(0, 0, 0, 0.25)",
     borderRadius: "12px",
-    zIndex: 100,
+    zIndex: 10000,
     marginLeft: "20px"
   } as React.CSSProperties;
 
@@ -53,8 +53,9 @@ export default function ThicknessButton () {
     <React.Fragment>
       <div>
         <IconButton style={thicknessStyle} className="thicknessDropDown" onClick={handleClickThickness}>
-          <SvgIcon id="svg_thickness" className="thicknessDropDown" style={{width: "32px", height: "18px"}}>
+          <SvgIcon id="svg_thickness" className="thicknessDropDown" onClick={handleClickThickness} style={{width: "32px", height: "18px"}}>
             <path
+              onClick={handleClickThickness}
               className="thicknessDropDown"
               fillRule="evenodd"
               clipRule="evenodd"

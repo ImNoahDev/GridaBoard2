@@ -47,11 +47,13 @@ let _promise: Promise<IPrintOption>;
 let _resolve;
 
 const printStyle = {
-  width: "80px",
-  height: "16px",
+  // width: "80px",
+  // height: "16px",
   letterSpacing: "0.25px",
-  marginRight: "24px"
-}
+  marginRight: "24px",
+  fontStyle: "normal",
+  fontWeight: "bold",
+} as React.CSSProperties;
 
 /**
  * Class

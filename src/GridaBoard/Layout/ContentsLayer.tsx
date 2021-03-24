@@ -25,7 +25,7 @@ const localStyle = {
 const rotateStyle = {
   position: "absolute",
   zIndex: 100,
-  top: "calc(14%)",
+  top: "calc(15%)",
   left: "calc(96%)"
 } as React.CSSProperties;
 

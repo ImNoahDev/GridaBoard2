@@ -16,8 +16,8 @@ type Props = {
 }
 
 const buttonStyle = {
-  width: "80px",
-  height: "16px",
+  // width: "80px",
+  // height: "16px",
   top: "2px",
   fontFamily: "Roboto",
   fontStyle: "normal",
@@ -25,7 +25,7 @@ const buttonStyle = {
   fontSize: "14px",
   textAlign: "right",
   letterSpacing: "0.25px",
-  marginRight: "24px"
+  marginRight: "8px"
 } as React.CSSProperties;
 
 const PrintButton = (props: Props) => {

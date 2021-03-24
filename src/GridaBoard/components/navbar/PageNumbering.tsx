@@ -12,7 +12,8 @@ import { turnOnGlobalKeyShortCut } from '../../GlobalFunctions';
 const selectPageStyle = {
   width: "35px",
   height: "20px",
-  marginRight: "10px"
+  marginRight: "10px",
+  marginLeft: "8px"
 } as React.CSSProperties;
 
 const PageNumbering = () => {
@@ -69,14 +70,14 @@ const PageNumbering = () => {
 
     return (
       <div>
-        <IconButton id="pre_btn" onClick={prevChange}>
+        <IconButton id="pre_btn" onClick={prevChange} style={{padding: "8px"}}>
           <NavigateBeforeIcon />
         </IconButton>
         <input id="page_input" value={pageNo} style={selectPageStyle} onChange={handleChange}/>
         /
         &nbsp;
-        <span>{numPages}</span>
-        <IconButton id="next_btn" onClick={nextChange}>
+        <span style={{marginRight: "8px"}}>{numPages}</span>
+        <IconButton id="next_btn" onClick={nextChange} style={{padding: "8px"}}>
           <NavigateNextIcon />
         </IconButton>
       </div>

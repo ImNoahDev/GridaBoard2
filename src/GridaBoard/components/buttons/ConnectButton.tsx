@@ -18,7 +18,7 @@ const numPenStyle = {
   left: "27px",
   top: "4px",
   background: "rgba(0,0,0,1)",
-  borderRadius: "50px"
+  borderRadius: "50px",
 } as React.CSSProperties;
 
 const numPenCountStyle = {
@@ -82,7 +82,7 @@ const ConnectButton = (props: Props) => {
 
   return (
     <React.Fragment>
-      <IconButton id="btn_connect" style={{display: "block"}}
+      <IconButton id="btn_connect" style={{display: "block", padding: "8px"}}
         onClick={() => handleConnectPen()}>
         {/* <GridaToolTip open={true} placement="left" tip={{
           head: "Pen Connect",
@@ -101,7 +101,7 @@ const ConnectButton = (props: Props) => {
           </SvgIcon>
         {/* </GridaToolTip> */}
       </IconButton>
-      <IconButton id="btn_connected" style={{display: "none"}}
+      <IconButton id="btn_connected" style={{display: "none", padding: "8px"}}
         onClick={() => handleConnectPen()}>
         {/* <GridaToolTip open={true} placement="left" tip={{
           head: "Pen Connect",

@@ -34,16 +34,16 @@ export default class ThemeManager {
     $c2.children(".hover-image").attr("src", hover_img);
   }
 
-  public setUITextColor(c) {
-    document.getElementById("grida_board").style.color = c;
-  }
+  // public setUITextColor(c) {
+  //   document.getElementById("grida_board").style.color = c;
+  // }
 
   public setUITextColorNormal() {
-    this.setUITextColor("#000000");
+    // this.setUITextColor("#000000");
   }
 
   public setUiTextColorInverse() {
-    this.setUITextColor("#ffffff");
+    // this.setUITextColor("#ffffff");
   }
 
   // white board 등
