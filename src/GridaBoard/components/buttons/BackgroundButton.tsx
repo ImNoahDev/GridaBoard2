@@ -95,7 +95,7 @@ export default function BackgroundButton() {
   return (
     <React.Fragment>
       <div>
-        <Button type="button" id="basic_background" className="backgroundDropDown" style={basicStyle} onClick={handleClickBackground}>
+        <Button variant="outlined" type="button" id="basic_background" className="backgroundDropDown" style={basicStyle} onClick={handleClickBackground}>
           {/* <GridaToolTip open={true} placement="left" tip={{
               head: "Background",
               msg: "화면의 배경색을 선택합니다.",

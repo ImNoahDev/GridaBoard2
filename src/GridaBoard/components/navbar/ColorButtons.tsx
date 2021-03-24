@@ -89,7 +89,7 @@ const ColorButtons = () => {
           <ButtonBase id="clr_3" type="button" className="color_btn select_color" style={colorStyle} onClick={handleClickColor}>
             <div id="select_color" className="color_icon color_3" style={{width: "18px", height: "18px"}}>
             </div>
-            <KeyboardArrowDownRoundedIcon style={{marginLeft: "6px"}}/>
+            {/* <KeyboardArrowDownRoundedIcon style={{marginLeft: "6px"}}/> */}
           </ButtonBase>
           
         </BootstrapTooltip>

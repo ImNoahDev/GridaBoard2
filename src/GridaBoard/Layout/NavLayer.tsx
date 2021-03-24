@@ -138,10 +138,10 @@ const NavLayer = () => {
       }}>
 
         <BackgroundButton />
-        <KeyboardArrowDownRoundedIcon style={{marginRight: "24px"}}/>
+        {/* <KeyboardArrowDownRoundedIcon style={{marginRight: "24px"}}/> */}
 
         <FitButton />
-        <KeyboardArrowDownRoundedIcon style={{marginRight: "24px"}}/>
+        {/* <KeyboardArrowDownRoundedIcon style={{marginRight: "24px"}}/> */}
 
       </div>
 

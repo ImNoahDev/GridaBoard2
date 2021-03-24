@@ -25,7 +25,8 @@ const buttonStyle = {
   fontSize: "14px",
   textAlign: "right",
   letterSpacing: "0.25px",
-  marginRight: "8px"
+  marginRight: "8px",
+  marginTop: "4px"
 } as React.CSSProperties;
 
 const PrintButton = (props: Props) => {

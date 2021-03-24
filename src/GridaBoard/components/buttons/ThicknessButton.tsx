@@ -8,7 +8,7 @@ import KeyboardArrowDownRoundedIcon from '@material-ui/icons/KeyboardArrowDownRo
 const manager: PenManager = PenManager.getInstance();
 
 const thicknessStyle = {
-  marginLeft: "8px",
+  marginLeft: "22px",
   padding: "8px",
   zIndex: 100
 } as React.CSSProperties;
@@ -82,9 +82,8 @@ export default function ThicknessButton () {
                 clipRule="evenodd"
                 d="M23.149 6.906a3 3 0 01-.055 4.243l-6.158 6a3 3 0 01-4.243-.056L8.972 13.27l-3.85 3.85A3 3 0 11.878 12.88l6-6a3 3 0 014.27.028l3.749 3.85 4.008-3.906a3 3 0 014.243.055z"
               />
-              
             </SvgIcon>
-            <KeyboardArrowDownRoundedIcon style={{marginLeft: "6px"}}/>
+            {/* <KeyboardArrowDownRoundedIcon /> */}
           </IconButton>
         </BootstrapTooltip>
 

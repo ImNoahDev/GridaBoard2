@@ -94,7 +94,7 @@ export default function FitButton() {
   return (
     <React.Fragment>
       <div>
-        <Button type="button" id="btn_fit" className="fitDropDown" onClick={handleClickFit}>
+        <Button variant="outlined" type="button" id="btn_fit" className="fitDropDown" onClick={handleClickFit} style={{marginLeft: "10px", marginRight: "10px"}}>
           {/* <GridaToolTip open={true} placement="left" tip={{
               head: "Fit",
               msg: "용지의 크기를 맞추는 여러 옵션 중 하나를 선택합니다.",
