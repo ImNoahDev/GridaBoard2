@@ -20,7 +20,13 @@ export enum PEN_STATE {
   HOVER_MOVE = 101,
 }
 
-
+export enum PEN_THICKNESS {
+  THICKNESS1 = 0.04,
+  THICKNESS2 = 0.08,
+  THICKNESS3 = 0.12,
+  THICKNESS4 = 0.16,
+  THICKNESS5 = 0.2,
+}
 
 /** @enum {string} */
 export enum PenEventName {

@@ -2,9 +2,7 @@ import React from "react";
 import '../../styles/buttons.css';
 import PenManager from "../../../nl-lib/neosmartpen/PenManager";
 import { IconButton, SvgIcon } from "@material-ui/core";
-import $ from "jquery";
-import { useSelector } from "react-redux";
-import { RootState } from "../../store/rootReducer";
+import { PEN_THICKNESS } from "../../../nl-lib/common/enums";
 
 const manager: PenManager = PenManager.getInstance();
 
@@ -65,7 +63,7 @@ export default function ThicknessButton () {
         </IconButton>
 
         <div id="thicknessDrop" className="btn-group" style={thicknessDropDownStyle}>
-          <IconButton onClick={() => setThickness(1)}>
+          <IconButton onClick={() => setThickness(PEN_THICKNESS.THICKNESS1)}>
             <SvgIcon id="svg_thickness_1" style={{width: "32px", height: "18px"}}>
               <path
                 id="thickness_1"
@@ -75,7 +73,7 @@ export default function ThicknessButton () {
               />
             </SvgIcon>
           </IconButton>
-          <IconButton onClick={() => setThickness(2)}>
+          <IconButton onClick={() => setThickness(PEN_THICKNESS.THICKNESS2)}>
             <SvgIcon style={{width: "32px", height: "18px"}}>
               <path
                 id="thickness_2"
@@ -85,7 +83,7 @@ export default function ThicknessButton () {
               />
             </SvgIcon>
           </IconButton>
-          <IconButton onClick={() => setThickness(3)}>
+          <IconButton onClick={() => setThickness(PEN_THICKNESS.THICKNESS3)}>
             <SvgIcon style={{width: "32px", height: "18px"}}>
               <path
                 id="thickness_3"
@@ -95,7 +93,7 @@ export default function ThicknessButton () {
               />
             </SvgIcon>
           </IconButton>
-          <IconButton onClick={() => setThickness(4)}>
+          <IconButton onClick={() => setThickness(PEN_THICKNESS.THICKNESS4)}>
             <SvgIcon style={{width: "32px", height: "18px"}}>
               <path
                 id="thickness_4"
@@ -105,7 +103,7 @@ export default function ThicknessButton () {
               />
             </SvgIcon>
           </IconButton>
-          <IconButton onClick={() => setThickness(5)}>
+          <IconButton onClick={() => setThickness(PEN_THICKNESS.THICKNESS5)}>
             <SvgIcon style={{width: "32px", height: "18px"}}>
               <path
                 id="thickness_5"

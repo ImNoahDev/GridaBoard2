@@ -1,27 +1,18 @@
 import $ from "jquery";
 import { EventDispatcher, EventCallbackType } from "../common/event";
-import { IBrushType, PenEventName } from "../common/enums";
+import { IBrushType, PenEventName, PEN_THICKNESS } from "../common/enums";
 import { IPenEvent } from "../common/structures";
-
-
 import ThemeManager from "../../GridaBoard/styles/ThemeManager"
 import { INeoSmartpen, IPenToViewerEvent } from "../common/neopen/INeoSmartpen";
 import NeoSmartpen from "./NeoSmartpen";
-import { IPenManager } from "../common/neopen/IPenManager";
 import VirtualPen from "./VirtualPen";
-import { sprintf } from "sprintf-js";
-
 
 let _penmanager_instance = null as PenManager;
 let _active_pen: INeoSmartpen = null;
 
-
-
 export const DEFAULT_PEN_COLOR_NUM = 3;
-export const DEFAULT_PEN_THICKNESS = 2;
+export const DEFAULT_PEN_THICKNESS = PEN_THICKNESS.THICKNESS3;
 export const DEFAULT_PEN_RENDERER_TYPE: IBrushType = IBrushType.PEN;
-
-
 
 export default class PenManager {
   penArray: { id: string, mac: string, pen: INeoSmartpen, connected: boolean }[] = new Array(0);
@@ -187,8 +178,8 @@ export default class PenManager {
     }
   }
 
-  setActivePen = (penId: string) => {
-    _active_pen = this.penArray.find(penInfo => penInfo.pen.mac === penId).pen;
+  setActivePen = async (penId: string) => {
+    _active_pen = await this.penArray.find(penInfo => penInfo.pen.mac === penId).pen;
   }
 
   setColor(color_num: number) {
@@ -327,32 +318,49 @@ export default class PenManager {
     }
   }
 
-  setThickness(thickness: number) {
+  changeThicknessIcon(thickness: PEN_THICKNESS) {
     $("#thickness_num").text(thickness);
 
-    if (thickness === 1) {
-      $('#svg_thickness').empty();
-      const thickness_1_clone = $('#thickness_1').clone();
-      $('#svg_thickness').append(thickness_1_clone);
-    } else if (thickness === 2) {
-      $('#svg_thickness').empty();
-      const thickness_2_clone = $('#thickness_2').clone();
-      $('#svg_thickness').append(thickness_2_clone);
-    } else if (thickness === 3) {
-      $('#svg_thickness').empty();
-      const thickness_3_clone = $('#thickness_3').clone();
-      $('#svg_thickness').append(thickness_3_clone);
-    } else if (thickness === 4) {
-      $('#svg_thickness').empty();
-      const thickness_4_clone = $('#thickness_4').clone();
-      $('#svg_thickness').append(thickness_4_clone);
-    } else {
-      $('#svg_thickness').empty();
-      const thickness_5_clone = $('#thickness_5').clone();
-      $('#svg_thickness').append(thickness_5_clone);
+    switch (thickness) {
+      case PEN_THICKNESS.THICKNESS1 : {
+        $('#svg_thickness').empty();
+        const thickness_1_clone = $('#thickness_1').clone();
+        $('#svg_thickness').append(thickness_1_clone);
+        break;
+      }
+      case PEN_THICKNESS.THICKNESS2 : {
+        $('#svg_thickness').empty();
+        const thickness_2_clone = $('#thickness_2').clone();
+        $('#svg_thickness').append(thickness_2_clone);
+        break;
+      }
+      case PEN_THICKNESS.THICKNESS3 : {
+        $('#svg_thickness').empty();
+        const thickness_3_clone = $('#thickness_3').clone();
+        $('#svg_thickness').append(thickness_3_clone);
+        break;
+      }
+      case PEN_THICKNESS.THICKNESS4 : {
+        $('#svg_thickness').empty();
+        const thickness_4_clone = $('#thickness_4').clone();
+        $('#svg_thickness').append(thickness_4_clone);
+        break;
+      }
+      case PEN_THICKNESS.THICKNESS5 : {
+        $('#svg_thickness').empty();
+        const thickness_5_clone = $('#thickness_5').clone();
+        $('#svg_thickness').append(thickness_5_clone);
+        break;
+      }
+      default: {
+        break;
+      }
     }
+  }
 
-    thickness = thickness / 10;
+  setThickness(thickness: PEN_THICKNESS) {
+    this.changeThicknessIcon(thickness);
+
     this.thickness = thickness;
 
     if (_active_pen) {

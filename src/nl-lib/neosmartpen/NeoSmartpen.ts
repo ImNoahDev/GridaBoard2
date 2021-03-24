@@ -222,11 +222,11 @@ export default class NeoSmartpen implements INeoSmartpen {
     // const stroke = this.storage.openStroke(openStrokeArg);
     // const strokeKey = stroke.key;
     // this.currPenMovement.stroke = stroke;
+    this.manager.setActivePen(event.penId);
 
     console.log(`NeoSmartpen dispatch event ON_PEN_DOWN`);
     this.dispatcher.dispatch(PenEventName.ON_PEN_DOWN, penDownStrokeInfo);
 
-    this.manager.setActivePen(event.penId);
     // event 전달
     // let ph = this.appPen;
     // ph.onPenDown(event);
@@ -587,6 +587,10 @@ export default class NeoSmartpen implements INeoSmartpen {
     const mac = this.protocolHandler.getMac();
     this.mac = mac;
     console.log(`Connected: ${mac}`);
+
+    this.setThickness(this.manager.thickness);
+    this.setPenRendererType(this.manager.penRendererType);
+    this.setColor(this.manager.color);
 
     // this.manager.onConnected({ pen: this, event });
     this.dispatcher.dispatch(PenEventName.ON_CONNECTED, { pen: this, mac, event });
