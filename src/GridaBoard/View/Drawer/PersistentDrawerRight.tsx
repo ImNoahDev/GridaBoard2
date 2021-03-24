@@ -109,9 +109,10 @@ const useStyles = makeStyles((theme: Theme) =>
       alignItems: 'center',
       padding: theme.spacing(0, 1),
       // necessary for content to be below app bar
-      ...theme.mixins.toolbar,
+      // ...theme.mixins.toolbar,
       justifyContent: 'flex-start',
       zIndex: 150,
+      height: "56px",
     },
 
     contentShift: {
@@ -179,8 +180,12 @@ const drawerFooter = {
 const drawerHeader = {
   position: "fixed",
   zIndex: 1100,
-  marginTop: "5px",
-  marginLeft: "100px"
+  marginTop: "8px",
+  marginLeft: "120px",
+  padding: "8px",
+  // width: "172px",
+  background: "white",
+  opacity: 0.8
 } as React.CSSProperties;
 
 const minDrawerWidth = 50;
@@ -237,6 +242,8 @@ export default function PersistentDrawerRight(props: Props) {
 
   const blockHeight = $('#white_block').height();
 
+  const footerHeight = $('#footer').height();
+
   const sumHeight = headerHeight + navHeight + blockHeight;
 
   return (
@@ -248,19 +255,22 @@ export default function PersistentDrawerRight(props: Props) {
         variant="persistent"
         anchor="left"
         open={open}
-        PaperProps={{ style: { width: drawerWidth, flexShrink: 0, zIndex: 1100, marginTop: sumHeight, height: window.innerHeight - sumHeight, background: "rgba(255, 255, 255, 0.25)", float: "left", display: "flex" } }}
+        PaperProps={{ style: { width: "190px", flexShrink: 0, zIndex: 1100, marginTop: sumHeight, height: window.innerHeight - sumHeight, background: "rgba(255, 255, 255, 0.25)", float: "left", display: "flex" } }}
       >
       <div id="drawer_content">
         <div className={classes.drawerHeader}>
-          <IconButton onClick={props.handleDrawerClose} style={drawerHeader}>
-            {theme.direction === 'rtl' ? <ChevronRightIcon /> : <ChevronLeftIcon />}
-          </IconButton>
+          {/* <div style={drawerHeader}> */}
+            <IconButton onClick={props.handleDrawerClose} style={drawerHeader}>
+              {theme.direction === 'rtl' ? <ChevronRightIcon /> : <ChevronLeftIcon />}
+            </IconButton>
+          {/* </div> */}
+          
         </div>
-        <div style={{ height: "1px", background: "rgba(255,255,255,1)", zoom: 1 / brZoom }}></div>
+        <div style={{ height: "1px", background: "rgba(255,255,255,1)", zoom: 1 / brZoom, }}></div>
         <div onMouseDown={e => handleMouseDown(e)} className={classes.dragger} />
         < DrawerPages noInfo={props.noInfo} />
         <div style={{ height: "1px", background: "rgba(255,255,255,1)", zoom: 1 / brZoom }}></div>
-        <div style={{height: "80px"}}>
+        <div id="footer" style={{height: "80px"}}>
           <Button onClick={(evnet) => addBlankPage(event)} style={drawerFooter}>
             <AddIcon style={{width: "12px", height: "12px", color: "rgba(255,255,255,1)"}}/>
             <span style={{fontSize: "12px", color: "rgba(255,255,255,1)"}}>페이지 추가</span>

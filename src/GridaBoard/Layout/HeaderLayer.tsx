@@ -243,7 +243,7 @@ const HeaderLayer = (props: Props) => {
               }} 
                 onClick={() => saveGrida('hello.grida')}
                 // onClick={() => alert('미구현된 기능입니다.')}
-              >
+              >s
                 <span style={{marginLeft: "-40px"}}>데이터 저장(.grida)</span>
               </Button>
             </div>
