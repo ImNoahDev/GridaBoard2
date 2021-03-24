@@ -3,10 +3,11 @@ import '../../styles/main.css';
 import GridaToolTip from '../../styles/GridaToolTip';
 import PenManager from '../../../nl-lib/neosmartpen/PenManager';
 import Button from '@material-ui/core/Button';
-import { ButtonBase, Popover } from '@material-ui/core';
+import { ButtonBase, makeStyles, Popover, Theme, Tooltip, TooltipProps } from '@material-ui/core';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../store/rootReducer';
 import $ from "jquery";
+import KeyboardArrowDownRoundedIcon from '@material-ui/icons/KeyboardArrowDownRounded';
 
 const manager: PenManager = PenManager.getInstance();
 
@@ -35,6 +36,22 @@ const groupStyle = {
   marginTop: "8px",
   marginLeft: "22px"
 } as React.CSSProperties;
+
+const useStylesBootstrap = makeStyles((theme: Theme) => ({
+  arrow: {
+    color: theme.palette.common.black,
+  },
+  tooltip: {
+    backgroundColor: theme.palette.common.black,
+    fontSize: "11px"
+  },
+}));
+
+function BootstrapTooltip(props: TooltipProps) {
+  const classes = useStylesBootstrap();
+
+  return <Tooltip arrow classes={classes} {...props} />;
+}
 
 const ColorButtons = () => {
 
@@ -68,10 +85,15 @@ const ColorButtons = () => {
   return (
     <React.Fragment>
       <div>
-        <ButtonBase id="clr_3" type="button" className="color_btn select_color" style={colorStyle} onClick={handleClickColor}>
-          <div id="select_color" className="color_icon color_3" style={{width: "18px", height: "18px"}}>
-          </div>
-        </ButtonBase>
+        <BootstrapTooltip title="색상 [1 ~ 0]">
+          <ButtonBase id="clr_3" type="button" className="color_btn select_color" style={colorStyle} onClick={handleClickColor}>
+            <div id="select_color" className="color_icon color_3" style={{width: "18px", height: "18px"}}>
+            </div>
+            <KeyboardArrowDownRoundedIcon style={{marginLeft: "6px"}}/>
+          </ButtonBase>
+          
+        </BootstrapTooltip>
+        
 
         <div id="colorDrop" className="selected_color" style={colorDropDownStyle}>
           <ButtonBase id="clr_1" type="button" className="color_btn" style={groupStyle}
@@ -81,8 +103,10 @@ const ColorButtons = () => {
                 msg: "표시되는 펜의 색상을 선택합니다",
                 tail: "키보드 버튼 1로 선택 가능합니다"
               }} title={undefined}> */}
+            
               <div className="color_icon color_1">
               </div>
+            
             {/* </GridaToolTip> */}
           </ButtonBase>
 

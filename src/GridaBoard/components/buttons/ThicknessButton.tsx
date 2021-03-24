@@ -1,15 +1,37 @@
 import React from "react";
 import '../../styles/buttons.css';
 import PenManager from "../../../nl-lib/neosmartpen/PenManager";
-import { IconButton, SvgIcon } from "@material-ui/core";
+import { IconButton, makeStyles, SvgIcon, Theme, Tooltip, TooltipProps } from "@material-ui/core";
 import { PEN_THICKNESS } from "../../../nl-lib/common/enums";
+import KeyboardArrowDownRoundedIcon from '@material-ui/icons/KeyboardArrowDownRounded';
 
 const manager: PenManager = PenManager.getInstance();
 
 const thicknessStyle = {
   marginLeft: "8px",
+  padding: "8px",
   zIndex: 100
 } as React.CSSProperties;
+
+const thicknessDropStyle = {
+  padding: "8px"
+} as React.CSSProperties;
+
+const useStylesBootstrap = makeStyles((theme: Theme) => ({
+  arrow: {
+    color: theme.palette.common.black,
+  },
+  tooltip: {
+    backgroundColor: theme.palette.common.black,
+    fontSize: "11px"
+  },
+}));
+
+function BootstrapTooltip(props: TooltipProps) {
+  const classes = useStylesBootstrap();
+
+  return <Tooltip arrow classes={classes} {...props} />;
+}
 
 export default function ThicknessButton () {
 
@@ -39,8 +61,8 @@ export default function ThicknessButton () {
     alignItems: "center",
     padding: "4px 8px",
     position: "absolute",
-    width: "300px",
-    height: "48px",
+    // width: "300px",
+    // height: "48px",
     background: "rgba(255,255,255,0.9)",
     boxShadow: "2px 2px 2px rgba(0, 0, 0, 0.25)",
     borderRadius: "12px",
@@ -51,20 +73,24 @@ export default function ThicknessButton () {
   return (
     <React.Fragment>
       <div>
-        <IconButton style={thicknessStyle} className="thicknessDropDown" onClick={handleClickThickness}>
-          <SvgIcon id="svg_thickness" className="thicknessDropDown" >
-            <path
-              className="thicknessDropDown"
-              fillRule="evenodd"
-              clipRule="evenodd"
-              d="M23.149 6.906a3 3 0 01-.055 4.243l-6.158 6a3 3 0 01-4.243-.056L8.972 13.27l-3.85 3.85A3 3 0 11.878 12.88l6-6a3 3 0 014.27.028l3.749 3.85 4.008-3.906a3 3 0 014.243.055z"
-            />
-          </SvgIcon>
-        </IconButton>
+        <BootstrapTooltip title="두께 [A ~ G]">
+          <IconButton style={thicknessStyle} className="thicknessDropDown" onClick={handleClickThickness}>
+            <SvgIcon id="svg_thickness" className="thicknessDropDown" >
+              <path
+                className="thicknessDropDown"
+                fillRule="evenodd"
+                clipRule="evenodd"
+                d="M23.149 6.906a3 3 0 01-.055 4.243l-6.158 6a3 3 0 01-4.243-.056L8.972 13.27l-3.85 3.85A3 3 0 11.878 12.88l6-6a3 3 0 014.27.028l3.749 3.85 4.008-3.906a3 3 0 014.243.055z"
+              />
+              
+            </SvgIcon>
+            <KeyboardArrowDownRoundedIcon style={{marginLeft: "6px"}}/>
+          </IconButton>
+        </BootstrapTooltip>
 
         <div id="thicknessDrop" className="btn-group" style={thicknessDropDownStyle}>
-          <IconButton onClick={() => setThickness(PEN_THICKNESS.THICKNESS1)}>
-            <SvgIcon id="svg_thickness_1" style={{width: "32px", height: "18px"}}>
+          <IconButton onClick={() => setThickness(PEN_THICKNESS.THICKNESS1)} style={thicknessDropStyle}>
+            <SvgIcon id="svg_thickness_1">
               <path
                 id="thickness_1"
                 fillRule="evenodd"
@@ -73,8 +99,8 @@ export default function ThicknessButton () {
               />
             </SvgIcon>
           </IconButton>
-          <IconButton onClick={() => setThickness(PEN_THICKNESS.THICKNESS2)}>
-            <SvgIcon style={{width: "32px", height: "18px"}}>
+          <IconButton onClick={() => setThickness(PEN_THICKNESS.THICKNESS2)} style={thicknessDropStyle}>
+            <SvgIcon>
               <path
                 id="thickness_2"
                 fillRule="evenodd"
@@ -83,34 +109,34 @@ export default function ThicknessButton () {
               />
             </SvgIcon>
           </IconButton>
-          <IconButton onClick={() => setThickness(PEN_THICKNESS.THICKNESS3)}>
-            <SvgIcon style={{width: "32px", height: "18px"}}>
-              <path
-                id="thickness_3"
-                fillRule="evenodd"
-                clipRule="evenodd"
-                d="M23.149 6.906a3 3 0 01-.055 4.243l-6.158 6a3 3 0 01-4.243-.056L8.972 13.27l-3.85 3.85A3 3 0 11.878 12.88l6-6a3 3 0 014.27.028l3.749 3.85 4.008-3.906a3 3 0 014.243.055z"
-              />
+          <IconButton onClick={() => setThickness(PEN_THICKNESS.THICKNESS3)} style={thicknessDropStyle}>
+            <SvgIcon>
+            <path
+              id="thickness_3"
+              fillRule="evenodd"
+              clipRule="evenodd"
+              d="M23.149 6.906a3 3 0 01-.055 4.243l-6.158 6a3 3 0 01-4.243-.056L8.972 13.27l-3.85 3.85A3 3 0 11.878 12.88l6-6a3 3 0 014.27.028l3.749 3.85 4.008-3.906a3 3 0 014.243.055z"
+            />
             </SvgIcon>
           </IconButton>
-          <IconButton onClick={() => setThickness(PEN_THICKNESS.THICKNESS4)}>
-            <SvgIcon style={{width: "32px", height: "18px"}}>
-              <path
-                id="thickness_4"
-                fillRule="evenodd"
-                clipRule="evenodd"
-                d="M25.723 5.36a4.5 4.5 0 01-.083 6.363l-6.157 6a4.5 4.5 0 01-6.365-.084l-2.66-2.732-2.776 2.775a4.5 4.5 0 01-6.364-6.364l6-6a4.5 4.5 0 016.406.043l2.702 2.774 2.934-2.858a4.5 4.5 0 016.363.083z"
-              />
+          <IconButton onClick={() => setThickness(PEN_THICKNESS.THICKNESS4)} style={thicknessDropStyle}>
+            <SvgIcon>
+            <path
+              id="thickness_4"
+              fillRule="evenodd"
+              clipRule="evenodd"
+              d="M22.865 5.36c1.542 1.78 1.509 4.629-.073 6.363l-5.474 6c-.76.833-1.783 1.292-2.844 1.277-1.061-.016-2.073-.505-2.814-1.36l-2.365-2.733-2.467 2.775c-1.562 1.757-4.094 1.757-5.656 0-1.563-1.757-1.563-4.607 0-6.364l5.333-6C7.262 4.467 8.29 3.992 9.36 4c1.07.008 2.093.498 2.84 1.36l2.4 2.775 2.609-2.858c1.582-1.734 4.114-1.697 5.656.083z"
+            />
             </SvgIcon>
           </IconButton>
-          <IconButton onClick={() => setThickness(PEN_THICKNESS.THICKNESS5)}>
-            <SvgIcon style={{width: "32px", height: "18px"}}>
-              <path
-                id="thickness_5"
-                fillRule="evenodd"
-                clipRule="evenodd"
-                d="M30.184 4.813c2.467 2.373 2.414 6.172-.118 8.484l-6.568 6c-1.216 1.111-2.853 1.723-4.55 1.703-1.698-.021-3.317-.674-4.502-1.814l-1.707-1.644-1.814 1.7c-2.499 2.344-6.551 2.344-9.05 0-2.5-2.343-2.5-6.142 0-8.485l6.4-6C9.485 3.622 11.13 2.99 12.843 3c1.712.01 3.348.664 4.542 1.814l1.766 1.7 1.983-1.811c2.531-2.313 6.583-2.264 9.05.11z"
-              />
+          <IconButton onClick={() => setThickness(PEN_THICKNESS.THICKNESS5)} style={thicknessDropStyle}>
+            <SvgIcon>
+            <path
+              id="thickness_5"
+              fillRule="evenodd"
+              clipRule="evenodd"
+              d="M22.638 4.813c1.85 2.373 1.81 6.172-.088 8.484l-4.927 6c-.912 1.111-2.14 1.723-3.413 1.703-1.273-.021-2.487-.674-3.375-1.814l-1.28-1.644-1.36 1.7c-1.875 2.344-4.915 2.344-6.79 0-1.874-2.343-1.874-6.142 0-8.485l4.8-6C7.115 3.622 8.349 2.99 9.633 3c1.284.01 2.511.664 3.407 1.814l1.324 1.7 1.487-1.811c1.899-2.313 4.938-2.264 6.788.11z"
+            />
             </SvgIcon>
           </IconButton>
         </div>

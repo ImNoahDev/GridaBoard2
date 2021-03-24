@@ -5,7 +5,7 @@ import { RootState } from '../../store/rootReducer';
 import { useSelector } from "react-redux";
 import NavigateBeforeIcon from '@material-ui/icons/NavigateBefore';
 import NavigateNextIcon from '@material-ui/icons/NavigateNext';
-import { IconButton } from '@material-ui/core';
+import { IconButton, makeStyles, Theme, Tooltip, TooltipProps } from '@material-ui/core';
 import $ from "jquery";
 import { turnOnGlobalKeyShortCut } from '../../GlobalFunctions';
 
@@ -20,6 +20,22 @@ const selectPageStyle = {
   paddingBottom: "6px",
   // padding: "2px"
 } as React.CSSProperties;
+
+const useStylesBootstrap = makeStyles((theme: Theme) => ({
+  arrow: {
+    color: theme.palette.common.black,
+  },
+  tooltip: {
+    backgroundColor: theme.palette.common.black,
+    fontSize: "11px"
+  },
+}));
+
+function BootstrapTooltip(props: TooltipProps) {
+  const classes = useStylesBootstrap();
+
+  return <Tooltip arrow classes={classes} {...props} />;
+}
 
 const PageNumbering = () => {
     const numPages_store = useSelector((state: RootState) => state.activePage.numDocPages);
@@ -76,14 +92,18 @@ const PageNumbering = () => {
     return (
       <div>
         <IconButton id="pre_btn" onClick={prevChange} style={{padding: "8px"}}>
-          <NavigateBeforeIcon />
+          <BootstrapTooltip title="이전 페이지 [<-]">
+            <NavigateBeforeIcon />
+          </BootstrapTooltip>
         </IconButton>
         <input id="page_input" value={pageNo} style={selectPageStyle} onChange={handleChange}/>
         /
         &nbsp;
         <span style={{marginRight: "8px"}}>{numPages}</span>
         <IconButton id="next_btn" onClick={nextChange} style={{padding: "8px"}}>
-          <NavigateNextIcon />
+          <BootstrapTooltip title="다음 페이지 [->]">
+            <NavigateNextIcon />
+          </BootstrapTooltip>
         </IconButton>
       </div>
     )

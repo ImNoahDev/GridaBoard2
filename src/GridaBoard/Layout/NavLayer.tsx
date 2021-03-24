@@ -122,10 +122,8 @@ const NavLayer = () => {
         <PenTypeButton />
 
         <ColorButtons />
-        <KeyboardArrowDownRoundedIcon />
-
+        
         <ThicknessButton />
-        <KeyboardArrowDownRoundedIcon />
 
         <TracePointButton />
       </div>
@@ -140,10 +138,10 @@ const NavLayer = () => {
       }}>
 
         <BackgroundButton />
-        <KeyboardArrowDownRoundedIcon />
+        <KeyboardArrowDownRoundedIcon style={{marginRight: "24px"}}/>
 
         <FitButton />
-        <KeyboardArrowDownRoundedIcon />
+        <KeyboardArrowDownRoundedIcon style={{marginRight: "24px"}}/>
 
       </div>
 

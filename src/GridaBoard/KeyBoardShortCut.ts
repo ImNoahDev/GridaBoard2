@@ -2,10 +2,13 @@
 // 2020-12-09 현재 구현되어 있는 기능까지 단축키 완성(추가 구현된 기능 넣고 다른 버튼들 단축키 지정하기)
 
 import { store } from "./client/Root";
-import { IBrushType } from "../nl-lib/common/enums";
+import { IBrushType, ZoomFitEnum } from "../nl-lib/common/enums";
 import PenManager from "../nl-lib/neosmartpen/PenManager";
 import { setActivePageNo } from "./store/reducers/activePageReducer";
 import GridaDoc from "./GridaDoc";
+import { setViewFit } from "./store/reducers/viewFitReducer";
+import { setZoomStore } from "./store/reducers/zoomReducer";
+import { setRotationTrigger } from "./store/reducers/rotate";
 
 
 let _isCtrl = false;
@@ -102,11 +105,11 @@ export default function KeyBoardShortCut(evt: KeyboardEvent) {
         handled = true;
         break;
 
-      case "w": // w
-        // setPenType(PenType.MARKER);
-        PenManager.getInstance().setPenRendererType(IBrushType.MARKER);
-        handled = true;
-        break;
+      // case "w": // w
+      //   // setPenType(PenType.MARKER);
+      //   // PenManager.getInstance().setPenRendererType(IBrushType.MARKER);
+      //   // handled = true;
+      //   break;
 
       case "e": // e
         // setPenType(PenType.ERASER);
@@ -115,6 +118,8 @@ export default function KeyBoardShortCut(evt: KeyboardEvent) {
         break;
 
       case "r": // r
+        PenManager.getInstance().setPenRendererType(IBrushType.MARKER);
+        handled = true;
         break;
 
       case "t": // t
@@ -140,22 +145,28 @@ export default function KeyBoardShortCut(evt: KeyboardEvent) {
 
       case "f": // f
         // setPenThickness(4);
+        PenManager.getInstance().setThickness(4);
+        handled = true;
         // handled = true;
         break;
 
       case "g": // g
         // setPenThickness(5);
+        PenManager.getInstance().setThickness(5);
+        handled = true;
         // handled = true;
         break;
 
-      case "z": // z
+      case "w": // z
         // onBtn_fitWidth();
-        // handled = true;
+        setViewFit(ZoomFitEnum.WIDTH);
+        handled = true;
         break;
 
-      case "x": // x
+      case "h": // x
         // onBtn_fitHeight();
-        // handled = true;
+        setViewFit(ZoomFitEnum.HEIGHT);
+        handled = true;
         break;
 
       case "c": // c
@@ -173,6 +184,36 @@ export default function KeyBoardShortCut(evt: KeyboardEvent) {
 
       case "Tab": // <TAB>
         // onRotateButton();
+        // const rotationTrigger = store.getState().rotate.rotationTrigger;
+        // setRotationTrigger(!rotationTrigger);
+
+        // let page = doc.getPageAt(activePageNo_store);
+
+        // if (page._pdfPage !== undefined) {
+        //   if (page._pdfPage.viewport.rotation >= 270) {
+        //     page._pdfPage.viewport.rotation = 0;
+        //   } else {
+        //     page._pdfPage.viewport.rotation += 90;
+        //   }
+        // }
+
+        // if (page.pageOverview.rotation >= 270) {
+        //   page._rotation = 0;
+        // } else {
+        //   page._rotation += 90;
+        // }
+
+        // if (page.pageOverview.rotation == 90 || page.pageOverview.rotation == 270) {
+        //   $('#vertical_rotate').css('display', 'none');
+        //   $('#horizontal_rotate').css('display', 'block');
+        // } else {
+        //   $('#vertical_rotate').css('display', 'block');
+        //   $('#horizontal_rotate').css('display', 'none');
+        // }
+
+        // const tmp = page.pageOverview.sizePu.width ;
+        // page.pageOverview.sizePu.width = page.pageOverview.sizePu.height;
+        // page.pageOverview.sizePu.height = tmp;
         // handled = true;
         break;
 
@@ -205,6 +246,43 @@ export default function KeyBoardShortCut(evt: KeyboardEvent) {
 
         // onPrevPage();
         handled = true;
+        break;
+      }
+
+      case "ArrowLeft": {// P
+        const activePageNo = store.getState().activePage.activePageNo
+        if (activePageNo === 0) {
+          return;
+        }
+        setActivePageNo(activePageNo-1);
+        break;
+      }
+
+      case "ArrowRight": {// P
+        const activePageNo = store.getState().activePage.activePageNo;
+        const numDocPages = store.getState().activePage.numDocPages;
+        if (activePageNo === numDocPages-1) {
+          return;
+        }
+        setActivePageNo(activePageNo+1);
+        break;
+      }
+
+      case "+": {
+        setViewFit(ZoomFitEnum.FREE);
+        const zoom = store.getState().zoomReducer.zoom;
+        const delta = -100;
+        const newZoom = zoom * 0.9985 ** delta
+        setZoomStore(newZoom);
+        break;
+      }
+
+      case "-": {
+        setViewFit(ZoomFitEnum.FREE);
+        const zoom = store.getState().zoomReducer.zoom;
+        const delta = 100;
+        const newZoom = zoom * 0.9985 ** delta
+        setZoomStore(newZoom);
         break;
       }
 
@@ -259,6 +337,24 @@ export default function KeyBoardShortCut(evt: KeyboardEvent) {
         handled = true;
         break;
       }
+
+      // case "+": {
+      //   setViewFit(ZoomFitEnum.FREE);
+      //   const zoom = store.getState().zoomReducer.zoom;
+      //   const delta = -100;
+      //   const newZoom = zoom * 0.9985 ** delta
+      //   setZoomStore(newZoom);
+      //   break;
+      // }
+
+      // case "-": {
+      //   setViewFit(ZoomFitEnum.FREE);
+      //   const zoom = store.getState().zoomReducer.zoom;
+      //   const delta = 100;
+      //   const newZoom = zoom * 0.9985 ** delta
+      //   setZoomStore(newZoom);
+      //   break;
+      // }
     }
   }
 

@@ -49,6 +49,7 @@ const buttonStyle = {
   letterSpacing: "0.25px",
   marginRight: "8px",
   color: '#121212',
+  marginTop: "4px"
 } as React.CSSProperties;
 
 const printBtnId = "printTestButton";
@@ -173,8 +174,8 @@ const HeaderLayer = (props: Props) => {
     alignItems: "flex-start",
     padding: "8px",
     position: "absolute",
-    width: "220px",
-    height: "90px",
+    // width: "220px",
+    // height: "90px",
     background: "rgba(255,255,255,0.9)",
     boxShadow: "2px 2px 2px rgba(0, 0, 0, 0.25)",
     borderRadius: "12px",
@@ -187,8 +188,8 @@ const HeaderLayer = (props: Props) => {
     alignItems: "flex-start",
     padding: "8px",
     position: "absolute",
-    width: "220px",
-    height: "90px",
+    // width: "220px",
+    // height: "90px",
     background: "rgba(255,255,255,0.9)",
     boxShadow: "2px 2px 2px rgba(0, 0, 0, 0.25)",
     borderRadius: "12px",
@@ -243,7 +244,7 @@ const HeaderLayer = (props: Props) => {
               }} 
                 onClick={() => saveGrida('hello.grida')}
                 // onClick={() => alert('미구현된 기능입니다.')}
-              >s
+              >
                 <span style={{marginLeft: "-40px"}}>데이터 저장(.grida)</span>
               </Button>
             </div>
