@@ -893,7 +893,7 @@ export default class PenComm extends ProtocolHandlerBase {
     const timediff = buf[5];
     this.accTime(timediff);
 
-    const force = intFromBytes(buf, 6, 2);
+    let force = intFromBytes(buf, 6, 2);
     const dotX = intFromBytes(buf, 8, 2);
     const dotY = intFromBytes(buf, 10, 2);
     const dotFx = intFromBytes(buf, 12, 1);
@@ -902,6 +902,19 @@ export default class PenComm extends ProtocolHandlerBase {
 
     const x = dotX + dotFx / 100;
     const y = dotY + dotFy / 100;
+    
+    switch (this.deviceInfo.modelName) {
+      case 'NWP-F30': { //디모
+        force += 600;
+        break;
+      }
+      case 'NWP-F80': { //라미
+        force += 300;
+        break;
+      }
+      default: break;
+    }
+
     const e = makePenEvent(this.deviceInfo.deviceType, PenCommEventEnum.PEN_MOVE, { x, y, force, timediff, timeStamp: this.currentTime });
     this.penHandler.onPenMove(e);
   }
