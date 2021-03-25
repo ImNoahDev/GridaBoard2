@@ -336,9 +336,9 @@ const CalibrationDialog = (props: IDialogProps) => {
             <Button onClick={handleNext} color="primary">
               Next
             </Button> */}
-            <Button onClick={handleCancel} color="primary">
+            {/* <Button onClick={handleCancel} color="primary">
               Cancel
-            </Button>
+            </Button> */}
             <ConnectButton onPenLinkChanged={e => onPenLinkChanged(e)} />
           </DialogActions>
         </Dialog>
