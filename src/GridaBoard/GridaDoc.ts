@@ -118,7 +118,7 @@ export default class GridaDoc {
     console.log(pdfDoc);
 
     if (pdfDoc) {
-      let activePageNo = await this.appendPdfDocument(pdfDoc, pageInfo, basePageInfo);
+      let activePageNo = await this.appendPdfDocument(pdfDoc, pageInfo, basePageInfo, false);
       scrollToBottom("drawer_content");
 
       if (activePageNo === -1) {
@@ -130,7 +130,7 @@ export default class GridaDoc {
   }
 
   public openGridaFile = async (option: { url: string, filename: string }
-    , gridaRawData, neoStroke, pageInfo) => {
+    , gridaRawData, neoStroke, pageInfo: IPageSOBP, basePageInfo: IPageSOBP) => {
     const pdfDoc = await NeoPdfManager.getInstance().getGrida({ url: option.url, filename: option.filename, purpose: "open pdf by GridaDoc" }, gridaRawData, neoStroke);
 
     if (pdfDoc) {
@@ -138,7 +138,7 @@ export default class GridaDoc {
       if (!found) {
         this._pages = [];
       }
-      let activePageNo = await this.appendPdfDocument(pdfDoc, pageInfo); //이 안에서 doc에 pages를 넣어줌
+      let activePageNo = await this.appendPdfDocument(pdfDoc, pageInfo, basePageInfo, true); //이 안에서 doc에 pages를 넣어줌
       
       if (activePageNo === -1) {
         const state = store.getState() as RootState;
@@ -156,7 +156,7 @@ export default class GridaDoc {
     }
   }
 
-  private appendPdfDocument = (pdfDoc: NeoPdfDocument, pageInfo: IPageSOBP, basePageInfo?: IPageSOBP) => {
+  private appendPdfDocument = (pdfDoc: NeoPdfDocument, pageInfo: IPageSOBP, basePageInfo: IPageSOBP, loadGrida?: boolean) => {
     // 0) PDF가 있는지 찾아보고 있으면 return, (없으면 1, 2를 통해서 넣는다)
     const found = this._pdfd.find(item => item.fingerprint === pdfDoc.fingerprint);
     if (found) {
@@ -201,6 +201,15 @@ export default class GridaDoc {
       }
       basePageInfo = theBase.basePageInfo;
     }
+
+    // if (loadGrida) {
+    //   const msi = MappingStorage.getInstance();
+    //   let theBase = msi.findAssociatedBaseNcode(pdfDoc.fingerprint);
+    //   if (!theBase) {
+    //     const { url, filename, fingerprint, numPages } = pdfDoc;
+    //     theBase = msi.makeTemporaryAssociateMapItem({ pdf: { url, filename, fingerprint, numPages }, n_paper: undefined, numBlankPages: undefined });
+    //   }
+    // }
 
     const m0 = g_availablePagesInSection[pageInfo.section];
     const m1 = g_availablePagesInSection[basePageInfo.section];

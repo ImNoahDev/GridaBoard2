@@ -23,6 +23,7 @@ const LoadGrida = () => {
         const gridaRawData = gridaStruct.pdf.pdfInfo.rawData;
         const neoStroke = gridaStruct.stroke;
         const gridaPageInfo = gridaStruct.pdf.pdfInfo.pageInfo;
+        const gridaBasePageInfo = gridaStruct.pdf.pdfInfo.basePageInfo;
 
         // pdf의 url을 만들어 주기 위해 rawData를 blob으로 만들어 createObjectURL을 한다
         const rawDataBuf = new ArrayBuffer(gridaRawData.length*2);
@@ -46,6 +47,13 @@ const LoadGrida = () => {
           page: gridaPageInfo.p
         };
 
+        const basePageInfo = {
+          section: gridaBasePageInfo.s,
+          owner: gridaBasePageInfo.o,
+          book: gridaBasePageInfo.b,
+          page: gridaBasePageInfo.p
+        };
+
         for (let i = 0; i < neoStroke.length; i++) {
 
           pageId[i] = InkStorage.makeNPageIdStr(neoStroke[i][0]);
@@ -60,7 +68,7 @@ const LoadGrida = () => {
         }
 
         const doc = GridaDoc.getInstance();
-        doc.openGridaFile({ url: url, filename: file.name }, gridaRawData, neoStroke, pageInfo);
+        doc.openGridaFile({ url: url, filename: file.name }, gridaRawData, neoStroke, pageInfo, basePageInfo);
       }
     } else {
         alert("file open cancelled");
