@@ -17,6 +17,7 @@ import { IFileBrowserReturn } from "../../nl-lib/common/structures";
 import { useSelector } from 'react-redux';
 import { RootState } from '../store/rootReducer';
 import { turnOnGlobalKeyShortCut } from "../GlobalFunctions";
+import SaveGridaDialog from "../Save/SaveGridaDialog";
 
 
 const imgStyle = {
@@ -251,14 +252,15 @@ const HeaderLayer = (props: Props) => {
             </Button>
             <div id="saveDrop" className="saveDropDownContent" style={saveDropdownStyle}>
               <SavePdfDialog />
-              <Button className="save_drop_down" style={{
+              <SaveGridaDialog />
+              {/* <Button className="save_drop_down" style={{
                 width: "200px", height: "40px", padding: "4px 12px",
               }} 
                 onClick={() => saveGrida('hello.grida')}
                 // onClick={() => alert('미구현된 기능입니다.')}
               >
                 <span style={{marginLeft: "-40px"}}>데이터 저장(.grida)</span>
-              </Button>
+              </Button> */}
             </div>
           </div>
           
