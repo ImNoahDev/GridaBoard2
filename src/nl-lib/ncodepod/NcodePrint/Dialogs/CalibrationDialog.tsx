@@ -91,9 +91,8 @@ const CalibrationDialog = (props: IDialogProps) => {
   };
 
   const handleClose = (e) => {
-    // hideCalibrationDialog();
-    console.log("testing: closing");
     initState();
+    hideCalibrationDialog();
   }
 
   const handleCancel = (e) => {
