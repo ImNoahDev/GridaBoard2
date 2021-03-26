@@ -9,6 +9,8 @@ import GridaDoc from "./GridaDoc";
 import { setViewFit } from "./store/reducers/viewFitReducer";
 import { setZoomStore } from "./store/reducers/zoomReducer";
 import { setRotationTrigger } from "./store/reducers/rotate";
+import { PEN_THICKNESS } from '../nl-lib/common/enums';
+import $ from "jquery";
 
 
 let _isCtrl = false;
@@ -127,32 +129,32 @@ export default function KeyBoardShortCut(evt: KeyboardEvent) {
 
       case "a": // a
         // setPenThickness(1);
-        PenManager.getInstance().setThickness(1);
+        PenManager.getInstance().setThickness(PEN_THICKNESS.THICKNESS1);
         handled = true;
         break;
 
       case "s": // s
         // setPenThickness(2);
-        PenManager.getInstance().setThickness(2);
+        PenManager.getInstance().setThickness(PEN_THICKNESS.THICKNESS2);
         handled = true;
         break;
 
       case "d": // d
         // setPenThickness(3);
-        PenManager.getInstance().setThickness(3);
+        PenManager.getInstance().setThickness(PEN_THICKNESS.THICKNESS3);
         handled = true;
         break;
 
       case "f": // f
         // setPenThickness(4);
-        PenManager.getInstance().setThickness(4);
+        PenManager.getInstance().setThickness(PEN_THICKNESS.THICKNESS4);
         handled = true;
         // handled = true;
         break;
 
       case "g": // g
         // setPenThickness(5);
-        PenManager.getInstance().setThickness(5);
+        PenManager.getInstance().setThickness(PEN_THICKNESS.THICKNESS5);
         handled = true;
         // handled = true;
         break;
@@ -182,41 +184,43 @@ export default function KeyBoardShortCut(evt: KeyboardEvent) {
       case "b": // b
         break;
 
-      case "Tab": // <TAB>
+      case "Tab": {// <TAB>
         // onRotateButton();
-        // const rotationTrigger = store.getState().rotate.rotationTrigger;
-        // setRotationTrigger(!rotationTrigger);
+        const doc = GridaDoc.getInstance();
+        const rotationTrigger = store.getState().rotate.rotationTrigger;
+        const activePageNo = store.getState().activePage.activePageNo;
+        setRotationTrigger(!rotationTrigger);
 
-        // let page = doc.getPageAt(activePageNo_store);
+        let page = doc.getPageAt(activePageNo);
 
-        // if (page._pdfPage !== undefined) {
-        //   if (page._pdfPage.viewport.rotation >= 270) {
-        //     page._pdfPage.viewport.rotation = 0;
-        //   } else {
-        //     page._pdfPage.viewport.rotation += 90;
-        //   }
-        // }
+        if (page._pdfPage !== undefined) {
+          if (page._pdfPage.viewport.rotation >= 270) {
+            page._pdfPage.viewport.rotation = 0;
+          } else {
+            page._pdfPage.viewport.rotation += 90;
+          }
+        }
 
-        // if (page.pageOverview.rotation >= 270) {
-        //   page._rotation = 0;
-        // } else {
-        //   page._rotation += 90;
-        // }
+        if (page.pageOverview.rotation >= 270) {
+          page._rotation = 0;
+        } else {
+          page._rotation += 90;
+        }
 
-        // if (page.pageOverview.rotation == 90 || page.pageOverview.rotation == 270) {
-        //   $('#vertical_rotate').css('display', 'none');
-        //   $('#horizontal_rotate').css('display', 'block');
-        // } else {
-        //   $('#vertical_rotate').css('display', 'block');
-        //   $('#horizontal_rotate').css('display', 'none');
-        // }
+        if (page.pageOverview.rotation == 90 || page.pageOverview.rotation == 270) {
+          $('#vertical_rotate').css('display', 'none');
+          $('#horizontal_rotate').css('display', 'block');
+        } else {
+          $('#vertical_rotate').css('display', 'block');
+          $('#horizontal_rotate').css('display', 'none');
+        }
 
         // const tmp = page.pageOverview.sizePu.width ;
         // page.pageOverview.sizePu.width = page.pageOverview.sizePu.height;
         // page.pageOverview.sizePu.height = tmp;
-        // handled = true;
+        handled = true;
         break;
-
+      }
 
       case "p": // P
         // toggleAllStrokesVisible();
