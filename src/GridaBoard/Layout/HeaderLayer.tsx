@@ -223,6 +223,17 @@ const HeaderLayer = (props: Props) => {
     }
   }
 
+  function changeUrl() {
+    location.href = 'https://gridaboard-v1-30576.web.app/';
+  }
+
+  
+  // <script type="text/javascript">
+  //     document.getElementById("myButton").onclick = function () {
+  //         location.href = "https://www.naver.com";
+  //     };
+  // </script>
+
   // alert($('#header').height());
 
   return (
@@ -277,6 +288,10 @@ const HeaderLayer = (props: Props) => {
           justifyContent: "flex-start", alignItems: "center", marginRight: "24px"
         }}>
           <ConnectButton onPenLinkChanged={e => onPenLinkChanged(e)} />
+
+          <Button onClick={changeUrl} id="myButton" className="float-left submit-button" >
+            구버전 바로가기
+          </Button>
 
           {/* <div>구글 이메일</div>
           <KeyboardArrowDownRoundedIcon /> */}

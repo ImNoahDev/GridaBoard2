@@ -120,11 +120,6 @@ function handleFocusBack(e) {
     $('#back, #loadingBar').remove();
   }, 500);
 
-  // function FunLoadingBarEnd() {
-    // $('#back, #loadingBar').hide();
-    // $('#back, #loadingBar').remove();
-  // }
-
   document.body.onfocus = null;
 }
 

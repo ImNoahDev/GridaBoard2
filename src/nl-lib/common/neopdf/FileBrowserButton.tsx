@@ -50,11 +50,6 @@ const FileBrowserButton = (props: Props) => {
     $('#loadingBar').show();
   }
   
-  function FunLoadingBarEnd() {
-    $('#back, #loadingBar').hide();
-    $('#back, #loadingBar').remove();
-  }
-
   $(document).ready(function(){
     $('.load_drop_down').hover(
       function(event){
