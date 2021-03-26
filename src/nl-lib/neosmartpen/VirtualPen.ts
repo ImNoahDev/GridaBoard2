@@ -2,7 +2,7 @@ import { EventDispatcher, EventCallbackType } from "../common/event";
 import PenManager from "./PenManager";
 import PUIController from "../../GridaBoard/components/PUIController";
 import { IBrushState, IPenEvent, NeoDot, NeoStroke, TransformParameters } from "../common/structures";
-import { IBrushType, PEN_STATE, PenEventName } from "../common/enums";
+import { IBrushType, PEN_STATE, PenEventName, PEN_THICKNESS } from "../common/enums";
 import { InkStorage, IOpenStrokeArg } from "../common/penstorage";
 import { IPenToViewerEvent, INeoSmartpen } from "../common/neopen/INeoSmartpen";
 import { sprintf } from "sprintf-js";
@@ -69,7 +69,7 @@ export default class VirtualPen implements INeoSmartpen {
     const color = this.manager.color;
     for (let i = 0; i < this.penState.length; i++) {
       this.penState[i] = {
-        thickness: 0.2,
+        thickness: PEN_THICKNESS.THICKNESS3,
         color: color,
       };
     }
