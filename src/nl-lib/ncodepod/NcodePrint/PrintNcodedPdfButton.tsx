@@ -53,7 +53,9 @@ const printStyle = {
   marginRight: "24px",
   fontStyle: "normal",
   fontWeight: "bold",
-  marginTop: "4px"
+  marginTop: "4px",
+  padding: 0,
+  marginLeft: "-6px"
 } as React.CSSProperties;
 
 /**

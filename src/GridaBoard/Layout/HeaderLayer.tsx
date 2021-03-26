@@ -20,7 +20,7 @@ import { turnOnGlobalKeyShortCut } from "../GlobalFunctions";
 
 
 const imgStyle = {
-  marginRight: "24px",
+  marginRight: "32px",
   borderRadius: "8px",
 } as React.CSSProperties;
 
@@ -47,9 +47,10 @@ const buttonStyle = {
   fontSize: "14px",
   textAlign: "right",
   letterSpacing: "0.25px",
-  marginRight: "8px",
+  marginRight: "20px",
   color: '#121212',
-  marginTop: "4px"
+  marginTop: "4px",
+  padding: 0
 } as React.CSSProperties;
 
 const printBtnId = "printTestButton";
