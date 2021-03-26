@@ -100,39 +100,27 @@ export async function savePDF(saveName: string) {
       const brushType = NeoStrokes[j].brushType;
       const dotArr = NeoStrokes[j].dotArray;
       const rgbStrArr = NeoStrokes[j].color.match(/\d+/g);
+      const stroke_h = NeoStrokes[j].h;
+      const stroke_h_rev = NeoStrokes[j].h_rev;
+
+      const { a, b, c, d, e, f, g, h } = stroke_h;
 
       let opacity = 1;
       if (NeoStrokes[j].brushType === 1) {
         opacity = 0.3;
       }
 
-      // let canvasCenterSrc = new fabric.Point(page.getHeight()/2, page.getWidth()/2)
-      // let canvasCenterDst = new fabric.Point(page.getWidth()/2, page.getHeight()/2)
-      // const radians = fabric.util.degreesToRadians(-rotation)
-
-      // if (rotation === 0) {
-      //   canvasCenterDst = canvasCenterSrc;
-      // } else if (rotation === 180) {
-      //   canvasCenterSrc = canvasCenterDst;
-      // }
-
       const pointArray = [];
 
       if (isPdf) {
         for (let k = 0; k < dotArr.length; k++) {
           const dot = dotArr[k];
-          const pdf_xy = { x: dot.x * PDF_TO_SCREEN_SCALE, y: dot.y * PDF_TO_SCREEN_SCALE};
 
-          // 1. subtractEquals
-          // pdf_xy.x -= canvasCenterSrc.x;
-          // pdf_xy.y -= canvasCenterSrc.y;
-          
-          // // 2. rotateVector
-          // var v = fabric.util.rotateVector(pdf_xy, radians);
+          const nominator = g * dot.x + h * dot.y + 1;
+          const px = (a * dot.x + b * dot.y + c) / nominator;
+          const py = (d * dot.x + e * dot.y + f) / nominator;
 
-          // // 3. addEquals
-          // v.x += canvasCenterDst.x;
-          // v.y += canvasCenterDst.y;
+          const pdf_xy = { x: px, y: py};
 
           pointArray.push({ x: pdf_xy.x, y: pdf_xy.y, f: dot.f });
         }
@@ -142,7 +130,12 @@ export async function savePDF(saveName: string) {
       } else { //ncode page 일 때
         for (let k = 0; k < dotArr.length; k++) {
           const dot = dotArr[k];
-          const pdf_xy = { x: dot.x * PDF_TO_SCREEN_SCALE, y: dot.y * PDF_TO_SCREEN_SCALE};
+
+          const nominator = g * dot.x + h * dot.y + 1;
+          const px = (a * dot.x + b * dot.y + c) / nominator;
+          const py = (d * dot.x + e * dot.y + f) / nominator;
+
+          const pdf_xy = { x: px, y: py};
 
           pointArray.push({ x: pdf_xy.x, y: pdf_xy.y, f: dot.f });
         }
