@@ -185,8 +185,6 @@ export default class VirtualPen implements INeoSmartpen {
       console.error("Ink Storage has not been initialized");
     }
 
-    this.dispatcher.dispatch(PenEventName.ON_PEN_DOWN_FOR_HOMOGRAPHY, this);//pen에 h, h_rev가 세팅된다.
-
     const penDownStrokeInfo = this.processPenDown(event);
 
     console.log(`NeoSmartpen dispatch event ON_PEN_DOWN`);
@@ -403,7 +401,7 @@ export default class VirtualPen implements INeoSmartpen {
   processPenUp = (event: IPenEvent) => {
     const stroke = this.currPenMovement.stroke;
     const strokeKey = stroke.key;
-    this.storage.closeStroke(strokeKey);
+    this.storage.closeStroke(strokeKey, this.h, this.h_rev);
 
     return { strokeKey, stroke };
   }
@@ -421,6 +419,8 @@ export default class VirtualPen implements INeoSmartpen {
     if (!this.storage) {
       console.error("Ink Storage has not been initialized");
     }
+
+    this.dispatcher.dispatch(PenEventName.ON_PEN_UP_FOR_HOMOGRAPHY, this);//pen에 h, h_rev가 세팅된다.
 
     const penUpStrokeInfo = this.processPenUp(event);
     const { mac, section, owner, book, page } = penUpStrokeInfo.stroke;

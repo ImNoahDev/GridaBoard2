@@ -728,7 +728,7 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
 
     strokes.forEach(stroke => {
       if (stroke.dotArray.length > 0) {
-        const path = this.createFabricPath(stroke, true, rotationIndep) as IExtendedPathType;
+        const path = this.createFabricPathByStorage(stroke, true, rotationIndep) as IExtendedPathType;
         this.canvasFb.add(path);
         this.localPathArray.push(path);
       }
@@ -787,6 +787,29 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
     return pathData_arr;
   };
 
+  createPathDataByStorage = (stroke: NeoStroke, rotationIndep: boolean) => {
+    const { dotArray, brushType, thickness } = stroke;
+
+    const pointArray = [];
+    dotArray.forEach(dot => {
+      const pt = this.ncodeToPdfXy_strokeHomography(dot, stroke.h);
+      pointArray.push(pt);
+    });
+
+    let strokeThickness = thickness / 64;
+    switch (brushType) {
+      case 1:
+        strokeThickness *= 5;
+        break;
+      default:
+        break;
+    }
+
+    const pathData = drawPath(pointArray, strokeThickness);
+
+    return pathData;
+  };
+
   createPathData = (stroke: NeoStroke, rotationIndep: boolean) => {
     const { dotArray, brushType, thickness } = stroke;
 
@@ -808,6 +831,46 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
     const pathData = drawPath(pointArray, strokeThickness);
 
     return pathData;
+  };
+
+  createFabricPathByStorage = (stroke: NeoStroke, cache: boolean, rotationIndep: boolean) => {
+    const { color, brushType, key } = stroke;
+    const pathData = this.createPathDataByStorage(stroke, rotationIndep);
+
+    let opacity = 0;
+    switch (brushType) {
+      case 0:
+        opacity = 1;
+        break;
+      case 1:
+        opacity = 0.3;
+        break;
+      case 3:
+        opacity = 0;
+        break;
+      default:
+        opacity = 1;
+        break;
+    }
+
+    const pathOption = {
+      // stroke: color, //"rgba(0,0,0,255)"
+      fill: color,
+      color: color,
+      opacity: opacity,
+      // strokeWidth: 10,
+      originX: 'left',
+      originY: 'top',
+      selectable: false,
+
+      data: STROKE_OBJECT_ID, // neostroke
+      evented: true,
+      key: key,
+      objectCaching: cache,
+    };
+    const path = new fabric.Path(pathData, pathOption);
+
+    return path;
   };
 
   createFabricPath = (stroke: NeoStroke, cache: boolean, rotationIndep: boolean) => {

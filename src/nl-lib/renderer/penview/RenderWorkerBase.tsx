@@ -742,6 +742,30 @@ export default abstract class RenderWorkerBase {
     return { x: nx, y: ny, f };
   };
 
+  public ncodeToPdfXy_strokeHomography = (ncodeXY: { x: number; y: number; f?: number }, stroke_h: TransformParameters) => {
+    const { x, y } = ncodeXY;
+
+    const { a, b, c, d, e, f, g, h } = stroke_h;
+
+    const nominator = g * x + h * y + 1;
+    const px = (a * x + b * y + c) / nominator;
+    const py = (d * x + e * y + f) / nominator;
+
+    return { x: px, y: py, f: ncodeXY.f };
+  };
+
+  protected pdfToNcodeXy_strokeHomography = (ncodeXY: { x: number; y: number; f?: number }, stroke_h_rev: TransformParameters) => {
+    const { x, y } = ncodeXY;
+
+    const { a, b, c, d, e, f, g, h } = stroke_h_rev;
+
+    const nominator = 1 / (g * x + h * y + 1);
+    const px = (a * x + b * y + c) / nominator;
+    const py = (d * x + e * y + f) / nominator;
+
+    return { x: px, y: py, f: ncodeXY.f };
+  };
+
   public ncodeToPdfXy_homography = (ncodeXY: { x: number; y: number; f?: number }, rotationIndep?: boolean) => {
     const { x, y } = ncodeXY;
 

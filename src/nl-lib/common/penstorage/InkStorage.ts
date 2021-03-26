@@ -369,9 +369,12 @@ export default class InkStorage {
    * close stroke to move to "completed"
    * @param strokeKey
    */
-  public closeStroke(strokeKey: string) {
+  public closeStroke(strokeKey: string, h: TransformParameters, h_rev: TransformParameters) {
     /** @type {NeoStroke} */
     const stroke = this.realtime[strokeKey];
+    stroke.h = h;
+    stroke.h_rev = h_rev;
+    
     if (!stroke || stroke.brushType === IBrushType.ERASER) {
       console.error(`stroke was not initiated`);
       return;
