@@ -292,7 +292,7 @@ const CalibrationDialog = (props: IDialogProps) => {
   let calibrationGuide = "";
   switch (progress) {
     case 0: {
-      calibrationGuide = "인쇄된 문서의 왼쪽 상단에 있는 마크를 스마트 펜으로 터치해 주십시오";
+      calibrationGuide = "네오스마트펜의 전원을 켜서 그리다보드에 연결한 후 Ncode A4에 인쇄된 문서의 왼쪽 상단에 있는 마크를 스마트 펜으로 터치해 주십시오";
       break;
     }
     case 1: {
@@ -313,7 +313,7 @@ const CalibrationDialog = (props: IDialogProps) => {
 
           <DialogTitle id="form-dialog-title" style={{ float: "left", width: "500px" }}>
             <Box fontSize={20} fontWeight="fontWeightBold" >
-              인쇄물 등록, 페이지 {pageNo}
+              인쇄 페이지 순서 등록, 페이지 {pageNo}
               {/* /{numPages} (Step: {progress + 1}/{numProgresses}) */}
             </Box>
           </DialogTitle>
