@@ -70,11 +70,6 @@ export default function KeyBoardShortCut(evt: KeyboardEvent) {
       handled = true;
       break;
     }
-
-    case "TAB": {
-      handled = true;
-      break;
-    }
   }
 
   const cmd = (_isCtrl ? 1 : 0) | (_isAlt ? 2 : 0) | (_isShift ? 4 : 0) | (evt.metaKey ? 8 : 0);
