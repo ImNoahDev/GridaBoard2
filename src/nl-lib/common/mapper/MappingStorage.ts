@@ -1,6 +1,5 @@
 import * as cloud_util_func from "../../../cloud_util_func";
 
-
 import { getNPaperInfo, getNPaperSize_pu } from "../noteserver";
 import { EventDispatcher, EventCallbackType } from "../event";
 import { cloneObj, convertNuToPu, getNextNcodePage, getNowTimeStr, isPageInRange, isPageInMapper, isSamePage, makePdfId } from "../util";
@@ -382,6 +381,42 @@ export class MappingStorage {
     ret.basePageInfo = pageInfo;
 
     return ret;
+  }
+
+  public makeTemporaryGridaItem = (option: {
+    /** Ncode 로 추가되는 페이지의 경우 */
+    n_paper: IPageSOBP,
+    /** PDF로 추가되는 페이지의 경우 */
+    pdf: { url: string, filename: string, fingerprint: string, numPages: number },
+    /** Blank page의 경우 */
+    numBlankPages: number,
+  }, pageInfo: IPageSOBP, basePageInfo: IPageSOBP) => {
+    const { pdf, n_paper, numBlankPages } = option;
+
+    const nextCode = getNextNcodePage(this._temporary.nextIssuable, 0);
+    let basePdfToNcodeMap: IPdfToNcodeMapItem;
+
+    if (pdf) {
+      // 매핑되지 않은 PDF를 추가
+      this._temporary.nextIssuable = getNextNcodePage(this._temporary.nextIssuable, pdf.numPages);
+      basePdfToNcodeMap = this.makeDummyParamsForBasePageInfo(nextCode, pdf.url, pdf.filename, pdf.fingerprint, pdf.numPages, true);
+
+      const section = basePageInfo.section;
+      const owner = basePageInfo.owner;
+      const book = basePageInfo.book;
+      const page = basePageInfo.page;
+
+      for (let i = 0; i < basePdfToNcodeMap.params.length; i++ ) {
+        basePdfToNcodeMap.params[i].pageInfo = pageInfo;
+        
+        basePdfToNcodeMap.params[i].basePageInfo = {section, owner, book, page}; 
+        basePdfToNcodeMap.params[i].basePageInfo.page += i;
+      }
+    }
+
+    this._temporary.arrDocMap.push(basePdfToNcodeMap);
+    return basePdfToNcodeMap;
+
   }
 
   /**

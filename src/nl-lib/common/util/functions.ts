@@ -109,11 +109,9 @@ export function isPageInRange(pg: IPageSOBP, arrStart: IPageSOBP, numPages: numb
 export function isPageInMapper(pg: IPageSOBP, m: IPdfToNcodeMapItem, numPages: number): boolean {
   if (!pg) return false;
 
-  const arr: number[] = [];
-
   for (let i = 0; i < numPages; i++) {
-    const tmpMapperPageInfo = m.params[i].pageInfo;
-    if (isSamePage(pg, tmpMapperPageInfo)) {
+    const tmpMapperPageInfo = m.params[i].pageInfo; 
+    if (isSamePage(pg, tmpMapperPageInfo)) { 
       return true;
     }
   }

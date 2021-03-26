@@ -202,14 +202,14 @@ export default class GridaDoc {
       basePageInfo = theBase.basePageInfo;
     }
 
-    // if (loadGrida) {
-    //   const msi = MappingStorage.getInstance();
-    //   let theBase = msi.findAssociatedBaseNcode(pdfDoc.fingerprint);
-    //   if (!theBase) {
-    //     const { url, filename, fingerprint, numPages } = pdfDoc;
-    //     theBase = msi.makeTemporaryAssociateMapItem({ pdf: { url, filename, fingerprint, numPages }, n_paper: undefined, numBlankPages: undefined });
-    //   }
-    // }
+    if (loadGrida) {
+      const msi = MappingStorage.getInstance();
+      let theBase = msi.findAssociatedBaseNcode(pdfDoc.fingerprint);
+      if (!theBase) {
+        const { url, filename, fingerprint, numPages } = pdfDoc;
+        theBase = msi.makeTemporaryGridaItem({ pdf: { url, filename, fingerprint, numPages }, n_paper: undefined, numBlankPages: undefined }, pageInfo, basePageInfo);
+      }
+    }
 
     const m0 = g_availablePagesInSection[pageInfo.section];
     const m1 = g_availablePagesInSection[basePageInfo.section];
