@@ -1,4 +1,5 @@
 import { IFileBrowserReturn } from "../structures";
+import $ from "jquery";
 
 export const g_hiddenFileInputBtnId = "pdf_file_append_dynamic";
 const _fileInputId = g_hiddenFileInputBtnId;
@@ -114,7 +115,15 @@ function handleFocusBack(e) {
     if (_isRunning) {
       func(result);
     }
+
+    $('#back, #loadingBar').hide();
+    $('#back, #loadingBar').remove();
   }, 500);
+
+  // function FunLoadingBarEnd() {
+    // $('#back, #loadingBar').hide();
+    // $('#back, #loadingBar').remove();
+  // }
 
   document.body.onfocus = null;
 }
