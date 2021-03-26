@@ -1,6 +1,6 @@
 import { EventDispatcher, EventCallbackType } from "../event";
 import { IBrushType, PenEventName } from "../enums";
-import { NeoStroke, IPageSOBP, StrokeStatus, INeoStrokeProps, NeoDot } from "../structures";
+import { NeoStroke, IPageSOBP, StrokeStatus, INeoStrokeProps, NeoDot, TransformParameters } from "../structures";
 import { isSameNcode } from "../../common/util";
 import { DefaultFilmNcode } from "../../common/constants";
 import intersect from 'path-intersection';
@@ -19,6 +19,8 @@ export interface IOpenStrokeArg {
   brushType: IBrushType,
   thickness: number,
   color: string,
+  h: TransformParameters;
+  h_rev: TransformParameters;
 }
 
 
@@ -271,7 +273,7 @@ export default class InkStorage {
     // let stroke = new NeoStroke(mac);
 
     // let stroke = initStroke(-1 /* section */, -1 /* owner */, -1 /*book */, -1 /* page */, time, mac);
-    const { mac, time, thickness, brushType, color } = args;
+    const { mac, time, thickness, brushType, color, h, h_rev } = args;
     const strokeProps: INeoStrokeProps = {
       section: -1,
       owner: -1,
@@ -283,6 +285,8 @@ export default class InkStorage {
       brushType,
       color,
       status: brushType === IBrushType.ERASER ? StrokeStatus.ERASED : StrokeStatus.NORMAL,
+      h,
+      h_rev,
     }
 
     const stroke = new NeoStroke(strokeProps);

@@ -2,6 +2,7 @@ import { NeoDot } from "./NeoDot";
 
 import { IBrushType } from "../enums"
 import { uuidv4 } from "../util";
+import { TransformParameters } from "./MapDataTypes";
 
 export enum StrokeStatus {
   NORMAL,
@@ -31,6 +32,9 @@ export interface INeoStrokeProps {
   status: StrokeStatus,
 
   multiPage?: StrokePageAttr,
+
+  h: TransformParameters,
+  h_rev: TransformParameters,
 }
 
 
@@ -74,6 +78,9 @@ export class NeoStroke implements INeoStrokeProps {
 
   dotArray: NeoDot[];
   opened: boolean;
+
+  h: TransformParameters;
+  h_rev: TransformParameters;
 
 
   /**

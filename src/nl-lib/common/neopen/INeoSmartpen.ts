@@ -1,5 +1,5 @@
 import { EventDispatcher, EventCallbackType } from "../event";
-import { IBrushState,  IPenEvent, NeoDot, NeoStroke } from "../structures";
+import { IBrushState,  IPenEvent, NeoDot, NeoStroke, TransformParameters } from "../structures";
 import { IBrushType, PEN_STATE, PenEventName } from "../enums";
 
 
@@ -51,6 +51,9 @@ export interface INeoSmartpen {
 
   calibrationPoint?: any;
   calibrationData?: any;
+
+  h: TransformParameters;
+  h_rev: TransformParameters;
 
   getMac(): string;
   getBtDevice(): BluetoothDevice;

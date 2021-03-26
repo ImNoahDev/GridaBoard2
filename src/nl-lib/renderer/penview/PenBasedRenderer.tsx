@@ -201,6 +201,7 @@ class PenBasedRenderer extends React.Component<Props, State> {
       pen.addEventListener(PenEventName.ON_PEN_UP, this.onLivePenUp);
       pen.addEventListener(PenEventName.ON_HOVER_MOVE, this.onLiveHoverMove);
       pen.addEventListener(PenEventName.ON_PEN_HOVER_PAGEINFO, this.onLiveHoverPageInfo);
+      pen.addEventListener(PenEventName.ON_PEN_DOWN_FOR_HOMOGRAPHY, this.setTransformParametersForPen);
 
       // virual pen down/up은, 펜 스트로크가 이어지고 있음에도 페이지가 바뀌는 경우에 발생한다
       pen.addEventListener(PenEventName.ON_PEN_DOWN_VIRTUAL, this.onLivePenDown);
@@ -225,6 +226,7 @@ class PenBasedRenderer extends React.Component<Props, State> {
       pen.removeEventListener(PenEventName.ON_PEN_MOVE, this.onLivePenMove);
       pen.removeEventListener(PenEventName.ON_PEN_UP, this.onLivePenUp);
       pen.removeEventListener(PenEventName.ON_HOVER_MOVE, this.onLiveHoverMove);
+      pen.removeEventListener(PenEventName.ON_PEN_DOWN_FOR_HOMOGRAPHY, this.setTransformParametersForPen);
 
       pen.removeEventListener(PenEventName.ON_PEN_DOWN_VIRTUAL, this.onLivePenDown);
       pen.removeEventListener(PenEventName.ON_PEN_UP_VIRTUAL, this.onLivePenUp);
@@ -661,6 +663,11 @@ class PenBasedRenderer extends React.Component<Props, State> {
     if (this.renderer) {
       this.renderer.moveHoverPoint(event);
     }
+  }
+
+  setTransformParametersForPen = (pen: INeoSmartpen) => {
+    pen.h = this.renderer._opt.h;
+    pen.h_rev = this.renderer._opt.h_rev;
   }
 
   render() {

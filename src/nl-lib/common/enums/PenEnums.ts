@@ -36,6 +36,7 @@ export enum PenEventName {
   ON_PEN_HOVER_PAGEINFO = "hoverpageinfo",
   ON_PEN_MOVE = "penmove",
   ON_PEN_UP = "penup",
+  ON_PEN_DOWN_FOR_HOMOGRAPHY = "pendownforhomography",
 
   ON_HOVER_MOVE = "hovermove",
 

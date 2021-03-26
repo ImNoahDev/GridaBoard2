@@ -640,6 +640,8 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
       brushType: IBrushType.PEN,
       thickness: 1,
       status: StrokeStatus.NORMAL,
+      h: this._opt.h,
+      h_rev: this._opt.h_rev,
     };
     const defaultStroke = new NeoStroke(strokeArg);
 

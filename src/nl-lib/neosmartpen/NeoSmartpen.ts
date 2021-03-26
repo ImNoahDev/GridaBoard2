@@ -2,7 +2,7 @@ import PenComm, { deviceSelectDlg } from "./pencomm/pencomm";
 import { EventDispatcher, EventCallbackType } from "../common/event";
 import PenManager, {DEFAULT_PEN_THICKNESS} from "./PenManager";
 import PUIController from "../../GridaBoard/components/PUIController";
-import { IBrushState, INoteServerItem, IPenEvent, NeoDot, NeoStroke, StrokePageAttr } from "../common/structures";
+import { IBrushState, INoteServerItem, IPenEvent, NeoDot, NeoStroke, StrokePageAttr, TransformParameters } from "../common/structures";
 import { IBrushType, PEN_STATE, PenEventName } from "../common/enums";
 import { InkStorage, IOpenStrokeArg } from "../common/penstorage";
 import { IPenToViewerEvent, INeoSmartpen } from "../common/neopen/INeoSmartpen";
@@ -61,7 +61,9 @@ export default class NeoSmartpen implements INeoSmartpen {
   manager: PenManager = PenManager.getInstance();
   dispatcher: EventDispatcher = new EventDispatcher();
 
-
+  h: TransformParameters;
+  h_rev: TransformParameters;
+  
   /**
    *
    * @param customStorage
@@ -182,6 +184,8 @@ export default class NeoSmartpen implements INeoSmartpen {
       brushType: this.penRendererType,
       thickness: this.penState[this.penRendererType].thickness,
       color: this.penState[this.penRendererType].color,
+      h: this.h,
+      h_rev: this.h_rev,
     }
 
     const stroke = this.storage.openStroke(openStrokeArg);
@@ -204,6 +208,8 @@ export default class NeoSmartpen implements INeoSmartpen {
     if (!this.storage) {
       console.error("Ink Storage has not been initialized");
     }
+    
+    this.dispatcher.dispatch(PenEventName.ON_PEN_DOWN_FOR_HOMOGRAPHY, this);//pen에 h, h_rev가 세팅된다.
 
     const penDownStrokeInfo = this.processPenDown(event);
 
@@ -504,6 +510,7 @@ export default class NeoSmartpen implements INeoSmartpen {
     if (isSameNcode({section: event.section, owner: event.owner, book: event.book, page: event.page}, DefaultPUINcode)) {
       return;
     }
+
     const penUpStrokeInfo = this.processPenUp(event);
     const { mac, section, owner, book, page } = penUpStrokeInfo.stroke;
     this.dispatcher.dispatch(PenEventName.ON_PEN_UP, { ...penUpStrokeInfo, mac, pen: this, section, owner, book, page });

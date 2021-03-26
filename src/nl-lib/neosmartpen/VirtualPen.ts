@@ -1,7 +1,7 @@
 import { EventDispatcher, EventCallbackType } from "../common/event";
 import PenManager from "./PenManager";
 import PUIController from "../../GridaBoard/components/PUIController";
-import { IBrushState, IPenEvent, NeoDot, NeoStroke } from "../common/structures";
+import { IBrushState, IPenEvent, NeoDot, NeoStroke, TransformParameters } from "../common/structures";
 import { IBrushType, PEN_STATE, PenEventName } from "../common/enums";
 import { InkStorage, IOpenStrokeArg } from "../common/penstorage";
 import { IPenToViewerEvent, INeoSmartpen } from "../common/neopen/INeoSmartpen";
@@ -35,10 +35,6 @@ export default class VirtualPen implements INeoSmartpen {
   /** 펜 종류 (렌더러 종류) */
   penRendererType: IBrushType = IBrushType.PEN;
 
-  // lastInfoEvent: IPenEvent = null;
-
-  // protocolHandler: PenComm = new PenComm(this);
-
   mac: string = null;
   id: string = null;
   name?: string = "VirtualPen";
@@ -46,26 +42,12 @@ export default class VirtualPen implements INeoSmartpen {
 
   lastState: PEN_STATE = PEN_STATE.NONE;
 
-  // surfaceInfo: INoteServerItem = {
-  //   id: "3.27.168",
-  //   section: 3,
-  //   owner: 27,
-  //   book: 168,
-
-  //   margin: {
-  //     Xmin: 3.12,
-  //     Ymin: 3.12,
-  //     Xmax: 91.68,
-  //     Ymax: 128.36,
-  //   },
-
-  //   Mag: 1,
-  // }
-
   storage: InkStorage = InkStorage.getInstance();
   manager: PenManager = PenManager.getInstance();
   dispatcher: EventDispatcher = new EventDispatcher();
 
+  h: TransformParameters;
+  h_rev: TransformParameters;
 
   /**
    *
@@ -178,6 +160,8 @@ export default class VirtualPen implements INeoSmartpen {
       brushType: this.penRendererType,
       thickness: this.penState[this.penRendererType].thickness,
       color: this.penState[this.penRendererType].color,
+      h: this.h,
+      h_rev: this.h_rev,
     }
 
     const stroke = this.storage.openStroke(openStrokeArg);
@@ -192,41 +176,22 @@ export default class VirtualPen implements INeoSmartpen {
    * @param event
    */
   onPenDown = (event: IPenEvent) => {
-    // event: { timeStamp: number, penTipMode: number, penId }
-
     this.resetPenStroke();
     this.currPenMovement.downEvent = event;
     this.lastState = PEN_STATE.PEN_DOWN;
-
-    // console.log(event);
 
     // storage에 저장
     if (!this.storage) {
       console.error("Ink Storage has not been initialized");
     }
 
-    const penDownStrokeInfo = this.processPenDown(event);
-    // const mac = this.mac;
-    // const time = event.timeStamp;
-    // const openStrokeArg: IOpenStrokeArg = {
-    //   mac,
-    //   time,
-    //   penTipMode: event.penTipMode,
-    //   brushType: this.penRendererType,
-    //   thickness: this.penState[this.penRendererType].thickness,
-    //   color: this.penState[this.penRendererType].color,
-    // }
+    this.dispatcher.dispatch(PenEventName.ON_PEN_DOWN_FOR_HOMOGRAPHY, this);//pen에 h, h_rev가 세팅된다.
 
-    // const stroke = this.storage.openStroke(openStrokeArg);
-    // const strokeKey = stroke.key;
-    // this.currPenMovement.stroke = stroke;
+    const penDownStrokeInfo = this.processPenDown(event);
 
     console.log(`NeoSmartpen dispatch event ON_PEN_DOWN`);
     this.dispatcher.dispatch(PenEventName.ON_PEN_DOWN, penDownStrokeInfo);
 
-    // event 전달
-    // let ph = this.appPen;
-    // ph.onPenDown(event);
   }
 
   /**
@@ -456,12 +421,6 @@ export default class VirtualPen implements INeoSmartpen {
     if (!this.storage) {
       console.error("Ink Storage has not been initialized");
     }
-
-    // const stroke = this.currPenMovement.stroke;
-    // const strokeKey = stroke.key;
-    // this.storage.closeStroke(strokeKey);
-    // const { mac, section, owner, book, page } = penUpStrokeInfo.stroke;
-    // this.dispatcher.dispatch(PenEventName.ON_PEN_UP, { strokeKey, mac, pen: this, stroke, section, owner, book, page });
 
     const penUpStrokeInfo = this.processPenUp(event);
     const { mac, section, owner, book, page } = penUpStrokeInfo.stroke;
