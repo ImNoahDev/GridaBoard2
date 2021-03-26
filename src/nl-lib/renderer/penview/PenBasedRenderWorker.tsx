@@ -738,37 +738,9 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
   createPathData_arr = (stroke: NeoStroke, rotation: number, rotationIndep: boolean) => {
     const { dotArray, brushType, thickness } = stroke;
 
-    let canvasCenterSrc = new fabric.Point(this._opt.pageSize.height / 2, this._opt.pageSize.width / 2);
-    let canvasCenterDst = new fabric.Point(this._opt.pageSize.width / 2, this._opt.pageSize.height / 2);
-    const radians = fabric.util.degreesToRadians(rotation);
-
-    // 바뀌는 rotation이 90, 270 일 때는 width가 길다고 가정하고 src, dst가 처음 세팅한대로 가고
-    // 바뀌는 rotation이 180, 0 일 때는 src가 width/2, height/2 이고 dst가 height/2, width/2 로 계산
-    if (rotation === 0) {
-      canvasCenterDst = canvasCenterSrc;
-    } else if (rotation === 180) {
-      canvasCenterSrc = canvasCenterDst;
-    }
-
     const pointArray = [];
     dotArray.forEach(dot => {
       const pt = this.ncodeToPdfXy(dot, rotationIndep);
-
-      // fabric js의 rotatePoint 로직 flow인데 여기다 풀어 쓴 이유는 fabric.util.rotatePoint는 canvas는 도는 상황이 아니기 때문에 subtractEquals와 addEquals에 다른 origin을 넣을 수 없기 때문
-      // 1. subtractEquals
-      // pt.x -= canvasCenterSrc.x;
-      // pt.y -= canvasCenterSrc.y;
-
-      // // 2. rotateVector
-      // const v = fabric.util.rotateVector(pt, radians);
-
-      // // 3. addEquals
-      // v.x += canvasCenterDst.x;
-      // v.y += canvasCenterDst.y;
-
-      // pt.x = v.x;
-      // pt.y = v.y;
-
       pointArray.push(pt);
     });
 
@@ -782,7 +754,6 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
     }
 
     const pathData_arr = drawPath_arr(pointArray, strokeThickness);
-    // const pathData_arr = drawPath_chiselNip(pointArray, strokeThickness);
 
     return pathData_arr;
   };
