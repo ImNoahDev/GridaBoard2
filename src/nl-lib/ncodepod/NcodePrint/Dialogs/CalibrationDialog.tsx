@@ -25,6 +25,17 @@ const useStyles = makeStyles({
   },
 });
 
+const mappingStyle = {
+  justifyContent: "center",
+  background: "rgba(255, 255, 255, 0.5)",
+  border: "1px solid #CFCFCF",
+  boxSizing: "border-box",
+  borderRadius: "4px",
+  overflow: "hidden",
+  textOverflow: "ellipsis",
+  whiteSpace: "nowrap"
+} as React.CSSProperties;
+
 interface IDialogProps {
   filename: string,
   printOption: IPrintOption,
@@ -37,7 +48,7 @@ const imgDensity = 2;
 
 const nu = { p0: {x: 0, y: 0} as IPoint, p2: {x: 0, y: 0} as IPoint };
 const pu = { p0: {x: 0, y: 0} as IPoint, p2: {x: 0, y: 0} as IPoint };
-const pageInfos: IPageSOBP[] = [];
+let pageInfos: IPageSOBP[] = [];
 
 let AlertGuideTitle = "";
 let AlertGuideText = "";
@@ -80,6 +91,7 @@ const CalibrationDialog = (props: IDialogProps) => {
     setMarkPosRatio({ xr: 0, yr: 0 });
     setImgSrc("//:0");
     setStatus("inited");
+    pageInfos = [];
   }
 
   const handleOpenAlert = () => {
@@ -391,9 +403,15 @@ export default function CalibrationButton(props: Props) {
     }
   }
 
+  const activePageNo_store = useSelector((state: RootState) => state.activePage.activePageNo);
+  let disabled = true;
+  if (activePageNo_store !== -1) {
+    disabled = false;
+  }
+
   return (
     <React.Fragment>
-      <Button {...rest} onClick={startCalibration}>
+      <Button {...rest} style={mappingStyle} onClick={startCalibration} disabled={disabled}>
         {props.children}
       </Button>
       <CalibrationDialog {...props} />

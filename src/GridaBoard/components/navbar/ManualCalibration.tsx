@@ -26,7 +26,7 @@ const mappingTextStyle = {
   // height: "14px",
   fontSize: "12px",
   lineHeight: "14px",
-  color: '#666666',
+  // color: '#666666',
   // marginLeft: "-40px"
   // margin: "8px"
 } as React.CSSProperties;
@@ -41,12 +41,6 @@ type Props = {
 const ManualCalibration = (props: Props) => {
   const { filename, printOption, cancelCallback, ...rest } = props;
 
-  const activePageNo_store = useSelector((state: RootState) => state.activePage.activePageNo);
-  let disabled = true;
-  if (activePageNo_store !== -1) {
-    disabled = false;
-  }
-
   return (
     <CalibrationButton {...props} cancelCallback={cancelCallback} style={{marginRight: "33px"}} handlePdfUrl={props.handlePdfUrl}>
       {/* <GridaToolTip open={true} placement="left-end" tip={{
@@ -55,9 +49,7 @@ const ManualCalibration = (props: Props) => {
         tail: "단축키 Q로 선택가능합니다."
       }} title={undefined}> */}
         <div>
-          <Button style={mappingStyle} disabled={disabled}>
-            <span style={mappingTextStyle}>인쇄 페이지 순서 등록</span>
-          </Button>
+          <span style={mappingTextStyle}>인쇄 페이지 순서 등록</span>
         </div>
       {/* </GridaToolTip> */}
     </CalibrationButton>
