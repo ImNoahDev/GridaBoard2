@@ -43,8 +43,8 @@ type Props = {
   onPenLinkChanged: (e) => void;
 }
 const ConnectButton = (props: Props) => {
-  let connectDisplayProp: string = "block";
-  let connectedDisplayProp: string= "none";
+  let connectDisplayProp = "block";
+  let connectedDisplayProp = "none";
 
   const [numPens, setNumPens] = useState(0);
   const numPens_store = useSelector((state: RootState) => state.appConfig.num_pens);

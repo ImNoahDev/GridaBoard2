@@ -557,7 +557,7 @@ class PenBasedRenderer extends React.Component<Props, State> {
   onCalibrationUp = (event: IPenToViewerEvent) => {
     let i;
 
-    let penCalibrationPoint = event.pen.calibrationPoint;
+    const penCalibrationPoint = event.pen.calibrationPoint;
 
     const pts = event.pen.calibrationData.points;
     const len = pts.length;

@@ -42,7 +42,7 @@ export default class VirtualPen implements INeoSmartpen {
   mac: string = null;
   id: string = null;
   name?: string = "VirtualPen";
-  rotationIndep: boolean = true;
+  rotationIndep = true;
 
   lastState: PEN_STATE = PEN_STATE.NONE;
 

@@ -79,7 +79,7 @@ const PageNumbering = () => {
     }
 
     useEffect(() => {
-      var form = document.getElementById("page_input");
+      const form = document.getElementById("page_input");
       form.addEventListener("focus", function( event ) {
         turnOnGlobalKeyShortCut(false);
       }, true);

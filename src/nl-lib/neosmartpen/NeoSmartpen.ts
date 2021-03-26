@@ -45,7 +45,7 @@ export default class NeoSmartpen implements INeoSmartpen {
 
   id: string = null;
 
-  rotationIndep: boolean = false;
+  rotationIndep = false;
 
   name?: string = "NeoSmartPen";
 
@@ -200,36 +200,17 @@ export default class NeoSmartpen implements INeoSmartpen {
     this.currPenMovement.downEvent = event;
     this.lastState = PEN_STATE.PEN_DOWN;
 
-    // console.log(event);
-
     // storage에 저장
     if (!this.storage) {
       console.error("Ink Storage has not been initialized");
     }
 
     const penDownStrokeInfo = this.processPenDown(event);
-    // const mac = this.mac;
-    // const time = event.timeStamp;
-    // const openStrokeArg: IOpenStrokeArg = {
-    //   mac,
-    //   time,
-    //   penTipMode: event.penTipMode,
-    //   brushType: this.penRendererType,
-    //   thickness: this.penState[this.penRendererType].thickness,
-    //   color: this.penState[this.penRendererType].color,
-    // }
 
-    // const stroke = this.storage.openStroke(openStrokeArg);
-    // const strokeKey = stroke.key;
-    // this.currPenMovement.stroke = stroke;
     this.manager.setActivePen(event.penId);
 
     console.log(`NeoSmartpen dispatch event ON_PEN_DOWN`);
     this.dispatcher.dispatch(PenEventName.ON_PEN_DOWN, penDownStrokeInfo);
-
-    // event 전달
-    // let ph = this.appPen;
-    // ph.onPenDown(event);
   }
 
   /**

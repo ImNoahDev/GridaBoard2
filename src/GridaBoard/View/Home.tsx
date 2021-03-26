@@ -25,8 +25,6 @@ const Home = () => {
   const [pageWidth, setPageWidth] = useState(0);
   const pdfUrl = undefined as string;
   const pdfFilename = undefined as string;
-  let pdfFingerprint = undefined as string;
-  let pdfPageNo = 1;
 
   const setDrawerWidth = (width: number) => updateDrawerWidth({ width });
 
@@ -145,7 +143,8 @@ const Home = () => {
 
   //https://css-tricks.com/controlling-css-animations-transitions-javascript/
 
-  console.log(`HOME: docPageNo:${activePageNo}, pdfUrl=${pdfUrl}, fingerPrint: ${pdfFingerprint}, pdfPageNo:${pdfPageNo}`);
+  console.log(`HOME: docPageNo:${activePageNo}, pdfUrl=${pdfUrl}`);
+
   return (
     <React.Fragment>
       <ViewLayer id="view-layer" handlePdfOpen={handlePdfOpen} style={{display: "block"}}/>
@@ -171,9 +170,9 @@ declare global {
 
 })(window);
 
-var tx = 0;
-var ty = 0;
-var scale = 1;
+let tx = 0;
+let ty = 0;
+let scale = 1;
 
 document.addEventListener('wheel', function(e) {
   var box = document.getElementById('view-layer');
