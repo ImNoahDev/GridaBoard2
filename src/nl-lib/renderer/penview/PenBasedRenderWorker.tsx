@@ -4,24 +4,16 @@ import { fabric } from 'fabric';
 import RenderWorkerBase, { IRenderWorkerOption } from './RenderWorkerBase';
 
 import { callstackDepth, drawPath, drawPath_arr, makeNPageIdStr, isSamePage, uuidv4, drawPath_chiselNip } from '../../common/util';
-import { IBrushType, PenEventName, PageEventName } from '../../common/enums';
+import { IBrushType, PenEventName } from '../../common/enums';
 import { IPoint, NeoStroke, NeoDot, IPageSOBP, INeoStrokeProps, StrokeStatus, ISize } from '../../common/structures';
 import { INeoSmartpen, IPenToViewerEvent } from '../../common/neopen';
 import { InkStorage } from '../../common/penstorage';
-import { NeoSmartpen, PenManager, VirtualPen } from '../../neosmartpen';
+import { PenManager } from '../../neosmartpen';
 import { MappingStorage } from '../../common/mapper/MappingStorage';
 import { calcRevH } from '../../common/mapper/CoordinateTanslater';
 import { applyTransform } from '../../common/math/echelon/SolveTransform';
 import GridaDoc from '../../../GridaBoard/GridaDoc';
 import { setActivePageNo } from '../../../GridaBoard/store/reducers/activePageReducer';
-
-// import { PaperInfo } from "../../common/noteserver";
-
-// const timeTickDuration = 20; // ms
-// const DISABLED_STROKE_COLOR = "rgba(0, 0, 0, 0.1)";
-// const INVISIBLE_STROKE_COLOR = "rgba(255, 255, 255, 0)";
-// const INCOMPLETE_STROKE_COLOR = "rgba(255, 0, 255, 0.4)";
-// const CURRENT_POINT_STROKE_COLOR = "rgba(255, 255, 255, 1)";
 
 const NUM_HOVER_POINTERS = 6;
 const DFAULT_BRUSH_SIZE = 10;
@@ -33,7 +25,6 @@ const STROKE_OBJECT_ID = 'ns';
 
 interface IPenHoverCursors {
   visibleHoverPoints: number;
-  // pathHoverPoints: Array<fabric.Circle> = new Array(0);
   intervalHandle: number;
   waitCount: number;
   eraserLastPoint: IPoint;
@@ -283,8 +274,6 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
     const pathObj = live.pathObj;
 
     if (pathObj) {
-      // pathObj.fill = pathObj.color;
-      // pathObj.stroke = pathObj.color;
       this.localPathArray.push(pathObj);
     }
 
@@ -297,8 +286,6 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
    */
   closeLiveStroke_byStorage = (event: IPenToViewerEvent) => {
     const new_pathObj = this.createFabricPath(event.stroke, false, false) as IExtendedPathType;
-    // new_pathObj.fill = new_pathObj.color;
-    // new_pathObj.stroke = new_pathObj.color;
 
     this.canvasFb.add(new_pathObj);
     this.localPathArray.push(new_pathObj);
@@ -429,8 +416,6 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
     obj.set({ left: canvas_xy.x - radius, top: canvas_xy.y - radius });
     obj.setCoords();
 
-    const pen = event.pen;
-
     const hps = cursor.hoverPoints;
     for (let i = 0; i < cursor.visibleHoverPoints; i++) {
       const r = hps[i].radius;
@@ -529,40 +514,15 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
     const pageId = InkStorage.makeNPageIdStr(pageInfo);
     const strokeArr = ins.completedOnPage.get(pageId);
     if (strokeArr === undefined) return;
-
-    const canvasCenterSrc = new fabric.Point(this._opt.pageSize.width / 2, this._opt.pageSize.height / 2);
-    const canvasCenterDst = new fabric.Point(this._opt.pageSize.height / 2, this._opt.pageSize.width / 2);
-    const radians = fabric.util.degreesToRadians(degrees);
-
-    // strokeArr.forEach((stroke) => {
-    //   stroke.dotArray.forEach((dot) => {
-    //     const pdf_xy = this.ncodeToPdfXy(dot, true);
-
-    //     // 1. subtractEquals
-    //     pdf_xy.x -= canvasCenterSrc.x;
-    //     pdf_xy.y -= canvasCenterSrc.y;
-
-    //     // 2. rotateVector
-    //     const v = fabric.util.rotateVector(pdf_xy, radians);
-
-    //     // 3. addEquals
-    //     v.x += canvasCenterDst.x;
-    //     v.y += canvasCenterDst.y;
-
-    //     const ncode_xy = this.pdfToNcodeXy(v, true);
-
-    //     dot.x = ncode_xy.x;
-    //     dot.y = ncode_xy.y;
-    //   })
-    // })
+    strokeArr.forEach(stroke => { 
+      stroke.h = this._opt.h;
+    })
   };
 
   changePage = (pageInfo: IPageSOBP, pageSize: ISize, forceToRefresh: boolean): boolean => {
     if (!pageInfo) return;
 
     this.pageInfo = { ...pageInfo };
-
-    // const { section, owner, book, page } = pageInfo;
 
     const pdfSize = {
       width: Math.round(pageSize.width),
@@ -580,8 +540,6 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
     const h_rev = calcRevH(transform.h);
     const leftTop_nu = applyTransform({ x: 0, y: 0 }, h_rev);
     this.paperBase = { Xmin: leftTop_nu.x, Ymin: leftTop_nu.y };
-
-    // const szPaper = PaperInfo.getPaperSize_pu({ section, owner, book, page });
 
     // 현재 모든 stroke를 지운다.
     this.removeAllCanvasObject();
