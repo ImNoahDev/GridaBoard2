@@ -10,12 +10,12 @@ const themeManager: ThemeManager = ThemeManager.getInstance();
 
 const basicStyle = {
   display: "block",
-  marginRight: "4px"
+  marginRight: "20px"
 } as React.CSSProperties;
 
 const neoStyle = {
   display: "none",
-  marginRight: "4px"
+  marginRight: "20px"
 } as React.CSSProperties;
 
 export default function BackgroundButton() {
@@ -109,7 +109,7 @@ export default function BackgroundButton() {
               </span>
           {/* </GridaToolTip> */}
         </Button>
-        <Button type="button" id="neo_background" className="backgroundDropDown" style={neoStyle} onClick={handleClickBackground}>
+        <Button variant="outlined" type="button" id="neo_background" className="backgroundDropDown" style={neoStyle} onClick={handleClickBackground}>
           {/* <GridaToolTip open={true} placement="left" tip={{
               head: "Background",
               msg: "화면의 배경색을 선택합니다.",
