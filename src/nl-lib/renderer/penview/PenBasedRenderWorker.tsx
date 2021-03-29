@@ -14,6 +14,7 @@ import { calcRevH } from '../../common/mapper/CoordinateTanslater';
 import { applyTransform } from '../../common/math/echelon/SolveTransform';
 import GridaDoc from '../../../GridaBoard/GridaDoc';
 import { setActivePageNo } from '../../../GridaBoard/store/reducers/activePageReducer';
+import { store } from "../../../GridaBoard/client/Root";
 
 const NUM_HOVER_POINTERS = 6;
 const DFAULT_BRUSH_SIZE = 10;
@@ -182,6 +183,11 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
    * @param {{strokeKey:string, mac:string, stroke:NeoStroke, dot:NeoDot}} event
    */
   pushLiveDot = (event: IPenToViewerEvent, rotation: number) => {
+    const activePageNo = store.getState().activePage.activePageNo; 
+    if (activePageNo === -1) { //페이지가 생성 안된 시점에 필름에 펜을 쓸 경우를 위함. 기획 논의 필요
+      return;
+    }
+
     //pen tracker rendering
     this.movePenTracker(event);
 
@@ -431,6 +437,10 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
   };
 
   moveHoverPoint = (e: IPenToViewerEvent) => {
+    const activePageNo = store.getState().activePage.activePageNo; 
+    if (activePageNo === -1) { //페이지가 생성 안된 시점에 필름에 펜을 쓸 경우를 위함. 기획 논의 필요
+      return;
+    }
     const cursor = this.penCursors[e.mac];
     if (!cursor) {
       console.log(`ERROR: pen cursor has not been initiated`);
@@ -599,7 +609,7 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
       thickness: 1,
       status: StrokeStatus.NORMAL,
       h: this._opt.h,
-      h_rev: this._opt.h_rev,
+      h_origin: this._opt.h_origin,
     };
     const defaultStroke = new NeoStroke(strokeArg);
 

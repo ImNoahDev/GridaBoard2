@@ -34,7 +34,7 @@ export interface INeoStrokeProps {
   multiPage?: StrokePageAttr,
 
   h: TransformParameters,
-  h_rev: TransformParameters,
+  h_origin: TransformParameters,
 }
 
 
@@ -80,7 +80,7 @@ export class NeoStroke implements INeoStrokeProps {
   opened: boolean;
 
   h: TransformParameters;
-  h_rev: TransformParameters;
+  h_origin: TransformParameters;
 
 
   /**

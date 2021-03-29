@@ -53,7 +53,7 @@ export interface INeoSmartpen {
   calibrationData?: any;
 
   h: TransformParameters;
-  h_rev: TransformParameters;
+  h_origin: TransformParameters;
 
   getMac(): string;
   getBtDevice(): BluetoothDevice;

@@ -62,7 +62,7 @@ export default class NeoSmartpen implements INeoSmartpen {
   dispatcher: EventDispatcher = new EventDispatcher();
 
   h: TransformParameters;
-  h_rev: TransformParameters;
+  h_origin: TransformParameters;
   
   /**
    *
@@ -185,7 +185,7 @@ export default class NeoSmartpen implements INeoSmartpen {
       thickness: this.penState[this.penRendererType].thickness,
       color: this.penState[this.penRendererType].color,
       h: this.h,
-      h_rev: this.h_rev,
+      h_origin: this.h_origin,
     }
 
     const stroke = this.storage.openStroke(openStrokeArg);
@@ -487,7 +487,7 @@ export default class NeoSmartpen implements INeoSmartpen {
   processPenUp = (event: IPenEvent) => {
     const stroke = this.currPenMovement.stroke;
     const strokeKey = stroke.key;
-    this.storage.closeStroke(strokeKey, this.h, this.h_rev);
+    this.storage.closeStroke(strokeKey, this.h, this.h_origin);
 
     return { strokeKey, stroke };
   }

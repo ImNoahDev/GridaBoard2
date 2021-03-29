@@ -101,9 +101,10 @@ export async function savePDF(saveName: string) {
       const dotArr = NeoStrokes[j].dotArray;
       const rgbStrArr = NeoStrokes[j].color.match(/\d+/g);
       const stroke_h = NeoStrokes[j].h;
-      const stroke_h_rev = NeoStrokes[j].h_rev;
+      const stroke_h_origin = NeoStrokes[j].h_origin;
 
       const { a, b, c, d, e, f, g, h } = stroke_h;
+      const { a: a0, b: b0, c: c0, d: d0, e: e0, f: f0, g: g0, h: h0 } = stroke_h_origin;
 
       let opacity = 1;
       if (NeoStrokes[j].brushType === 1) {
@@ -112,21 +113,33 @@ export async function savePDF(saveName: string) {
 
       const pointArray = [];
 
-      for (let k = 0; k < dotArr.length; k++) {
-        const dot = dotArr[k];
-        const pdf_xy = { x: dot.x * PDF_TO_SCREEN_SCALE, y: dot.y * PDF_TO_SCREEN_SCALE};
-        // const nominator = g * dot.x + h * dot.y + 1;
-        // const px = (a * dot.x + b * dot.y + c) / nominator;
-        // const py = (d * dot.x + e * dot.y + f) / nominator;
+      if (isPdf) {
+        for (let k = 0; k < dotArr.length; k++) {
+          const dot = dotArr[k];
+          const nominator = g0 * dot.x + h0 * dot.y + 1;
+          const px = (a0 * dot.x + b0 * dot.y + c0) / nominator;
+          const py = (d0 * dot.x + e0 * dot.y + f0) / nominator;
+  
+          const pdf_xy = { x: px, y: py};
+  
+          pointArray.push({ x: pdf_xy.x, y: pdf_xy.y, f: dot.f });
+        }
+        page.setRotation(degrees(rotation));
 
-        // const pdf_xy = { x: px, y: py};
-
-        pointArray.push({ x: pdf_xy.x, y: pdf_xy.y, f: dot.f });
+      } else {
+        for (let k = 0; k < dotArr.length; k++) {
+          const dot = dotArr[k];
+          // const pdf_xy = { x: dot.x * PDF_TO_SCREEN_SCALE, y: dot.y * PDF_TO_SCREEN_SCALE};
+          const nominator = g * dot.x + h * dot.y + 1;
+          const px = (a * dot.x + b * dot.y + c) / nominator;
+          const py = (d * dot.x + e * dot.y + f) / nominator;
+  
+          const pdf_xy = { x: px, y: py};
+  
+          pointArray.push({ x: pdf_xy.x, y: pdf_xy.y, f: dot.f });
+        }
       }
       
-      if (isPdf) {
-        page.setRotation(degrees(rotation));
-      } 
 
       let strokeThickness = thickness / 64;
       switch (brushType) {

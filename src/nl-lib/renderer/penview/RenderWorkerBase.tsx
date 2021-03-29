@@ -45,6 +45,7 @@ export interface IRenderWorkerOption {
   rotation: number;
   h?: TransformParameters;
   h_rev?: TransformParameters;
+  h_origin?: TransformParameters;
 
   autoFocus: boolean;
 

@@ -20,7 +20,7 @@ export interface IOpenStrokeArg {
   thickness: number,
   color: string,
   h: TransformParameters;
-  h_rev: TransformParameters;
+  h_origin: TransformParameters;
 }
 
 
@@ -161,6 +161,10 @@ export default class InkStorage {
     let pageId = InkStorage.makeNPageIdStr({ section, owner, book, page });
 
     const activePageNo = store.getState().activePage.activePageNo;
+    if (activePageNo === -1) {
+      alert("페이지를 생성한 후 필름을 사용해주세요")
+      return;
+    }
     const basePageInfo = GridaDoc.getInstance().getPage(activePageNo).basePageInfo;
 
     if (isSameNcode(DefaultFilmNcode, {section, owner, book, page})) {
@@ -273,7 +277,7 @@ export default class InkStorage {
     // let stroke = new NeoStroke(mac);
 
     // let stroke = initStroke(-1 /* section */, -1 /* owner */, -1 /*book */, -1 /* page */, time, mac);
-    const { mac, time, thickness, brushType, color, h, h_rev } = args;
+    const { mac, time, thickness, brushType, color, h, h_origin } = args;
     const strokeProps: INeoStrokeProps = {
       section: -1,
       owner: -1,
@@ -286,7 +290,7 @@ export default class InkStorage {
       color,
       status: brushType === IBrushType.ERASER ? StrokeStatus.ERASED : StrokeStatus.NORMAL,
       h,
-      h_rev,
+      h_origin,
     }
 
     const stroke = new NeoStroke(strokeProps);
@@ -369,11 +373,11 @@ export default class InkStorage {
    * close stroke to move to "completed"
    * @param strokeKey
    */
-  public closeStroke(strokeKey: string, h: TransformParameters, h_rev: TransformParameters) {
+  public closeStroke(strokeKey: string, h: TransformParameters, h_origin: TransformParameters) {
     /** @type {NeoStroke} */
     const stroke = this.realtime[strokeKey];
     stroke.h = h;
-    stroke.h_rev = h_rev;
+    stroke.h_origin = h_origin;
     
     if (!stroke || stroke.brushType === IBrushType.ERASER) {
       console.error(`stroke was not initiated`);

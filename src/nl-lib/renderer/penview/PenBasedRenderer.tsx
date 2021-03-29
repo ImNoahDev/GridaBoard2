@@ -666,7 +666,7 @@ class PenBasedRenderer extends React.Component<Props, State> {
 
   setTransformParametersForPen = (pen: INeoSmartpen) => {
     pen.h = this.renderer._opt.h;
-    pen.h_rev = this.renderer._opt.h_rev;
+    pen.h_origin = this.renderer.h;
   }
 
   render() {
