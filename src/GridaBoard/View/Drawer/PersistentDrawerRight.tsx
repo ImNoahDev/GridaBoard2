@@ -247,7 +247,7 @@ export default function PersistentDrawerRight(props: Props) {
   const sumHeight = headerHeight + navHeight + blockHeight;
 
   return (
-    <div style={{float: "left", display: "flex", height: "816px",}}>
+    <div style={{float: "left", display: "flex", height: "816px"}}>
       {/* <CssBaseline /> */}
 
       <Drawer
@@ -255,7 +255,7 @@ export default function PersistentDrawerRight(props: Props) {
         variant="persistent"
         anchor="left"
         open={open}
-        PaperProps={{ style: { width: "190px", flexShrink: 0, zIndex: 1100, marginTop: sumHeight, height: window.innerHeight - sumHeight, background: "rgba(255, 255, 255, 0.25)", float: "left", display: "flex" } }}
+        PaperProps={{ style: { width: "190px", flexShrink: 0, zIndex: 1100, marginTop: sumHeight, background: "rgba(255, 255, 255, 0.25)", float: "left", display: "flex" } }}
       >
       <div id="drawer_content">
         <div className={classes.drawerHeader}>

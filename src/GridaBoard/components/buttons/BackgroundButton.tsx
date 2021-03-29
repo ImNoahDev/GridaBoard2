@@ -10,12 +10,12 @@ const themeManager: ThemeManager = ThemeManager.getInstance();
 
 const basicStyle = {
   display: "block",
-  marginRight: "20px"
+  marginRight: "4px"
 } as React.CSSProperties;
 
 const neoStyle = {
   display: "none",
-  marginRight: "20px"
+  marginRight: "4px"
 } as React.CSSProperties;
 
 export default function BackgroundButton() {

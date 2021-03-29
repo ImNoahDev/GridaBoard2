@@ -89,7 +89,7 @@ const ConnectButton = (props: Props) => {
 
   return (
     <React.Fragment>
-      <IconButton id="btn_connect" style={{display: connectDisplayProp, padding: "8px", marginRight: "20px"}}
+      <IconButton id="btn_connect" style={{display: connectDisplayProp, padding: "8px", marginRight: "12px"}}
         onClick={() => handleConnectPen()}>
         {/* <GridaToolTip open={true} placement="left" tip={{
           head: "Pen Connect",
@@ -108,7 +108,7 @@ const ConnectButton = (props: Props) => {
           </SvgIcon>
         {/* </GridaToolTip> */}
       </IconButton>
-      <IconButton id="btn_connected" style={{display: connectedDisplayProp, padding: "8px", marginRight: "20px"}}
+      <IconButton id="btn_connected" style={{display: connectedDisplayProp, padding: "8px", marginRight: "12px"}}
         onClick={() => handleConnectPen()}>
         {/* <GridaToolTip open={true} placement="left" tip={{
           head: "Pen Connect",
