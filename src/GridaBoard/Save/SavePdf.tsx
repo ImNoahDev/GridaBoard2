@@ -114,12 +114,12 @@ export async function savePDF(saveName: string) {
 
       for (let k = 0; k < dotArr.length; k++) {
         const dot = dotArr[k];
+        const pdf_xy = { x: dot.x * PDF_TO_SCREEN_SCALE, y: dot.y * PDF_TO_SCREEN_SCALE};
+        // const nominator = g * dot.x + h * dot.y + 1;
+        // const px = (a * dot.x + b * dot.y + c) / nominator;
+        // const py = (d * dot.x + e * dot.y + f) / nominator;
 
-        const nominator = g * dot.x + h * dot.y + 1;
-        const px = (a * dot.x + b * dot.y + c) / nominator;
-        const py = (d * dot.x + e * dot.y + f) / nominator;
-
-        const pdf_xy = { x: px, y: py};
+        // const pdf_xy = { x: px, y: py};
 
         pointArray.push({ x: pdf_xy.x, y: pdf_xy.y, f: dot.f });
       }
