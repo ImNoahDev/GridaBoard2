@@ -337,23 +337,12 @@ export default function KeyBoardShortCut(evt: KeyboardEvent) {
         break;
       }
 
-      // case "+": {
-      //   setViewFit(ZoomFitEnum.FREE);
-      //   const zoom = store.getState().zoomReducer.zoom;
-      //   const delta = -100;
-      //   const newZoom = zoom * 0.9985 ** delta
-      //   setZoomStore(newZoom);
-      //   break;
-      // }
-
-      // case "-": {
-      //   setViewFit(ZoomFitEnum.FREE);
-      //   const zoom = store.getState().zoomReducer.zoom;
-      //   const delta = 100;
-      //   const newZoom = zoom * 0.9985 ** delta
-      //   setZoomStore(newZoom);
-      //   break;
-      // }
+      case "+": 
+      case "-": {
+        evt.cancelBubble = true;
+        evt.returnValue = false;
+        break;
+      }
     }
   }
 
