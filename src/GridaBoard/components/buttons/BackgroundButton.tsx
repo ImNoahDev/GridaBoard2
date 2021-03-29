@@ -4,15 +4,18 @@ import ThemeManager from "../../styles/ThemeManager";
 import GridaToolTip from "../../styles/GridaToolTip";
 import { Button } from "@material-ui/core";
 import $ from "jquery";
+import Icon from '@material-ui/core/Icon';
 
 const themeManager: ThemeManager = ThemeManager.getInstance();
 
 const basicStyle = {
   display: "block",
+  marginRight: "20px"
 } as React.CSSProperties;
 
 const neoStyle = {
   display: "none",
+  marginRight: "20px"
 } as React.CSSProperties;
 
 export default function BackgroundButton() {

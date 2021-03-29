@@ -198,6 +198,30 @@ const HeaderLayer = (props: Props) => {
     zIndex: 10000,
   } as React.CSSProperties;
 
+  const changeUrlStyle = {
+    justifyContent: "center",
+    background: "rgba(255, 255, 255, 0.5)",
+    border: "1px solid #CFCFCF",
+    boxSizing: "border-box",
+    borderRadius: "4px",
+    overflow: "hidden",
+    textOverflow: "ellipsis",
+    whiteSpace: "nowrap",
+    padding: 0,
+    marginRight: "8px"
+  } as React.CSSProperties;
+
+  const changeUrlTextStyle = {
+    // width: "80px",
+    // height: "14px",
+    fontSize: "12px",
+    lineHeight: "14px",
+    // color: '#666666',
+    // marginLeft: "-40px"
+    margin: "8px",
+    padding: 0
+  } as React.CSSProperties;
+
 
   console.log(`browser zoom level changed = ${brZoom}`);
 
@@ -291,8 +315,10 @@ const HeaderLayer = (props: Props) => {
         }}>
           <ConnectButton onPenLinkChanged={e => onPenLinkChanged(e)} />
 
-          <Button onClick={changeUrl} id="myButton" className="float-left submit-button" >
-            구버전 바로가기
+          <Button onClick={changeUrl} id="myButton" className="float-left submit-button" style={changeUrlStyle}>
+            <div>
+              <span style={changeUrlTextStyle}>구버전 바로가기</span>
+            </div>
           </Button>
 
           {/* <div>구글 이메일</div>

@@ -36,7 +36,7 @@ const numPenCountStyle = {
     // alignItems: "center",
     // textAlign: "right",
     // letterSpacing: "0.25px",
-    color: "rgba(255,255,255,1)"
+    color: "rgba(255,255,255,1)",
 } as React.CSSProperties;
 
 type Props = {
@@ -89,7 +89,7 @@ const ConnectButton = (props: Props) => {
 
   return (
     <React.Fragment>
-      <IconButton id="btn_connect" style={{display: connectDisplayProp, padding: "8px"}}
+      <IconButton id="btn_connect" style={{display: connectDisplayProp, padding: "8px", marginRight: "20px"}}
         onClick={() => handleConnectPen()}>
         {/* <GridaToolTip open={true} placement="left" tip={{
           head: "Pen Connect",
@@ -108,7 +108,7 @@ const ConnectButton = (props: Props) => {
           </SvgIcon>
         {/* </GridaToolTip> */}
       </IconButton>
-      <IconButton id="btn_connected" style={{display: connectedDisplayProp, padding: "8px"}}
+      <IconButton id="btn_connected" style={{display: connectedDisplayProp, padding: "8px", marginRight: "20px"}}
         onClick={() => handleConnectPen()}>
         {/* <GridaToolTip open={true} placement="left" tip={{
           head: "Pen Connect",
