@@ -18,8 +18,10 @@ import $ from "jquery";
 const rotateStyle = {
   position: "absolute",
   zIndex: 100,
-  top: "calc(15%)",
-  left: "calc(96%)"
+  // top: "calc(15%)",
+  // left: "calc(96%)"
+  marginLeft: "1850px",
+  marginTop: "20px"
 } as React.CSSProperties;
 
 
