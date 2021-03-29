@@ -148,7 +148,7 @@ function OptionLevel_0(props: ILeveledDialogProps) {
           <TableRow className={classes.tr}>
             <TableCell colSpan={1} style={cellRadioStyle} align={"right"}>
               <RadioField showHelp={help} checked={printOption.downloadNcodedPdf} handleChange={handleChange2} color={color} name="downloadNcodedPdf">
-                PDF로 저장
+                재인쇄용 PDF 저장
             </RadioField >
             </TableCell>
           </TableRow>

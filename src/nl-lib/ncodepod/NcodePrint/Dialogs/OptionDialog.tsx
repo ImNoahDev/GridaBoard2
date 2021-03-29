@@ -284,7 +284,7 @@ export function OptionDialog(props: IDialogProps) {
 
         <DialogTitle id="form-dialog-title" style={{ float: "left", width: "600px" }}>
           <Box fontSize={20} fontWeight="fontWeightBold" style={{float: "left", marginRight: "100px", marginBottom: "-20px"}}>
-            인쇄 옵션
+            스마트펜용 인쇄 옵션
           </Box>
    
           {/* <TableCell colSpan={1} style={cellRadioStyle}>
