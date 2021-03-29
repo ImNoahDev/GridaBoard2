@@ -383,15 +383,11 @@ export class MappingStorage {
     return ret;
   }
 
-  public makeTemporaryGridaItem = (option: {
-    /** Ncode 로 추가되는 페이지의 경우 */
-    n_paper: IPageSOBP,
+  public makeTemporaryGridaMapItem = (option: {
     /** PDF로 추가되는 페이지의 경우 */
     pdf: { url: string, filename: string, fingerprint: string, numPages: number },
-    /** Blank page의 경우 */
-    numBlankPages: number,
-  }, pageInfo: IPageSOBP, basePageInfo: IPageSOBP) => {
-    const { pdf, n_paper, numBlankPages } = option;
+  }, pageInfos: IPageSOBP[], basePageInfos: IPageSOBP[]) => {
+    const { pdf } = option;
 
     const nextCode = getNextNcodePage(this._temporary.nextIssuable, 0);
     let basePdfToNcodeMap: IPdfToNcodeMapItem;
@@ -401,16 +397,9 @@ export class MappingStorage {
       this._temporary.nextIssuable = getNextNcodePage(this._temporary.nextIssuable, pdf.numPages);
       basePdfToNcodeMap = this.makeDummyParamsForBasePageInfo(nextCode, pdf.url, pdf.filename, pdf.fingerprint, pdf.numPages, true);
 
-      const section = basePageInfo.section;
-      const owner = basePageInfo.owner;
-      const book = basePageInfo.book;
-      const page = basePageInfo.page;
-
       for (let i = 0; i < basePdfToNcodeMap.params.length; i++ ) {
-        basePdfToNcodeMap.params[i].pageInfo = pageInfo;
-        
-        basePdfToNcodeMap.params[i].basePageInfo = {section, owner, book, page}; 
-        basePdfToNcodeMap.params[i].basePageInfo.page += i;
+        basePdfToNcodeMap.params[i].pageInfo = pageInfos[i];
+        basePdfToNcodeMap.params[i].basePageInfo = basePageInfos[i]; 
       }
     }
 

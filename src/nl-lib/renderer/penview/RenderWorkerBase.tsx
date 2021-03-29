@@ -357,7 +357,7 @@ export default abstract class RenderWorkerBase {
 
     this.drawInfoText();
 
-    let sw = true;
+    // let sw = true;
     // 세로 grid 그리기
     // for (let x = 0; x < size.width; x += size.width / 4) {
     //   let color = 'rgba(0,0,0,0.3)';

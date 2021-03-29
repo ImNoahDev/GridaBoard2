@@ -27,6 +27,9 @@ export async function saveGrida(gridaName: string) {
   const baseBook = [];
   const basePage = [];
 
+  const pageInfos = [];
+  const basePageInfos = [];
+
   let cnt = 0;
   let infoCnt = 0;
 
@@ -37,11 +40,15 @@ export async function saveGrida(gridaName: string) {
     pdfBook[cnt] = page.pageInfos[0].book;
     pdfPage[cnt] = page.pageInfos[0].page
 
+    pageInfos.push({section: pdfSection[cnt], owner: pdfOwner[cnt], book: pdfBook[cnt], page: pdfPage[cnt]});
+
     baseSection[cnt] = page.basePageInfo.section;
     baseOwner[cnt] = page.basePageInfo.owner;
     baseBook[cnt] = page.basePageInfo.book;
     basePage[cnt] = page.basePageInfo.page
     
+    basePageInfos.push({section: baseSection[cnt], owner: baseOwner[cnt], book: baseBook[cnt], page: basePage[cnt]});
+
     cnt++;
 
     if (page.pdf === undefined) {
@@ -158,8 +165,8 @@ export async function saveGrida(gridaName: string) {
 
   const pdf = {
     pdfInfo : {
-      pageInfo: { "s": pdfSection[0], "o": pdfOwner[0], "b": pdfBook[0], "p": pdfPage[0] },
-      basePageInfo : { "s": baseSection[0], "o": baseOwner[0], "b": baseBook[0], "p": basePage[0] },
+      pageInfos: pageInfos,
+      basePageInfos : basePageInfos,
       rawData: newRawData
     }
   };

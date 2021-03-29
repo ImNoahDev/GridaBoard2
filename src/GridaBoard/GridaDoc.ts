@@ -118,7 +118,7 @@ export default class GridaDoc {
     console.log(pdfDoc);
 
     if (pdfDoc) {
-      let activePageNo = await this.appendPdfDocument(pdfDoc, pageInfo, basePageInfo, false);
+      let activePageNo = await this.appendPdfDocument(pdfDoc, pageInfo, basePageInfo);
       scrollToBottom("drawer_content");
 
       if (activePageNo === -1) {
@@ -130,7 +130,7 @@ export default class GridaDoc {
   }
 
   public openGridaFile = async (option: { url: string, filename: string }
-    , gridaRawData, neoStroke, pageInfo: IPageSOBP, basePageInfo: IPageSOBP) => {
+    , gridaRawData, neoStroke, pageInfos: IPageSOBP[], basePageInfos: IPageSOBP[]) => {
     const pdfDoc = await NeoPdfManager.getInstance().getGrida({ url: option.url, filename: option.filename, purpose: "open pdf by GridaDoc" }, gridaRawData, neoStroke);
 
     if (pdfDoc) {
@@ -138,7 +138,7 @@ export default class GridaDoc {
       if (!found) {
         this._pages = [];
       }
-      let activePageNo = await this.appendPdfDocument(pdfDoc, pageInfo, basePageInfo, true); //이 안에서 doc에 pages를 넣어줌
+      let activePageNo = await this.appendPdfDocumentForGrida(pdfDoc, pageInfos, basePageInfos); //이 안에서 doc에 pages를 넣어줌
       
       if (activePageNo === -1) {
         const state = store.getState() as RootState;
@@ -156,7 +156,50 @@ export default class GridaDoc {
     }
   }
 
-  private appendPdfDocument = (pdfDoc: NeoPdfDocument, pageInfo: IPageSOBP, basePageInfo: IPageSOBP, loadGrida?: boolean) => {
+  private appendPdfDocumentForGrida = (pdfDoc: NeoPdfDocument, pageInfos: IPageSOBP[], basePageInfos: IPageSOBP[]) => {
+    // 0) PDF가 있는지 찾아보고 있으면 return, (없으면 1, 2를 통해서 넣는다)
+    const found = this._pdfd.find(item => item.fingerprint === pdfDoc.fingerprint);
+    if (found) {
+      alert('이미 등록된 PDF가 존재합니다');
+      return -1;
+    }
+
+    // 1) page와 maps(MappingStorage)에 있는 정보를 매핑해둔다.
+    // pdfDoc.refreshNcodeMappingTable();
+
+    // 2) PDF 배열에 정보를 추가하고
+    this._pdfd.push({
+      pdf: pdfDoc,
+      fingerprint: pdfDoc.fingerprint,
+      pdfOpenInfo: { url: pdfDoc.url, filename: pdfDoc.filename, purpose: "to be stored by GridaDoc", },
+      promise: Promise.resolve(pdfDoc),
+      startPageInDoc: this.numPages,
+      endPageInDoc: this.numPages + pdfDoc.numPages - 1,
+      pdfToNcodeMap: pdfDoc.pdfToNcodeMap,
+    });
+
+    // 3) 페이지를 넣어 주자
+    const numPages = pdfDoc.numPages;
+    const pageNoArr = [] as number[];
+
+    const msi = MappingStorage.getInstance();
+    let theBase = msi.findAssociatedBaseNcode(pdfDoc.fingerprint);
+    if (!theBase) {
+      const { url, filename, fingerprint, numPages } = pdfDoc;
+      theBase = msi.makeTemporaryGridaMapItem({ pdf: { url, filename, fingerprint, numPages } }, pageInfos, basePageInfos);
+    }
+
+    for (let i = 0; i < numPages; i++) {
+      const pageNo = this.addPdfPage(pdfDoc, i + 1, pageInfos[i], basePageInfos[i]);
+      pageNoArr.push(pageNo);
+    }
+
+    setDocNumPages(this._pages.length);
+
+    return pageNoArr[0];
+  }
+
+  private appendPdfDocument = (pdfDoc: NeoPdfDocument, pageInfo: IPageSOBP, basePageInfo: IPageSOBP) => {
     // 0) PDF가 있는지 찾아보고 있으면 return, (없으면 1, 2를 통해서 넣는다)
     const found = this._pdfd.find(item => item.fingerprint === pdfDoc.fingerprint);
     if (found) {
@@ -200,15 +243,6 @@ export default class GridaDoc {
         theBase = msi.makeTemporaryAssociateMapItem({ pdf: { url, filename, fingerprint, numPages }, n_paper: undefined, numBlankPages: undefined });
       }
       basePageInfo = theBase.basePageInfo;
-    }
-
-    if (loadGrida) {
-      const msi = MappingStorage.getInstance();
-      let theBase = msi.findAssociatedBaseNcode(pdfDoc.fingerprint);
-      if (!theBase) {
-        const { url, filename, fingerprint, numPages } = pdfDoc;
-        theBase = msi.makeTemporaryGridaItem({ pdf: { url, filename, fingerprint, numPages }, n_paper: undefined, numBlankPages: undefined }, pageInfo, basePageInfo);
-      }
     }
 
     const m0 = g_availablePagesInSection[pageInfo.section];

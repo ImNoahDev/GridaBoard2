@@ -11,24 +11,28 @@ const LoadGrida = () => {
     console.log(selectedFile.result);
 
     if (selectedFile.result === "success") {
-      let { url, file } = selectedFile;
-      let jsonFile = null;
+      const file = selectedFile.file;
       const reader = new FileReader();
+
+      let url = selectedFile.url;
+      let jsonFile = null;
+
       reader.readAsText(file);
       reader.onload = async function(e) {
         jsonFile = e.target.result;
 
-        const gridaStruct = JSON.parse(jsonFile);
-        const gridaRawData = gridaStruct.pdf.pdfInfo.rawData;
-        const neoStroke = gridaStruct.stroke;
-        const gridaPageInfo = gridaStruct.pdf.pdfInfo.pageInfo;
-        const gridaBasePageInfo = gridaStruct.pdf.pdfInfo.basePageInfo;
+        const gridaInfo = JSON.parse(jsonFile);
+        const pdfRawData = gridaInfo.pdf.pdfInfo.rawData;
+        const neoStroke = gridaInfo.stroke;
+
+        const pageInfos = gridaInfo.pdf.pdfInfo.pageInfos;
+        const basePageInfos = gridaInfo.pdf.pdfInfo.basePageInfos;
 
         // pdf의 url을 만들어 주기 위해 rawData를 blob으로 만들어 createObjectURL을 한다
-        const rawDataBuf = new ArrayBuffer(gridaRawData.length*2);
+        const rawDataBuf = new ArrayBuffer(pdfRawData.length*2);
         const rawDataBufView = new Uint8Array(rawDataBuf);
-        for (let i = 0; i < gridaRawData.length; i++) {
-          rawDataBufView[i] = gridaRawData.charCodeAt(i);
+        for (let i = 0; i < pdfRawData.length; i++) {
+          rawDataBufView[i] = pdfRawData.charCodeAt(i);
         }
         const blob = new Blob([rawDataBufView], {type: 'application/pdf'});
         url = await URL.createObjectURL(blob);
@@ -38,20 +42,6 @@ const LoadGrida = () => {
 
         const gridaArr = [];
         const pageId = []
-
-        const pageInfo = {
-          section: gridaPageInfo.s,
-          owner: gridaPageInfo.o,
-          book: gridaPageInfo.b,
-          page: gridaPageInfo.p
-        };
-
-        const basePageInfo = {
-          section: gridaBasePageInfo.s,
-          owner: gridaBasePageInfo.o,
-          book: gridaBasePageInfo.b,
-          page: gridaBasePageInfo.p
-        };
 
         for (let i = 0; i < neoStroke.length; i++) {
 
@@ -67,7 +57,7 @@ const LoadGrida = () => {
         }
 
         const doc = GridaDoc.getInstance();
-        doc.openGridaFile({ url: url, filename: file.name }, gridaRawData, neoStroke, pageInfo, basePageInfo);
+        doc.openGridaFile({ url: url, filename: file.name }, pdfRawData, neoStroke, pageInfos, basePageInfos);
       }
     } else {
         alert("file open cancelled");
