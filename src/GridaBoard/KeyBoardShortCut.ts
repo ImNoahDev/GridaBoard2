@@ -11,6 +11,7 @@ import { setZoomStore } from "./store/reducers/zoomReducer";
 import { setRotationTrigger } from "./store/reducers/rotate";
 import { PEN_THICKNESS } from '../nl-lib/common/enums';
 import $ from "jquery";
+import { setPointerTracer } from "./store/reducers/pointerTracer";
 
 
 let _isCtrl = false;
@@ -123,8 +124,24 @@ export default function KeyBoardShortCut(evt: KeyboardEvent) {
         handled = true;
         break;
 
-      case "t": // t
+      case "t": {// t
+        const isTrace = store.getState().pointerTracer.isTrace;
+        store.dispatch(setPointerTracer(!isTrace));
+
+        const $elem = $(`#${"btn_tracepoint"}`);
+        if (!isTrace) {
+          const $elem = $("#btn_tracepoint").find(".c2");
+          $elem.addClass("checked");
+          $('#btn_tracepoint').css('background', 'white');
+          $('#tracer_svg_icon').css('color', '#688FFF');
+        } else {
+          const $elem = $("#btn_tracepoint").find(".c2");
+          $elem.removeClass("checked");
+          $('#btn_tracepoint').css('background', 'none');
+          $('#tracer_svg_icon').css('color', '#58627D');
+        }
         break;
+      }
 
       case "a": // a
         // setPenThickness(1);
