@@ -41,12 +41,12 @@ export async function savePDF(saveName: string) {
       if (pdfUrl !== page.pdf.url) {
         pdfUrl = page.pdf.url;
         const existingPdfBytes = await fetch(page.pdf.url).then(res => res.arrayBuffer());
-        let pdfDocSrc = await PDFDocument.load(existingPdfBytes);
+        const pdfDocSrc = await PDFDocument.load(existingPdfBytes);
 
         if (pdfDoc !== undefined) {
           //ncode 페이지가 미리 생성돼서 그 뒤에다 붙여야하는 경우
           const srcLen = pdfDocSrc.getPages().length;
-          let totalPageArr = [];
+          const totalPageArr = [];
           for (let i = 0; i<srcLen; i++) {
             totalPageArr.push(i);
           }

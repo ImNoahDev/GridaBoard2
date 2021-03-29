@@ -13,19 +13,19 @@ export async function saveGrida(gridaName: string) {
   const doc = GridaDoc.getInstance();
   const docPages = doc.pages;
 
-  let strokeInfos = [];
+  const strokeInfos = [];
 
   let pdfUrl, pdfDoc = undefined;
 
-  let pdfSection = [];
-  let pdfOwner = [];
-  let pdfBook = [];
-  let pdfPage = [];
+  const pdfSection = [];
+  const pdfOwner = [];
+  const pdfBook = [];
+  const pdfPage = [];
 
-  let baseSection = [];
-  let baseOwner = [];
-  let baseBook = [];
-  let basePage = [];
+  const baseSection = [];
+  const baseOwner = [];
+  const baseBook = [];
+  const basePage = [];
 
   let cnt = 0;
   let infoCnt = 0;
@@ -60,12 +60,12 @@ export async function saveGrida(gridaName: string) {
       if (pdfUrl !== page.pdf.url) {
         pdfUrl = page.pdf.url;
         const existingPdfBytes = await fetch(page.pdf.url).then(res => res.arrayBuffer());
-        let pdfDocSrc = await PDFDocument.load(existingPdfBytes);
+        const pdfDocSrc = await PDFDocument.load(existingPdfBytes);
 
         if (pdfDoc !== undefined) {
           //ncode 페이지가 미리 생성돼서 그 뒤에다 붙여야하는 경우
           const srcLen = pdfDocSrc.getPages().length;
-          let totalPageArr = [];
+          const totalPageArr = [];
           for (let i = 0; i<srcLen; i++) {
             totalPageArr.push(i);
           }
@@ -155,7 +155,7 @@ export async function saveGrida(gridaName: string) {
 
   const gridaDate = new Date();
 
-  let pdf = {
+  const pdf = {
     pdfInfo : {
       pageInfo: { "s": pdfSection[0], "o": pdfOwner[0], "b": pdfBook[0], "p": pdfPage[0] },
       basePageInfo : { "s": baseSection[0], "o": baseOwner[0], "b": baseBook[0], "p": basePage[0] },
@@ -163,9 +163,9 @@ export async function saveGrida(gridaName: string) {
     }
   };
 
-  let stroke = strokeInfos;
+  const stroke = strokeInfos;
 
-  let gridaInfo = {
+  const gridaInfo = {
     gridaDate : gridaDate,
     id : "asdf",
     pwd : "qwer"

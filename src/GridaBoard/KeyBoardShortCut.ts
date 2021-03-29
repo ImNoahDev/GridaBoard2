@@ -16,7 +16,6 @@ import $ from "jquery";
 let _isCtrl = false;
 let _isAlt = false;
 let _isShift = false;
-let _isMeta = false;
 
 export function KeyBoardShortCut_keyup(evt: KeyboardEvent) {
   if (evt.defaultPrevented) {
@@ -185,13 +184,12 @@ export default function KeyBoardShortCut(evt: KeyboardEvent) {
         break;
 
       case "Tab": {// <TAB>
-        // onRotateButton();
         const doc = GridaDoc.getInstance();
         const rotationTrigger = store.getState().rotate.rotationTrigger;
         const activePageNo = store.getState().activePage.activePageNo;
         setRotationTrigger(!rotationTrigger);
 
-        let page = doc.getPageAt(activePageNo);
+        const page = doc.getPageAt(activePageNo);
 
         if (page._pdfPage !== undefined) {
           if (page._pdfPage.viewport.rotation >= 270) {
@@ -215,9 +213,6 @@ export default function KeyBoardShortCut(evt: KeyboardEvent) {
           $('#horizontal_rotate').css('display', 'none');
         }
 
-        // const tmp = page.pageOverview.sizePu.width ;
-        // page.pageOverview.sizePu.width = page.pageOverview.sizePu.height;
-        // page.pageOverview.sizePu.height = tmp;
         handled = true;
         break;
       }

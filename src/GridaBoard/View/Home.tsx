@@ -175,14 +175,14 @@ let ty = 0;
 let scale = 1;
 
 document.addEventListener('wheel', function(e) {
-  var box = document.getElementById('view-layer');
+  const box = document.getElementById('view-layer');
   if (e.ctrlKey) {
       e.preventDefault();
       e.stopPropagation();
-      var s = Math.exp(-e.deltaY / 100);
+      const s = Math.exp(-e.deltaY / 100);
       scale *= s;
   } else {
-      var direction = 1; //natural.checked ? -1 : 1;
+      const direction = 1; //natural.checked ? -1 : 1;
       tx += e.deltaX * direction;
       ty += e.deltaY * direction;
   }

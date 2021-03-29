@@ -3,7 +3,6 @@ import { openFileBrowser } from "../../nl-lib/common/neopdf/FileBrowser";
 import { InkStorage } from '../../nl-lib/common/penstorage';
 import GridaDoc from '../GridaDoc';
 import { Button } from '@material-ui/core';
-import GridaToolTip from "../styles/GridaToolTip";
 import $ from "jquery";
 
 const LoadGrida = () => {
@@ -14,7 +13,7 @@ const LoadGrida = () => {
     if (selectedFile.result === "success") {
       let { url, file } = selectedFile;
       let jsonFile = null;
-      var reader = new FileReader();
+      const reader = new FileReader();
       reader.readAsText(file);
       reader.onload = async function(e) {
         jsonFile = e.target.result;
@@ -37,8 +36,8 @@ const LoadGrida = () => {
         const completed = InkStorage.getInstance().completedOnPage;
         completed.clear();
 
-        let gridaArr = [];
-        let pageId = []
+        const gridaArr = [];
+        const pageId = []
 
         const pageInfo = {
           section: gridaPageInfo.s,

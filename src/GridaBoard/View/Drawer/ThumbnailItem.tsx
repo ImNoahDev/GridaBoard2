@@ -57,10 +57,6 @@ const ThumbnailItem = (props: Props) => {
     setActivePageNo(pageNo);
   };
 
-  let bgColor = `rgb(255, 255,255)`;
-  // if (activePageNo === pn)
-  //   bgColor = `rgb(0, 255, 255)`;
-
   let thumbBorderColor = `rgb(255, 255,255)`;
   if (activePageNo === pn)
     thumbBorderColor = `rgb(0, 0, 0)`;
