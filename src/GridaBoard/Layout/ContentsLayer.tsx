@@ -18,10 +18,10 @@ import $ from "jquery";
 const rotateStyle = {
   position: "absolute",
   zIndex: 100,
-  // top: "calc(15%)",
-  // left: "calc(96%)"
-  marginLeft: "1850px",
-  marginTop: "20px"
+  top: "calc(15%)",
+  left: "calc(96%)"
+  // marginLeft: "1850px",
+  // marginTop: "20px"
 } as React.CSSProperties;
 
 
@@ -149,7 +149,7 @@ const ContentsLayer = (props: Props) => {
     flex: 1,
     overflow: "auto",
     flexDirection: "column",
-    height: innerHeight - sumHeight,
+    // height: innerHeight - sumHeight,
   } as React.CSSProperties;
 
   const dropdownStyle = {

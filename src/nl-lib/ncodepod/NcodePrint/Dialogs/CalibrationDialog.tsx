@@ -33,7 +33,8 @@ const mappingStyle = {
   borderRadius: "4px",
   overflow: "hidden",
   textOverflow: "ellipsis",
-  whiteSpace: "nowrap"
+  whiteSpace: "nowrap",
+  padding: 0
 } as React.CSSProperties;
 
 interface IDialogProps {

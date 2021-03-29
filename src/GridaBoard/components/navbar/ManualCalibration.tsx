@@ -28,7 +28,8 @@ const mappingTextStyle = {
   lineHeight: "14px",
   // color: '#666666',
   // marginLeft: "-40px"
-  // margin: "8px"
+  margin: "8px",
+  padding: 0
 } as React.CSSProperties;
 
 type Props = {
