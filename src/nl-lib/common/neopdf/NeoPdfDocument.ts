@@ -7,6 +7,7 @@ import { resolve } from "path";
 
 // import PdfJsWorker from "../../../../public/pdf.worker.2.5.207.js/index.js";
 console.log(`PDFjs version=${PdfJs.version}`);
+console.log(`PDFjs version=${PdfJs}`);
 // PdfJs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${PdfJs.version}/pdf.worker.js`;
 PdfJs.GlobalWorkerOptions.workerSrc = "./pdf.worker.2.5.207.js";
 

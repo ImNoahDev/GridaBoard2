@@ -198,7 +198,7 @@ interface Props extends BoxProps {
   handleDrawerClose: () => void,
   open: boolean,
 
-  noInfo?:boolean,
+  noInfo?: boolean,
 }
 
 export default function PersistentDrawerRight(props: Props) {
@@ -244,10 +244,11 @@ export default function PersistentDrawerRight(props: Props) {
 
   const footerHeight = $('#footer').height();
 
-  const sumHeight = headerHeight + navHeight + blockHeight;
+  let sumHeight = headerHeight + navHeight + blockHeight;
+  if (isNaN(sumHeight)) sumHeight = 0;
 
   return (
-    <div style={{float: "left", display: "flex", height: "816px"}}>
+    <div style={{ float: "left", display: "flex", height: "816px" }}>
       {/* <CssBaseline /> */}
 
       <Drawer
@@ -257,26 +258,26 @@ export default function PersistentDrawerRight(props: Props) {
         open={open}
         PaperProps={{ style: { width: "190px", flexShrink: 0, zIndex: 1100, marginTop: sumHeight, background: "rgba(255, 255, 255, 0.25)", float: "left", display: "flex" } }}
       >
-      <div id="drawer_content">
-        <div className={classes.drawerHeader}>
-          {/* <div style={drawerHeader}> */}
+        <div id="drawer_content">
+          <div className={classes.drawerHeader}>
+            {/* <div style={drawerHeader}> */}
             <IconButton onClick={props.handleDrawerClose} style={drawerHeader}>
               {theme.direction === 'rtl' ? <ChevronRightIcon /> : <ChevronLeftIcon />}
             </IconButton>
-          {/* </div> */}
-          
+            {/* </div> */}
+
+          </div>
+          <div style={{ height: "1px", background: "rgba(255,255,255,1)", zoom: 1 / brZoom, }}></div>
+          <div onMouseDown={e => handleMouseDown(e)} className={classes.dragger} />
+          < DrawerPages noInfo={props.noInfo} />
+          <div style={{ height: "1px", background: "rgba(255,255,255,1)", zoom: 1 / brZoom }}></div>
+          <div id="footer" style={{ height: "80px" }}>
+            <Button onClick={(evnet) => addBlankPage(event)} style={drawerFooter}>
+              <AddIcon style={{ width: "12px", height: "12px", color: "rgba(255,255,255,1)" }} />
+              <span style={{ fontSize: "12px", color: "rgba(255,255,255,1)" }}>페이지 추가</span>
+            </Button>
+          </div>
         </div>
-        <div style={{ height: "1px", background: "rgba(255,255,255,1)", zoom: 1 / brZoom, }}></div>
-        <div onMouseDown={e => handleMouseDown(e)} className={classes.dragger} />
-        < DrawerPages noInfo={props.noInfo} />
-        <div style={{ height: "1px", background: "rgba(255,255,255,1)", zoom: 1 / brZoom }}></div>
-        <div id="footer" style={{height: "80px"}}>
-          <Button onClick={(evnet) => addBlankPage(event)} style={drawerFooter}>
-            <AddIcon style={{width: "12px", height: "12px", color: "rgba(255,255,255,1)"}}/>
-            <span style={{fontSize: "12px", color: "rgba(255,255,255,1)"}}>페이지 추가</span>
-          </Button>
-        </div>
-      </div>
       </Drawer>
     </div>
   );

@@ -25,7 +25,6 @@ yarn-debug.log*
 yarn-error.log*
 
 .svn
-package-lock.json
 .vscode/bookmarks.json
 
 .firebase/
