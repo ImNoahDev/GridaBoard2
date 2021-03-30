@@ -1,5 +1,9 @@
 # Gridaboard v2
 
+### npm install 시 react-virtualized가 react@^17.0.1 에서 문제를 일으킨다.
+    npm install --legacy-peer-deps react-virtualized
+로 따로 설치해 줘야 한다
+
 ### 한글 문자열을 i18n해야 한다
 
 문자열 찾기에서 정규식 표현으로 다음을 넣고 한글 문자열을 찾은 다음, localization을 해야.
