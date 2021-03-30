@@ -648,14 +648,14 @@ export default abstract class RenderWorkerBase {
     if (zoom > PDFVIEW_ZOOM_MAX) zoom = PDFVIEW_ZOOM_MAX;
     if (zoom < PDFVIEW_ZOOM_MIN) zoom = PDFVIEW_ZOOM_MIN;
 
-    const evt: MouseEvent = opt.e;
-    const pt = new fabric.Point(evt.offsetX, evt.offsetY);
-    if (opt) {
-      this.zoomToPoint(pt, zoom);
-    } else {
+    // const evt: MouseEvent = opt.e;
+    // const pt = new fabric.Point(evt.offsetX, evt.offsetY);
+    // if (opt) {
+      // this.zoomToPoint(undefined, zoom);
+    // } else {
       // canvasFb.setZoom(zoom);
-      this.zoomToPoint(null, zoom);
-    }
+    this.zoomToPoint(null, zoom);
+    // }
 
     opt.e.preventDefault();
     opt.e.stopPropagation();
