@@ -205,15 +205,14 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
     const dot = event.dot;
 
     //지우개 구현
-    const pdf_xy = this.ncodeToPdfXy(dot, event.pen.rotationIndep);
     const pen = event.pen;
-
+    
     const cursor = this.penCursors[event.mac];
     if (pen && pen.penRendererType === IBrushType.ERASER) {
+      const pdf_xy = this.ncodeToPdfXy(dot, event.pen.rotationIndep);
       if (cursor.eraserLastPoint !== undefined) {
         this.eraseOnLine(cursor.eraserLastPoint.x, cursor.eraserLastPoint.y, pdf_xy.x, pdf_xy.y, live.stroke);
       }
-
       cursor.eraserLastPoint = { x: pdf_xy.x, y: pdf_xy.y };
     } else {
       if (!live.pathObj) {
@@ -225,7 +224,6 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
         const pathObj = live.pathObj as fabric.Path;
         pathObj.path = pathData as any;
       }
-
       this.focusToDot(dot, event.pen.rotationIndep);
     }
   };
@@ -264,6 +262,8 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
    */
   closeLiveStroke = (event: IPenToViewerEvent) => {
     const cursor = this.penCursors[event.mac];
+    cursor.eraserLastPoint = undefined;
+
     const obj = cursor.penTracker;
     obj.visible = false;
 
@@ -383,7 +383,7 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
         intervalHandle: 0,
         waitCount: 0,
         eraserLastPoint: undefined,
-        penTracker: penTrackerObj[0] as fabric.Circle,
+        penTracker: penTrackerObj[penTrackerObj.length-1] as fabric.Circle,
         hoverPoints: hoverPointsObj as fabric.Circle[],
       };
     }
@@ -413,19 +413,19 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
     }
 
     const dot = event.dot;
-    const canvas_xy = this.funcNcodeToPdfXy(dot, event.pen.rotationIndep);
+    const pdf_xy = this.funcNcodeToPdfXy(dot, event.pen.rotationIndep);
 
     const obj = cursor.penTracker;
     obj.visible = true;
 
     const radius = obj.radius;
-    obj.set({ left: canvas_xy.x - radius, top: canvas_xy.y - radius });
+    obj.set({ left: pdf_xy.x - radius, top: pdf_xy.y - radius });
     obj.setCoords();
 
     const hps = cursor.hoverPoints;
     for (let i = 0; i < cursor.visibleHoverPoints; i++) {
       const r = hps[i].radius;
-      hps[i].set({ left: canvas_xy.x - r, top: canvas_xy.y - r });
+      hps[i].set({ left: pdf_xy.x - r, top: pdf_xy.y - r });
       hps[i].visible = false;
     }
     this.canvasFb.requestRenderAll();

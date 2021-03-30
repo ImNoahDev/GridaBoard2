@@ -504,7 +504,8 @@ export default abstract class RenderWorkerBase {
       // 그리기 중간
       // 2021/01/12 PointerEvent도 처리할 수 있도록 추가해야 함
       if (this.drawing.isDragging) {
-        if (!opt.target || opt.target.name !== 'page_layout') {
+        
+        if (!opt.target) {
           return;
         }
 
