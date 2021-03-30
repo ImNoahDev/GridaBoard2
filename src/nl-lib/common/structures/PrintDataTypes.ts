@@ -1,4 +1,3 @@
-/// <reference types="pdfjs-dist"/>
 /// <reference types="@types/pdfjs-dist" />
 
 import { IPaperSize } from "./SurfaceDataTypes";
