@@ -17,7 +17,7 @@
     npm install @types/react
     npm install @types/react-dom
 
-    npm install nan
+    npm install nan@2.14.0
     npm install canvas
 
     npm install axios
