@@ -3,9 +3,9 @@ import { saveAs } from "file-saver";
 import printJS from "print-js";
 
 import { showCalibrationDialog } from '../../../GridaBoard/store/reducers/calibrationReducer';
-import { IPrintingEvent, IPrintingReport, IPrintOption, IUnitString, IProgressCallbackFunction, IPrintingSheetDesc } from "../../common/structures";
+import { IPrintingEvent, IPrintingReport, IPrintOption, IUnitString, IProgressCallbackFunction, IPrintingSheetDesc, IPageMapItem } from "../../common/structures";
 
-import { MappingStorage, PdfDocMapper } from "../../common/mapper";
+import { MappingItem, MappingStorage, PdfDocMapper } from "../../common/mapper";
 import { SheetRendererManager } from "../NcodeSurface/SheetRendererManager";
 import { cloneObj, convertUnit, getExtensionName, getFilenameOnly, getNcodedPdfName, makeNPageIdStr, makePdfId, sleep, uuidv4 } from "../../common/util";
 import { _app_name, _lib_name, _version } from "../Version";
@@ -235,7 +235,7 @@ export default class PrintNcodedPdfWorker {
     if (progressCallback) progressCallback();
     await sleep(10);
 
-    await this.setMetaData(pdfDoc, pdf, printOption);
+    await this.setMetaData(pdfDoc, pdf, printOption, tempMapping);
     await sleep(10);
     const pdfBytes = await pdfDoc.save()
 
@@ -447,7 +447,7 @@ export default class PrintNcodedPdfWorker {
     }
   }
 
-  private setMetaData = async (pdfDoc: PDFDocument, pdf: NeoPdfDocument, printOption: IPrintOption) => {
+  private setMetaData = async (pdfDoc: PDFDocument, pdf: NeoPdfDocument, printOption: IPrintOption, mappingInfo: PdfDocMapper) => {
     const { pagesPerSheet } = printOption;
     const meta = await pdf.getMetadata();
     console.log(meta);
@@ -471,6 +471,8 @@ export default class PrintNcodedPdfWorker {
     this.setMetaInfoValue(pdfDoc, "pagesPerSheet", `${pagesPerSheet}`);
     this.setMetaInfoValue(pdfDoc, "Ncode issused", ncodeStr);
 
+    this.setMetaData_homographyInfo(pdfDoc, mappingInfo);
+
     // addMetadataToDoc(pdfDoc, {
     //   author: _app_name,
     //   title: meta.info.title ? meta.info.title : filename,
@@ -486,6 +488,55 @@ export default class PrintNcodedPdfWorker {
     //   mappingID: `${makePdfId(pdf.fingerprint, pagesPerSheet as number)}`,
     // });
   }
+
+  /**
+   * PDF custom meta data에 homography 관련된 정보를 넣는 부분
+   * 2021/03/30 kitty 
+   *
+   * @private
+   * @param {PDFDocument} pdfDoc
+   * @param {PdfDocMapper} mappingInfo
+   * @memberof PrintNcodedPdfWorker
+   */
+  private setMetaData_homographyInfo = async (pdfDoc: PDFDocument, mappingInfo: PdfDocMapper) => {
+    // homography를 PDF property에 넣자
+    if (mappingInfo.length > 0) {
+      const m: IPageMapItem = mappingInfo.getAt(0);
+      const x = m.h;
+
+      let isSame = true;
+      const isSame_arr = new Array(mappingInfo.length) as boolean[];
+      isSame_arr[0] = true;
+      for (let i = 1; i < mappingInfo.length; i++) {
+        const mapItem: IPageMapItem = mappingInfo.getAt(i);
+        const { a, b, c, d, e, f, g, h } = mapItem.h;
+        if (a !== x.a || b !== x.b || c !== x.c || d !== x.d || e !== x.e || f !== x.f || g !== x.g || h !== x.h) {
+          isSame = false;
+          isSame_arr[i] = false;
+        }
+        else
+          isSame_arr[i] = true;
+      }
+
+      const h_str = JSON.stringify(m.h);
+      const h_rev_str = JSON.stringify(m.h_rev);
+      this.setMetaInfoValue(pdfDoc, `homography`, h_str);
+      this.setMetaInfoValue(pdfDoc, `rev_h`, h_rev_str);
+
+      // 전체와 같이 않은 H는 따로 기록한다. pg_homography-pageNo이다
+      for (let i = 1; i < mappingInfo.length; i++) {
+        if (!isSame_arr[i]) {
+          const mapItem: IPageMapItem = mappingInfo.getAt(0);
+          const h_str = JSON.stringify(mapItem.h);
+          const h_rev_str = JSON.stringify(mapItem.h_rev);
+          const pageNo = mapItem.pdfPageNo;
+          this.setMetaInfoValue(pdfDoc, `pg_homography-${pageNo}`, h_str);
+          this.setMetaInfoValue(pdfDoc, `pg_rev_h-${pageNo}`, h_rev_str);
+        }
+      }
+    }
+  }
+
 
   private getInfoDict(pdfDoc: PDFDocument): PDFDict {
     const existingInfo = pdfDoc.context.lookup(pdfDoc.context.trailerInfo.Info);
