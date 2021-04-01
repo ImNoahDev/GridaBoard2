@@ -43,8 +43,8 @@ export default class GridaApp {
   }
 
   start = async () => {
-    var lang = navigator.language;
-    if (lang !== 'ko-KR') {
+    let lang = navigator.language;
+    if (lang.split('-')[0] !== 'ko') {
       location.href = 'https://gridaboard-v1-30576.web.app/';
     }
 
