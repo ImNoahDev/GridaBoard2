@@ -56,10 +56,11 @@
     "sweetalert2": "10.15.7",
     "web-bluetooth": "0.1.2",
     "web-vitals": "1.1.1",
+    "xlsx": "^0.16.9",
     "zlib": "1.0.5"
   },
   "scripts": {
-    "start": "react-scripts start",
+    "start": "node exceltojson.js && react-scripts start",
     "https": "set HTTPS=true&&react-scripts start",
     "build": "set GENERATE_SOURCEMAP=true && react-scripts build",
     "test": "react-scripts test",
