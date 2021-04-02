@@ -43,6 +43,11 @@ export default class GridaApp {
   }
 
   start = async () => {
+    let lang = navigator.language;
+    if (lang.split('-')[0] !== 'ko') {
+      location.href = 'https://gridaboard-v1-30576.web.app/';
+    }
+
     const doc = GridaDoc.getInstance();
     // const filename = "Portrait, codeError_test.pdf";
     // const url = "./Portrait, codeError_test.pdf";

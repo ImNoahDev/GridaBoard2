@@ -67,6 +67,7 @@ export enum PenEventName {
   ON_PEN_UP_VIRTUAL = "penup_virtual",
 
   ON_COLOR_CHANGED = "colorchanged",
+  ON_PEN_TYPE_CHANGED = "pentypechanged"
 
 
 }
