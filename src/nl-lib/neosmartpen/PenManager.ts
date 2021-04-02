@@ -21,20 +21,20 @@ export default class PenManager {
   // render = [];
 
   pen_colors: string[] = [
-    "rgb(255,2,0)", // 0 DARK_GARY #FFAAAAAA #A9A9A9
-    "rgb(229,229,229)", // 1 RED #FFFF0200 #FF0000  rgb(255, 0, 0, 0)
-    "rgb(151,151,151)", // 2 YELLOW #FFFFD001 #FFFF02
-    "rgb(0,0,0)", // 3 NAVY #FF012EE2 #000080
+    "rgb(255,2,0)", // 10 RED #FFFF0200 #FF0000  rgb(255, 0, 0, 0)
+    "rgb(229,229,229)", // 1 LIGHT_GRAY
+    "rgb(151,151,151)", // 2 DARK_GARY #FFAAAAAA #A9A9A9
+    "rgb(0,0,0)", // 3 BLACK #FF000000 #000000 
 
-    "rgb(108,0,226)", // 4 BLACK #FF000000 #000000
+    "rgb(108,0,226)", // 4 NAVY #FF012EE2 #000080
 
-    "rgb(1,46,226)", // 5 LIGHT_GRAY #FFE5E5E5 #D3D3D3
-    "rgb(0,171,235)", // 6 ORANGE #FFFF6500 #FFA500
+    "rgb(1,46,226)", // 5 BLUE #FF00ABEB #0000FF 
+    "rgb(0,171,235)", // 6 LIGHT_BLUE
     "rgb(60,221,0)", // 7 GREEN #FF3CDD00 #008000
 
-    "rgb(255,208,1)", // 8 BLUE #FF00ABEB #0000FF
-    "rgb(255,101,0)", // 9 PURPLE #FF6C00E2 #800080
-    "rgb(255,2,0)" // 10 DARK_GARY #FFAAAAAA #A9A9A9
+    "rgb(255,208,1)", // 8 YELLOW #FFFFD001 #FFFF02
+    "rgb(255,101,0)", // 9 ORANGE #FFFF6500 #FFA500 
+    "rgb(255,2,0)" // 10 RED #FFFF0200 #FF0000  rgb(255, 0, 0, 0)
   ];
 
   marker_colors: string[] = [
@@ -297,6 +297,8 @@ export default class PenManager {
 
     this._virtualPen.setPenRendererType(this.penRendererType);
     this._virtualPen.setColor(this.color);
+
+    this.dispatcher.dispatch(PenEventName.ON_PEN_TYPE_CHANGED, this);
   }
 
   setPenTypeStatus($elem, type) {

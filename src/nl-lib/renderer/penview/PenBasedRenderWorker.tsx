@@ -131,7 +131,7 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
         brushColor = 'rgb(108,0,226)';
         break;
       case 5:
-        brushColor = 'rgb(240,168,60)';
+        brushColor = 'rgb(1,46,226)';
         break;
       case 6:
         brushColor = 'rgb(0,171,235)';

@@ -1,13 +1,8 @@
-import React from 'react';
+import React, { useState, useEffect} from 'react';
 import '../../styles/main.css';
-import GridaToolTip from '../../styles/GridaToolTip';
 import PenManager from '../../../nl-lib/neosmartpen/PenManager';
-import Button from '@material-ui/core/Button';
-import { ButtonBase, makeStyles, Popover, Theme, Tooltip, TooltipProps } from '@material-ui/core';
-import { useSelector } from 'react-redux';
-import { RootState } from '../../store/rootReducer';
-import $ from "jquery";
-import KeyboardArrowDownRoundedIcon from '@material-ui/icons/KeyboardArrowDownRounded';
+import { ButtonBase, makeStyles, Theme, Tooltip, TooltipProps } from '@material-ui/core';
+import { IBrushType, PenEventName } from "../../../nl-lib/common/enums";
 
 const manager: PenManager = PenManager.getInstance();
 
@@ -53,17 +48,21 @@ function BootstrapTooltip(props: TooltipProps) {
   return <Tooltip arrow classes={classes} {...props} />;
 }
 
+let btnStyles = [] as React.CSSProperties[];
+
 const ColorButtons = () => {
-
-  // useEffect(() => {
-  //   const colorStr = manager.color;
-  //   const colorNum = Number(manager.getColorNum(colorStr));
-  //   const toggleColorNum = colorNum !== -1 ? colorNum : DEFAULT_PEN_COLOR_NUM;
-  //   manager.toggleColorRadioButton(toggleColorNum);
-  // });
-
+  const [penType, setPenType] = useState(0 as IBrushType);
   const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null);
 
+  useEffect(() => {
+    changeBtnStyles();
+    manager.addEventListener(PenEventName.ON_PEN_TYPE_CHANGED, changeColorButtons);
+
+    return () => {
+      manager.removeEventListener(PenEventName.ON_PEN_TYPE_CHANGED, changeColorButtons);
+    }
+  }, []);
+  
   const handleClose = () => {
     setAnchorEl(null);
   };
@@ -82,6 +81,29 @@ const ColorButtons = () => {
     }
   }
 
+  const changeBtnStyles = () => {
+    btnStyles = [];
+    if (manager.penRendererType === IBrushType.PEN) {
+      for (let i = 1; i <= 10; i++) {
+        btnStyles.push({
+          backgroundColor: manager.pen_colors[i]
+        })
+      }
+    } 
+    else if (manager.penRendererType === IBrushType.MARKER) {
+      for (let i = 1; i <= 10; i++) {
+        btnStyles.push({
+          backgroundColor: manager.marker_colors[i]
+        })
+      }
+    }
+  }
+
+  const changeColorButtons = () => {
+    changeBtnStyles();
+    setPenType(manager.penRendererType);
+  }
+
   return (
     <React.Fragment>
       <div>
@@ -91,256 +113,41 @@ const ColorButtons = () => {
             </div>
             {/* <KeyboardArrowDownRoundedIcon style={{marginLeft: "6px"}}/> */}
           </ButtonBase>
-          
         </BootstrapTooltip>
-        
 
         <div id="colorDrop" className="selected_color" style={colorDropDownStyle}>
-          <ButtonBase id="clr_1" type="button" className="color_btn" style={groupStyle}
-            onClick={() => changeColor(1)}>
-            {/* <GridaToolTip open={true} placement="top" tip={{
-                head: "RED",
-                msg: "표시되는 펜의 색상을 선택합니다",
-                tail: "키보드 버튼 1로 선택 가능합니다"
-              }} title={undefined}> */}
-            
-              <div className="color_icon color_1">
-              </div>
-            
-            {/* </GridaToolTip> */}
+          <ButtonBase id="clr_1" className="color_btn" style={groupStyle} onClick={() => changeColor(1)}>
+              <div className="color_icon" style={btnStyles[0]}></div>
           </ButtonBase>
-
-          <ButtonBase id="clr_2" type="button" className="color_btn" style={groupStyle}
-            onClick={() => changeColor(2)}>
-            {/* <GridaToolTip open={true} placement="top" tip={{
-                head: "YELLOW",
-                msg: "표시되는 펜의 색상을 선택합니다",
-                tail: "키보드 버튼 2로 선택 가능합니다"
-              }} title={undefined}> */}
-              <div className="color_icon color_2">
-              </div>
-            {/* </GridaToolTip> */}
+          <ButtonBase id="clr_2" className="color_btn" style={groupStyle} onClick={() => changeColor(2)}>
+              <div className="color_icon" style={btnStyles[1]}></div>
           </ButtonBase>
-          <ButtonBase id="clr_3" type="button" className="color_btn" style={groupStyle}
-            onClick={() => changeColor(3)}>
-            {/* <GridaToolTip open={true} placement="top" tip={{
-                head: "NAVY",
-                msg: "표시되는 펜의 색상을 선택합니다",
-                tail: "키보드 버튼 3로 선택 가능합니다"
-              }} title={undefined}> */}
-              <div className="color_icon color_3">
-              </div>
-            {/* </GridaToolTip> */}
+          <ButtonBase id="clr_3" className="color_btn" style={groupStyle} onClick={() => changeColor(3)}>
+              <div className="color_icon" style={btnStyles[2]}></div>
           </ButtonBase>
-          <ButtonBase id="clr_4" type="button" className="color_btn" style={groupStyle}
-            onClick={() => changeColor(4)}>
-            {/* <GridaToolTip open={true} placement="top" tip={{
-                head: "BLACK",
-                msg: "표시되는 펜의 색상을 선택합니다",
-                tail: "키보드 버튼 4로 선택 가능합니다"
-              }} title={undefined}> */}
-              <div className="color_icon color_4">
-              </div>
-            {/* </GridaToolTip> */}
+          <ButtonBase id="clr_4" className="color_btn" style={groupStyle} onClick={() => changeColor(4)}>
+              <div className="color_icon" style={btnStyles[3]}></div>
           </ButtonBase>
-          <ButtonBase id="clr_5" type="button" className="color_btn" style={groupStyle}
-            onClick={() => changeColor(5)}>
-            {/* <GridaToolTip open={true} placement="top" tip={{
-                head: "WHITE",
-                msg: "표시되는 펜의 색상을 선택합니다",
-                tail: "키보드 버튼 5로 선택 가능합니다"
-              }} title={undefined}> */}
-              <div className="color_icon color_5">
-              </div>
-            {/* </GridaToolTip> */}
+          <ButtonBase id="clr_5" className="color_btn" style={groupStyle} onClick={() => changeColor(5)}>
+              <div className="color_icon" style={btnStyles[4]}></div>
           </ButtonBase>
-          <ButtonBase id="clr_6" type="button" className="color_btn" style={groupStyle}
-            onClick={() => changeColor(6)}>
-            {/* <GridaToolTip open={true} placement="top" tip={{
-                head: "ORANGE",
-                msg: "표시되는 펜의 색상을 선택합니다",
-                tail: "키보드 버튼 6로 선택 가능합니다"
-              }} title={undefined}> */}
-              <div className="color_icon color_6">
-              </div>
-            {/* </GridaToolTip> */}
+          <ButtonBase id="clr_6" className="color_btn" style={groupStyle} onClick={() => changeColor(6)}>
+              <div className="color_icon" style={btnStyles[5]}></div>
           </ButtonBase>
-          <ButtonBase id="clr_7" type="button" className="color_btn" style={groupStyle}
-            onClick={() => changeColor(7)}>
-            {/* <GridaToolTip open={true} placement="top" tip={{
-                head: "GREEN",
-                msg: "표시되는 펜의 색상을 선택합니다",
-                tail: "키보드 버튼 7로 선택 가능합니다"
-              }} title={undefined}> */}
-              <div className="color_icon color_7">
-              </div>
-            {/* </GridaToolTip> */}
+          <ButtonBase id="clr_7" className="color_btn" style={groupStyle} onClick={() => changeColor(7)}>
+              <div className="color_icon" style={btnStyles[6]}></div>
           </ButtonBase>
-          <ButtonBase id="clr_8" type="button" className="color_btn" style={groupStyle}
-            onClick={() => changeColor(8)}>
-            {/* <GridaToolTip open={true} placement="top" tip={{
-                head: "BLUE",
-                msg: "표시되는 펜의 색상을 선택합니다",
-                tail: "키보드 버튼 8로 선택 가능합니다"
-              }} title={undefined}> */}
-              <div className="color_icon color_8">
-              </div>
-            {/* </GridaToolTip> */}
+          <ButtonBase id="clr_8" className="color_btn" style={groupStyle} onClick={() => changeColor(8)}>
+              <div className="color_icon" style={btnStyles[7]}></div>
           </ButtonBase>
-          <ButtonBase id="clr_9" type="button" className="color_btn" style={groupStyle}
-            onClick={() => changeColor(9)}>
-            {/* <GridaToolTip open={true} placement="top" tip={{
-                head: "PURPLE",
-                msg: "표시되는 펜의 색상을 선택합니다",
-                tail: "키보드 버튼 9로 선택 가능합니다"
-              }} title={undefined}> */}
-              <div className="color_icon color_9">
-              </div>
-            {/* </GridaToolTip> */}
+          <ButtonBase id="clr_9" className="color_btn" style={groupStyle} onClick={() => changeColor(9)}>
+              <div className="color_icon" style={btnStyles[8]}></div>
           </ButtonBase>
-          <ButtonBase id="clr_0" type="button" className="color_btn" style={groupStyle}
-            onClick={() => changeColor(0)}>
-            {/* <GridaToolTip open={true} placement="top" tip={{
-                head: "DARK GRAY",
-                msg: "표시되는 펜의 색상을 선택합니다",
-                tail: "키보드 버튼 0로 선택 가능합니다"
-              }} title={undefined}> */}
-              <div className="color_icon color_0">
-              </div>
-            {/* </GridaToolTip> */}
+          <ButtonBase id="clr_0" className="color_btn" style={groupStyle} onClick={() => changeColor(0)}>
+              <div className="color_icon" style={btnStyles[9]}></div>
           </ButtonBase>
         </div>
       </div>
-      
-      {/* <Popover
-        style={{zoom: 1 / brZoom}}
-        id={id}
-        open={open}
-        anchorEl={anchorEl}
-        onClose={handleClose}
-        anchorOrigin={{
-          vertical: 'bottom',
-          horizontal: 'center'
-        }}
-        transformOrigin={{
-          vertical: 'top',
-          horizontal: 'left'
-        }}
-      >
-        <div style={colorDropDownStyle}>
-          <Button id="clr_1" type="button" className="color_btn" style={groupStyle}
-            onClick={() => changeColor(1)}>
-            <GridaToolTip open={true} placement="top" tip={{
-                head: "RED",
-                msg: "표시되는 펜의 색상을 선택합니다",
-                tail: "키보드 버튼 1로 선택 가능합니다"
-              }} title={undefined}>
-              <div className="color_icon color_1">
-              </div>
-            </GridaToolTip>
-          </Button>
-
-          <Button id="clr_2" type="button" className="color_btn" style={groupStyle}
-            onClick={() => changeColor(2)}>
-            <GridaToolTip open={true} placement="top" tip={{
-                head: "YELLOW",
-                msg: "표시되는 펜의 색상을 선택합니다",
-                tail: "키보드 버튼 2로 선택 가능합니다"
-              }} title={undefined}>
-              <div className="color_icon color_2">
-              </div>
-            </GridaToolTip>
-          </Button>
-          <Button id="clr_3" type="button" className="color_btn" style={groupStyle}
-            onClick={() => changeColor(3)}>
-            <GridaToolTip open={true} placement="top" tip={{
-                head: "NAVY",
-                msg: "표시되는 펜의 색상을 선택합니다",
-                tail: "키보드 버튼 3로 선택 가능합니다"
-              }} title={undefined}>
-              <div className="color_icon color_3">
-              </div>
-            </GridaToolTip>
-          </Button>
-          <Button id="clr_4" type="button" className="color_btn" style={groupStyle}
-            onClick={() => changeColor(4)}>
-            <GridaToolTip open={true} placement="top" tip={{
-                head: "BLACK",
-                msg: "표시되는 펜의 색상을 선택합니다",
-                tail: "키보드 버튼 4로 선택 가능합니다"
-              }} title={undefined}>
-              <div className="color_icon color_4">
-              </div>
-            </GridaToolTip>
-          </Button>
-          <Button id="clr_5" type="button" className="color_btn" style={groupStyle}
-            onClick={() => changeColor(5)}>
-            <GridaToolTip open={true} placement="top" tip={{
-                head: "WHITE",
-                msg: "표시되는 펜의 색상을 선택합니다",
-                tail: "키보드 버튼 5로 선택 가능합니다"
-              }} title={undefined}>
-              <div className="color_icon color_5">
-              </div>
-            </GridaToolTip>
-          </Button>
-          <Button id="clr_6" type="button" className="color_btn" style={groupStyle}
-            onClick={() => changeColor(6)}>
-            <GridaToolTip open={true} placement="top" tip={{
-                head: "ORANGE",
-                msg: "표시되는 펜의 색상을 선택합니다",
-                tail: "키보드 버튼 6로 선택 가능합니다"
-              }} title={undefined}>
-              <div className="color_icon color_6">
-              </div>
-            </GridaToolTip>
-          </Button>
-          <Button id="clr_7" type="button" className="color_btn" style={groupStyle}
-            onClick={() => changeColor(7)}>
-            <GridaToolTip open={true} placement="top" tip={{
-                head: "GREEN",
-                msg: "표시되는 펜의 색상을 선택합니다",
-                tail: "키보드 버튼 7로 선택 가능합니다"
-              }} title={undefined}>
-              <div className="color_icon color_7">
-              </div>
-            </GridaToolTip>
-          </Button>
-          <Button id="clr_8" type="button" className="color_btn" style={groupStyle}
-            onClick={() => changeColor(8)}>
-            <GridaToolTip open={true} placement="top" tip={{
-                head: "BLUE",
-                msg: "표시되는 펜의 색상을 선택합니다",
-                tail: "키보드 버튼 8로 선택 가능합니다"
-              }} title={undefined}>
-              <div className="color_icon color_8">
-              </div>
-            </GridaToolTip>
-          </Button>
-          <Button id="clr_9" type="button" className="color_btn" style={groupStyle}
-            onClick={() => changeColor(9)}>
-            <GridaToolTip open={true} placement="top" tip={{
-                head: "PURPLE",
-                msg: "표시되는 펜의 색상을 선택합니다",
-                tail: "키보드 버튼 9로 선택 가능합니다"
-              }} title={undefined}>
-              <div className="color_icon color_9">
-              </div>
-            </GridaToolTip>
-          </Button>
-          <Button id="clr_0" type="button" className="color_btn" style={groupStyle}
-            onClick={() => changeColor(0)}>
-            <GridaToolTip open={true} placement="top" tip={{
-                head: "DARK GRAY",
-                msg: "표시되는 펜의 색상을 선택합니다",
-                tail: "키보드 버튼 0로 선택 가능합니다"
-              }} title={undefined}>
-              <div className="color_icon color_0">
-              </div>
-            </GridaToolTip>
-          </Button>
-        </div>
-      </Popover> */}
     </React.Fragment>
   );
 }
