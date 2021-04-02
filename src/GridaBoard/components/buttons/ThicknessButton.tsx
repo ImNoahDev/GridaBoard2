@@ -4,6 +4,7 @@ import PenManager from "../../../nl-lib/neosmartpen/PenManager";
 import { IconButton, makeStyles, SvgIcon, Theme, Tooltip, TooltipProps } from "@material-ui/core";
 import { PEN_THICKNESS } from "../../../nl-lib/common/enums";
 import KeyboardArrowDownRoundedIcon from '@material-ui/icons/KeyboardArrowDownRounded';
+import getText from "../../language/language";
 
 const manager: PenManager = PenManager.getInstance();
 
@@ -73,7 +74,7 @@ export default function ThicknessButton () {
   return (
     <React.Fragment>
       <div>
-        <BootstrapTooltip title="두께 [A ~ G]">
+        <BootstrapTooltip title={getText("nav_thickness")}>
           <IconButton style={thicknessStyle} className="thicknessDropDown" onClick={handleClickThickness}>
             <SvgIcon id="svg_thickness" className="thicknessDropDown" >
               <path

@@ -1,5 +1,7 @@
 import { DialogContent, makeStyles, TextField } from '@material-ui/core';
 import React, { useState } from 'react';
+import getText from "../language/language";
+
 
 type Props = {
   onTextAreaChange: (pdfName) => void;
@@ -34,13 +36,13 @@ const PdfDialogTextArea = (props: Props) => {
       <TextField
         autoFocus
         margin="dense"
-        placeholder="저장할 파일의 이름을 입력하세요"
+        placeholder={getText("save_pdf_popup_holder")}
         type="text"
         name="title"
         value={pdfName}
         onChange={onChange}
         className={classes.textArea}
-        label="제목"
+        label={getText("save_pdf_popup_name")}
         variant="outlined"
       />
     </DialogContent>

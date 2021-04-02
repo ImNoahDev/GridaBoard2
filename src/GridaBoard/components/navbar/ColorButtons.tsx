@@ -3,6 +3,7 @@ import '../../styles/main.css';
 import PenManager from '../../../nl-lib/neosmartpen/PenManager';
 import { ButtonBase, makeStyles, Theme, Tooltip, TooltipProps } from '@material-ui/core';
 import { IBrushType, PenEventName } from "../../../nl-lib/common/enums";
+import getText from "../../language/language";
 
 const manager: PenManager = PenManager.getInstance();
 
@@ -107,7 +108,7 @@ const ColorButtons = () => {
   return (
     <React.Fragment>
       <div>
-        <BootstrapTooltip title="색상 [1 ~ 0]">
+        <BootstrapTooltip title={getText("nav_color")}>
           <ButtonBase id="clr_3" type="button" className="color_btn select_color" style={colorStyle} onClick={handleClickColor}>
             <div id="select_color" className="color_icon color_3" style={{width: "18px", height: "18px"}}>
             </div>

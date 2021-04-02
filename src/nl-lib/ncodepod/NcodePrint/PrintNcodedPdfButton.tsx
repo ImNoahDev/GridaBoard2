@@ -10,6 +10,7 @@ import CancelWaitingDialog from "./CancelWaitingDialog";
 import { cloneObj } from "../../common/util";
 import Button from '@material-ui/core/Button';
 import $ from "jquery";
+import getText from "../../../GridaBoard/language/language";
 
 interface Props extends ButtonProps {
   /** 인쇄될 문서의 url, printOption.url로 들어간다. */
@@ -221,8 +222,8 @@ export default function PrintNcodedPdfButton(props: Props) {
 
 
 
-  let dialogTitle = status === "prepared" ? "인쇄 종료 대기 중" : "인쇄 준비 중";
-  dialogTitle = status === "completed" ? "완료" : dialogTitle;
+  let dialogTitle = status === "prepared" ? getText("print_close_ready") : getText("print_ready");
+  dialogTitle = status === "completed" ? getText("print_end") : dialogTitle;
 
   const optionDialogOn = optionOn;
   // const optionDialogOn = true;
@@ -230,7 +231,7 @@ export default function PrintNcodedPdfButton(props: Props) {
   return (
     <React.Fragment>
       <Button {...rest} id="printBtn"onClick={startPrint} style={printStyle}>
-        {/* {props.children} */}프린트
+        {/* {props.children} */}{getText("print")}
       </Button>
 
       { optionDialogOn

@@ -7,6 +7,7 @@ import { PageZoomEnum, ZoomFitEnum } from "../../../nl-lib/common/enums";
 import { useSelector } from "react-redux";
 import { RootState } from "../../store/rootReducer";
 import { setZoomStore } from '../../store/reducers/zoomReducer';
+import getText from "../../language/language";
 
 import $ from "jquery";
 
@@ -110,28 +111,28 @@ export default function FitButton() {
             width: "224px", height: "40px", padding: "4px 12px"
           }} onClick={() => setZoomByButton(PageZoomEnum.ZOOM_UP)}>
             <span style={{width: "200px", height: "16px", marginLeft: "-128px"}}>
-              화면 확대
+              {getText("nav_scale_increase")}
             </span>
           </Button>
           <Button id="shortcut" className="help_drop_down" style={{
             width: "224px", height: "40px", padding: "4px 12px"
           }} onClick={() => setZoomByButton(PageZoomEnum.ZOOM_DOWN)}>
             <span style={{width: "200px", height: "16px", marginLeft: "-128px"}}>
-              화면 축소
+              {getText("nav_scale_reduce")}
             </span>
           </Button>
           <Button id="tutorial" className="help_drop_down" style={{
             width: "224px", height: "40px", padding: "4px 12px"
           }} onClick={() => handleClose(ZoomFitEnum.HEIGHT)}>
             <span style={{width: "200px", height: "16px", marginLeft: "-80px"}}>
-              페이지 높이 맞춤
+              {getText("nav_scale_toHeight")}
             </span>
           </Button>
           <Button id="faq" className="help_drop_down" style={{
             width: "224px", height: "40px", padding: "4px 12px"
           }} onClick={() => handleClose(ZoomFitEnum.WIDTH)}>
             <span style={{width: "200px", height: "16px", marginLeft: "-80px"}}>
-              페이지 너비 맞춤
+              {getText("nav_scale_toWidth")}
             </span>
           </Button>
         </div>

@@ -8,6 +8,7 @@ import PdfDialogTextArea from './PdfDialogTextArea';
 import { turnOnGlobalKeyShortCut } from '../GlobalFunctions';
 import GridaToolTip from '../styles/GridaToolTip';
 import $ from "jquery";
+import getText from "../language/language";
 
 const useStyles = makeStyles({
   title: {
@@ -91,22 +92,22 @@ const SavePdfDialog = () => {
         <Button className="save_drop_down" style={{
           width: "200px", height: "40px", padding: "4px 12px"
         }} onClick={handlePdfDialogOpen}>
-          <span style={{marginLeft: "-54px"}}>이미지 저장(.pdf)</span>
+          <span style={{marginLeft: "-54px"}}>{getText("save_to_pdf")}</span>
         </Button>
       {/* </GridaToolTip> */}
       <Dialog open={open} onClose={handlePdfDialogClose} aria-labelledby="form-dialog-title">
         <DialogTitle id="form-dialog-title" className={classes.title}>
           <Box fontSize={20} fontWeight="fontWeightBold" className={classes.titleBox}>
-            PDF 저장
+          {getText("save_pdf_popup_title")}
           </Box>
         </DialogTitle>
         <PdfDialogTextArea onTextAreaChange={(pdfName) => savePdfName(pdfName)}/>
         <DialogActions>
           <Button onClick={handleSavePdf} variant="contained" color="primary" className={classes.button}>
-            저장
+          {getText("save_pdf_popup_save")}
           </Button>
           <Button onClick={handlePdfDialogClose} variant="contained" className={classes.button}>
-            취소
+          {getText("save_pdf_popup_cancel")}
           </Button>
         </DialogActions>
       </Dialog>

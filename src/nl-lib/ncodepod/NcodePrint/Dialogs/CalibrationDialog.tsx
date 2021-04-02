@@ -16,6 +16,7 @@ import { MappingStorage } from '../../../common/mapper/MappingStorage';
 import { isSamePage, makeNPageIdStr } from "../../../common/util";
 import GridaApp from "../../../../GridaBoard/GridaApp";
 import ConnectButton from "../../../../GridaBoard/components/buttons/ConnectButton";
+import getText from "../../../../GridaBoard/language/language";
 
 const _penImageUrl = "/icons/image_calibration.png";
 
@@ -186,14 +187,14 @@ const CalibrationDialog = (props: IDialogProps) => {
         if (progress === 1) {
           if (!isSamePage(pageInfo, calibratedPageInfo)) {
             notSamePageForFirstPage = true;
-            AlertGuideTitle = "동일한 페이지가 아님";
-            AlertGuideText = "같은 PDF 페이지는 하나의 Ncode 용지에 대응되어야 합니다";
+            AlertGuideTitle = getText("print_reg_not_samePage");
+            AlertGuideText = getText("print_reg_not_samePage_explain");
           }
         }
         if (progress > 1 && isSamePage(pageInfo, calibratedPageInfo)) {
           duplicated = true;
-          AlertGuideTitle = "등록된 페이지와 겹침";
-          AlertGuideText = "이전에 등록한 페이지와 겹치는 페이지입니다\n인쇄된 용지를 확인해 주십시오";
+          AlertGuideTitle = getText("print_reg_pageNo_popup_alert_title");
+          AlertGuideText = getText("print_reg_pageNo_popup_alert_expalin");
         }
       });
 
@@ -293,15 +294,15 @@ const CalibrationDialog = (props: IDialogProps) => {
   let calibrationGuide = "";
   switch (progress) {
     case 0: {
-      calibrationGuide = "네오스마트펜의 전원을 켜서 그리다보드에 연결한 후 Ncode A4에 인쇄된 문서의 왼쪽 상단에 있는 마크를 스마트 펜으로 터치해 주십시오";
+      calibrationGuide = getText("print_reg_pageNo_popup_explain1");
       break;
     }
     case 1: {
-      calibrationGuide = "인쇄된 문서의 오른쪽 하단에 있는 마크를 스마트 펜으로 터치해 주십시오";
+      calibrationGuide = getText("print_reg_pageNo_popup_explain2");
       break;
     }
     default : {
-      calibrationGuide = "인쇄된 문서의 아무 곳이나 스마트 펜으로 터치해 주십시오";
+      calibrationGuide = getText("print_reg_pageNo_popup_success");
       break;
     }
   }
@@ -314,7 +315,7 @@ const CalibrationDialog = (props: IDialogProps) => {
 
           <DialogTitle id="form-dialog-title" style={{ float: "left", width: "500px" }}>
             <Box fontSize={20} fontWeight="fontWeightBold" >
-              인쇄 페이지 순서 등록, 페이지 {pageNo}
+              {getText("print_reg_pageNo_popup_title").replace("%d", pageNo.toString())}
               {/* /{numPages} (Step: {progress + 1}/{numProgresses}) */}
             </Box>
           </DialogTitle>
@@ -337,7 +338,7 @@ const CalibrationDialog = (props: IDialogProps) => {
             </Box>
             <br/>
             <Box component="div" className={classes.root}>
-              <Box fontSize={16} fontWeight="fontWeightRegular" >페이지 등록이 완료되면 팝업이 자동으로 종료됩니다</Box>
+              <Box fontSize={16} fontWeight="fontWeightRegular" >{getText("print_reg_pageNo_popup_warn")}</Box>
             </Box>
           </DialogContent>
 
@@ -371,7 +372,7 @@ const CalibrationDialog = (props: IDialogProps) => {
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseAlert} color="primary" autoFocus>
-            닫기
+            {getText("print_reg_pageNo_popup_exit")}
           </Button>
         </DialogActions>
       </Dialog>

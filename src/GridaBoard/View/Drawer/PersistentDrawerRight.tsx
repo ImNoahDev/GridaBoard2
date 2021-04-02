@@ -15,6 +15,7 @@ import { setActivePageNo } from "../../store/reducers/activePageReducer";
 import { scrollToBottom } from '../../../nl-lib/common/util';
 import $ from "jquery";
 import { sum } from 'pdf-lib';
+import getText from "../../language/language";
 
 
 
@@ -274,7 +275,7 @@ export default function PersistentDrawerRight(props: Props) {
           <div id="footer" style={{ height: "80px" }}>
             <Button onClick={(evnet) => addBlankPage(event)} style={drawerFooter}>
               <AddIcon style={{ width: "12px", height: "12px", color: "rgba(255,255,255,1)" }} />
-              <span style={{ fontSize: "12px", color: "rgba(255,255,255,1)" }}>페이지 추가</span>
+              <span style={{ fontSize: "12px", color: "rgba(255,255,255,1)" }}>{getText("add_page")}</span>
             </Button>
           </div>
         </div>

@@ -7,7 +7,7 @@ import { PageRangeField } from './PageRangeField';
 import { SelectField } from './SelectField';
 
 import { IPrintOption } from '../../../../common/structures';
-
+import getText from "../../../../../GridaBoard/language/language";
 
 // const useStyles = makeStyles((theme: Theme) => {
 //   createStyles({
@@ -108,7 +108,7 @@ function OptionLevel_0(props: ILeveledDialogProps) {
         <TableBody>
           <TableRow className={classes.tr}>
             <TableCell colSpan={2} style={cellRadioStyle}>
-              <Typography variant="subtitle1" component="h5"> <b> 인쇄 대상 용지 </b> </Typography>
+              <Typography variant="subtitle1" component="h5"> <b> {getText("print_popup_select_paper")} </b> </Typography>
             </TableCell>
           </TableRow>
 
@@ -117,13 +117,13 @@ function OptionLevel_0(props: ILeveledDialogProps) {
             <TableCell colSpan={1} style={cellRadioStyle}>
               <RadioField showHelp={help} checked={printOption.hasToPutNcode ? printOption.hasToPutNcode : false}
                 handleChange={handleChange2} color={color} name="hasToPutNcode">
-                일반 복사 용지에 인쇄
+                {getText("print_popup_select_normal")}
             </RadioField >
             </TableCell>
 
             <TableCell colSpan={1} style={cellRadioStyle}>
               <RadioField showHelp={help} checked={!printOption.hasToPutNcode} handleChange={handleChange2} color={color} name="useNA4">
-                Ncode A4에 인쇄
+                {getText("print_popup_select_ncode")}
             </RadioField >
             </TableCell>
           </TableRow>
@@ -148,7 +148,7 @@ function OptionLevel_0(props: ILeveledDialogProps) {
           <TableRow className={classes.tr}>
             <TableCell colSpan={1} style={cellRadioStyle} align={"right"}>
               <RadioField showHelp={help} checked={printOption.downloadNcodedPdf} handleChange={handleChange2} color={color} name="downloadNcodedPdf">
-                재인쇄용 PDF 저장
+                {getText("print_popup_selectSub_savepdf")}
             </RadioField >
             </TableCell>
           </TableRow>
@@ -166,7 +166,7 @@ function OptionLevel_0(props: ILeveledDialogProps) {
         <TableBody>
           <TableRow className={classes.tr}>
             <TableCell colSpan={2} style={cellRadioStyle}>
-              <Typography variant="subtitle1" component="h5"> <b> 인쇄 페이지 </b> </Typography>
+              <Typography variant="subtitle1" component="h5"> <b> {getText("print_popup_select_page_title")} </b> </Typography>
             </TableCell>
           </TableRow>
 
@@ -174,7 +174,7 @@ function OptionLevel_0(props: ILeveledDialogProps) {
           <TableRow className={classes.tr}>
             <TableCell colSpan={2} style={cellRadioStyle}>
               <PageRangeField showHelp={help} range={printOption.targetPages} max={printOption.docNumPages} handleChange={handleChange2} color={color} name="targetPages">
-                인쇄 범위 ({printOption.targetPages.length}페이지)
+                {getText("print_popup_select_page_selected").replace("%d", printOption.targetPages.length.toString())}
             </PageRangeField >
             </TableCell>
           </TableRow>

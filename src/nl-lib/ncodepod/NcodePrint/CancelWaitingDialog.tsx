@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle } from '@material-ui/core';
-
+import getText from "../../../GridaBoard/language/language";
 
 type Props = {
   open: boolean,
@@ -32,16 +32,16 @@ function SimpleDialog(props: Props) {
 
   return (
     <Dialog onClose={handleClose} aria-labelledby="simple-dialog-title" open={open}>
-      <DialogTitle id="simple-dialog-title">프로그램이 실행 중입니다.<br />멈춘 줄 알고 걱정이었습니다.조금만 더 기다려 주세요.</DialogTitle>
+      <DialogTitle id="simple-dialog-title">{getText("print_cancel_ready_ok_warn1")}<br />{getText("print_cancel_ready_ok_warn2")}</DialogTitle>
     </Dialog>
   );
 }
 
 
 const msgs = [
-  "인쇄 준비 작업이 취소되기를 기다리고 있습니다",
-  "처리할 페이지 수가 많아 기다리는 시간이 더 걸리고 있습니다, 잠시만 기다려 주세요",
-  "너무 오래 기다리게 했습니다만, 조금만 더 기다려 주세요"];
+  getText("print_ready_to_cancel"),
+  getText("print_cancel_ready_expalin"),
+  getText("print_sorry_but_more")];
 
 
 
@@ -91,7 +91,7 @@ export default function CancelWaitingDialog(props: Props) {
       <Dialog open={props.open}>
         <DialogTitle id="form-dialog-title" style={{ float: "left", width: "500px" }}>
           <Box fontSize={20} fontWeight="fontWeightBold" >
-            취소 대기 중
+            {getText("print_cancel_ready")}
             </Box>
         </DialogTitle>
 
@@ -105,7 +105,7 @@ export default function CancelWaitingDialog(props: Props) {
 
         <DialogActions>
           <Button onClick={handleClose} color="primary">
-            알겠습니다
+            {getText("print_cancel_ready_ok")}
           </Button>
         </DialogActions>
       </Dialog>

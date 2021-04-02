@@ -9,6 +9,7 @@ import { IPenToViewerEvent, INeoSmartpen } from "../common/neopen/INeoSmartpen";
 import { store } from "../../GridaBoard/client/Root";
 import { DefaultPUINcode } from "../common/constants";
 import { isSameNcode } from "../common/util";
+import getText from "../../GridaBoard/language/language";
 
 interface IPenMovement {
   downEvent: IPenEvent,
@@ -548,8 +549,9 @@ export default class NeoSmartpen implements INeoSmartpen {
     let guide = "";
     if (retryCount > 0) {
       guide = "\n비밀번호를 " + (retryCount) + "회 잘못 입력하셨습니다. \n10회 오류 시 필기 데이터가 초기화됩니다."
+      guide = "\n" + getText("bluetooth_needPw_wrong").replace("%d", retryCount.toString());
     }
-    const passcode = prompt("비밀번호 입력(4자리)" + guide);
+    const passcode = prompt(getText("bluetooth_needPw") + guide);
     if (passcode === null) return;
     this.protocolHandler.sendPasscode(passcode);
 

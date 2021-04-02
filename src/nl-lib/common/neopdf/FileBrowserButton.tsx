@@ -5,6 +5,7 @@ import { openFileBrowser } from "./FileBrowser";
 import { IFileBrowserReturn } from '../structures';
 import { NeoToolTip } from '../ui';
 import $ from "jquery";
+import getText from "../../../GridaBoard/language/language";
 
 
 interface Props extends ButtonProps {
@@ -76,7 +77,7 @@ const FileBrowserButton = (props: Props) => {
           style={{
             width: "200px", height: "40px", padding: "4px 12px"
           }}>
-          <span style={{marginLeft: "-44px"}}>파일 업로드(.pdf)</span>
+          <span style={{marginLeft: "-44px"}}>{getText("load_from_pdf")}</span>
           {props.children}
         </Button>
       {/* </NeoToolTip> */}
