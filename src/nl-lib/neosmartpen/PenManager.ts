@@ -38,7 +38,7 @@ export default class PenManager {
   ];
 
   marker_colors: string[] = [
-    "rgb(217, 217, 224)", // 0
+    "rgb(222, 147, 159)", // 0
     "rgb(214, 215, 228)", // 1
     "rgb(191, 192, 205)", // 2
     "rgb(145, 146, 159)", // 3
@@ -183,59 +183,6 @@ export default class PenManager {
   }
 
   setColor(color_num: number) {
-
-    if (color_num === 1) {
-      $('.select_color').removeAttr('id');
-      $('.select_color').attr('id', 'clr_1');
-      $('#select_color').removeAttr('class');
-      $('#select_color').attr('class', 'color_icon color_1');
-    } else if (color_num === 2) {
-      $('.select_color').removeAttr('id');
-      $('.select_color').attr('id', 'clr_2');
-      $('#select_color').removeAttr('class');
-      $('#select_color').attr('class', 'color_icon color_2');
-    } else if (color_num === 3) {
-      $('.select_color').removeAttr('id');
-      $('.select_color').attr('id', 'clr_3');
-      $('#select_color').removeAttr('class');
-      $('#select_color').attr('class', 'color_icon color_3');
-    } else if (color_num === 4) {
-      $('.select_color').removeAttr('id');
-      $('.select_color').attr('id', 'clr_4');
-      $('#select_color').removeAttr('class');
-      $('#select_color').attr('class', 'color_icon color_4');
-    } else if (color_num === 5) {
-      $('.select_color').removeAttr('id');
-      $('.select_color').attr('id', 'clr_5');
-      $('#select_color').removeAttr('class');
-      $('#select_color').attr('class', 'color_icon color_5');
-    } else if (color_num === 6) {
-      $('.select_color').removeAttr('id');
-      $('.select_color').attr('id', 'clr_6');
-      $('#select_color').removeAttr('class');
-      $('#select_color').attr('class', 'color_icon color_6');
-    } else if (color_num === 7) {
-      $('.select_color').removeAttr('id');
-      $('.select_color').attr('id', 'clr_7');
-      $('#select_color').removeAttr('class');
-      $('#select_color').attr('class', 'color_icon color_7');
-    } else if (color_num === 8) {
-      $('.select_color').removeAttr('id');
-      $('.select_color').attr('id', 'clr_8');
-      $('#select_color').removeAttr('class');
-      $('#select_color').attr('class', 'color_icon color_8');
-    } else if (color_num === 9) {
-      $('.select_color').removeAttr('id');
-      $('.select_color').attr('id', 'clr_9');
-      $('#select_color').removeAttr('class');
-      $('#select_color').attr('class', 'color_icon color_9');
-    } else {
-      $('.select_color').removeAttr('id');
-      $('.select_color').attr('id', 'clr_0');
-      $('#select_color').removeAttr('class');
-      $('#select_color').attr('class', 'color_icon color_0');
-    }
-
     this.color = this.pen_colors[color_num];
 
     if (_active_pen) {

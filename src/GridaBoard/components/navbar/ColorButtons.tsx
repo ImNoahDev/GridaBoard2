@@ -49,17 +49,25 @@ function BootstrapTooltip(props: TooltipProps) {
 }
 
 let btnStyles = [] as React.CSSProperties[];
+let selectStyle = {
+  width: "18px", 
+  height: "18px",
+  backgroundColor: manager.color
+};
 
 const ColorButtons = () => {
-  const [penType, setPenType] = useState(0 as IBrushType);
+  const [penType, setPenType] = useState(manager.penRendererType as IBrushType);
+  const [color, setColor] = useState(manager.color as string);
   const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null);
 
   useEffect(() => {
     changeBtnStyles();
-    manager.addEventListener(PenEventName.ON_PEN_TYPE_CHANGED, changeColorButtons);
+    manager.addEventListener(PenEventName.ON_PEN_TYPE_CHANGED, changeColorBtns);
+    manager.addEventListener(PenEventName.ON_COLOR_CHANGED, changeColorBtnSelected);
 
     return () => {
-      manager.removeEventListener(PenEventName.ON_PEN_TYPE_CHANGED, changeColorButtons);
+      manager.removeEventListener(PenEventName.ON_PEN_TYPE_CHANGED, changeColorBtns);
+      manager.removeEventListener(PenEventName.ON_COLOR_CHANGED, changeColorBtnSelected);
     }
   }, []);
   
@@ -82,35 +90,66 @@ const ColorButtons = () => {
   }
 
   const changeBtnStyles = () => {
-    btnStyles = [];
-    if (manager.penRendererType === IBrushType.PEN) {
-      for (let i = 1; i <= 10; i++) {
-        btnStyles.push({
-          backgroundColor: manager.pen_colors[i]
-        })
+    switch (manager.penRendererType) {
+      case IBrushType.PEN: {
+        btnStyles = [];
+        for (let i = 1; i <= 10; i++) {
+          btnStyles.push({
+            backgroundColor: manager.pen_colors[i]
+          })
+        }
+        break;
       }
-    } 
-    else if (manager.penRendererType === IBrushType.MARKER) {
-      for (let i = 1; i <= 10; i++) {
-        btnStyles.push({
-          backgroundColor: manager.marker_colors[i]
-        })
+      case IBrushType.MARKER: {
+        btnStyles = [];
+        for (let i = 1; i <= 10; i++) {
+          btnStyles.push({
+            backgroundColor: manager.marker_colors[i]
+          })
+        }
+        break;
       }
+      default: break;
     }
-  }
 
-  const changeColorButtons = () => {
+    changeColorBtnSelected();
+  }
+  
+  const changeColorBtns = () => {
     changeBtnStyles();
     setPenType(manager.penRendererType);
   }
+
+  const changeColorBtnSelected = () => {
+    let bgColor = "";
+
+    switch (manager.penRendererType) {
+      case IBrushType.PEN: {
+        bgColor = manager.color;
+        break;
+      }
+      case IBrushType.MARKER: {
+        const colorNum = manager.getColorNum(manager.color);
+        bgColor = manager.marker_colors[colorNum];
+        break;
+      }
+      default: bgColor = manager.color; break;
+    }
+    setColor(bgColor) //for re-render
+  }
+
+  selectStyle = {
+    width: "18px", 
+    height: "18px",
+    backgroundColor: color
+  };
 
   return (
     <React.Fragment>
       <div>
         <BootstrapTooltip title="색상 [1 ~ 0]">
-          <ButtonBase id="clr_3" type="button" className="color_btn select_color" style={colorStyle} onClick={handleClickColor}>
-            <div id="select_color" className="color_icon color_3" style={{width: "18px", height: "18px"}}>
-            </div>
+          <ButtonBase className="color_btn select_color" style={colorStyle} onClick={handleClickColor}>
+            <div id="select_color" className="color_icon" style={selectStyle}></div>
             {/* <KeyboardArrowDownRoundedIcon style={{marginLeft: "6px"}}/> */}
           </ButtonBase>
         </BootstrapTooltip>
