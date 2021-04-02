@@ -75,6 +75,7 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
 
     const penManager = PenManager.getInstance();
     penManager.addEventListener(PenEventName.ON_COLOR_CHANGED, this.changeDrawCursor);
+    penManager.addEventListener(PenEventName.ON_PEN_TYPE_CHANGED, this.changeDrawCursor);
 
     this.changePage(this.pageInfo, options.pageSize, true);
     console.log(`PAGE CHANGE (worker constructor):                             ${makeNPageIdStr(this.pageInfo as IPageSOBP)}`);
@@ -85,6 +86,7 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
   prepareUnmount = () => {
     const penManager = PenManager.getInstance();
     penManager.removeEventListener(PenEventName.ON_COLOR_CHANGED, this.changeDrawCursor);
+    penManager.removeEventListener(PenEventName.ON_PEN_TYPE_CHANGED, this.changeDrawCursor);
   };
 
   /**
@@ -112,60 +114,65 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
     this.canvasFb.hoverCursor = `url(${this.getDrawCursor()}) ${this.brushSize / 2} ${this.brushSize / 2}, crosshair`;
   };
   getDrawCursor = () => {
-    const color = PenManager.getInstance().color;
-    const pen_colors = PenManager.getInstance().pen_colors;
-    const foundIdx = pen_colors.findIndex(ele => ele === color);
+    const penManager = PenManager.getInstance();
 
-    let brushColor;
-    switch (foundIdx) {
-      case 1:
-        brushColor = 'rgb(229,229,229)';
+    const color = penManager.color;
+    const pen_colors = penManager.pen_colors;
+    const foundIdx = pen_colors.findIndex(ele => ele === color);
+    const penType = penManager.penRendererType;
+    
+    let cursor = "";
+
+    switch (penType) {
+      case IBrushType.PEN: {
+        const brushColor = penManager.pen_colors[foundIdx]
+        cursor = `
+          <svg
+            height="${this.brushSize}"
+            fill="${brushColor}"
+            viewBox="0 0 ${this.brushSize * 2} ${this.brushSize * 2}"
+            width="${this.brushSize}"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <circle
+              cx="50%"
+              cy="50%"
+              r="${this.brushSize}"
+            />
+          </svg>
+        `;
         break;
-      case 2:
-        brushColor = 'rgb(151,151,151)';
+      }
+      case IBrushType.MARKER: {
+        const brushColor = penManager.marker_colors[foundIdx]
+        cursor = `
+          <svg
+            height="${this.brushSize}"
+            fill="${brushColor}"
+            viewBox="0 0 ${this.brushSize * 2} ${this.brushSize * 2}"
+            width="${this.brushSize}"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <circle
+              cx="50%"
+              cy="50%"
+              r="${this.brushSize}"
+            />
+          </svg>
+        `;
         break;
-      case 3:
-        brushColor = 'rgb(0,0,0)';
+      }
+      case IBrushType.ERASER: {
+        cursor = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" width="1.3em" height="1.3em" style="-ms-transform: rotate(90deg); -webkit-transform: rotate(90deg); transform: rotate(90deg);" preserveAspectRatio="xMidYMid meet" viewBox="0 0 20 20"><g fill="none"><path d="M11.197 2.44a1.5 1.5 0 0 1 2.121 0l4.243 4.242a1.5 1.5 0 0 1 0 2.121L9.364 17H14.5a.5.5 0 0 1 0 1H7.82a1.496 1.496 0 0 1-1.14-.437L2.437 13.32a1.5 1.5 0 0 1 0-2.121l8.76-8.76zm1.414.706a.5.5 0 0 0-.707 0L5.538 9.512l4.95 4.95l6.366-6.366a.5.5 0 0 0 0-.707L12.61 3.146zM9.781 15.17l-4.95-4.95l-1.687 1.687a.5.5 0 0 0 0 .707l4.243 4.243a.5.5 0 0 0 .707 0l1.687-1.687z" fill="#626262"/></g><rect x="0" y="0" width="100" height="100" fill="rgba(0, 0, 0, 0)" /></svg>`
+        //https://iconify.design/icon-sets/?query=eraser
         break;
-      case 4:
-        brushColor = 'rgb(108,0,226)';
-        break;
-      case 5:
-        brushColor = 'rgb(1,46,226)';
-        break;
-      case 6:
-        brushColor = 'rgb(0,171,235)';
-        break;
-      case 7:
-        brushColor = 'rgb(60,221,0)';
-        break;
-      case 8:
-        brushColor = 'rgb(255,208,1)';
-        break;
-      case 9:
-        brushColor = 'rgb(255,101,0)';
-        break;
-      case 0:
-        brushColor = 'rgb(255,2,0)';
-        break;
-    }
-    const circle = `
-      <svg
-        height="${this.brushSize}"
-        fill="${brushColor}"
-        viewBox="0 0 ${this.brushSize * 2} ${this.brushSize * 2}"
-        width="${this.brushSize}"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <circle
-          cx="50%"
-          cy="50%"
-          r="${this.brushSize}"
-        />
-      </svg>
-    `;
-    return `data:image/svg+xml;base64,${window.btoa(circle)}`;
+      }
+      default: break;
+    } 
+
+    return `data:image/svg+xml;base64,${window.btoa(cursor)}`;
   };
+
   createLiveStroke = (event: IPenToViewerEvent) => {
     // console.log(`Stroke created = ${event.strokeKey}`);
     this.livePaths[event.strokeKey] = {
