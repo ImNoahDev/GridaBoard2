@@ -90,7 +90,7 @@ const LoadGrida = () => {
         onClick={fileOpenHandler}
         // onClick={() => alert('미구현된 기능입니다.')} 
         style={{
-          width: "200px", height: "40px", padding: "4px 12px"
+          width: "200px", height: "40px", padding: "4px 12px", justifyContent: "flex-start"
         }}>
           <span>{getText("load_from_grida")}</span>
         </Button>
