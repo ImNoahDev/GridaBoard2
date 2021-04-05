@@ -33,16 +33,8 @@ const useStyles = makeStyles((theme) => ({
 
 
 const LoadingCircle = () => { 
-  let isVisible = useSelector((state: RootState) => state.loadingCircle.visible);
+  const isVisible = useSelector((state: RootState) => state.loadingCircle.visible);
   const classes = useStyles();
-  
-  // useEffect(() => {
-  //   console.log("!!!!!!!!!", isVisible);
-  //   // if (isVisible !== toggleRotation) {
-  
-  //     // setToggleRotation(rotationTrigger);
-  //   // }
-  // }, [isVisible])
   
   return (<div className={`${classes.root} ${isVisible?"": classes.hidden}`}>
       <div className={classes.background}></div>

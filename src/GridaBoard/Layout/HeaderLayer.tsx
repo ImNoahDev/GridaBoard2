@@ -298,7 +298,7 @@ const HeaderLayer = (props: Props) => {
             <div id="loadDrop" className="loadDropDownContent" style={loadDropdownStyle}>
               <FileBrowserButton handlePdfOpen={handlePdfOpen} />
               <LoadGrida />
-              {/* <ConvertFileLoad /> */}
+              <ConvertFileLoad />
             </div>
           </div>
 

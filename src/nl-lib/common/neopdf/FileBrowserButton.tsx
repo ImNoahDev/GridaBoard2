@@ -71,7 +71,7 @@ const FileBrowserButton = (props: Props) => {
     style={{
       width: "200px", height: "40px", padding: "4px 12px", justifyContent: "flex-start"
     }}>
-    <span>{getText("load_from_pdf")}</span>
+    <span>{getText("load_from_pdf")}(.pdf)</span>
     {props.children}
   </Button>);
       {/* <NeoToolTip open={true} placement="top" tip={{

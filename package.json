@@ -16,6 +16,7 @@
     "bootstrap": "4.6.0",
     "cairo": "0.1.0-alpha.3",
     "canvas": "2.7.0",
+    "cloudconvert": "^2.2.1",
     "cmake-js": "6.1.0",
     "electron-is-dev": "2.0.0",
     "eslint-config-airbnb": "18.2.1",
