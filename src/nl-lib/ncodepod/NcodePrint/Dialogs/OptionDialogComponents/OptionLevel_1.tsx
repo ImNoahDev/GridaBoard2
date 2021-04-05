@@ -6,6 +6,7 @@ import { ILeveledDialogProps, LineBreak, useLevelDialogStyles, cellRadioStyle } 
 import { SelectField } from './SelectField';
 import { makeNPageIdStr } from '../../../../common/util';
 import { MediaSize } from '../../../../common/constants';
+import getText from '../../../../../GridaBoard/language/language';
 
 function EmptryTableRow() {
   return (
@@ -63,7 +64,7 @@ function OptionLevel_1(props: ILeveledDialogProps) {
         <TableBody>
           <TableRow className={classes.tr}>
             <TableCell style={cellRadioStyle} colSpan={2}>
-              <Typography variant="subtitle1" component="h5"> <b> 용지 크기와 농도 </b> </Typography>
+              <Typography variant="subtitle1" component="h5"> <b> {getText("print_popup_detail_title")} </b> </Typography>
             </TableCell>
           </TableRow>
 
@@ -73,7 +74,7 @@ function OptionLevel_1(props: ILeveledDialogProps) {
                 candidates={mediaNames}
                 value={printOption.mediaSize.name}
                 color={color} name="mediaSize">
-                용지 크기:
+                {getText("print_popup_detail_papersize")}:
               </SelectField >
             </TableCell>
           </TableRow>
@@ -83,16 +84,16 @@ function OptionLevel_1(props: ILeveledDialogProps) {
           <TableRow className={classes.tr}>
             <TableCell colSpan={1} style={cellRadioStyle}>
               <SelectField showHelp={help} colSpan={2} handleChange={handleChange2}
-                candidates={["연하게", "보통", "진하게"]}
-                value={(printOption.codeDensity === 2 ? "보통" : "진하게")}
+                candidates={[getText("print_popup_detail_ncodelevel_low"), getText("print_popup_detail_ncodelevel_normal"), getText("print_popup_detail_ncodelevel_hard")]}
+                value={(printOption.codeDensity === 2 ? getText("print_popup_detail_ncodelevel_normal") : getText("print_popup_detail_ncodelevel_hard"))}
                 color={color} name="codeDensity">
-                Ncode 농도:
+                {getText("print_popup_detail_ncodelevel")}:
               </SelectField >
             </TableCell>
 
             <TableCell colSpan={1} style={cellRadioStyle}>
               <RadioField showHelp={help} checked={printOption.drawFrame} handleChange={handleChange2} color={color} name="drawFrame">
-                페이지 윤곽 표시
+                {getText("print_popup_detail_outline")}:
               </RadioField >
             </TableCell>
 

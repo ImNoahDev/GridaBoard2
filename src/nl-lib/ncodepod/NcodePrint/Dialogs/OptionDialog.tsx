@@ -14,6 +14,7 @@ import { MediaSize } from '../../../common/constants';
 import { RadioField } from './OptionDialogComponents/RadioField';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../../../GridaBoard/store/rootReducer';
+import getText from "../../../../GridaBoard/language/language";
 
 
 const useStyles = makeStyles({
@@ -265,7 +266,7 @@ export function OptionDialog(props: IDialogProps) {
     forceToRender();
   };
 
-  const levelButtonText = ["상세 설정 보기", "전문가 설정 보기", "간단 설정으로"];
+  const levelButtonText = [getText("print_popup_toDetail"), "전문가 설정 보기", getText("")];
 
   console.log(`default: level=${optionLevel}`);
   let msg = levelButtonText[optionLevel];
@@ -284,7 +285,7 @@ export function OptionDialog(props: IDialogProps) {
 
         <DialogTitle id="form-dialog-title" style={{ float: "left", width: "600px" }}>
           <Box fontSize={20} fontWeight="fontWeightBold" style={{float: "left", marginRight: "100px", marginBottom: "-20px"}}>
-            스마트펜용 인쇄 옵션
+            {getText("print_popup_title")}
           </Box>
    
           {/* <TableCell colSpan={1} style={cellRadioStyle}>
@@ -298,7 +299,7 @@ export function OptionDialog(props: IDialogProps) {
 
         <DialogContent ref={dialogRef}>
           <DialogContentText>
-            원활한 필기 인식을 위해 인쇄물의 색상이 실제와 다를 수 있습니다.
+            {getText("print_popup_subtitle")}
             <br/><br/>
           </DialogContentText>
 
@@ -327,7 +328,7 @@ export function OptionDialog(props: IDialogProps) {
               color: theme.palette.info.contrastText,
               boxShadow: "4px 4px 10px rgba(0, 0, 0, 0.3)",
             }} onClick={handleOK} color="primary" autoFocus>
-              확인
+              {getText("print_popup_yes")}
           </Button>
           </Grid>
 
@@ -338,7 +339,7 @@ export function OptionDialog(props: IDialogProps) {
               boxShadow: "4px 4px 10px rgba(0, 0, 0, 0.3)",
             }}
               onClick={handleCancel} color="secondary">
-              취소
+              {getText("print_popup_no")}
           </Button>
           </Grid>
 

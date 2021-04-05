@@ -10,6 +10,7 @@ import GridaToolTip from '../styles/GridaToolTip';
 import $ from "jquery";
 import { saveGrida } from "./SaveGrida";
 import GridaDialogTextArea from './GridaDialogTextArea';
+import getText from "../language/language";
 
 const useStyles = makeStyles({
   title: {
@@ -102,22 +103,22 @@ const SaveGridaDialog = () => {
           onClick={handleGridaDialogOpen}
           // onClick={() => alert('미구현된 기능입니다.')}
         >
-          <span style={{marginLeft: "-40px"}}>데이터 저장(.grida)</span>
+          <span style={{marginLeft: "-40px"}}>{getText("save_to_grida")}</span>
         </Button>
       {/* </GridaToolTip> */}
       <Dialog open={open} onClose={handleGridaDialogClose} aria-labelledby="form-dialog-title">
         <DialogTitle id="form-dialog-title" className={classes.title}>
           <Box fontSize={20} fontWeight="fontWeightBold" className={classes.titleBox}>
-            GRIDA 저장
+          {getText("save_grida_popup_title")}
           </Box>
         </DialogTitle>
         <GridaDialogTextArea onTextAreaChange={(gridaName) => saveGridaName(gridaName)}/>
         <DialogActions>
           <Button onClick={handleSaveGrida} variant="contained" color="primary" className={classes.button}>
-            저장
+            {getText("save_grida_popup_save")}
           </Button>
           <Button onClick={handleGridaDialogClose} variant="contained" className={classes.button}>
-            취소
+            {getText("save_grida_popup_cancel")}
           </Button>
         </DialogActions>
       </Dialog>

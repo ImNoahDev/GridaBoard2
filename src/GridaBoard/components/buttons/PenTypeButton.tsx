@@ -4,6 +4,7 @@ import GridaToolTip from "../../styles/GridaToolTip";
 import PenManager from "../../../nl-lib/neosmartpen/PenManager";
 import { IBrushType } from "../../../nl-lib/common/enums";
 import { IconButton, makeStyles, SvgIcon, Theme, Tooltip, TooltipProps } from "@material-ui/core";
+import getText from "../../language/language";
 
 
 const manager: PenManager = PenManager.getInstance();
@@ -48,7 +49,7 @@ export default function PenTypeButton () {
             msg: "펜을 선택하는 버튼입니다.",
             tail: "단축키 Q로 선택가능합니다."
           }} title={undefined}> */}
-          <BootstrapTooltip title="펜 [Q]">
+          <BootstrapTooltip title={getText("nav_pen")}>
             <SvgIcon id="pen_svg_icon">
               <path
                 fillRule="evenodd"
@@ -66,7 +67,7 @@ export default function PenTypeButton () {
             msg: "형광펜을 선택하는 버튼입니다.",
             tail: "단축키 W로 선택가능합니다."
           }} title={undefined}> */}
-          <BootstrapTooltip title="형광펜 [R]">
+          <BootstrapTooltip title={getText("nav_highlighter")}>
             <SvgIcon id="marker_svg_icon">
               <path
                 fillRule="evenodd"
@@ -85,7 +86,7 @@ export default function PenTypeButton () {
             msg: "지우개를 선택하는 버튼입니다.",
             tail: "단축키 E로 선택가능합니다."
           }} title={undefined}> */}
-          <BootstrapTooltip title="지우개 [E]">
+          <BootstrapTooltip title={getText("nav_eraser")}>
             <SvgIcon id="eraser_svg_icon">
               <path
                 fillRule="evenodd"

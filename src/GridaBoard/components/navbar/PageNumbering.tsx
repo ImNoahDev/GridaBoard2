@@ -8,6 +8,7 @@ import NavigateNextIcon from '@material-ui/icons/NavigateNext';
 import { IconButton, makeStyles, Theme, Tooltip, TooltipProps } from '@material-ui/core';
 import $ from "jquery";
 import { turnOnGlobalKeyShortCut } from '../../GlobalFunctions';
+import getText from '../../language/language';
 
 const selectPageStyle = {
   width: "35px",
@@ -92,7 +93,7 @@ const PageNumbering = () => {
     return (
       <div>
         <IconButton id="pre_btn" onClick={prevChange} style={{padding: "8px"}}>
-          <BootstrapTooltip title="이전 페이지 [<-]">
+          <BootstrapTooltip title={getText("nav_page_prev")}>
             <NavigateBeforeIcon />
           </BootstrapTooltip>
         </IconButton>
@@ -101,7 +102,7 @@ const PageNumbering = () => {
         &nbsp;
         <span style={{marginRight: "8px"}}>{numPages}</span>
         <IconButton id="next_btn" onClick={nextChange} style={{padding: "8px"}}>
-          <BootstrapTooltip title="다음 페이지 [->]">
+          <BootstrapTooltip title={getText("nav_page_next")}>
             <NavigateNextIcon />
           </BootstrapTooltip>
         </IconButton>

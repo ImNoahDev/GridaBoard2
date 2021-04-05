@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, LinearProgress } from '@material-ui/core';
+import getText from "../../../GridaBoard/language/language";
 
 const useStyles = makeStyles({
   root: {
@@ -72,13 +73,13 @@ export default function ProgressDialog(props: Props) {
           <LinearProgress variant="buffer" value={percent} valueBuffer={buffered} />
         </div>
         <div className={classes.root}>
-          <Box fontSize={16} fontWeight="fontWeightRegular" >Processing... {percent}%</Box>
+          <Box fontSize={16} fontWeight="fontWeightRegular" >{getText("print_processing")} {percent}%</Box>
         </div>
       </DialogContent>
 
       <DialogActions>
         <Button onClick={handleClose} color="primary">
-          Cancel
+          {getText("print_processing_cancel")}
           </Button>
       </DialogActions>
     </Dialog>

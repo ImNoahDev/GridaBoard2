@@ -4,6 +4,7 @@ import { Box, Checkbox, createStyles, FormControl, FormControlLabel, FormLabel, 
 import NeoToolTip, { ITipType } from '../../../../common/ui/NeoToolTip';
 import { printOptionTip } from './ToolTips';
 import ArrowRightSharpIcon from '@material-ui/icons/ArrowRightSharp';
+import getText from '../../../../../GridaBoard/language/language';
 
 const BootstrapInput = withStyles((theme) => ({
   root: {
@@ -87,7 +88,7 @@ function SelectFieldSub(props: Props) {
           value={value}
           input={<BootstrapInput />}
           onBlur={onFocusOut}
-          label='ex) 빈칸=전체, "1, 2, 4", "1-3, 5"'
+          label={getText("print_popup_select_page_example")}
           fullWidth={true}
         >
           {candidates.map((value, index) => (<MenuItem key={index} value={value}>{value}</MenuItem>))}

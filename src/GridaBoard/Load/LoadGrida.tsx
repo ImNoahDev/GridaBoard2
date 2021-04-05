@@ -4,6 +4,7 @@ import { InkStorage } from '../../nl-lib/common/penstorage';
 import GridaDoc from '../GridaDoc';
 import { Button } from '@material-ui/core';
 import $ from "jquery";
+import getText from "../language/language";
 
 const LoadGrida = () => {
   async function fileOpenHandler() {
@@ -91,7 +92,7 @@ const LoadGrida = () => {
         style={{
           width: "200px", height: "40px", padding: "4px 12px"
         }}>
-          <span>데이터 불러오기(.grida)</span>
+          <span>{getText("load_from_grida")}</span>
         </Button>
       // </GridaToolTip>
   );

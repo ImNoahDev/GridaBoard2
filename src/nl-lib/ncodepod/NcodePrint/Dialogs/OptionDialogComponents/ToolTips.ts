@@ -1,16 +1,17 @@
 import { ITipType } from "../../../../common/ui";
+import getText from "../../../../../GridaBoard/language/language";
 
 export const printOptionTip: { [key: string]: ITipType } = {
   'hasToPutNcode': {
-    head: '복사지에 Ncode를 인쇄',
-    msg: '일반 용지에 PDF 파일과 N코드를 동시에 인쇄합니다. 칼라프린터가 필요하며 프린터 기종에 따라 지원되지 않을 수도 있습니다.',
-    tail: '프린터에 일반 인쇄 용지를 준비하세요.'
+    head: getText("print_popup_select_normal_dialog_title"),
+    msg: getText("print_popup_select_normal_dialog_explain"),
+    tail: getText("print_popup_select_normal_dialog_ready")
   },
 
   'useNA4': {
-    head: 'Ncode A4에 인쇄',
-    msg: 'Ncode A4에 인쇄합니다. 칼라 프린터가 필요하며, 인쇄된 후에는 인쇄된 페이지를 수동 등록해야 합니다. 화면 오른쪽 아래에 등록 버튼이 있습니다.',
-    tail: '프린터에 Ncode A4를 준비하세요.'
+    head: getText("print_popup_select_ncode_dialog_title"),
+    msg: getText("print_popup_select_ncode_dialog_explain"),
+    tail: getText("print_popup_select_ncode_dialog_ready")
   },
 
   'pagesPerSheet': {
@@ -26,9 +27,9 @@ export const printOptionTip: { [key: string]: ITipType } = {
   },
 
   'targetPages': {
-    head: '인쇄 대상 페이지 번호',
-    msg: '인쇄할 대상의 페이지 번호를 "숫자", "쉼표(,)" 그리고 "하이픈(-)" 표시로 입력하여 지정합니다.',
-    tail: '빈칸으로 남겨두면 전체 페이지를 인쇄합니다.'
+    head: getText("print_popup_select_page_dialog_title"),
+    msg: getText("print_popup_select_page_dialog_explain"),
+    tail: getText("print_popup_select_page_dialog_warn")
   },
 
   'sameCode': {
@@ -56,15 +57,15 @@ export const printOptionTip: { [key: string]: ITipType } = {
   },
 
   'mediaSize': {
-    head: '용지 크기',
-    msg: '인쇄할 용지의 크기를 결정합니다.',
-    tail: '인쇄 용지의 크기와 연결된 프린터의 용지 크기가 다른 경우, Ncode가 인식되지 않을 수 있습니다.'
+    head: getText("print_popup_detail_papersize_dialog_title"),
+    msg: getText("print_popup_detail_papersize_dialog_explain"),
+    tail: getText("print_popup_detail_papersize_dialog_warn")
   },
 
   'downloadNcodedPdf': {
-    head: '재인쇄용 파일 다운로드',
-    msg: '인쇄만 따로 할 수 있도록, 컴퓨터에 재인쇄용 PDF 파일을 다운로드 합니다. 인쇄 준비 과정이 종료되면, 자동으로 다운로드 되어 웹 브라우저에서 지정한 다운로드 폴더에 저장됩니다',
-    tail: 'Adobe Acrobat (Reader)로, 설정에서 "확대 축소 없이, 원래 크기"대로 인쇄하도록 설정하고 인쇄해야 정상적으로 작동합니다.'
+    head: getText("print_popup_selectSub_savepdf_title"),
+    msg: getText("print_popup_selectSub_savepdf_explain"),
+    tail: getText("print_popup_selectSub_savepdf_ready")
   },
 
   'drawCalibrationMark': {
@@ -92,15 +93,15 @@ export const printOptionTip: { [key: string]: ITipType } = {
   },
 
   'codeDensity': {
-    head: 'Ncode 인쇄 시, 코드 농도',
-    msg: '일반 복사 용지에 인쇄를 선택하면 문서와 함께 Ncode가 인쇄됩니다. 이 때 인쇄되는 Ncode의 농도를 결정합니다. 보통의 경우가 가장 적절합니다.',
-    tail: '"보통"이나 "연하게"에서 코드 인식이 전혀 되지 않을 때에만 "진하게"를 선택해 주십시오'
+    head: getText("print_popup_detail_ncodelevel_dialog_title"),
+    msg: getText("print_popup_detail_ncodelevel_dialog_explain"),
+    tail: getText("print_popup_detail_ncodelevel_dialog_warn")
   },
 
   'drawFrame': {
-    head: '페이지 윤곽을 인쇄',
-    msg: '분할 인쇄를 하는 경우 각 페이지의 경계 표시가 필요한 경우가 있습니다. 이 때를 위해 문서 페이지의 경계를 표시해서 인쇄합니다.',
-    tail: '기본값으로는 윤곽 표시를 하지 않습니다.'
+    head: getText("print_popup_detail_outline_dialog_title"),
+    msg: getText("print_popup_detail_outline_dialog_explain"),
+    tail: getText("print_popup_detail_outline_dialog_warn")
   },
 
   'padding': {

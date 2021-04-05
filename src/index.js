@@ -20,7 +20,6 @@ import { getBrowserZoomFactor} from "./nl-lib/common/util";
 
 // import "./electron-starter.js";
 
-
 ReactDOM.render(
 
     <Root />

@@ -5,6 +5,7 @@ import GridaToolTip from "../../styles/GridaToolTip";
 import { Button } from "@material-ui/core";
 import $ from "jquery";
 import Icon from '@material-ui/core/Icon';
+import getText from "../../language/language";
 
 const themeManager: ThemeManager = ThemeManager.getInstance();
 
@@ -105,7 +106,7 @@ export default function BackgroundButton() {
               tail: "키보드 버튼 1로 선택 가능합니다"
             }} title={undefined}> */}
               <span className="backgroundDropDown">
-                Basic
+                {getText("nav_background_basic")}
               </span>
           {/* </GridaToolTip> */}
         </Button>
@@ -116,7 +117,7 @@ export default function BackgroundButton() {
               tail: "키보드 버튼 1로 선택 가능합니다"
             }} title={undefined}> */}
               <span className="backgroundDropDown">
-                Neo-prism
+                {getText("nav_background_neoprism")}
               </span>
           {/* </GridaToolTip> */}
         </Button>   
@@ -126,12 +127,12 @@ export default function BackgroundButton() {
         <Button className="background_drop_down" onClick={() => setBackground(1)} style={{
           width: "120px", height: "40px", padding: "4px 12px", zIndex: 5000
         }}>
-          <span className="bg-dropmenu" style={{marginLeft: "-58px"}}>Basic</span>
+          <span className="bg-dropmenu" style={{marginLeft: "-58px"}}>{getText("nav_background_basic")}</span>
         </Button>
         <Button className="background_drop_down" onClick={() => setBackground(2)} style={{
           width: "120px", height: "40px", padding: "4px 12px", zIndex: 5000
         }}>
-          <span className="bg-dropmenu" style={{marginLeft: "-20px"}}>Neo-prism</span>
+          <span className="bg-dropmenu" style={{marginLeft: "-20px"}}>{getText("nav_background_neoprism")}</span>
         </Button>
       </div>  
     </React.Fragment> 

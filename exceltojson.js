@@ -19,9 +19,9 @@ codes.forEach((el)=>{
 for(let i = 3; i < jsonData.length; i++){
   let now = jsonData[i];
   for(let j = 0; j < codes.length; j++){
-    let key = "__EMPTY_" + (j + 5);
+    let key = "__EMPTY_" + (j + 4);
     if(now[key] != ""){
-      data[codes[j]][now["__EMPTY_2"]] = now[key];
+      data[codes[j]][now["__EMPTY_1"]] = now[key];
     }
   }
 }

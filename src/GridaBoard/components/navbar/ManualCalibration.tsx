@@ -6,6 +6,7 @@ import { CalibrationButton } from '../../../nl-lib/ncodepod';
 import { Button } from '@material-ui/core';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../store/rootReducer';
+import getText from '../../language/language';
 
 const mappingStyle = {
   // display: "flex",
@@ -50,7 +51,7 @@ const ManualCalibration = (props: Props) => {
         tail: "단축키 Q로 선택가능합니다."
       }} title={undefined}> */}
         <div>
-          <span style={mappingTextStyle}>인쇄 페이지 순서 등록</span>
+          <span style={mappingTextStyle}>{getText("print_reg_pageNo")}</span>
         </div>
       {/* </GridaToolTip> */}
     </CalibrationButton>

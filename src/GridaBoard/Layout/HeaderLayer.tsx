@@ -18,6 +18,7 @@ import { useSelector } from 'react-redux';
 import { RootState } from '../store/rootReducer';
 import { turnOnGlobalKeyShortCut } from "../GlobalFunctions";
 import SaveGridaDialog from "../Save/SaveGridaDialog";
+import getText from "../language/language";
 
 
 const imgStyle = {
@@ -272,7 +273,7 @@ const HeaderLayer = (props: Props) => {
           {/* <a id="grida_board" href="#" style={aStyle}>Grida board</a> */}
           <div>
             <Button id="save" className="saveDropDown" style={buttonStyle} onClick={handleClickSave} disabled={disabled}>
-              저장하기
+              {getText("save_file")}
             </Button>
             <div id="saveDrop" className="saveDropDownContent" style={saveDropdownStyle}>
               <SavePdfDialog />
@@ -290,7 +291,7 @@ const HeaderLayer = (props: Props) => {
           
           <div>
             <Button id="load" className="loadDropDown" style={buttonStyle} onClick={handleClickLoad}>
-              불러오기
+              {getText("load_file")}
             </Button>
             <div id="loadDrop" className="loadDropDownContent" style={loadDropdownStyle}>
               <FileBrowserButton handlePdfOpen={handlePdfOpen} />
@@ -317,7 +318,7 @@ const HeaderLayer = (props: Props) => {
 
           <Button onClick={changeUrl} id="myButton" className="float-left submit-button" style={changeUrlStyle}>
             <div>
-              <span style={changeUrlTextStyle}>구버전 바로가기</span>
+              <span style={changeUrlTextStyle}>{getText("go_to_old")}</span>
             </div>
           </Button>
 

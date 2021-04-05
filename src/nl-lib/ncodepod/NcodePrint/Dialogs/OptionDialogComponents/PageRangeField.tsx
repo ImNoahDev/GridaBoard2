@@ -3,7 +3,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import { Box, Checkbox, createStyles, FormControl, FormControlLabel, FormLabel, Grid, Paper, Radio, RadioGroup, Table, TableBody, TableCell, TableCellProps, TableContainer, TableRow, TextField, Theme, Typography, useTheme } from '@material-ui/core';
 import NeoToolTip, { ITipType } from '../../../../common/ui/NeoToolTip';
 import { printOptionTip } from './ToolTips';
-
+import getText from "../../../../../GridaBoard/language/language";
 
 
 interface Props extends TableCellProps {
@@ -66,7 +66,7 @@ function PageRangeSub(props: Props) {
             shrink: true,
           }}
           onBlur={onFocusOut}
-          label='ex) 빈칸=전체, "1, 2, 4", "1-3, 5"'
+          label= {getText("print_popup_select_page_example")}
           value={rangeStr}
           fullWidth={true}
         />
