@@ -3,6 +3,7 @@ import { Button, Popover } from "@material-ui/core";
 import KeyboardArrowDownRoundedIcon from '@material-ui/icons/KeyboardArrowDownRounded';
 import { saveGrida } from "../Save/SaveGrida";
 import LoadGrida from "../Load/LoadGrida";
+import ConvertFileLoad from "../Load/ConvertFileLoad";
 import PrintButton from "../components/navbar/PrintButton";
 import GridaDoc from "../GridaDoc";
 import { PDFDocument } from 'pdf-lib';
@@ -186,7 +187,7 @@ const HeaderLayer = (props: Props) => {
   } as React.CSSProperties;
 
   const loadDropdownStyle = {
-    display: "none",
+    display: "flex",
     flexDirection: "column",
     alignItems: "flex-start",
     padding: "8px",
@@ -197,6 +198,7 @@ const HeaderLayer = (props: Props) => {
     boxShadow: "2px 2px 2px rgba(0, 0, 0, 0.25)",
     borderRadius: "12px",
     zIndex: 10000,
+    visibility:"hidden"
   } as React.CSSProperties;
 
   const changeUrlStyle = {
@@ -242,10 +244,10 @@ const HeaderLayer = (props: Props) => {
 
   function handleClickLoad() {
     const load = document.getElementById("loadDrop");
-    if (load.style.display == 'none') {
-      load.style.display = 'block'
+    if (load.style.visibility == "hidden") {
+      load.style.visibility = "visible";
     } else {
-      load.style.display = 'none'
+      load.style.visibility = "hidden"
     }
   }
 
@@ -296,6 +298,7 @@ const HeaderLayer = (props: Props) => {
             <div id="loadDrop" className="loadDropDownContent" style={loadDropdownStyle}>
               <FileBrowserButton handlePdfOpen={handlePdfOpen} />
               <LoadGrida />
+              {/* <ConvertFileLoad /> */}
             </div>
           </div>
 

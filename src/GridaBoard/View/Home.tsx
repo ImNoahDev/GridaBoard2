@@ -201,7 +201,7 @@ window.onclick = function(event) {
   
   if (!event.target.parentNode.matches('.loadDropDown')) {
     const load = document.getElementById("loadDrop");
-    load.style.display = 'none'
+    load.style.visibility = "hidden"
   }
 
   if (!event.target.parentNode.matches('.select_color')) {
