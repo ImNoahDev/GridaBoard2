@@ -149,7 +149,7 @@ const ContentsLayer = (props: Props) => {
     flex: 1,
     overflow: "auto",
     flexDirection: "column",
-    // height: innerHeight - sumHeight,
+    height: innerHeight - sumHeight,
   } as React.CSSProperties;
 
   const dropdownStyle = {
