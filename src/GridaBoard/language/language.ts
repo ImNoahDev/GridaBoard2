@@ -1,10 +1,10 @@
 import data from "./textData.json";
 import qs from "query-string";
 
-let defaultLang = "en";
+const defaultLang = "en";
 let languageType : string = null;
 let textData : JSON = null;
-let searchLang : string = qs.parse(location.search).lang;
+const searchLang : string = qs.parse(location.search).lang;
 
 
 function setData(lang: string = null) : string {
