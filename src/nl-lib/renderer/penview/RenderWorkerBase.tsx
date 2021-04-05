@@ -138,8 +138,8 @@ export default abstract class RenderWorkerBase {
 
   h_rev: TransformParameters;
 
-  funcNcodeToPdfXy: (ncodeXY: { x: number; y: number; f?: number }, rotationIndep: boolean) => { x: number; y: number; f: number };
-  funcPdfToNcodeXy: (ncodeXY: { x: number; y: number; f?: number }, rotationIndep: boolean) => { x: number; y: number; f: number };
+  funcNcodeToPdfXy: (ncodeXY: { x: number; y: number; f?: number }) => { x: number; y: number; f: number };
+  funcPdfToNcodeXy: (ncodeXY: { x: number; y: number; f?: number }) => { x: number; y: number; f: number };
 
   // fitMargin = 0;
 
@@ -768,7 +768,7 @@ export default abstract class RenderWorkerBase {
     return { x: px, y: py, f: ncodeXY.f };
   };
 
-  public ncodeToPdfXy_homography = (ncodeXY: { x: number; y: number; f?: number }, rotationIndep?: boolean) => {
+  public ncodeToPdfXy_homography = (ncodeXY: { x: number; y: number; f?: number }) => {
     const { x, y } = ncodeXY;
 
     const { a, b, c, d, e, f, g, h } = this._opt.h;
@@ -780,7 +780,7 @@ export default abstract class RenderWorkerBase {
     return { x: px, y: py, f: ncodeXY.f };
   };
 
-  protected pdfToNcodeXy_homography = (ncodeXY: { x: number; y: number; f?: number }, rotationIndep: boolean) => {
+  protected pdfToNcodeXy_homography = (ncodeXY: { x: number; y: number; f?: number }) => {
     const { x, y } = ncodeXY;
 
     const { a, b, c, d, e, f, g, h } = this._opt.h_rev;
@@ -796,15 +796,15 @@ export default abstract class RenderWorkerBase {
    * @protected
    * @param {{x:number, y:number, f?:number}} ncodeXY
    */
-  protected ncodeToPdfXy = (ncodeXY: { x: number; y: number; f?: number }, rotationIndep: boolean) => {
-    const ret = this.funcNcodeToPdfXy(ncodeXY, rotationIndep);
+  protected ncodeToPdfXy = (ncodeXY: { x: number; y: number; f?: number }) => {
+    const ret = this.funcNcodeToPdfXy(ncodeXY);
     const { x, y, f } = ret;
 
     return { x: x * PATH_THICKNESS_SCALE, y: y * PATH_THICKNESS_SCALE, f };
   };
 
-  protected pdfToNcodeXy = (pdfXY: { x: number; y: number; f?: number }, rotationIndep: boolean) => {
-    const ret = this.funcPdfToNcodeXy(pdfXY, rotationIndep);
+  protected pdfToNcodeXy = (pdfXY: { x: number; y: number; f?: number }) => {
+    const ret = this.funcPdfToNcodeXy(pdfXY);
     const { x, y, f } = ret;
 
     return { x: x * PATH_THICKNESS_SCALE, y: y * PATH_THICKNESS_SCALE, f };
@@ -907,10 +907,10 @@ export default abstract class RenderWorkerBase {
    * @protected
    * @param {{x:number, y:number}} dot
    */
-  protected focusToDot = (dot: { x: number; y: number }, rotationIndep: boolean) => {
+  protected focusToDot = (dot: { x: number; y: number }) => {
     if (!this._opt.autoFocus) return;
     const margin_to_go_ratio = 0.25;
-    const canvas_xy = this.funcNcodeToPdfXy(dot, rotationIndep);
+    const canvas_xy = this.funcNcodeToPdfXy(dot);
     const screen_xy = this.pdfToScreenXy(canvas_xy);
 
     let dx = 0,
