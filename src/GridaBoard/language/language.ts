@@ -1,15 +1,23 @@
 import data from "./textData.json";
+import qs from "query-string";
 
-let languageType = "en";
+let defaultLang = "en";
+let languageType : string = null;
 let textData : JSON = null;
+let searchLang : string = qs.parse(location.search).lang;
+
+
 function setData(lang: string = null) : string {
-    const language : string = (navigator.language || navigator["userLanguage"]).slice(0,2);
-    if(lang != null){
+    const navLang : string = (navigator.language || navigator["userLanguage"]).slice(0,2);
+
+    if(lang != null){//1순위 셋 데이터 인자값이 가장 우선
         languageType = lang;
-    }else if(language in data){
-        languageType = language;
+    }else if(searchLang != undefined && searchLang in data){//2순위 : 페이지 파라미터값 
+        languageType = searchLang;
+    }else if(navLang in data){//3순위 : navi값(특정 국가에서 준비된 언어가 존재하지 않을 경우 넘어간다)
+        languageType = navLang;
     }else{
-        languageType = "en";  //기본 언어
+        languageType = defaultLang;  //기본 언어(언어가 준비되지 않았다는 이야기는 해외일 가능성이 높음 따라서 기본 언어는 영어)
     }
 
     textData = data[languageType];
@@ -26,23 +34,9 @@ function lang(tag : string) : string{
     }
 
     return nowText;
-    // let obj = textData;
-    // if(tag.constructor === String) tag = [tag];
-    // try{
-    //     for(let i = 0; i < tag.length; i++){
-    //         obj = obj[tag[i]];
-    //     }
-    // }catch(e){
-    //     return "wrong tag path";
-    // }
-    // return obj;
-    // return data[languageType][tag];
 }
 function changeType(type : string){
-    languageType = type;
-    if(data !== null){
-        textData = data[languageType];
-    }
+    setData(type);
 }
 
 setData();
