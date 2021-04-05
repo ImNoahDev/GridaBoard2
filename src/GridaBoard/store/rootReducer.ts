@@ -5,6 +5,7 @@ import activePageReducer from "./reducers/activePageReducer"
 import authorizationReducer from './reducers/authorization';
 import pointerTracer from './reducers/pointerTracer';
 import rotate from './reducers/rotate';
+import loadingCircle from './reducers/loadingCircle';
 import viewFitReducer from './reducers/viewFitReducer';
 import uiReducer from './reducers/ui';
 import progressDlgReducer from "./reducers/progressDlgReducer";
@@ -24,6 +25,7 @@ const rootReducer = combineReducers({
   ui: uiReducer,
   pointerTracer,
   rotate,
+  loadingCircle,
   viewFitReducer,
   activePage: activePageReducer,
   zoomReducer,

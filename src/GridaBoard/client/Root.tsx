@@ -14,6 +14,7 @@ import { hideUIProgressBackdrop, reportBrowserZoomFactor, showUIProgressBackdrop
 import { fetchGzippedFile, getBrowserZoomFactor } from "../../nl-lib/common/util";
 import { g_paperType, g_paperType_default } from "../../nl-lib/common/noteserver";
 import Home from "../View/Home";
+import LoadingCircle from "../Load/LoadingCircle";
 
 
 
@@ -123,6 +124,7 @@ const Root = () => {
 
   return (
     <Provider store={store}>
+      <LoadingCircle />
       <MuiThemeProvider theme={theme}>
         {/* {paperInfoInited ?
         <Home /> : <></>} */}
