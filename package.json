@@ -18,6 +18,7 @@
     "canvas": "2.7.0",
     "cloudconvert": "^2.2.1",
     "cmake-js": "6.1.0",
+    "convert-excel-to-json": "^1.7.0",
     "electron-is-dev": "2.0.0",
     "eslint-config-airbnb": "18.2.1",
     "expect.js": "0.3.1",
@@ -61,7 +62,7 @@
     "zlib": "1.0.5"
   },
   "scripts": {
-    "start": "node exceltojson.js && react-scripts start",
+    "start": "node ./src/GridaBoard/util/exceltojson.js && react-scripts start",
     "https": "set HTTPS=true&&react-scripts start",
     "build": "set GENERATE_SOURCEMAP=true && react-scripts build",
     "test": "react-scripts test",
