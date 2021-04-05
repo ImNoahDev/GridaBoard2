@@ -121,21 +121,22 @@ const ColorButtons = () => {
   }
 
   const changeColorBtnSelected = () => {
-    let bgColor = "";
-
     switch (manager.penRendererType) {
       case IBrushType.PEN: {
+        let bgColor = "";
         bgColor = manager.color;
+        setColor(bgColor) //for re-render
         break;
       }
       case IBrushType.MARKER: {
+        let bgColor = "";
         const colorNum = manager.getColorNum(manager.color);
         bgColor = manager.marker_colors[colorNum];
+        setColor(bgColor) //for re-render
         break;
       }
-      default: bgColor = manager.color; break;
+      default: break;
     }
-    setColor(bgColor) //for re-render
   }
 
   selectStyle = {
