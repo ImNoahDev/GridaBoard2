@@ -235,7 +235,7 @@ const HeaderLayer = (props: Props) => {
 
   function handleClickSave() {
     const save = document.getElementById("saveDrop");
-    if (save.style.display == 'none') {
+    if (save.style.display === 'none') {
       save.style.display = 'block'
     } else {
       save.style.display = 'none'
@@ -244,7 +244,7 @@ const HeaderLayer = (props: Props) => {
 
   function handleClickLoad() {
     const load = document.getElementById("loadDrop");
-    if (load.style.visibility == "hidden") {
+    if (load.style.visibility === "hidden") {
       load.style.visibility = "visible";
     } else {
       load.style.visibility = "hidden"
