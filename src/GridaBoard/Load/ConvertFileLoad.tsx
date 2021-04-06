@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { Button } from '@material-ui/core';
+import { Button, ButtonProps } from '@material-ui/core';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import { render } from "react-dom";
+import { IFileBrowserReturn } from '../../nl-lib/common/structures';
 import getText from "../language/language";
 import CloudConvert from 'cloudconvert';
 import { setLoadingVisibility } from '../store/reducers/loadingCircle';
@@ -12,7 +13,6 @@ import { InkStorage } from '../../nl-lib/common/penstorage';
 
 const CLOUDCONVERT_APIKEY = "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiIxIiwianRpIjoiZWY2MzlhMzFiMTRkMDkwMmJlMzE5ZmM3YmI3NzVlODhjNmE0NmU1NDYwZjY5ZTNmNTM3OTkzMjhiMWQwNDg0MDhiNzg4ZTJhYjAzMzk2MDciLCJpYXQiOiIxNjE3NTg5ODc0LjcxMTQxMSIsIm5iZiI6IjE2MTc1ODk4NzQuNzExNDE0IiwiZXhwIjoiNDc3MzI2MzQ3NC42NzEwNzgiLCJzdWIiOiI0OTUwMjk4OSIsInNjb3BlcyI6WyJ0YXNrLndyaXRlIiwidGFzay5yZWFkIl19.SD_Q-xL9vs66TdDIv5StDAsRkBBuhAnTukJ12MyWVnshWAnFcFOn7PcJ6m-RMOhtIFy5EQ2PQZ4NMzx8czyQ2LjBE4W8-so_b5ZoJ9skCiONxUYJiKzuRM6DUrqrCLFVetGG-yzujqwRyklT9X866FxlkrJADC5VsecgeLEdYOfKn-opC-KeX2iZ-OI8_00B09eGy8-NbNXZLwpewhslkTcXxPwfziC9KOEzKXlLfm-_qPVmD4uApsZXJT7l0Wo3yBqOZ2kxL6YDGXSMsIw4_dwOqXJojLYF4X0nUivvclwn8jIpBlIWLx9h7ALz6k37II0CQ2gzofmVcLWovd7x_2jqgczEEYe3J6qYa8NEFWufAyhSRZ-Cqe9dPtn20pDp98u1bAmrL5vXdZwi9NEomaL1WzFrLbWQViuNfp4eu65nwEljLMcBrerRAv4ROVRGBn_PH7PcIqh6ZfcCuWeSfKKvAAaXeFtHjMsVNOHpMNrjD4rnRxA1JRDiWaq2nu0Jk3h34y4NZKYEWvSAdc-COZf5AUIQaapp8Stb9TAa20OFlKljT2B_2B9wJmKitZibgHP6yXY1lzdgsdGtjC6uXtpKfKu2UAj9at7Skg_d7JeOyf8srZe5MGwY2D_gryvWMhnMHEu4C2zuJnYUJ1AkxyYC7q853_XzhEPJeuSyGwc";
 const cloudConvert = new CloudConvert(CLOUDCONVERT_APIKEY);
-
 interface Form {
   parameters: Array<string>,
   url : string
@@ -27,6 +27,9 @@ interface cloudImportResponse {
   data : Data
 }
 
+interface Props extends ButtonProps {
+  handlePdfOpen: (event: IFileBrowserReturn) => void,
+}
 // 그리다 파일을 불러왔을때 이용
 function fileConvert(selectedFile){
   if (selectedFile.result === "success") {
@@ -83,9 +86,9 @@ function fileConvert(selectedFile){
   }
 }
 
-const ConvertFileLoad = () => {
+const ConvertFileLoad = (props: Props) => {
   const [canConvert, setCanConvert] = useState(true);
-
+  const { handlePdfOpen } = props;
   function fileOpenHandler() {
     // const selectedFile = await openFileBrowser();
     // console.log(selectedFile);
@@ -103,12 +106,14 @@ const ConvertFileLoad = () => {
       file : null,
       url : null
     };
-    if(fileType == "pdf"){
-      console.log("pdf");
-    }else if(fileType == "grida"){
+    if(fileType == "pdf" || fileType == "grida"){
       result.file = inputer.files[0];
       result.url = URL.createObjectURL(result.file);
-      fileConvert(result);
+      if(fileType == "pdf"){
+        handlePdfOpen(result as IFileBrowserReturn);
+      }else if(fileType == "grida"){
+        fileConvert(result as IFileBrowserReturn);
+      }
     }else{
       doFileConvert();
     }
@@ -224,7 +229,7 @@ const ConvertFileLoad = () => {
     style={{
       width: "200px", height: "40px", padding: "4px 12px", justifyContent: "flex-start"
     }}>
-      {getText("load_from_pdf")}(.grida,.etc)
+      {getText("load_from_pdf")}
       <input type="file" id="fileForconvert" style={{ display: "none" }} onChange={inputChange} accept=".3FR,.ABW,.AI,.ARW,.AVIF,.AZW,.AZW3,.AZW4,.BMP,.CBC,.CBR,.CBZ,.CDR,.CGM,.CHM,.CR2,.CR3,.CRW,.CSV,.DCR,.DJVU,.DNG,.DOC,.DOCM,.DOCX,.DOT,.DOTX,.DPS,.DWG,.DXF,.EMF,.EPS,.EPUB,.ERF,.ET,.FB2,.GIF,.HEIC,.HTM,.HTML,.HTMLZ,.HWP,.ICO,.JFIF,.JPEG,.JPG,.KEY,.LIT,.LRF,.LWP,.MD,.MOBI,.MOS,.MRW,.NEF,.NUMBERS,.ODD,.ODP,.ODS,.ODT,.ORF,.PAGES,.PDB,.PDF,.PEF,.PML,.PNG,.POT,.POTX,.PPM,.PPS,.PPSX,.PPT,.PPTM,.PPTX,.PRC,.PS,.PSD,.RAF,.RAW,.RB,.RST,.RTF,.RW2,.SDA,.SDC,.SDW,.SK,.SK1,.SNB,.SVG,.SVGZ,.TCR,.TEX,.TIF,.TIFF,.TXT,.TXTZ,.VSD,.WEBP,.WMF,.WPD,.WPS,.X3F,.XCF,.XLS,.XLSM,.XLSX,.XPS,.ZABW, .grida"/> 
       {/* getText("load_from_grida") */}
     </Button>);

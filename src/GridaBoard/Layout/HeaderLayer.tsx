@@ -13,7 +13,7 @@ import ManualCalibration from "../components/navbar/ManualCalibration";
 import { g_defaultPrintOption, PrintNcodedPdfButton } from "../../nl-lib/ncodepod";
 import $ from "jquery";
 import SavePdfDialog from "../Save/SavePdfDialog";
-import { FileBrowserButton } from "../../nl-lib/common/neopdf";
+// import { FileBrowserButton } from "../../nl-lib/common/neopdf";
 import { IFileBrowserReturn } from "../../nl-lib/common/structures";
 import { useSelector } from 'react-redux';
 import { RootState } from '../store/rootReducer';
@@ -296,9 +296,9 @@ const HeaderLayer = (props: Props) => {
               {getText("load_file")}
             </Button>
             <div id="loadDrop" className="loadDropDownContent" style={loadDropdownStyle}>
-              <FileBrowserButton handlePdfOpen={handlePdfOpen} />
+              {/* <FileBrowserButton handlePdfOpen={handlePdfOpen} /> */}
               {/* <LoadGrida /> */}
-              <ConvertFileLoad />
+              <ConvertFileLoad handlePdfOpen={handlePdfOpen}/>
             </div>
           </div>
 
