@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from '@material-ui/core';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import { render } from "react-dom";
@@ -12,7 +12,7 @@ const CLOUDCONVERT_APIKEY = "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiIxIi
 const cloudConvert = new CloudConvert(CLOUDCONVERT_APIKEY);
 
 interface Form {
-  parameters: string[],
+  parameters: Array<string>,
   url : string
 }
 interface Result {
@@ -26,6 +26,8 @@ interface cloudImportResponse {
 }
 
 const ConvertFileLoad = () => {
+  const [canConvert, setCanConvert] = useState(false);
+
   function fileOpenHandler() {
     // const selectedFile = await openFileBrowser();
     // console.log(selectedFile);
@@ -33,6 +35,8 @@ const ConvertFileLoad = () => {
     input.click();
   }
   async function doFileConvert(){
+    if(!canConvert) return ;
+    
     //converting을 기다려야 하기 때문에 로딩 서클 켜주기
     setLoadingVisibility(true);
 
@@ -44,7 +48,7 @@ const ConvertFileLoad = () => {
             "Content-type": "application/json"
         }
     });
-        
+
     const responJson:cloudImportResponse = await res.json();
 
     //전송할 form 데이터 생성
@@ -70,35 +74,68 @@ const ConvertFileLoad = () => {
     }
     xhr.send(formData);
 
-  } false;
+  } 
   async function setTask(res:HTMLAllCollection){
     //컨버팅 중
-      let job = await cloudConvert.jobs.create({
-          "tasks": {
-              "task-1": {
-                  "operation": "convert",
-                  "input": [res[3].textContent.split("/")[0]],
-                  "output_format": "pdf"
-              },
-              "export-1": {
-                  "operation": "export/url",
-                  "input": [
-                      "task-1"
-                  ],
-                  "inline": false,
-                  "archive_multiple_files": false
-              }
+      try{
+        let job = await cloudConvert.jobs.create({
+            "tasks": {
+                "task-1": {
+                    "operation": "convert", 
+                    "input": [res[3].textContent.split("/")[0]],
+                    "output_format": "pdf"
+                },
+                "export-1": {
+                    "operation": "export/url",
+                    "input": [
+                        "task-1"
+                    ],
+                    "inline": false,
+                    "archive_multiple_files": false
+                }
+            }
+        });
+        job = await cloudConvert.jobs.wait(job.id);
+        
+        const url = job.tasks[0].result.files[0].url;
+        console.log(url);
+  
+        const doc = GridaDoc.getInstance();
+        doc.openPdfFile({ url: url, filename: job.tasks[0].result.files[0].filename });
+      }catch(e){
+        /** 
+         * 422 (invalid data)
+         * 429 (too many requests)
+         * 500 (internal server error)
+         * 503 (temporary unavailable)
+         */
+        //에러 로그 출력
+        switch(e.response.status){
+          case 422 : {
+            //잘못된 파일 => 컨버트 할 수 없는 파일
+            //input type으로 한번 걸렀으나, alert 처리 해주면 좋을듯
+            alert("wrong file type!!");
+            break;
           }
-      });
-      job = await cloudConvert.jobs.wait(job.id);
-      
-      const url = job.tasks[0].result.files[0].url;
+          case 429 : {
+            //요청이 너무 많음 => 일시 사용 불가로 변환해주어야 함
+            setCanConvert(false);
+            setTimeout(()=>{
+                setCanConvert(true);
+            } ,3000);
+            break ;
+          }
+          case 500 : {
+            //클라우드 컨버트 서버 오류 => 답이 없음
+            break ;
+          }
+          case 503 : {
+            //일시적으로 사용할 수 없음 => 요건 어떤 상황인지 잘 모르겠음
+            break ;
+          }
+        }
+      }
       setLoadingVisibility(false);
-      console.log(job.tasks[0].result.files[0]);
-      console.log(url);
-
-      const doc = GridaDoc.getInstance();
-      doc.openPdfFile({ url: url, filename: job.tasks[0].result.files[0].filename });
       return 1;
   }
 
@@ -109,7 +146,7 @@ const ConvertFileLoad = () => {
       width: "200px", height: "40px", padding: "4px 12px", justifyContent: "flex-start"
     }}>
       {getText("load_from_pdf")}(.etc)
-      <input type="file" id="fileForconvert" style={{ display: "none" }} onChange={doFileConvert}/> 
+      <input type="file" id="fileForconvert" style={{ display: "none" }} onChange={doFileConvert} accept=".3FR,.ABW,.AI,.ARW,.AVIF,.AZW,.AZW3,.AZW4,.BMP,.CBC,.CBR,.CBZ,.CDR,.CGM,.CHM,.CR2,.CR3,.CRW,.CSV,.DCR,.DJVU,.DNG,.DOC,.DOCM,.DOCX,.DOT,.DOTX,.DPS,.DWG,.DXF,.EMF,.EPS,.EPUB,.ERF,.ET,.FB2,.GIF,.HEIC,.HTM,.HTML,.HTMLZ,.HWP,.ICO,.JFIF,.JPEG,.JPG,.KEY,.LIT,.LRF,.LWP,.MD,.MOBI,.MOS,.MRW,.NEF,.NUMBERS,.ODD,.ODP,.ODS,.ODT,.ORF,.PAGES,.PDB,.PDF,.PEF,.PML,.PNG,.POT,.POTX,.PPM,.PPS,.PPSX,.PPT,.PPTM,.PPTX,.PRC,.PS,.PSD,.RAF,.RAW,.RB,.RST,.RTF,.RW2,.SDA,.SDC,.SDW,.SK,.SK1,.SNB,.SVG,.SVGZ,.TCR,.TEX,.TIF,.TIFF,.TXT,.TXTZ,.VSD,.WEBP,.WMF,.WPD,.WPS,.X3F,.XCF,.XLS,.XLSM,.XLSX,.XPS,.ZABW"/> 
       {/* getText("load_from_grida") */}
     </Button>);
 
