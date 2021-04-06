@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Button, Popover } from "@material-ui/core";
 import KeyboardArrowDownRoundedIcon from '@material-ui/icons/KeyboardArrowDownRounded';
 import { saveGrida } from "../Save/SaveGrida";
-import LoadGrida from "../Load/LoadGrida";
+// import LoadGrida from "../Load/LoadGrida";
 import ConvertFileLoad from "../Load/ConvertFileLoad";
 import PrintButton from "../components/navbar/PrintButton";
 import GridaDoc from "../GridaDoc";
@@ -297,7 +297,7 @@ const HeaderLayer = (props: Props) => {
             </Button>
             <div id="loadDrop" className="loadDropDownContent" style={loadDropdownStyle}>
               <FileBrowserButton handlePdfOpen={handlePdfOpen} />
-              <LoadGrida />
+              {/* <LoadGrida /> */}
               <ConvertFileLoad />
             </div>
           </div>

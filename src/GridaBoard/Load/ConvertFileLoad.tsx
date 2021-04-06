@@ -6,6 +6,8 @@ import getText from "../language/language";
 import CloudConvert from 'cloudconvert';
 import { setLoadingVisibility } from '../store/reducers/loadingCircle';
 import GridaDoc from "../GridaDoc";
+import { InkStorage } from '../../nl-lib/common/penstorage';
+// import {fileConvert} from "./LoadGrida";
 
 
 const CLOUDCONVERT_APIKEY = "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiIxIiwianRpIjoiZWY2MzlhMzFiMTRkMDkwMmJlMzE5ZmM3YmI3NzVlODhjNmE0NmU1NDYwZjY5ZTNmNTM3OTkzMjhiMWQwNDg0MDhiNzg4ZTJhYjAzMzk2MDciLCJpYXQiOiIxNjE3NTg5ODc0LjcxMTQxMSIsIm5iZiI6IjE2MTc1ODk4NzQuNzExNDE0IiwiZXhwIjoiNDc3MzI2MzQ3NC42NzEwNzgiLCJzdWIiOiI0OTUwMjk4OSIsInNjb3BlcyI6WyJ0YXNrLndyaXRlIiwidGFzay5yZWFkIl19.SD_Q-xL9vs66TdDIv5StDAsRkBBuhAnTukJ12MyWVnshWAnFcFOn7PcJ6m-RMOhtIFy5EQ2PQZ4NMzx8czyQ2LjBE4W8-so_b5ZoJ9skCiONxUYJiKzuRM6DUrqrCLFVetGG-yzujqwRyklT9X866FxlkrJADC5VsecgeLEdYOfKn-opC-KeX2iZ-OI8_00B09eGy8-NbNXZLwpewhslkTcXxPwfziC9KOEzKXlLfm-_qPVmD4uApsZXJT7l0Wo3yBqOZ2kxL6YDGXSMsIw4_dwOqXJojLYF4X0nUivvclwn8jIpBlIWLx9h7ALz6k37II0CQ2gzofmVcLWovd7x_2jqgczEEYe3J6qYa8NEFWufAyhSRZ-Cqe9dPtn20pDp98u1bAmrL5vXdZwi9NEomaL1WzFrLbWQViuNfp4eu65nwEljLMcBrerRAv4ROVRGBn_PH7PcIqh6ZfcCuWeSfKKvAAaXeFtHjMsVNOHpMNrjD4rnRxA1JRDiWaq2nu0Jk3h34y4NZKYEWvSAdc-COZf5AUIQaapp8Stb9TAa20OFlKljT2B_2B9wJmKitZibgHP6yXY1lzdgsdGtjC6uXtpKfKu2UAj9at7Skg_d7JeOyf8srZe5MGwY2D_gryvWMhnMHEu4C2zuJnYUJ1AkxyYC7q853_XzhEPJeuSyGwc";
@@ -25,14 +27,91 @@ interface cloudImportResponse {
   data : Data
 }
 
+// 그리다 파일을 불러왔을때 이용
+function fileConvert(selectedFile){
+  if (selectedFile.result === "success") {
+    const file = selectedFile.file;
+    const reader = new FileReader();
+
+    let url = selectedFile.url;
+    let jsonFile = null;
+
+    reader.readAsText(file);
+    reader.onload = async function(e) {
+      jsonFile = e.target.result;
+
+      const gridaInfo = JSON.parse(jsonFile);
+      const pdfRawData = gridaInfo.pdf.pdfInfo.rawData;
+      const neoStroke = gridaInfo.stroke;
+
+      const pageInfos = gridaInfo.pdf.pdfInfo.pageInfos;
+      const basePageInfos = gridaInfo.pdf.pdfInfo.basePageInfos;
+
+      // pdf의 url을 만들어 주기 위해 rawData를 blob으로 만들어 createObjectURL을 한다
+      const rawDataBuf = new ArrayBuffer(pdfRawData.length*2);
+      const rawDataBufView = new Uint8Array(rawDataBuf);
+      for (let i = 0; i < pdfRawData.length; i++) {
+        rawDataBufView[i] = pdfRawData.charCodeAt(i);
+      }
+      const blob = new Blob([rawDataBufView], {type: 'application/pdf'});
+      url = await URL.createObjectURL(blob);
+
+      const completed = InkStorage.getInstance().completedOnPage;
+      completed.clear();
+
+      const gridaArr = [];
+      const pageId = []
+
+      for (let i = 0; i < neoStroke.length; i++) {
+
+        pageId[i] = InkStorage.makeNPageIdStr(neoStroke[i][0]);
+        if (!completed.has(pageId[i])) {
+          completed.set(pageId[i], new Array(0));
+        }
+
+        gridaArr[i] = completed.get(pageId[i]);
+        for (let j = 0; j < neoStroke[i].length; j++){
+          gridaArr[i].push(neoStroke[i][j]);
+        }
+      }
+
+      const doc = GridaDoc.getInstance();
+      doc.openGridaFile({ url: url, filename: file.name }, pdfRawData, neoStroke, pageInfos, basePageInfos);
+    }
+  } else {
+      alert("file open cancelled");
+  }
+}
+
 const ConvertFileLoad = () => {
-  const [canConvert, setCanConvert] = useState(false);
+  const [canConvert, setCanConvert] = useState(true);
 
   function fileOpenHandler() {
     // const selectedFile = await openFileBrowser();
     // console.log(selectedFile);
-    const input = document.querySelector("#fileForconvert") as HTMLElement;
+    const input = document.querySelector("#fileForconvert") as HTMLInputElement;
+    input.value = "";
     input.click();
+  }
+  function inputChange(){
+    const inputer = document.getElementById("fileForconvert") as HTMLInputElement;
+    const fileName = inputer.files[0].name.split(".");
+    const fileType = fileName[fileName.length-1];
+    
+    const result = {
+      result : "success",
+      file : null,
+      url : null
+    };
+    if(fileType == "pdf"){
+      console.log("pdf");
+    }else if(fileType == "grida"){
+      result.file = inputer.files[0];
+      result.url = URL.createObjectURL(result.file);
+      fileConvert(result);
+    }else{
+      doFileConvert();
+    }
   }
   async function doFileConvert(){
     if(!canConvert) return ;
@@ -122,7 +201,7 @@ const ConvertFileLoad = () => {
             setCanConvert(false);
             setTimeout(()=>{
                 setCanConvert(true);
-            } ,3000);
+            } ,60000); //60초
             break ;
           }
           case 500 : {
@@ -145,8 +224,8 @@ const ConvertFileLoad = () => {
     style={{
       width: "200px", height: "40px", padding: "4px 12px", justifyContent: "flex-start"
     }}>
-      {getText("load_from_pdf")}(.etc)
-      <input type="file" id="fileForconvert" style={{ display: "none" }} onChange={doFileConvert} accept=".3FR,.ABW,.AI,.ARW,.AVIF,.AZW,.AZW3,.AZW4,.BMP,.CBC,.CBR,.CBZ,.CDR,.CGM,.CHM,.CR2,.CR3,.CRW,.CSV,.DCR,.DJVU,.DNG,.DOC,.DOCM,.DOCX,.DOT,.DOTX,.DPS,.DWG,.DXF,.EMF,.EPS,.EPUB,.ERF,.ET,.FB2,.GIF,.HEIC,.HTM,.HTML,.HTMLZ,.HWP,.ICO,.JFIF,.JPEG,.JPG,.KEY,.LIT,.LRF,.LWP,.MD,.MOBI,.MOS,.MRW,.NEF,.NUMBERS,.ODD,.ODP,.ODS,.ODT,.ORF,.PAGES,.PDB,.PDF,.PEF,.PML,.PNG,.POT,.POTX,.PPM,.PPS,.PPSX,.PPT,.PPTM,.PPTX,.PRC,.PS,.PSD,.RAF,.RAW,.RB,.RST,.RTF,.RW2,.SDA,.SDC,.SDW,.SK,.SK1,.SNB,.SVG,.SVGZ,.TCR,.TEX,.TIF,.TIFF,.TXT,.TXTZ,.VSD,.WEBP,.WMF,.WPD,.WPS,.X3F,.XCF,.XLS,.XLSM,.XLSX,.XPS,.ZABW"/> 
+      {getText("load_from_pdf")}(.grida,.etc)
+      <input type="file" id="fileForconvert" style={{ display: "none" }} onChange={inputChange} accept=".3FR,.ABW,.AI,.ARW,.AVIF,.AZW,.AZW3,.AZW4,.BMP,.CBC,.CBR,.CBZ,.CDR,.CGM,.CHM,.CR2,.CR3,.CRW,.CSV,.DCR,.DJVU,.DNG,.DOC,.DOCM,.DOCX,.DOT,.DOTX,.DPS,.DWG,.DXF,.EMF,.EPS,.EPUB,.ERF,.ET,.FB2,.GIF,.HEIC,.HTM,.HTML,.HTMLZ,.HWP,.ICO,.JFIF,.JPEG,.JPG,.KEY,.LIT,.LRF,.LWP,.MD,.MOBI,.MOS,.MRW,.NEF,.NUMBERS,.ODD,.ODP,.ODS,.ODT,.ORF,.PAGES,.PDB,.PDF,.PEF,.PML,.PNG,.POT,.POTX,.PPM,.PPS,.PPSX,.PPT,.PPTM,.PPTX,.PRC,.PS,.PSD,.RAF,.RAW,.RB,.RST,.RTF,.RW2,.SDA,.SDC,.SDW,.SK,.SK1,.SNB,.SVG,.SVGZ,.TCR,.TEX,.TIF,.TIFF,.TXT,.TXTZ,.VSD,.WEBP,.WMF,.WPD,.WPS,.X3F,.XCF,.XLS,.XLSM,.XLSX,.XPS,.ZABW, .grida"/> 
       {/* getText("load_from_grida") */}
     </Button>);
 
