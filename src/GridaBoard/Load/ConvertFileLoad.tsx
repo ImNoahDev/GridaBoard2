@@ -195,6 +195,7 @@ const ConvertFileLoad = (props: Props) => {
          * 503 (temporary unavailable)
          */
         //에러 로그 출력
+        //TODO : Unhandled Rejection (TypeError): Cannot read property 'status' of undefined
         switch(e.response.status){
           case 422 : {
             //잘못된 파일 => 컨버트 할 수 없는 파일

@@ -50,9 +50,10 @@ const LeftSideLayer = () => {
 
   const sideStyle = {
     display: "flex",
-    width: drawerOpen ? "180px" : 0,
-    height: "816px",
+    width: drawerOpen ? "190px" : 0,
+    height:"100%",
     zoom: 1 / brZoom,
+    zIndex: 1000
   } as React.CSSProperties;
 
   let disabled = true;
@@ -61,7 +62,7 @@ const LeftSideLayer = () => {
   }
 
   return (
-      <div id="mainFrame" style={sideStyle}>
+      <div style={sideStyle}>
         {/* Drawer 구현 */}
           <IconButton
             id="arrow-btn"

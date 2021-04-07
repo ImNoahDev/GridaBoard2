@@ -114,6 +114,7 @@ const useStyles = makeStyles((theme: Theme) =>
       justifyContent: 'flex-start',
       zIndex: 150,
       height: "56px",
+      overflow: "auto"
     },
 
     contentShift: {
@@ -158,9 +159,25 @@ const useStyles = makeStyles((theme: Theme) =>
       left: 20,
       // marginBottom: "-50vh"
       zIndex: 1100,
+    },
+    drawerContainer : {
+      overflow: 'auto',
+    },
+    customizeToolbar : {
+      minHeight: "91px"
+    },
+    drawerPaper : {
+      width: "190px",
+      flexShrink: 0,
+      zIndex: 1100,
+      background: "rgba(255, 255, 255, 0.25)", 
+      float: "left", 
+      display: "flex",
+      position: "relative"
     }
   }),
 );
+
 
 const drawerFooter = {
   marginTop: "74vh",
@@ -237,29 +254,18 @@ export default function PersistentDrawerRight(props: Props) {
 
   const brZoom = useSelector((state: RootState) => state.ui.browser.zoom);
 
-  const headerHeight = $('#header').height();
-
-  const navHeight = $('#button_div').height();
-
-  const blockHeight = $('#white_block').height();
-
-  const footerHeight = $('#footer').height();
-
-  let sumHeight = headerHeight + navHeight + blockHeight;
-  if (isNaN(sumHeight)) sumHeight = 0;
-
   return (
-    <div style={{ float: "left", display: "flex", height: "816px" }}>
-      {/* <CssBaseline /> */}
-
       <Drawer
         className={classes.drawer}
         variant="persistent"
         anchor="left"
         open={open}
-        PaperProps={{ style: { width: "190px", flexShrink: 0, zIndex: 1100, marginTop: sumHeight, background: "rgba(255, 255, 255, 0.25)", float: "left", display: "flex" } }}
+        classes={{
+          paper: classes.drawerPaper,
+        }}
       >
-        <div id="drawer_content">
+      {/* <Toolbar className={classes.customizeToolbar} /> */}
+        <div id="drawer_content" className={classes.drawerContainer}>
           <div className={classes.drawerHeader}>
             {/* <div style={drawerHeader}> */}
             <IconButton onClick={props.handleDrawerClose} style={drawerHeader}>
@@ -280,6 +286,5 @@ export default function PersistentDrawerRight(props: Props) {
           </div>
         </div>
       </Drawer>
-    </div>
   );
 }

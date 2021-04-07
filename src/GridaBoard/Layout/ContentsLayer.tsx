@@ -136,20 +136,11 @@ const ContentsLayer = (props: Props) => {
 
   const brZoom = useSelector((state: RootState) => state.ui.browser.zoom);
 
-  const headerHeight = $('#header').height();
-
-  const navHeight = $('#button_div').height();
-
-  const blockHeight = $('#white_block').height();
-
-  const sumHeight = headerHeight + navHeight + blockHeight;
-
   const localStyle = {
     display: "flex",
     flex: 1,
     overflow: "auto",
-    flexDirection: "column",
-    height: innerHeight - sumHeight,
+    flexDirection: "column"
   } as React.CSSProperties;
 
   const dropdownStyle = {

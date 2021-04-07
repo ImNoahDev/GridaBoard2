@@ -147,7 +147,7 @@ const Home = () => {
 
   return (
     <React.Fragment>
-      <ViewLayer id="view-layer" handlePdfOpen={handlePdfOpen} style={{display: "block"}}/>
+      <ViewLayer id="view-layer" handlePdfOpen={handlePdfOpen} style={{display: "flex"}}/>
       <input type="file" id={g_hiddenFileInputBtnId} onChange={onFileInputChanged} onClick={onFileInputClicked} style={{ display: "none" }} name="pdf" accept=".pdf,.grida" />
     </React.Fragment>
   );
