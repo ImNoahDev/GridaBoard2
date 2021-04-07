@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Button, Popover } from "@material-ui/core";
+import { makeStyles } from '@material-ui/core/styles';
 import KeyboardArrowDownRoundedIcon from '@material-ui/icons/KeyboardArrowDownRounded';
 import { saveGrida } from "../Save/SaveGrida";
 // import LoadGrida from "../Load/LoadGrida";
@@ -11,7 +12,6 @@ import ConnectButton from "../components/buttons/ConnectButton";
 import GridaApp from "../GridaApp";
 import ManualCalibration from "../components/navbar/ManualCalibration";
 import { g_defaultPrintOption, PrintNcodedPdfButton } from "../../nl-lib/ncodepod";
-import $ from "jquery";
 import SavePdfDialog from "../Save/SavePdfDialog";
 // import { FileBrowserButton } from "../../nl-lib/common/neopdf";
 import { IFileBrowserReturn } from "../../nl-lib/common/structures";
@@ -20,41 +20,70 @@ import { RootState } from '../store/rootReducer';
 import { turnOnGlobalKeyShortCut } from "../GlobalFunctions";
 import SaveGridaDialog from "../Save/SaveGridaDialog";
 import getText from "../language/language";
+import { NCODE_CLASS6_NUM_DOTS } from "../../nl-lib/common/constants";
 
+const useStyles = props => makeStyles((theme) => ({
+  buttonStyle : {
+    fontFamily: "Roboto",
+    fontStyle: "normal",
+    fontWeight: "bold",
+    fontSize: "14px",
+    textAlign: "right",
+    letterSpacing: "0.25px",
+    marginRight: "20px",
+    marginTop: "4px",
+    padding: 0,
+    color: "rgba(18,18,18,1)",
+    "&:hover": {
+      color: "rgba(104,143,255,1)"
+    }
+  },
+  saveDropdownStyle : {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "flex-start",
+    padding: "8px",
+    position: "absolute",
+    background: "rgba(255,255,255,0.9)",
+    boxShadow: "2px 2px 2px rgba(0, 0, 0, 0.25)",
+    borderRadius: "12px",
+    zIndex: 10000,
+    visibility:"hidden"
+  },
+  changeUrlTextStyle : {
+    fontSize: "12px",
+    lineHeight: "14px",
+    margin: "8px",
+    padding: 0
+  },
+  headerStyle : {
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    flexWrap: "wrap",
+    height: "70px",
+    background: "rgba(255, 255, 255, 0.5)",
+    zoom: 1 / props.brZoom,
+  },
+  changeUrlStyle : {
+    justifyContent: "center",
+    background: "rgba(255, 255, 255, 0.5)",
+    border: "1px solid #CFCFCF",
+    boxSizing: "border-box",
+    borderRadius: "4px",
+    overflow: "hidden",
+    textOverflow: "ellipsis",
+    whiteSpace: "nowrap",
+    padding: 0,
+    marginRight: "8px"
+  },
+  imgStyle: {
+    marginRight: "32px",
+    borderRadius: "8px"
+  }
+}));
 
-const imgStyle = {
-  marginRight: "32px",
-  borderRadius: "8px",
-} as React.CSSProperties;
-
-const aStyle = {
-  width: "110px",
-  height: "24px",
-  left: "48px",
-  fontFamily: "Roboto",
-  fontStyle: "normal",
-  fontWeight: "bold",
-  fontSize: "18px",
-  textAlign: "right",
-  letterSpacing: "0.25px",
-  textDecoration: "none",
-  marginRight: "34px"
-} as React.CSSProperties;
-
-const buttonStyle = {
-  // width: "80px",
-  // height: "16px",
-  fontFamily: "Roboto",
-  fontStyle: "normal",
-  fontWeight: "bold",
-  fontSize: "14px",
-  textAlign: "right",
-  letterSpacing: "0.25px",
-  marginRight: "20px",
-  // color: '#121212',
-  marginTop: "4px",
-  padding: 0
-} as React.CSSProperties;
 
 const printBtnId = "printTestButton";
 const printOption = g_defaultPrintOption;
@@ -69,7 +98,7 @@ const HeaderLayer = (props: Props) => {
 
   const [pdfUrl, setPdfUrl] = useState(undefined as string);
   const [pdfFilename, setPdfFilename] = useState(undefined as string);
-
+  
   const makePdfUrl = async () => {
     const doc = GridaDoc.getInstance();
     const docPages = doc.pages;
@@ -131,99 +160,14 @@ const HeaderLayer = (props: Props) => {
     app.onPenLinkChanged(e);
   }
 
-  $('#save').hover(function () {
-    $(this).css("color", "rgba(104,143,255,1)")
-  }, function () {
-    $(this).css("color", "rgba(18,18,18,1)")
-  });
 
-  $('#load').hover(function () {
-    $(this).css("color", "rgba(104,143,255,1)")
-  }, function () {
-    $(this).css("color", "rgba(18,18,18,1)")
-  });
 
-  $(document).ready(function () {
-    $('.save_drop_down').hover(
-      function (event) {
-        $(this).addClass('hover');
-        $(this).css("color", "rgba(104,143,255,1)");
-        $(this).css("background", "rgba(232,236,245,1)");
-      },
-      function () {
-        $(this).removeClass('hover');
-        $(this).css("color", "rgba(18,18,18,1)");
-        $(this).css("background", "rgba(255,255,255,0.9)");
-      }
-    );
-  });
   const activePageNo_store = useSelector((state: RootState) => state.activePage.activePageNo);
 
   const brZoom = useSelector((state: RootState) => state.ui.browser.zoom);
 
-  const headerStyle = {
-    display: "flex",
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    flexWrap: "wrap",
-    height: "70px",
-    background: "rgba(255, 255, 255, 0.5)",
-    zoom: 1 / brZoom,
-  } as React.CSSProperties;
 
-  const saveDropdownStyle = {
-    display: "none",
-    flexDirection: "column",
-    alignItems: "flex-start",
-    padding: "8px",
-    position: "absolute",
-    // width: "220px",
-    // height: "90px",
-    background: "rgba(255,255,255,0.9)",
-    boxShadow: "2px 2px 2px rgba(0, 0, 0, 0.25)",
-    borderRadius: "12px",
-    zIndex: 10000,
-  } as React.CSSProperties;
-
-  const loadDropdownStyle = {
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "flex-start",
-    padding: "8px",
-    position: "absolute",
-    // width: "220px",
-    // height: "90px",
-    background: "rgba(255,255,255,0.9)",
-    boxShadow: "2px 2px 2px rgba(0, 0, 0, 0.25)",
-    borderRadius: "12px",
-    zIndex: 10000,
-    visibility:"hidden"
-  } as React.CSSProperties;
-
-  const changeUrlStyle = {
-    justifyContent: "center",
-    background: "rgba(255, 255, 255, 0.5)",
-    border: "1px solid #CFCFCF",
-    boxSizing: "border-box",
-    borderRadius: "4px",
-    overflow: "hidden",
-    textOverflow: "ellipsis",
-    whiteSpace: "nowrap",
-    padding: 0,
-    marginRight: "8px"
-  } as React.CSSProperties;
-
-  const changeUrlTextStyle = {
-    // width: "80px",
-    // height: "14px",
-    fontSize: "12px",
-    lineHeight: "14px",
-    // color: '#666666',
-    // marginLeft: "-40px"
-    margin: "8px",
-    padding: 0
-  } as React.CSSProperties;
+  const classes = useStyles({brZoom})();
 
 
   console.log(`browser zoom level changed = ${brZoom}`);
@@ -234,20 +178,11 @@ const HeaderLayer = (props: Props) => {
   }
 
   function handleClickSave() {
-    const save = document.getElementById("saveDrop");
-    if (save.style.display === 'none') {
-      save.style.display = 'block'
+    const element = document.getElementById("saveDrop");
+    if (element.style.visibility === 'hidden') {
+      element.style.visibility = "visible";
     } else {
-      save.style.display = 'none'
-    }
-  }
-
-  function handleClickLoad() {
-    const load = document.getElementById("loadDrop");
-    if (load.style.visibility === "hidden") {
-      load.style.visibility = "visible";
-    } else {
-      load.style.visibility = "hidden"
+      element.style.visibility = "hidden"
     }
   }
 
@@ -255,29 +190,19 @@ const HeaderLayer = (props: Props) => {
     location.href = 'https://gridaboard-v1-30576.web.app/';
   }
 
-  
-  // <script type="text/javascript">
-  //     document.getElementById("myButton").onclick = function () {
-  //         location.href = "https://www.naver.com";
-  //     };
-  // </script>
-
-  // alert($('#header').height());
-
   return (
     <React.Fragment>
-      <div id="header" style={headerStyle}>
+      <div id="header" className={`${classes.headerStyle}`}>
         <div style={{
           display: "inline-flex", flexDirection: "row",
           justifyContent: "flex-start", alignItems: "center", marginLeft: "24px"
         }}>
-          <img src="grida_logo.png" style={imgStyle}></img>
-          {/* <a id="grida_board" href="#" style={aStyle}>Grida board</a> */}
+          <img src="grida_logo.png" className={classes.imgStyle}></img>
           <div>
-            <Button id="save" className="saveDropDown" style={buttonStyle} onClick={handleClickSave} disabled={disabled}>
+            <Button id="save" className={`saveDropDown ${classes.buttonStyle}`}  onClick={handleClickSave} disabled={disabled}>
               {getText("save_file")}
             </Button>
-            <div id="saveDrop" className="saveDropDownContent" style={saveDropdownStyle}>
+            <div id="saveDrop" className={`${classes.saveDropdownStyle}`}>
               <SavePdfDialog />
               <SaveGridaDialog />
               {/* <Button className="save_drop_down" style={{
@@ -292,14 +217,7 @@ const HeaderLayer = (props: Props) => {
           </div>
           
           <div>
-            <Button id="load" className="loadDropDown" style={buttonStyle} onClick={handleClickLoad}>
-              {getText("load_file")}
-            </Button>
-            <div id="loadDrop" className="loadDropDownContent" style={loadDropdownStyle}>
-              {/* <FileBrowserButton handlePdfOpen={handlePdfOpen} /> */}
-              {/* <LoadGrida /> */}
-              <ConvertFileLoad handlePdfOpen={handlePdfOpen}/>
-            </div>
+            <ConvertFileLoad className={`loadDropDown ${classes.buttonStyle}`}  handlePdfOpen={handlePdfOpen}/>
           </div>
 
           <PrintNcodedPdfButton
@@ -319,9 +237,9 @@ const HeaderLayer = (props: Props) => {
         }}>
           <ConnectButton onPenLinkChanged={e => onPenLinkChanged(e)} />
 
-          <Button onClick={changeUrl} id="myButton" className="float-left submit-button" style={changeUrlStyle}>
+          <Button onClick={changeUrl} id="myButton" className={`float-left submit-button ${classes.changeUrlStyle}`}>
             <div>
-              <span style={changeUrlTextStyle}>{getText("go_to_old")}</span>
+              <span className={classes.changeUrlTextStyle}>{getText("go_to_old")}</span>
             </div>
           </Button>
 

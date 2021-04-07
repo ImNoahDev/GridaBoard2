@@ -51,20 +51,20 @@ const FileBrowserButton = (props: Props) => {
     $('#loadingBar').show();
   }
   
-  $(document).ready(function(){
-    $('.load_drop_down').hover(
-      function(event){
-        $(this).addClass('hover');
-        $(this).css("color", "rgba(104,143,255,1)");
-        $(this).css("background", "rgba(232,236,245,1)");
-      },
-      function(){
-        $(this).removeClass('hover');
-        $(this).css("color", "rgba(18,18,18,1)");
-        $(this).css("background", "rgba(255,255,255,0.9)");
-      }
-    );
-  });
+  // $(document).ready(function(){
+  //   $('.load_drop_down').hover(
+  //     function(event){
+  //       $(this).addClass('hover');
+  //       $(this).css("color", "rgba(104,143,255,1)");
+  //       $(this).css("background", "rgba(232,236,245,1)");
+  //     },
+  //     function(){
+  //       $(this).removeClass('hover');
+  //       $(this).css("color", "rgba(18,18,18,1)");
+  //       $(this).css("background", "rgba(255,255,255,0.9)");
+  //     }
+  //   );
+  // });
 
   return (
   <Button {...rest} onClick={fileOpenHandler} id="btn_file_open" className="load_drop_down" type="button"

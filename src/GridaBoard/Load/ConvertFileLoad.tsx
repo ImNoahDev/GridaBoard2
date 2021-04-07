@@ -1,7 +1,5 @@
 import React, { useState } from 'react';
 import { Button, ButtonProps } from '@material-ui/core';
-import CircularProgress from '@material-ui/core/CircularProgress';
-import { render } from "react-dom";
 import { IFileBrowserReturn } from '../../nl-lib/common/structures';
 import getText from "../language/language";
 import CloudConvert from 'cloudconvert';
@@ -29,6 +27,7 @@ interface cloudImportResponse {
 
 interface Props extends ButtonProps {
   handlePdfOpen: (event: IFileBrowserReturn) => void,
+  className: string
 }
 // 그리다 파일을 불러왔을때 이용
 function fileConvert(selectedFile){
@@ -84,11 +83,12 @@ function fileConvert(selectedFile){
   } else {
       alert("file open cancelled");
   }
+  setLoadingVisibility(false);
 }
 
 const ConvertFileLoad = (props: Props) => {
   const [canConvert, setCanConvert] = useState(true);
-  const { handlePdfOpen } = props;
+  const { handlePdfOpen , className} = props;
   function fileOpenHandler() {
     // const selectedFile = await openFileBrowser();
     // console.log(selectedFile);
@@ -106,11 +106,13 @@ const ConvertFileLoad = (props: Props) => {
       file : null,
       url : null
     };
+    setLoadingVisibility(true);
     if(fileType == "pdf" || fileType == "grida"){
       result.file = inputer.files[0];
       result.url = URL.createObjectURL(result.file);
       if(fileType == "pdf"){
         handlePdfOpen(result as IFileBrowserReturn);
+        setLoadingVisibility(false);
       }else if(fileType == "grida"){
         fileConvert(result as IFileBrowserReturn);
       }
@@ -122,7 +124,6 @@ const ConvertFileLoad = (props: Props) => {
     if(!canConvert) return ;
     
     //converting을 기다려야 하기 때문에 로딩 서클 켜주기
-    setLoadingVisibility(true);
 
     //cloudconvert에 업로드 할 수 있는 위치 및 시그니처 받기
     const res = await fetch("https://api.cloudconvert.com/v2/import/upload", {
@@ -224,12 +225,9 @@ const ConvertFileLoad = (props: Props) => {
   }
 
   return (
-    <Button className="load_drop_down" 
-    onClick={fileOpenHandler}
-    style={{
-      width: "200px", height: "40px", padding: "4px 12px", justifyContent: "flex-start"
-    }}>
-      {getText("load_from_pdf")}
+    <Button className={`${className}`}
+    onClick={fileOpenHandler}>
+      {getText("load_file")}
       <input type="file" id="fileForconvert" style={{ display: "none" }} onChange={inputChange} accept=".3FR,.ABW,.AI,.ARW,.AVIF,.AZW,.AZW3,.AZW4,.BMP,.CBC,.CBR,.CBZ,.CDR,.CGM,.CHM,.CR2,.CR3,.CRW,.CSV,.DCR,.DJVU,.DNG,.DOC,.DOCM,.DOCX,.DOT,.DOTX,.DPS,.DWG,.DXF,.EMF,.EPS,.EPUB,.ERF,.ET,.FB2,.GIF,.HEIC,.HTM,.HTML,.HTMLZ,.HWP,.ICO,.JFIF,.JPEG,.JPG,.KEY,.LIT,.LRF,.LWP,.MD,.MOBI,.MOS,.MRW,.NEF,.NUMBERS,.ODD,.ODP,.ODS,.ODT,.ORF,.PAGES,.PDB,.PDF,.PEF,.PML,.PNG,.POT,.POTX,.PPM,.PPS,.PPSX,.PPT,.PPTM,.PPTX,.PRC,.PS,.PSD,.RAF,.RAW,.RB,.RST,.RTF,.RW2,.SDA,.SDC,.SDW,.SK,.SK1,.SNB,.SVG,.SVGZ,.TCR,.TEX,.TIF,.TIFF,.TXT,.TXTZ,.VSD,.WEBP,.WMF,.WPD,.WPS,.X3F,.XCF,.XLS,.XLSM,.XLSX,.XPS,.ZABW, .grida"/> 
       {/* getText("load_from_grida") */}
     </Button>);

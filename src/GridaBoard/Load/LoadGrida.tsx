@@ -3,7 +3,7 @@ import { openFileBrowser } from "../../nl-lib/common/neopdf/FileBrowser";
 import { InkStorage } from '../../nl-lib/common/penstorage';
 import GridaDoc from '../GridaDoc';
 import { Button } from '@material-ui/core';
-import $ from "jquery";
+// import $ from "jquery";
 import getText from "../language/language";
 
 const LoadGrida = () => {
@@ -65,20 +65,20 @@ const LoadGrida = () => {
     }
   }
 
-  $(document).ready(function(){
-    $('.load_drop_down').hover(
-      function(event){
-        $(this).addClass('hover');
-        $(this).css("color", "rgba(104,143,255,1)");
-        $(this).css("background", "rgba(232,236,245,1)");
-      },
-      function(){
-        $(this).removeClass('hover');
-        $(this).css("color", "rgba(18,18,18,1)");
-        $(this).css("background", "rgba(255,255,255,0.9)");
-      }
-    );
-  });
+  // $(document).ready(function(){
+  //   $('.load_drop_down').hover(
+  //     function(event){
+  //       $(this).addClass('hover');
+  //       $(this).css("color", "rgba(104,143,255,1)");
+  //       $(this).css("background", "rgba(232,236,245,1)");
+  //     },
+  //     function(){
+  //       $(this).removeClass('hover');
+  //       $(this).css("color", "rgba(18,18,18,1)");
+  //       $(this).css("background", "rgba(255,255,255,0.9)");
+  //     }
+  //   );
+  // });
 
   return (
       // <GridaToolTip open={true} placement="top-end" tip={{

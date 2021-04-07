@@ -196,12 +196,7 @@ document.addEventListener('wheel', function(e) {
 window.onclick = function(event) {
   if (!event.target.parentNode.matches('.saveDropDown')) {
     const save = document.getElementById("saveDrop");
-    save.style.display = 'none'
-  }
-  
-  if (!event.target.parentNode.matches('.loadDropDown')) {
-    const load = document.getElementById("loadDrop");
-    load.style.visibility = "hidden"
+    save.style.visibility = 'hidden';
   }
 
   if (!event.target.parentNode.matches('.select_color')) {
