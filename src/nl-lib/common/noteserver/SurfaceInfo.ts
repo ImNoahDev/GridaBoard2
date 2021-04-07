@@ -1,6 +1,7 @@
 import { g_paperType } from "./NcodeSurfaceDataJson";
 import { INcodeSOBPxy, INoteServerItem_forPOD, IPageSOBP, IPaperSize, ISize } from "../structures";
-import { INCH_TO_MM_SCALE, NCODE_TO_INCH_SCALE, PDF_DEFAULT_DPI, UNIT_TO_DPI } from "../constants";
+import { FilmNcode_Landscape, FilmNcode_Portrait, INCH_TO_MM_SCALE, NCODE_TO_INCH_SCALE, PDF_DEFAULT_DPI, UNIT_TO_DPI } from "../constants";
+import { isSamePage } from "../util";
 
 
 // kitty, Ncode SDK를 읽고 다음의 페이지수를 채워 넣을 것
@@ -121,7 +122,21 @@ export function getNPaperInfo(pageInfo: IPageSOBP) {
   return desc;
 }
 
-
+export function adjustNoteItemMarginForFilm(noteItem: INoteServerItem_forPOD, pageInfo: IPageSOBP) {
+  //3.1013.2에 대해 플레이트와 필름의 요구사항이 달라서 이렇게 처리한다
+  if (isSamePage(pageInfo, FilmNcode_Portrait)){
+    noteItem.margin.Xmin = 9; 
+    noteItem.margin.Ymin = 9;
+    noteItem.margin.Xmax = 91;
+    noteItem.margin.Ymax = 128;
+  }
+  else if (isSamePage(pageInfo, FilmNcode_Landscape)) {
+    noteItem.margin.Xmin = 9; 
+    noteItem.margin.Ymin = 9;
+    noteItem.margin.Xmax = 128;
+    noteItem.margin.Ymax = 91;
+  }
+}
 
 export function getSurfaceSize_dpi(size: IPaperSize, dpi: number, isLandscape, padding = 0) {
 
