@@ -1,6 +1,6 @@
 import * as cloud_util_func from "../../../cloud_util_func";
 
-import { getNPaperInfo, getNPaperSize_pu } from "../noteserver";
+import { adjustNoteItemMarginForFilm, getNPaperInfo, getNPaperSize_pu } from "../noteserver";
 import { EventDispatcher, EventCallbackType } from "../event";
 import { cloneObj, convertNuToPu, getNextNcodePage, getNowTimeStr, isPageInRange, isPageInMapper, isSamePage, makePdfId } from "../util";
 import { g_availablePagesInSection, g_defaultNcode, g_defaultTemporaryNcode, nullNcode } from "../constants";
@@ -336,7 +336,10 @@ export class MappingStorage {
 
     // 1) Ncode 페이지 맵에 있는지 확인한다.
     const noteItem = getNPaperInfo(pageInfo);
+    adjustNoteItemMarginForFilm(noteItem, pageInfo);
+
     const isCalibrationMode = store.getState().calibration.calibrationMode;
+
     if (!noteItem.isDefault && !isCalibrationMode && !tempFound) {
       h = this.calcHfromNote({ ...noteItem.margin, pageNo: pageInfo.page });
       ret.h = h;

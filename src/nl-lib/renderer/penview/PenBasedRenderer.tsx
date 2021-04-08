@@ -12,7 +12,7 @@ import { callstackDepth, isSamePage, isSameNcode, makeNPageIdStr, makeNCodeIdStr
 
 import { INeoSmartpen, IPenToViewerEvent } from "../../common/neopen";
 import { MappingStorage } from "../../common/mapper";
-import { DefaultFilmNcode, DefaultPUINcode } from "../../common/constants";
+import { DefaultPlateNcode, DefaultPUINcode } from "../../common/constants";
 import { InkStorage } from "../../common/penstorage";
 
 import { setCalibrationData } from '../../../GridaBoard/store/reducers/calibrationDataReducer';
@@ -365,7 +365,7 @@ class PenBasedRenderer extends React.Component<Props, State> {
         const transform = MappingStorage.getInstance().getNPageTransform(pageInfo);
         this.renderer.setTransformParameters(transform.h, this.pdfSize);
 
-        if (isSameNcode(nextProps.pageInfo, DefaultFilmNcode)){
+        if (isSameNcode(nextProps.pageInfo, DefaultPlateNcode)){
           return;
         }
 
@@ -515,6 +515,7 @@ class PenBasedRenderer extends React.Component<Props, State> {
       this.props.onNcodePageChanged({ section, owner, book, page });
     }
   }
+
   onLivePenPageInfo_byStorage = (event: IPenToViewerEvent) => {
     // const { section, owner, book, page } = event;
     // const pageInfo = { section, owner, book, page } as IPageSOBP;
@@ -649,7 +650,7 @@ class PenBasedRenderer extends React.Component<Props, State> {
 
   onLiveHoverPageInfo = (event: IPenToViewerEvent) => {
     if (this.renderer) {
-      // this.renderer.addHoverPoints(event);
+      this.renderer.registerPageInfoForPlate(event);
     }
   }
 

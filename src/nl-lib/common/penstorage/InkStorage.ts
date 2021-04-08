@@ -2,7 +2,7 @@ import { EventDispatcher, EventCallbackType } from "../event";
 import { IBrushType, PenEventName } from "../enums";
 import { NeoStroke, IPageSOBP, StrokeStatus, INeoStrokeProps, NeoDot, TransformParameters } from "../structures";
 import { isSameNcode } from "../../common/util";
-import { DefaultFilmNcode } from "../../common/constants";
+import { DefaultPlateNcode } from "../../common/constants";
 import intersect from 'path-intersection';
 import { store } from "../../../GridaBoard/client/Root";
 import GridaDoc from "../../../GridaBoard/GridaDoc";
@@ -162,12 +162,12 @@ export default class InkStorage {
 
     const activePageNo = store.getState().activePage.activePageNo;
     if (activePageNo === -1) {
-      alert("페이지를 생성한 후 필름을 사용해주세요")
+      alert("PDF를 등록하거나 펜을 사용해서 페이지를 생성해주세요")
       return;
     }
     const basePageInfo = GridaDoc.getInstance().getPage(activePageNo).basePageInfo;
 
-    if (isSameNcode(DefaultFilmNcode, {section, owner, book, page})) {
+    if (isSameNcode(DefaultPlateNcode, {section, owner, book, page})) {
       pageId = InkStorage.makeNPageIdStr({ section: basePageInfo.section, book: basePageInfo.book, owner: basePageInfo.owner, page: basePageInfo.page });
     }
     // console.log( `add completed: ${mac},  ${pageId} = ${section}.${owner}.${book}.${page} `);
