@@ -194,6 +194,8 @@ document.addEventListener('wheel', function(e) {
 });
 
 window.onclick = function(event) {
+  if(event.target.parentNode.matches === undefined) return ;
+  
   if (!event.target.parentNode.matches('.saveDropDown')) {
     const save = document.getElementById("saveDrop");
     save.style.visibility = 'hidden';
