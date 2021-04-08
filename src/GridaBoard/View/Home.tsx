@@ -13,6 +13,7 @@ import {
 } from "../../nl-lib/common/neopdf";
 import { IPageSOBP, IFileBrowserReturn, IGetNPageTransformType } from "../../nl-lib/common/structures";
 import { useBeforeunload } from 'react-beforeunload';
+import getText from "../language/language";
 
 const Home = () => {
   const [drawerOpen, setDrawerOpen] = useState(true);
@@ -128,7 +129,7 @@ const Home = () => {
 
     }
     else if (event.result === "canceled") {
-      alert("file open cancelled");
+      alert(getText("alert_fileOpenCancel"));
     }
   };
 

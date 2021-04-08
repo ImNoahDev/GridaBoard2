@@ -11,6 +11,7 @@ import { isSamePage, makeNPageIdStr } from "../nl-lib/common/util";
 
 import { MappingStorageEventName, IMappingStorageEvent, MappingStorage } from "../nl-lib/common/mapper";
 import { scrollToBottom } from "../nl-lib/common/util";
+import getText from "./language/language";
 
 
 let _doc_instance = undefined as GridaDoc;
@@ -160,7 +161,7 @@ export default class GridaDoc {
     // 0) PDF가 있는지 찾아보고 있으면 return, (없으면 1, 2를 통해서 넣는다)
     const found = this._pdfd.find(item => item.fingerprint === pdfDoc.fingerprint);
     if (found) {
-      alert('이미 등록된 PDF가 존재합니다');
+      alert(getText("alert_regedPdf"));
       return -1;
     }
 
@@ -203,7 +204,7 @@ export default class GridaDoc {
     // 0) PDF가 있는지 찾아보고 있으면 return, (없으면 1, 2를 통해서 넣는다)
     const found = this._pdfd.find(item => item.fingerprint === pdfDoc.fingerprint);
     if (found) {
-      alert('이미 등록된 PDF가 존재합니다');
+      alert(getText("alert_regedPdf"));
       return -1;
     }
 

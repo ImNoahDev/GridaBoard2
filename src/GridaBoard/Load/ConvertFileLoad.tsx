@@ -81,7 +81,7 @@ function fileConvert(selectedFile){
       doc.openGridaFile({ url: url, filename: file.name }, pdfRawData, neoStroke, pageInfos, basePageInfos);
     }
   } else {
-      alert("file open cancelled");
+      alert(getText("alert_fileOpenCancel"));
   }
   setLoadingVisibility(false);
 }
@@ -200,7 +200,7 @@ const ConvertFileLoad = (props: Props) => {
           case 422 : {
             //잘못된 파일 => 컨버트 할 수 없는 파일
             //input type으로 한번 걸렀으나, alert 처리 해주면 좋을듯
-            alert("wrong file type!!");
+            alert(getText("alert_wrongFileType"));
             break;
           }
           case 429 : {

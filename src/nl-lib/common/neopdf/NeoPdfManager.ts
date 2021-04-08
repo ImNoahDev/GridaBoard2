@@ -2,6 +2,7 @@ import { openFileBrowser } from "./FileBrowser";
 import { NeoPdfDocument, IPdfOpenOption } from "./NeoPdfDocument";
 
 import { EventDispatcher, EventCallbackType } from "../event";
+import getText from "../../../GridaBoard/language/language";
 
 let _pdf_manager: NeoPdfManager = undefined;
 
@@ -124,7 +125,7 @@ export class NeoPdfManager {
       return { result: "not match", url, file };
     }
     else {
-      alert("파일 열기를 취소 했습니다");
+      alert(getText("alert_fileOpenCancel"));
       return { result: "canceled", url: null, file: null };
 
       // alert("파일 열기가 실패했습니다");

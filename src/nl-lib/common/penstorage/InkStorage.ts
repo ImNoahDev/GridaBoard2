@@ -6,6 +6,7 @@ import { DefaultPlateNcode } from "../../common/constants";
 import intersect from 'path-intersection';
 import { store } from "../../../GridaBoard/client/Root";
 import GridaDoc from "../../../GridaBoard/GridaDoc";
+import getText from "../../../GridaBoard/language/language";
 
 /** @type {InkStorage} */
 let _storage_instance = null;
@@ -162,7 +163,7 @@ export default class InkStorage {
 
     const activePageNo = store.getState().activePage.activePageNo;
     if (activePageNo === -1) {
-      alert("PDF를 등록하거나 펜을 사용해서 페이지를 생성해주세요")
+      alert(getText("alert_needPage"));
       return;
     }
     const basePageInfo = GridaDoc.getInstance().getPage(activePageNo).basePageInfo;
