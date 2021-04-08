@@ -226,7 +226,7 @@ const ConvertFileLoad = (props: Props) => {
   }
 
   return (
-    <Button className={`${className}`}
+    <Button id="loadFileButton" className={`${className}`}
     onClick={fileOpenHandler}>
       {getText("load_file")}
       <input type="file" id="fileForconvert" style={{ display: "none" }} onChange={inputChange} accept=".3FR,.ABW,.AI,.ARW,.AVIF,.AZW,.AZW3,.AZW4,.BMP,.CBC,.CBR,.CBZ,.CDR,.CGM,.CHM,.CR2,.CR3,.CRW,.CSV,.DCR,.DJVU,.DNG,.DOC,.DOCM,.DOCX,.DOT,.DOTX,.DPS,.DWG,.DXF,.EMF,.EPS,.EPUB,.ERF,.ET,.FB2,.GIF,.HEIC,.HTM,.HTML,.HTMLZ,.HWP,.ICO,.JFIF,.JPEG,.JPG,.KEY,.LIT,.LRF,.LWP,.MD,.MOBI,.MOS,.MRW,.NEF,.NUMBERS,.ODD,.ODP,.ODS,.ODT,.ORF,.PAGES,.PDB,.PDF,.PEF,.PML,.PNG,.POT,.POTX,.PPM,.PPS,.PPSX,.PPT,.PPTM,.PPTX,.PRC,.PS,.PSD,.RAF,.RAW,.RB,.RST,.RTF,.RW2,.SDA,.SDC,.SDW,.SK,.SK1,.SNB,.SVG,.SVGZ,.TCR,.TEX,.TIF,.TIFF,.TXT,.TXTZ,.VSD,.WEBP,.WMF,.WPD,.WPS,.X3F,.XCF,.XLS,.XLSM,.XLSX,.XPS,.ZABW, .grida"/> 

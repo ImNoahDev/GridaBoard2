@@ -85,6 +85,15 @@ export default function PrintNcodedPdfButton(props: Props) {
     // console.log(`status = ${status}, progress=${progressPercent}`);
   }, [status, progressPercent]);
 
+  useEffect(() => {
+    if (optionOn) {
+      props.handkeTurnOnAppShortCutKey(false);
+    }
+    else {
+      props.handkeTurnOnAppShortCutKey(true);
+    }
+
+  }, [optionOn]);
 
   /**
    * 인쇄의 시작, worker가 PDF를 만들고 viewer를 띄우는 등 모든 작업을 한다.
@@ -237,7 +246,6 @@ export default function PrintNcodedPdfButton(props: Props) {
       { optionDialogOn
         ? <OptionDialog open={optionDialogOn}
           cancelCallback={onCancel} okCallback={onOK}
-          handkeTurnOnAppShortCutKey={props.handkeTurnOnAppShortCutKey}
           printOption={_workingOption}
         />
         : <ProgressDialog progress={progressPercent} title={dialogTitle} open={progressOn} cancelCallback={cancelPrint} />

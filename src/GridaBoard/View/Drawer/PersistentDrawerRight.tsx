@@ -268,7 +268,7 @@ export default function PersistentDrawerRight(props: Props) {
         <div id="drawer_content" className={classes.drawerContainer}>
           <div className={classes.drawerHeader}>
             {/* <div style={drawerHeader}> */}
-            <IconButton onClick={props.handleDrawerClose} style={drawerHeader}>
+            <IconButton id="drawer_hide_button" onClick={props.handleDrawerClose} style={drawerHeader}>
               {theme.direction === 'rtl' ? <ChevronRightIcon /> : <ChevronLeftIcon />}
             </IconButton>
             {/* </div> */}

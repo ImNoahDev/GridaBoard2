@@ -45,7 +45,6 @@ interface IDialogProps extends DialogProps {
   cancelCallback: (printOption: IPrintOption) => void,
   okCallback: (printOption: IPrintOption) => void,
 
-  handkeTurnOnAppShortCutKey: (on: boolean) => void,
 }
 
 let _printOption: IPrintOption;
@@ -74,16 +73,6 @@ export function OptionDialog(props: IDialogProps) {
       // Your useEffect code here to be run on update
     }
   });
-
-  useEffect(() => {
-    if (props.open) {
-      props.handkeTurnOnAppShortCutKey(false);
-    }
-    else {
-      props.handkeTurnOnAppShortCutKey(true);
-    }
-
-  }, [props.open]);
 
 
   const setInputFileds = () => {
@@ -358,7 +347,6 @@ export function OptionDialog(props: IDialogProps) {
 
 interface Props extends ButtonProps {
   printOption: IPrintOption,
-  handkeTurnOnAppShortCutKey: (on: boolean) => void,
 }
 
 
@@ -367,20 +355,19 @@ export default function OptionDialogButton(props: Props) {
   const [show, setShow] = useState(false);
 
   const openDialog = () => {
-    props.handkeTurnOnAppShortCutKey(false);
-
+    //동작함??
     setShow(true);
   }
 
   const onCancel = () => {
+    //동작함??
     setShow(false);
-    props.handkeTurnOnAppShortCutKey(true);
     console.log("onCancel");
   }
 
   const onOK = () => {
+    //동작함??
     setShow(false);
-    props.handkeTurnOnAppShortCutKey(true);
     console.log("onOK");
   }
 
@@ -393,7 +380,6 @@ export default function OptionDialogButton(props: Props) {
       { show ? <OptionDialog
         open={show}
         cancelCallback={onCancel} okCallback={onOK}
-        handkeTurnOnAppShortCutKey={props.handkeTurnOnAppShortCutKey}
         printOption={_printOption} /> : ""}
     </React.Fragment>
   );

@@ -14,6 +14,7 @@ import $ from "jquery";
 import { setPointerTracer } from "./store/reducers/pointerTracer";
 
 
+/* 
 let _isCtrl = false;
 let _isAlt = false;
 let _isShift = false;
@@ -43,41 +44,21 @@ export function KeyBoardShortCut_keyup(evt: KeyboardEvent) {
 
   // console.log(`key up cmd=${cmd} ==> code=${evt.code}  key => ${evt.key}`);
 
-}
+} */
 
 
 export default function KeyBoardShortCut(evt: KeyboardEvent) {
   if (evt.defaultPrevented) {
     return; // Should do nothing if the default action has been cancelled
   }
+  const isCtrl = evt.ctrlKey, isAlt = evt.altKey, isShift = evt.shiftKey;
 
-  let handled = false;
-  switch (evt.key) {
-    case "Alt": {
-      _isAlt = true;
-      handled = true;
-      break;
-    }
-
-    case "Control": {
-      _isCtrl = true;
-      handled = true;
-      break;
-    }
-
-    case "Shift": {
-      _isShift = true;
-      handled = true;
-      break;
-    }
-  }
-
-  const cmd = (_isCtrl ? 1 : 0) | (_isAlt ? 2 : 0) | (_isShift ? 4 : 0) | (evt.metaKey ? 8 : 0);
+  const cmd = (isCtrl ? 1 : 0) | (isAlt ? 2 : 0) | (isShift ? 4 : 0) | (evt.metaKey ? 8 : 0);
 
   // console.log(`key down cmd=${cmd} ==> code=${evt.code}  key => ${evt.key}`);
-
+  
   if (cmd == 0) {
-    switch (evt.key) {
+    switch (evt.key.toLocaleLowerCase()) {
       case "0":
       case "1":
       case "2":
@@ -89,118 +70,122 @@ export default function KeyBoardShortCut(evt: KeyboardEvent) {
       case "8":
       case "9":
         {
-          const color_num = evt.keyCode - 0x30;
-          PenManager.getInstance().setColor(color_num);
-          // setPenColor(color_num);
-          // toggleColorRadioButton( color_num );
-          // console.log(`                ==> setColor(${color_num})`);
-          // var $elem = $(`.color_${color_num}`);
-          // processColorRadioButton(undefined, $elem);
-          handled = true;
+          if(evt.code.indexOf("Numpad") === -1){
+            const color_num = evt.keyCode - 0x30;
+            PenManager.getInstance().setColor(color_num);
+          }
         }
 
         break;
-
-      case "q": // q
-        // setPenType(PenType.PEN);
-        PenManager.getInstance().setPenRendererType(IBrushType.PEN);
-        handled = true;
-        break;
-
-      // case "w": // w
-      //   // setPenType(PenType.MARKER);
-      //   // PenManager.getInstance().setPenRendererType(IBrushType.MARKER);
-      //   // handled = true;
-      //   break;
-
-      case "e": // e
-        // setPenType(PenType.ERASER);
-        PenManager.getInstance().setPenRendererType(IBrushType.ERASER);
-        handled = true;
-        break;
-
-      case "r": // r
-        PenManager.getInstance().setPenRendererType(IBrushType.MARKER);
-        handled = true;
-        break;
-
-      case "t": {// t
-        const isTrace = store.getState().pointerTracer.isTrace;
-        store.dispatch(setPointerTracer(!isTrace));
-
-        const $elem = $(`#${"btn_tracepoint"}`);
-        if (!isTrace) {
-          const $elem = $("#btn_tracepoint").find(".c2");
-          $elem.addClass("checked");
-          $('#btn_tracepoint').css('background', 'white');
-          $('#tracer_svg_icon').css('color', '#688FFF');
-        } else {
-          const $elem = $("#btn_tracepoint").find(".c2");
-          $elem.removeClass("checked");
-          $('#btn_tracepoint').css('background', 'none');
-          $('#tracer_svg_icon').css('color', '#58627D');
-        }
-        break;
-      }
 
       case "a": // a
         // setPenThickness(1);
-        PenManager.getInstance().setThickness(PEN_THICKNESS.THICKNESS1);
-        handled = true;
         break;
 
-      case "s": // s
-        // setPenThickness(2);
-        PenManager.getInstance().setThickness(PEN_THICKNESS.THICKNESS2);
-        handled = true;
+      case "b": // b
+        PenManager.getInstance().setThickness(PEN_THICKNESS.THICKNESS5);
+        break;
+
+      case "c": // c
+        PenManager.getInstance().setThickness(PEN_THICKNESS.THICKNESS3);
         break;
 
       case "d": // d
         // setPenThickness(3);
-        PenManager.getInstance().setThickness(PEN_THICKNESS.THICKNESS3);
-        handled = true;
+        break;
+
+      case "e": // e
+        // setPenType(PenType.ERASER);
+        PenManager.getInstance().setPenRendererType(IBrushType.ERASER);
         break;
 
       case "f": // f
         // setPenThickness(4);
-        PenManager.getInstance().setThickness(PEN_THICKNESS.THICKNESS4);
-        handled = true;
-        // handled = true;
         break;
 
       case "g": // g
         // setPenThickness(5);
-        PenManager.getInstance().setThickness(PEN_THICKNESS.THICKNESS5);
-        handled = true;
-        // handled = true;
         break;
 
-      case "w": // z
-        // onBtn_fitWidth();
-        setViewFit(ZoomFitEnum.WIDTH);
-        handled = true;
-        break;
-
-      case "h": // x
+      case "h": // h
         // onBtn_fitHeight();
         setViewFit(ZoomFitEnum.HEIGHT);
-        handled = true;
+        break;
+      case "l": //L
+        (document.querySelector("#arrow-btn") as HTMLElement).click();
+        break;
+      case "p":{ // P
+        evt.preventDefault(); //web 기본 탭 기능 정지
+        const activePageNo = store.getState().activePage.activePageNo;
+        //페이지가 하나도 없으면 인쇄 못함
+        console.log(activePageNo);
+        if(activePageNo === -1) break;
+        console.log(activePageNo);
+
+        (document.querySelector("#printBtn") as HTMLElement).click();
+        break;
+  
+      }
+      case "q": // q
+        // setPenType(PenType.PEN);
+        PenManager.getInstance().setPenRendererType(IBrushType.PEN);
         break;
 
-      case "c": // c
-        // onBtn_fitCanvas();
-        // handled = true;
+      case "r": // r
+        PenManager.getInstance().setPenRendererType(IBrushType.MARKER);
         break;
+
+      case "s":{ // s => pdf save기능
+        evt.preventDefault(); //web 기본 탭 기능 정지
+        const activePageNo = store.getState().activePage.activePageNo;
+        //페이지가 하나도 없으면 저장 못함
+        if(activePageNo === -1) break;
+
+        (document.querySelector(".save_drop_down") as HTMLElement).click();
+        break;
+      }
+      case "t": {// t
+          const isTrace = store.getState().pointerTracer.isTrace;
+          store.dispatch(setPointerTracer(!isTrace));
+  
+          const $elem = $(`#${"btn_tracepoint"}`);
+          if (!isTrace) {
+            const $elem = $("#btn_tracepoint").find(".c2");
+            $elem.addClass("checked");
+            $('#btn_tracepoint').css('background', 'white');
+            $('#tracer_svg_icon').css('color', '#688FFF');
+          } else {
+            const $elem = $("#btn_tracepoint").find(".c2");
+            $elem.removeClass("checked");
+            $('#btn_tracepoint').css('background', 'none');
+            $('#tracer_svg_icon').css('color', '#58627D');
+          }
+          break;
+        }
 
       case "v": // v
         // onBtn_fitPaper();
-        // handled = true;
+        PenManager.getInstance().setThickness(PEN_THICKNESS.THICKNESS4);
         break;
 
-      case "b": // b
+      case "w": // w
+        // onBtn_fitWidth();
+        setViewFit(ZoomFitEnum.WIDTH);
         break;
-
-      case "Tab": {// <TAB>
+      // case "w": // w
+      //   // setPenType(PenType.MARKER);
+      //   // PenManager.getInstance().setPenRendererType(IBrushType.MARKER);
+      //   break;
+      case "x" : {
+        PenManager.getInstance().setThickness(PEN_THICKNESS.THICKNESS2);
+        break;
+      }
+      case "z" : {
+        PenManager.getInstance().setThickness(PEN_THICKNESS.THICKNESS1);
+        break;
+      }
+      case "tab": {// <TAB>
+        evt.preventDefault(); //web 기본 탭 기능 정지
         const doc = GridaDoc.getInstance();
         const rotationTrigger = store.getState().rotate.rotationTrigger;
         const activePageNo = store.getState().activePage.activePageNo;
@@ -208,6 +193,9 @@ export default function KeyBoardShortCut(evt: KeyboardEvent) {
 
         const page = doc.getPageAt(activePageNo);
 
+        //무언가 하나도 사용하지 않았을때 탭을 누를 수도 있음 그때 page가 undefined
+        if(page === undefined) break ;
+        
         if (page._pdfPage !== undefined) {
           if (page._pdfPage.viewport.rotation >= 270) {
             page._pdfPage.viewport.rotation = 0;
@@ -230,51 +218,30 @@ export default function KeyBoardShortCut(evt: KeyboardEvent) {
           $('#horizontal_rotate').css('display', 'none');
         }
 
-        handled = true;
         break;
       }
-
-      case "p": // P
-        // toggleAllStrokesVisible();
-        // handled = true;
-        break;
 
       // page up
-      case "PageUp": {
-        const doc = GridaDoc.getInstance();
-        const state = store.getState();
-        const activePageNo = state.activePage.activePageNo;
-        const pageNo = Math.max(0, activePageNo - 1);
-        setActivePageNo(pageNo);
-
-        // onPrevPage();
-        handled = true;
-        break;
-      }
-
-      // page down
-      case "PageDown": {
-        const doc = GridaDoc.getInstance();
-        const state = store.getState();
-        const activePageNo = state.activePage.activePageNo;
-        const pageNo = Math.min(doc.numPages - 1, activePageNo + 1);
-        setActivePageNo(pageNo);
-
-        // onPrevPage();
-        handled = true;
-        break;
-      }
-
-      case "ArrowLeft": {// P
-        const activePageNo = store.getState().activePage.activePageNo
-        if (activePageNo === 0) {
+      // case "pageup":
+      case "arrowleft": {// 키보드 ←  
+        if(document.querySelector("#main").clientHeight < (document.querySelector("#main") as HTMLElement).offsetHeight){
+          //하단 스크롤 존재
+          return ;
+        }
+        const activePageNo = store.getState().activePage.activePageNo;
+        if (activePageNo <= 0) {
           return;
         }
         setActivePageNo(activePageNo-1);
         break;
       }
-
-      case "ArrowRight": {// P
+      // page down
+      // case "pagedown":
+      case "arrowright": {// →  
+        if(document.querySelector("#main").clientHeight < (document.querySelector("#main") as HTMLElement).offsetHeight){
+          //하단 스크롤 존재
+          return ;
+        }
         const activePageNo = store.getState().activePage.activePageNo;
         const numDocPages = store.getState().activePage.numDocPages;
         if (activePageNo === numDocPages-1) {
@@ -301,6 +268,11 @@ export default function KeyBoardShortCut(evt: KeyboardEvent) {
         setZoomStore(newZoom);
         break;
       }
+      case "escape" : {
+        (document.querySelector("#drawer_hide_button") as HTMLElement).click();
+        
+        break ;
+      }
 
     }
   } else if (cmd == 4) {
@@ -313,44 +285,44 @@ export default function KeyBoardShortCut(evt: KeyboardEvent) {
       case "6":
       case "7":
         // togglePenStrokeVisible(evt.keyCode - 0x30);
-        // handled = true;
         break;
 
       case "0":
         // toggleAllStrokesVisible();
-        // handled = true;
         break;
     }
   } else if (cmd == 1) {
     switch (evt.key) {
+      case "o":{ // ctrl-o
+        evt.preventDefault(); //web 기본 오픈 기능 강제 스탑
+        (document.querySelector("#loadFileButton") as HTMLSpanElement).click();
+        
+        break;
+      }
       case "z": // ctrl-Z
         // onBtnUndo();
-        // handled = true;
         break;
 
       case "y": // ctrl-Z
         // onBtnRedo();
-        // handled = true;
         break;
 
       // ctrl - page up
-      case "Home": {
+      case "home": {
         const pageNo = 0;
         setActivePageNo(pageNo);
 
         // onPrevPage();
-        handled = true;
         break;
       }
 
       // ctrl - page down
-      case "End": {
+      case "end": {
         const doc = GridaDoc.getInstance();
         const pageNo = doc.numPages - 1;
         setActivePageNo(pageNo);
 
         // onPrevPage();
-        handled = true;
         break;
       }
 
