@@ -141,6 +141,7 @@ const CalibrationDialog = (props: IDialogProps) => {
     }
   }, [progress, status]);
 
+
   useEffect(() => {
     if (show) {
       setCalibrationMode(true);
@@ -315,7 +316,7 @@ const CalibrationDialog = (props: IDialogProps) => {
 
           <DialogTitle id="form-dialog-title" style={{ float: "left", width: "500px" }}>
             <Box fontSize={20} fontWeight="fontWeightBold" >
-              {getText("print_reg_pageNo_popup_title").replace("%d", pageNo.toString())}
+              {pageNo !== undefined ? getText("print_reg_pageNo_popup_title").replace("%d", pageNo.toString()) : ""}
               {/* /{numPages} (Step: {progress + 1}/{numProgresses}) */}
             </Box>
           </DialogTitle>
