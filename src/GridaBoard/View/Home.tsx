@@ -198,11 +198,6 @@ window.onclick = function(event) {
   if(!event.target.parentNode || event.target.parentNode.matches === undefined) return ;
 
 
-  if (!event.target.parentNode.matches('.select_color')) {
-    const color = document.getElementById("colorDrop");
-    color.style.display = 'none'
-  }
-
   if (!event.target.matches('.thicknessDropDown')) {
     const thickness = document.getElementById("thicknessDrop");
     thickness.style.display = 'none'

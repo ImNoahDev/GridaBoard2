@@ -7,31 +7,52 @@ import getText from "../../language/language";
 
 const manager: PenManager = PenManager.getInstance();
 
-const colorStyle = {
-  marginLeft: "24px",
-} as React.CSSProperties;
-
-const colorDropDownStyle = {
-  display: "none",
-  flexDirection: "row",
-  justifyContent: "center",
-  alignItems: "center",
-  padding: "4px 4px",
-  position: "absolute",
-  width: "486px",
-  height: "48px",
-  background: "rgba(255,255,255,0.9)",
-  boxShadow: "2px 2px 2px rgba(0, 0, 0, 0.25)",
-  borderRadius: "12px",
-  zIndex: 100,
-  marginTop: "30px",
-  marginLeft: "20px"
-} as React.CSSProperties;
-
-const groupStyle = {
-  marginTop: "8px",
-  marginLeft: "22px"
-} as React.CSSProperties;
+const useStyles = makeStyles((theme: Theme) => ({
+  smallBtn: {
+    width: "18px !important", 
+    height: "18px !important",
+  },
+  colorBtn : {
+    textAlign: "center",
+    padding: "0px",
+    transition: "none",
+    float: "left"
+  },
+  colorIcon : {
+    marginTop: "0px",
+    width: "24px",
+    height: "24px",
+    borderRadius: "24px",
+    "&:hover" : {
+      boxShadow: "0px 0px 2px 2px rgba(0, 0, 0, 0.4) inset"
+    },
+    "&:pressed" : {
+      border: "2px solid var(--gridaboard_cyan)"
+    }
+  },
+  dropColorBtn : {
+    marginTop: "8px",
+    marginLeft: "22px"
+  },
+  selectColorBtn : {
+    marginLeft: "24px",
+  },
+  colorDropDownStyle : {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    padding: "4px 4px",
+    position: "absolute",
+    width: "486px",
+    height: "48px",
+    background: "rgba(255,255,255,0.9)",
+    boxShadow: "2px 2px 2px rgba(0, 0, 0, 0.25)",
+    borderRadius: "12px",
+    zIndex: 100,
+    marginTop: "30px",
+    marginLeft: "20px"
+  }
+}));
 
 const useStylesBootstrap = makeStyles((theme: Theme) => ({
   arrow: {
@@ -40,7 +61,7 @@ const useStylesBootstrap = makeStyles((theme: Theme) => ({
   tooltip: {
     backgroundColor: theme.palette.common.black,
     fontSize: "11px"
-  },
+  }
 }));
 
 function BootstrapTooltip(props: TooltipProps) {
@@ -50,16 +71,15 @@ function BootstrapTooltip(props: TooltipProps) {
 }
 
 let btnStyles = [] as React.CSSProperties[];
-let selectStyle = {
-  width: "18px", 
-  height: "18px",
-  backgroundColor: manager.color
-};
 
 const ColorButtons = () => {
   const [penType, setPenType] = useState(manager.penRendererType as IBrushType);
   const [color, setColor] = useState(manager.color as string);
   const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null);
+  const [dropVisible, setDropVisible] = useState(true);
+  let _dropDom = undefined as HTMLElement;
+  
+  const classes = useStyles();
 
   useEffect(() => {
     changeBtnStyles();
@@ -72,6 +92,14 @@ const ColorButtons = () => {
     }
   }, []);
   
+  useEffect(() => {
+    if(!dropVisible){
+      const element = _dropDom;
+      element.focus();
+    }
+  },[dropVisible]);
+  
+
   const handleClose = () => {
     setAnchorEl(null);
   };
@@ -81,13 +109,23 @@ const ColorButtons = () => {
     handleClose();
   }
 
-  function handleClickColor() {
-    const color = document.getElementById("colorDrop");
-    if (color.style.display == 'none') {
-      color.style.display = 'block'
-    } else {
-      color.style.display = 'none'
+  function handleClickColor(visible:boolean = null) {
+    if(visible !== null){
+      setDropVisible(visible);
+    }else if(visible !== dropVisible){
+        setDropVisible(!dropVisible);
     }
+  }
+  function dropBlur(e){
+    const  currentTarget = e.currentTarget;
+    // 이벤트 루프의 다음 틱에서 새로 포커스 된 요소를 확인합니다.
+    setTimeout(() => {
+      // 새 activeElement가 원래 컨테이너의 자식인지 확인
+      if (!currentTarget.contains(document.activeElement)) {
+        // 여기에서 콜백을 호출하거나 맞춤 로직을 추가 할 수 있습니다.
+        handleClickColor(true);
+      }
+    }, 0);
   }
 
   const changeBtnStyles = () => {
@@ -139,54 +177,22 @@ const ColorButtons = () => {
       default: break;
     }
   }
-
-  selectStyle = {
-    width: "18px", 
-    height: "18px",
-    backgroundColor: color
-  };
-
   return (
     <React.Fragment>
       <div>
         <BootstrapTooltip title={getText("nav_color")}>
-          <ButtonBase className="color_btn select_color" style={colorStyle} onClick={handleClickColor}>
-            <div id="select_color" className="color_icon" style={selectStyle}></div>
+          <ButtonBase className={`${classes.colorBtn} ${classes.selectColorBtn}`} onClick={()=>handleClickColor()}>
+            <div id="" className={`${classes.smallBtn} ${classes.colorIcon}`} style={{"backgroundColor": color }}></div>
             {/* <KeyboardArrowDownRoundedIcon style={{marginLeft: "6px"}}/> */}
           </ButtonBase>
         </BootstrapTooltip>
 
-        <div id="colorDrop" className="selected_color" style={colorDropDownStyle}>
-          <ButtonBase id="clr_1" className="color_btn" style={groupStyle} onClick={() => changeColor(1)}>
-              <div className="color_icon" style={btnStyles[0]}></div>
-          </ButtonBase>
-          <ButtonBase id="clr_2" className="color_btn" style={groupStyle} onClick={() => changeColor(2)}>
-              <div className="color_icon" style={btnStyles[1]}></div>
-          </ButtonBase>
-          <ButtonBase id="clr_3" className="color_btn" style={groupStyle} onClick={() => changeColor(3)}>
-              <div className="color_icon" style={btnStyles[2]}></div>
-          </ButtonBase>
-          <ButtonBase id="clr_4" className="color_btn" style={groupStyle} onClick={() => changeColor(4)}>
-              <div className="color_icon" style={btnStyles[3]}></div>
-          </ButtonBase>
-          <ButtonBase id="clr_5" className="color_btn" style={groupStyle} onClick={() => changeColor(5)}>
-              <div className="color_icon" style={btnStyles[4]}></div>
-          </ButtonBase>
-          <ButtonBase id="clr_6" className="color_btn" style={groupStyle} onClick={() => changeColor(6)}>
-              <div className="color_icon" style={btnStyles[5]}></div>
-          </ButtonBase>
-          <ButtonBase id="clr_7" className="color_btn" style={groupStyle} onClick={() => changeColor(7)}>
-              <div className="color_icon" style={btnStyles[6]}></div>
-          </ButtonBase>
-          <ButtonBase id="clr_8" className="color_btn" style={groupStyle} onClick={() => changeColor(8)}>
-              <div className="color_icon" style={btnStyles[7]}></div>
-          </ButtonBase>
-          <ButtonBase id="clr_9" className="color_btn" style={groupStyle} onClick={() => changeColor(9)}>
-              <div className="color_icon" style={btnStyles[8]}></div>
-          </ButtonBase>
-          <ButtonBase id="clr_0" className="color_btn" style={groupStyle} onClick={() => changeColor(0)}>
-              <div className="color_icon" style={btnStyles[9]}></div>
-          </ButtonBase>
+        <div ref={(e)=>{_dropDom=e}} tabIndex={-1} hidden={dropVisible} className={`${classes.colorDropDownStyle}`}  onBlur={dropBlur}>
+          {(Array.from({length:10},(el,idx)=>idx)).map(el=>{
+            return (<ButtonBase key={el} className={`${classes.colorBtn} ${classes.dropColorBtn}`} onClick={() => changeColor((el+1)%10)}>
+            <div className={classes.colorIcon} style={btnStyles[el]}></div>
+            </ButtonBase>)
+          })}
         </div>
       </div>
     </React.Fragment>

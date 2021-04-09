@@ -169,6 +169,7 @@ const HeaderLayer = (props: Props) => {
   const classes = useStyles({brZoom})();
 
   const [dropVisible, setDropVisible] = useState(true);
+  let _dropDom = undefined as HTMLElement;
 
   console.log(`browser zoom level changed = ${brZoom}`);
 
@@ -178,8 +179,6 @@ const HeaderLayer = (props: Props) => {
   }
 
   function handleClickSave(visible:boolean = null) {
-    // const element = document.querySelector("#saveDrop") as HTMLElement;
-    
     if(visible !== null){
       setDropVisible(visible);
     }else if(visible !== dropVisible){
@@ -188,8 +187,7 @@ const HeaderLayer = (props: Props) => {
   }
   useEffect(() => {
     if(!dropVisible){
-      const element = document.querySelector("#saveDrop") as HTMLElement;
-      element.focus();
+      _dropDom.focus();
     }
   },[dropVisible]);
 
@@ -218,10 +216,10 @@ const HeaderLayer = (props: Props) => {
         }}>
           <img src="grida_logo.png" className={classes.imgStyle}></img>
           <div>
-            <Button id="save" className={`saveDropDown ${classes.buttonStyle}`}  onClick={()=>handleClickSave()} disabled={disabled}>
+            <Button className={`${classes.buttonStyle}`}  onClick={()=>handleClickSave()} disabled={disabled}>
               {getText("save_file")}
             </Button>
-            <div id="saveDrop" tabIndex={-1} hidden={dropVisible} className={`${classes.saveDropdownStyle}`} onBlur={saveDropBlur} >
+            <div ref={(e)=>{_dropDom=e}} tabIndex={-1} hidden={dropVisible} className={`${classes.saveDropdownStyle}`} onBlur={saveDropBlur} >
               <SavePdfDialog />
               <SaveGridaDialog />
               {/* <Button className="save_drop_down" style={{
