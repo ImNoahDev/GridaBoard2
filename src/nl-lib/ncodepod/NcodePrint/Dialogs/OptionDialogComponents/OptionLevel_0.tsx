@@ -94,7 +94,7 @@ function OptionLevel_0(props: ILeveledDialogProps) {
   }
   // makeNPageIdStr
   // console.log(`OptionLevel1: level=${optionLevel}`);
-  const msg = optionLevel > 0 ? "고급 설정 닫기" : "고급 설정 열기";
+  // const msg = optionLevel > 0 ? "고급 설정 닫기" : "고급 설정 열기";
 
   const msi = MappingStorage.getInstance();
 

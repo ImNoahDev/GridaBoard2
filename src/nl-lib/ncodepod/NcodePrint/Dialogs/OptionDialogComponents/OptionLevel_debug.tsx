@@ -30,7 +30,7 @@ const OptionLevel_debug = (props: ILeveledDialogProps) => {
   console.log(`OptionLevel2: level=${optionLevel}`);
   if (optionLevel < 1) return (<></>);
 
-  const msg = optionLevel > 1 ? "전문가 설정 닫기" : "전문가 설정 열기";
+  // const msg = optionLevel > 1 ? "전문가 설정 닫기" : "전문가 설정 열기";
   console.log(`OptionLevel2: step 2, level=${optionLevel}`);
 
   return (
