@@ -513,6 +513,7 @@ class PenBasedRenderer extends React.Component<Props, State> {
     }
     /** pdf pageNo를 바꿀 수 있게, container에게 전달한다. */
     if (this.props.onNcodePageChanged) {
+      this.renderer.registerPageInfoForPlate(event);//hover page info를 거치지 않고 바로 page info로 들어오는 경우(빨리 찍으면 hover 안들어옴)
       this.props.onNcodePageChanged({ section, owner, book, page });
     }
   }
