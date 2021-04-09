@@ -435,15 +435,12 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
     let plateCanvasRatio = ratio1;
     if (ratio2 > ratio1) plateCanvasRatio = ratio2;
 
-    const x_offset = (window.innerWidth - npaperWidth * plateCanvasRatio) / 2;
-    const y_offset = (window.innerHeight - npaperHeight * plateCanvasRatio) / 2;
-
     const globalZoom = store.getState().zoomReducer.zoom;
 
-    const screen_x = dot.x * globalZoom * plateCanvasRatio + x_offset;
-    const screen_y = dot.y * globalZoom * plateCanvasRatio + y_offset;
+    const screen_x = dot.x * globalZoom * plateCanvasRatio;
+    const screen_y = dot.y * globalZoom * plateCanvasRatio;
 
-    return {x: screen_x, y: screen_y, f: 500};
+    return {x: screen_x, y: screen_y, f: dot.f};
   }
 
   movePenTracker = (event: IPenToViewerEvent, pageInfo: IPageSOBP) => {
