@@ -533,6 +533,11 @@ class MixedPageView_module extends React.Component<MixedViewProps, State>  {
 
           break;
         }
+        case "plate": {
+          this._internal.pdf = undefined;
+          this._internal.pdfFilename = undefined;
+          break;
+        }
         case "default":
         case "note":
         default: {

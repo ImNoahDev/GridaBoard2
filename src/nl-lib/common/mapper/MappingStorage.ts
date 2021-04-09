@@ -2,8 +2,8 @@ import * as cloud_util_func from "../../../cloud_util_func";
 
 import { adjustNoteItemMarginForFilm, getNPaperInfo, getNPaperSize_pu } from "../noteserver";
 import { EventDispatcher, EventCallbackType } from "../event";
-import { cloneObj, convertNuToPu, getNextNcodePage, getNowTimeStr, isPageInRange, isPageInMapper, isSamePage, makePdfId } from "../util";
-import { g_availablePagesInSection, g_defaultNcode, g_defaultTemporaryNcode, nullNcode } from "../constants";
+import { cloneObj, convertNuToPu, getNextNcodePage, getNowTimeStr, isPageInRange, isPageInMapper, isSamePage, makePdfId, isSameNcode } from "../util";
+import { DefaultPlateNcode, g_availablePagesInSection, g_defaultNcode, g_defaultTemporaryNcode, nullNcode } from "../constants";
 import {
   IPageSOBP, TransformParameters, INoteServerItem_forPOD, IPrintOption, IPdfToNcodeMapItem,
   INcodeSOBPxy, IPageMapItem, IPdfPageDesc, IPolygonArea, IRectDpi, IAutoLoadDocDesc, IGetNPageTransformType, IMappingData
@@ -313,7 +313,7 @@ export class MappingStorage {
   public getNPageTransform = (pageInfo: IPageSOBP) => {
     let h: TransformParameters;
     const ret: IGetNPageTransformType = {
-      type: undefined as "note" | "pod" | "default",
+      type: undefined as "note" | "pod" | "default" | "plate",
       pageInfo: undefined as IPageSOBP,
       basePageInfo: undefined as IPageSOBP,
       h: undefined as TransformParameters,
@@ -343,7 +343,11 @@ export class MappingStorage {
     if (!noteItem.isDefault && !isCalibrationMode && !tempFound) {
       h = this.calcHfromNote({ ...noteItem.margin, pageNo: pageInfo.page });
       ret.h = h;
+
       ret.type = "note";
+      if (isSameNcode(DefaultPlateNcode, pageInfo)) {
+        ret.type = "plate";
+      }
       ret.pageInfo = pageInfo;
       ret.basePageInfo = pageInfo;
       ret.pdf.filename = noteItem.pdf_name;

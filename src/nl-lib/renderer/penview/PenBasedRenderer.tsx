@@ -16,6 +16,8 @@ import { DefaultPlateNcode, DefaultPUINcode } from "../../common/constants";
 import { InkStorage } from "../../common/penstorage";
 
 import { setCalibrationData } from '../../../GridaBoard/store/reducers/calibrationDataReducer';
+import { store } from "../../../GridaBoard/client/Root";
+import GridaDoc from "../../../GridaBoard/GridaDoc";
 
 /**
  * Properties
@@ -311,7 +313,6 @@ class PenBasedRenderer extends React.Component<Props, State> {
     if ((this.props.rotation !== nextProps.rotation) && isSamePage(this.props.basePageInfo, nextProps.basePageInfo)) {
       //회전 버튼을 누를 경우만 들어와야 하는 로직, 회전된 pdf를 로드할 때는 들어오면 안됨
       //로드할 경우에는 this.props의 basePageInfo가 nullNCode로 세팅돼있기 때문에 들어오지 않음
-      const degrees = nextProps.rotation - this.props.rotation;
 
       this.renderer.setRotation(nextProps.rotation, this.pdfSize);
 
@@ -319,7 +320,7 @@ class PenBasedRenderer extends React.Component<Props, State> {
       // ctx.rotate(180 * Math.PI / 180);
 
       if (this.props.isMainView) {
-        this.renderer.rotate(degrees, nextProps.pageInfo);
+        this.renderer.rotate(nextProps.pageInfo);
       }
 
       this.renderer.redrawStrokes(nextProps.pageInfo);
@@ -631,10 +632,19 @@ class PenBasedRenderer extends React.Component<Props, State> {
   onLivePenUp_byStorage = (event: IPenToViewerEvent) => {
     const { section, owner, book, page } = event;
     const pageInfo = { section, owner, book, page } as IPageSOBP;
+    
+    const activePageNo = store.getState().activePage.activePageNo;
+    const activePage = GridaDoc.getInstance().getPageAt(activePageNo);
+    const activePageInfo = activePage.pageInfos[0];//plate에 쓰는 경우 plate의 pageInfo가 아닌 실제 pageInfo가 필요
 
-    if (this.renderer && isSamePage(this.props.pageInfo, pageInfo)) {
+    let isPlate = false;
+    if (isSamePage(activePageInfo, this.props.pageInfo) && isSameNcode(DefaultPlateNcode, pageInfo)) {
+      isPlate = true;
+    }
+
+    if (this.renderer && (isSamePage(this.props.pageInfo, pageInfo) || isPlate)) {
       // console.log(`Renderer(${makeNPageIdStr(this.props.pageInfo)}): onLivePenUp, pageInfo=${makeNPageIdStr(pageInfo)}  ==> ADDED`);
-      this.renderer.closeLiveStroke_byStorage(event);
+      this.renderer.closeLiveStroke_byStorage(event, pageInfo);
     }
     // else {
     //   console.log(`Renderer(${makeNPageIdStr(this.props.pageInfo)}): onLivePenUp, pageInfo=${makeNPageIdStr(pageInfo)}  ==> DISCARDED`);

@@ -245,33 +245,33 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
     }
   };
 
-  pushLiveDot_byStorage = (event: IPenToViewerEvent) => {
-    let live = this.livePaths[event.strokeKey];
-    if (!live) {
-      console.error('왜 live stroke가 등록 안된게 나오지?');
+  // pushLiveDot_byStorage = (event: IPenToViewerEvent) => {
+  //   let live = this.livePaths[event.strokeKey];
+  //   if (!live) {
+  //     console.error('왜 live stroke가 등록 안된게 나오지?');
 
-      live = {
-        stroke: event.stroke,
-        pathObj: null,
-      };
-      this.livePaths[event.strokeKey] = live;
-    }
-    const dot = event.dot;
+  //     live = {
+  //       stroke: event.stroke,
+  //       pathObj: null,
+  //     };
+  //     this.livePaths[event.strokeKey] = live;
+  //   }
+  //   const dot = event.dot;
 
-    //지우개 구현
-    const canvas_xy = this.ncodeToPdfXy(dot);
-    if (!live.pathObj) {
-      const new_pathObj = this.createFabricPath(live.stroke, false);
-      live.pathObj = new_pathObj as IExtendedPathType;
-      this.canvasFb.add(new_pathObj);
-    } else {
-      const pathData = this.createPathData_arr(live.stroke);
-      const pathObj = live.pathObj as fabric.Path;
-      pathObj.path = pathData as any;
-    }
+  //   //지우개 구현
+  //   const canvas_xy = this.ncodeToPdfXy(dot);
+  //   if (!live.pathObj) {
+  //     const new_pathObj = this.createFabricPath(live.stroke, false);
+  //     live.pathObj = new_pathObj as IExtendedPathType;
+  //     this.canvasFb.add(new_pathObj);
+  //   } else {
+  //     const pathData = this.createPathData_arr(live.stroke);
+  //     const pathObj = live.pathObj as fabric.Path;
+  //     pathObj.path = pathData as any;
+  //   }
 
-    this.focusToDot(dot);
-  };
+  //   this.focusToDot(dot);
+  // };
 
   /**
    *
@@ -307,8 +307,8 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
    *
    * @param {{strokeKey:string, mac:string, stroke, section:number, owner:number, book:number, page:number}} event
    */
-  closeLiveStroke_byStorage = (event: IPenToViewerEvent) => {
-    const new_pathObj = this.createFabricPath(event.stroke, false) as IExtendedPathType;
+  closeLiveStroke_byStorage = (event: IPenToViewerEvent, pageInfo: IPageSOBP) => {
+    const new_pathObj = this.createFabricPath(event.stroke, false, pageInfo) as IExtendedPathType;
 
     this.canvasFb.add(new_pathObj);
     this.localPathArray.push(new_pathObj);
@@ -582,7 +582,7 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
     }
   };
 
-  rotate = (degrees, pageInfo) => {
+  rotate = (pageInfo) => {
     const ins = InkStorage.getInstance();
     const pageId = InkStorage.makeNPageIdStr(pageInfo);
     const strokeArr = ins.completedOnPage.get(pageId);
@@ -914,7 +914,7 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
     return path;
   };
 
-  createFabricPath = (stroke: NeoStroke, cache: boolean, pageInfo?: IPageSOBP) => {
+  createFabricPath = (stroke: NeoStroke, cache: boolean, pageInfo: IPageSOBP) => {
     const { color, brushType, key } = stroke;
     let pathData;
 
