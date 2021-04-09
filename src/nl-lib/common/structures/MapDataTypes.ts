@@ -14,7 +14,7 @@ import { IPageSOBP, IPoint } from "./Structures";
 
 
 export type IGetNPageTransformType = {
-  type: "default" | "note" | "pod";
+  type: "default" | "note" | "pod" | "plate";
   pageInfo: IPageSOBP;
   basePageInfo: IPageSOBP;
   h: TransformParameters;
