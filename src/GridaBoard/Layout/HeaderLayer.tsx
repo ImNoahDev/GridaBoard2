@@ -47,8 +47,7 @@ const useStyles = props => makeStyles((theme) => ({
     background: "rgba(255,255,255,0.9)",
     boxShadow: "2px 2px 2px rgba(0, 0, 0, 0.25)",
     borderRadius: "12px",
-    zIndex: 10000,
-    visibility:"hidden"
+    zIndex: 10000
   },
   changeUrlTextStyle : {
     fontSize: "12px",
@@ -169,6 +168,7 @@ const HeaderLayer = (props: Props) => {
 
   const classes = useStyles({brZoom})();
 
+  const [dropVisible, setDropVisible] = useState(true);
 
   console.log(`browser zoom level changed = ${brZoom}`);
 
@@ -177,17 +177,36 @@ const HeaderLayer = (props: Props) => {
     disabled = false;
   }
 
-  function handleClickSave() {
-    const element = document.getElementById("saveDrop");
-    if (element.style.visibility === 'hidden') {
-      element.style.visibility = "visible";
-    } else {
-      element.style.visibility = "hidden"
+  function handleClickSave(visible:boolean = null) {
+    // const element = document.querySelector("#saveDrop") as HTMLElement;
+    
+    if(visible !== null){
+      setDropVisible(visible);
+    }else if(visible !== dropVisible){
+        setDropVisible(!dropVisible);
     }
   }
+  useEffect(() => {
+    if(!dropVisible){
+      const element = document.querySelector("#saveDrop") as HTMLElement;
+      element.focus();
+    }
+  },[dropVisible]);
+
 
   function changeUrl() {
     location.href = 'https://gridaboard-v1-30576.web.app/';
+  }
+  function saveDropBlur(e){
+    const  currentTarget  =  e.currentTarget ;
+    // 이벤트 루프의 다음 틱에서 새로 포커스 된 요소를 확인합니다.
+    setTimeout(() => {
+      // 새 activeElement가 원래 컨테이너의 자식인지 확인
+      if (!currentTarget.contains(document.activeElement)) {
+        // 여기에서 콜백을 호출하거나 맞춤 로직을 추가 할 수 있습니다.
+        handleClickSave(true);
+      }
+    }, 0);
   }
 
   return (
@@ -199,10 +218,10 @@ const HeaderLayer = (props: Props) => {
         }}>
           <img src="grida_logo.png" className={classes.imgStyle}></img>
           <div>
-            <Button id="save" className={`saveDropDown ${classes.buttonStyle}`}  onClick={handleClickSave} disabled={disabled}>
+            <Button id="save" className={`saveDropDown ${classes.buttonStyle}`}  onClick={()=>handleClickSave()} disabled={disabled}>
               {getText("save_file")}
             </Button>
-            <div id="saveDrop" className={`${classes.saveDropdownStyle}`}>
+            <div id="saveDrop" tabIndex={-1} hidden={dropVisible} className={`${classes.saveDropdownStyle}`} onBlur={saveDropBlur} >
               <SavePdfDialog />
               <SaveGridaDialog />
               {/* <Button className="save_drop_down" style={{

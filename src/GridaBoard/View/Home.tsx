@@ -195,12 +195,8 @@ document.addEventListener('wheel', function(e) {
 });
 
 window.onclick = function(event) {
-  if(event.target.parentNode || event.target.parentNode.matches === undefined) return ;
+  if(!event.target.parentNode || event.target.parentNode.matches === undefined) return ;
 
-  if (!event.target.parentNode.matches('.saveDropDown')) {
-    const save = document.getElementById("saveDrop");
-    save.style.visibility = 'hidden';
-  }
 
   if (!event.target.parentNode.matches('.select_color')) {
     const color = document.getElementById("colorDrop");
