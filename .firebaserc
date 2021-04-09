@@ -1,5 +1,7 @@
 {
   "projects": {
-    "default": "gridaboard"
+    "default": "gridaboard",
+    "test": "gridaboard-v2-test",
+    "live": "gridaboard"
   }
 }

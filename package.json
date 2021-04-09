@@ -70,7 +70,8 @@
     "react-start": "react-scripts start",
     "e:start": "concurrently \"cross-env NODE_ENV=development BROWSER=none npm run react-start\" \"wait-on http://localhost:3000 && electron .\"",
     "e:build": "npm run build && electron-builder",
-    "deploy": "npm run  build && electron-builder --publish=always"
+    "test-deploy" : "node ./src/GridaBoard/util/exceltojson.js && npm run build && firebase use test && firebase deploy",
+    "deploy": "node ./src/GridaBoard/util/exceltojson.js && npm run build && firebase use live && firebase deploy"
   },
   "eslintConfig": {
     "extends": [

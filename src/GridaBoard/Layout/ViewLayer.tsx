@@ -35,11 +35,7 @@ const ViewLayer = (props: Props) => {
   const classes = useStyles();
   return (
     <div className={classes.wrap}>
-      <AppBar position="relative" color="transparent" elevation={0}
-      ref={e=>{
-        console.log(e);  
-        // e.style.setProperty("--appBar-height", 1)
-      }}> 
+      <AppBar position="relative" color="transparent" elevation={0}> 
         <HeaderLayer {...props}/>
         <NavLayer {...props} />
       </AppBar>

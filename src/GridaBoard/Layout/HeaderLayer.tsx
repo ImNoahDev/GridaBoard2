@@ -62,7 +62,7 @@ const useStyles = props => makeStyles((theme) => ({
     justifyContent: "space-between",
     alignItems: "center",
     flexWrap: "wrap",
-    height: "40px",
+    height: "70px",
     background: "rgba(255, 255, 255, 0.5)",
     zoom: 1 / props.brZoom,
   },
