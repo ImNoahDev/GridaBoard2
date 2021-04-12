@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { makeStyles } from '@material-ui/core/styles';
 import { Box, Checkbox, createStyles, FormControl, FormControlLabel, FormLabel, Grid, Paper, Radio, RadioGroup, Table, TableBody, TableCell, TableCellProps, TableContainer, TableRow, TextField, Theme, Typography, useTheme } from '@material-ui/core';
-import NeoToolTip, { ITipType } from '../../../../common/ui/NeoToolTip';
+import NeoToolTip, { ITipType } from 'nl-lib/common/ui/NeoToolTip';
 import { printOptionTip } from './ToolTips';
-import getText from "../../../../../GridaBoard/language/language";
+import getText from "nl-lib/../GridaBoard/language/language";
 
 
 interface Props extends TableCellProps {

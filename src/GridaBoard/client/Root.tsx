@@ -11,8 +11,8 @@ import { RootState } from '../store/rootReducer';
 
 import GridaApp from "../GridaApp";
 import { hideUIProgressBackdrop, reportBrowserZoomFactor, showUIProgressBackdrop } from "../store/reducers/ui";
-import { fetchGzippedFile, getBrowserZoomFactor } from "../../nl-lib/common/util";
-import { g_paperType, g_paperType_default } from "../../nl-lib/common/noteserver";
+import { fetchGzippedFile, getBrowserZoomFactor } from "nl-lib/common/util";
+import { g_paperType, g_paperType_default } from "nl-lib/common/noteserver";
 import Home from "../View/Home";
 import LoadingCircle from "../Load/LoadingCircle";
 

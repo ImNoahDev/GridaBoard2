@@ -5,15 +5,14 @@ import { withResizeDetector } from 'react-resize-detector';
 import NeoPdfPageView from "./pdfview/NeoPdfPageView";
 import PenBasedRenderer from "./penview/PenBasedRenderer";
 
-
-import { IAutoLoadDocDesc, IGetNPageTransformType, IPageSOBP } from "../common/structures";
-import { NeoPdfDocument, NeoPdfManager } from "../common/neopdf";
-import { callstackDepth, isSamePage, makeNPageIdStr } from "../common/util";
-import { MappingStorage } from "../common/mapper";
-import { getNPaperSize_pu } from "../common/noteserver";
-import { PLAYSTATE, ZoomFitEnum } from "../common/enums";
-import { INeoSmartpen } from "../common/neopen";
-import { setZoomStore } from "../../GridaBoard/store/reducers/zoomReducer";
+import { IAutoLoadDocDesc, IPageSOBP } from "nl-lib/common/structures";
+import { NeoPdfDocument, NeoPdfManager } from "nl-lib/common/neopdf";
+import { isSamePage, makeNPageIdStr } from "nl-lib/common/util";
+import { MappingStorage } from "nl-lib/common/mapper";
+import { getNPaperSize_pu } from "nl-lib/common/noteserver";
+import { PLAYSTATE, ZoomFitEnum } from "nl-lib/common/enums";
+import { INeoSmartpen } from "nl-lib/common/neopen";
+import { setZoomStore } from "GridaBoard/store/reducers/zoomReducer";
 
 
 export const ZINDEX_INK_LAYER = 3;

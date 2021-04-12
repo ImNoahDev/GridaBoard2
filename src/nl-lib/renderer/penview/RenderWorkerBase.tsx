@@ -1,16 +1,15 @@
 import { fabric } from 'fabric';
 import { Point } from 'fabric/fabric-impl';
 import { sprintf } from 'sprintf-js';
-import { NU_TO_PU, PU_TO_NU } from '../../common/constants';
-import { ZoomFitEnum } from '../../common/enums';
-import { calcRotatedH, calcRotatedH90, calcRotatedH180, calcRotatedH270, calcRevH } from '../../common/mapper/CoordinateTanslater';
-import { InkStorage } from '../../common/penstorage';
-import { TransformParameters, ISize, IPageSOBP } from '../../common/structures';
-import { makeNPageIdStr } from '../../common/util';
-import { PATH_THICKNESS_SCALE } from '../../common/util';
+import { NU_TO_PU, PU_TO_NU } from 'nl-lib/common/constants';
+import { ZoomFitEnum } from 'nl-lib/common/enums';
+import { calcRotatedH, calcRotatedH90, calcRotatedH180, calcRotatedH270, calcRevH } from 'nl-lib/common/mapper/CoordinateTanslater';
+import { InkStorage } from 'nl-lib/common/penstorage';
+import { TransformParameters, ISize, IPageSOBP } from 'nl-lib/common/structures';
+import { makeNPageIdStr } from 'nl-lib/common/util';
+import { PATH_THICKNESS_SCALE } from 'nl-lib/common/util';
 import { PDFVIEW_ZOOM_MAX, PDFVIEW_ZOOM_MIN } from '../RendererConstants';
-import { setViewFit } from '../../../GridaBoard/store/reducers/viewFitReducer';
-import * as Solve from '../../common/math/echelon/SolveTransform';
+import { setViewFit } from 'GridaBoard/store/reducers/viewFitReducer';
 
 // const timeTickDuration = 20; // ms
 // const DISABLED_STROKE_COLOR = "rgba(0, 0, 0, 0.1)";

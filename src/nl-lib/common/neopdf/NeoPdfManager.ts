@@ -2,7 +2,7 @@ import { openFileBrowser } from "./FileBrowser";
 import { NeoPdfDocument, IPdfOpenOption } from "./NeoPdfDocument";
 
 import { EventDispatcher, EventCallbackType } from "../event";
-import getText from "../../../GridaBoard/language/language";
+import getText from "GridaBoard/language/language";
 
 let _pdf_manager: NeoPdfManager = undefined;
 

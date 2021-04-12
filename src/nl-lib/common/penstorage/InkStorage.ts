@@ -1,12 +1,12 @@
 import { EventDispatcher, EventCallbackType } from "../event";
 import { IBrushType, PenEventName } from "../enums";
 import { NeoStroke, IPageSOBP, StrokeStatus, INeoStrokeProps, NeoDot, TransformParameters } from "../structures";
-import { isSameNcode } from "../../common/util";
-import { DefaultPlateNcode } from "../../common/constants";
+import { isSameNcode } from "nl-lib/common/util";
+import { DefaultPlateNcode } from "nl-lib/common/constants";
 import intersect from 'path-intersection';
-import { store } from "../../../GridaBoard/client/Root";
-import GridaDoc from "../../../GridaBoard/GridaDoc";
-import getText from "../../../GridaBoard/language/language";
+import { store } from "GridaBoard/client/Root";
+import GridaDoc from "GridaBoard/GridaDoc";
+import getText from "GridaBoard/language/language";
 
 /** @type {InkStorage} */
 let _storage_instance = null;

@@ -10,8 +10,8 @@ import GridaDoc from "../GridaDoc";
 import {
   NeoPdfManager,
   openFileBrowser2, g_hiddenFileInputBtnId, onFileInputChanged, onFileInputClicked
-} from "../../nl-lib/common/neopdf";
-import { IPageSOBP, IFileBrowserReturn, IGetNPageTransformType } from "../../nl-lib/common/structures";
+} from "nl-lib/common/neopdf";
+import { IPageSOBP, IFileBrowserReturn, IGetNPageTransformType } from "nl-lib/common/structures";
 import { useBeforeunload } from 'react-beforeunload';
 import getText from "../language/language";
 

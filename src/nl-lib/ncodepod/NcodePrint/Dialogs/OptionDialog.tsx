@@ -6,15 +6,15 @@ import OptionLevel_0 from "./OptionDialogComponents/OptionLevel_0";
 import OptionLevel_1 from "./OptionDialogComponents/OptionLevel_1";
 import OptionLevel_2 from "./OptionDialogComponents/OptionLevel_2";
 import { convertStringToArray } from './OptionDialogComponents/PageRangeField';
-import { MappingStorage } from '../../../common/mapper';
+import { MappingStorage } from 'nl-lib/common/mapper';
 
-import { cloneObj } from '../../../common/util';
-import { IPrintOption } from '../../../common/structures';
-import { MediaSize } from '../../../common/constants';
-import { RadioField } from './OptionDialogComponents/RadioField';
+import { cloneObj } from 'nl-lib/common/util';
+import { IPrintOption } from 'nl-lib/common/structures';
+import { MediaSize } from 'nl-lib/common/constants';
 import { useSelector } from 'react-redux';
-import { RootState } from '../../../../GridaBoard/store/rootReducer';
-import getText from "../../../../GridaBoard/language/language";
+
+import { RootState } from 'GridaBoard/store/rootReducer';
+import getText from "GridaBoard/language/language";
 
 
 const useStyles = makeStyles({

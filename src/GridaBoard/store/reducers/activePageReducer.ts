@@ -1,5 +1,5 @@
 import { store } from "../../client/Root";
-import { NeoPdfDocument } from "../../../nl-lib/common/neopdf";
+import { NeoPdfDocument } from "nl-lib/common/neopdf";
 
 //[Define Action Types
 const ActionGroup = "ACTIVE_PDF";

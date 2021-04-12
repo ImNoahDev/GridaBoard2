@@ -1,14 +1,14 @@
 import { sprintf } from "sprintf-js";
 
 import NcodeFetcher from "../NcodeGenerator/NcodeFetcher";
-import { getSurfaceSize_dpi } from "../../common/noteserver";
+import { getSurfaceSize_dpi } from "nl-lib/common/noteserver";
 import { devideSurfaceAreaTo, getCellMatrixShape } from "./SurfaceSplitter";
 import NcodeFetcherPool from "../NcodeGenerator/NcodeFetcherPool";
 
-import { IPrintOption, IProgressCallbackFunction } from "../../common/structures";
-import { INoteServerItem_forPOD, IPageSOBP, IPointDpi, IRectDpi } from "../../common/structures";
-import { autoSetDpi, cloneObj, makeNPageIdStr } from "../../common/util";
-import { NCODE_CLASS6_NUM_DOTS, UNIT_TO_DPI } from "../../common/constants";
+import { IPrintOption, IProgressCallbackFunction } from "nl-lib/common/structures";
+import { INoteServerItem_forPOD, IPageSOBP, IPointDpi, IRectDpi } from "nl-lib/common/structures";
+import { autoSetDpi, cloneObj, makeNPageIdStr } from "nl-lib/common/util";
+import { NCODE_CLASS6_NUM_DOTS, UNIT_TO_DPI } from "nl-lib/common/constants";
 
 
 // import { PrintContextConsumer } from "react-to-print";

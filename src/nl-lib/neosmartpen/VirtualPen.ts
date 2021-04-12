@@ -1,10 +1,10 @@
-import { EventDispatcher, EventCallbackType } from "../common/event";
+import { EventDispatcher, EventCallbackType } from "nl-lib/common/event";
 import PenManager from "./PenManager";
-import PUIController from "../../GridaBoard/components/PUIController";
-import { IBrushState, IPenEvent, NeoDot, NeoStroke, TransformParameters } from "../common/structures";
-import { IBrushType, PEN_STATE, PenEventName, PEN_THICKNESS } from "../common/enums";
-import { InkStorage, IOpenStrokeArg } from "../common/penstorage";
-import { IPenToViewerEvent, INeoSmartpen } from "../common/neopen/INeoSmartpen";
+import PUIController from "GridaBoard/components/PUIController";
+import { IBrushState, IPenEvent, NeoDot, NeoStroke, TransformParameters } from "nl-lib/common/structures";
+import { IBrushType, PEN_STATE, PenEventName, PEN_THICKNESS } from "nl-lib/common/enums";
+import { InkStorage, IOpenStrokeArg } from "nl-lib/common/penstorage";
+import { IPenToViewerEvent, INeoSmartpen } from "nl-lib/common/neopen/INeoSmartpen";
 import { sprintf } from "sprintf-js";
 
 

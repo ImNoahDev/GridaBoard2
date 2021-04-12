@@ -1,8 +1,8 @@
 import { IAreasDesc } from "./NcodeRasterizer";
-import { getSurfaceSize_px_600dpi } from "../../common/noteserver";
+import { getSurfaceSize_px_600dpi } from "nl-lib/common/noteserver";
 
-import { IPrintOption, IRectDpi, ISize} from "../../common/structures";
-import { MediaSize } from "../../common/constants";
+import { IPrintOption, IRectDpi, ISize} from "nl-lib/common/structures";
+import { MediaSize } from "nl-lib/common/constants";
 
 // import { isPortrait } from "./SurfaceInfo";
 export const PAGES_CELL_SPACING = 120; // 600dpi px, 5.08mm

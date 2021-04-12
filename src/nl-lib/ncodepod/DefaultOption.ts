@@ -1,6 +1,6 @@
-import { g_nullNcode, MediaSize } from "../common/constants";
-import { ColorConvertMethod, NcodePdfScaleMode } from "../common/enums";
-import { IPageSOBP, IPrintOption } from "../common/structures";
+import { g_nullNcode, MediaSize } from "nl-lib/common/constants";
+import { ColorConvertMethod, NcodePdfScaleMode } from "nl-lib/common/enums";
+import { IPageSOBP, IPrintOption } from "nl-lib/common/structures";
 
 // export const g_debugURL = "./Portrait, 초등학교 4학년 4P.pdf";
 // export const g_debugFilename = "./Portrait, 초등학교 4학년 4P.pdf";

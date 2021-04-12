@@ -12,7 +12,7 @@ import {
 import PdfDocMapper from "./PdfDocMapper";
 import { MappingItem } from "./MappingItem";
 import CoordinateTanslater from "./CoordinateTanslater";
-import { store } from "../../../GridaBoard/client/Root";
+import { store } from "GridaBoard/client/Root";
 
 export const BASECODE_PAGES_PER_SHEET = 16384;
 

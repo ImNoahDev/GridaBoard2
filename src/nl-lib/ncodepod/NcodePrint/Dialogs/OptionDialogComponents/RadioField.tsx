@@ -1,8 +1,7 @@
 import React from 'react';
 import { Box, Checkbox, TableCell, TableCellProps, Typography } from '@material-ui/core';
-import NeoToolTip, { ITipType } from '../../../../common/ui/NeoToolTip';
+import NeoToolTip, { ITipType } from 'nl-lib/common/ui/NeoToolTip';
 import { printOptionTip } from './ToolTips';
-import { cellRadioStyle } from "./OptionLevel_0";
 
 
 interface Props extends TableCellProps {

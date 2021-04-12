@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import { Box, Checkbox, createStyles, FormControl, FormControlLabel, FormLabel, Grid, InputBase, InputLabel, Paper, Radio, RadioGroup, Table, TableBody, TableCell, TableCellProps, TableContainer, TableRow, TextField, Theme, Typography, useTheme, withStyles } from '@material-ui/core';
+import { Box, FormControl,Grid, InputBase, InputLabel, TableCellProps, Typography, withStyles } from '@material-ui/core';
 import { printOptionTip } from './ToolTips';
 
-import NeoToolTip, { ITipType } from '../../../../common/ui/NeoToolTip';
+import NeoToolTip, { ITipType } from 'nl-lib/common/ui/NeoToolTip';
 
 
 const BootstrapInput = withStyles((theme) => ({

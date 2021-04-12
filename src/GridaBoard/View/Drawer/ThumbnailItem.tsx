@@ -6,10 +6,10 @@ import GridaDoc from "../../GridaDoc";
 import { RootState } from "../../store/rootReducer";
 import { setActivePageNo } from '../../store/reducers/activePageReducer';
 
-import { MixedPageView } from "../../../nl-lib/renderer";
-import { makeNPageIdStr } from "../../../nl-lib/common/util";
-import { PLAYSTATE, ZoomFitEnum } from "../../../nl-lib/common/enums";
-import { nullNcode } from "../../../nl-lib/common/constants";
+import { MixedPageView } from "nl-lib/renderer";
+import { makeNPageIdStr } from "nl-lib/common/util";
+import { PLAYSTATE, ZoomFitEnum } from "nl-lib/common/enums";
+import { nullNcode } from "nl-lib/common/constants";
 import { red } from "@material-ui/core/colors";
 
 interface Props {

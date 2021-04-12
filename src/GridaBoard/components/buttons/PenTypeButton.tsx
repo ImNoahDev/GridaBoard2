@@ -1,8 +1,8 @@
 import React from "react";
 import '../../styles/buttons.css';
 import GridaToolTip from "../../styles/GridaToolTip";
-import PenManager from "../../../nl-lib/neosmartpen/PenManager";
-import { IBrushType } from "../../../nl-lib/common/enums";
+import PenManager from "nl-lib/neosmartpen/PenManager";
+import { IBrushType } from "nl-lib/common/enums";
 import { IconButton, makeStyles, SvgIcon, Theme, Tooltip, TooltipProps } from "@material-ui/core";
 import getText from "../../language/language";
 

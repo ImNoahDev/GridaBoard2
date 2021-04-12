@@ -6,19 +6,19 @@ import { Typography } from "@material-ui/core";
 import { IRenderWorkerOption } from "./RenderWorkerBase";
 import PenBasedRenderWorker from "./PenBasedRenderWorker";
 
-import { IBrushType, PenEventName, PageEventName, PLAYSTATE, ZoomFitEnum } from "../../common/enums";
-import { IPageSOBP, ISize } from "../../common/structures";
-import { callstackDepth, isSamePage, isSameNcode, makeNPageIdStr, makeNCodeIdStr, uuidv4 } from "../../common/util";
+import { IBrushType, PenEventName, PageEventName, PLAYSTATE, ZoomFitEnum } from "nl-lib/common/enums";
+import { IPageSOBP, ISize } from "nl-lib/common/structures";
+import { callstackDepth, isSamePage, isSameNcode, makeNPageIdStr, makeNCodeIdStr, uuidv4 } from "nl-lib/common/util";
 
-import { INeoSmartpen, IPenToViewerEvent } from "../../common/neopen";
-import { MappingStorage } from "../../common/mapper";
-import { DefaultPlateNcode, DefaultPUINcode } from "../../common/constants";
-import { InkStorage } from "../../common/penstorage";
+import { INeoSmartpen, IPenToViewerEvent } from "nl-lib/common/neopen";
+import { MappingStorage } from "nl-lib/common/mapper";
+import { DefaultPlateNcode, DefaultPUINcode } from "nl-lib/common/constants";
+import { InkStorage } from "nl-lib/common/penstorage";
+import { isPUI } from "nl-lib/common/noteserver";
 
-import { setCalibrationData } from '../../../GridaBoard/store/reducers/calibrationDataReducer';
-import { store } from "../../../GridaBoard/client/Root";
-import GridaDoc from "../../../GridaBoard/GridaDoc";
-import { isPUI } from "../../common/noteserver";
+import { setCalibrationData } from 'GridaBoard/store/reducers/calibrationDataReducer';
+import { store } from "GridaBoard/client/Root";
+import GridaDoc from "GridaBoard/GridaDoc";
 
 /**
  * Properties

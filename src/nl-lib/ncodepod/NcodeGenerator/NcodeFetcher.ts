@@ -1,7 +1,7 @@
 import * as Zlib from "zlib";
 import { sprintf } from "sprintf-js";
-import { getNPaperInfo } from "../../common/noteserver";
-import { INoteServerItem_forPOD, IPageSOBP } from "../../common/structures";
+import { getNPaperInfo } from "nl-lib/common/noteserver";
+import { INoteServerItem_forPOD, IPageSOBP } from "nl-lib/common/structures";
 
 
 /**

@@ -2,15 +2,15 @@
 import React, { useEffect, useState } from "react";
 import { ButtonProps, } from "@material-ui/core";
 
-import { IPrintingReport, IPrintOption } from "../../common/structures";
+import { IPrintingReport, IPrintOption } from "nl-lib/common/structures";
 import ProgressDialog from "./ProgressDialog";
 import PrintNcodedPdfWorker from "./PrintNcodedPdfWorker";
 import { OptionDialog } from "./Dialogs/OptionDialog";
 import CancelWaitingDialog from "./CancelWaitingDialog";
-import { cloneObj } from "../../common/util";
+import { cloneObj } from "nl-lib/common/util";
 import Button from '@material-ui/core/Button';
 import $ from "jquery";
-import getText from "../../../GridaBoard/language/language";
+import getText from "GridaBoard/language/language";
 
 interface Props extends ButtonProps {
   /** 인쇄될 문서의 url, printOption.url로 들어간다. */

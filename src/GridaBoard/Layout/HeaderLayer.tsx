@@ -11,16 +11,16 @@ import { PDFDocument } from 'pdf-lib';
 import ConnectButton from "../components/buttons/ConnectButton";
 import GridaApp from "../GridaApp";
 import ManualCalibration from "../components/navbar/ManualCalibration";
-import { g_defaultPrintOption, PrintNcodedPdfButton } from "../../nl-lib/ncodepod";
+import { g_defaultPrintOption, PrintNcodedPdfButton } from "nl-lib/ncodepod";
 import SavePdfDialog from "../Save/SavePdfDialog";
-// import { FileBrowserButton } from "../../nl-lib/common/neopdf";
-import { IFileBrowserReturn } from "../../nl-lib/common/structures";
+// import { FileBrowserButton } from "nl-lib/common/neopdf";
+import { IFileBrowserReturn } from "nl-lib/common/structures";
 import { useSelector } from 'react-redux';
 import { RootState } from '../store/rootReducer';
 import { turnOnGlobalKeyShortCut } from "../GlobalFunctions";
 import SaveGridaDialog from "../Save/SaveGridaDialog";
 import getText from "../language/language";
-import { NCODE_CLASS6_NUM_DOTS } from "../../nl-lib/common/constants";
+import { NCODE_CLASS6_NUM_DOTS } from "nl-lib/common/constants";
 
 const useStyles = props => makeStyles((theme) => ({
   buttonStyle : {

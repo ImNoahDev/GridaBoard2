@@ -1,16 +1,15 @@
 import { store } from "./client/Root";
-import { PenEventName } from "../nl-lib/common/enums";
-import { IPageSOBP } from "../nl-lib/common/structures";
-import { MappingStorage } from "../nl-lib/common/mapper";
-import { INeoSmartpen, IPenToViewerEvent } from "../nl-lib/common/neopen";
+import { PenEventName } from "nl-lib/common/enums";
+import { IPageSOBP } from "nl-lib/common/structures";
+import { MappingStorage } from "nl-lib/common/mapper";
+import { INeoSmartpen, IPenToViewerEvent } from "nl-lib/common/neopen";
 import { setPens } from "./store/reducers/appConfigReducer";
-import { DefaultPlateNcode, DefaultPUINcode } from "../nl-lib/common/constants";
-import { isSameNcode } from "../nl-lib/common/util";
+import { DefaultPlateNcode, DefaultPUINcode } from "nl-lib/common/constants";
+import { isSameNcode } from "nl-lib/common/util";
 import GridaDoc from "./GridaDoc";
-import PenManager from "../nl-lib/neosmartpen/PenManager";
-import { setActivePageNo } from "./store/reducers/activePageReducer";
+import PenManager from "nl-lib/neosmartpen/PenManager";
 import $ from "jquery";
-import { isPUI } from "../nl-lib/common/noteserver";
+import { isPUI } from "nl-lib/common/noteserver";
 
 let _app_instance = undefined as GridaApp;
 

@@ -6,9 +6,9 @@ import { IconButton, SvgIcon } from '@material-ui/core';
 import GridaToolTip from "../../styles/GridaToolTip";
 import { useSelector } from "react-redux";
 import { RootState } from "../../store/rootReducer";
-import PenManager from "../../../nl-lib/neosmartpen/PenManager";
-import { PenEventName } from "../../../nl-lib/common/enums";
-import { INeoSmartpen } from "../../../nl-lib/common/neopen";
+import PenManager from "nl-lib/neosmartpen/PenManager";
+import { PenEventName } from "nl-lib/common/enums";
+import { INeoSmartpen } from "nl-lib/common/neopen";
 import $ from "jquery";
 
 const numPenStyle = {
