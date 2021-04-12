@@ -161,14 +161,16 @@ declare global {
 }
 
 (function (window) {
-  const pui = new PUIController('./3_1013_1116_Grida.nproj');
+  const pui_grida = new PUIController('./nproj/3_1013_1116_Grida.nproj');
+  const pui_smart = new PUIController("./nproj/SmartClassKit_Controller.nproj");
+  const pui_paper = new PUIController("./nproj/papertube_controller_171117.nproj");
 
   window._pui = [];
-  window._pui.push(pui);
-  console.log(window._pui);
+  window._pui.push(pui_grida);
+  window._pui.push(pui_smart);
+  window._pui.push(pui_paper);
 
   turnOnGlobalKeyShortCut(true);
-
 })(window);
 
 let tx = 0;

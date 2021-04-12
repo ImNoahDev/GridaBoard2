@@ -913,9 +913,7 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
 
   createFabricPath = (stroke: NeoStroke, cache: boolean, pageInfo: IPageSOBP) => {
     const { color, brushType, key } = stroke;
-    let pathData;
-
-    pathData = this.createPathData(stroke, pageInfo);
+    const pathData = this.createPathData(stroke, pageInfo);
 
     let opacity = 0;
     switch (brushType) {

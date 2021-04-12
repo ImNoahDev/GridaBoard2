@@ -25,14 +25,14 @@ export function isPlatePaper(pageInfo: IPageSOBP): boolean {
  *
  * @param coordInfo
  */
-export function isPUI(pageInfo: INcodeSOBPxy): boolean {
+export function isPUI(pageInfo: IPageSOBP): boolean {
   const { owner, book, page, } = pageInfo;
   // console.log( `isPUI: ${owner}.${book}.${page}`);
   if (owner === 27 && book === 161 && page === 1) {
     return true;
   }
 
-  if (owner === 1013 && book === 1) {
+  if (owner === 1013 && (book === 1 || book === 1116)) {
     // page === 4, Smart plate
     // page === 1, Plate paper
 

@@ -18,6 +18,7 @@ import { InkStorage } from "../../common/penstorage";
 import { setCalibrationData } from '../../../GridaBoard/store/reducers/calibrationDataReducer';
 import { store } from "../../../GridaBoard/client/Root";
 import GridaDoc from "../../../GridaBoard/GridaDoc";
+import { isPUI } from "../../common/noteserver";
 
 /**
  * Properties
@@ -357,7 +358,7 @@ class PenBasedRenderer extends React.Component<Props, State> {
       if (this.renderer && !this.props.calibrationMode) {
         console.log(`VIEW SIZE PAGE CHANGE 1: ${makeNPageIdStr(pageInfo)}`);
 
-        if (isSameNcode(nextProps.pageInfo, DefaultPUINcode)) { 
+        if (isSameNcode(nextProps.pageInfo, DefaultPUINcode) || isPUI(nextProps.pageInfo)) { 
           //1. PUI에 쓸 경우 페이지가 바뀌는 것을 막기 위함
           return;
         }

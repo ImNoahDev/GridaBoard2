@@ -1,11 +1,11 @@
 import $ from 'jquery';
-import { store } from "../../GridaBoard/client/Root";
-import { IBrushType, PageZoomEnum, ZoomFitEnum } from '../../nl-lib/common/enums';
-import PenManager from '../../nl-lib/neosmartpen/PenManager';
-import { setViewFit } from '../store/reducers/viewFitReducer';
-import { setZoomStore } from '../store/reducers/zoomReducer';
-import { setActivePageNo } from '../store/reducers/activePageReducer';
-import { setPointerTracer } from '../store/reducers/pointerTracer';
+import { store } from "GridaBoard/client/Root";
+import { IBrushType, PEN_THICKNESS, ZoomFitEnum } from 'nl-lib/common/enums';
+import PenManager from 'nl-lib/neosmartpen/PenManager';
+import { setViewFit } from 'GridaBoard/store/reducers/viewFitReducer';
+import { setZoomStore } from 'GridaBoard/store/reducers/zoomReducer';
+import { setActivePageNo } from 'GridaBoard/store/reducers/activePageReducer';
+import { setPointerTracer } from 'GridaBoard/store/reducers/pointerTracer';
 
 
 // 2020-12-09 현재 구현되어 있는 부분까지 PUI 완성(페이지 넘어가는 부분과 스트로크 찍히는 오류 수정할 것)
@@ -163,15 +163,15 @@ export default class PUIController {
 
     switch (cmd) {
       case "strokesize_1":
-        PenManager.getInstance().setThickness(1);
+        PenManager.getInstance().setThickness(PEN_THICKNESS.THICKNESS1);
         break;
 
       case "strokesize_2":
-        PenManager.getInstance().setThickness(2);
+        PenManager.getInstance().setThickness(PEN_THICKNESS.THICKNESS2);
         break;
 
       case "strokesize_3":
-        PenManager.getInstance().setThickness(3);
+        PenManager.getInstance().setThickness(PEN_THICKNESS.THICKNESS3);
         break;
 
       case "pen":
@@ -187,10 +187,12 @@ export default class PUIController {
         break;
 
       case "#FFE5E5E5": //LG
+      case "white":
         PenManager.getInstance().setColor(1)
         break;
 
       case "#FF000000": //BK
+      case "black":
         PenManager.getInstance().setColor(3)
         break;
 
@@ -199,6 +201,7 @@ export default class PUIController {
         break;
 
       case "#FFFFD001": // YE
+      case "yellow":
         PenManager.getInstance().setColor(8)
         break;
 
@@ -207,14 +210,17 @@ export default class PUIController {
         break;
 
       case "#FFFF0200": // RED
+      case "red":
         PenManager.getInstance().setColor(0)
         break;
 
       case "#FF00ABEB": // BLU
+      case "lightblue":
         PenManager.getInstance().setColor(6)
         break;
 
       case "#FF3CDD00": // GRN
+      case "green":
         PenManager.getInstance().setColor(7)
         break;
 
@@ -248,6 +254,10 @@ export default class PUIController {
         break;
 
       case "menu_grida":
+        break;
+      
+      case "fit":
+        setViewFit(ZoomFitEnum.WIDTH);
         break;
 
       case "full":

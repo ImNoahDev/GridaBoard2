@@ -10,6 +10,7 @@ import GridaDoc from "./GridaDoc";
 import PenManager from "../nl-lib/neosmartpen/PenManager";
 import { setActivePageNo } from "./store/reducers/activePageReducer";
 import $ from "jquery";
+import { isPUI } from "../nl-lib/common/noteserver";
 
 let _app_instance = undefined as GridaApp;
 
@@ -43,7 +44,7 @@ export default class GridaApp {
   }
 
   start = async () => {
-    let lang = navigator.language;
+    const lang = navigator.language;
     if (lang.split('-')[0] !== 'ko') {
       location.href = 'https://gridaboard-v1-30576.web.app/';
     }
@@ -80,7 +81,7 @@ export default class GridaApp {
 
     const pageInfo = { section: event.section, owner: event.owner, book: event.book, page: event.page } as IPageSOBP;
 
-    if (isSameNcode(pageInfo, DefaultPlateNcode) || isSameNcode(pageInfo, DefaultPUINcode)) {
+    if (isSameNcode(pageInfo, DefaultPlateNcode) || isSameNcode(pageInfo, DefaultPUINcode) || isPUI(pageInfo)) {
         return;
     }
 

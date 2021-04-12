@@ -1,15 +1,17 @@
 import PenComm, { deviceSelectDlg } from "./pencomm/pencomm";
-import { EventDispatcher, EventCallbackType } from "../common/event";
 import PenManager, {DEFAULT_PEN_THICKNESS} from "./PenManager";
-import PUIController from "../../GridaBoard/components/PUIController";
-import { IBrushState, INoteServerItem, IPenEvent, NeoDot, NeoStroke, StrokePageAttr, TransformParameters } from "../common/structures";
-import { IBrushType, PEN_STATE, PenEventName } from "../common/enums";
-import { InkStorage, IOpenStrokeArg } from "../common/penstorage";
-import { IPenToViewerEvent, INeoSmartpen } from "../common/neopen/INeoSmartpen";
-import { store } from "../../GridaBoard/client/Root";
-import { DefaultPUINcode } from "../common/constants";
-import { isSameNcode } from "../common/util";
-import getText from "../../GridaBoard/language/language";
+import { EventDispatcher, EventCallbackType } from "nl-lib/common/event";
+import { IBrushState, IPenEvent, NeoDot, NeoStroke, StrokePageAttr, TransformParameters } from "nl-lib/common/structures";
+import { IBrushType, PEN_STATE, PenEventName } from "nl-lib/common/enums";
+import { InkStorage, IOpenStrokeArg } from "nl-lib/common/penstorage";
+import { IPenToViewerEvent, INeoSmartpen } from "nl-lib/common/neopen/INeoSmartpen";
+import { DefaultPUINcode } from "nl-lib/common/constants";
+import { isSameNcode } from "nl-lib/common/util";
+import { isPUI } from "nl-lib/common/noteserver";
+
+import getText from "GridaBoard/language/language";
+import PUIController from "GridaBoard/components/PUIController";
+import { store } from "GridaBoard/client/Root";
 
 interface IPenMovement {
   downEvent: IPenEvent,
@@ -407,8 +409,12 @@ export default class NeoSmartpen implements INeoSmartpen {
       x: event.x,
       y: event.y,
     });
-
-    if (isSameNcode({section: event.section, owner: event.owner, book: event.book, page: event.page}, DefaultPUINcode)) {
+    
+    const pageInfo = {
+      section: event.section, owner: event.owner, book: event.book, page: event.page
+    }
+     
+    if (isPUI(pageInfo)) {
       if (event.isFirstDot) {
         console.log("===================================");
         // let puis = window._pui;
@@ -429,6 +435,7 @@ export default class NeoSmartpen implements INeoSmartpen {
           }
         }
       }
+      return;
     }
 
     const stroke = this.currPenMovement.stroke;
@@ -509,7 +516,10 @@ export default class NeoSmartpen implements INeoSmartpen {
       console.error("Ink Storage has not been initialized");
     }
 
-    if (isSameNcode({section: event.section, owner: event.owner, book: event.book, page: event.page}, DefaultPUINcode)) {
+    const pageInfo = {
+      section: event.section, owner: event.owner, book: event.book, page: event.page
+    }
+    if (isSameNcode(pageInfo, DefaultPUINcode) || isPUI(pageInfo)) {
       return;
     }
 
