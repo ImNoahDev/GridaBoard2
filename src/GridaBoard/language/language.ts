@@ -8,7 +8,12 @@ const searchLang : string = qs.parse(location.search).lang;
 
 
 function setData(lang: string = null) : string {
-    const navLang : string = (navigator.language || navigator["userLanguage"]).slice(0,2);
+    const navigatorLang = (navigator.language || navigator["userLanguage"]);
+    let navLang : string = navigatorLang.slice(0,2);
+
+    if(navLang === "zh"){//중국어일 경우, 간체 번체 나누기 필요
+        navLang = navigatorLang.substr(3,2);
+    }
 
     if(lang != null){//1순위 셋 데이터 인자값이 가장 우선
         languageType = lang;

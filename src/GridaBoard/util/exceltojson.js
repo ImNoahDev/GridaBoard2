@@ -3,7 +3,7 @@ const excelToJson = require('convert-excel-to-json');
 const fs = require("fs");
 const url = "./src/GridaBoard/language/";
 
-const codes = ["ko", "en", "ja", "zh", "de", "es"]; //5, 6, 7, 8, 9, 10번에 각각 들어있음
+const codes = ["ko", "en", "ja", "tw", "de", "es"]; //5, 6, 7, 8, 9, 10번에 각각 들어있음
 
 const excelFile = excelToJson({
   source: fs.readFileSync(url + "textData.xlsx" ), // fs.readFileSync return a Buffer
