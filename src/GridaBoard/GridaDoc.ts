@@ -3,14 +3,14 @@ import { store } from "./client/Root";
 import { forceToRenderPanes, setActivePageNo, setActivePdf, setDocNumPages, setUrlAndFilename } from "./store/reducers/activePageReducer";
 import { RootState } from "./store/rootReducer";
 
-import { g_availablePagesInSection, nullNcode } from "../nl-lib/common/constants";
-import { NeoPdfDocument, IPdfOpenOption, NeoPdfManager, PdfManagerEventName, IPdfManagerEvent } from "../nl-lib/common/neopdf";
-import { IPdfToNcodeMapItem, IPageSOBP, IGetNPageTransformType } from "../nl-lib/common/structures";
-import { isSamePage, makeNPageIdStr } from "../nl-lib/common/util";
+import { g_availablePagesInSection, nullNcode } from "nl-lib/common/constants";
+import { NeoPdfDocument, IPdfOpenOption, NeoPdfManager, PdfManagerEventName, IPdfManagerEvent } from "nl-lib/common/neopdf";
+import { IPdfToNcodeMapItem, IPageSOBP, IGetNPageTransformType } from "nl-lib/common/structures";
+import { isSamePage, makeNPageIdStr } from "nl-lib/common/util";
 
 
-import { MappingStorageEventName, IMappingStorageEvent, MappingStorage } from "../nl-lib/common/mapper";
-import { scrollToBottom } from "../nl-lib/common/util";
+import { MappingStorageEventName, IMappingStorageEvent, MappingStorage } from "nl-lib/common/mapper";
+import { scrollToBottom } from "nl-lib/common/util";
 import getText from "./language/language";
 
 

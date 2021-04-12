@@ -1,5 +1,5 @@
-import { ITipType } from "../../../../common/ui";
-import getText from "../../../../../GridaBoard/language/language";
+import { ITipType } from "nl-lib/common/ui";
+import getText from "GridaBoard/language/language";
 
 export const printOptionTip: { [key: string]: ITipType } = {
   'hasToPutNcode': {

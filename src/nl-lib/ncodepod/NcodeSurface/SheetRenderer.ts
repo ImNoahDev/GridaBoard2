@@ -1,14 +1,14 @@
 import NcodeRasterizer, { drawArrow, IAreasDesc, ICellsOnSheetDesc, getNcodeAtCanvasPixel, getNcodeRectAtCanvasPixel, } from "../NcodeSurface/NcodeRasterizer";
-import { ICanvasShapeDesc, IPrintingEvent, IPrintingSheetDesc, IPrintOption, IProgressCallbackFunction } from "../../common/structures";
+import { ICanvasShapeDesc, IPrintingEvent, IPrintingSheetDesc, IPrintOption, IProgressCallbackFunction } from "nl-lib/common/structures";
 import { getCellMatrixShape } from '../NcodeSurface/SurfaceSplitter';
-import { getSurfaceSize_css } from '../../common/noteserver/SurfaceInfo';
-import { MappingItem } from '../../common/mapper/MappingItem';
+import { getSurfaceSize_css } from 'nl-lib/common/noteserver/SurfaceInfo';
+import { MappingItem } from 'nl-lib/common/mapper/MappingItem';
 
-import { ICssSize, IPageSOBP, IPolygonArea, IRectDpi, ISize } from "../../common/structures";
-import { cloneObj, isSameObject, makePdfId, stringToDpiNum, uuidv4 } from "../../common/util";
-import { CSS_DPI } from "../../common/constants";
-import { NeoPdfDocument, IPdfPageCanvasDesc } from "../../common/neopdf";
-import { CoordinateTanslater } from "../../common/mapper";
+import { ICssSize, IPageSOBP, IPolygonArea, IRectDpi, ISize } from "nl-lib/common/structures";
+import { cloneObj, isSameObject, makePdfId, stringToDpiNum, uuidv4 } from "nl-lib/common/util";
+import { CSS_DPI } from "nl-lib/common/constants";
+import { NeoPdfDocument, IPdfPageCanvasDesc } from "nl-lib/common/neopdf";
+import { CoordinateTanslater } from "nl-lib/common/mapper";
 
 let debug = 0;
 

@@ -1,5 +1,5 @@
 import { DeviceTypeEnum } from "./pencomm_enum";
-import { IPenEvent } from "../../common/structures";
+import { IPenEvent } from "nl-lib/common/structures";
 
 export const PenCommEventEnum = {
   PEN_UP: "pen_up",

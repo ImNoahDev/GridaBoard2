@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle } from '@material-ui/core';
-import getText from "../../../GridaBoard/language/language";
+import getText from "GridaBoard/language/language";
 
 type Props = {
   open: boolean,

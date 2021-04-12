@@ -3,20 +3,21 @@ import { fabric } from 'fabric';
 
 import RenderWorkerBase, { IRenderWorkerOption } from './RenderWorkerBase';
 
-import { callstackDepth, drawPath, drawPath_arr, makeNPageIdStr, isSamePage, uuidv4, drawPath_chiselNip, isSameNcode } from '../../common/util';
-import { IBrushType, PenEventName } from '../../common/enums';
-import { IPoint, NeoStroke, NeoDot, IPageSOBP, INeoStrokeProps, StrokeStatus, ISize } from '../../common/structures';
-import { INeoSmartpen, IPenToViewerEvent } from '../../common/neopen';
-import { InkStorage } from '../../common/penstorage';
-import { PenManager } from '../../neosmartpen';
-import { adjustNoteItemMarginForFilm, getNPaperInfo } from "../../common/noteserver";
-import { MappingStorage } from '../../common/mapper/MappingStorage';
-import { calcRevH } from '../../common/mapper/CoordinateTanslater';
-import { applyTransform } from '../../common/math/echelon/SolveTransform';
-import GridaDoc from '../../../GridaBoard/GridaDoc';
-import { setActivePageNo } from '../../../GridaBoard/store/reducers/activePageReducer';
-import { store } from "../../../GridaBoard/client/Root";
-import { PlateNcode_1, PlateNcode_2 } from '../../common/constants';
+import { callstackDepth, drawPath, drawPath_arr, makeNPageIdStr, isSamePage, uuidv4, drawPath_chiselNip, isSameNcode } from 'nl-lib/common/util';
+import { IBrushType, PenEventName } from 'nl-lib/common/enums';
+import { IPoint, NeoStroke, NeoDot, IPageSOBP, INeoStrokeProps, StrokeStatus, ISize } from 'nl-lib/common/structures';
+import { INeoSmartpen, IPenToViewerEvent } from 'nl-lib/common/neopen';
+import { InkStorage } from 'nl-lib/common/penstorage';
+import { PenManager } from 'nl-lib/neosmartpen';
+import { adjustNoteItemMarginForFilm, getNPaperInfo } from "nl-lib/common/noteserver";
+import { MappingStorage } from 'nl-lib/common/mapper/MappingStorage';
+import { calcRevH } from 'nl-lib/common/mapper/CoordinateTanslater';
+import { applyTransform } from 'nl-lib/common/math/echelon/SolveTransform';
+import { PlateNcode_1, PlateNcode_2 } from 'nl-lib/common/constants';
+
+import GridaDoc from 'GridaBoard/GridaDoc';
+import { setActivePageNo } from 'GridaBoard/store/reducers/activePageReducer';
+import { store } from "GridaBoard/client/Root";
 
 const NUM_HOVER_POINTERS = 6;
 const DFAULT_BRUSH_SIZE = 10;
@@ -913,9 +914,7 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
 
   createFabricPath = (stroke: NeoStroke, cache: boolean, pageInfo: IPageSOBP) => {
     const { color, brushType, key } = stroke;
-    let pathData;
-
-    pathData = this.createPathData(stroke, pageInfo);
+    const pathData = this.createPathData(stroke, pageInfo);
 
     let opacity = 0;
     switch (brushType) {

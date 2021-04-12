@@ -1,7 +1,7 @@
-import { NeoPdfDocument, NeoPdfPage } from "../nl-lib/common/neopdf";
-import { IPageMapBase, IPageSOBP, IPageOverview } from "../nl-lib/common/structures";
-import { getNPaperSize_pu } from "../nl-lib/common/noteserver";
-import { isSamePage } from "../nl-lib/common/util";
+import { NeoPdfDocument, NeoPdfPage } from "nl-lib/common/neopdf";
+import { IPageMapBase, IPageSOBP, IPageOverview } from "nl-lib/common/structures";
+import { getNPaperSize_pu } from "nl-lib/common/noteserver";
+import { isSamePage } from "nl-lib/common/util";
 
 export default class GridaPage {
   _pageNo: number;

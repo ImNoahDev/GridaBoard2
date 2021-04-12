@@ -12,7 +12,7 @@ import {
 } from "./pencomm_const";
 
 import { unescapePacket } from "./pen_util_func";
-import getText from "../../../GridaBoard/language/language";
+import getText from "GridaBoard/language/language";
 
 export async function deviceSelectDlg(): Promise<BluetoothDevice> {
   console.log("********* Requesting any Bluetooth Device... **********");

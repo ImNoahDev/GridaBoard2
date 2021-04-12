@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import { Box, Checkbox, createStyles, FormControl, FormControlLabel, FormLabel, Grid, InputBase, InputLabel, MenuItem, Paper, Radio, RadioGroup, Select, Table, TableBody, TableCell, TableCellProps, TableContainer, TableRow, TextField, Theme, Typography, useTheme, withStyles } from '@material-ui/core';
-import NeoToolTip, { ITipType } from '../../../../common/ui/NeoToolTip';
+import NeoToolTip, { ITipType } from 'nl-lib/common/ui/NeoToolTip';
 import { printOptionTip } from './ToolTips';
 import ArrowRightSharpIcon from '@material-ui/icons/ArrowRightSharp';
-import getText from '../../../../../GridaBoard/language/language';
+import getText from 'nl-lib/../GridaBoard/language/language';
 
 const BootstrapInput = withStyles((theme) => ({
   root: {

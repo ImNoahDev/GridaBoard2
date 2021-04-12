@@ -2,18 +2,18 @@ import { PageSizes, PDFDict, PDFDocument, PDFHexString, PDFName } from "pdf-lib"
 import { saveAs } from "file-saver";
 import printJS from "print-js";
 
-import { showCalibrationDialog } from '../../../GridaBoard/store/reducers/calibrationReducer';
-import { IPrintingEvent, IPrintingReport, IPrintOption, IUnitString, IProgressCallbackFunction, IPrintingSheetDesc, IPageMapItem } from "../../common/structures";
+import { showCalibrationDialog } from 'GridaBoard/store/reducers/calibrationReducer';
+import { IPrintingEvent, IPrintingReport, IPrintOption, IUnitString, IProgressCallbackFunction, IPrintingSheetDesc, IPageMapItem } from "nl-lib/common/structures";
 
-import { MappingItem, MappingStorage, PdfDocMapper } from "../../common/mapper";
+import { MappingItem, MappingStorage, PdfDocMapper } from "nl-lib/common/mapper";
 import { SheetRendererManager } from "../NcodeSurface/SheetRendererManager";
-import { cloneObj, convertUnit, getExtensionName, getFilenameOnly, getNcodedPdfName, makeNPageIdStr, makePdfId, sleep, uuidv4 } from "../../common/util";
+import { cloneObj, convertUnit, getExtensionName, getFilenameOnly, getNcodedPdfName, makeNPageIdStr, makePdfId, sleep, uuidv4 } from "nl-lib/common/util";
 import { _app_name, _lib_name, _version } from "../Version";
 import { g_defaultPrintOption } from "../DefaultOption";
-import { IPdfToNcodeMapItem } from "../../common/structures";
-import { NcodePdfScaleMode } from "../../common/enums";
-import { NeoPdfDocument, NeoPdfManager } from "../../common/neopdf";
-import { g_nullNcode } from "../../common/constants";
+import { IPdfToNcodeMapItem } from "nl-lib/common/structures";
+import { NcodePdfScaleMode } from "nl-lib/common/enums";
+import { NeoPdfDocument, NeoPdfManager } from "nl-lib/common/neopdf";
+import { g_nullNcode } from "nl-lib/common/constants";
 
 
 // https://stackoverflow.com/questions/9616426/javascript-print-iframe-contents-only/9616706

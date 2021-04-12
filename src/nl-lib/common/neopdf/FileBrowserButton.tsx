@@ -5,7 +5,7 @@ import { openFileBrowser } from "./FileBrowser";
 import { IFileBrowserReturn } from '../structures';
 import { NeoToolTip } from '../ui';
 import $ from "jquery";
-import getText from "../../../GridaBoard/language/language";
+import getText from "GridaBoard/language/language";
 
 
 interface Props extends ButtonProps {

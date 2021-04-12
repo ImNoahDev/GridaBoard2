@@ -3,7 +3,7 @@ import '../../styles/buttons.css';
 import { Button } from '@material-ui/core';
 import GridaToolTip from "../../styles/GridaToolTip";
 import { setViewFit } from '../../store/reducers/viewFitReducer';
-import { PageZoomEnum, ZoomFitEnum } from "../../../nl-lib/common/enums";
+import { PageZoomEnum, ZoomFitEnum } from "nl-lib/common/enums";
 import { useSelector } from "react-redux";
 import { RootState } from "../../store/rootReducer";
 import { setZoomStore } from '../../store/reducers/zoomReducer';

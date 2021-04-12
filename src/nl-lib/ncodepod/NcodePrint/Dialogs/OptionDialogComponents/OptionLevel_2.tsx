@@ -1,10 +1,10 @@
 import React from 'react';
 import { Box, Table, TableBody, TableCell, TableRow, Typography, useTheme } from '@material-ui/core';
-import { MappingStorage } from '../../../../common/mapper';
+import { MappingStorage } from 'nl-lib/common/mapper';
 import { RadioField } from './RadioField';
 import { ILeveledDialogProps, LineBreak, useLevelDialogStyles, cellRadioStyle } from "./OptionLevel_0";
 import { SelectField } from './SelectField';
-import { ColorConvertMethod } from '../../../../common/enums';
+import { ColorConvertMethod } from 'nl-lib/common/enums';
 
 function OptionLevel_2(props: ILeveledDialogProps) {
   const { optionLevel, printOption, handleChange2, color } = props;

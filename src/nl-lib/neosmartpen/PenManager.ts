@@ -1,9 +1,9 @@
 import $ from "jquery";
-import { EventDispatcher, EventCallbackType } from "../common/event";
-import { IBrushType, PenEventName, PEN_THICKNESS } from "../common/enums";
-import { IPenEvent } from "../common/structures";
-import ThemeManager from "../../GridaBoard/styles/ThemeManager"
-import { INeoSmartpen, IPenToViewerEvent } from "../common/neopen/INeoSmartpen";
+import { EventDispatcher, EventCallbackType } from "nl-lib/common/event";
+import { IBrushType, PenEventName, PEN_THICKNESS } from "nl-lib/common/enums";
+import { IPenEvent } from "nl-lib/common/structures";
+import ThemeManager from "GridaBoard/styles/ThemeManager"
+import { INeoSmartpen, IPenToViewerEvent } from "nl-lib/common/neopen/INeoSmartpen";
 import NeoSmartpen from "./NeoSmartpen";
 import VirtualPen from "./VirtualPen";
 

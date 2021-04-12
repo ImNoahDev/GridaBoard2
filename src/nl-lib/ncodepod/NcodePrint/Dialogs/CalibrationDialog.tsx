@@ -5,18 +5,17 @@ import { useSelector, useDispatch } from 'react-redux';
 
 import "./pen_touch.css";
 
-// import { theme } from '../../../../styles/theme';
-import { theme } from '../../../../GridaBoard/styles/theme';
-import { RootState } from '../../../../GridaBoard/store/rootReducer';
-import { hideCalibrationDialog, showCalibrationDialog, updateCalibrationDialog, setCalibrationMode } from '../../../../GridaBoard/store/reducers/calibrationReducer';
-import { IPageSOBP, IPoint, IPrintOption } from '../../../common/structures';
-import { NeoPdfDocument, NeoPdfManager } from '../../../common/neopdf';
-import CalibrationData from '../../../common/mapper/Calibration/CalibrationData';
-import { MappingStorage } from '../../../common/mapper/MappingStorage';
-import { isSamePage, makeNPageIdStr } from "../../../common/util";
-import GridaApp from "../../../../GridaBoard/GridaApp";
-import ConnectButton from "../../../../GridaBoard/components/buttons/ConnectButton";
-import getText from "../../../../GridaBoard/language/language";
+import { theme } from 'GridaBoard//styles/theme';
+import { RootState } from 'GridaBoard//store/rootReducer';
+import { hideCalibrationDialog, showCalibrationDialog, updateCalibrationDialog, setCalibrationMode } from 'GridaBoard//store/reducers/calibrationReducer';
+import { IPageSOBP, IPoint, IPrintOption } from 'nl-lib/common/structures';
+import { NeoPdfDocument, NeoPdfManager } from 'nl-lib/common/neopdf';
+import CalibrationData from 'nl-lib/common/mapper/Calibration/CalibrationData';
+import { MappingStorage } from 'nl-lib/common/mapper/MappingStorage';
+import { isSamePage, makeNPageIdStr } from "nl-lib/common/util";
+import GridaApp from "GridaBoard//GridaApp";
+import ConnectButton from "GridaBoard//components/buttons/ConnectButton";
+import getText from "GridaBoard//language/language";
 
 const _penImageUrl = "/icons/image_calibration.png";
 

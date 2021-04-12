@@ -1,13 +1,12 @@
 import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import { createStyles, Table, TableBody, TableCell, TableRow, Theme, Typography, useTheme } from '@material-ui/core';
-import { MappingStorage } from '../../../../common/mapper';
+import { MappingStorage } from 'nl-lib/common/mapper';
 import { RadioField } from './RadioField';
 import { PageRangeField } from './PageRangeField';
-import { SelectField } from './SelectField';
 
-import { IPrintOption } from '../../../../common/structures';
-import getText from "../../../../../GridaBoard/language/language";
+import { IPrintOption } from 'nl-lib/common/structures';
+import getText from "nl-lib/../GridaBoard/language/language";
 
 // const useStyles = makeStyles((theme: Theme) => {
 //   createStyles({

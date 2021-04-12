@@ -1,5 +1,5 @@
 import { store } from "../../client/Root";
-import { ZoomFitEnum } from "../../../nl-lib/common/enums";
+import { ZoomFitEnum } from "nl-lib/common/enums";
 
 const SET_VIEW_FIT = 'rotate/SET_VIEW_FIT';
 

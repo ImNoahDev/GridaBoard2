@@ -3,8 +3,8 @@ import { degrees, degreesToRadians, PDFDocument, rgb, StandardFonts } from 'pdf-
 
 import GridaDoc from "../GridaDoc";
 
-import { InkStorage } from "../../nl-lib/common/penstorage";
-import { drawPath } from "../../nl-lib/common/util";
+import { InkStorage } from "nl-lib/common/penstorage";
+import { drawPath } from "nl-lib/common/util";
 import { fabric } from "fabric";
 
 const PDF_TO_SCREEN_SCALE = 6.72; // (56/600)*72

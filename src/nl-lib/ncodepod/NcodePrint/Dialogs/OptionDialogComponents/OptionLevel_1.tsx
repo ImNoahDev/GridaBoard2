@@ -1,12 +1,12 @@
 import React from 'react';
 import { Table, TableBody, TableCell, TableRow, Typography, useTheme } from '@material-ui/core';
-import { MappingStorage } from '../../../../common/mapper';
+import { MappingStorage } from 'nl-lib/common/mapper';
 import { RadioField } from './RadioField';
 import { ILeveledDialogProps, LineBreak, useLevelDialogStyles, cellRadioStyle } from "./OptionLevel_0";
 import { SelectField } from './SelectField';
-import { makeNPageIdStr } from '../../../../common/util';
-import { MediaSize } from '../../../../common/constants';
-import getText from '../../../../../GridaBoard/language/language';
+import { makeNPageIdStr } from 'nl-lib/common/util';
+import { MediaSize } from 'nl-lib/common/constants';
+import getText from 'nl-lib/../GridaBoard/language/language';
 
 function EmptryTableRow() {
   return (

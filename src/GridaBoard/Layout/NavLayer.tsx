@@ -3,12 +3,12 @@ import { useSelector } from "react-redux";
 
 import GridaDoc from "../GridaDoc";
 
-import { makeNPageIdStr } from "../../nl-lib/common/util";
+import { makeNPageIdStr } from "nl-lib/common/util";
 
-import { g_defaultPrintOption } from "../../nl-lib/ncodepod";
+import { g_defaultPrintOption } from "nl-lib/ncodepod";
 
-import { MappingStorage } from "../../nl-lib/common/mapper";
-import { NoteServerClient } from "../../nl-lib/common/noteserver";
+import { MappingStorage } from "nl-lib/common/mapper";
+import { NoteServerClient } from "nl-lib/common/noteserver";
 
 import KeyboardArrowDownRoundedIcon from '@material-ui/icons/KeyboardArrowDownRounded';
 import PenTypeButton from "../components/buttons/PenTypeButton";

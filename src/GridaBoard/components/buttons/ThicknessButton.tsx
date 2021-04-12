@@ -1,8 +1,8 @@
 import React from "react";
 import '../../styles/buttons.css';
-import PenManager from "../../../nl-lib/neosmartpen/PenManager";
+import PenManager from "nl-lib/neosmartpen/PenManager";
 import { IconButton, makeStyles, SvgIcon, Theme, Tooltip, TooltipProps } from "@material-ui/core";
-import { PEN_THICKNESS } from "../../../nl-lib/common/enums";
+import { PEN_THICKNESS } from "nl-lib/common/enums";
 import KeyboardArrowDownRoundedIcon from '@material-ui/icons/KeyboardArrowDownRounded';
 import getText from "../../language/language";
 

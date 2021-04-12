@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, LinearProgress } from '@material-ui/core';
-import getText from "../../../GridaBoard/language/language";
+import getText from "GridaBoard/language/language";
 
 const useStyles = makeStyles({
   root: {

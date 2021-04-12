@@ -1,8 +1,8 @@
 import { SheetRenderer } from "./SheetRenderer";
 
-import { IPrintOption, IProgressCallbackFunction } from "../../common/structures";
-import { cloneObj, isSameObject } from "../../common/util";
-import { NeoPdfDocument } from "../../common/neopdf";
+import { IPrintOption, IProgressCallbackFunction } from "nl-lib/common/structures";
+import { cloneObj, isSameObject } from "nl-lib/common/util";
+import { NeoPdfDocument } from "nl-lib/common/neopdf";
 
 
 type ISheetRendererDesc = {

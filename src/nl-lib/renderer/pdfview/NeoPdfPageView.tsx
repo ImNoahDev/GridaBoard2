@@ -4,9 +4,9 @@ import { CSSProperties } from '@material-ui/core/styles/withStyles';
 
 import { MAX_RENDERER_PIXELS } from "../RendererConstants";
 import { MixedViewProps } from '../MixedPageView';
-import { NeoPdfDocument, NeoPdfPage } from '../../common/neopdf';
-import { PDF_DEFAULT_DPI } from '../../common/constants';
-import { dumpDiffPropsAndState, makeNPageIdStr } from "../../common/util";
+import { NeoPdfDocument, NeoPdfPage } from 'nl-lib/common/neopdf';
+import { PDF_DEFAULT_DPI } from 'nl-lib/common/constants';
+import { makeNPageIdStr } from "nl-lib/common/util";
 
 interface PageProps extends MixedViewProps {
   // pdf: PdfJs.PDFDocumentProxy,

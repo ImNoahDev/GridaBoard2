@@ -4,7 +4,7 @@ import NavLayer from "./NavLayer";
 import LeftSideLayer from "./LeftSideLayer";
 import ContentsLayer from "./ContentsLayer";
 import { ButtonProps } from "@material-ui/core";
-import { IFileBrowserReturn } from "../../nl-lib/common/structures";
+import { IFileBrowserReturn } from "nl-lib/common/structures";
 import AppBar from '@material-ui/core/AppBar';
 import { makeStyles } from '@material-ui/core/styles';
 

@@ -1,7 +1,7 @@
 import { saveAs } from "file-saver";
 import { degrees, PDFDocument } from 'pdf-lib';
 import GridaDoc from "../GridaDoc";
-import { InkStorage } from "../../nl-lib/common/penstorage";
+import { InkStorage } from "nl-lib/common/penstorage";
 import { fabric } from "fabric";
 
 const PDF_TO_SCREEN_SCALE = 6.72; // (56/600)*72

@@ -1,7 +1,7 @@
 import NcodeFetcher from "./NcodeFetcher";
 
-import { INoteServerItem_forPOD, IPageSOBP } from "../../common/structures";
-import { isSamePage, makeNPageIdStr } from "../../common/util";
+import { INoteServerItem_forPOD, IPageSOBP } from "nl-lib/common/structures";
+import { isSamePage, makeNPageIdStr } from "nl-lib/common/util";
 
 
 

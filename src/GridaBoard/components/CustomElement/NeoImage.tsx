@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useTheme } from "@material-ui/core";
 import { ImageProps } from "react-bootstrap";
-import { hex2ColorObject } from "../../../nl-lib/common/util";
+import { hex2ColorObject } from "nl-lib/common/util";
 
 
 function convertColor(c: HTMLCanvasElement, color: string) {

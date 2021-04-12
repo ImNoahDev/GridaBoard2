@@ -6,18 +6,19 @@ import { Typography } from "@material-ui/core";
 import { IRenderWorkerOption } from "./RenderWorkerBase";
 import PenBasedRenderWorker from "./PenBasedRenderWorker";
 
-import { IBrushType, PenEventName, PageEventName, PLAYSTATE, ZoomFitEnum } from "../../common/enums";
-import { IPageSOBP, ISize } from "../../common/structures";
-import { callstackDepth, isSamePage, isSameNcode, makeNPageIdStr, makeNCodeIdStr, uuidv4 } from "../../common/util";
+import { IBrushType, PenEventName, PageEventName, PLAYSTATE, ZoomFitEnum } from "nl-lib/common/enums";
+import { IPageSOBP, ISize } from "nl-lib/common/structures";
+import { callstackDepth, isSamePage, isSameNcode, makeNPageIdStr, makeNCodeIdStr, uuidv4 } from "nl-lib/common/util";
 
-import { INeoSmartpen, IPenToViewerEvent } from "../../common/neopen";
-import { MappingStorage } from "../../common/mapper";
-import { DefaultPlateNcode, DefaultPUINcode } from "../../common/constants";
-import { InkStorage } from "../../common/penstorage";
+import { INeoSmartpen, IPenToViewerEvent } from "nl-lib/common/neopen";
+import { MappingStorage } from "nl-lib/common/mapper";
+import { DefaultPlateNcode, DefaultPUINcode } from "nl-lib/common/constants";
+import { InkStorage } from "nl-lib/common/penstorage";
+import { isPUI } from "nl-lib/common/noteserver";
 
-import { setCalibrationData } from '../../../GridaBoard/store/reducers/calibrationDataReducer';
-import { store } from "../../../GridaBoard/client/Root";
-import GridaDoc from "../../../GridaBoard/GridaDoc";
+import { setCalibrationData } from 'GridaBoard/store/reducers/calibrationDataReducer';
+import { store } from "GridaBoard/client/Root";
+import GridaDoc from "GridaBoard/GridaDoc";
 
 /**
  * Properties
@@ -357,7 +358,7 @@ class PenBasedRenderer extends React.Component<Props, State> {
       if (this.renderer && !this.props.calibrationMode) {
         console.log(`VIEW SIZE PAGE CHANGE 1: ${makeNPageIdStr(pageInfo)}`);
 
-        if (isSameNcode(nextProps.pageInfo, DefaultPUINcode)) { 
+        if (isSameNcode(nextProps.pageInfo, DefaultPUINcode) || isPUI(nextProps.pageInfo)) { 
           //1. PUI에 쓸 경우 페이지가 바뀌는 것을 막기 위함
           return;
         }
