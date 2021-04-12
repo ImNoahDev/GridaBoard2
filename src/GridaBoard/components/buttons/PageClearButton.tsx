@@ -46,11 +46,11 @@ const PageClearButton = () => {
   
   const handlePageClearBtn = () => {
     const doc = GridaDoc.getInstance();
-    const basePageInfo = doc.getPage(activePageNo).basePageInfo;
+    const pageInfo = doc.getPage(activePageNo).pageInfos[0];
 
     const inkStorage = InkStorage.getInstance();
-    inkStorage.dispatcher.dispatch(PageEventName.PAGE_CLEAR, basePageInfo);
-    inkStorage.removeStrokeFromPage(basePageInfo);
+    inkStorage.dispatcher.dispatch(PageEventName.PAGE_CLEAR, pageInfo);
+    inkStorage.removeStrokeFromPage(pageInfo);
   }
 
   const classes = useStyles();

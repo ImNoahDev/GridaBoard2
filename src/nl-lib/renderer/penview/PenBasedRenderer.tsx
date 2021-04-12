@@ -655,7 +655,16 @@ class PenBasedRenderer extends React.Component<Props, State> {
   }
 
   removeAllCanvasObjectOnActivePage = (pageInfo: IPageSOBP) => {
-    if (this.renderer && isSamePage(this.props.pageInfo, pageInfo)) {
+    const activePageNo = store.getState().activePage.activePageNo;
+    const activePage = GridaDoc.getInstance().getPageAt(activePageNo);
+    const activePageInfo = activePage.pageInfos[0];//plate에 쓰는 경우 plate의 pageInfo가 아닌 실제 pageInfo가 필요
+
+    let isPlate = false;
+    if (isSamePage(activePageInfo, pageInfo) && isSameNcode(DefaultPlateNcode, this.props.pageInfo)) {
+      isPlate = true;
+    }
+
+    if (this.renderer && (isSamePage(this.props.pageInfo, pageInfo) || isPlate)) {
       this.renderer.removeAllCanvasObject();
     }
   }
