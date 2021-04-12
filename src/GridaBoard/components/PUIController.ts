@@ -1,11 +1,13 @@
 import $ from 'jquery';
 import { store } from "GridaBoard/client/Root";
-import { IBrushType, PEN_THICKNESS, ZoomFitEnum } from 'nl-lib/common/enums';
+import { IBrushType, PageEventName, PEN_THICKNESS, ZoomFitEnum } from 'nl-lib/common/enums';
 import PenManager from 'nl-lib/neosmartpen/PenManager';
 import { setViewFit } from 'GridaBoard/store/reducers/viewFitReducer';
 import { setZoomStore } from 'GridaBoard/store/reducers/zoomReducer';
 import { setActivePageNo } from 'GridaBoard/store/reducers/activePageReducer';
 import { setPointerTracer } from 'GridaBoard/store/reducers/pointerTracer';
+import GridaDoc from '../GridaDoc';
+import { InkStorage } from 'nl-lib/common/penstorage';
 
 
 // 2020-12-09 현재 구현되어 있는 부분까지 PUI 완성(페이지 넘어가는 부분과 스트로크 찍히는 오류 수정할 것)
@@ -250,9 +252,16 @@ export default class PUIController {
         }
         break;
       }
-      case "erase_all":
+      case "erase_all": {
+        const activePageNo = store.getState().activePage.activePageNo;
+        const doc = GridaDoc.getInstance();
+        const pageInfo = doc.getPage(activePageNo).pageInfos[0];
+    
+        const inkStorage = InkStorage.getInstance();
+        inkStorage.dispatcher.dispatch(PageEventName.PAGE_CLEAR, pageInfo);
+        inkStorage.removeStrokeFromPage(pageInfo);
         break;
-
+      }
       case "menu_grida":
         break;
       
