@@ -125,7 +125,7 @@ const Home = () => {
     console.log(event.url)
     if (event.result === "success") {
       const doc = GridaDoc.getInstance();
-      doc.openPdfFile({ url: event.url, filename: event.file.name }, pageInfo, basePageInfo);
+      await doc.openPdfFile({ url: event.url, filename: event.file.name }, pageInfo, basePageInfo);
 
     }
     else if (event.result === "canceled") {
