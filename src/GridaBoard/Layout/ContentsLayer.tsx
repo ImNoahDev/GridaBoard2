@@ -14,6 +14,7 @@ import GridaToolTip from "../styles/GridaToolTip";
 import { Button, IconButton, Popover } from "@material-ui/core";
 import HelpIcon from '@material-ui/icons/Help';
 import $ from "jquery";
+import TrashButton from "../components/buttons/TrashButton";
 
 const rotateStyle = {
   position: "absolute",
@@ -164,6 +165,7 @@ const ContentsLayer = (props: Props) => {
     <div id="main" style={localStyle}>
       <div style={rotateStyle}>
         <RotateButton />
+        <TrashButton />
       </div>
       {/* <div>
         <GridaToolTip open={true} placement="top-start" tip={{
