@@ -110,28 +110,28 @@ export default function FitButton() {
           <Button id="customer" className="help_drop_down" style={{
             width: "224px", height: "40px", padding: "4px 12px"
           }} onClick={() => setZoomByButton(PageZoomEnum.ZOOM_UP)}>
-            <span style={{width: "200px", height: "16px", marginLeft: "-128px"}}>
+            <span style={{width: "200px", height: "16px", textAlign:"left"}}>
               {getText("nav_scale_increase")}
             </span>
           </Button>
           <Button id="shortcut" className="help_drop_down" style={{
             width: "224px", height: "40px", padding: "4px 12px"
           }} onClick={() => setZoomByButton(PageZoomEnum.ZOOM_DOWN)}>
-            <span style={{width: "200px", height: "16px", marginLeft: "-128px"}}>
+            <span style={{width: "200px", height: "16px", textAlign:"left"}}>
               {getText("nav_scale_reduce")}
             </span>
           </Button>
           <Button id="tutorial" className="help_drop_down" style={{
             width: "224px", height: "40px", padding: "4px 12px"
           }} onClick={() => handleClose(ZoomFitEnum.HEIGHT)}>
-            <span style={{width: "200px", height: "16px", marginLeft: "-80px"}}>
+            <span style={{width: "200px", height: "16px", textAlign:"left"}}>
               {getText("nav_scale_toHeight")}
             </span>
           </Button>
           <Button id="faq" className="help_drop_down" style={{
             width: "224px", height: "40px", padding: "4px 12px"
           }} onClick={() => handleClose(ZoomFitEnum.WIDTH)}>
-            <span style={{width: "200px", height: "16px", marginLeft: "-80px"}}>
+            <span style={{width: "200px", height: "16px", textAlign:"left"}}>
               {getText("nav_scale_toWidth")}
             </span>
           </Button>

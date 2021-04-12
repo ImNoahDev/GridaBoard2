@@ -255,7 +255,7 @@ export function OptionDialog(props: IDialogProps) {
     forceToRender();
   };
 
-  const levelButtonText = [getText("print_popup_toDetail"), "전문가 설정 보기", getText("")];
+  const levelButtonText = [getText("print_popup_toDetail"), "전문가 설정 보기", getText("print_popup_toSimple")];
 
   console.log(`default: level=${optionLevel}`);
   let msg = levelButtonText[optionLevel];
@@ -302,14 +302,14 @@ export function OptionDialog(props: IDialogProps) {
 
         <DialogActions>
 
-          <Grid item xs={12} sm={4}>
+          <Grid item xs={12} sm={11}>
             <Button onClick={handleLevel} color="primary">
               {msg}
             </Button>
           </Grid>
 
-          <Grid item xs={12} sm={7}>
-          </Grid>
+          {/* <Grid item xs={12} sm={5}>
+          </Grid> */}
 
           <Grid item xs={12} sm={2}>
             <Button style={{

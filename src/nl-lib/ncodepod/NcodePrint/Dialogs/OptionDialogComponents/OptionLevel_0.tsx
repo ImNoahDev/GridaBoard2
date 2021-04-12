@@ -174,6 +174,8 @@ function OptionLevel_0(props: ILeveledDialogProps) {
           <TableRow className={classes.tr}>
             <TableCell colSpan={2} style={cellRadioStyle}>
               <PageRangeField showHelp={help} range={printOption.targetPages} max={printOption.docNumPages} handleChange={handleChange2} color={color} name="targetPages">
+                {console.log(getText("print_popup_select_page_selected"),printOption.targetPages.length.toString() )}
+                {console.log(getText)}
                 {getText("print_popup_select_page_selected").replace("%d", printOption.targetPages.length.toString())}
             </PageRangeField >
             </TableCell>
