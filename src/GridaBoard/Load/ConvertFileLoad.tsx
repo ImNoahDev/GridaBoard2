@@ -78,12 +78,12 @@ function fileConvert(selectedFile){
       }
 
       const doc = GridaDoc.getInstance();
-      doc.openGridaFile({ url: url, filename: file.name }, pdfRawData, neoStroke, pageInfos, basePageInfos);
+      await doc.openGridaFile({ url: url, filename: file.name }, pdfRawData, neoStroke, pageInfos, basePageInfos);
+      setLoadingVisibility(false);
     }
   } else {
       alert(getText("alert_fileOpenCancel"));
   }
-  setLoadingVisibility(false);
 }
 
 const ConvertFileLoad = (props: Props) => {
@@ -96,7 +96,7 @@ const ConvertFileLoad = (props: Props) => {
     input.value = "";
     input.click();
   }
-  function inputChange(){
+  async function inputChange(){
     const inputer = document.getElementById("fileForconvert") as HTMLInputElement;
     const fileName = inputer.files[0].name.split(".");
     const fileType = fileName[fileName.length-1];
@@ -111,7 +111,7 @@ const ConvertFileLoad = (props: Props) => {
       result.file = inputer.files[0];
       result.url = URL.createObjectURL(result.file);
       if(fileType == "pdf"){
-        handlePdfOpen(result as IFileBrowserReturn);
+        await handlePdfOpen(result as IFileBrowserReturn);
         setLoadingVisibility(false);
       }else if(fileType == "grida"){
         fileConvert(result as IFileBrowserReturn);

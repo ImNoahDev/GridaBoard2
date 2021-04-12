@@ -125,7 +125,7 @@ const Home = () => {
     console.log(event.url)
     if (event.result === "success") {
       const doc = GridaDoc.getInstance();
-      doc.openPdfFile({ url: event.url, filename: event.file.name }, pageInfo, basePageInfo);
+      await doc.openPdfFile({ url: event.url, filename: event.file.name }, pageInfo, basePageInfo);
 
     }
     else if (event.result === "canceled") {
@@ -199,11 +199,6 @@ document.addEventListener('wheel', function(e) {
 window.onclick = function(event) {
   if(!event.target.parentNode || event.target.parentNode.matches === undefined) return ;
 
-
-  if (!event.target.parentNode.matches('.select_color')) {
-    const color = document.getElementById("colorDrop");
-    color.style.display = 'none'
-  }
 
   if (!event.target.matches('.thicknessDropDown')) {
     const thickness = document.getElementById("thicknessDrop");
