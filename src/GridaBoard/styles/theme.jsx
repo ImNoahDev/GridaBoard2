@@ -27,6 +27,7 @@ import { createMuiTheme, useMediaQuery } from '@material-ui/core';
 //   tonalOffset: 0.2
 // };
 
+
 const palette = {
   myColor: {
     main: colors.blue[500]
@@ -92,6 +93,12 @@ export const theme = createMuiTheme({
   palette: {
     neutral: {
       main: '#5c6ac4',
+    },
+    primary: {
+      main: "rgb(104,143,255)"
+    },
+    secondary: {
+      main: "#e33371",
     },
   },
 

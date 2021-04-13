@@ -104,14 +104,10 @@ export default class GridaApp {
 
     const pen = e.pen;
     if (e.event.event === 'on_connected') {
-      $('#btn_connect').css('display', 'none');
-      $('#btn_connected').css('display', 'block')
       this._pens.push(pen);
       setPens([...this._pens]);
     }
     else if (e.event.event === 'on_disconnected') {
-      $('#btn_connect').css('display', 'block');
-      $('#btn_connected').css('display', 'none')
       const mac = pen.getMac();
       console.log(`Home: OnPenDisconnected, mac=${pen.getMac()}`);
       const index = this._pens.findIndex(p => p.getMac() === mac);

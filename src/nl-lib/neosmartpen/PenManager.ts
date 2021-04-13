@@ -356,10 +356,6 @@ export default class PenManager {
       this.penArray.push({ id: pen.getBtDevice().id, mac: pen.getMac(), pen, connected: true });
     }
 
-    const $elem = $("#btn_connect").find(".c2");
-    $elem.addClass("checked");
-    $("#pen_id").text(`${this.penArray.length}`);
-
     const themeManager = ThemeManager.getInstance();
     themeManager.enablePenRelatedButtons(true);
   }
@@ -380,11 +376,6 @@ export default class PenManager {
       console.log("PenManager: something wrong, un-added pen disconnected");
     }
 
-    $("#pen_id").text(`${this.penArray.length}`);
-    if (this.penArray.length === 0) {
-      const $elem = $("#btn_connect").find(".c2");
-      $elem.removeClass("checked");
-    }
   }
 
   /**

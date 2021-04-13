@@ -19,6 +19,7 @@ import { RootState } from '../store/rootReducer';
 import { turnOnGlobalKeyShortCut } from "../GlobalFunctions";
 import getText from "../language/language";
 import { NCODE_CLASS6_NUM_DOTS } from "nl-lib/common/constants";
+import { theme as myTheme } from "../styles/theme";
 
 const useStyles = props => makeStyles((theme) => ({
     buttonStyle : {

@@ -1,52 +1,77 @@
 /* eslint-disable no-unused-vars */
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from 'react';
+import { useSelector } from 'react-redux';
 
-import '../../styles/buttons.css';
-import { IconButton, makeStyles, SvgIcon } from '@material-ui/core';
-import GridaToolTip from "../../styles/GridaToolTip";
-import { useSelector } from "react-redux";
-import { RootState } from "../../store/rootReducer";
-import PenManager from "nl-lib/neosmartpen/PenManager";
-import { PenEventName } from "nl-lib/common/enums";
-import { INeoSmartpen } from "nl-lib/common/neopen";
-import $ from "jquery";
+import Button from '@material-ui/core/Button';
+import { makeStyles } from '@material-ui/core';
 
-const useStyle = makeStyles(theme=>({
-  penStyle : {
-    position: "absolute",
-    transform: "translate(10px, -10px)",
-    width: "16px",
-    height: "16px",
-    background: theme.palette.grey[400],
-    borderRadius: "50px",
-    "& > span":{
-      position: "absolute",
-      left: "0px",
-      top: "0px",
-      transform: "translate(4px, 1px)",
-      fontFamily: "Roboto",
-      fontStyle: "normal",
-      fontWeight: "normal",
-      fontSize: "8px",
-      lineHeight: "13px",
-      color: theme.palette.grey[50],
-    }
-  }
-  
-}));
+import PenManager from 'nl-lib/neosmartpen/PenManager';
+import { PenEventName } from 'nl-lib/common/enums';
+import { INeoSmartpen } from 'nl-lib/common/neopen';
 
+import { RootState } from 'GridaBoard/store/rootReducer';
 
 type Props = {
   onPenLinkChanged: (e) => void;
   className?:string
-}
-const ConnectButton = (props: Props) => {
-  let connectDisplayProp = "block";
-  let connectedDisplayProp = "none";
-  const classes = useStyle();
+};
 
+const ConnectButton = (props: Props) => {
   const [numPens, setNumPens] = useState(0);
   const numPens_store = useSelector((state: RootState) => state.appConfig.num_pens);
+
+  const useStyle = makeStyles(theme=>({
+    penStyle : {
+      position: "absolute",
+      transform: "translate(10px, -10px)",
+      width: "16px",
+      height: "16px",
+      background: theme.palette.grey[400],
+      borderRadius: "50px",
+      "& > span":{
+        position: "absolute",
+        left: "0px",
+        top: "0px",
+        transform: "translate(4px, 1px)",
+        fontFamily: "Roboto",
+        fontStyle: "normal",
+        fontWeight: "normal",
+        fontSize: "8px",
+        lineHeight: "13px",
+        color: theme.palette.grey[50],
+      }
+    }
+    
+  }));
+
+  const useStyles = makeStyles({
+    connectBtn: {
+      width: '92px',
+      height: '30px',
+      margin: '0px 16px',
+      padding: '8px',
+      borderRadius: '4px',
+    },
+    connectedBtn: {
+      width: '84px',
+      height: '30px',
+      margin: '0px 16px',
+      padding: '8px',
+      borderRadius: '4px',
+    },
+    btnText: {
+      fontFamily: 'Roboto',
+      fontStyle: 'normal',
+      fontWeight: 'normal',
+      fontSize: '12px',
+      lineHeight: '14px',
+
+      display: 'flex',
+      alignItems: 'center',
+      textAlign: 'center',
+      letterSpacing: '0.25px',
+    },
+  });
 
   useEffect(() => {
     setNumPens(numPens_store);
@@ -66,59 +91,21 @@ const ConnectButton = (props: Props) => {
     }
   };
 
-  if (numPens_store > 0) {
-    connectDisplayProp = "none";
-    connectedDisplayProp = "block";
-  } else {
-    connectDisplayProp = "block";
-    connectedDisplayProp = "none";
-  }
-  
+  const classes = useStyles();
 
   return (
     <React.Fragment>
-      <IconButton id="btn_connect" className={props.className} style={{display: connectDisplayProp }}
-        onClick={() => handleConnectPen()}>
-        {/* <GridaToolTip open={true} placement="left" tip={{
-          head: "Pen Connect",
-          msg: "블루투스를 통해 펜을 연결합니다. 블루투스 통신이 가능한 환경에서만 동작합니다.",
-          tail: "Shift + 1~7 각 펜의 내용을 감추기/보이기, P 모든 펜의 획을 감추기/보이기"
-        }} title={undefined}> */}
-          <SvgIcon>
-            <path
-              fillRule="evenodd"
-              clipRule="evenodd"
-              d="M17.997 19.488A10.978 10.978 0 0022 11c0-.99-.13-1.949-.376-2.861a5.518 5.518 0 01-1.754 1.326c.085.499.13 1.012.13 1.535a8.975 8.975 0 01-2.84 6.561 3.18 3.18 0 00-3.09-2.435 2.268 2.268 0 01-2.268-2.268v-1.647a2.312 2.312 0 00-1.837-2.262V7.677l-1.118-3.08a.302.302 0 00-.285-.197.3.3 0 00-.284.197L7.18 7.677v1.299a2.147 2.147 0 00-1.58 2.07v7.155a9 9 0 016.935-16.07A5.518 5.518 0 0113.861.375l-.112-.03A11.02 11.02 0 0011 0C4.925 0 0 4.925 0 11a10.996 10.996 0 0011 11 10.952 10.952 0 006.997-2.512zM7.6 19.336A8.974 8.974 0 0011 20a8.96 8.96 0 004.248-1.064v-.632c0-.65-.528-1.178-1.178-1.178a4.268 4.268 0 01-4.268-4.268v-1.647a.31.31 0 00-.31-.311H7.745a.146.146 0 00-.146.146v8.29z"
-            />
-              <path
-                d="M17.5 0a4.5 4.5 0 110 9 4.5 4.5 0 010-9zm0 2.077a.346.346 0 00-.346.346v1.73h-1.73l-.024.002a.346.346 0 00.023.691h1.731V6.6a.346.346 0 00.692-.023V4.846H19.6a.346.346 0 00-.023-.692h-1.73v-1.73l-.002-.024a.346.346 0 00-.345-.323z"
-              />
-          </SvgIcon>
-        {/* </GridaToolTip> */}
-      </IconButton>
-      <IconButton id="btn_connected" className={props.className} style={{display: connectedDisplayProp}}
-        onClick={() => handleConnectPen()}>
-        {/* <GridaToolTip open={true} placement="left" tip={{
-          head: "Pen Connect",
-          msg: "블루투스를 통해 펜을 연결합니다. 블루투스 통신이 가능한 환경에서만 동작합니다.",
-          tail: "Shift + 1~7 각 펜의 내용을 감추기/보이기, P 모든 펜의 획을 감추기/보이기"
-        }} title={undefined}> */}
-          <SvgIcon>
-            <path
-              style={{background: "rgba(88,98,125,1)"}}
-              fillRule="evenodd"
-              clipRule="evenodd"
-              d="M18.997 20.488A10.978 10.978 0 0023 12c0-6.075-4.925-11-11-11S1 5.925 1 12a10.996 10.996 0 0011 11 10.968 10.968 0 006.997-2.512zm-2.749-.552A8.96 8.96 0 0112 21a8.974 8.974 0 01-3.4-.664v-8.29c0-.08.065-.146.146-.146h1.745c.172 0 .311.14.311.31v1.648a4.268 4.268 0 004.268 4.268c.65 0 1.178.527 1.178 1.178v.632zm1.913-1.375a3.18 3.18 0 00-3.091-2.435 2.268 2.268 0 01-2.268-2.268v-1.647a2.312 2.312 0 00-1.837-2.262V8.677l-1.118-3.08a.302.302 0 00-.285-.197.3.3 0 00-.284.197L8.18 8.677v1.299a2.147 2.147 0 00-1.58 2.07v7.155a9 9 0 1111.56-.64z"
-            />
-          </SvgIcon>
-        {/* </GridaToolTip> */}
-        <div className={classes.penStyle}>
-          <span id="pen_id" >{numPens}</span>
-        </div>
-
-      </IconButton>
+      {numPens < 1 ? (
+        <Button className={classes.connectBtn} variant="contained" color="primary" onClick={() => handleConnectPen()}>
+          <span className={classes.btnText}>+ 펜 연결하기</span>
+        </Button>
+      ) : (
+        <Button className={classes.connectedBtn} variant="contained" color="primary" onClick={() => handleConnectPen()}>
+          <span className={classes.btnText}>연결된 펜 ({numPens})</span>
+        </Button>
+      )}
     </React.Fragment>
   );
-}
+};
 
 export default ConnectButton;
