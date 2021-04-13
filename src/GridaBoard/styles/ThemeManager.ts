@@ -80,7 +80,7 @@ export default class ThemeManager {
 
   // Theme 1: Basic
   public setT1() {
-    document.body.style.background = "rgba(0,0,0,0.05)";
+    document.body.style.background = "rgba(238,238,238,0.05)";
     this.setThemeDark(false);
   }
 

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Button, Popover } from "@material-ui/core";
+import { Button, Popover, SvgIcon} from "@material-ui/core";
 import { makeStyles } from '@material-ui/core/styles';
 import KeyboardArrowDownRoundedIcon from '@material-ui/icons/KeyboardArrowDownRounded';
 import { saveGrida } from "../Save/SaveGrida";
@@ -9,7 +9,7 @@ import GridaDoc from "../GridaDoc";
 import { PDFDocument } from 'pdf-lib';
 import ConnectButton from "../components/buttons/ConnectButton";
 import GridaApp from "../GridaApp";
-import ManualCalibration from "../components/navbar/ManualCalibration";
+// import ManualCalibration from "../components/navbar/ManualCalibration";
 import { g_defaultPrintOption, PrintNcodedPdfButton } from "nl-lib/ncodepod";
 import SavePdfDialog from "../Save/SavePdfDialog";
 // import { FileBrowserButton } from "nl-lib/common/neopdf";
@@ -20,21 +20,37 @@ import { turnOnGlobalKeyShortCut } from "../GlobalFunctions";
 import getText from "../language/language";
 import { NCODE_CLASS6_NUM_DOTS } from "nl-lib/common/constants";
 import { theme as myTheme } from "../styles/theme";
+import { CalibrationButton } from 'nl-lib/ncodepod';
 
 const useStyles = props => makeStyles((theme) => ({
     buttonStyle : {
+      padding: 0,
+      minWidth: "0px",
+      minHeight: "0px"
+    },
+    calibration : {
+      background: theme.palette.primary.light,
+      border: "1px solid #CFCFCF",
+      boxSizing: "border-box",
+      borderRadius: "4px",
+      fontSize: "12px",
+      fontFamily: "Roboto",
+      padding : "8px",
+      textTransform: 'none'
+    },
+    buttonFontStyle : {
+      minWidth: "0px",
       fontFamily: "Roboto",
       fontStyle: "normal",
-      fontWeight: "bold",
+      fontWeight: 600,
+      lineHeight: "16.41px",
       fontSize: "14px",
       textAlign: "right",
       letterSpacing: "0.25px",
-      marginRight: "20px",
-      marginTop: "4px",
-      padding: 0,
       color: theme.palette.text.primary,
       "&:hover": {
-        color: theme.palette.action.hover
+        color: theme.palette.action.hover,
+        fontWeight: 700
       }
     },
     saveDropdownStyle : {
@@ -46,14 +62,9 @@ const useStyles = props => makeStyles((theme) => ({
       background: theme.palette.grey[50],
       boxShadow: theme.shadows[1],
       borderRadius: "12px",
-      zIndex: 10000
-    },
-    changeUrlTextStyle : {
-      fontSize: "12px",
-      lineHeight: "14px",
-      margin: "8px",
-      fontWeight:500,
-      padding: 0
+      zIndex: 10000,
+      marginTop: "21px",
+      marginLeft: "-1px"
     },
     headerStyle : {
       display: "flex",
@@ -61,9 +72,42 @@ const useStyles = props => makeStyles((theme) => ({
       justifyContent: "space-between",
       alignItems: "center",
       flexWrap: "wrap",
-      height: "70px",
+      height: "72px",
       background: theme.palette.primary.light,
       zoom: 1 / props.brZoom,
+      backdropFilter: "blur(4px)",
+      "& > div":{
+        display: "flex",
+        flexDirection: "row",
+        justifyContent: "flex-start",
+        alignItems: "center",
+        margin: "0 24px"
+      },
+      "& > div > div" : {
+        display: "flex",
+        flexDirection: "row",
+        justifyContent: "flex-start",
+        alignItems: "center",
+      } ,
+      "& > div:first-child > div" : {
+        margin: "0 24px",
+        padding: "10px"
+      } ,
+      "& > div:last-child > div" : {
+        marginLeft: "16px"
+      } ,
+      "& > div > div > div" : {
+        display:"flex",
+        marginRight : "24px"
+      },
+      "& > div > div > div:last-child" : {
+        marginRight : "0px"
+      }
+    },
+    headerLineV : {
+      width: "1px",
+      height: "15px",
+      background: theme.palette.grey[500]
     },
     changeUrlStyle : {
       justifyContent: "center",
@@ -75,10 +119,14 @@ const useStyles = props => makeStyles((theme) => ({
       textOverflow: "ellipsis",
       whiteSpace: "nowrap",
       padding: 0,
-      marginRight: "8px"
+      "& > span": {
+        fontSize: "12px",
+        lineHeight: "14px",
+        padding: "5px",
+        fontWeight:500
+      }
     },
     imgStyle: {
-      marginRight: "32px",
       borderRadius: "8px"
     }
   }));
@@ -97,6 +145,7 @@ const HeaderLayer = (props: Props) => {
 
   const [pdfUrl, setPdfUrl] = useState(undefined as string);
   const [pdfFilename, setPdfFilename] = useState(undefined as string);
+
   
   const makePdfUrl = async () => {
     const doc = GridaDoc.getInstance();
@@ -160,13 +209,31 @@ const HeaderLayer = (props: Props) => {
   }
 
 
-
   const activePageNo_store = useSelector((state: RootState) => state.activePage.activePageNo);
 
   const brZoom = useSelector((state: RootState) => state.ui.browser.zoom);
 
-
   const classes = useStyles({brZoom})();
+
+  const HeaderLine = ()=>{
+    return (<div className={classes.headerLineV} />);
+  }
+  const InformationBtn = ()=>{
+    return (
+      <div>
+        <Button className={`${classes.buttonStyle} `}>
+          <SvgIcon>
+            <path
+              fillRule="evenodd"
+              clipRule="evenodd"
+              d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12s4.477 10 10 10 10-4.477 10-10zM4 12a8 8 0 1116 0 8 8 0 01-16 0zm9-5a1 1 0 11-2 0 1 1 0 012 0zm-1 11a1 1 0 001-1v-6a1 1 0 10-2 0v6a1 1 0 001 1z"
+            />
+          </SvgIcon>
+      </Button>
+      </div>
+      );
+  }
+
 
   const [dropVisible, setDropVisible] = useState(true);
   let _dropDom = undefined as HTMLElement;
@@ -210,47 +277,47 @@ const HeaderLayer = (props: Props) => {
   return (
     <React.Fragment>
       <div id="header" className={`${classes.headerStyle}`}>
-        <div style={{
-          display: "inline-flex", flexDirection: "row",
-          justifyContent: "flex-start", alignItems: "center", marginLeft: "24px"
-        }}>
+        <div >
           <img src="grida_logo.png" className={classes.imgStyle}></img>
           <div>
-            <Button className={`${classes.buttonStyle}`}  onClick={()=>handleClickSave()} disabled={disabled}>
-              {getText("save_file")}
-            </Button>
-            <div ref={(e)=>{_dropDom=e}} tabIndex={-1} hidden={dropVisible} className={`${classes.saveDropdownStyle}`} onBlur={saveDropBlur} >
-              <SavePdfDialog saveType="pdf"/>
-              <SavePdfDialog saveType="grida"/>
+            <div>
+              <Button className={`${classes.buttonStyle} ${classes.buttonFontStyle}`}  onClick={()=>handleClickSave()} disabled={disabled}>
+                {getText("save_file")}
+              </Button>
+              <div ref={(e)=>{_dropDom=e}} tabIndex={-1} hidden={dropVisible} className={`${classes.saveDropdownStyle}`} onBlur={saveDropBlur} >
+                <SavePdfDialog saveType="pdf"/>
+                <SavePdfDialog saveType="grida"/>
+              </div>
+            </div>
+            <div>
+              <ConvertFileLoad className={`loadDropDown ${classes.buttonStyle} ${classes.buttonFontStyle}`}  handlePdfOpen={handlePdfOpen}/>
+            </div>
+            <div>
+              <PrintNcodedPdfButton
+              className={` ${classes.buttonStyle}  ${classes.buttonFontStyle}`}
+              handkeTurnOnAppShortCutKey={turnOnGlobalKeyShortCut}
+              
+              url={pdfUrl} filename={pdfFilename} handlePdfUrl={makePdfUrl} disabled={disabled} />
             </div>
           </div>
-          
-          <div>
-            <ConvertFileLoad className={`loadDropDown ${classes.buttonStyle}`}  handlePdfOpen={handlePdfOpen}/>
-          </div>
-
-          <PrintNcodedPdfButton
-            className={` ${classes.buttonStyle}`}
-            handkeTurnOnAppShortCutKey={turnOnGlobalKeyShortCut}
-            
-            url={pdfUrl} filename={pdfFilename} handlePdfUrl={makePdfUrl} disabled={disabled}>
-          </PrintNcodedPdfButton>
-
-          <ManualCalibration className={`${classes.buttonStyle}`} filename={pdfFilename} printOption={printOption} handlePdfUrl={makePdfUrl} />
+          <CalibrationButton className={`${classes.buttonStyle}  ${classes.calibration}`} filename={pdfFilename} printOption={printOption}  handlePdfUrl={makePdfUrl} />
         </div>
 
-        <div style={{
-          display: "inline-flex", flexDirection: "row",
-          justifyContent: "flex-start", alignItems: "center", marginRight: "24px"
-        }}>
-          <ConnectButton className={`${classes.buttonStyle}`} onPenLinkChanged={e => onPenLinkChanged(e)} />
+        <div >
 
-          <Button onClick={changeUrl} className={`${classes.buttonStyle} ${classes.changeUrlStyle}`}>
-            <div>
-              <span className={classes.changeUrlTextStyle}>{getText("go_to_old")}</span>
-            </div>
-          </Button>
+          <div>
+            <ConnectButton className={`${classes.buttonStyle}`} onPenLinkChanged={e => onPenLinkChanged(e)} />
+          </div>
+          <HeaderLine />
+          
+          <InformationBtn />
 
+          <HeaderLine />
+          <div>
+            <Button onClick={changeUrl} className={`${classes.buttonStyle} ${classes.changeUrlStyle}`}>
+              {getText("go_to_old")}
+            </Button>
+          </div>
           {/* <div>구글 이메일</div>
           <KeyboardArrowDownRoundedIcon /> */}
         </div>

@@ -10,10 +10,9 @@
   -moz-osx-font-smoothing: grayscale;
 } */
 
-body,
-html {
+html, body {
     height: 100%;
-    background: rgba(0,0,0,0.05);
+    /* background: rgba(0,0,0,0.05); */
     /* background-image: --webkit-linear-gradient(bottom, rgb(255, 255, 255) 0%, rgb(230, 230, 230) 100%); */
 }
 

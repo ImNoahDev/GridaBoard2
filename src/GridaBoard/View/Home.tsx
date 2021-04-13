@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import '../styles/main.css'
-import { MuiThemeProvider } from '@material-ui/core/styles';
+import { makeStyles, MuiThemeProvider } from '@material-ui/core/styles';
 import * as neolabTheme from '../theme';
 
 import PUIController from '../components/PUIController';
@@ -17,6 +17,14 @@ import { IPageSOBP, IFileBrowserReturn, IGetNPageTransformType } from "nl-lib/co
 import { useBeforeunload } from 'react-beforeunload';
 import getText from "../language/language";
 
+const useStyle = makeStyles(theme=>({
+  rootDiv :{
+    width: "100vw",
+    height: "100vh",
+    background: theme.palette.background.default
+  }
+}));
+
 const Home = () => {
   const [drawerOpen, setDrawerOpen] = useState(true);
   const [autoLoadOptions, setAutoLoadOptions] = useState(undefined as IGetNPageTransformType);
@@ -30,6 +38,7 @@ const Home = () => {
   const pdfFilename = undefined as string;
 
   const setDrawerWidth = (width: number) => updateDrawerWidth({ width });
+  const classes = useStyle();
 
   useBeforeunload(() => "변경사항이 저장되지 않을 수 있습니다."); //edge, chrome에선 broswer 내장 dialog box의 string을 return하여 보여줌
 
@@ -147,16 +156,12 @@ const Home = () => {
   //https://css-tricks.com/controlling-css-animations-transitions-javascript/
 
   console.log(`HOME: docPageNo:${activePageNo}, pdfUrl=${pdfUrl}`);
-
-  const [theme, settheme] = useState(neolabTheme.theme)
   
   return (
-    // <React.Fragment>
-    <MuiThemeProvider theme={theme}>
+    <div className={classes.rootDiv}>
       <ViewLayer id="view-layer" handlePdfOpen={handlePdfOpen} style={{display: "flex"}}/>
       <input type="file" id={g_hiddenFileInputBtnId} onChange={onFileInputChanged} onClick={onFileInputClicked} style={{ display: "none" }} name="pdf" accept=".pdf,.grida" />
-    </MuiThemeProvider>
-    // </React.Fragment>
+    </div>
   );
 };
 

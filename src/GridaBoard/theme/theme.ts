@@ -4,7 +4,7 @@ export const theme = createMuiTheme({
   palette: {
     primary: {
       light: "rgba(255, 255, 255, 0.5)",
-      main: "#3f51b5",
+      main: "#688FFF",
       // dark: "rgba(0,0,0,0.05)",
       // contrastText: "rgba(255,255,255,0.9)",
     },
@@ -12,12 +12,12 @@ export const theme = createMuiTheme({
       main: "#ff0000",
     },
     background: {
-      paper: "#ffffff", 
-      default: "#f5f5f5",
+      paper: "#FFFFFF", 
+      default: "rgba(0,0,0,0.05)",
     },
     text: {
-      primary: "rgba(18,18,18,1)",
-      secondary: "rgba(0, 0, 0, 0.54)",
+      primary: "#121212",
+      secondary: "#666666",
       // disabled: "#aaaaaa",
       hint: "rgba(0, 0, 0, 0.87)",
     },
@@ -28,11 +28,15 @@ export const theme = createMuiTheme({
       200 : "#f5f5f9",
       300 : "#dadde9",
       400 : "rgb(88, 98, 125)",
+      500 : "#E9E9E9",
     },
     action: {
       hover: "rgba(104,143,255,1)",
       selected: "rgba(0, 0, 0, 0.10)",
     },
+  },
+  zIndex: {
+    drawer: 1000,
   },
   shadows : [
     "none",

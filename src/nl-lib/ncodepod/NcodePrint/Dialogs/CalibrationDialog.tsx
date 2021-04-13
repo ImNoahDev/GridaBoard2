@@ -25,22 +25,10 @@ const useStyles = makeStyles({
   },
 });
 
-const mappingStyle = {
-  justifyContent: "center",
-  background: "rgba(255, 255, 255, 0.5)",
-  border: "1px solid #CFCFCF",
-  boxSizing: "border-box",
-  borderRadius: "4px",
-  overflow: "hidden",
-  textOverflow: "ellipsis",
-  whiteSpace: "nowrap",
-  padding: 0
-} as React.CSSProperties;
-
 interface IDialogProps {
   filename: string,
   printOption: IPrintOption,
-  cancelCallback: (e) => void,
+  cancelCallback?: (e) => void,
 }
 
 const imgWidth = 400;
@@ -385,7 +373,7 @@ interface Props extends ButtonProps {
   filename: string,
   printOption: IPrintOption,
   handlePdfUrl: any,
-  cancelCallback: (e) => void,
+  cancelCallback?: (e) => void,
 }
 
 export default function CalibrationButton(props: Props) {
@@ -413,8 +401,8 @@ export default function CalibrationButton(props: Props) {
 
   return (
     <React.Fragment>
-      <Button {...rest} style={mappingStyle} onClick={startCalibration} disabled={disabled}>
-        {props.children}
+      <Button {...rest} onClick={startCalibration} disabled={disabled} >
+        {getText("print_reg_pageNo")}
       </Button>
       <CalibrationDialog {...props} />
       {/* { new_url ? <CalibrationDialog {...props, url = new_url} /> : ""} */}

@@ -10,6 +10,7 @@ import { PenEventName } from 'nl-lib/common/enums';
 import { INeoSmartpen } from 'nl-lib/common/neopen';
 
 import { RootState } from 'GridaBoard/store/rootReducer';
+import getText from 'GridaBoard/language/language';
 
 type Props = {
   onPenLinkChanged: (e) => void;
@@ -20,58 +21,25 @@ const ConnectButton = (props: Props) => {
   const [numPens, setNumPens] = useState(0);
   const numPens_store = useSelector((state: RootState) => state.appConfig.num_pens);
 
-  const useStyle = makeStyles(theme=>({
-    penStyle : {
-      position: "absolute",
-      transform: "translate(10px, -10px)",
-      width: "16px",
-      height: "16px",
-      background: theme.palette.grey[400],
-      borderRadius: "50px",
-      "& > span":{
-        position: "absolute",
-        left: "0px",
-        top: "0px",
-        transform: "translate(4px, 1px)",
-        fontFamily: "Roboto",
-        fontStyle: "normal",
-        fontWeight: "normal",
-        fontSize: "8px",
-        lineHeight: "13px",
-        color: theme.palette.grey[50],
-      }
-    }
-    
-  }));
 
-  const useStyles = makeStyles({
+  const useStyles = makeStyles(theme => ({
     connectBtn: {
-      width: '92px',
-      height: '30px',
-      margin: '0px 16px',
-      padding: '8px',
+      padding: "0px",
       borderRadius: '4px',
+      "&>span" : {
+        fontFamily: 'Roboto',
+        fontStyle: 'normal',
+        fontWeight: 'normal',
+        fontSize: '12px',
+        lineHeight: '14px',
+        padding: "8px",
+        display: 'flex',
+        alignItems: 'center',
+        textAlign: 'center',
+        letterSpacing: '0.25px',
+      }
     },
-    connectedBtn: {
-      width: '84px',
-      height: '30px',
-      margin: '0px 16px',
-      padding: '8px',
-      borderRadius: '4px',
-    },
-    btnText: {
-      fontFamily: 'Roboto',
-      fontStyle: 'normal',
-      fontWeight: 'normal',
-      fontSize: '12px',
-      lineHeight: '14px',
-
-      display: 'flex',
-      alignItems: 'center',
-      textAlign: 'center',
-      letterSpacing: '0.25px',
-    },
-  });
+  }));
 
   useEffect(() => {
     setNumPens(numPens_store);
@@ -97,11 +65,11 @@ const ConnectButton = (props: Props) => {
     <React.Fragment>
       {numPens < 1 ? (
         <Button className={classes.connectBtn} variant="contained" color="primary" onClick={() => handleConnectPen()}>
-          <span className={classes.btnText}>+ 펜 연결하기</span>
+          + {getText("pen_connect")}
         </Button>
       ) : (
-        <Button className={classes.connectedBtn} variant="contained" color="primary" onClick={() => handleConnectPen()}>
-          <span className={classes.btnText}>연결된 펜 ({numPens})</span>
+        <Button className={classes.connectBtn} variant="contained" color="primary" onClick={() => handleConnectPen()}>
+        {getText("pen_connect_count")} ({numPens})
         </Button>
       )}
     </React.Fragment>

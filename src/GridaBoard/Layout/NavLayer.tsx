@@ -109,6 +109,7 @@ const NavLayer = () => {
     flexWrap: "wrap",
     height: "50px",
     background: "rgba(255, 255, 255, 0.5)",
+    zIndex: -1,
     zoom: 1 / brZoom,
   } as React.CSSProperties;
 

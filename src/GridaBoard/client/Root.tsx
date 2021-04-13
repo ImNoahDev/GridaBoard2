@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { Provider } from "react-redux";
-import { Backdrop, CircularProgress, IconButton, MuiThemeProvider, Snackbar } from "@material-ui/core";
+import { Backdrop, CircularProgress, IconButton, makeStyles, MuiThemeProvider, Snackbar } from "@material-ui/core";
 import MuiAlert from "@material-ui/lab/Alert";
 import CloseIcon from "@material-ui/icons/Close";
 
 // import App from "../shared/App";
-import { theme } from "../styles/theme";
+import { theme as them } from "../styles/theme";
+import * as neolabTheme from '../theme';
 import configureStore from "../store/configureStore";
 import { RootState } from '../store/rootReducer';
 
@@ -24,6 +25,20 @@ import LoadingCircle from "../Load/LoadingCircle";
 export const store = configureStore();
 
 // export const store = configureStore();
+const useStyle = makeStyles(theme=>{
+  console.log(theme);
+  return ({
+    rootDiv:{
+      width:"100vw",
+      height:"100vh",
+      background : theme.palette.background.default
+    },
+    backdrop: {
+      zIndex: theme.zIndex.drawer + 5,
+      color: theme.palette.primary.main,
+    },
+  })
+}); 
 
 
 const handleToastClose = (e) => {
@@ -63,8 +78,8 @@ const renderToastMessage = () => {
       {isAlertToast ? (
         <MuiAlert
           style={{
-            color: theme.palette.getContrastText(
-              theme.palette[toast.toastType].main
+            color: them.palette.getContrastText(
+              them.palette[toast.toastType].main
             ),
           }}
           onClose={handleToastClose}
@@ -82,6 +97,8 @@ const renderToastMessage = () => {
 
 const Root = () => {
   const [paperInfoInited, setPaperInfoInited] = useState(false);
+  const [theme, settheme] = useState(neolabTheme.theme)
+  const classes = useStyle();
   useEffect(() => {
     if (!paperInfoInited) {
       showUIProgressBackdrop();
@@ -105,38 +122,25 @@ const Root = () => {
     }
   }, [paperInfoInited]);
 
-  const styles = {
-    routerWrapper: {
-      position: "absolute",
-      width: "100%",
-      height: "100%",
-    },
-    backdrop: {
-      zIndex: theme.zIndex.drawer + 5,
-      color: theme.palette.primary.main,
-    },
-  };
-
-
 
   const rootState = store.getState() as RootState;
   const shouldWait = rootState.ui.waiting.circular;
 
   return (
     <Provider store={store}>
-      <LoadingCircle />
-      <MuiThemeProvider theme={theme}>
-        {/* {paperInfoInited ?
-        <Home /> : <></>} */}
-        <Home />
+        <LoadingCircle />
+        <MuiThemeProvider theme={theme}>
+          {/* {paperInfoInited ?
+          <Home /> : <></>} */}
+          <Home />
 
-        <Backdrop style={styles.backdrop} open={shouldWait} >
-          <CircularProgress color="inherit" />
-        </Backdrop>
+          <Backdrop className={classes.backdrop} open={shouldWait} >
+            <CircularProgress color="inherit" />
+          </Backdrop>
 
 
-        {renderToastMessage()}
-      </MuiThemeProvider>
+          {renderToastMessage()}
+        </MuiThemeProvider>
     </Provider>
   );
 }
