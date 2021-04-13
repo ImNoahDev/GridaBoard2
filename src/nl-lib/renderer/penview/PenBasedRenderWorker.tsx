@@ -436,7 +436,7 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
     let plateCanvasRatio = ratio1;
     if (ratio2 > ratio1) plateCanvasRatio = ratio2;
 
-    const globalZoom = store.getState().zoomReducer.zoom;
+    const globalZoom = store.getState().ui.browser.zoom;
 
     const screen_x = dot.x * globalZoom * plateCanvasRatio;
     const screen_y = dot.y * globalZoom * plateCanvasRatio;

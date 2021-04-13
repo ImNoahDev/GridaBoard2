@@ -1,4 +1,5 @@
 import { store } from "../../client/Root";
+import { getBrowserZoomFactor } from "nl-lib/common/util";
 
 //[Define Action Types
 const ActionGroup = 'UI';
@@ -182,7 +183,7 @@ const initialState = {
     pageNo: 0,
   },
   browser: {
-    zoom: 1,
+    zoom: getBrowserZoomFactor(),
   }
 }
 
