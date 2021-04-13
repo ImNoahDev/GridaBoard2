@@ -15,19 +15,21 @@ interface Props extends ButtonProps {
   handlePdfOpen: (event: IFileBrowserReturn) => void,
 }
 
-const useStyles = makeStyles((theme) => ({
-  wrap : {
-    display: "flex",
-    flexDirection: "column",
-    height: "100%"
-  },
-  main : {display: "flex", 
-    flex: 1, 
-    flexDirection: "row-reverse", 
-    justifyContent: "flex-start", 
-    height:"calc(100% - 300px)"
-  }
-}));
+const useStyles = makeStyles((theme) => {
+  return ({
+    wrap : {
+      display: "flex",
+      flexDirection: "column",
+      height: "100%"
+    },
+    main : {display: "flex", 
+      flex: 1, 
+      flexDirection: "row-reverse", 
+      justifyContent: "flex-start", 
+      height:"calc(100% - 300px)"
+    }
+  })
+});
 
 
 // style={{"--appBar-height":"0px"}}

@@ -171,7 +171,7 @@ export default class ThemeManager {
 
   public enablePdfRelatedButtons(sw) {
     this.addDisabledAttr("btn_clear_pdf", sw);
-    this.addDisabledAttr("btn_print_pdf", sw);
+    // this.addDisabledAttr("btn_print_pdf", sw);
     this.addDisabledAttr("btn_start_calibration", sw);
   }
 }

@@ -47,18 +47,6 @@ let _promise: Promise<IPrintOption>;
 /** _promise의 resolve callback */
 let _resolve;
 
-const printStyle = {
-  // width: "80px",
-  // height: "16px",
-  letterSpacing: "0.25px",
-  marginRight: "24px",
-  fontStyle: "normal",
-  fontWeight: "bold",
-  marginTop: "4px",
-  padding: 0,
-  marginLeft: "-8px"
-} as React.CSSProperties;
-
 /**
  * Class
  */
@@ -74,12 +62,6 @@ export default function PrintNcodedPdfButton(props: Props) {
 
   const closeOptionDialog = () => setOptionOn(false);
   const openOptionDialog = () => setOptionOn(true);
-
-  $('#printBtn').hover(function() {
-    $(this).css("color", "rgba(104,143,255,1)")
-  },function() {
-    $(this).css("color", "rgba(18,18,18,1)")
-  })
 
   useEffect(() => {
     // console.log(`status = ${status}, progress=${progressPercent}`);
@@ -239,7 +221,7 @@ export default function PrintNcodedPdfButton(props: Props) {
   // _workingOption = g_defaultPrintOption;
   return (
     <React.Fragment>
-      <Button {...rest} id="printBtn"onClick={startPrint} style={printStyle}>
+      <Button {...rest} onClick={startPrint}>
         {/* {props.children} */}{getText("print")}
       </Button>
 

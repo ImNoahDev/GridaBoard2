@@ -3,45 +3,33 @@ import '../../styles/main.css';
 import GridaToolTip from '../../styles/GridaToolTip';
 import { IPrintOption } from '../../../nl-lib/common/structures';
 import { CalibrationButton } from '../../../nl-lib/ncodepod';
-import { Button } from '@material-ui/core';
+import { Button, makeStyles } from '@material-ui/core';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../store/rootReducer';
 import getText from '../../language/language';
 
-const mappingStyle = {
-  // display: "flex",
-  // width: "140px",
-  // height: "30px",
-  justifyContent: "center",
-  background: "rgba(255, 255, 255, 0.5)",
-  border: "1px solid #CFCFCF",
-  boxSizing: "border-box",
-  borderRadius: "4px",
-  overflow: "hidden",
-  textOverflow: "ellipsis",
-  whiteSpace: "nowrap"
-} as React.CSSProperties;
+const useStyle = makeStyles(theme=>({
+  textStyle : {
+    fontSize: "12px",
+    lineHeight: "14px",
+    margin: "8px",
+    padding: 0,
+    fontWeight: 500,
+  }
+}))
 
-const mappingTextStyle = {
-  // width: "80px",
-  // height: "14px",
-  fontSize: "12px",
-  lineHeight: "14px",
-  // color: '#666666',
-  // marginLeft: "-40px"
-  margin: "8px",
-  padding: 0
-} as React.CSSProperties;
 
 type Props = {
   filename: string,
   printOption: IPrintOption,
   handlePdfUrl?: any,
+  className?:string,
   cancelCallback?: (e) => void,
 }
 
 const ManualCalibration = (props: Props) => {
   const { filename, printOption, cancelCallback, ...rest } = props;
+  const classes = useStyle();
 
   return (
     <CalibrationButton {...props} cancelCallback={cancelCallback} style={{marginRight: "33px"}} handlePdfUrl={props.handlePdfUrl}>
@@ -51,7 +39,7 @@ const ManualCalibration = (props: Props) => {
         tail: "단축키 Q로 선택가능합니다."
       }} title={undefined}> */}
         <div>
-          <span style={mappingTextStyle}>{getText("print_reg_pageNo")}</span>
+          <span className={classes.textStyle}>{getText("print_reg_pageNo")}</span>
         </div>
       {/* </GridaToolTip> */}
     </CalibrationButton>

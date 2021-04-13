@@ -5,6 +5,7 @@ import getText from "../language/language";
 
 type Props = {
   onTextAreaChange: (pdfName) => void;
+  saveType:string;
 }
 
 const useStyles = makeStyles({
@@ -18,7 +19,7 @@ const useStyles = makeStyles({
 });
 
 const PdfDialogTextArea = (props: Props) => {
-
+  const {saveType, ...rest} = props;
   const classes = useStyles();
 
   const [pdfName, setPdfName] = useState('');
@@ -36,13 +37,13 @@ const PdfDialogTextArea = (props: Props) => {
       <TextField
         autoFocus
         margin="dense"
-        placeholder={getText("save_pdf_popup_holder")}
+        placeholder={getText("save_"+saveType+"_popup_holder")}
         type="text"
         name="title"
         value={pdfName}
         onChange={onChange}
         className={classes.textArea}
-        label={getText("save_pdf_popup_name")}
+        label={getText("save_"+saveType+"_popup_name")}
         variant="outlined"
       />
     </DialogContent>

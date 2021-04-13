@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 
 import '../../styles/buttons.css';
-import { IconButton, SvgIcon } from '@material-ui/core';
+import { IconButton, makeStyles, SvgIcon } from '@material-ui/core';
 import GridaToolTip from "../../styles/GridaToolTip";
 import { useSelector } from "react-redux";
 import { RootState } from "../../store/rootReducer";
@@ -11,40 +11,39 @@ import { PenEventName } from "nl-lib/common/enums";
 import { INeoSmartpen } from "nl-lib/common/neopen";
 import $ from "jquery";
 
-const numPenStyle = {
-  position: "absolute",
-  width: "16px",
-  height: "16px",
-  left: "22px",
-  top: "4px",
-  background: "rgba(88,98,125,1)",
-  borderRadius: "50px",
-} as React.CSSProperties;
-
-const numPenCountStyle = {
+const useStyle = makeStyles(theme=>({
+  penStyle : {
     position: "absolute",
-    // width: "7px",
-    // height: "13px",
-    left: "4px",
-    top: "2px",
-    fontFamily: "Roboto",
-    fontStyle: "normal",
-    fontWeight: "normal",
-    fontSize: "8px",
-    lineHeight: "13px",
-    // display: "flex",
-    // alignItems: "center",
-    // textAlign: "right",
-    // letterSpacing: "0.25px",
-    color: "rgba(255,255,255,1)",
-} as React.CSSProperties;
+    transform: "translate(10px, -10px)",
+    width: "16px",
+    height: "16px",
+    background: theme.palette.grey[400],
+    borderRadius: "50px",
+    "& > span":{
+      position: "absolute",
+      left: "0px",
+      top: "0px",
+      transform: "translate(4px, 1px)",
+      fontFamily: "Roboto",
+      fontStyle: "normal",
+      fontWeight: "normal",
+      fontSize: "8px",
+      lineHeight: "13px",
+      color: theme.palette.grey[50],
+    }
+  }
+  
+}));
+
 
 type Props = {
   onPenLinkChanged: (e) => void;
+  className?:string
 }
 const ConnectButton = (props: Props) => {
   let connectDisplayProp = "block";
   let connectedDisplayProp = "none";
+  const classes = useStyle();
 
   const [numPens, setNumPens] = useState(0);
   const numPens_store = useSelector((state: RootState) => state.appConfig.num_pens);
@@ -75,21 +74,10 @@ const ConnectButton = (props: Props) => {
     connectedDisplayProp = "none";
   }
   
-  $('#btn_connect').hover(function() {
-    $(this).css("color", "rgba(104,143,255,1)")
-  },function() {
-    $(this).css("color", "rgba(18,18,18,1)")
-  });
-
-  $('#btn_connected').hover(function() {
-    $(this).css("color", "rgba(104,143,255,1)")
-  },function() {
-    $(this).css("color", "rgba(18,18,18,1)")
-  });
 
   return (
     <React.Fragment>
-      <IconButton id="btn_connect" style={{display: connectDisplayProp, padding: "8px", marginRight: "12px"}}
+      <IconButton id="btn_connect" className={props.className} style={{display: connectDisplayProp }}
         onClick={() => handleConnectPen()}>
         {/* <GridaToolTip open={true} placement="left" tip={{
           head: "Pen Connect",
@@ -108,7 +96,7 @@ const ConnectButton = (props: Props) => {
           </SvgIcon>
         {/* </GridaToolTip> */}
       </IconButton>
-      <IconButton id="btn_connected" style={{display: connectedDisplayProp, padding: "8px", marginRight: "12px"}}
+      <IconButton id="btn_connected" className={props.className} style={{display: connectedDisplayProp}}
         onClick={() => handleConnectPen()}>
         {/* <GridaToolTip open={true} placement="left" tip={{
           head: "Pen Connect",
@@ -124,8 +112,8 @@ const ConnectButton = (props: Props) => {
             />
           </SvgIcon>
         {/* </GridaToolTip> */}
-        <div style={numPenStyle}>
-          <span id="pen_id" style={numPenCountStyle}>{numPens}</span>
+        <div className={classes.penStyle}>
+          <span id="pen_id" >{numPens}</span>
         </div>
 
       </IconButton>

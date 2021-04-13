@@ -5,7 +5,6 @@ import KeyboardArrowDownRoundedIcon from '@material-ui/icons/KeyboardArrowDownRo
 import { saveGrida } from "../Save/SaveGrida";
 // import LoadGrida from "../Load/LoadGrida";
 import ConvertFileLoad from "../Load/ConvertFileLoad";
-import PrintButton from "../components/navbar/PrintButton";
 import GridaDoc from "../GridaDoc";
 import { PDFDocument } from 'pdf-lib';
 import ConnectButton from "../components/buttons/ConnectButton";
@@ -18,70 +17,70 @@ import { IFileBrowserReturn } from "nl-lib/common/structures";
 import { useSelector } from 'react-redux';
 import { RootState } from '../store/rootReducer';
 import { turnOnGlobalKeyShortCut } from "../GlobalFunctions";
-import SaveGridaDialog from "../Save/SaveGridaDialog";
 import getText from "../language/language";
 import { NCODE_CLASS6_NUM_DOTS } from "nl-lib/common/constants";
 
 const useStyles = props => makeStyles((theme) => ({
-  buttonStyle : {
-    fontFamily: "Roboto",
-    fontStyle: "normal",
-    fontWeight: "bold",
-    fontSize: "14px",
-    textAlign: "right",
-    letterSpacing: "0.25px",
-    marginRight: "20px",
-    marginTop: "4px",
-    padding: 0,
-    color: "rgba(18,18,18,1)",
-    "&:hover": {
-      color: "rgba(104,143,255,1)"
+    buttonStyle : {
+      fontFamily: "Roboto",
+      fontStyle: "normal",
+      fontWeight: "bold",
+      fontSize: "14px",
+      textAlign: "right",
+      letterSpacing: "0.25px",
+      marginRight: "20px",
+      marginTop: "4px",
+      padding: 0,
+      color: theme.palette.text.primary,
+      "&:hover": {
+        color: theme.palette.action.hover
+      }
+    },
+    saveDropdownStyle : {
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "flex-start",
+      padding: "8px",
+      position: "absolute",
+      background: theme.palette.grey[50],
+      boxShadow: theme.shadows[1],
+      borderRadius: "12px",
+      zIndex: 10000
+    },
+    changeUrlTextStyle : {
+      fontSize: "12px",
+      lineHeight: "14px",
+      margin: "8px",
+      fontWeight:500,
+      padding: 0
+    },
+    headerStyle : {
+      display: "flex",
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      flexWrap: "wrap",
+      height: "70px",
+      background: theme.palette.primary.light,
+      zoom: 1 / props.brZoom,
+    },
+    changeUrlStyle : {
+      justifyContent: "center",
+      background: theme.palette.primary.light,
+      border: "1px solid #CFCFCF",
+      boxSizing: "border-box",
+      borderRadius: "4px",
+      overflow: "hidden",
+      textOverflow: "ellipsis",
+      whiteSpace: "nowrap",
+      padding: 0,
+      marginRight: "8px"
+    },
+    imgStyle: {
+      marginRight: "32px",
+      borderRadius: "8px"
     }
-  },
-  saveDropdownStyle : {
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "flex-start",
-    padding: "8px",
-    position: "absolute",
-    background: "rgba(255,255,255,0.9)",
-    boxShadow: "2px 2px 2px rgba(0, 0, 0, 0.25)",
-    borderRadius: "12px",
-    zIndex: 10000
-  },
-  changeUrlTextStyle : {
-    fontSize: "12px",
-    lineHeight: "14px",
-    margin: "8px",
-    padding: 0
-  },
-  headerStyle : {
-    display: "flex",
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    flexWrap: "wrap",
-    height: "70px",
-    background: "rgba(255, 255, 255, 0.5)",
-    zoom: 1 / props.brZoom,
-  },
-  changeUrlStyle : {
-    justifyContent: "center",
-    background: "rgba(255, 255, 255, 0.5)",
-    border: "1px solid #CFCFCF",
-    boxSizing: "border-box",
-    borderRadius: "4px",
-    overflow: "hidden",
-    textOverflow: "ellipsis",
-    whiteSpace: "nowrap",
-    padding: 0,
-    marginRight: "8px"
-  },
-  imgStyle: {
-    marginRight: "32px",
-    borderRadius: "8px"
-  }
-}));
+  }));
 
 
 const printBtnId = "printTestButton";
@@ -220,16 +219,8 @@ const HeaderLayer = (props: Props) => {
               {getText("save_file")}
             </Button>
             <div ref={(e)=>{_dropDom=e}} tabIndex={-1} hidden={dropVisible} className={`${classes.saveDropdownStyle}`} onBlur={saveDropBlur} >
-              <SavePdfDialog />
-              <SaveGridaDialog />
-              {/* <Button className="save_drop_down" style={{
-                width: "200px", height: "40px", padding: "4px 12px",
-              }} 
-                onClick={() => saveGrida('hello.grida')}
-                // onClick={() => alert('미구현된 기능입니다.')}
-              >
-                <span style={{marginLeft: "-40px"}}>데이터 저장(.grida)</span>
-              </Button> */}
+              <SavePdfDialog saveType="pdf"/>
+              <SavePdfDialog saveType="grida"/>
             </div>
           </div>
           
@@ -238,23 +229,22 @@ const HeaderLayer = (props: Props) => {
           </div>
 
           <PrintNcodedPdfButton
-            id="btn_print_pdf" type="button" className="btn btn-neo "
+            className={` ${classes.buttonStyle}`}
             handkeTurnOnAppShortCutKey={turnOnGlobalKeyShortCut}
-            style={{ margin: 0, padding: 0, }}
+            
             url={pdfUrl} filename={pdfFilename} handlePdfUrl={makePdfUrl} disabled={disabled}>
           </PrintNcodedPdfButton>
 
-          {/* <PrintButton targetId={printBtnId} url={pdfUrl} filename={pdfFilename} handlePdfUrl={makePdfUrl} /> */}
-          <ManualCalibration filename={pdfFilename} printOption={printOption} handlePdfUrl={makePdfUrl} />
+          <ManualCalibration className={`${classes.buttonStyle}`} filename={pdfFilename} printOption={printOption} handlePdfUrl={makePdfUrl} />
         </div>
 
         <div style={{
           display: "inline-flex", flexDirection: "row",
           justifyContent: "flex-start", alignItems: "center", marginRight: "24px"
         }}>
-          <ConnectButton onPenLinkChanged={e => onPenLinkChanged(e)} />
+          <ConnectButton className={`${classes.buttonStyle}`} onPenLinkChanged={e => onPenLinkChanged(e)} />
 
-          <Button onClick={changeUrl} id="myButton" className={`float-left submit-button ${classes.changeUrlStyle}`}>
+          <Button onClick={changeUrl} className={`${classes.buttonStyle} ${classes.changeUrlStyle}`}>
             <div>
               <span className={classes.changeUrlTextStyle}>{getText("go_to_old")}</span>
             </div>

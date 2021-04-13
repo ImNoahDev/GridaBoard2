@@ -4,83 +4,86 @@ import {
 } from '@material-ui/core';
 import React from 'react';
 import { savePDF } from "./SavePdf";
+import { saveGrida } from "./SaveGrida";
 import PdfDialogTextArea from './PdfDialogTextArea';
 import { turnOnGlobalKeyShortCut } from '../GlobalFunctions';
 import GridaToolTip from '../styles/GridaToolTip';
 import $ from "jquery";
 import getText from "../language/language";
 
-const useStyles = makeStyles({
-  title: {
-    width: "450px",
-  },
-  titleBox: {
-    justifyContent: "center",
-    alignItems: "center",
-    fontSize: 20,
-    textAlign: "center",
-  },
-  button: {
-    border: "1px solid black",
-    margin: "auto"
-  },
-  iconContainer: {
-    "&:hover $icon": {
-        color: 'red',
+
+
+const useStyles = makeStyles((theme) => {
+  console.log(theme);
+  return ({
+    dropdownBtn : {
+      width: "200px",
+      height: "40px",
+      padding: "4px 12px",
+      display: "flex",
+      justifyContent: "left",
+      "&:hover" : {
+        background : theme.palette.grey[100],
+        color: theme.palette.action.hover
+      }
+    },
+    title: {
+      width: "450px",
+    },
+    titleBox: {
+      justifyContent: "center",
+      alignItems: "center",
+      fontSize: 20,
+      textAlign: "center",
+    },
+    button: {
+      border: "1px solid black",
+      margin: "auto"
     }
-  },
-  icon: {
-      color: 'black',
-  },
+  });
 });
 
-const SavePdfDialog = () => {
+const SavePdfDialog = (props) => {
+  const {saveType, ...rest} = props;
+
 
   const classes = useStyles();
 
   const [open, setOpen] = React.useState(false);
 
-  let pdfSaveName = '';
+  let selectedName = '';
 
-  const savePdfName = (pdfName: string) => {
-    pdfSaveName = pdfName;
+  const setName = (propName: string) => {
+    selectedName = propName;
+
+    if(saveType == "grida")
+      selectedName += ".grida";
   }
 
   const onReset = () => {
-    pdfSaveName = '';
+    selectedName = '';
     turnOnGlobalKeyShortCut(true);
   };
 
-  const handlePdfDialogOpen = () => {
+  const handleDialogOpen = () => {
     setOpen(true);
     turnOnGlobalKeyShortCut(false);
   };
 
-  const handlePdfDialogClose = () => {
+  const handleDialogClose = () => {
     setOpen(false);
     onReset();
   };
 
   const handleSavePdf = () => {
-    savePDF(pdfSaveName);
+    if(saveType == "grida"){
+      saveGrida(selectedName);
+    }else{
+      savePDF(selectedName);
+    }
     setOpen(false);
     onReset();
   }
-
-  $(document).ready(function(){
-    $('.save_drop_down').hover(
-      function(event){
-        $(this).addClass('hover');
-        $(this).css("color", "rgba(104,143,255,1)");
-        $(this).css("background", "rgba(232,236,245,1)");
-      },
-      function(){
-        $(this).removeClass('hover');
-        $(this).css("color", "rgba(18,18,18,1)");
-        $(this).css("background", "rgba(255,255,255,0.9)");
-      }
-    );
-  });
 
   return (
     <div>
@@ -89,25 +92,23 @@ const SavePdfDialog = () => {
         msg: "PDF 파일을 로컬에 저장하는 버튼입니다.",
         tail: "키보드 버튼 ?로 선택 가능합니다"
       }} title={undefined}> */}
-        <Button className="save_drop_down" style={{
-          width: "200px", height: "40px", padding: "4px 12px"
-        }} onClick={handlePdfDialogOpen}>
-          <span style={{marginLeft: "-54px"}}>{getText("save_to_pdf")}</span>
+        <Button className={`${classes.dropdownBtn}`} onClick={handleDialogOpen}>
+          {getText("save_to_"+saveType)}
         </Button>
       {/* </GridaToolTip> */}
-      <Dialog open={open} onClose={handlePdfDialogClose} aria-labelledby="form-dialog-title">
+      <Dialog open={open} onClose={handleDialogClose} aria-labelledby="form-dialog-title">
         <DialogTitle id="form-dialog-title" className={classes.title}>
           <Box fontSize={20} fontWeight="fontWeightBold" className={classes.titleBox}>
-          {getText("save_pdf_popup_title")}
+          {getText("save_"+saveType+"_popup_title")}
           </Box>
         </DialogTitle>
-        <PdfDialogTextArea onTextAreaChange={(pdfName) => savePdfName(pdfName)}/>
+        <PdfDialogTextArea saveType={saveType} onTextAreaChange={(name) => setName(name)}/>
         <DialogActions>
           <Button onClick={handleSavePdf} variant="contained" color="primary" className={classes.button}>
-          {getText("save_pdf_popup_save")}
+          {getText("save_"+saveType+"_popup_save")}
           </Button>
-          <Button onClick={handlePdfDialogClose} variant="contained" className={classes.button}>
-          {getText("save_pdf_popup_cancel")}
+          <Button onClick={handleDialogClose} variant="contained" className={classes.button}>
+          {getText("save_"+saveType+"_popup_cancel")}
           </Button>
         </DialogActions>
       </Dialog>

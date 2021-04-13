@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import '../styles/main.css'
+import { MuiThemeProvider } from '@material-ui/core/styles';
+import * as neolabTheme from '../theme';
 
 import PUIController from '../components/PUIController';
 import { turnOnGlobalKeyShortCut } from "../GlobalFunctions";
@@ -146,11 +148,15 @@ const Home = () => {
 
   console.log(`HOME: docPageNo:${activePageNo}, pdfUrl=${pdfUrl}`);
 
+  const [theme, settheme] = useState(neolabTheme.theme)
+  
   return (
-    <React.Fragment>
+    // <React.Fragment>
+    <MuiThemeProvider theme={theme}>
       <ViewLayer id="view-layer" handlePdfOpen={handlePdfOpen} style={{display: "flex"}}/>
       <input type="file" id={g_hiddenFileInputBtnId} onChange={onFileInputChanged} onClick={onFileInputClicked} style={{ display: "none" }} name="pdf" accept=".pdf,.grida" />
-    </React.Fragment>
+    </MuiThemeProvider>
+    // </React.Fragment>
   );
 };
 

@@ -5,15 +5,15 @@ import { Theme, Tooltip, TooltipProps, Typography, withStyles } from "@material-
 
 export type ITipType = { head: string, msg: string, tail: string };
 
-const NeoToolTipPopup = withStyles((theme: Theme) => ({
-  tooltip: {
-    backgroundColor: '#f5f5f9',
-    color: 'rgba(0, 0, 0, 0.87)',
-    maxWidth: 240,
-    fontSize: theme.typography.pxToRem(12),
-    border: '1px solid #dadde9',
-  },
-}))(Tooltip);
+const NeoToolTipPopup = withStyles((theme: Theme) => ({ 
+    tooltip: {
+      backgroundColor: theme.palette.grey[200],
+      color: theme.palette.text.hint,
+      maxWidth: 240,
+      fontSize: theme.typography.pxToRem(12),
+      border: `1px solid ${theme.palette.grey[300]}`, 
+    },
+  }))(Tooltip); 
 
 interface Props extends TooltipProps {
   open?: boolean,
@@ -45,7 +45,6 @@ export default function NeoToolTip(props: Props) {
       return (
         <React.Fragment>
           <Typography color="primary"><b> {head}</b></Typography>
-          <br />
           {msg}
           <br />
           <br />
