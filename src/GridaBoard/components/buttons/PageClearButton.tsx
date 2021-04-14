@@ -8,20 +8,6 @@ import { PageEventName } from "nl-lib/common/enums";
 import { RootState } from "GridaBoard/store/rootReducer";
 import GridaDoc from "GridaBoard/GridaDoc";
 
-const useStylesBootstrap = makeStyles((theme: Theme) => ({
-  arrow: {
-    color: theme.palette.common.black,
-  },
-  tooltip: {
-    backgroundColor: theme.palette.common.black,
-    fontSize: "11px"
-  },
-}));
-
-function BootstrapTooltip(props: TooltipProps) {
-  const classes = useStylesBootstrap();
-  return <Tooltip arrow classes={classes} {...props} />;
-}
 
 const PageClearButton = () => {
   const brZoom = useSelector((state: RootState) => state.ui.browser.zoom);

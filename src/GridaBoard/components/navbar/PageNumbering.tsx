@@ -9,6 +9,7 @@ import { IconButton, makeStyles, Theme, Tooltip, TooltipProps } from '@material-
 import $ from "jquery";
 import { turnOnGlobalKeyShortCut } from '../../GlobalFunctions';
 import getText from '../../language/language';
+import SimpleTooltip from "../SimpleTooltip";
 
 const selectPageStyle = {
   width: "35px",
@@ -22,21 +23,6 @@ const selectPageStyle = {
   // padding: "2px"
 } as React.CSSProperties;
 
-const useStylesBootstrap = makeStyles((theme: Theme) => ({
-  arrow: {
-    color: theme.palette.common.black,
-  },
-  tooltip: {
-    backgroundColor: theme.palette.common.black,
-    fontSize: "11px"
-  },
-}));
-
-function BootstrapTooltip(props: TooltipProps) {
-  const classes = useStylesBootstrap();
-
-  return <Tooltip arrow classes={classes} {...props} />;
-}
 
 const PageNumbering = () => {
     const numPages_store = useSelector((state: RootState) => state.activePage.numDocPages);
@@ -93,18 +79,18 @@ const PageNumbering = () => {
     return (
       <div>
         <IconButton id="pre_btn" onClick={prevChange} style={{padding: "8px"}}>
-          <BootstrapTooltip title={getText("nav_page_prev")}>
+          <SimpleTooltip title={getText("nav_page_prev")}>
             <NavigateBeforeIcon />
-          </BootstrapTooltip>
+          </SimpleTooltip>
         </IconButton>
         <input id="page_input" value={pageNo} style={selectPageStyle} onChange={handleChange}/>
         /
         &nbsp;
         <span style={{marginRight: "8px"}}>{numPages}</span>
         <IconButton id="next_btn" onClick={nextChange} style={{padding: "8px"}}>
-          <BootstrapTooltip title={getText("nav_page_next")}>
+          <SimpleTooltip title={getText("nav_page_next")}>
             <NavigateNextIcon />
-          </BootstrapTooltip>
+          </SimpleTooltip>
         </IconButton>
       </div>
     )

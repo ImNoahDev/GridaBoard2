@@ -6,6 +6,7 @@ import { PEN_THICKNESS } from "nl-lib/common/enums";
 import KeyboardArrowDownRoundedIcon from '@material-ui/icons/KeyboardArrowDownRounded';
 import getText from "../../language/language";
 import dropEvent from "./dropBlur";
+import SimpleTooltip from "../SimpleTooltip";
 
 const manager: PenManager = PenManager.getInstance();
 const useStyle = makeStyles(theme=>({
@@ -29,34 +30,8 @@ const useStyle = makeStyles(theme=>({
     "& > button" : {
       padding: "8px"
     }
-  },
-  arrow: {
-    color: theme.palette.common.black,
-  },
-  tooltip: {
-    backgroundColor: theme.palette.common.black,
-    fontSize: "11px"
-  },
+  }
 }));
-
-
-const useStylesBootstrap = makeStyles((theme: Theme) =>{
-  return  ({
-    arrow: {
-      color: theme.palette.common.black,
-    },
-    tooltip: {
-      backgroundColor: theme.palette.common.black,
-      fontSize: "11px"
-    },
-  })
-});
-
-function BootstrapTooltip(props: TooltipProps) {
-  const classes = useStylesBootstrap();
-
-  return <Tooltip arrow classes={classes} {...props} />;
-}
 
 export default function ThicknessButton () {
   const classes = useStyle();
@@ -103,7 +78,7 @@ export default function ThicknessButton () {
   return (
     <React.Fragment>
       <div>
-        <BootstrapTooltip title={getText("nav_thickness")}>
+        <SimpleTooltip title={getText("nav_thickness")}>
           <IconButton ref={e=>iconDom=e} className={`${classes.icon}`} onClick={()=>handleClick()}>
             <SvgIcon id="svg_thickness" >
               <path
@@ -116,7 +91,7 @@ export default function ThicknessButton () {
             </SvgIcon>
             {/* <KeyboardArrowDownRoundedIcon /> */}
           </IconButton>
-        </BootstrapTooltip>
+        </SimpleTooltip>
 
         <div id="thicknessDrop" ref={e=>_dropDom=e} hidden={dropHidden}  className={`${classes.dropDown}`} tabIndex={-1} onBlur={e=>dropEvent.dropBlur(e,iconDom,handleClick.bind(true))}>
           {pathArr.map((el,idx)=>(

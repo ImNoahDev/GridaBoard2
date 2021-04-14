@@ -267,9 +267,6 @@ export function OptionDialog(props: IDialogProps) {
 
   return (
     <React.Fragment>
-      {
-        console.log(open)
-      }
       <Dialog open={open} {...rest} onClose={handleClose} classes={{ scrollPaper: classes.scrollPaper }} style={{zoom: 1 / brZoom}}>
 
         <DialogTitle id="form-dialog-title" style={{ float: "left", width: "600px" }}>

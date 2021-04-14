@@ -5,6 +5,7 @@ import { ButtonBase, makeStyles, Theme, Tooltip, TooltipProps } from '@material-
 import { IBrushType, PenEventName } from "nl-lib/common/enums";
 import getText from "../../language/language";
 import dropEvent from "../buttons/dropBlur";
+import SimpleTooltip from "../SimpleTooltip";
 
 const manager: PenManager = PenManager.getInstance();
 
@@ -55,22 +56,9 @@ const useStyles = makeStyles((theme: Theme) => ({
   }
 }));
 
-const useStylesBootstrap = makeStyles((theme: Theme) => ({
-  arrow: {
-    color: theme.palette.common.black,
-  },
-  tooltip: {
-    backgroundColor: theme.palette.common.black,
-    fontSize: "11px"
-  }
-}));
 
-function BootstrapTooltip(props: TooltipProps) {
-  const classes = useStylesBootstrap();
 
-  return <Tooltip arrow classes={classes} {...props} />;
-}
-
+  
 let btnStyles = [] as React.CSSProperties[];
 
 const ColorButtons = () => {
@@ -162,12 +150,12 @@ const ColorButtons = () => {
   return (
     <React.Fragment>
       <div>
-        <BootstrapTooltip title={getText("nav_color")}>
+        <SimpleTooltip title={getText("nav_color")}>
           <ButtonBase ref={e=>iconDom=e} className={`${classes.colorBtn} ${classes.selectColorBtn}`} onClick={()=>handleClick()}>
             <div id="" className={`${classes.smallBtn} ${classes.colorIcon}`} style={{"backgroundColor": color }}></div>
             {/* <KeyboardArrowDownRoundedIcon style={{marginLeft: "6px"}}/> */}
           </ButtonBase>
-        </BootstrapTooltip>
+        </SimpleTooltip>
 
         <div ref={(e)=>{_dropDom=e}} tabIndex={-1} hidden={dropVisible} className={`${classes.colorDropDownStyle}`}  onBlur={e=>dropEvent.dropBlur(e,iconDom,handleClick.bind(true))}>
           {(Array.from({length:10},(el,idx)=>idx)).map(el=>{

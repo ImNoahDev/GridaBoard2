@@ -1,19 +1,24 @@
 import React from 'react';
-import { Theme, Tooltip, TooltipProps, Typography, withStyles } from "@material-ui/core";
+import { useSelector } from "react-redux";
+import { RootState } from "GridaBoard/store/rootReducer";
+import { makeStyles, Theme, Tooltip, TooltipProps, Typography, withStyles } from "@material-ui/core";
 // import { ITipType } from './RadioField';
 
 
 export type ITipType = { head: string, msg: string, tail: string };
 
-const NeoToolTipPopup = withStyles((theme: Theme) => ({ 
-    tooltip: {
-      backgroundColor: theme.palette.grey[200],
-      color: theme.palette.text.hint,
-      maxWidth: 240,
-      fontSize: theme.typography.pxToRem(12),
-      border: `1px solid ${theme.palette.grey[300]}`, 
-    },
-  }))(Tooltip); 
+const tooltipStyle = props => makeStyles(theme=>({
+  tooltip: {
+    backgroundColor: theme.palette.grey[200],
+    color: theme.palette.text.hint,
+    maxWidth: 240,
+    fontSize: theme.typography.pxToRem(12),
+    border: `1px solid ${theme.palette.grey[300]}`, 
+  },
+  popper: {
+    zoom: 1 / props.brZoom
+  }
+}));
 
 interface Props extends TooltipProps {
   open?: boolean,
@@ -25,6 +30,7 @@ interface Props extends TooltipProps {
 export default function NeoToolTip(props: Props) {
   const { children, tip, open, title, ...rest } = props;
   const { title: titleDefault } = props;
+  const brZoom = useSelector((state: RootState) => state.ui.browser.zoom);
 
   let show = open;
 
@@ -60,14 +66,14 @@ export default function NeoToolTip(props: Props) {
       );
     }
   }
-
+  const tooltipClass = tooltipStyle({brZoom:brZoom})();
 
   if (show) {
     return (
-      <NeoToolTipPopup
+      <Tooltip classes={tooltipClass}
         placement="left" title={renderTitle(title, tip)}>
         {children}
-      </NeoToolTipPopup>
+      </Tooltip>
     );
   }
 
