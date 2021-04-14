@@ -25,7 +25,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     height: "24px",
     borderRadius: "24px",
     "&:hover" : {
-      boxShadow: theme.shadows[2]
+      boxShadow: theme.shadows[3]
     },
     "&:pressed" : {
       border: "2px solid var(--gridaboard_cyan)"
