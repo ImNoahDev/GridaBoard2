@@ -29,6 +29,7 @@ export const theme = createMuiTheme({
       300 : "#dadde9",
       400 : "rgb(88, 98, 125)",
       500 : "#E9E9E9",
+      600 : "rgba(255, 255, 255, 0.25)"
     },
     action: {
       hover: "rgba(104,143,255,1)",

@@ -18,64 +18,6 @@ import { sum } from 'pdf-lib';
 import getText from "../../language/language";
 
 
-
-// const useStyles_HOME_TSX = makeStyles((theme: Theme) =>
-//   createStyles({
-//     root: {
-//       display: "flex"
-//     },
-//     appBar: {
-//       transition: theme.transitions.create(['margin', 'width'], {
-//         easing: theme.transitions.easing.sharp,
-//         duration: theme.transitions.duration.leavingScreen,
-//       }),
-//     },
-//     appBarShift: {
-//       width: `calc(100% - ${g_drawerWidth}px)`,
-//       transition: theme.transitions.create(['margin', 'width'], {
-//         easing: theme.transitions.easing.easeOut,
-//         duration: theme.transitions.duration.enteringScreen,
-//       }),
-//       marginRight: `calc( ${g_drawerWidth}`,
-//     },
-//     toolbar: theme.mixins.toolbar,
-//     content: {
-//       flexGrow: 1,
-//       padding: theme.spacing(3),
-//       transition: theme.transitions.create('margin', {
-//         easing: theme.transitions.easing.sharp,
-//         duration: theme.transitions.duration.leavingScreen,
-//       }),
-//       marginRight: `calc(${-g_drawerWidth}`,
-//     },
-//     drawerHeader: {
-//       display: 'flex',
-//       alignItems: 'center',
-//       padding: theme.spacing(0, 1),
-//       // necessary for content to be below app bar
-//       ...theme.mixins.toolbar,
-//       justifyContent: 'flex-start',
-//     },
-//     contentShift: {
-//       transition: theme.transitions.create('margin', {
-//         easing: theme.transitions.easing.easeOut,
-//         duration: theme.transitions.duration.enteringScreen,
-//       }),
-//       marginRight: 0,
-//     },
-//     hide: {
-//       display: 'none',
-//     },
-//   }),
-// );
-
-
-// https://codesandbox.io/s/resizable-drawer-34ife?from-embed=&file=/src/CustomDrawer.js:649-948
-
-const addPageStyle = {
-
-} as React.CSSProperties;
-
 const addBlankPage = async (event) => {
   const doc = GridaDoc.getInstance();
   const pageNo = await doc.addBlankPage();
@@ -83,73 +25,76 @@ const addBlankPage = async (event) => {
   scrollToBottom("drawer_content");
 }
 
-const useStyles = makeStyles((theme: Theme) =>
-  createStyles({
-    root: {
-      display: 'block',
-    },
-    drawer: {
-      flexShrink: 0,
-    },
-    toolbar: theme.mixins.toolbar,
-    appBar: {
-      transition: theme.transitions.create(['margin', 'width'], {
-        easing: theme.transitions.easing.sharp,
-        duration: theme.transitions.duration.leavingScreen,
-      }),
-    },
-    title: {
-      flexGrow: 1,
-    },
-    hide: {
-      display: 'none',
-    },
+const useStyles = props => makeStyles((theme: Theme) => ({
+  root: {
+    display: 'block',
+  },
+  drawer: {
+    flexShrink: 0,
+  },
+  toolbar: theme.mixins.toolbar,
+  appBar: {
+    transition: theme.transitions.create(['margin', 'width'], {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.leavingScreen,
+    }),
+  },
+  title: {
+    flexGrow: 1,
+  },
+  hide: {
+    display: 'none',
+  },
+  liner: { 
+    height: "1px",
+    background: "rgba(255,255,255,1)",
+    zoom: 1 / props.brZoom
+  },
+  drawerHeader: {
+    display: 'fixed',
+    alignItems: 'center',
+    padding: theme.spacing(0, 1),
+    justifyContent: 'flex-start',
+    zIndex: 150,
+    height: "56px",
+    overflow: "auto",
+    "& > button" : {
+      position: "fixed",
+      zIndex: 1100,
+      marginTop: "8px",
+      marginLeft: "120px",
+      padding: "8px",
+      // width: "172px",
+      background: "white",
+      opacity: 0.8
+    }
+  },
 
-    drawerHeader: {
-      display: 'fixed',
-      alignItems: 'center',
-      padding: theme.spacing(0, 1),
-      // necessary for content to be below app bar
-      // ...theme.mixins.toolbar,
-      justifyContent: 'flex-start',
-      zIndex: 150,
-      height: "56px",
-      overflow: "auto"
-    },
-
-    contentShift: {
-      transition: theme.transitions.create('margin', {
-        easing: theme.transitions.easing.easeOut,
-        duration: theme.transitions.duration.enteringScreen,
-      }),
-      marginRight: 0,
-    },
-    dragger: {
-      width: "5px",
-      cursor: "ew-resize",
-      padding: "4px 0 0",
-      borderTop: "1px solid #ddd",
-      position: "absolute",
-      top: 0,
-      left: 0,
-      // right:0,
-      bottom: 0,
-      zIndex: 100,
-      // backgroundColor: "#f4f7f9"
-      // backgroundColor: "#ff0000"
-    },
-    drawerFooter: {
+  contentShift: {
+    transition: theme.transitions.create('margin', {
+      easing: theme.transitions.easing.easeOut,
+      duration: theme.transitions.duration.enteringScreen,
+    }),
+    marginRight: 0,
+  },
+  dragger: {
+    width: "5px",
+    cursor: "ew-resize",
+    padding: "4px 0 0",
+    borderTop: "1px solid #ddd",
+    position: "absolute",
+    top: 0,
+    left: 0,
+    bottom: 0,
+    zIndex: 100,
+  },
+  drawerFooter: {
+    height: "80px",
+    "& > button":{
       marginTop: "74vh",
-      // marginLeft: "0.8vw",
-      background: "rgba(104,143,255,1)",
-      // display: 'fii',
       position: "fixed",
       flexDirection: "row",
       alignItems: 'center',
-      // padding: "8px 24px",
-      // padding: theme.spacing(0, 1),
-      // necessary for content to be below app bar
-      // ...theme.mixins.toolbar,
       justifyContent: 'center',
       boxShadow: "2px 0px 24px rgba(0, 0, 0, 0.15)",
       borderRadius: "60px",
@@ -157,54 +102,37 @@ const useStyles = makeStyles((theme: Theme) =>
       height: 40,
       bottom: 24,
       left: 20,
-      // marginBottom: "-50vh"
       zIndex: 1100,
-    },
-    drawerContainer : {
-      overflow: 'auto',
-    },
-    customizeToolbar : {
-      minHeight: "91px"
-    },
-    drawerPaper : {
-      width: "190px",
-      flexShrink: 0,
-      zIndex: 1100,
-      background: "rgba(255, 255, 255, 0.25)", 
-      float: "left", 
-      display: "flex",
-      position: "relative"
+      "& > span:first-child" : {
+        "& > span": {
+          fontSize: "12px"
+        },
+        "& > svg" : {
+          width: "12px",
+          height: "12px",
+          color: theme.palette.grey[50]
+        }
+      }
     }
-  }),
-);
+  },
+  drawerContainer : {
+    overflow: 'auto'
+  },
+  customizeToolbar : {
+    minHeight: "91px"
+  },
+  drawerPaper : {
+    width: "190px",
+    flexShrink: 0,
+    zIndex: 1100,
+    background: theme.palette.grey[600], 
+    float: "left", 
+    display: "flex",
+    position: "relative"
+  }
+}));
 
 
-const drawerFooter = {
-  marginTop: "74vh",
-  background: "rgba(104,143,255,1)",
-  position: "fixed",
-  flexDirection: "row",
-  alignItems: 'center',
-  justifyContent: 'center',
-  boxShadow: "2px 0px 24px rgba(0, 0, 0, 0.15)",
-  borderRadius: "60px",
-  width: 140,
-  height: 40,
-  bottom: 24,
-  left: 20,
-  zIndex: 1100,
-} as React.CSSProperties;
-
-const drawerHeader = {
-  position: "fixed",
-  zIndex: 1100,
-  marginTop: "8px",
-  marginLeft: "120px",
-  padding: "8px",
-  // width: "172px",
-  background: "white",
-  opacity: 0.8
-} as React.CSSProperties;
 
 const minDrawerWidth = 50;
 const maxDrawerWidth = 1000;
@@ -220,7 +148,8 @@ interface Props extends BoxProps {
 }
 
 export default function PersistentDrawerRight(props: Props) {
-  const classes = useStyles();
+  const brZoom = useSelector((state: RootState) => state.ui.browser.zoom);
+  const classes = useStyles({brZoom:brZoom})();
   const theme = useTheme();
   const [open, setOpen] = React.useState(props.open);
   // const [handleDrawerClose, setHandleDrawerClose] = React.useState(props.handleDrawerClose);
@@ -252,7 +181,6 @@ export default function PersistentDrawerRight(props: Props) {
     }
   }, []);
 
-  const brZoom = useSelector((state: RootState) => state.ui.browser.zoom);
 
   return (
       <Drawer
@@ -267,21 +195,19 @@ export default function PersistentDrawerRight(props: Props) {
       {/* <Toolbar className={classes.customizeToolbar} /> */}
         <div id="drawer_content" className={classes.drawerContainer}>
           <div className={classes.drawerHeader}>
-            {/* <div style={drawerHeader}> */}
-            <IconButton id="drawer_hide_button" onClick={props.handleDrawerClose} style={drawerHeader}>
+            <IconButton id="drawer_hide_button" onClick={props.handleDrawerClose}>
               {theme.direction === 'rtl' ? <ChevronRightIcon /> : <ChevronLeftIcon />}
             </IconButton>
-            {/* </div> */}
-
           </div>
-          <div style={{ height: "1px", background: "rgba(255,255,255,1)", zoom: 1 / brZoom, }}></div>
+          <div className={classes.liner}></div>
           <div onMouseDown={e => handleMouseDown(e)} className={classes.dragger} />
           < DrawerPages noInfo={props.noInfo} />
-          <div style={{ height: "1px", background: "rgba(255,255,255,1)", zoom: 1 / brZoom }}></div>
-          <div id="footer" style={{ height: "80px" }}>
-            <Button onClick={(evnet) => addBlankPage(event)} style={drawerFooter}>
-              <AddIcon style={{ width: "12px", height: "12px", color: "rgba(255,255,255,1)" }} />
-              <span style={{ fontSize: "12px", color: "rgba(255,255,255,1)" }}>{getText("add_page")}</span>
+          <div className={classes.liner}></div>
+          
+          <div className={classes.drawerFooter} >
+            <Button variant="contained" color="primary" onClick={(evnet) => addBlankPage(event)} >
+              <AddIcon />
+              <span >{getText("add_page")}</span>
             </Button>
           </div>
         </div>
