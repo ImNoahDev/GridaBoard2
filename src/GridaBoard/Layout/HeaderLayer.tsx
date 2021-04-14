@@ -288,7 +288,7 @@ const HeaderLayer = (props: Props) => {
               url={pdfUrl} filename={pdfFilename} handlePdfUrl={makePdfUrl} disabled={disabled} />
             </div>
           </div>
-          <CalibrationButton className={`${classes.buttonStyle}  ${classes.calibration}`} filename={pdfFilename} printOption={printOption}  handlePdfUrl={makePdfUrl} />
+          <CalibrationButton className={`${classes.buttonStyle}  ${classes.calibration}`} filename={pdfFilename} handlePdfUrl={makePdfUrl} />
         </div>
 
         <div >
