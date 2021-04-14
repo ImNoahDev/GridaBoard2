@@ -6,7 +6,7 @@ export const theme = createMuiTheme({
       light: "rgba(255, 255, 255, 0.5)",
       main: "#688FFF",
       // dark: "rgba(0,0,0,0.05)",
-      // contrastText: "rgba(255,255,255,0.9)",
+      contrastText: "rgba(255,255,255,0.9)",
     },
     error: {
       main: "#ff0000",
@@ -41,7 +41,7 @@ export const theme = createMuiTheme({
   shadows : [
     "none",
     "2px 2px 2px rgba(0, 0, 0, 0.25)",
-    "0px 3px 1px -2px rgba(0,0,0,0.2),0px 2px 2px 0px rgba(0,0,0,0.14),0px 1px 5px 0px rgba(0,0,0,0.12)",
+    "0px 0px 2px 2px rgba(0, 0, 0, 0.4) inset",
     "0px 3px 3px -2px rgba(0,0,0,0.2),0px 3px 4px 0px rgba(0,0,0,0.14),0px 1px 8px 0px rgba(0,0,0,0.12)",
     "0px 2px 4px -1px rgba(0,0,0,0.2),0px 4px 5px 0px rgba(0,0,0,0.14),0px 1px 10px 0px rgba(0,0,0,0.12)",
     "0px 3px 5px -1px rgba(0,0,0,0.2),0px 5px 8px 0px rgba(0,0,0,0.14),0px 1px 14px 0px rgba(0,0,0,0.12)",

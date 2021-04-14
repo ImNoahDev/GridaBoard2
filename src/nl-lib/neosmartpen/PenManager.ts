@@ -65,6 +65,8 @@ export default class PenManager {
 
   _virtualPen: INeoSmartpen;
 
+  changeThicknessIcon: Function = function(){};
+
   init = () => {
     this.setThickness(DEFAULT_PEN_THICKNESS);
     this.setPenRendererType(DEFAULT_PEN_RENDERER_TYPE);
@@ -273,44 +275,8 @@ export default class PenManager {
     }
   }
 
-  changeThicknessIcon(thickness: PEN_THICKNESS) {
-    $("#thickness_num").text(thickness);
-
-    switch (thickness) {
-      case PEN_THICKNESS.THICKNESS1 : {
-        $('#svg_thickness').empty();
-        const thickness_1_clone = $('#thickness_1').clone();
-        $('#svg_thickness').append(thickness_1_clone);
-        break;
-      }
-      case PEN_THICKNESS.THICKNESS2 : {
-        $('#svg_thickness').empty();
-        const thickness_2_clone = $('#thickness_2').clone();
-        $('#svg_thickness').append(thickness_2_clone);
-        break;
-      }
-      case PEN_THICKNESS.THICKNESS3 : {
-        $('#svg_thickness').empty();
-        const thickness_3_clone = $('#thickness_3').clone();
-        $('#svg_thickness').append(thickness_3_clone);
-        break;
-      }
-      case PEN_THICKNESS.THICKNESS4 : {
-        $('#svg_thickness').empty();
-        const thickness_4_clone = $('#thickness_4').clone();
-        $('#svg_thickness').append(thickness_4_clone);
-        break;
-      }
-      case PEN_THICKNESS.THICKNESS5 : {
-        $('#svg_thickness').empty();
-        const thickness_5_clone = $('#thickness_5').clone();
-        $('#svg_thickness').append(thickness_5_clone);
-        break;
-      }
-      default: {
-        break;
-      }
-    }
+  setChangeThicknessIcon(changeFunction: Function){
+    this.changeThicknessIcon = changeFunction;
   }
 
   setThickness(thickness: PEN_THICKNESS) {

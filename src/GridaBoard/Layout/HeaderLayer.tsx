@@ -21,6 +21,7 @@ import getText from "../language/language";
 import { NCODE_CLASS6_NUM_DOTS } from "nl-lib/common/constants";
 import { theme as myTheme } from "../styles/theme";
 import { CalibrationButton } from 'nl-lib/ncodepod';
+import dropEvent from "./../components/buttons/dropBlur";
 
 const useStyles = props => makeStyles((theme) => ({
     buttonStyle : {
@@ -246,11 +247,7 @@ const HeaderLayer = (props: Props) => {
   }
 
   function handleClickSave(visible:boolean = null) {
-    if(visible !== null){
-      setDropVisible(visible);
-    }else if(visible !== dropVisible){
-        setDropVisible(!dropVisible);
-    }
+    dropEvent.handleClick(dropVisible, setDropVisible, visible);
   }
   useEffect(() => {
     if(!dropVisible){
@@ -259,19 +256,10 @@ const HeaderLayer = (props: Props) => {
   },[dropVisible]);
 
 
+  let saveBtn = null as HTMLElement;
+  
   function changeUrl() {
     location.href = 'https://gridaboard-v1-30576.web.app/';
-  }
-  function saveDropBlur(e){
-    const  currentTarget  =  e.currentTarget ;
-    // 이벤트 루프의 다음 틱에서 새로 포커스 된 요소를 확인합니다.
-    setTimeout(() => {
-      // 새 activeElement가 원래 컨테이너의 자식인지 확인
-      if (!currentTarget.contains(document.activeElement)) {
-        // 여기에서 콜백을 호출하거나 맞춤 로직을 추가 할 수 있습니다.
-        handleClickSave(true);
-      }
-    }, 0);
   }
 
   return (
@@ -281,10 +269,10 @@ const HeaderLayer = (props: Props) => {
           <img src="grida_logo.png" className={classes.imgStyle}></img>
           <div>
             <div>
-              <Button className={`${classes.buttonStyle} ${classes.buttonFontStyle}`}  onClick={()=>handleClickSave()} disabled={disabled}>
+              <Button ref={e=>saveBtn=e}className={`${classes.buttonStyle} ${classes.buttonFontStyle}`}  onClick={()=>handleClickSave()} disabled={disabled}>
                 {getText("save_file")}
               </Button>
-              <div ref={(e)=>{_dropDom=e}} tabIndex={-1} hidden={dropVisible} className={`${classes.saveDropdownStyle}`} onBlur={saveDropBlur} >
+              <div ref={(e)=>{_dropDom=e}} tabIndex={-1} hidden={dropVisible} className={`${classes.saveDropdownStyle}`} onBlur={e=>dropEvent.dropBlur(e,saveBtn,handleClickSave.bind(true))} >
                 <SavePdfDialog saveType="pdf"/>
                 <SavePdfDialog saveType="grida"/>
               </div>
