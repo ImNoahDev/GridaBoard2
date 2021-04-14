@@ -296,11 +296,11 @@ const HeaderLayer = (props: Props) => {
           <div>
             <ConnectButton className={`${classes.buttonStyle}`} onPenLinkChanged={e => onPenLinkChanged(e)} />
           </div>
-          <HeaderLine />
+          {/* <HeaderLine />
           
           <InformationBtn />
 
-          <HeaderLine />
+          <HeaderLine /> */}
           <div>
             <Button onClick={changeUrl} className={`${classes.buttonStyle} ${classes.changeUrlStyle}`}>
               {getText("go_to_old")}
