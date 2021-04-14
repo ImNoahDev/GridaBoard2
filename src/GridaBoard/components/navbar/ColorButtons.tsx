@@ -4,7 +4,7 @@ import PenManager from '../../../nl-lib/neosmartpen/PenManager';
 import { ButtonBase, makeStyles, Theme, Tooltip, TooltipProps } from '@material-ui/core';
 import { IBrushType, PenEventName } from "nl-lib/common/enums";
 import getText from "../../language/language";
-import dropEvent from "../buttons/dropBlur";
+import ClickAwayListener from '@material-ui/core/ClickAwayListener';
 import SimpleTooltip from "../SimpleTooltip";
 
 const manager: PenManager = PenManager.getInstance();
@@ -64,9 +64,7 @@ let btnStyles = [] as React.CSSProperties[];
 const ColorButtons = () => {
   const [penType, setPenType] = useState(manager.penRendererType as IBrushType);
   const [color, setColor] = useState(manager.color as string);
-  const [dropVisible, setDropVisible] = useState(true);
-  let _dropDom = undefined as HTMLElement;
-  let iconDom = undefined as HTMLElement;
+  const [isOpen, setIsOpen] = useState(false);
   const classes = useStyles();
 
   useEffect(() => {
@@ -79,24 +77,20 @@ const ColorButtons = () => {
       manager.removeEventListener(PenEventName.ON_COLOR_CHANGED, changeColorBtnSelected);
     }
   }, []);
-  
-  useEffect(() => {
-    if(!dropVisible){
-      const element = _dropDom;
-      element.focus();
-    }
-  },[dropVisible]);
-  
+    
 
 
   const changeColor = (color: number) => {
     manager.setColor(color);
-    handleClick();
-  }
-  function handleClick(hidden:boolean = null) {
-    dropEvent.handleClick(dropVisible, setDropVisible, hidden);
+    setIsOpen(false);
   }
 
+  function handleClick() {
+    setIsOpen((prev) => !prev);
+  }
+  function handleClickAway(){
+    setIsOpen(false);
+  }
 
   const changeBtnStyles = () => {
     switch (manager.penRendererType) {
@@ -148,24 +142,26 @@ const ColorButtons = () => {
     }
   }
   return (
-    <React.Fragment>
+    <ClickAwayListener onClickAway={handleClickAway}>
       <div>
         <SimpleTooltip title={getText("nav_color")}>
-          <ButtonBase ref={e=>iconDom=e} className={`${classes.colorBtn} ${classes.selectColorBtn}`} onClick={()=>handleClick()}>
+          <ButtonBase className={`${classes.colorBtn} ${classes.selectColorBtn}`} onClick={()=>handleClick()}>
             <div id="" className={`${classes.smallBtn} ${classes.colorIcon}`} style={{"backgroundColor": color }}></div>
             {/* <KeyboardArrowDownRoundedIcon style={{marginLeft: "6px"}}/> */}
           </ButtonBase>
         </SimpleTooltip>
-
-        <div ref={(e)=>{_dropDom=e}} tabIndex={-1} hidden={dropVisible} className={`${classes.colorDropDownStyle}`}  onBlur={e=>dropEvent.dropBlur(e,iconDom,handleClick.bind(true))}>
-          {(Array.from({length:10},(el,idx)=>idx)).map(el=>{
-            return (<ButtonBase key={el} className={`${classes.colorBtn} ${classes.dropColorBtn}`} onClick={() => changeColor((el+1)%10)}>
-            <div className={classes.colorIcon} style={btnStyles[el]}></div>
-            </ButtonBase>)
-          })}
-        </div>
+        
+        {isOpen ? (
+          <div className={`${classes.colorDropDownStyle}`}>
+            {(Array.from({length:10},(el,idx)=>idx)).map(el=>{
+              return (<ButtonBase key={el} className={`${classes.colorBtn} ${classes.dropColorBtn}`} onClick={() => changeColor((el+1)%10)}>
+              <div className={classes.colorIcon} style={btnStyles[el]}></div>
+              </ButtonBase>)
+            })}
+          </div>
+          ) : null}
       </div>
-    </React.Fragment>
+    </ClickAwayListener>
   );
 }
 export default ColorButtons;

@@ -5,7 +5,7 @@ import { IconButton, makeStyles, SvgIcon, Theme, Tooltip, TooltipProps } from "@
 import { PEN_THICKNESS } from "nl-lib/common/enums";
 import KeyboardArrowDownRoundedIcon from '@material-ui/icons/KeyboardArrowDownRounded';
 import getText from "../../language/language";
-import dropEvent from "./dropBlur";
+import ClickAwayListener from '@material-ui/core/ClickAwayListener';
 import SimpleTooltip from "../SimpleTooltip";
 
 const manager: PenManager = PenManager.getInstance();
@@ -35,15 +35,11 @@ const useStyle = makeStyles(theme=>({
 
 export default function ThicknessButton () {
   const classes = useStyle();
-  let titleSvg = null as SVGPathElement;
-  let _dropDom = null as HTMLElement;
-  let iconDom = null as HTMLElement;
-  const [dropHidden, setDropHidden] = useState(true);
+  const [isOpen, setIsOpen] = useState(false);
   const [selectedThickness, setSelectedThickness] = useState(2);
   
   //penmanager에서 접근해서 아이콘을 변경해 줄 수 있도록 처리
   const changeIcon = function(thickness: PEN_THICKNESS){
-    console.log(PEN_THICKNESS[thickness])
     const idx = parseInt(PEN_THICKNESS[thickness].substr(-1,1)) - 1;
     
     setSelectedThickness(idx);
@@ -61,28 +57,22 @@ export default function ThicknessButton () {
 
   const setThickness = (thickness: number) => {
     manager.setThickness(PEN_THICKNESS[`THICKNESS${(thickness+1)}`]);
-    handleClick(true);
+    setIsOpen(false);
   }
 
-  useEffect(() => {
-    if(!dropHidden){
-      const element = _dropDom;
-      element.focus();
-    }
-  },[dropHidden]);
-
-  function handleClick(hidden:boolean = null) {
-    dropEvent.handleClick(dropHidden, setDropHidden, hidden);
+  function handleClick() {
+    setIsOpen((prev) => !prev);
   }
-
+  function handleClickAway(){
+    setIsOpen(false);
+  }
   return (
-    <React.Fragment>
+    <ClickAwayListener onClickAway={handleClickAway}>
       <div>
         <SimpleTooltip title={getText("nav_thickness")}>
-          <IconButton ref={e=>iconDom=e} className={`${classes.icon}`} onClick={()=>handleClick()}>
+          <IconButton className={`${classes.icon}`} onClick={()=>handleClick()}>
             <SvgIcon id="svg_thickness" >
               <path
-                ref={e=>titleSvg=e}
                 className="thicknessDropDown"
                 fillRule="evenodd"
                 clipRule="evenodd"
@@ -93,7 +83,8 @@ export default function ThicknessButton () {
           </IconButton>
         </SimpleTooltip>
 
-        <div id="thicknessDrop" ref={e=>_dropDom=e} hidden={dropHidden}  className={`${classes.dropDown}`} tabIndex={-1} onBlur={e=>dropEvent.dropBlur(e,iconDom,handleClick.bind(true))}>
+        {isOpen ? (
+        <div id="thicknessDrop" className={`${classes.dropDown}`} >
           {pathArr.map((el,idx)=>(
             <IconButton key={idx} onClick={() => setThickness(idx)}>
               <SvgIcon>
@@ -105,9 +96,9 @@ export default function ThicknessButton () {
               </SvgIcon>
             </IconButton>
           ))}
-
         </div>
+        ) : null}
       </div>
-    </React.Fragment>
+    </ClickAwayListener>
   );
 }

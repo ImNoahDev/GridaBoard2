@@ -21,7 +21,7 @@ import getText from "../language/language";
 import { NCODE_CLASS6_NUM_DOTS } from "nl-lib/common/constants";
 import { theme as myTheme } from "../styles/theme";
 import { CalibrationButton } from 'nl-lib/ncodepod';
-import dropEvent from "./../components/buttons/dropBlur";
+import ClickAwayListener from '@material-ui/core/ClickAwayListener';
 
 const useStyles = props => makeStyles((theme) => ({
     buttonStyle : {
@@ -236,9 +236,6 @@ const HeaderLayer = (props: Props) => {
   }
 
 
-  const [dropVisible, setDropVisible] = useState(true);
-  let _dropDom = undefined as HTMLElement;
-
   console.log(`browser zoom level changed = ${brZoom}`);
 
   let disabled = true;
@@ -246,17 +243,16 @@ const HeaderLayer = (props: Props) => {
     disabled = false;
   }
 
-  function handleClickSave(visible:boolean = null) {
-    dropEvent.handleClick(dropVisible, setDropVisible, visible);
+
+  const [isSaveOpen, setIsSaveOpen] = useState(false);
+
+  function handleClickSave() {
+    setIsSaveOpen((prev) => !prev);
   }
-  useEffect(() => {
-    if(!dropVisible){
-      _dropDom.focus();
-    }
-  },[dropVisible]);
+  function handleClickSaveAway(){
+    setIsSaveOpen(false);
+  }
 
-
-  let saveBtn = null as HTMLElement;
   
   function changeUrl() {
     location.href = 'https://gridaboard-v1-30576.web.app/';
@@ -268,15 +264,19 @@ const HeaderLayer = (props: Props) => {
         <div >
           <img src="grida_logo.png" className={classes.imgStyle}></img>
           <div>
-            <div>
-              <Button ref={e=>saveBtn=e}className={`${classes.buttonStyle} ${classes.buttonFontStyle}`}  onClick={()=>handleClickSave()} disabled={disabled}>
-                {getText("save_file")}
-              </Button>
-              <div ref={(e)=>{_dropDom=e}} tabIndex={-1} hidden={dropVisible} className={`${classes.saveDropdownStyle}`} onBlur={e=>dropEvent.dropBlur(e,saveBtn,handleClickSave.bind(true))} >
-                <SavePdfDialog saveType="pdf"/>
-                <SavePdfDialog saveType="grida"/>
+            <ClickAwayListener onClickAway={handleClickSaveAway}>
+              <div>
+                  <Button className={`${classes.buttonStyle} ${classes.buttonFontStyle}`}  onClick={handleClickSave} disabled={disabled}>
+                    {getText("save_file")}
+                  </Button>
+                  {isSaveOpen ? (
+                    <div className={`${classes.saveDropdownStyle}`} >
+                      <SavePdfDialog saveType="pdf"/> 
+                      <SavePdfDialog saveType="grida"/>
+                    </div>
+                  ) : null}
               </div>
-            </div>
+            </ClickAwayListener>
             <div>
               <ConvertFileLoad className={`loadDropDown ${classes.buttonStyle} ${classes.buttonFontStyle}`}  handlePdfOpen={handlePdfOpen}/>
             </div>
