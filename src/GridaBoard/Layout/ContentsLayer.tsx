@@ -205,8 +205,8 @@ const ContentsLayer = (props: Props) => {
         {isHeader ? (<KeyboardArrowUp/>) : (<KeyboardArrowDown/>)}
       </IconButton>
       <div className={`${classes.sideEventer}`}>
-        <RotateButton />
-        <PageClearButton />
+        <RotateButton disabled={activePageNo_store === -1} />
+        <PageClearButton disabled={activePageNo_store === -1} />
       </div>
       {/* <div>
         <GridaToolTip open={true} placement="top-start" tip={{
