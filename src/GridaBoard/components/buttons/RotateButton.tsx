@@ -14,6 +14,8 @@ const RotateButton = (props) => {
   const activePageNo_store = useSelector((state: RootState) => state.activePage.activePageNo);
 
   const onToggleRotate = () => {
+    if(activePageNo_store === -1) return ;
+
     setRotationTrigger(!rotationTrigger);
 
     const page = doc.getPageAt(activePageNo_store);
@@ -52,7 +54,7 @@ const RotateButton = (props) => {
     //     tail: "TAB 가로쓰기/세로쓰기 전환"
     //   }} title={undefined}>
   return (
-    <IconButton onClick={onToggleRotate} {...props}>
+    <IconButton id="pageRotateButton" onClick={onToggleRotate} {...props}>
       <SvgIcon>
         <path
           d="M8.55 4.9l2.667-2a.5.5 0 000-.8L8.55.1a.5.5 0 00-.8.4v1.25C5.105 1.75 3 3.956 3 6.627c0 .793.185 1.544.514 2.208a.75.75 0 001.344-.666A3.462 3.462 0 014.5 6.626C4.5 4.74 5.977 3.25 7.75 3.25V4.5a.5.5 0 00.8.4z"

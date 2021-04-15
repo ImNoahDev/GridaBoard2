@@ -29,7 +29,7 @@ const useStyle = props=>makeStyles(theme=>({
     position: "absolute",
     zIndex: 100,
     top: "calc(6%)",
-    left: "calc(96%)",
+    right: "54px",
     "&> button" : {
       marginTop: "16px",
       background: theme.custom.white[1],

@@ -175,44 +175,17 @@ export default function KeyBoardShortCut(evt: KeyboardEvent) {
         PenManager.getInstance().setThickness(PEN_THICKNESS.THICKNESS2);
         break;
       }
+      case "y" : {
+        (document.querySelector("#pageClearButton") as HTMLElement).click();
+        break;
+      }
       case "z" : {
         PenManager.getInstance().setThickness(PEN_THICKNESS.THICKNESS1);
         break;
       }
       case "tab": {// <TAB>
         evt.preventDefault(); //web 기본 탭 기능 정지
-        const doc = GridaDoc.getInstance();
-        const rotationTrigger = store.getState().rotate.rotationTrigger;
-        const activePageNo = store.getState().activePage.activePageNo;
-        setRotationTrigger(!rotationTrigger);
-
-        const page = doc.getPageAt(activePageNo);
-
-        //무언가 하나도 사용하지 않았을때 탭을 누를 수도 있음 그때 page가 undefined
-        if(page === undefined) break ;
-        
-        if (page._pdfPage !== undefined) {
-          if (page._pdfPage.viewport.rotation >= 270) {
-            page._pdfPage.viewport.rotation = 0;
-          } else {
-            page._pdfPage.viewport.rotation += 90;
-          }
-        }
-
-        if (page.pageOverview.rotation >= 270) {
-          page._rotation = 0;
-        } else {
-          page._rotation += 90;
-        }
-
-        if (page.pageOverview.rotation == 90 || page.pageOverview.rotation == 270) {
-          $('#vertical_rotate').css('display', 'none');
-          $('#horizontal_rotate').css('display', 'block');
-        } else {
-          $('#vertical_rotate').css('display', 'block');
-          $('#horizontal_rotate').css('display', 'none');
-        }
-
+        (document.querySelector("#pageRotateButton") as HTMLElement).click();
         break;
       }
 
