@@ -29,7 +29,20 @@ const useStyle = props=>makeStyles(theme=>({
     position: "absolute",
     zIndex: 100,
     top: "calc(6%)",
-    left: "calc(96%)"
+    left: "calc(96%)",
+    "&> button" : {
+      marginTop: "16px",
+      background: theme.custom.white[1],
+      boxShadow: "2px 0px 24px rgba(0, 0, 0, 0.15), inset 0px 2px 0px rgba(255, 255, 255, 1)",
+      borderRadius: "50%",
+      display: "block",
+      flexWrap: "wrap",
+      zIndex: 100,
+      zoom: 1 / props.brZoom,
+      "&:hover": {
+        color: theme.palette.action.hover,
+      },
+    }
   },
   dropDown : {
     display: "none",
@@ -39,8 +52,8 @@ const useStyle = props=>makeStyles(theme=>({
     position: "fixed",
     width: "240px",
     height: "176px",
-    background: "rgba(255,255,255,0.9)",
-    boxShadow: "2px 2px 2px rgba(0, 0, 0, 0.25)",
+    background: theme.custom.white[0],
+    boxShadow: theme.custom.shadows[0],
     borderRadius: "12px",
     zIndex: 100,
     marginTop: "620px",
@@ -56,7 +69,7 @@ const useStyle = props=>makeStyles(theme=>({
     padding: "8px",
     width: "40px",
     height: "40px",
-    background: "rgba(255,255,255,0.9)",
+    background: theme.custom.white[0],
     borderRadius: "40px",
     zIndex: 1000
   }
