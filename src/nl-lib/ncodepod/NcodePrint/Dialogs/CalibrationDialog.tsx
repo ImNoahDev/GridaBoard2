@@ -13,9 +13,11 @@ import { NeoPdfDocument, NeoPdfManager } from 'nl-lib/common/neopdf';
 import CalibrationData from 'nl-lib/common/mapper/Calibration/CalibrationData';
 import { MappingStorage } from 'nl-lib/common/mapper/MappingStorage';
 import { isSamePage, makeNPageIdStr } from "nl-lib/common/util";
+import { g_defaultPrintOption } from "nl-lib/ncodepod";
 import GridaApp from "GridaBoard//GridaApp";
 import ConnectButton from "GridaBoard//components/buttons/ConnectButton";
 import getText from "GridaBoard//language/language";
+import GridaDoc from 'GridaBoard/GridaDoc';
 
 const _penImageUrl = "/icons/image_calibration.png";
 
@@ -27,7 +29,6 @@ const useStyles = makeStyles({
 
 interface IDialogProps {
   filename: string,
-  printOption: IPrintOption,
   cancelCallback?: (e) => void,
 }
 
@@ -46,7 +47,6 @@ const CalibrationDialog = (props: IDialogProps) => {
   const classes = useStyles();
   const [pdf, setPdf] = useState(undefined as NeoPdfDocument);
   const [numPages, setNumPages] = useState(0);
-  const [targetPages, setTargetPages] = useState(props.printOption.targetPages);
   const [markPosRatio, setMarkPosRatio] = useState({ xr: 0, yr: 0 });
   const [imgSrc, setImgSrc] = useState("//:0");
   const [status, setStatus] = useState("inited");
@@ -60,6 +60,8 @@ const CalibrationDialog = (props: IDialogProps) => {
   }));
 
   const progress = useSelector((state: RootState) => state.calibration.progress);
+  const targetPages = useSelector((state: RootState) => state.calibration.targetPages);
+
   const url = useSelector((state: RootState) => state.calibration.url);
 
   const show = useSelector((state: RootState) => state.calibration.show);
@@ -76,7 +78,6 @@ const CalibrationDialog = (props: IDialogProps) => {
   const initState = () => {
     setPdf(undefined);
     setNumPages(0);
-    setTargetPages(props.printOption.targetPages);
     setMarkPosRatio({ xr: 0, yr: 0 });
     setImgSrc("//:0");
     setStatus("inited");
@@ -119,8 +120,8 @@ const CalibrationDialog = (props: IDialogProps) => {
       const w = imgWidth * imgDensity;
       const h = imgHeight * imgDensity;
       const markPos = progress < 2 ? progress : 2;
-      if (pageNo !== undefined) {
-        pdf.getPageThumbnailUrl(pageNo, w, h, "rgb(220,220,220)", true, markPos).then(thumbnail => {
+      if (pageNo <= targetPages.length) {
+        pdf.getPageThumbnailUrl(pageNo, w, h, "rgb(220,220,220)", true, markPos).then(thumbnail => { //pageNo은 1부터 시작
           setImgSrc(thumbnail.url);
           setMarkPosRatio({ xr: thumbnail.markPos.x / thumbnail.canvas.w, yr: thumbnail.markPos.y / thumbnail.canvas.h });
         });
@@ -142,8 +143,7 @@ const CalibrationDialog = (props: IDialogProps) => {
           const h = imgHeight * imgDensity;
           // loadedPdf.generatePageThumbnails(w, h, "rgb(220,220,220)", true).then(() => {
           setPdf(loadedPdf);
-          const t = Array.from({ length: loadedPdf.numPages }, (_, i) => i + 1);
-          setTargetPages(t);
+          const t = Array.from({ length: targetPages.length }, (_, i) => i + 1);
           console.log(`calibration: pdf loaded, pages=${t}`)
           setNumPages(t.length);
 
@@ -254,10 +254,7 @@ const CalibrationDialog = (props: IDialogProps) => {
   if (!pdf) return (<></>);
 
   if (pdf && targetPages.length > 0) {
-    pageNo = progress > 1 ? targetPages[progress-1] : targetPages[0];
-
-    // let tmpPageNo = progress > 0 ? targetPages[progress - 1] : targetPages[0];
-    // setPageNo(tmpPageNo);
+    pageNo = progress > 1 ? progress : 1;
     numProgresses = targetPages.length + 1;
   }
 
@@ -277,7 +274,7 @@ const CalibrationDialog = (props: IDialogProps) => {
   const open = show && (pdf !== undefined);
   console.log(`testing: render  imgSrc=${imgSrc.length}`);
 
-  const { filename: propsFilename, printOption: propsPrintOption, cancelCallback: propsCancelCallback, ...rest } = props;
+  const { filename: propsFilename, cancelCallback: propsCancelCallback, ...rest } = props;
 
   let calibrationGuide = "";
   switch (progress) {
@@ -371,20 +368,25 @@ const CalibrationDialog = (props: IDialogProps) => {
 
 interface Props extends ButtonProps {
   filename: string,
-  printOption: IPrintOption,
   handlePdfUrl: any,
   cancelCallback?: (e) => void,
 }
 
 export default function CalibrationButton(props: Props) {
-  const { filename, printOption, handlePdfUrl, cancelCallback, ...rest } = props;
+  const { handlePdfUrl, ...rest } = props;
+  const printOption = g_defaultPrintOption;
+
   const startCalibration = async (e) => {
     const new_url = await handlePdfUrl();
+
+    const numPages = GridaDoc.getInstance().numPages;
+    const targetPages = Array.from({ length: numPages }, (_, i) => i + 1);
+
     if (new_url) {
       const option = {
         url: new_url,
         show: true,
-        targetPages: props.printOption.targetPages,
+        targetPages: targetPages,
         progress: 0,
         calibrationMode: true,
       };

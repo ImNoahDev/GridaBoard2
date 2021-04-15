@@ -554,10 +554,11 @@ export default class PrintNcodedPdfWorker {
   }
 
   private printByPrintJs = (ncodedUrl: string, hasToPutNcode: boolean) => {
+    const printOption = this.printOption;
     const option = {
       url: ncodedUrl,
       show: true,
-      targetPages: [],
+      targetPages: printOption.targetPages,
       progress: 0,
       calibrationMode: true,
     };
