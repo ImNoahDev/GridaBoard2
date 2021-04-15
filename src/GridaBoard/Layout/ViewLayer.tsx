@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useState} from "react";
 import HeaderLayer from "./HeaderLayer";
 import NavLayer from "./NavLayer";
 import LeftSideLayer from "./LeftSideLayer";
@@ -7,7 +7,8 @@ import { ButtonProps } from "@material-ui/core";
 import { IFileBrowserReturn } from "nl-lib/common/structures";
 import AppBar from '@material-ui/core/AppBar';
 import { makeStyles } from '@material-ui/core/styles';
-
+import Collapse from '@material-ui/core/Collapse';
+ 
 /**
  *
  */
@@ -35,14 +36,18 @@ const useStyles = makeStyles((theme) => {
 // style={{"--appBar-height":"0px"}}
 const ViewLayer = (props: Props) => {
   const classes = useStyles();
+  const [isView, setHeaderView] = useState(true);
+
   return (
     <div className={classes.wrap}>
-      <AppBar position="relative" color="transparent" elevation={0}> 
-        <HeaderLayer {...props}/>
-        <NavLayer {...props} />
-      </AppBar>
+      <Collapse in={isView} timeout={0}>
+        <AppBar position="relative" color="transparent" elevation={0}> 
+          <HeaderLayer {...props}/>
+          <NavLayer {...props} />
+        </AppBar>
+      </Collapse>
       <div className={classes.main}>
-        <ContentsLayer {...props}/>
+        <ContentsLayer {...props} setHeaderView={setHeaderView} />
         <LeftSideLayer {...props}/>
       </div>
     </div>

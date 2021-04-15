@@ -254,9 +254,6 @@ const HeaderLayer = (props: Props) => {
   }
 
   
-  function changeUrl() {
-    location.href = 'https://gridaboard-v1-30576.web.app/';
-  }
 
   return (
     <React.Fragment>
@@ -302,7 +299,7 @@ const HeaderLayer = (props: Props) => {
 
           <HeaderLine />
           <div>
-            <Button onClick={changeUrl} className={`${classes.buttonStyle} ${classes.changeUrlStyle}`}>
+            <Button href="https://gridaboard-v1-30576.web.app/" className={`${classes.buttonStyle} ${classes.changeUrlStyle}`}>
               {getText("go_to_old")}
             </Button>
           </div>
@@ -312,7 +309,7 @@ const HeaderLayer = (props: Props) => {
 
 
       </div>
-      <div id="white_block" style={{ height: "1px", background: "rgba(255,255,255,1)", zoom: 1 / brZoom }}></div>
+      <div style={{ height: "1px", background: "rgba(255,255,255,1)", zoom: 1 / brZoom }}></div>
     </React.Fragment>
   );
 }

@@ -11,36 +11,82 @@ import { PLAYSTATE } from "nl-lib/common/enums";
 import { PenManager } from "nl-lib/neosmartpen";
 import RotateButton from "../components/buttons/RotateButton";
 import GridaToolTip from "../styles/GridaToolTip";
-import { Button, IconButton, Popover } from "@material-ui/core";
+import { Button, IconButton, makeStyles, Popover } from "@material-ui/core";
 import HelpIcon from '@material-ui/icons/Help';
 import $ from "jquery";
 import PageClearButton from "../components/buttons/PageClearButton";
+import {KeyboardArrowUp, KeyboardArrowDown} from '@material-ui/icons/';
 
 const rotateStyle = {
-  position: "absolute",
-  zIndex: 100,
-  top: "calc(15%)",
-  left: "calc(96%)"
   // marginLeft: "1850px",
   // marginTop: "20px"
 } as React.CSSProperties;
 
+const useStyle = props=>makeStyles(theme=>({
+  root : {
+    display: "flex",
+    position: "relative",
+    flex: 1,
+    overflow: "auto",
+    flexDirection: "column"
+  },
+  sideEventer : {
+    position: "absolute",
+    zIndex: 100,
+    top: "calc(6%)",
+    left: "calc(96%)"
+  },
+  dropDown : {
+    display: "none",
+    flexDirection: "column",
+    alignItems: "flex-start",
+    padding: "8px",
+    position: "fixed",
+    width: "240px",
+    height: "176px",
+    background: "rgba(255,255,255,0.9)",
+    boxShadow: "2px 2px 2px rgba(0, 0, 0, 0.25)",
+    borderRadius: "12px",
+    zIndex: 100,
+    marginTop: "620px",
+    marginLeft: "1420px",
+    zoom: 1 / props.brZoom
+  },
+  upIcon : {
+    top: "10px",
+    position: "absolute",
+    marginLeft: "0px",
+    right: "45px",
+    display: "flex",
+    padding: "8px",
+    width: "40px",
+    height: "40px",
+    background: "rgba(255,255,255,0.9)",
+    borderRadius: "40px",
+    zIndex: 1000
+  }
+}));
 
 
 interface Props {
   handlePdfOpen: (event: IFileBrowserReturn) => void,
+  setHeaderView : (isView: boolean) => void
 }
 
 const ContentsLayer = (props: Props) => {
-  const { handlePdfOpen, ...rest } = props;
+  const { handlePdfOpen, setHeaderView, ...rest } = props;
   const [pageWidth, setPageWidth] = useState(0);
   const {zoomStore} = useSelector((state: RootState) =>({
     zoomStore: state.zoomReducer.zoom as number,
   }));
+  const [isHeader, setisHeader] = useState(true);
   const rotationTrigger = useSelector((state: RootState) => state.rotate.rotationTrigger);
   const {activePageNo_store} = useSelector((state: RootState) =>({
     activePageNo_store: state.activePage.activePageNo,
   }));
+  const brZoom = useSelector((state: RootState) => state.ui.browser.zoom);
+
+  const classes = useStyle({brZoom:brZoom})();
   useEffect(() => {
     if (activePageNo_store !== activePageNo) {
       setLocalActivePageNo(activePageNo_store);
@@ -104,14 +150,14 @@ const ContentsLayer = (props: Props) => {
 
   const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null);
 
-  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    setAnchorEl(event.currentTarget);
-    if ($(".help_drop_btn").css("display") == "none") {
-      $(".help_drop_btn").show();
-    } else {
-      $(".help_drop_btn").hide();
-    }
-  };
+  // const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+  //   setAnchorEl(event.currentTarget);
+  //   if ($(".help_drop_btn").css("display") == "none") {
+  //     $(".help_drop_btn").show();
+  //   } else {
+  //     $(".help_drop_btn").hide();
+  //   }
+  // };
 
   const handleClose = () => {
     setAnchorEl(null);
@@ -135,35 +181,22 @@ const ContentsLayer = (props: Props) => {
     );
   });
 
-  const brZoom = useSelector((state: RootState) => state.ui.browser.zoom);
-
-  const localStyle = {
-    display: "flex",
-    flex: 1,
-    overflow: "auto",
-    flexDirection: "column"
-  } as React.CSSProperties;
-
-  const dropdownStyle = {
-    display: "none",
-    flexDirection: "column",
-    alignItems: "flex-start",
-    padding: "8px",
-    position: "fixed",
-    width: "240px",
-    height: "176px",
-    background: "rgba(255,255,255,0.9)",
-    boxShadow: "2px 2px 2px rgba(0, 0, 0, 0.25)",
-    borderRadius: "12px",
-    zIndex: 100,
-    marginTop: "620px",
-    marginLeft: "1420px",
-    zoom: 1 / brZoom
-  } as React.CSSProperties;
 
   return (
-    <div id="main" style={localStyle}>
-      <div style={rotateStyle}>
+    <div id="main" className={`${classes.root}`}>
+      <IconButton
+        color="inherit"
+        aria-label="open drawer"
+        edge="end"
+        className={classes.upIcon}
+        onClick={()=>{
+          setisHeader(!isHeader)
+          setHeaderView(!isHeader);
+        }}
+      >
+        {isHeader ? (<KeyboardArrowUp/>) : (<KeyboardArrowDown/>)}
+      </IconButton>
+      <div className={`${classes.sideEventer}`}>
         <RotateButton />
         <PageClearButton />
       </div>
@@ -189,7 +222,7 @@ const ContentsLayer = (props: Props) => {
         </GridaToolTip>
       </div> */}
 
-      <div className="help_drop_btn" style={dropdownStyle}>
+      <div className={`${classes.dropDown}`} >
         <Button id="customer" className="help_drop_down" style={{
           width: "224px", height: "40px", padding: "4px 12px"
         }}>
