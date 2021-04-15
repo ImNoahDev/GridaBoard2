@@ -1,6 +1,6 @@
-import React from "react";
+import React, {useState} from "react";
 import '../../styles/buttons.css';
-import { Button } from '@material-ui/core';
+import { Button, makeStyles, ClickAwayListener } from '@material-ui/core';
 import GridaToolTip from "../../styles/GridaToolTip";
 import { setViewFit } from '../../store/reducers/viewFitReducer';
 import { PageZoomEnum, ZoomFitEnum } from "nl-lib/common/enums";
@@ -9,133 +9,99 @@ import { RootState } from "../../store/rootReducer";
 import { setZoomStore } from '../../store/reducers/zoomReducer';
 import getText from "../../language/language";
 
-import $ from "jquery";
-
-const dropdownStyle = {
-  display: "none",
-  flexDirection: "column",
-  justifyContent: "center",
-  alignItems: "flex-start",
-  padding: "8px",
-  position: "fixed",
-  width: "240px",
-  height: "176px",
-  background: "rgba(255,255,255,0.9)",
-  boxShadow: "2px 2px 2px rgba(0, 0, 0, 0.25)",
-  borderRadius: "12px",
-  zIndex: 10000,
-  marginRight: "20px",
-  marginTop: "210px"
-} as React.CSSProperties;
+const useStyle = makeStyles(theme => ({
+  buttonStyle : {
+    marginLeft: "10px",
+    marginRight: "30px",
+    color : theme.custom.icon.mono[0],
+    "&:hover" : {
+      color : theme.palette.action.hover
+    }
+  },
+  dropDown : {
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "center",
+    alignItems: "flex-start",
+    padding: "8px",
+    position: "absolute",
+    width: "240px",
+    boxShadow: theme.custom.shadows[0],
+    borderRadius: "12px",
+    zIndex: 10000,
+    marginLeft: "-160px",
+    color : theme.custom.icon.mono[0],
+    background: theme.custom.white[0],
+    "&:hover" : {
+      color : theme.palette.action.hover,
+      background: theme.custom.icon.blue[3]
+    },
+    "& > button" : {
+      width: "224px",
+      height: "40px",
+      padding: "4px 12px",
+      "&>span" : {
+        width: "200px",
+        height: "16px",
+        textAlign:"left"
+      }
+    }
+  }
+}));
 
 export default function FitButton() {
-
-  const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null);
-
-  const handleClose = (viewFit: ZoomFitEnum) => {
-    setAnchorEl(null);
-    setViewFit(viewFit);
-  };
-
+  const [isOpen, setIsOpen] = useState(false);
+  const classes = useStyle();
+  
   const zoom = useSelector((state: RootState) => state.zoomReducer.zoom);
   const zoomPercent = Math.round(zoom * 100);
+  const selectArr = ["increase", "reduce", "toHeight", "toWidth"];
 
-  const setZoomByButton = (zoomEnum: PageZoomEnum) => {
-    setAnchorEl(null);
-    setViewFit(ZoomFitEnum.FREE);
-    
-    let newZoom;
-    switch (zoomEnum) {
-      case PageZoomEnum.ZOOM_UP: {
-        const delta = -100;
-        newZoom = zoom * 0.9985 ** delta
-        break;
-      }
-      case PageZoomEnum.ZOOM_DOWN: {
-        const delta = 100;
-        newZoom = zoom * 0.9985 ** delta
-        break;
-      }
-      default: break;
+  const changeView = (selected:number)=>{
+    if([0,1].includes(selected)){
+      setViewFit(ZoomFitEnum.FREE);
+      let delta;
+      if(selected == 0)
+        delta = -100;
+      else if(selected == 1)
+        delta = 100;
+      
+      let newZoom = zoom * 0.9985 ** delta;
+  
+      setZoomStore(newZoom);
+    }else{
+      const selectedArr = [ZoomFitEnum.HEIGHT, ZoomFitEnum.WIDTH];
+      setViewFit(selectedArr[selected-2]);
     }
-
-    setZoomStore(newZoom);
-  };
-
-  $('#btn_fit').hover(function() {
-    $(this).css("color", "rgba(104,143,255,1)")
-  },function() {
-    $(this).css("color", "rgba(18,18,18,1)")
-  });
-
-  $(document).ready(function(){
-    $('.help_drop_down').hover(
-      function(event){
-        $(this).addClass('hover');
-        $(this).css("color", "rgba(104,143,255,1)");
-        $(this).css("background", "rgba(232,236,245,1)");
-      },
-      function(){
-        $(this).removeClass('hover');
-        $(this).css("color", "rgba(18,18,18,1)");
-        $(this).css("background", "rgba(255,255,255,0.9)");
-      }
-    );
-  });
-
-  function handleClickFit() {
-    const fit = document.getElementById("fitDrop");
-    if (fit.style.display == 'none') {
-      fit.style.display = 'block'
-    } else {
-      fit.style.display = 'none'
-    }
+    setIsOpen(false);
+  }
+  
+  function handleClick() {
+    setIsOpen((prev) => !prev);
+  }
+  function handleClickAway(){
+    setIsOpen(false);
   }
 
   return (
-    <React.Fragment>
+    <ClickAwayListener onClickAway={handleClickAway}>
+    <div>
       <div>
-        <Button variant="outlined" type="button" id="btn_fit" className="fitDropDown" onClick={handleClickFit} style={{marginLeft: "10px", marginRight: "30px"}}>
-          {/* <GridaToolTip open={true} placement="left" tip={{
-              head: "Fit",
-              msg: "용지의 크기를 맞추는 여러 옵션 중 하나를 선택합니다.",
-              tail: "Z 폭 맞춤, X 높이 맞춤, C 전체 페이지, V 100%"
-            }} title={undefined}> */}
-            <span id="zoom-ratio" className="fitDropDown">{zoomPercent}%</span>
-          {/* </GridaToolTip> */}
+        <Button variant="outlined" type="button" id="btn_fit" className={`${classes.buttonStyle}`} onClick={handleClick} style={{}}>
+          <span >{zoomPercent}%</span>
         </Button>
       </div>
 
-      <div id="fitDrop" className="fit_btn" style={dropdownStyle}>
-          <Button id="customer" className="help_drop_down" style={{
-            width: "224px", height: "40px", padding: "4px 12px"
-          }} onClick={() => setZoomByButton(PageZoomEnum.ZOOM_UP)}>
-            <span style={{width: "200px", height: "16px", textAlign:"left"}}>
-              {getText("nav_scale_increase")}
+      {isOpen ? (<div id="fitDrop" className={classes.dropDown}>
+        {selectArr.map((el, idx)=>(
+          <Button key={idx} onClick={() => changeView(idx)}>
+            <span>
+              {getText(`nav_scale_${el}`)}
             </span>
           </Button>
-          <Button id="shortcut" className="help_drop_down" style={{
-            width: "224px", height: "40px", padding: "4px 12px"
-          }} onClick={() => setZoomByButton(PageZoomEnum.ZOOM_DOWN)}>
-            <span style={{width: "200px", height: "16px", textAlign:"left"}}>
-              {getText("nav_scale_reduce")}
-            </span>
-          </Button>
-          <Button id="tutorial" className="help_drop_down" style={{
-            width: "224px", height: "40px", padding: "4px 12px"
-          }} onClick={() => handleClose(ZoomFitEnum.HEIGHT)}>
-            <span style={{width: "200px", height: "16px", textAlign:"left"}}>
-              {getText("nav_scale_toHeight")}
-            </span>
-          </Button>
-          <Button id="faq" className="help_drop_down" style={{
-            width: "224px", height: "40px", padding: "4px 12px"
-          }} onClick={() => handleClose(ZoomFitEnum.WIDTH)}>
-            <span style={{width: "200px", height: "16px", textAlign:"left"}}>
-              {getText("nav_scale_toWidth")}
-            </span>
-          </Button>
-        </div>
-    </React.Fragment>
+        ))}
+        </div>) : null}
+    </div>
+    </ClickAwayListener>
   );
 }

@@ -169,13 +169,8 @@ export default function KeyBoardShortCut(evt: KeyboardEvent) {
         break;
 
       case "w": // w
-        // onBtn_fitWidth();
         setViewFit(ZoomFitEnum.WIDTH);
         break;
-      // case "w": // w
-      //   // setPenType(PenType.MARKER);
-      //   // PenManager.getInstance().setPenRendererType(IBrushType.MARKER);
-      //   break;
       case "x" : {
         PenManager.getInstance().setThickness(PEN_THICKNESS.THICKNESS2);
         break;
