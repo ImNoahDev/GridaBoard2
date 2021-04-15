@@ -210,10 +210,10 @@ document.addEventListener('wheel', function(e) {
 window.onclick = function(event) {
   if(!event.target.parentNode || event.target.parentNode.matches === undefined) return ;
 
-  if (!event.target.matches('.backgroundDropDown')) {
-    const background = document.getElementById("backgroundDrop");
-    background.style.display = 'none'
-  }
+  // if (!event.target.matches('.backgroundDropDown')) {
+  //   const background = document.getElementById("backgroundDrop");
+  //   background.style.display = 'none'
+  // }
 
   if (!event.target.matches('.fitDropDown')) {
     const fit = document.getElementById("fitDrop");

@@ -2,8 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 
-import Button from '@material-ui/core/Button';
-import { makeStyles } from '@material-ui/core';
+import { Button, makeStyles } from '@material-ui/core';
 
 import PenManager from 'nl-lib/neosmartpen/PenManager';
 import { PenEventName } from 'nl-lib/common/enums';

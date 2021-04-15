@@ -17,11 +17,6 @@ import $ from "jquery";
 import PageClearButton from "../components/buttons/PageClearButton";
 import {KeyboardArrowUp, KeyboardArrowDown} from '@material-ui/icons/';
 
-const rotateStyle = {
-  // marginLeft: "1850px",
-  // marginTop: "20px"
-} as React.CSSProperties;
-
 const useStyle = props=>makeStyles(theme=>({
   root : {
     display: "flex",

@@ -1,10 +1,9 @@
 import React, { useState, useEffect} from 'react';
 import '../../styles/main.css';
 import PenManager from '../../../nl-lib/neosmartpen/PenManager';
-import { ButtonBase, makeStyles, Theme, Tooltip, TooltipProps } from '@material-ui/core';
+import { ButtonBase, makeStyles, Theme, Tooltip, TooltipProps, ClickAwayListener} from '@material-ui/core';
 import { IBrushType, PenEventName } from "nl-lib/common/enums";
 import getText from "../../language/language";
-import ClickAwayListener from '@material-ui/core/ClickAwayListener';
 import SimpleTooltip from "../SimpleTooltip";
 
 const manager: PenManager = PenManager.getInstance();

@@ -1,11 +1,10 @@
 import React, {useState, useEffect} from "react";
 import '../../styles/buttons.css';
 import PenManager from "nl-lib/neosmartpen/PenManager";
-import { IconButton, makeStyles, SvgIcon, Theme, Tooltip, TooltipProps } from "@material-ui/core";
+import { IconButton, makeStyles, SvgIcon, Theme, Tooltip, TooltipProps, ClickAwayListener } from "@material-ui/core";
 import { PEN_THICKNESS } from "nl-lib/common/enums";
 import KeyboardArrowDownRoundedIcon from '@material-ui/icons/KeyboardArrowDownRounded';
 import getText from "../../language/language";
-import ClickAwayListener from '@material-ui/core/ClickAwayListener';
 import SimpleTooltip from "../SimpleTooltip";
 
 const manager: PenManager = PenManager.getInstance();

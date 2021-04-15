@@ -3,11 +3,8 @@ import HeaderLayer from "./HeaderLayer";
 import NavLayer from "./NavLayer";
 import LeftSideLayer from "./LeftSideLayer";
 import ContentsLayer from "./ContentsLayer";
-import { ButtonProps } from "@material-ui/core";
+import { ButtonProps, AppBar, makeStyles, Collapse } from "@material-ui/core";
 import { IFileBrowserReturn } from "nl-lib/common/structures";
-import AppBar from '@material-ui/core/AppBar';
-import { makeStyles } from '@material-ui/core/styles';
-import Collapse from '@material-ui/core/Collapse';
  
 /**
  *

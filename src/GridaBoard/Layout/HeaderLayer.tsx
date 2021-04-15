@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Button, Popover, SvgIcon} from "@material-ui/core";
-import { makeStyles } from '@material-ui/core/styles';
+import { Button, Popover, SvgIcon, makeStyles, ClickAwayListener} from "@material-ui/core";
 import KeyboardArrowDownRoundedIcon from '@material-ui/icons/KeyboardArrowDownRounded';
 import { saveGrida } from "../Save/SaveGrida";
 // import LoadGrida from "../Load/LoadGrida";
@@ -21,7 +20,6 @@ import getText from "../language/language";
 import { NCODE_CLASS6_NUM_DOTS } from "nl-lib/common/constants";
 import { theme as myTheme } from "../styles/theme";
 import { CalibrationButton } from 'nl-lib/ncodepod';
-import ClickAwayListener from '@material-ui/core/ClickAwayListener';
 
 const useStyles = props => makeStyles((theme) => ({
     buttonStyle : {
