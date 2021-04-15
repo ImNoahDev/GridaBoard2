@@ -23,7 +23,7 @@ const useStyles = makeStyles((theme) => {
       display: "flex",
       justifyContent: "left",
       "&:hover" : {
-        background : theme.palette.grey[100],
+        background : theme.custom.icon.blue[3],
         color: theme.palette.action.hover
       }
     },

@@ -9,11 +9,11 @@ export type ITipType = { head: string, msg: string, tail: string };
 
 const tooltipStyle = props => makeStyles(theme=>({
   tooltip: {
-    backgroundColor: theme.palette.grey[200],
+    backgroundColor: theme.custom.icon.blue[4],
     color: theme.palette.text.hint,
     maxWidth: 240,
     fontSize: theme.typography.pxToRem(12),
-    border: `1px solid ${theme.palette.grey[300]}`, 
+    border: `1px solid ${theme.custom.icon.blue[2]}`, 
   },
   popper: {
     zoom: 1 / props.brZoom

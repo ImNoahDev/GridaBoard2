@@ -17,15 +17,18 @@ import { RootState } from 'GridaBoard/store/rootReducer';
 import getText from "GridaBoard/language/language";
 
 
-const useStyles = makeStyles({
+const useStyles = makeStyles(theme=> ({
   root: {
     width: '100%',
   },
   scrollPaper: {
     alignItems: 'baseline',  // default center
     width: "100%"
+  },
+  buttons : {
+    boxShadow: `${theme.custom.shadows[2]} !important`
   }
-});
+}));
 
 export const cellRadioStyle = {
   paddingBottom: 2, paddingTop: 2,
@@ -57,7 +60,7 @@ export function OptionDialog(props: IDialogProps) {
   const dialogRef = useRef(null);
   const [optionLevel, setOptionLevel] = useState(DEFAULT_PRINTOPTION_LEVEL);
   const isInitialMount = useRef(true);
-
+  
   /** force to rerender */
   const [value, setValue] = React.useState(0);
   const forceToRender = () => {
@@ -309,22 +312,13 @@ export function OptionDialog(props: IDialogProps) {
           </Grid> */}
 
           <Grid item xs={12} sm={2}>
-            <Button style={{
-              backgroundColor: theme.palette.primary.main,
-              color: theme.palette.info.contrastText,
-              boxShadow: "4px 4px 10px rgba(0, 0, 0, 0.3)",
-            }} onClick={handleOK} color="primary" autoFocus>
+            <Button className={classes.buttons} onClick={handleOK} variant="contained" color="primary" autoFocus>
               {getText("print_popup_yes")}
           </Button>
           </Grid>
 
           <Grid item xs={12} sm={2}>
-            <Button style={{
-              backgroundColor: theme.palette.info.main,
-              color: theme.palette.info.contrastText,
-              boxShadow: "4px 4px 10px rgba(0, 0, 0, 0.3)",
-            }}
-              onClick={handleCancel} color="secondary">
+            <Button className={classes.buttons} onClick={handleCancel} variant="contained">
               {getText("print_popup_no")}
           </Button>
           </Grid>

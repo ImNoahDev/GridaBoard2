@@ -110,7 +110,7 @@ const useStyles = props => makeStyles((theme: Theme) => ({
         "& > svg" : {
           width: "12px",
           height: "12px",
-          color: theme.palette.grey[50]
+          color: theme.custom.icon.mono[4]
         }
       }
     }
@@ -125,7 +125,7 @@ const useStyles = props => makeStyles((theme: Theme) => ({
     width: "190px",
     flexShrink: 0,
     zIndex: 1100,
-    background: theme.palette.grey[600], 
+    background: theme.custom.white[2], 
     float: "left", 
     display: "flex",
     position: "relative"

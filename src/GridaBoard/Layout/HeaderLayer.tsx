@@ -30,7 +30,7 @@ const useStyles = props => makeStyles((theme) => ({
       minHeight: "0px"
     },
     calibration : {
-      background: theme.palette.primary.light,
+      background: theme.custom.white[3],
       border: "1px solid #CFCFCF",
       boxSizing: "border-box",
       borderRadius: "4px",
@@ -60,8 +60,8 @@ const useStyles = props => makeStyles((theme) => ({
       alignItems: "flex-start",
       padding: "8px",
       position: "absolute",
-      background: theme.palette.grey[50],
-      boxShadow: theme.shadows[1],
+      background: theme.custom.icon.mono[4],
+      boxShadow: theme.custom.shadows[1],
       borderRadius: "12px",
       zIndex: 10000,
       marginTop: "21px",
@@ -74,7 +74,7 @@ const useStyles = props => makeStyles((theme) => ({
       alignItems: "center",
       flexWrap: "wrap",
       height: "72px",
-      background: theme.palette.primary.light,
+      background: theme.custom.white[3],
       zoom: 1 / props.brZoom,
       backdropFilter: "blur(4px)",
       "& > div":{
@@ -108,11 +108,11 @@ const useStyles = props => makeStyles((theme) => ({
     headerLineV : {
       width: "1px",
       height: "15px",
-      background: theme.palette.grey[500]
+      background: theme.custom.icon.mono[3]
     },
     changeUrlStyle : {
       justifyContent: "center",
-      background: theme.palette.primary.light,
+      background: theme.custom.white[3],
       border: "1px solid #CFCFCF",
       boxSizing: "border-box",
       borderRadius: "4px",

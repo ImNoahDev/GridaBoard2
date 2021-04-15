@@ -26,7 +26,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     height: "24px",
     borderRadius: "24px",
     "&:hover" : {
-      boxShadow: theme.shadows[3]
+      boxShadow: theme.custom.shadows[1]
     },
     "&:pressed" : {
       border: "2px solid var(--gridaboard_cyan)"
@@ -47,8 +47,8 @@ const useStyles = makeStyles((theme: Theme) => ({
     position: "absolute",
     width: "486px",
     height: "48px",
-    background: theme.palette.primary.contrastText,
-    boxShadow: theme.shadows[1],
+    background: theme.custom.white[0],
+    boxShadow: theme.custom.shadows[0],
     borderRadius: "12px",
     zIndex: 100,
     marginTop: "30px",
