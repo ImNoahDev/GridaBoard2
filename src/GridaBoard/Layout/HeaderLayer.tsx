@@ -59,7 +59,7 @@ const useStyles = props => makeStyles((theme) => ({
       padding: "8px",
       position: "absolute",
       background: theme.custom.icon.mono[4],
-      boxShadow: theme.custom.shadows[1],
+      boxShadow: theme.custom.shadows[0],
       borderRadius: "12px",
       zIndex: 10000,
       marginTop: "21px",

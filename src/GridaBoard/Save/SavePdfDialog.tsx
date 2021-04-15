@@ -14,7 +14,6 @@ import getText from "../language/language";
 
 
 const useStyles = makeStyles((theme) => {
-  console.log(theme);
   return ({
     dropdownBtn : {
       width: "200px",
