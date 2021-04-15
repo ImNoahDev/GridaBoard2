@@ -63,7 +63,9 @@ export default class PdfDocMapper {
     const { url, fingerprint, numPages } = head.pdfDesc;
     const availablePages = g_availablePagesInSection[pi.section];
     const availablePages_base = g_availablePagesInSection[basePageInfo.section];
-    for (let pgNo = 1; pgNo <= numPages; pgNo++) {
+    for (let pgNo = head.pdfPageNo; pgNo <= numPages; pgNo++) { 
+      //head.pdfPageNo에 인쇄된 pdf가 갖는 실제 자기가 속한 pdf의 pageNo이 있음. 
+      //2~3page만 인쇄했다면 arr에도 2~3page만 들어있기 때문에 여기서도 맞춰줘야 더미를 생성하지 않는다.
       const idx = arr.indexOf(pgNo);
 
       /**

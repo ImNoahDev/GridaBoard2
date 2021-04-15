@@ -227,13 +227,15 @@ const CalibrationDialog = (props: IDialogProps) => {
           fingerprint: pdf.fingerprint,
           id: pdf.fingerprint + '/1',
           numPages: numPages,
-          pageNo: pageNo
+          pageNo: pageNo,
+          //이 pageNo은 인쇄할 시 정해진 페이지 수에 따라 생성된 pdf document의 pageNo
+          //4장중 2장만 인쇄했다면 2장을 전체로 하는 pageNo인데 지금은 마지막 pageNo만 넘어가고 있어서 의미가 없는듯하다
         }
 
         const worker = new CalibrationData();
         const mapper = worker.createDocMapperItemOneStep(
-          nu, pu, pageInfos, pdfPagesDesc, pdfPagesDesc.filename, numPages, 1
-        );
+          nu, pu, pageInfos, pdfPagesDesc, pdfPagesDesc.filename, numPages, 1, targetPages
+        ); 
 
         const msi = MappingStorage.getInstance();
         msi.registerTemporary(mapper);
