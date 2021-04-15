@@ -222,7 +222,7 @@ const HeaderLayer = (props: Props) => {
   const InformationBtn = ()=>{
     return (
       <div>
-        <Button className={`${classes.buttonStyle} `}>
+        <Button className={`${classes.buttonStyle} `} target="_blank" href="https://neolabdev.gitbook.io/gridaboard/">
           <SvgIcon>
             <path
               fillRule="evenodd"
