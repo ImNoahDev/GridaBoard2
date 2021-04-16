@@ -36,6 +36,8 @@ const useStyles = makeStyles((theme: Theme) => ({
     marginLeft: "22px"
   },
   selectColorBtn : {
+    width : "40px",
+    height : "40px",
     marginLeft: "24px",
   },
   colorDropDownStyle : {

@@ -212,31 +212,6 @@ export default class PenManager {
   }
 
   setPenRendererType(type: IBrushType) {
-
-    if (type == IBrushType.MARKER) {
-      $('#btn_marker').css('background', 'white');
-      $('#marker_svg_icon').css('color', '#688FFF');
-    } else {
-      $('#btn_marker').css('background', 'none');
-      $('#marker_svg_icon').css('color', '#58627D');
-    }
-
-    if (type == IBrushType.ERASER) {
-      $('#btn_eraser').css('background', 'white');
-      $('#eraser_svg_icon').css('color', '#688FFF');
-    } else {
-      $('#btn_eraser').css('background', 'none');
-      $('#eraser_svg_icon').css('color', '#58627D');
-    }
-
-    if (type == IBrushType.PEN) {
-      $('#btn_pen').css('background', 'white');
-      $('#pen_svg_icon').css('color', '#688FFF');
-    } else {
-      $('#btn_pen').css('background', 'none');
-      $('#pen_svg_icon').css('color', '#58627D');
-    }
-
     this.penRendererType = type;
 
     if (_active_pen) {
