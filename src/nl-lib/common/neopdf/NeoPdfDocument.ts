@@ -4,6 +4,7 @@ import { uuidv4 } from "../util";
 import { MappingStorage } from "../mapper";
 import { NeoPdfPage, PDF_VIEWPORT_DESC } from "./NeoPdfPage";
 import { resolve } from "path";
+import { setLoadingVisibility } from "GridaBoard/store/reducers/loadingCircle";
 
 // import PdfJsWorker from "../../../../public/pdf.worker.2.5.207.js/index.js";
 console.log(`PDFjs version=${PdfJs.version}`);
@@ -75,7 +76,8 @@ export class NeoPdfDocument {
 
   load = async (options: IPdfOpenOption) => {
     console.log("~GRIDA DOC~,   load, step 1")
-   const pdfDoc = await pdfJsOpenDocument(options);
+    const pdfDoc = await pdfJsOpenDocument(options);
+
     console.log("~GRIDA DOC~,   load, step 2")
 
 
@@ -448,7 +450,23 @@ function pdfJsOpenDocument(options: IPdfOpenOption): Promise<PdfJs.PDFDocumentPr
 
   
   console.log(`:GRIDA DOC:,     pdfJsOpenDocument, step 2  fingerprint=${pdf_fingerprint} `);
-  const loadingTask = PdfJs.getDocument(openOption);
+  const loadingTask: any = PdfJs.getDocument(openOption); 
+  //onPassword가 typescript에서 compile이 안된다. :any를 추가함
+
+  loadingTask.onPassword = function passwordNeeded(updateCallback, reason) {
+    //when the document is encrypted, this function will be triggered
+    if (reason === 1) {
+      const password = prompt("PDF가 암호화 되어있습니다. 비밀번호를 입력해주세요.");
+      if (password === null) {
+        loadingTask.destroy();
+      } else {
+        updateCallback(password);
+      }
+    } else {
+      updateCallback(null);
+      confirm("잘못된 비밀번호입니다");
+    }
+  };
 
     /**
      * 왜, 아래의 부분의 await 다음이 두번 콜백 실행되지? callback에 등록이 희안하게 되는 모양인데 말이지.
@@ -472,16 +490,19 @@ function pdfJsOpenDocument(options: IPdfOpenOption): Promise<PdfJs.PDFDocumentPr
      */
     return new Promise(resolve => {
       loadingTask.promise.then(pdf => {
-        console.log(pdf);
         resolve(pdf);
+
         // if (pdf_fingerprint[pdf_loader_idx] === "" || pdf_fingerprint[pdf_loader_idx] !== pdf.fingerprint) {
-        //   resolve(pdf);
+        //   resolve(pdf); 
         // }
         // else {
         //   pdf.destroy();
         // }
         console.log(`:GRIDA DOC:,     pdfJsOpenDocument, step 3  fingerprint=${pdf_fingerprint} `);
         pdf_fingerprint[pdf_loader_idx] = pdf.fingerprint;
+      }, function (e) {
+        console.error('error code : ' + e)
+        setLoadingVisibility(false);
       });
     })
   }
