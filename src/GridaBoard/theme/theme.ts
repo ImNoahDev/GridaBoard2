@@ -35,7 +35,8 @@ export const theme = createMuiTheme({
       "rgba(255, 255, 255, 0.5)"
     ],
     grey: [
-      "rgba(88, 98, 125, 0.75)"
+      "rgba(88, 98, 125, 0.75)",
+      "#E5E5E5"
     ],
     icon:{
       blue : ["#313747","#58627D","#CED3E2","#E8ECF5", "#F5F5F9"],

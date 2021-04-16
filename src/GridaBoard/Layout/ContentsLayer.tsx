@@ -13,9 +13,7 @@ import RotateButton from "../components/buttons/RotateButton";
 import GridaToolTip from "../styles/GridaToolTip";
 import { Button, IconButton, makeStyles, Popover } from "@material-ui/core";
 import HelpIcon from '@material-ui/icons/Help';
-import $ from "jquery";
 import PageClearButton from "../components/buttons/PageClearButton";
-import {KeyboardArrowUp, KeyboardArrowDown} from '@material-ui/icons/';
 import CustomBadge from "../components/CustomElement/CustomBadge";
 import InformationButton from "../components/buttons/InformationButton";
 
@@ -30,12 +28,13 @@ const useStyle = props=>makeStyles(theme=>({
   sideEventer : {
     position: "absolute",
     zIndex: 100,
-    top: "calc(6%)",
-    right: "54px",
+    right: "0px",
+    padding: "24px",
     "& > span" : {
       display: "flex",
       "& > button": {
-        marginTop: "16px",
+        width: "56px",
+        height: "56px",
         background: theme.custom.white[1],
         boxShadow: "2px 0px 24px rgba(0, 0, 0, 0.15), inset 0px 2px 0px rgba(255, 255, 255, 1)",
         borderRadius: "50%",
@@ -45,36 +44,10 @@ const useStyle = props=>makeStyles(theme=>({
           color: theme.palette.action.hover,
         },
       }
+    },
+    "& > span:first-child": {
+      marginBottom: "16px"
     }
-  },
-  dropDown : {
-    display: "none",
-    flexDirection: "column",
-    alignItems: "flex-start",
-    padding: "8px",
-    position: "fixed",
-    width: "240px",
-    height: "176px",
-    background: theme.custom.white[0],
-    boxShadow: theme.custom.shadows[0],
-    borderRadius: "12px",
-    zIndex: 100,
-    marginTop: "620px",
-    marginLeft: "1420px",
-    zoom: 1 / props.brZoom
-  },
-  upIcon : {
-    top: "10px",
-    position: "absolute",
-    marginLeft: "0px",
-    right: "45px",
-    display: "flex",
-    padding: "8px",
-    width: "40px",
-    height: "40px",
-    background: theme.custom.white[0],
-    borderRadius: "40px",
-    zIndex: 1000
   },
   information : {
     right: "24px",
@@ -95,16 +68,14 @@ const useStyle = props=>makeStyles(theme=>({
 
 interface Props {
   handlePdfOpen: (event: IFileBrowserReturn) => void,
-  setHeaderView : (isView: boolean) => void
 }
 
 const ContentsLayer = (props: Props) => {
-  const { handlePdfOpen, setHeaderView, ...rest } = props;
+  const { handlePdfOpen, ...rest } = props;
   const [pageWidth, setPageWidth] = useState(0);
   const {zoomStore} = useSelector((state: RootState) =>({
     zoomStore: state.zoomReducer.zoom as number,
   }));
-  const [isHeader, setisHeader] = useState(true);
   const rotationTrigger = useSelector((state: RootState) => state.rotate.rotationTrigger);
   const {activePageNo_store} = useSelector((state: RootState) =>({
     activePageNo_store: state.activePage.activePageNo,
@@ -172,55 +143,11 @@ const ContentsLayer = (props: Props) => {
   const handlePageWidthNeeded = (width: number) => {
     setPageWidth(width);
   }
-
-  const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null);
-
-  // const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-  //   setAnchorEl(event.currentTarget);
-  //   if ($(".help_drop_btn").css("display") == "none") {
-  //     $(".help_drop_btn").show();
-  //   } else {
-  //     $(".help_drop_btn").hide();
-  //   }
-  // };
-
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
-
-  const open = Boolean(anchorEl);
-  const id = open ? 'simple-popover' : undefined;
-
-  $(document).ready(function(){
-    $('.help_drop_down').hover(
-      function(event){
-        $(this).addClass('hover');
-        $(this).css("color", "rgba(104,143,255,1)");
-        $(this).css("background", "rgba(232,236,245,1)");
-      },
-      function(){
-        $(this).removeClass('hover');
-        $(this).css("color", "rgba(18,18,18,1)");
-        $(this).css("background", "rgba(255,255,255,0.9)");
-      }
-    );
-  });
+  
 
 
   return (
     <div id="main" className={`${classes.root}`}>
-      <IconButton
-        color="inherit"
-        aria-label="open drawer"
-        edge="end"
-        className={classes.upIcon}
-        onClick={()=>{
-          setisHeader(!isHeader)
-          setHeaderView(!isHeader);
-        }}
-      >
-        {isHeader ? (<KeyboardArrowUp/>) : (<KeyboardArrowDown/>)}
-      </IconButton>
       <div className={`${classes.sideEventer}`}>
         <CustomBadge badgeContent={`TAB`}>
           <RotateButton disabled={activePageNo_store === -1} />
