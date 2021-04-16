@@ -4,6 +4,7 @@ import { Breakpoint } from '@material-ui/core/styles/createBreakpoints';
 declare module '@material-ui/core/styles/createMuiTheme' {
   interface Theme {
     custom : {
+      grey : Array<string>
       white : Array<string>,
       icon :{
         blue : Array<string>
@@ -15,6 +16,7 @@ declare module '@material-ui/core/styles/createMuiTheme' {
   // allow configuration using `createMuiTheme`
   interface ThemeOptions {
     custom? : {
+      grey? : Array<string>,
       white? : Array<string>,
       icon? :{
         blue? : Array<string>
@@ -31,6 +33,9 @@ export const theme = createMuiTheme({
       "rgba(255,255,255,0.8)",
       "rgba(255, 255, 255, 0.25)",
       "rgba(255, 255, 255, 0.5)"
+    ],
+    grey: [
+      "rgba(88, 98, 125, 0.75)"
     ],
     icon:{
       blue : ["#313747","#58627D","#CED3E2","#E8ECF5", "#F5F5F9"],

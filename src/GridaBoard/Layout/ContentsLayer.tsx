@@ -17,6 +17,7 @@ import $ from "jquery";
 import PageClearButton from "../components/buttons/PageClearButton";
 import {KeyboardArrowUp, KeyboardArrowDown} from '@material-ui/icons/';
 import CustomBadge from "../components/CustomElement/CustomBadge";
+import InformationButton from "../components/buttons/InformationButton";
 
 const useStyle = props=>makeStyles(theme=>({
   root : {
@@ -74,6 +75,20 @@ const useStyle = props=>makeStyles(theme=>({
     background: theme.custom.white[0],
     borderRadius: "40px",
     zIndex: 1000
+  },
+  information : {
+    right: "24px",
+    bottom: "24px",
+    display: "flex",
+    position : "absolute",
+    zIndex: 100,
+    "& > button": {
+      marginTop: "16px",
+      boxShadow: "2px 0px 24px rgba(0, 0, 0, 0.15), inset 0px 2px 0px rgba(255, 255, 255, 1)",
+      borderRadius: "50%",
+      display: "block",
+      zoom: 1 / props.brZoom,
+    }
   }
 }));
 
@@ -214,59 +229,8 @@ const ContentsLayer = (props: Props) => {
           <PageClearButton disabled={activePageNo_store === -1} />
         </CustomBadge>
       </div>
-      {/* <div>
-        <GridaToolTip open={true} placement="top-start" tip={{
-          head: "Helper",
-          msg: "도움말 기능들을 보여줍니다.",
-          tail: "키보드 버튼 ?로 선택 가능합니다"
-        }} title={undefined}>
-            <IconButton id="help_btn" onClick={handleClick} aria-describedby={id} style={{
-              position: "absolute",
-              zIndex: 1900,
-              top: "calc(94%)",
-              left: "calc(96%)",
-              zoom: 1 / brZoom,
-            }}>
-              <HelpIcon fontSize="large"
-                style={{
-                zIndex: 1500,
-                padding: 0,
-              }}/>
-            </IconButton>
-        </GridaToolTip>
-      </div> */}
-
-      <div className={`${classes.dropDown}`} >
-        <Button id="customer" className="help_drop_down" style={{
-          width: "224px", height: "40px", padding: "4px 12px"
-        }}>
-          <span style={{width: "200px", height: "16px", marginLeft: "-140px"}}>
-            고객센터
-          </span>
-        </Button>
-        <Button id="shortcut" className="help_drop_down" style={{
-          width: "224px", height: "40px", padding: "4px 12px"
-        }}>
-          <span style={{width: "200px", height: "16px", marginLeft: "-120px"}}>
-            단축키 안내
-          </span>
-        </Button>
-        <Button id="tutorial" className="help_drop_down" style={{
-          width: "224px", height: "40px", padding: "4px 12px"
-        }}>
-          <span style={{width: "200px", height: "16px", marginLeft: "-140px"}}>
-            튜토리얼
-          </span>
-        </Button>
-        <Button id="faq" className="help_drop_down" style={{
-          width: "224px", height: "40px", padding: "4px 12px"
-        }}>
-          <span style={{width: "200px", height: "16px", marginLeft: "-170px"}}>
-            FAQ
-          </span>
-        </Button>
-      </div>
-        
+      <InformationButton className={classes.information}/>
+      
       <div id="mixed-viewer-layer" style={{
         position: "relative",
         height: '100%',

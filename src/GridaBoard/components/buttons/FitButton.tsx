@@ -33,11 +33,15 @@ const useStyle = makeStyles(theme => ({
     marginLeft: "-160px",
     color : theme.custom.icon.mono[0],
     background: theme.custom.white[0],
-    "& > button" : {
-      width: "100%",
+    "& > span > button" : {
+      width: "224px",
       height: "40px",
       padding: "4px 12px",
       justifyContent: "left",
+      "&:hover" : {
+        color : theme.palette.action.hover,
+        background: theme.custom.icon.blue[3]
+      },
       "&>span" : {
         height: "16px",
         "&:hover": {

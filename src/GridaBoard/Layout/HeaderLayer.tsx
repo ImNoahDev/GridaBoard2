@@ -303,9 +303,9 @@ const HeaderLayer = (props: Props) => {
           <div>
             <ConnectButton className={`${classes.buttonStyle}`} onPenLinkChanged={e => onPenLinkChanged(e)} />
           </div>
-          <HeaderLine />
+          {/* <HeaderLine />
           
-          <InformationBtn />
+          <InformationBtn /> */}
 
           <HeaderLine />
           <div>
