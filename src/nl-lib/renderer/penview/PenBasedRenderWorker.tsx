@@ -364,10 +364,10 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
     if (!Object.prototype.hasOwnProperty.call(this.penCursors, mac)) {
       for (let i = 0; i < NUM_HOVER_POINTERS; i++) {
         const hoverPoint = new fabric.Circle({
-          radius: NUM_HOVER_POINTERS - i,
+          radius: NUM_HOVER_POINTERS/2 - i/2,
           fill: '#ff2222',
           stroke: '#ff2222',
-          opacity: (NUM_HOVER_POINTERS - i) / NUM_HOVER_POINTERS / 2,
+          opacity: (NUM_HOVER_POINTERS - i) / NUM_HOVER_POINTERS / 3,
           left: -30,
           top: -30,
           hasControls: false,
