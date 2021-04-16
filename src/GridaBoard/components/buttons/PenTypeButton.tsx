@@ -18,7 +18,7 @@ const useStyle = makeStyles(theme => ({
     padding: "8px",
   },
   selected : {
-    color: theme.palette.main,
+    color: theme.palette.primary.main,
     background: theme.custom.icon.mono[4],
     padding: "8px"
   }

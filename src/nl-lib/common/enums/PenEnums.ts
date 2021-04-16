@@ -31,6 +31,7 @@ export enum PEN_THICKNESS {
 /** @enum {string} */
 export enum PenEventName {
   ON_PEN_DOWN = "pendown",
+  ON_PEN_THICKNESS_CHANGE = "thicknessChange",
 
   ON_PEN_PAGEINFO = "penpageinfo",
   ON_PEN_HOVER_PAGEINFO = "hoverpageinfo",

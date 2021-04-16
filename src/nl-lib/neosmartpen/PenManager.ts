@@ -65,7 +65,6 @@ export default class PenManager {
 
   _virtualPen: INeoSmartpen;
 
-  changeThicknessIcon: Function = function(){};
 
   init = () => {
     this.setThickness(DEFAULT_PEN_THICKNESS);
@@ -224,10 +223,10 @@ export default class PenManager {
 
     //펜 타입이 변경 되었을 경우, thickness 데이터를 받아와 아이콘을 변경해준다    
     const thickness = this._virtualPen.getThickness() as PEN_THICKNESS;
-    this.changeThicknessIcon(thickness);
     this.thickness = thickness;
 
 
+    this.dispatcher.dispatch(PenEventName.ON_PEN_THICKNESS_CHANGE, this);
     this.dispatcher.dispatch(PenEventName.ON_PEN_TYPE_CHANGED, this);
   }
 
@@ -250,19 +249,16 @@ export default class PenManager {
     }
   }
 
-  setChangeThicknessIcon(changeFunction: Function){
-    this.changeThicknessIcon = changeFunction;
-  }
 
   setThickness(thickness: PEN_THICKNESS) {
-    this.changeThicknessIcon(thickness);
-
     this.thickness = thickness;
 
     if (_active_pen) {
       _active_pen.setThickness(this.thickness);
     }
     this._virtualPen.setThickness(this.thickness);
+    
+    this.dispatcher.dispatch(PenEventName.ON_PEN_THICKNESS_CHANGE, this);
   }
 
   // registerRenderContainer = (renderContainer) => {
