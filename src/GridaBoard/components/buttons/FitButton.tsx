@@ -8,6 +8,7 @@ import { useSelector } from "react-redux";
 import { RootState } from "../../store/rootReducer";
 import { setZoomStore } from '../../store/reducers/zoomReducer';
 import getText from "../../language/language";
+import CustomBadge from "../CustomElement/CustomBadge";
 
 const useStyle = makeStyles(theme => ({
   buttonStyle : {
@@ -32,18 +33,16 @@ const useStyle = makeStyles(theme => ({
     marginLeft: "-160px",
     color : theme.custom.icon.mono[0],
     background: theme.custom.white[0],
-    "&:hover" : {
-      color : theme.palette.action.hover,
-      background: theme.custom.icon.blue[3]
-    },
     "& > button" : {
-      width: "224px",
+      width: "100%",
       height: "40px",
       padding: "4px 12px",
+      justifyContent: "left",
       "&>span" : {
-        width: "200px",
         height: "16px",
-        textAlign:"left"
+        "&:hover": {
+          color : theme.palette.action.hover,
+        }
       }
     }
   }
@@ -56,6 +55,7 @@ export default function FitButton() {
   const zoom = useSelector((state: RootState) => state.zoomReducer.zoom);
   const zoomPercent = Math.round(zoom * 100);
   const selectArr = ["increase", "reduce", "toHeight", "toWidth"];
+  const shortCut = ["+", "-", "H", "W"];
 
   const changeView = (selected:number)=>{
     if([0,1].includes(selected)){
@@ -94,11 +94,15 @@ export default function FitButton() {
 
       {isOpen ? (<div id="fitDrop" className={classes.dropDown}>
         {selectArr.map((el, idx)=>(
-          <Button key={idx} onClick={() => changeView(idx)}>
-            <span>
-              {getText(`nav_scale_${el}`)}
-            </span>
-          </Button>
+          <CustomBadge key={idx} badgeContent={shortCut[idx]}
+            anchorOrigin={{
+              vertical: 'top',
+              horizontal: 'left',
+            }}>
+            <Button onClick={() => changeView(idx)}>
+                {getText(`nav_scale_${el}`)}
+            </Button>
+          </CustomBadge>
         ))}
         </div>) : null}
     </div>

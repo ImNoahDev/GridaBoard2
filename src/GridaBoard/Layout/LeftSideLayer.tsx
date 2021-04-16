@@ -6,6 +6,7 @@ import PersistentDrawerRight from "../View/Drawer/PersistentDrawerRight";
 import { updateDrawerWidth } from "../store/reducers/ui";
 import KeyboardArrowRightIcon from '@material-ui/icons/KeyboardArrowRight';
 import $ from "jquery";
+import CustomBadge from "../components/CustomElement/CustomBadge";
 
 const arrowRightStyle = {
   display: "flex",
@@ -73,7 +74,10 @@ const LeftSideLayer = () => {
             style={arrowRightStyle}
             disabled={disabled}
           >
-            <KeyboardArrowRightIcon/>
+
+            <CustomBadge badgeContent={`L`}>
+              <KeyboardArrowRightIcon/>
+            </CustomBadge>
           </IconButton>
           <PersistentDrawerRight
             id="show"

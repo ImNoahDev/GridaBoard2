@@ -16,6 +16,7 @@ import { scrollToBottom } from '../../../nl-lib/common/util';
 import $ from "jquery";
 import { sum } from 'pdf-lib';
 import getText from "../../language/language";
+import CustomBadge from "../../components/CustomElement/CustomBadge";
 
 
 const addBlankPage = async (event) => {
@@ -196,7 +197,9 @@ export default function PersistentDrawerRight(props: Props) {
         <div id="drawer_content" className={classes.drawerContainer}>
           <div className={classes.drawerHeader}>
             <IconButton id="drawer_hide_button" onClick={props.handleDrawerClose}>
-              {theme.direction === 'rtl' ? <ChevronRightIcon /> : <ChevronLeftIcon />}
+              <CustomBadge badgeContent={`ESC`}>
+                {theme.direction === 'rtl' ? <ChevronRightIcon /> : <ChevronLeftIcon />}
+              </CustomBadge>
             </IconButton>
           </div>
           <div className={classes.liner}></div>

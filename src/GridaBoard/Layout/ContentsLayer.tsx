@@ -16,6 +16,7 @@ import HelpIcon from '@material-ui/icons/Help';
 import $ from "jquery";
 import PageClearButton from "../components/buttons/PageClearButton";
 import {KeyboardArrowUp, KeyboardArrowDown} from '@material-ui/icons/';
+import CustomBadge from "../components/CustomElement/CustomBadge";
 
 const useStyle = props=>makeStyles(theme=>({
   root : {
@@ -30,18 +31,19 @@ const useStyle = props=>makeStyles(theme=>({
     zIndex: 100,
     top: "calc(6%)",
     right: "54px",
-    "&> button" : {
-      marginTop: "16px",
-      background: theme.custom.white[1],
-      boxShadow: "2px 0px 24px rgba(0, 0, 0, 0.15), inset 0px 2px 0px rgba(255, 255, 255, 1)",
-      borderRadius: "50%",
-      display: "block",
-      flexWrap: "wrap",
-      zIndex: 100,
-      zoom: 1 / props.brZoom,
-      "&:hover": {
-        color: theme.palette.action.hover,
-      },
+    "& > span" : {
+      display: "flex",
+      "& > button": {
+        marginTop: "16px",
+        background: theme.custom.white[1],
+        boxShadow: "2px 0px 24px rgba(0, 0, 0, 0.15), inset 0px 2px 0px rgba(255, 255, 255, 1)",
+        borderRadius: "50%",
+        display: "block",
+        zoom: 1 / props.brZoom,
+        "&:hover": {
+          color: theme.palette.action.hover,
+        },
+      }
     }
   },
   dropDown : {
@@ -205,8 +207,12 @@ const ContentsLayer = (props: Props) => {
         {isHeader ? (<KeyboardArrowUp/>) : (<KeyboardArrowDown/>)}
       </IconButton>
       <div className={`${classes.sideEventer}`}>
-        <RotateButton disabled={activePageNo_store === -1} />
-        <PageClearButton disabled={activePageNo_store === -1} />
+        <CustomBadge badgeContent={`TAB`}>
+          <RotateButton disabled={activePageNo_store === -1} />
+        </CustomBadge>
+        <CustomBadge badgeContent={`S`}>
+          <PageClearButton disabled={activePageNo_store === -1} />
+        </CustomBadge>
       </div>
       {/* <div>
         <GridaToolTip open={true} placement="top-start" tip={{

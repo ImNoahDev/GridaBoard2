@@ -91,7 +91,7 @@ const SavePdfDialog = (props) => {
         msg: "PDF 파일을 로컬에 저장하는 버튼입니다.",
         tail: "키보드 버튼 ?로 선택 가능합니다"
       }} title={undefined}> */}
-        <Button className={`${classes.dropdownBtn}`} onClick={handleDialogOpen}>
+        <Button className={`${classes.dropdownBtn} ${saveType==="pdf"? "save_drop_down": ""}`} onClick={handleDialogOpen}>
           {getText("save_to_"+saveType)}
         </Button>
       {/* </GridaToolTip> */}
@@ -103,7 +103,7 @@ const SavePdfDialog = (props) => {
         </DialogTitle>
         <PdfDialogTextArea saveType={saveType} onTextAreaChange={(name) => setName(name)}/>
         <DialogActions>
-          <Button onClick={handleSavePdf} variant="contained" color="primary" className={classes.button}>
+          <Button onClick={handleSavePdf} variant="contained" color="primary" className={`${classes.button}`}>
           {getText("save_"+saveType+"_popup_save")}
           </Button>
           <Button onClick={handleDialogClose} variant="contained" className={classes.button}>

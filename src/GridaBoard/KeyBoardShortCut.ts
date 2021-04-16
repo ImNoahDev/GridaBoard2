@@ -12,6 +12,7 @@ import { setRotationTrigger } from "./store/reducers/rotate";
 import { PEN_THICKNESS } from '../nl-lib/common/enums';
 import $ from "jquery";
 import { setPointerTracer } from "./store/reducers/pointerTracer";
+import { showShortCut } from './store/reducers/ui';
 
 
 /* 
@@ -56,7 +57,7 @@ export default function KeyBoardShortCut(evt: KeyboardEvent) {
   const cmd = (isCtrl ? 1 : 0) | (isAlt ? 2 : 0) | (isShift ? 4 : 0) | (evt.metaKey ? 8 : 0);
 
   // console.log(`key down cmd=${cmd} ==> code=${evt.code}  key => ${evt.key}`);
-  
+  console.log(evt, cmd);
   if (cmd == 0) {
     switch (evt.key.toLocaleLowerCase()) {
       case "0":
@@ -118,9 +119,7 @@ export default function KeyBoardShortCut(evt: KeyboardEvent) {
         evt.preventDefault(); //web 기본 탭 기능 정지
         const activePageNo = store.getState().activePage.activePageNo;
         //페이지가 하나도 없으면 인쇄 못함
-        console.log(activePageNo);
         if(activePageNo === -1) break;
-        console.log(activePageNo);
 
         (document.querySelector("#printBtn") as HTMLElement).click();
         break;
@@ -140,8 +139,12 @@ export default function KeyBoardShortCut(evt: KeyboardEvent) {
         const activePageNo = store.getState().activePage.activePageNo;
         //페이지가 하나도 없으면 저장 못함
         if(activePageNo === -1) break;
-
-        (document.querySelector(".save_drop_down") as HTMLElement).click();
+        
+        (document.querySelector(".saveButton") as HTMLElement).click();
+        //1틱 뒤에 동작해야함
+        setTimeout(()=>{
+          (document.querySelector(".save_drop_down") as HTMLElement).click();
+        },0);
         break;
       }
       case "t": {// t
@@ -260,7 +263,7 @@ export default function KeyBoardShortCut(evt: KeyboardEvent) {
         break;
     }
   } else if (cmd == 1) {
-    switch (evt.key) {
+    switch (evt.key.toLocaleLowerCase()) {
       case "o":{ // ctrl-o
         evt.preventDefault(); //web 기본 오픈 기능 강제 스탑
         (document.querySelector("#loadFileButton") as HTMLSpanElement).click();
@@ -299,6 +302,14 @@ export default function KeyBoardShortCut(evt: KeyboardEvent) {
         evt.cancelBubble = true;
         evt.returnValue = false;
         break;
+      }
+    }
+  } else if(cmd == 2){
+    switch (evt.key.toLocaleLowerCase()) {
+      case "alt" : {
+        evt.preventDefault(); //web 기본 오픈 기능 강제 스탑
+        showShortCut(!store.getState().ui.shotcut.show);
+        break; 
       }
     }
   }

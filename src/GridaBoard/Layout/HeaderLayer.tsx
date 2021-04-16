@@ -20,6 +20,7 @@ import getText from "../language/language";
 import { NCODE_CLASS6_NUM_DOTS } from "nl-lib/common/constants";
 import { theme as myTheme } from "../styles/theme";
 import { CalibrationButton } from 'nl-lib/ncodepod';
+import CustomBadge from "../components/CustomElement/CustomBadge";
 
 const useStyles = props => makeStyles((theme) => ({
     buttonStyle : {
@@ -127,6 +128,10 @@ const useStyles = props => makeStyles((theme) => ({
     },
     imgStyle: {
       borderRadius: "8px"
+    },
+    badge: {
+      background: theme.custom.icon.mono[1],
+      color : theme.custom.icon.mono[4]
     }
   }));
 
@@ -211,6 +216,7 @@ const HeaderLayer = (props: Props) => {
   const activePageNo_store = useSelector((state: RootState) => state.activePage.activePageNo);
 
   const brZoom = useSelector((state: RootState) => state.ui.browser.zoom);
+  const badgeInVisible = !useSelector((state: RootState) => state.ui.shotcut.show);
 
   const classes = useStyles({brZoom})();
 
@@ -261,9 +267,11 @@ const HeaderLayer = (props: Props) => {
           <div>
             <ClickAwayListener onClickAway={handleClickSaveAway}>
               <div>
-                  <Button className={`${classes.buttonStyle} ${classes.buttonFontStyle}`}  onClick={handleClickSave} disabled={disabled}>
-                    {getText("save_file")}
-                  </Button>
+                  <CustomBadge badgeContent={`S`}>
+                    <Button className={`${classes.buttonStyle} ${classes.buttonFontStyle} saveButton`}  onClick={handleClickSave} disabled={disabled}>
+                      {getText("save_file")}
+                    </Button>
+                  </CustomBadge>
                   {isSaveOpen ? (
                     <div className={`${classes.saveDropdownStyle}`} >
                       <SavePdfDialog saveType="pdf"/> 
@@ -273,14 +281,18 @@ const HeaderLayer = (props: Props) => {
               </div>
             </ClickAwayListener>
             <div>
-              <ConvertFileLoad className={`loadDropDown ${classes.buttonStyle} ${classes.buttonFontStyle}`}  handlePdfOpen={handlePdfOpen}/>
+              <CustomBadge badgeContent={`Ctrl-O`}>
+                <ConvertFileLoad className={`loadDropDown ${classes.buttonStyle} ${classes.buttonFontStyle}`}  handlePdfOpen={handlePdfOpen}/>
+              </CustomBadge>
             </div>
             <div>
-              <PrintNcodedPdfButton
-              className={` ${classes.buttonStyle}  ${classes.buttonFontStyle}`}
-              handkeTurnOnAppShortCutKey={turnOnGlobalKeyShortCut}
-              
-              url={pdfUrl} filename={pdfFilename} handlePdfUrl={makePdfUrl} disabled={disabled} />
+              <CustomBadge badgeContent={`P`}>
+                <PrintNcodedPdfButton id="printBtn"
+                className={` ${classes.buttonStyle}  ${classes.buttonFontStyle}`}
+                handkeTurnOnAppShortCutKey={turnOnGlobalKeyShortCut}
+                
+                url={pdfUrl} filename={pdfFilename} handlePdfUrl={makePdfUrl} disabled={disabled} />
+              </CustomBadge>
             </div>
           </div>
           <CalibrationButton className={`${classes.buttonStyle}  ${classes.calibration}`} filename={pdfFilename} handlePdfUrl={makePdfUrl} />

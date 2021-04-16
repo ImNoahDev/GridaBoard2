@@ -20,6 +20,7 @@ import FitButton from "../components/buttons/FitButton";
 import PageNumbering from "../components/navbar/PageNumbering";
 import { RootState } from "../store/rootReducer";
 import { makeStyles } from "@material-ui/core";
+import CustomBadge from "../components/CustomElement/CustomBadge"
 
 const useStyle = props => makeStyles(theme => ({
   navStyle : {
@@ -60,6 +61,7 @@ const NavLayer = () => {
   const [docViewDetail, setDocViewDetail] = useState(0);
   const brZoom = useSelector((state: RootState) => state.ui.browser.zoom);
   const classes = useStyle({brZoom:brZoom})();
+  const badgeInVisible = !useSelector((state: RootState) => state.ui.shotcut.show);
 
   let mapJson = {} as any;
   if (mapViewDetail) {
@@ -125,11 +127,17 @@ const NavLayer = () => {
       <div>
         <PenTypeButton />
 
-        <ColorButtons />
+        <CustomBadge badgeContent={`1~0`}>
+          <ColorButtons />
+        </CustomBadge>
         
-        <ThicknessButton />
+        <CustomBadge badgeContent={`Z~B`}>
+          <ThicknessButton />
+        </CustomBadge>
 
-        <TracePointButton />
+        <CustomBadge badgeContent={`T`}>
+          <TracePointButton />
+        </CustomBadge>
       </div>
 
       <div>

@@ -22,6 +22,8 @@ export const UIActionTypes = Object.freeze({
   UPDATED_SELECTD_PAGE: `${ActionGroup}.UPDATED_SELECTD_PAGE`,
 
   REPORT_BROWSER_ZOOM: `${ActionGroup}.REPORT_BROWSER_ZOOM`,
+  
+  SHOW_SHORTCUT: `${ActionGroup}.SHOW_SHORTCUT`,
 });
 //]
 
@@ -30,6 +32,13 @@ export const reportBrowserZoomFactor = (zoom: number) => {
   store.dispatch({
     type: UIActionTypes.REPORT_BROWSER_ZOOM,
     zoom: zoom
+  });
+
+}
+export const showShortCut = (show: boolean) => {
+  store.dispatch({
+    type: UIActionTypes.SHOW_SHORTCUT,
+    show: show
   });
 
 }
@@ -184,6 +193,9 @@ const initialState = {
   },
   browser: {
     zoom: getBrowserZoomFactor(),
+  },
+  shotcut : {
+    show : false
   }
 }
 
@@ -195,6 +207,14 @@ export default (state = initialState, action) => {
         ...state,
         browser: {
           zoom: action.zoom,
+        }
+      };
+    }
+    case UIActionTypes.SHOW_SHORTCUT: {
+      return {
+        ...state,
+        shotcut: {
+          show: action.show,
         }
       };
     }

@@ -36,7 +36,7 @@ export default function ThicknessButton () {
 
   const classes = useStyle();
   const [isOpen, setIsOpen] = useState(false);
-  const [selectedThickness, setSelectedThickness] = useState(0);
+  const [selectedThickness, setSelectedThickness] = useState(2);
   
   const change = ()=>{
     let nowCount : number = parseInt(PEN_THICKNESS[manager.thickness].substr(-1, 1));
