@@ -1,13 +1,44 @@
-import React from "react";
+import React, {useState} from "react";
 import '../../styles/buttons.css';
 import ThemeManager from "../../styles/ThemeManager";
 import GridaToolTip from "../../styles/GridaToolTip";
-import { Button } from "@material-ui/core";
+import { Button, makeStyles, ClickAwayListener, Icon } from "@material-ui/core";
 import $ from "jquery";
-import Icon from '@material-ui/core/Icon';
 import getText from "../../language/language";
 
 const themeManager: ThemeManager = ThemeManager.getInstance();
+const useStyle = makeStyles(theme => ({
+  buttonStyle : {
+    marginRight: "4px",
+    color : theme.custom.icon.mono[0],
+    "&:hover" : {
+      color : theme.palette.action.hover
+    }
+  },
+  dropDown : {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "flex-start",
+    padding: "8px",
+    position: "absolute",
+    width: "140px",
+    background: theme.custom.white[0],
+    boxShadow: theme.custom.shadows[0],
+    borderRadius: "12px",
+    "& > button" : {
+      textAlign: "left",
+      width: "120px",
+      height: "40px", 
+      zIndex: 5000,
+      color : theme.custom.icon.mono[0],
+      background : theme.custom.white[0],
+      "&:hover" : {
+        color : theme.palette.action.hover,
+        background : theme.custom.icon.blue[3]
+      }
+    }
+  }
+}));
 
 const basicStyle = {
   display: "block",
@@ -20,121 +51,49 @@ const neoStyle = {
 } as React.CSSProperties;
 
 export default function BackgroundButton() {
-
-  const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null);
+  const [theme, setTheme] = useState(0);
+  const [isOpen, setIsOpen] = useState(false);
+  const classes = useStyle();
+  const themeNameArr = ["basic", "neoprism"];
 
   const setBackground = (background) => {
-    if(background === 1) {
-      $('#basic_background').css('display', 'block');
-      $('#neo_background').css('display', 'none');
+    setTheme(background);
+    if(background === 0) {
       themeManager.setT1();
-    } else if(background === 2) {
-      $('#basic_background').css('display', 'none');
-      $('#neo_background').css('display', 'block');
+    } else if(background === 1) {
       themeManager.setT2();
-    } else if(background === 3) {
+    } else if(background === 2) {
       themeManager.setT4();
     } else {
       themeManager.setT5();
     }
-    handleClose();
+    setIsOpen(false);
   }
 
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
-
-  $('#basic_background').hover(function() {
-    $(this).css("color", "rgba(104,143,255,1)")
-  },function() {
-    $(this).css("color", "rgba(18,18,18,1)")
-  });
-
-  $('#neo_background').hover(function() {
-    $(this).css("color", "rgba(104,143,255,1)")
-  },function() {
-    $(this).css("color", "rgba(18,18,18,1)")
-  });
-
-  $(document).ready(function(){
-    $('.background_drop_down').hover(
-      function(event){
-        $(this).addClass('hover');
-        $(this).css("color", "rgba(104,143,255,1)");
-        $(this).css("background", "rgba(232,236,245,1)");
-      },
-      function(){
-        $(this).removeClass('hover');
-        $(this).css("color", "rgba(18,18,18,1)");
-        $(this).css("background", "rgba(255,255,255,0.9)");
-      }
-    );
-  });
-
-  function handleClickBackground() {
-    const background = document.getElementById("backgroundDrop");
-    if (background.style.display == 'none') {
-      background.style.display = 'block'
-    } else {
-      background.style.display = 'none'
-    }
+  function handleClick() {
+    setIsOpen((prev) => !prev);
   }
-
-  const dropdownStyle = {
-    display: "none",
-    flexDirection: "column",
-    alignItems: "flex-start",
-    padding: "8px",
-    position: "absolute",
-    width: "140px",
-    height: "100px",
-    background: "rgba(255,255,255,0.9)",
-    boxShadow: "2px 2px 2px rgba(0, 0, 0, 0.25)",
-    borderRadius: "12px",
-    zindex: 500,
-    marginRight: "110px",
-    marginTop: "140px"
-  } as React.CSSProperties;
-
+  function handleClickAway(){
+    setIsOpen(false);
+  }
   return (
-    <React.Fragment>
+    <ClickAwayListener onClickAway={handleClickAway}>
       <div>
-        <Button variant="outlined" type="button" id="basic_background" className="backgroundDropDown" style={basicStyle} onClick={handleClickBackground}>
-          {/* <GridaToolTip open={true} placement="left" tip={{
-              head: "Background",
-              msg: "화면의 배경색을 선택합니다.",
-              tail: "키보드 버튼 1로 선택 가능합니다"
-            }} title={undefined}> */}
-              <span className="backgroundDropDown">
-                {getText("nav_background_basic")}
-              </span>
-          {/* </GridaToolTip> */}
-        </Button>
-        <Button variant="outlined" type="button" id="neo_background" className="backgroundDropDown" style={neoStyle} onClick={handleClickBackground}>
-          {/* <GridaToolTip open={true} placement="left" tip={{
-              head: "Background",
-              msg: "화면의 배경색을 선택합니다.",
-              tail: "키보드 버튼 1로 선택 가능합니다"
-            }} title={undefined}> */}
-              <span className="backgroundDropDown">
-                {getText("nav_background_neoprism")}
-              </span>
-          {/* </GridaToolTip> */}
-        </Button>   
+        <div>
+          <Button variant="outlined" type="button" className={classes.buttonStyle} onClick={handleClick}>
+                <span>
+                  {getText(`nav_background_${themeNameArr[theme]}`)}
+                </span>
+          </Button>
+        </div>
+        {isOpen? (<div className={classes.dropDown}>
+            {themeNameArr.map((el,idx)=>(
+              <Button key={idx} onClick={() => setBackground(idx)}>
+                <span className="bg-dropmenu">{getText(`nav_background_${el}`)}</span>
+              </Button>
+            ))}
+        </div>  ) : null }
       </div>
-
-      <div id="backgroundDrop" className="backgroundDropDown" style={dropdownStyle}>
-        <Button className="background_drop_down" onClick={() => setBackground(1)} style={{
-          width: "120px", height: "40px", padding: "4px 12px", zIndex: 5000
-        }}>
-          <span className="bg-dropmenu" style={{marginLeft: "-58px"}}>{getText("nav_background_basic")}</span>
-        </Button>
-        <Button className="background_drop_down" onClick={() => setBackground(2)} style={{
-          width: "120px", height: "40px", padding: "4px 12px", zIndex: 5000
-        }}>
-          <span className="bg-dropmenu" style={{marginLeft: "-20px"}}>{getText("nav_background_neoprism")}</span>
-        </Button>
-      </div>  
-    </React.Fragment> 
+    </ClickAwayListener> 
   );
 }

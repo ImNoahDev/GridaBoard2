@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Button, Popover, SvgIcon} from "@material-ui/core";
-import { makeStyles } from '@material-ui/core/styles';
+import { Button, Popover, SvgIcon, makeStyles, ClickAwayListener} from "@material-ui/core";
 import KeyboardArrowDownRoundedIcon from '@material-ui/icons/KeyboardArrowDownRounded';
 import { saveGrida } from "../Save/SaveGrida";
 // import LoadGrida from "../Load/LoadGrida";
@@ -21,7 +20,7 @@ import getText from "../language/language";
 import { NCODE_CLASS6_NUM_DOTS } from "nl-lib/common/constants";
 import { theme as myTheme } from "../styles/theme";
 import { CalibrationButton } from 'nl-lib/ncodepod';
-import ClickAwayListener from '@material-ui/core/ClickAwayListener';
+import CustomBadge from "../components/CustomElement/CustomBadge";
 
 const useStyles = props => makeStyles((theme) => ({
     buttonStyle : {
@@ -30,7 +29,7 @@ const useStyles = props => makeStyles((theme) => ({
       minHeight: "0px"
     },
     calibration : {
-      background: theme.palette.primary.light,
+      background: theme.custom.white[3],
       border: "1px solid #CFCFCF",
       boxSizing: "border-box",
       borderRadius: "4px",
@@ -60,8 +59,8 @@ const useStyles = props => makeStyles((theme) => ({
       alignItems: "flex-start",
       padding: "8px",
       position: "absolute",
-      background: theme.palette.grey[50],
-      boxShadow: theme.shadows[1],
+      background: theme.custom.icon.mono[4],
+      boxShadow: theme.custom.shadows[0],
       borderRadius: "12px",
       zIndex: 10000,
       marginTop: "21px",
@@ -74,7 +73,7 @@ const useStyles = props => makeStyles((theme) => ({
       alignItems: "center",
       flexWrap: "wrap",
       height: "72px",
-      background: theme.palette.primary.light,
+      background: theme.custom.white[3],
       zoom: 1 / props.brZoom,
       backdropFilter: "blur(4px)",
       "& > div":{
@@ -108,11 +107,11 @@ const useStyles = props => makeStyles((theme) => ({
     headerLineV : {
       width: "1px",
       height: "15px",
-      background: theme.palette.grey[500]
+      background: theme.custom.icon.mono[3]
     },
     changeUrlStyle : {
       justifyContent: "center",
-      background: theme.palette.primary.light,
+      background: theme.custom.white[3],
       border: "1px solid #CFCFCF",
       boxSizing: "border-box",
       borderRadius: "4px",
@@ -129,6 +128,10 @@ const useStyles = props => makeStyles((theme) => ({
     },
     imgStyle: {
       borderRadius: "8px"
+    },
+    badge: {
+      background: theme.custom.icon.mono[1],
+      color : theme.custom.icon.mono[4]
     }
   }));
 
@@ -213,6 +216,7 @@ const HeaderLayer = (props: Props) => {
   const activePageNo_store = useSelector((state: RootState) => state.activePage.activePageNo);
 
   const brZoom = useSelector((state: RootState) => state.ui.browser.zoom);
+  const badgeInVisible = !useSelector((state: RootState) => state.ui.shotcut.show);
 
   const classes = useStyles({brZoom})();
 
@@ -222,7 +226,7 @@ const HeaderLayer = (props: Props) => {
   const InformationBtn = ()=>{
     return (
       <div>
-        <Button className={`${classes.buttonStyle} `}>
+        <Button className={`${classes.buttonStyle} `} target="_blank" href="https://neolabdev.gitbook.io/gridaboard/">
           <SvgIcon>
             <path
               fillRule="evenodd"
@@ -254,9 +258,6 @@ const HeaderLayer = (props: Props) => {
   }
 
   
-  function changeUrl() {
-    location.href = 'https://gridaboard-v1-30576.web.app/';
-  }
 
   return (
     <React.Fragment>
@@ -266,9 +267,11 @@ const HeaderLayer = (props: Props) => {
           <div>
             <ClickAwayListener onClickAway={handleClickSaveAway}>
               <div>
-                  <Button className={`${classes.buttonStyle} ${classes.buttonFontStyle}`}  onClick={handleClickSave} disabled={disabled}>
-                    {getText("save_file")}
-                  </Button>
+                  <CustomBadge badgeContent={`S`}>
+                    <Button className={`${classes.buttonStyle} ${classes.buttonFontStyle} saveButton`}  onClick={handleClickSave} disabled={disabled}>
+                      {getText("save_file")}
+                    </Button>
+                  </CustomBadge>
                   {isSaveOpen ? (
                     <div className={`${classes.saveDropdownStyle}`} >
                       <SavePdfDialog saveType="pdf"/> 
@@ -278,14 +281,18 @@ const HeaderLayer = (props: Props) => {
               </div>
             </ClickAwayListener>
             <div>
-              <ConvertFileLoad className={`loadDropDown ${classes.buttonStyle} ${classes.buttonFontStyle}`}  handlePdfOpen={handlePdfOpen}/>
+              <CustomBadge badgeContent={`Ctrl-O`}>
+                <ConvertFileLoad className={`loadDropDown ${classes.buttonStyle} ${classes.buttonFontStyle}`}  handlePdfOpen={handlePdfOpen}/>
+              </CustomBadge>
             </div>
             <div>
-              <PrintNcodedPdfButton
-              className={` ${classes.buttonStyle}  ${classes.buttonFontStyle}`}
-              handkeTurnOnAppShortCutKey={turnOnGlobalKeyShortCut}
-              
-              url={pdfUrl} filename={pdfFilename} handlePdfUrl={makePdfUrl} disabled={disabled} />
+              <CustomBadge badgeContent={`P`}>
+                <PrintNcodedPdfButton id="printBtn"
+                className={` ${classes.buttonStyle}  ${classes.buttonFontStyle}`}
+                handkeTurnOnAppShortCutKey={turnOnGlobalKeyShortCut}
+                
+                url={pdfUrl} filename={pdfFilename} handlePdfUrl={makePdfUrl} disabled={disabled} />
+              </CustomBadge>
             </div>
           </div>
           <CalibrationButton className={`${classes.buttonStyle}  ${classes.calibration}`} filename={pdfFilename} handlePdfUrl={makePdfUrl} />
@@ -296,13 +303,13 @@ const HeaderLayer = (props: Props) => {
           <div>
             <ConnectButton className={`${classes.buttonStyle}`} onPenLinkChanged={e => onPenLinkChanged(e)} />
           </div>
-          <HeaderLine />
+          {/* <HeaderLine />
           
-          <InformationBtn />
+          <InformationBtn /> */}
 
           <HeaderLine />
           <div>
-            <Button onClick={changeUrl} className={`${classes.buttonStyle} ${classes.changeUrlStyle}`}>
+            <Button href="https://gridaboard-v1-30576.web.app/" className={`${classes.buttonStyle} ${classes.changeUrlStyle}`}>
               {getText("go_to_old")}
             </Button>
           </div>
@@ -312,7 +319,7 @@ const HeaderLayer = (props: Props) => {
 
 
       </div>
-      <div id="white_block" style={{ height: "1px", background: "rgba(255,255,255,1)", zoom: 1 / brZoom }}></div>
+      <div style={{ height: "1px", background: "rgba(255,255,255,1)", zoom: 1 / brZoom }}></div>
     </React.Fragment>
   );
 }

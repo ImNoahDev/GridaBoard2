@@ -11,20 +11,59 @@ import { PLAYSTATE } from "nl-lib/common/enums";
 import { PenManager } from "nl-lib/neosmartpen";
 import RotateButton from "../components/buttons/RotateButton";
 import GridaToolTip from "../styles/GridaToolTip";
-import { Button, IconButton, Popover } from "@material-ui/core";
+import { Button, IconButton, makeStyles, Popover } from "@material-ui/core";
 import HelpIcon from '@material-ui/icons/Help';
-import $ from "jquery";
 import PageClearButton from "../components/buttons/PageClearButton";
+import CustomBadge from "../components/CustomElement/CustomBadge";
+import InformationButton from "../components/buttons/InformationButton";
 
-const rotateStyle = {
-  position: "absolute",
-  zIndex: 100,
-  top: "calc(15%)",
-  left: "calc(96%)"
-  // marginLeft: "1850px",
-  // marginTop: "20px"
-} as React.CSSProperties;
-
+const useStyle = props=>makeStyles(theme=>({
+  root : {
+    display: "flex",
+    position: "relative",
+    flex: 1,
+    overflow: "auto",
+    flexDirection: "column"
+  },
+  sideEventer : {
+    position: "absolute",
+    zIndex: 100,
+    right: "0px",
+    padding: "24px",
+    "& > span" : {
+      display: "flex",
+      "& > button": {
+        width: "56px",
+        height: "56px",
+        background: theme.custom.white[1],
+        boxShadow: "2px 0px 24px rgba(0, 0, 0, 0.15), inset 0px 2px 0px rgba(255, 255, 255, 1)",
+        borderRadius: "50%",
+        display: "block",
+        zoom: 1 / props.brZoom,
+        "&:hover": {
+          color: theme.palette.action.hover,
+        },
+      }
+    },
+    "& > span:first-child": {
+      marginBottom: "16px"
+    }
+  },
+  information : {
+    right: "24px",
+    bottom: "24px",
+    display: "flex",
+    position : "absolute",
+    zIndex: 100,
+    "& > button": {
+      marginTop: "16px",
+      boxShadow: "2px 0px 24px rgba(0, 0, 0, 0.15), inset 0px 2px 0px rgba(255, 255, 255, 1)",
+      borderRadius: "50%",
+      display: "block",
+      zoom: 1 / props.brZoom,
+    }
+  }
+}));
 
 
 interface Props {
@@ -41,6 +80,9 @@ const ContentsLayer = (props: Props) => {
   const {activePageNo_store} = useSelector((state: RootState) =>({
     activePageNo_store: state.activePage.activePageNo,
   }));
+  const brZoom = useSelector((state: RootState) => state.ui.browser.zoom);
+
+  const classes = useStyle({brZoom:brZoom})();
   useEffect(() => {
     if (activePageNo_store !== activePageNo) {
       setLocalActivePageNo(activePageNo_store);
@@ -101,125 +143,21 @@ const ContentsLayer = (props: Props) => {
   const handlePageWidthNeeded = (width: number) => {
     setPageWidth(width);
   }
+  
 
-  const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null);
-
-  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    setAnchorEl(event.currentTarget);
-    if ($(".help_drop_btn").css("display") == "none") {
-      $(".help_drop_btn").show();
-    } else {
-      $(".help_drop_btn").hide();
-    }
-  };
-
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
-
-  const open = Boolean(anchorEl);
-  const id = open ? 'simple-popover' : undefined;
-
-  $(document).ready(function(){
-    $('.help_drop_down').hover(
-      function(event){
-        $(this).addClass('hover');
-        $(this).css("color", "rgba(104,143,255,1)");
-        $(this).css("background", "rgba(232,236,245,1)");
-      },
-      function(){
-        $(this).removeClass('hover');
-        $(this).css("color", "rgba(18,18,18,1)");
-        $(this).css("background", "rgba(255,255,255,0.9)");
-      }
-    );
-  });
-
-  const brZoom = useSelector((state: RootState) => state.ui.browser.zoom);
-
-  const localStyle = {
-    display: "flex",
-    flex: 1,
-    overflow: "auto",
-    flexDirection: "column"
-  } as React.CSSProperties;
-
-  const dropdownStyle = {
-    display: "none",
-    flexDirection: "column",
-    alignItems: "flex-start",
-    padding: "8px",
-    position: "fixed",
-    width: "240px",
-    height: "176px",
-    background: "rgba(255,255,255,0.9)",
-    boxShadow: "2px 2px 2px rgba(0, 0, 0, 0.25)",
-    borderRadius: "12px",
-    zIndex: 100,
-    marginTop: "620px",
-    marginLeft: "1420px",
-    zoom: 1 / brZoom
-  } as React.CSSProperties;
 
   return (
-    <div id="main" style={localStyle}>
-      <div style={rotateStyle}>
-        <RotateButton />
-        <PageClearButton />
+    <div id="main" className={`${classes.root}`}>
+      <div className={`${classes.sideEventer}`}>
+        <CustomBadge badgeContent={`TAB`}>
+          <RotateButton disabled={activePageNo_store === -1} />
+        </CustomBadge>
+        <CustomBadge badgeContent={`S`}>
+          <PageClearButton disabled={activePageNo_store === -1} />
+        </CustomBadge>
       </div>
-      {/* <div>
-        <GridaToolTip open={true} placement="top-start" tip={{
-          head: "Helper",
-          msg: "도움말 기능들을 보여줍니다.",
-          tail: "키보드 버튼 ?로 선택 가능합니다"
-        }} title={undefined}>
-            <IconButton id="help_btn" onClick={handleClick} aria-describedby={id} style={{
-              position: "absolute",
-              zIndex: 1900,
-              top: "calc(94%)",
-              left: "calc(96%)",
-              zoom: 1 / brZoom,
-            }}>
-              <HelpIcon fontSize="large"
-                style={{
-                zIndex: 1500,
-                padding: 0,
-              }}/>
-            </IconButton>
-        </GridaToolTip>
-      </div> */}
-
-      <div className="help_drop_btn" style={dropdownStyle}>
-        <Button id="customer" className="help_drop_down" style={{
-          width: "224px", height: "40px", padding: "4px 12px"
-        }}>
-          <span style={{width: "200px", height: "16px", marginLeft: "-140px"}}>
-            고객센터
-          </span>
-        </Button>
-        <Button id="shortcut" className="help_drop_down" style={{
-          width: "224px", height: "40px", padding: "4px 12px"
-        }}>
-          <span style={{width: "200px", height: "16px", marginLeft: "-120px"}}>
-            단축키 안내
-          </span>
-        </Button>
-        <Button id="tutorial" className="help_drop_down" style={{
-          width: "224px", height: "40px", padding: "4px 12px"
-        }}>
-          <span style={{width: "200px", height: "16px", marginLeft: "-140px"}}>
-            튜토리얼
-          </span>
-        </Button>
-        <Button id="faq" className="help_drop_down" style={{
-          width: "224px", height: "40px", padding: "4px 12px"
-        }}>
-          <span style={{width: "200px", height: "16px", marginLeft: "-170px"}}>
-            FAQ
-          </span>
-        </Button>
-      </div>
-        
+      <InformationButton className={classes.information}/>
+      
       <div id="mixed-viewer-layer" style={{
         position: "relative",
         height: '100%',

@@ -19,7 +19,32 @@ import BackgroundButton from "../components/buttons/BackgroundButton";
 import FitButton from "../components/buttons/FitButton";
 import PageNumbering from "../components/navbar/PageNumbering";
 import { RootState } from "../store/rootReducer";
+import { makeStyles } from "@material-ui/core";
+import CustomBadge from "../components/CustomElement/CustomBadge"
 
+const useStyle = props => makeStyles(theme => ({
+  navStyle : {
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    flexWrap: "wrap",
+    height: "50px",
+    background: theme.custom.white[3],
+    zIndex: -1,
+    zoom: 1 / props.brZoom,
+    "&>div":{
+      display: "inline-flex",
+      flexDirection: "row",
+      justifyContent: "flex-start",
+      alignItems: "center",
+    },
+    "&>div:nth-child(2)":{
+      position: "relative",
+      left: "-6%",
+    }
+  }
+}));
 
 const printBtnId = "printTestButton";
 const printOption = g_defaultPrintOption;
@@ -30,16 +55,13 @@ const getNoteInfo = (event) => {
   // note_info.getNoteInfo({});
 };
 
-const pageNumberingStyle = {
-  zIndex: 100,
-  position: "relative",
-  left: "-6%",
-} as React.CSSProperties;
-
 const NavLayer = () => {
   const [num_pens, setNumPens] = useState(0);
   const [mapViewDetail, setMapViewDetail] = useState(0);
   const [docViewDetail, setDocViewDetail] = useState(0);
+  const brZoom = useSelector((state: RootState) => state.ui.browser.zoom);
+  const classes = useStyle({brZoom:brZoom})();
+  const badgeInVisible = !useSelector((state: RootState) => state.ui.shotcut.show);
 
   let mapJson = {} as any;
   if (mapViewDetail) {
@@ -99,51 +121,33 @@ const NavLayer = () => {
     docJson.pages.push(obj);
   }
 
-  const brZoom = useSelector((state: RootState) => state.ui.browser.zoom);
-
-  const navStyle = {
-    display: "flex",
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    flexWrap: "wrap",
-    height: "50px",
-    background: "rgba(255, 255, 255, 0.5)",
-    zIndex: -1,
-    zoom: 1 / brZoom,
-  } as React.CSSProperties;
-
 
   return (
-    <div id={"button_div"} style={navStyle}>
-      <div style={{
-        display: "inline-flex", flexDirection: "row",
-        justifyContent: "flex-start", alignItems: "center",
-      }}>
+    <div className={classes.navStyle}>
+      <div>
         <PenTypeButton />
 
-        <ColorButtons />
+        <CustomBadge badgeContent={`1~0`}>
+          <ColorButtons />
+        </CustomBadge>
         
-        <ThicknessButton />
+        <CustomBadge badgeContent={`Z~B`}>
+          <ThicknessButton />
+        </CustomBadge>
 
-        <TracePointButton />
+        <CustomBadge badgeContent={`T`}>
+          <TracePointButton />
+        </CustomBadge>
       </div>
 
-      <div style={pageNumberingStyle}>
+      <div>
         <PageNumbering />
       </div>
 
-      <div style={{
-        display: "inline-flex", flexDirection: "row",
-        justifyContent: "flex-end", alignItems: "center"
-      }}>
-
+      <div>
         <BackgroundButton />
-        {/* <KeyboardArrowDownRoundedIcon style={{marginRight: "24px"}}/> */}
 
         <FitButton />
-        {/* <KeyboardArrowDownRoundedIcon style={{marginRight: "24px"}}/> */}
-
       </div>
 
 

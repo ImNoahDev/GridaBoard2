@@ -12,6 +12,7 @@ import { setRotationTrigger } from "./store/reducers/rotate";
 import { PEN_THICKNESS } from '../nl-lib/common/enums';
 import $ from "jquery";
 import { setPointerTracer } from "./store/reducers/pointerTracer";
+import { showShortCut } from './store/reducers/ui';
 
 
 /* 
@@ -118,9 +119,7 @@ export default function KeyBoardShortCut(evt: KeyboardEvent) {
         evt.preventDefault(); //web 기본 탭 기능 정지
         const activePageNo = store.getState().activePage.activePageNo;
         //페이지가 하나도 없으면 인쇄 못함
-        console.log(activePageNo);
         if(activePageNo === -1) break;
-        console.log(activePageNo);
 
         (document.querySelector("#printBtn") as HTMLElement).click();
         break;
@@ -140,8 +139,12 @@ export default function KeyBoardShortCut(evt: KeyboardEvent) {
         const activePageNo = store.getState().activePage.activePageNo;
         //페이지가 하나도 없으면 저장 못함
         if(activePageNo === -1) break;
-
-        (document.querySelector(".save_drop_down") as HTMLElement).click();
+        
+        (document.querySelector(".saveButton") as HTMLElement).click();
+        //1틱 뒤에 동작해야함
+        setTimeout(()=>{
+          (document.querySelector(".save_drop_down") as HTMLElement).click();
+        },0);
         break;
       }
       case "t": {// t
@@ -169,15 +172,14 @@ export default function KeyBoardShortCut(evt: KeyboardEvent) {
         break;
 
       case "w": // w
-        // onBtn_fitWidth();
         setViewFit(ZoomFitEnum.WIDTH);
         break;
-      // case "w": // w
-      //   // setPenType(PenType.MARKER);
-      //   // PenManager.getInstance().setPenRendererType(IBrushType.MARKER);
-      //   break;
       case "x" : {
         PenManager.getInstance().setThickness(PEN_THICKNESS.THICKNESS2);
+        break;
+      }
+      case "y" : {
+        (document.querySelector("#pageClearButton") as HTMLElement).click();
         break;
       }
       case "z" : {
@@ -186,38 +188,7 @@ export default function KeyBoardShortCut(evt: KeyboardEvent) {
       }
       case "tab": {// <TAB>
         evt.preventDefault(); //web 기본 탭 기능 정지
-        const doc = GridaDoc.getInstance();
-        const rotationTrigger = store.getState().rotate.rotationTrigger;
-        const activePageNo = store.getState().activePage.activePageNo;
-        setRotationTrigger(!rotationTrigger);
-
-        const page = doc.getPageAt(activePageNo);
-
-        //무언가 하나도 사용하지 않았을때 탭을 누를 수도 있음 그때 page가 undefined
-        if(page === undefined) break ;
-        
-        if (page._pdfPage !== undefined) {
-          if (page._pdfPage.viewport.rotation >= 270) {
-            page._pdfPage.viewport.rotation = 0;
-          } else {
-            page._pdfPage.viewport.rotation += 90;
-          }
-        }
-
-        if (page.pageOverview.rotation >= 270) {
-          page._rotation = 0;
-        } else {
-          page._rotation += 90;
-        }
-
-        if (page.pageOverview.rotation == 90 || page.pageOverview.rotation == 270) {
-          $('#vertical_rotate').css('display', 'none');
-          $('#horizontal_rotate').css('display', 'block');
-        } else {
-          $('#vertical_rotate').css('display', 'block');
-          $('#horizontal_rotate').css('display', 'none');
-        }
-
+        (document.querySelector("#pageRotateButton") as HTMLElement).click();
         break;
       }
 
@@ -292,7 +263,7 @@ export default function KeyBoardShortCut(evt: KeyboardEvent) {
         break;
     }
   } else if (cmd == 1) {
-    switch (evt.key) {
+    switch (evt.key.toLocaleLowerCase()) {
       case "o":{ // ctrl-o
         evt.preventDefault(); //web 기본 오픈 기능 강제 스탑
         (document.querySelector("#loadFileButton") as HTMLSpanElement).click();
@@ -331,6 +302,14 @@ export default function KeyBoardShortCut(evt: KeyboardEvent) {
         evt.cancelBubble = true;
         evt.returnValue = false;
         break;
+      }
+    }
+  } else if(cmd == 2){
+    switch (evt.key.toLocaleLowerCase()) {
+      case "alt" : {
+        evt.preventDefault(); //web 기본 오픈 기능 강제 스탑
+        showShortCut(!store.getState().ui.shotcut.show);
+        break; 
       }
     }
   }

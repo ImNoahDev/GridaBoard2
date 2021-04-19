@@ -10,6 +10,7 @@ import $ from "jquery";
 import { turnOnGlobalKeyShortCut } from '../../GlobalFunctions';
 import getText from '../../language/language';
 import SimpleTooltip from "../SimpleTooltip";
+import CustomBadge from "../CustomElement/CustomBadge";
 
 const selectPageStyle = {
   width: "35px",
@@ -78,20 +79,24 @@ const PageNumbering = () => {
 
     return (
       <div>
-        <IconButton id="pre_btn" onClick={prevChange} style={{padding: "8px"}}>
-          <SimpleTooltip title={getText("nav_page_prev")}>
-            <NavigateBeforeIcon />
-          </SimpleTooltip>
-        </IconButton>
+        <CustomBadge badgeContent="←">
+          <IconButton id="pre_btn" onClick={prevChange} style={{padding: "8px"}}>
+            <SimpleTooltip title={getText("nav_page_prev")}>
+              <NavigateBeforeIcon />
+            </SimpleTooltip>
+          </IconButton>
+        </CustomBadge>
         <input id="page_input" value={pageNo} style={selectPageStyle} onChange={handleChange}/>
         /
         &nbsp;
-        <span style={{marginRight: "8px"}}>{numPages}</span>
-        <IconButton id="next_btn" onClick={nextChange} style={{padding: "8px"}}>
-          <SimpleTooltip title={getText("nav_page_next")}>
-            <NavigateNextIcon />
-          </SimpleTooltip>
-        </IconButton>
+          <span style={{marginRight: "8px"}}>{numPages}</span>
+        <CustomBadge badgeContent="→">
+          <IconButton id="next_btn" onClick={nextChange} style={{padding: "8px"}}>
+            <SimpleTooltip title={getText("nav_page_next")}>
+              <NavigateNextIcon />
+            </SimpleTooltip>
+          </IconButton>
+        </CustomBadge>
       </div>
     )
 }

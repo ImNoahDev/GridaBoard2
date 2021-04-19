@@ -35,7 +35,7 @@ const styles = (theme: Theme) =>
     },
     tableRowHover: {
       '&:hover': {
-        backgroundColor: theme.palette.grey[200],
+        backgroundColor: theme.custom.icon.blue[4],
       },
     },
     tableCell: {

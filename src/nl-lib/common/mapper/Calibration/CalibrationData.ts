@@ -73,6 +73,7 @@ export default class CalibrationData {
     filename: string,           // PDF filename
     numPages: number,           // PDF 페이지 수
     pagesPerSheet = 1,  // 종이 1장에 인쇄된 페이지수, 캘리브레이션에서는 1만 유효
+    targetPages: number[],
   ) => {
 
     this.setPdfDesc(pdfPageDesc);
@@ -81,10 +82,13 @@ export default class CalibrationData {
 
     const mapping = new PdfDocMapper(filename, pagesPerSheet);
 
+    //이 시점에서 2~3page만을 인쇄했다고 알 수 있어야 하는데 dialog에서 넘어오는 pageNo은 잘못돼있다. 가장 마지막 pageNo만 들어오니까
+    //pageNo을 고치든지 targetPages를 받아와야할듯
+
     for (let i = 0; i < numPages; i++) {
-      const pageNo = i + 1;
+      const pageNo = targetPages[i]; //이 pageNo은 app에 등록된 page를 전체가 기준인 pageNo. 이걸 맞춰줘야 가운데서부터 인쇄해도 mapping이 된다.
       const pdfPageDesc = { ...this.pdfPageDesc, pageNo };
-      const pageInfo = this.pageInfos[pageNo - 1];
+      const pageInfo = this.pageInfos[i];
 
       // 아래 translater에는 PDF 정보와, pageInfo도 같이 들어 있게 된다.
       const translater = this.getTranslater(
@@ -368,6 +372,7 @@ function sampleCalibration_OneStep(
   filename: string,           // PDF filename
   numPages: number,           // PDF 페이지 수
   pagesPerSheet = 1,  // 종이 1장에 인쇄된 페이지수, 캘리브레이션에서는 1만 유효
+  targetPages: number[],
 ) {
 
   const worker = new CalibrationData();
@@ -377,6 +382,7 @@ function sampleCalibration_OneStep(
     filename,
     numPages,
     pagesPerSheet,
+    targetPages
   );
 
   // 그 다음 등록

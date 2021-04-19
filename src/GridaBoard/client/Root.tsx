@@ -97,7 +97,7 @@ const renderToastMessage = () => {
 
 const Root = () => {
   const [paperInfoInited, setPaperInfoInited] = useState(false);
-  const [theme, settheme] = useState(neolabTheme.theme)
+  const [theme, settheme] = useState(neolabTheme.theme);
   const classes = useStyle();
   useEffect(() => {
     if (!paperInfoInited) {

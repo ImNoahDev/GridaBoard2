@@ -1,14 +1,12 @@
 import React, {useState, useEffect} from "react";
 import '../../styles/buttons.css';
 import PenManager from "nl-lib/neosmartpen/PenManager";
-import { IconButton, makeStyles, SvgIcon, Theme, Tooltip, TooltipProps } from "@material-ui/core";
-import { PEN_THICKNESS } from "nl-lib/common/enums";
+import { IconButton, makeStyles, SvgIcon, Theme, Tooltip, TooltipProps, ClickAwayListener } from "@material-ui/core";
+import { PEN_THICKNESS, PenEventName } from "nl-lib/common/enums";
 import KeyboardArrowDownRoundedIcon from '@material-ui/icons/KeyboardArrowDownRounded';
 import getText from "../../language/language";
-import ClickAwayListener from '@material-ui/core/ClickAwayListener';
 import SimpleTooltip from "../SimpleTooltip";
 
-const manager: PenManager = PenManager.getInstance();
 const useStyle = makeStyles(theme=>({
   icon : {
     marginLeft: "22px",
@@ -22,8 +20,8 @@ const useStyle = makeStyles(theme=>({
     alignItems: "center",
     padding: "4px 8px",
     position: "absolute",
-    background: theme.palette.primary.contrastText,
-    boxShadow: theme.shadows[1],
+    background: theme.custom.white[0],
+    boxShadow: theme.custom.shadows[0],
     borderRadius: "12px",
     zIndex: 10000,
     marginLeft: "20px",
@@ -34,17 +32,24 @@ const useStyle = makeStyles(theme=>({
 }));
 
 export default function ThicknessButton () {
+  const manager: PenManager = PenManager.getInstance();
+
   const classes = useStyle();
   const [isOpen, setIsOpen] = useState(false);
   const [selectedThickness, setSelectedThickness] = useState(2);
   
-  //penmanager에서 접근해서 아이콘을 변경해 줄 수 있도록 처리
-  const changeIcon = function(thickness: PEN_THICKNESS){
-    const idx = parseInt(PEN_THICKNESS[thickness].substr(-1,1)) - 1;
-    
-    setSelectedThickness(idx);
+  const change = ()=>{
+    let nowCount : number = parseInt(PEN_THICKNESS[manager.thickness].substr(-1, 1));
+    nowCount = nowCount - 1;
+    setSelectedThickness(nowCount);
   }
-  manager.setChangeThicknessIcon(changeIcon);
+  
+  useEffect(() => {
+    manager.addEventListener(PenEventName.ON_PEN_THICKNESS_CHANGE, change);
+    return () => {
+      manager.removeEventListener(PenEventName.ON_PEN_THICKNESS_CHANGE, change);
+    }
+  }, []);
 
   //path 배열
   const pathArr = [
