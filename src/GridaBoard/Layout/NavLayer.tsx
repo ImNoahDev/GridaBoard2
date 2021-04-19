@@ -32,7 +32,7 @@ const useStyle = props => makeStyles(theme => ({
     flexWrap: "wrap",
     height: "50px",
     background: theme.custom.white[3],
-    zIndex: -1,
+    zIndex: 1,
     zoom: 1 / props.brZoom,
     "&>div":{
       display: "inline-flex",

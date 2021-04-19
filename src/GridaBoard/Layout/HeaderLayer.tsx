@@ -68,6 +68,7 @@ const useStyles = props => makeStyles((theme) => ({
     },
     headerStyle : {
       display: "flex",
+      zIndex: 2,
       position: "relative",
       flexDirection: "row",
       justifyContent: "space-between",
