@@ -25,6 +25,7 @@ import CustomBadge from "../components/CustomElement/CustomBadge"
 const useStyle = props => makeStyles(theme => ({
   navStyle : {
     display: "flex",
+    position: "relative",
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",

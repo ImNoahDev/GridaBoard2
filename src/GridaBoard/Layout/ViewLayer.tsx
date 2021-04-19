@@ -28,6 +28,7 @@ const useStyles = makeStyles((theme) => {
       height:"calc(100% - 300px)"
     },
     headerViewBtn : {
+      zIndex: -2,
       background:theme.custom.grey[1],
       height:"24px",
       borderBottom : "rgba(0,0,0,0.05) solid 1px",
