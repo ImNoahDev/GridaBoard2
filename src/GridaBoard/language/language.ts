@@ -13,6 +13,7 @@ function setData(lang: string = null) : string {
 
     if(navLang === "zh"){//중국어일 경우, 간체 번체 나누기 필요
         navLang = navigatorLang.substr(3,2);
+        navLang = navLang.toLowerCase();
     }
 
     if(lang != null){//1순위 셋 데이터 인자값이 가장 우선
@@ -24,7 +25,7 @@ function setData(lang: string = null) : string {
     }else{
         languageType = defaultLang;  //기본 언어(언어가 준비되지 않았다는 이야기는 해외일 가능성이 높음 따라서 기본 언어는 영어)
     }
-
+ 
     textData = data[languageType];
     return languageType;
 }
