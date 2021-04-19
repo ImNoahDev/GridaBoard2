@@ -67,7 +67,7 @@ const InformationButton = (props) => {
   const selectArr = [
     {
       title : "go_to_neolab",
-      link : "https://labs.neostudio.io/"
+      link : "https://labs.neostudio.io/forum/15/"
     },
     {
       title : "go_to_guide",
