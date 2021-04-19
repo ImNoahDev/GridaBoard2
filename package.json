@@ -38,6 +38,7 @@
     "react-beforeunload": "2.4.0",
     "react-bluetooth": "0.0.0",
     "react-bootstrap": "1.5.2",
+    "react-cookie": "^4.0.3",
     "react-cookies": "0.1.1",
     "react-dom": "17.0.2",
     "react-google-login": "5.2.2",
@@ -70,7 +71,7 @@
     "react-start": "react-scripts start",
     "e:start": "concurrently \"cross-env NODE_ENV=development BROWSER=none npm run react-start\" \"wait-on http://localhost:3000 && electron .\"",
     "e:build": "npm run build && electron-builder",
-    "test-deploy" : "node ./src/GridaBoard/util/exceltojson.js && npm run build && firebase use test && firebase deploy",
+    "test-deploy": "node ./src/GridaBoard/util/exceltojson.js && npm run build && firebase use test && firebase deploy",
     "deploy": "node ./src/GridaBoard/util/exceltojson.js && npm run build && firebase use live && firebase deploy"
   },
   "eslintConfig": {

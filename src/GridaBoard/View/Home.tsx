@@ -16,6 +16,8 @@ import {
 import { IPageSOBP, IFileBrowserReturn, IGetNPageTransformType } from "nl-lib/common/structures";
 import { useBeforeunload } from 'react-beforeunload';
 import getText from "../language/language";
+import TutorialPage from "../components/TutorialPage";
+import {useCookies} from 'react-cookie';
 
 const useStyle = makeStyles(theme=>({
   rootDiv :{
@@ -31,6 +33,7 @@ const Home = () => {
   const [loadConfirmDlgOn, setLoadConfirmDlgOn] = useState(false);
   const [loadConfirmDlgStep, setLoadConfirmDlgStep] = useState(0);
   const [noMoreAutoLoad, setNoMoreAutoLoad] = useState(false);
+  const [tutorialOpen, setTutorialOpen] = useState(true);
 
   const [activePageNo, setLocalActivePageNo] = useState(-1);
   const [pageWidth, setPageWidth] = useState(0);
@@ -155,10 +158,31 @@ const Home = () => {
 
   //https://css-tricks.com/controlling-css-animations-transitions-javascript/
 
-  console.log(`HOME: docPageNo:${activePageNo}, pdfUrl=${pdfUrl}`);
+  //쿠키 확인 후 튜토리얼 띄우기
+  const [cookies, setCookie, removeCookie] = useCookies(['test']);
   
+  if(cookies.tutorialView === "true" && tutorialOpen === true){//쿠키에 저장될때 문자열로 변환되어서 이렇게 검사해야함
+    //이미 봄
+    setTutorialOpen(false);
+  }
+
+  const setDontShowTuto = ()=>{
+    //쿠키 저장
+    setCookie("tutorialView",true, {
+      expires: new Date((new Date()).setHours(24,0,0,0)) //오늘의 24시면 내일 0시이기 때문
+    });
+    //view 전환
+    setTutorialOpen(false);
+  }
+
+
+
+
+  console.log(`HOME: docPageNo:${activePageNo}, pdfUrl=${pdfUrl}`);
+
   return (
     <div className={classes.rootDiv}>
+      {tutorialOpen ? <TutorialPage dontShow={setDontShowTuto}/> : "" }
       <ViewLayer id="view-layer" handlePdfOpen={handlePdfOpen} style={{display: "flex"}}/>
       <input type="file" id={g_hiddenFileInputBtnId} onChange={onFileInputChanged} onClick={onFileInputClicked} style={{ display: "none" }} name="pdf" accept=".pdf,.grida" />
     </div>
