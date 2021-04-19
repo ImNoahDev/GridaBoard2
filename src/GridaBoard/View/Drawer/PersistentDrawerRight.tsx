@@ -31,15 +31,10 @@ const useStyles = props => makeStyles((theme: Theme) => ({
     display: 'block',
   },
   drawer: {
+    width: "190px",
     flexShrink: 0,
   },
   toolbar: theme.mixins.toolbar,
-  appBar: {
-    transition: theme.transitions.create(['margin', 'width'], {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.leavingScreen,
-    }),
-  },
   title: {
     flexGrow: 1,
   },
@@ -65,22 +60,12 @@ const useStyles = props => makeStyles((theme: Theme) => ({
       marginTop: "8px",
       marginLeft: "120px",
       padding: "8px",
-      // width: "172px",
       background: "white",
       opacity: 0.8
     }
   },
-
-  contentShift: {
-    transition: theme.transitions.create('margin', {
-      easing: theme.transitions.easing.easeOut,
-      duration: theme.transitions.duration.enteringScreen,
-    }),
-    marginRight: 0,
-  },
   dragger: {
     width: "5px",
-    cursor: "ew-resize",
     padding: "4px 0 0",
     borderTop: "1px solid #ddd",
     position: "absolute",
@@ -117,7 +102,8 @@ const useStyles = props => makeStyles((theme: Theme) => ({
     }
   },
   drawerContainer : {
-    overflow: 'auto'
+    overflow: 'auto',
+    paddingTop:"14px",
   },
   customizeToolbar : {
     minHeight: "91px"
@@ -142,7 +128,6 @@ const maxDrawerWidth = 1000;
 
 interface Props extends BoxProps {
   onDrawerResize: (size: number) => void,
-  handleDrawerClose: () => void,
   open: boolean,
 
   noInfo?: boolean,
@@ -188,6 +173,7 @@ export default function PersistentDrawerRight(props: Props) {
         className={classes.drawer}
         variant="persistent"
         anchor="left"
+        transitionDuration={theme.transitions.duration.enteringScreen + (open?50:-100)}
         open={open}
         classes={{
           paper: classes.drawerPaper,
@@ -195,14 +181,6 @@ export default function PersistentDrawerRight(props: Props) {
       >
       {/* <Toolbar className={classes.customizeToolbar} /> */}
         <div id="drawer_content" className={classes.drawerContainer}>
-          <div className={classes.drawerHeader}>
-            <IconButton id="drawer_hide_button" onClick={props.handleDrawerClose}>
-              <CustomBadge badgeContent={`ESC`}>
-                {theme.direction === 'rtl' ? <ChevronRightIcon /> : <ChevronLeftIcon />}
-              </CustomBadge>
-            </IconButton>
-          </div>
-          <div className={classes.liner}></div>
           <div onMouseDown={e => handleMouseDown(e)} className={classes.dragger} />
           < DrawerPages noInfo={props.noInfo} />
           <div className={classes.liner}></div>
