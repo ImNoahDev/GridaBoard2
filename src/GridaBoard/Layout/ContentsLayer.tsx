@@ -152,7 +152,7 @@ const ContentsLayer = (props: Props) => {
         <CustomBadge badgeContent={`TAB`}>
           <RotateButton disabled={activePageNo_store === -1} />
         </CustomBadge>
-        <CustomBadge badgeContent={`S`}>
+        <CustomBadge badgeContent={`Y`}>
           <PageClearButton disabled={activePageNo_store === -1} />
         </CustomBadge>
       </div>
