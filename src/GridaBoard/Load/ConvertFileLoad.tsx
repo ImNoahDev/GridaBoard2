@@ -6,6 +6,7 @@ import CloudConvert from 'cloudconvert';
 import { setLoadingVisibility } from '../store/reducers/loadingCircle';
 import GridaDoc from "../GridaDoc";
 import { InkStorage } from '../../nl-lib/common/penstorage';
+
 // import {fileConvert} from "./LoadGrida";
 
 
@@ -86,6 +87,31 @@ function fileConvert(selectedFile){
   }
 }
 
+const checkPdfIsEncryptted = (selectedFile) => {
+  
+  if (selectedFile.result === "success") {
+    const file = selectedFile.file;
+    const reader = new FileReader();
+
+    let pdfData = null;
+    
+    reader.readAsText(file);
+    reader.onload = async function(e) {
+      pdfData = e.target.result;
+      const n = pdfData.indexOf("/Encrypt");
+
+      if (n !== -1) {
+        confirm("PDF가 암호화 되어있습니다. 인쇄 혹은 인쇄 페이지 순서 등록 기능을 사용하려면 암호를 해제하여야 합니다.")
+        return true;
+      } else {
+        return false;
+      }
+    }
+
+    return false;
+  }
+}
+
 const ConvertFileLoad = (props: Props) => {
   const [canConvert, setCanConvert] = useState(true);
   const { handlePdfOpen , className} = props;
@@ -113,6 +139,7 @@ const ConvertFileLoad = (props: Props) => {
       if(fileType == "pdf"){
         await handlePdfOpen(result as IFileBrowserReturn);
         setLoadingVisibility(false);
+        checkPdfIsEncryptted(result as IFileBrowserReturn);
       }else if(fileType == "grida"){
         fileConvert(result as IFileBrowserReturn);
       }
