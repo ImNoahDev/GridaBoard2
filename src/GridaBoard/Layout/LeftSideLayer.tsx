@@ -45,7 +45,7 @@ const useStyle = props => makeStyles(theme=>({
   },
   openerHover: {
     "&:hover" : {
-      background:theme.custom.icon.mono[2],
+      background:"rgba(0,0,0,0.15)",
     }
   },
   contentShift: {

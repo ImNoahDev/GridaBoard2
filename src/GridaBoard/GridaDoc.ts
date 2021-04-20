@@ -158,15 +158,7 @@ export default class GridaDoc {
   }
 
   private appendPdfDocumentForGrida = (pdfDoc: NeoPdfDocument, pageInfos: IPageSOBP[], basePageInfos: IPageSOBP[]) => {
-    // 0) PDF가 있는지 찾아보고 있으면 return, (없으면 1, 2를 통해서 넣는다)
-    const found = this._pdfd.find(item => item.fingerprint === pdfDoc.fingerprint);
-    if (found) {
-      alert(getText("alert_regedPdf"));
-      return -1;
-    }
-
-    // 1) page와 maps(MappingStorage)에 있는 정보를 매핑해둔다.
-    // pdfDoc.refreshNcodeMappingTable();
+    this._pdfd = [];
 
     // 2) PDF 배열에 정보를 추가하고
     this._pdfd.push({

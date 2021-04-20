@@ -9,11 +9,11 @@ import { IPoint, NeoStroke, NeoDot, IPageSOBP, INeoStrokeProps, StrokeStatus, IS
 import { INeoSmartpen, IPenToViewerEvent } from 'nl-lib/common/neopen';
 import { InkStorage } from 'nl-lib/common/penstorage';
 import { PenManager } from 'nl-lib/neosmartpen';
-import { adjustNoteItemMarginForFilm, getNPaperInfo } from "nl-lib/common/noteserver";
+import { adjustNoteItemMarginForFilm, getNPaperInfo, isPUI } from "nl-lib/common/noteserver";
 import { MappingStorage } from 'nl-lib/common/mapper/MappingStorage';
 import { calcRevH } from 'nl-lib/common/mapper/CoordinateTanslater';
 import { applyTransform } from 'nl-lib/common/math/echelon/SolveTransform';
-import { PlateNcode_1, PlateNcode_2 } from 'nl-lib/common/constants';
+import { nullNcode, PlateNcode_1, PlateNcode_2 } from 'nl-lib/common/constants';
 
 import GridaDoc from 'GridaBoard/GridaDoc';
 import { setActivePageNo } from 'GridaBoard/store/reducers/activePageReducer';
@@ -463,10 +463,14 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
 
     const dot = event.dot;
 
+    if (isPUI(pageInfo) || isSamePage(pageInfo, nullNcode())) {
+      return;
+    }
+    
     let pdf_xy;
     if (!isPlate) {
       pdf_xy = this.funcNcodeToPdfXy(dot);
-    } else { //플레이트일 경우
+    } else if (isPlate) { //플레이트일 경우
       pdf_xy = this.ncodeToPdfXy_plate(dot, pageInfo);
     }
 
@@ -511,6 +515,10 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
     if (isSamePage(PlateNcode_1, this.currentPageInfo) || isSamePage(PlateNcode_2, this.currentPageInfo)) {
       isPlate = true;
     }
+
+    if (isPUI(this.currentPageInfo) || isSamePage(this.pageInfo, nullNcode())) {
+      return;
+    } 
 
     let pdf_xy;
     if (!isPlate) {
@@ -778,12 +786,12 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
       isPlate = true;
     }
 
-    if (!isPlate) {
+    if (!isPlate && !isSamePage(pageInfo, nullNcode())) {
       dotArray.forEach(dot => {
         const pt = this.ncodeToPdfXy(dot);
         pointArray.push(pt);
       });
-    } else { //플레이트일 경우
+    } else if (isPlate) { //플레이트일 경우
       dotArray.forEach(dot => {
         const pdf_xy = this.ncodeToPdfXy_plate(dot, pageInfo);
         pointArray.push(pdf_xy);
@@ -794,7 +802,7 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
     switch (brushType) {
       case 1:
         strokeThickness *= 5;
-        break;
+        break; 
       default:
         break;
     }
@@ -851,12 +859,12 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
 
     const pointArray = [];
 
-    if (!isPlate) {
+    if (!isPlate && !isSamePage(pageInfo, nullNcode())) {
       dotArray.forEach(dot => {
         const pt = this.ncodeToPdfXy(dot);
         pointArray.push(pt);
       });
-    } else {
+    } else if (isPlate) {
       dotArray.forEach(dot => {
         const pt = this.ncodeToPdfXy_plate(dot, pageInfo);
         pointArray.push(pt);

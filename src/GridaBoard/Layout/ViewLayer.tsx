@@ -28,14 +28,14 @@ const useStyles = makeStyles((theme) => {
       height:"calc(100% - 300px)"
     },
     headerViewBtn : {
-      background:theme.custom.grey[1],
+      zIndex: 0,
       height:"24px",
       borderBottom : "rgba(0,0,0,0.05) solid 1px",
       display: "flex",
       justifyContent: "center",
       alignItems: "center",
       "&:hover" : {
-        background:theme.custom.icon.mono[2],
+        background: "rgba(0,0,0,0.15)",
       }
     },
     headerViewOn : {
