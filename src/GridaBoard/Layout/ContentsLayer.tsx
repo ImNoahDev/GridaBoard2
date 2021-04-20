@@ -36,7 +36,7 @@ const useStyle = props=>makeStyles(theme=>({
       "& > button": {
         width: "56px",
         height: "56px",
-        background: theme.custom.white[1],
+        background: theme.custom.white[80],
         boxShadow: "2px 0px 24px rgba(0, 0, 0, 0.15), inset 0px 2px 0px rgba(255, 255, 255, 1)",
         borderRadius: "50%",
         display: "block",

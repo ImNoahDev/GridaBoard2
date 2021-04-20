@@ -22,7 +22,7 @@ const useStyle = makeStyles(theme => ({
     padding: "8px",
     position: "absolute",
     width: "140px",
-    background: theme.custom.white[0],
+    background: theme.custom.white[90],
     boxShadow: theme.custom.shadows[0],
     borderRadius: "12px",
     "& > button" : {
@@ -31,7 +31,7 @@ const useStyle = makeStyles(theme => ({
       height: "40px", 
       zIndex: 5000,
       color : theme.custom.icon.mono[0],
-      background : theme.custom.white[0],
+      background : theme.custom.white[90],
       "&:hover" : {
         color : theme.palette.action.hover,
         background : theme.custom.icon.blue[3]

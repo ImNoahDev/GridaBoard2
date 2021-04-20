@@ -80,17 +80,13 @@ export default class ThemeManager {
 
   // Theme 1: Basic
   public setT1() {
-    document.body.style.background = "rgba(238,238,238,0.05)";
+    (document.querySelector("#background") as HTMLElement).style.background = "";
     this.setThemeDark(false);
   }
 
   // Theme 2: Neo-prism
   public setT2() {
-    document.body.style.margin = "0";
-    document.body.style.width = "100vw";
-    document.body.style.height = "100vh";
-    document.body.style.backgroundImage = "url(bg_01.png)"
-    document.body.style.backgroundSize = "cover";
+    (document.querySelector("#background") as HTMLElement).style.background = "url(bg_01.png) 0% 0% / cover";
     this.setThemeDark(false);
   }
 

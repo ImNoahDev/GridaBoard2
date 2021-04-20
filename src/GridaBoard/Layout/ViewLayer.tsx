@@ -21,7 +21,9 @@ const useStyles = makeStyles((theme) => {
       flexDirection: "column",
       height: "100%"
     },
-    main : {display: "flex", 
+    main : {
+      background: theme.custom.black[5],
+      display: "flex", 
       flex: 1, 
       flexDirection: "row-reverse", 
       justifyContent: "flex-start", 
@@ -51,6 +53,9 @@ const useStyles = makeStyles((theme) => {
       borderLeft: "10px solid transparent",
       borderRight: "10px solid transparent",
       borderTop: `5px solid ${theme.custom.icon.mono[1]}`
+    },
+    headerCollapse:{
+      background: theme.custom.white[50]
     }
 
   })
@@ -79,7 +84,7 @@ const ViewLayer = (props: Props) => {
   return (
     <div className={classes.wrap}>
       <AppBar position="relative" color="transparent" elevation={0}> 
-        <Collapse in={isView} timeout={0}>
+        <Collapse in={isView} className={classes.headerCollapse} timeout={0}>
           <HeaderLayer {...props}/>
           <NavLayer {...props} />
         </Collapse>

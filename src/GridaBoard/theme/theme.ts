@@ -5,7 +5,8 @@ declare module '@material-ui/core/styles/createMuiTheme' {
   interface Theme {
     custom : {
       grey : Array<string>
-      white : Array<string>,
+      white : Object,
+      black : Object,
       icon :{
         blue : Array<string>
         mono : Array<string>
@@ -17,7 +18,8 @@ declare module '@material-ui/core/styles/createMuiTheme' {
   interface ThemeOptions {
     custom? : {
       grey? : Array<string>,
-      white? : Array<string>,
+      white? : Object,
+      black? : Object,
       icon? :{
         blue? : Array<string>
         mono? : Array<string>
@@ -28,12 +30,15 @@ declare module '@material-ui/core/styles/createMuiTheme' {
 }
 export const theme = createMuiTheme({
   custom:{
-    white: [
-      "rgba(255,255,255,0.9)",
-      "rgba(255,255,255,0.8)",
-      "rgba(255, 255, 255, 0.25)",
-      "rgba(255, 255, 255, 0.5)"
-    ],
+    white: {
+      "90" : "rgba(255,255,255,0.9)",
+      "80" : "rgba(255,255,255,0.8)",
+      "25" : "rgba(255, 255, 255, 0.25)",
+      "50" : "rgba(255, 255, 255, 0.5)"
+    },
+    black: {
+      "5" : "rgba(0,0,0,0.05)"
+    },
     grey: [
       "rgba(88, 98, 125, 0.75)",
       "#E5E5E5"
@@ -59,7 +64,7 @@ export const theme = createMuiTheme({
     },
     background: {
       paper: "#FFFFFF", 
-      default: "rgba(0,0,0,0.05)",
+      default: "#EEEEEE",
     },
     text: {
       primary: "#121212",

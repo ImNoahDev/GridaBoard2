@@ -25,20 +25,12 @@ import LoadingCircle from "../Load/LoadingCircle";
 export const store = configureStore();
 
 // export const store = configureStore();
-const useStyle = makeStyles(theme=>{
-  console.log(theme);
-  return ({
-    rootDiv:{
-      width:"100vw",
-      height:"100vh",
-      background : theme.palette.background.default
-    },
+const useStyle = makeStyles(theme=>({
     backdrop: {
       zIndex: theme.zIndex.drawer + 5,
       color: theme.palette.primary.main,
     },
-  })
-}); 
+})); 
 
 
 const handleToastClose = (e) => {

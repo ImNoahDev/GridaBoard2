@@ -112,7 +112,7 @@ const useStyles = props => makeStyles((theme: Theme) => ({
     width: "190px",
     flexShrink: 0,
     zIndex: 1100,
-    background: theme.custom.white[2], 
+    background: "rgba(0,0,0,0)", 
     float: "left", 
     display: "flex",
     position: "relative"

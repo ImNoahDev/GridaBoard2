@@ -23,6 +23,7 @@ const useStyle = makeStyles(theme=>({
   rootDiv :{
     width: "100vw",
     height: "100vh",
+    backgroundSize : "cover",
     background: theme.palette.background.default
   }
 }));
@@ -181,7 +182,7 @@ const Home = () => {
   console.log(`HOME: docPageNo:${activePageNo}, pdfUrl=${pdfUrl}`);
 
   return (
-    <div className={classes.rootDiv}>
+    <div id={`background`} className={classes.rootDiv}>
       {tutorialOpen ? <TutorialPage dontShow={setDontShowTuto}/> : "" }
       <ViewLayer id="view-layer" handlePdfOpen={handlePdfOpen} style={{display: "flex"}}/>
       <input type="file" id={g_hiddenFileInputBtnId} onChange={onFileInputChanged} onClick={onFileInputClicked} style={{ display: "none" }} name="pdf" accept=".pdf,.grida" />

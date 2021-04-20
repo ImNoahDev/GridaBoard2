@@ -32,7 +32,7 @@ const useStyle = makeStyles(theme => ({
     zIndex: 10000,
     marginLeft: "-160px",
     color : theme.custom.icon.mono[0],
-    background: theme.custom.white[0],
+    background: theme.custom.white[90],
     "& > span > button" : {
       width: "224px",
       height: "40px",

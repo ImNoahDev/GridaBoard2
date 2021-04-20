@@ -38,7 +38,7 @@ const useStyle = makeStyles(theme => ({
     borderRadius: "12px",
     zIndex: 10000,
     color : theme.custom.icon.mono[0],
-    background: theme.custom.white[0],
+    background: theme.custom.white[90],
     padding: "10px",
     "& > a" : {
       minWidth: "184px",

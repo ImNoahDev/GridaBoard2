@@ -29,7 +29,7 @@ const useStyles = props => makeStyles((theme) => ({
       minHeight: "0px"
     },
     calibration : {
-      background: theme.custom.white[3],
+      background: theme.custom.white[50],
       border: "1px solid #CFCFCF",
       boxSizing: "border-box",
       borderRadius: "4px",
@@ -75,7 +75,6 @@ const useStyles = props => makeStyles((theme) => ({
       alignItems: "center",
       flexWrap: "wrap",
       height: "72px",
-      background: theme.custom.white[3],
       zoom: 1 / props.brZoom,
       backdropFilter: "blur(4px)",
       "& > div":{
@@ -113,14 +112,14 @@ const useStyles = props => makeStyles((theme) => ({
     },
     changeUrlStyle : {
       justifyContent: "center",
-      background: theme.custom.white[3],
+      background: theme.custom.white[50],
       border: "1px solid #CFCFCF",
       boxSizing: "border-box",
       borderRadius: "4px",
       overflow: "hidden",
       textOverflow: "ellipsis",
       whiteSpace: "nowrap",
-      padding: 0,
+      padding: "3px",
       "& > span": {
         fontSize: "12px",
         lineHeight: "14px",
@@ -225,22 +224,6 @@ const HeaderLayer = (props: Props) => {
   const HeaderLine = ()=>{
     return (<div className={classes.headerLineV} />);
   }
-  const InformationBtn = ()=>{
-    return (
-      <div>
-        <Button className={`${classes.buttonStyle} `} target="_blank" href="https://neolabdev.gitbook.io/gridaboard/">
-          <SvgIcon>
-            <path
-              fillRule="evenodd"
-              clipRule="evenodd"
-              d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12s4.477 10 10 10 10-4.477 10-10zM4 12a8 8 0 1116 0 8 8 0 01-16 0zm9-5a1 1 0 11-2 0 1 1 0 012 0zm-1 11a1 1 0 001-1v-6a1 1 0 10-2 0v6a1 1 0 001 1z"
-            />
-          </SvgIcon>
-      </Button>
-      </div>
-      );
-  }
-
 
   console.log(`browser zoom level changed = ${brZoom}`);
 
