@@ -25,13 +25,14 @@ import CustomBadge from "../components/CustomElement/CustomBadge"
 const useStyle = props => makeStyles(theme => ({
   navStyle : {
     display: "flex",
+    position: "relative",
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
     flexWrap: "wrap",
     height: "50px",
     background: theme.custom.white[3],
-    zIndex: -1,
+    zIndex: 1,
     zoom: 1 / props.brZoom,
     "&>div":{
       display: "inline-flex",

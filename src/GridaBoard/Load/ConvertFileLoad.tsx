@@ -185,7 +185,7 @@ const ConvertFileLoad = (props: Props) => {
         }
     }
     xhr.send(formData);
-
+    console.log(123);
   } 
   async function setTask(res:HTMLAllCollection){
     //컨버팅 중
@@ -196,24 +196,59 @@ const ConvertFileLoad = (props: Props) => {
                     "operation": "convert", 
                     "input": [res[3].textContent.split("/")[0]],
                     "output_format": "pdf"
-                },
-                "export-1": {
-                    "operation": "export/url",
-                    "input": [
-                        "task-1"
-                    ],
-                    "inline": false,
-                    "archive_multiple_files": false
                 }
             }
         });
         job = await cloudConvert.jobs.wait(job.id);
-        
-        const url = job.tasks[0].result.files[0].url;
-        console.log(url);
-  
-        const doc = GridaDoc.getInstance();
-        doc.openPdfFile({ url: url, filename: job.tasks[0].result.files[0].filename });
+        //password가 필요 없으면 export만 추가로 해주면 됨
+        const task : any = {
+          "export-1": {
+              "operation": "export/url",
+              "input": [
+                job.tasks[0].id
+              ],
+              "inline": false,
+              "archive_multiple_files": false
+          } 
+        };
+        let isPassword = false;
+        let password = "";
+        if(job.tasks[0].code === "INVALID_PASSWORD"){
+          //password 필요함
+          //convert를 다시 해주어야 함
+          password = prompt(getText("need_password"));
+          //여기서 취소 누르면 null
+
+          isPassword = true;
+
+          task["task-1"] = {
+              "operation": "convert", 
+              "input": [res[3].textContent.split("/")[0]],
+              "output_format": "pdf",
+              "password": password
+          }
+          task["export-1"].input = ["task-1"];
+        }
+
+        if(!isPassword || (isPassword && password !== null )){
+          //패스워드가 필요 없거나, 패스워드가 필요한데 받았거나
+          job = await cloudConvert.jobs.create({
+              "tasks": task
+          });
+          job = await cloudConvert.jobs.wait(job.id);
+
+          if(isPassword && job.tasks[1].code === "INVALID_PASSWORD"){
+            //비밀번호 틀림
+            alert(getText("wrong_password"));
+          }else{
+            //모든게 괜찮을 경우 open
+            const url = job.tasks[0].result.files[0].url;
+            console.log(url);
+      
+            const doc = GridaDoc.getInstance();
+            doc.openPdfFile({ url: url, filename: job.tasks[0].result.files[0].filename });
+          }  
+        }
       }catch(e){
         /** 
          * 422 (invalid data)
@@ -223,28 +258,32 @@ const ConvertFileLoad = (props: Props) => {
          */
         //에러 로그 출력
         //TODO : Unhandled Rejection (TypeError): Cannot read property 'status' of undefined
-        switch(e.response.status){
-          case 422 : {
-            //잘못된 파일 => 컨버트 할 수 없는 파일
-            //input type으로 한번 걸렀으나, alert 처리 해주면 좋을듯
-            alert(getText("alert_wrongFileType"));
-            break;
-          }
-          case 429 : {
-            //요청이 너무 많음 => 일시 사용 불가로 변환해주어야 함
-            setCanConvert(false);
-            setTimeout(()=>{
-                setCanConvert(true);
-            } ,60000); //60초
-            break ;
-          }
-          case 500 : {
-            //클라우드 컨버트 서버 오류 => 답이 없음
-            break ;
-          }
-          case 503 : {
-            //일시적으로 사용할 수 없음 => 요건 어떤 상황인지 잘 모르겠음
-            break ;
+        if(e.response === undefined && e.message === "Cannot read property 'files' of null"){
+          console.log(e);
+        }else{
+          switch(e.response.status){
+            case 422 : {
+              //잘못된 파일 => 컨버트 할 수 없는 파일
+              //input type으로 한번 걸렀으나, alert 처리 해주면 좋을듯
+              alert(getText("alert_wrongFileType"));
+              break;
+            }
+            case 429 : {
+              //요청이 너무 많음 => 일시 사용 불가로 변환해주어야 함
+              setCanConvert(false);
+              setTimeout(()=>{
+                  setCanConvert(true);
+              } ,60000); //60초
+              break ;
+            }
+            case 500 : {
+              //클라우드 컨버트 서버 오류 => 답이 없음
+              break ;
+            }
+            case 503 : {
+              //일시적으로 사용할 수 없음 => 요건 어떤 상황인지 잘 모르겠음
+              break ;
+            }
           }
         }
       }

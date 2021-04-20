@@ -16,6 +16,7 @@ import HelpIcon from '@material-ui/icons/Help';
 import PageClearButton from "../components/buttons/PageClearButton";
 import CustomBadge from "../components/CustomElement/CustomBadge";
 import InformationButton from "../components/buttons/InformationButton";
+import getText, { languageType } from "../language/language";
 
 const useStyle = props=>makeStyles(theme=>({
   root : {
@@ -152,11 +153,11 @@ const ContentsLayer = (props: Props) => {
         <CustomBadge badgeContent={`TAB`}>
           <RotateButton disabled={activePageNo_store === -1} />
         </CustomBadge>
-        <CustomBadge badgeContent={`S`}>
+        <CustomBadge badgeContent={`Y`}>
           <PageClearButton disabled={activePageNo_store === -1} />
         </CustomBadge>
       </div>
-      <InformationButton className={classes.information}/>
+      {(languageType === "ko") ? <InformationButton className={classes.information}/> : ""}
       
       <div id="mixed-viewer-layer" style={{
         position: "relative",
