@@ -425,23 +425,28 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
 
   
   ncodeToPdfXy_plate = (dot: {x, y, f?}, pageInfo: IPageSOBP) => {
-    const noteItem = getNPaperInfo(pageInfo);
+    const noteItem = getNPaperInfo(pageInfo); //plate의 item
     adjustNoteItemMarginForFilm(noteItem, pageInfo);
 
-    const npaperWidth = noteItem.margin.Xmax - noteItem.margin.Xmin; // width
-    const npaperHeight = noteItem.margin.Ymax - noteItem.margin.Ymin; // Height
+    const currentPage = GridaDoc.getInstance().getPage(store.getState().activePage.activePageNo);
 
-    const ratio1 = window.innerWidth / npaperWidth;
-    const ratio2 = window.innerHeight / npaperHeight;
-    let plateCanvasRatio = ratio1;
-    if (ratio2 > ratio1) plateCanvasRatio = ratio2;
+    const npaperWidth = noteItem.margin.Xmax - noteItem.margin.Xmin;
+    const npaperHeight = noteItem.margin.Ymax - noteItem.margin.Ymin;
 
-    const globalZoom = store.getState().ui.browser.zoom;
+    const pageWidth = currentPage.pageOverview.sizePu.width;
+    const pageHeight =currentPage.pageOverview.sizePu.height;
 
-    const screen_x = dot.x * globalZoom * plateCanvasRatio;
-    const screen_y = dot.y * globalZoom * plateCanvasRatio;
+    const wRatio = pageWidth / npaperWidth;
+    const hRatio = pageHeight / npaperHeight;
+    let platePdfRatio = wRatio
+    if (hRatio > wRatio) platePdfRatio = hRatio
 
-    return {x: screen_x, y: screen_y, f: dot.f};
+    const zoom = store.getState().zoomReducer.zoom;
+
+    const pdf_x = dot.x * zoom * platePdfRatio;
+    const pdf_y = dot.y * zoom * platePdfRatio;
+
+    return {x: pdf_x, y: pdf_y, f: dot.f};
   }
 
   movePenTracker = (event: IPenToViewerEvent, pageInfo: IPageSOBP) => {
