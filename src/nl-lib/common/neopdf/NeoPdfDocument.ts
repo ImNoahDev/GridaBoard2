@@ -5,6 +5,7 @@ import { MappingStorage } from "../mapper";
 import { NeoPdfPage, PDF_VIEWPORT_DESC } from "./NeoPdfPage";
 import { resolve } from "path";
 import { setLoadingVisibility } from "GridaBoard/store/reducers/loadingCircle";
+import getText from "GridaBoard/language/language";
 
 // import PdfJsWorker from "../../../../public/pdf.worker.2.5.207.js/index.js";
 console.log(`PDFjs version=${PdfJs.version}`);
@@ -456,7 +457,7 @@ function pdfJsOpenDocument(options: IPdfOpenOption): Promise<PdfJs.PDFDocumentPr
   loadingTask.onPassword = function passwordNeeded(updateCallback, reason) {
     //when the document is encrypted, this function will be triggered
     if (reason === 1) {
-      const password = prompt("PDF가 암호화 되어있습니다. 비밀번호를 입력해주세요.");
+      const password = prompt(getText("need_password"));
       if (password === null) {
         loadingTask.destroy();
       } else {
@@ -464,7 +465,7 @@ function pdfJsOpenDocument(options: IPdfOpenOption): Promise<PdfJs.PDFDocumentPr
       }
     } else {
       updateCallback(null);
-      confirm("잘못된 비밀번호입니다");
+      confirm(getText("wrong_password"));
     }
   };
 

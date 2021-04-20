@@ -187,33 +187,41 @@ const ConvertFileLoad = (props: Props) => {
     xhr.send(formData);
 
   } 
-  async function setTask(res:HTMLAllCollection){
+  async function setTask(res:HTMLAllCollection, needPassword:boolean=false){
     //컨버팅 중
       try{
-        let job = await cloudConvert.jobs.create({
-            "tasks": {
-                "task-1": {
-                    "operation": "convert", 
-                    "input": [res[3].textContent.split("/")[0]],
-                    "output_format": "pdf"
-                },
-                "export-1": {
-                    "operation": "export/url",
-                    "input": [
-                        "task-1"
-                    ],
-                    "inline": false,
-                    "archive_multiple_files": false
-                }
-            }
-        });
-        job = await cloudConvert.jobs.wait(job.id);
-        
-        const url = job.tasks[0].result.files[0].url;
-        console.log(url);
-  
-        const doc = GridaDoc.getInstance();
-        doc.openPdfFile({ url: url, filename: job.tasks[0].result.files[0].filename });
+        let password = "";
+        if(needPassword){
+          password = prompt(getText("need_password"));
+
+        }
+        if(password != null){
+          let job = await cloudConvert.jobs.create({
+              "tasks": {
+                  "task-1": {
+                      "operation": "convert", 
+                      "input": [res[3].textContent.split("/")[0]],
+                      "output_format": "pdf",
+                      "password": password
+                  },
+                  "export-1": {
+                      "operation": "export/url",
+                      "input": [
+                          "task-1"
+                      ],
+                      "inline": false,
+                      "archive_multiple_files": false
+                  }
+              }
+          });
+          job = await cloudConvert.jobs.wait(job.id);
+          
+          const url = job.tasks[0].result.files[0].url;
+          console.log(url);
+    
+          const doc = GridaDoc.getInstance();
+          doc.openPdfFile({ url: url, filename: job.tasks[0].result.files[0].filename });
+        }
       }catch(e){
         /** 
          * 422 (invalid data)
@@ -223,28 +231,36 @@ const ConvertFileLoad = (props: Props) => {
          */
         //에러 로그 출력
         //TODO : Unhandled Rejection (TypeError): Cannot read property 'status' of undefined
-        switch(e.response.status){
-          case 422 : {
-            //잘못된 파일 => 컨버트 할 수 없는 파일
-            //input type으로 한번 걸렀으나, alert 처리 해주면 좋을듯
-            alert(getText("alert_wrongFileType"));
-            break;
-          }
-          case 429 : {
-            //요청이 너무 많음 => 일시 사용 불가로 변환해주어야 함
-            setCanConvert(false);
-            setTimeout(()=>{
-                setCanConvert(true);
-            } ,60000); //60초
-            break ;
-          }
-          case 500 : {
-            //클라우드 컨버트 서버 오류 => 답이 없음
-            break ;
-          }
-          case 503 : {
-            //일시적으로 사용할 수 없음 => 요건 어떤 상황인지 잘 모르겠음
-            break ;
+        if(e.response === undefined && e.message === "Cannot read property 'files' of null" && needPassword === false){
+          //파일을 직접 분석할 수 없어서 파일 전송 후 분석
+          setTask(res, true);
+          return 1;
+        }else if(e.response === undefined && e.message === "Cannot read property 'files' of null" && needPassword === true){
+          alert(getText("wrong_password"));
+        }else{
+          switch(e.response.status){
+            case 422 : {
+              //잘못된 파일 => 컨버트 할 수 없는 파일
+              //input type으로 한번 걸렀으나, alert 처리 해주면 좋을듯
+              alert(getText("alert_wrongFileType"));
+              break;
+            }
+            case 429 : {
+              //요청이 너무 많음 => 일시 사용 불가로 변환해주어야 함
+              setCanConvert(false);
+              setTimeout(()=>{
+                  setCanConvert(true);
+              } ,60000); //60초
+              break ;
+            }
+            case 500 : {
+              //클라우드 컨버트 서버 오류 => 답이 없음
+              break ;
+            }
+            case 503 : {
+              //일시적으로 사용할 수 없음 => 요건 어떤 상황인지 잘 모르겠음
+              break ;
+            }
           }
         }
       }
