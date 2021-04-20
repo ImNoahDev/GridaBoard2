@@ -31,7 +31,6 @@ const useStyle = props => makeStyles(theme => ({
     alignItems: "center",
     flexWrap: "wrap",
     height: "50px",
-    background: theme.custom.white[3],
     zIndex: 1,
     zoom: 1 / props.brZoom,
     "&>div":{

@@ -20,7 +20,7 @@ const useStyle = makeStyles(theme=>({
     alignItems: "center",
     padding: "4px 8px",
     position: "absolute",
-    background: theme.custom.white[0],
+    background: theme.custom.white[90],
     boxShadow: theme.custom.shadows[0],
     borderRadius: "12px",
     zIndex: 10000,

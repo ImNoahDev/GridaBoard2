@@ -48,7 +48,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     position: "absolute",
     width: "486px",
     height: "48px",
-    background: theme.custom.white[0],
+    background: theme.custom.white[90],
     boxShadow: theme.custom.shadows[0],
     borderRadius: "12px",
     zIndex: 100,

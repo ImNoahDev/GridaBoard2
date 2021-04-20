@@ -15,7 +15,8 @@ const useStyle = props => makeStyles(theme=>({
     width: props.drawerOpen ? "190px" : 0,
     zoom: 1 / props.brZoom,
     zIndex: 1000,
-    position:"relative"
+    position:"relative",
+    background: theme.custom.white[25]
   },
   arrowRight : {
     display: "flex",
