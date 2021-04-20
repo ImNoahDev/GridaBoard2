@@ -29,14 +29,13 @@ const useStyles = makeStyles((theme) => {
     },
     headerViewBtn : {
       zIndex: 0,
-      background:theme.custom.grey[1],
       height:"24px",
       borderBottom : "rgba(0,0,0,0.05) solid 1px",
       display: "flex",
       justifyContent: "center",
       alignItems: "center",
       "&:hover" : {
-        background:theme.custom.icon.mono[2],
+        background: "rgba(0,0,0,0.15)",
       }
     },
     headerViewOn : {
