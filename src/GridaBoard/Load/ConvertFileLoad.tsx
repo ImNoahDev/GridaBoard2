@@ -185,42 +185,69 @@ const ConvertFileLoad = (props: Props) => {
         }
     }
     xhr.send(formData);
-
+    console.log(123);
   } 
-  async function setTask(res:HTMLAllCollection, needPassword:boolean=false){
+  async function setTask(res:HTMLAllCollection){
     //컨버팅 중
       try{
+        let job = await cloudConvert.jobs.create({
+            "tasks": {
+                "task-1": {
+                    "operation": "convert", 
+                    "input": [res[3].textContent.split("/")[0]],
+                    "output_format": "pdf"
+                }
+            }
+        });
+        job = await cloudConvert.jobs.wait(job.id);
+        //password가 필요 없으면 export만 추가로 해주면 됨
+        const task : any = {
+          "export-1": {
+              "operation": "export/url",
+              "input": [
+                job.tasks[0].id
+              ],
+              "inline": false,
+              "archive_multiple_files": false
+          } 
+        };
+        let isPassword = false;
         let password = "";
-        if(needPassword){
+        if(job.tasks[0].code === "INVALID_PASSWORD"){
+          //password 필요함
+          //convert를 다시 해주어야 함
           password = prompt(getText("need_password"));
+          //여기서 취소 누르면 null
 
+          isPassword = true;
+
+          task["task-1"] = {
+              "operation": "convert", 
+              "input": [res[3].textContent.split("/")[0]],
+              "output_format": "pdf",
+              "password": password
+          }
+          task["export-1"].input = ["task-1"];
         }
-        if(password != null){
-          let job = await cloudConvert.jobs.create({
-              "tasks": {
-                  "task-1": {
-                      "operation": "convert", 
-                      "input": [res[3].textContent.split("/")[0]],
-                      "output_format": "pdf",
-                      "password": password
-                  },
-                  "export-1": {
-                      "operation": "export/url",
-                      "input": [
-                          "task-1"
-                      ],
-                      "inline": false,
-                      "archive_multiple_files": false
-                  }
-              }
+
+        if(!isPassword || (isPassword && password !== null )){
+          //패스워드가 필요 없거나, 패스워드가 필요한데 받았거나
+          job = await cloudConvert.jobs.create({
+              "tasks": task
           });
           job = await cloudConvert.jobs.wait(job.id);
-          
-          const url = job.tasks[0].result.files[0].url;
-          console.log(url);
-    
-          const doc = GridaDoc.getInstance();
-          doc.openPdfFile({ url: url, filename: job.tasks[0].result.files[0].filename });
+
+          if(isPassword && job.tasks[1].code === "INVALID_PASSWORD"){
+            //비밀번호 틀림
+            alert(getText("wrong_password"));
+          }else{
+            //모든게 괜찮을 경우 open
+            const url = job.tasks[0].result.files[0].url;
+            console.log(url);
+      
+            const doc = GridaDoc.getInstance();
+            doc.openPdfFile({ url: url, filename: job.tasks[0].result.files[0].filename });
+          }  
         }
       }catch(e){
         /** 
@@ -231,12 +258,8 @@ const ConvertFileLoad = (props: Props) => {
          */
         //에러 로그 출력
         //TODO : Unhandled Rejection (TypeError): Cannot read property 'status' of undefined
-        if(e.response === undefined && e.message === "Cannot read property 'files' of null" && needPassword === false){
-          //파일을 직접 분석할 수 없어서 파일 전송 후 분석
-          setTask(res, true);
-          return 1;
-        }else if(e.response === undefined && e.message === "Cannot read property 'files' of null" && needPassword === true){
-          alert(getText("wrong_password"));
+        if(e.response === undefined && e.message === "Cannot read property 'files' of null"){
+          console.log(e);
         }else{
           switch(e.response.status){
             case 422 : {
