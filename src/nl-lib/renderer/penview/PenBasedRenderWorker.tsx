@@ -220,6 +220,11 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
       this.livePaths[event.strokeKey] = live;
     }
 
+    let isPlate = false;
+    if (isSamePage(PlateNcode_1, pageInfo) || isSamePage(PlateNcode_2, pageInfo)) {
+      isPlate = true;
+    }
+
     const dot = event.dot;
 
     //지우개 구현
@@ -227,9 +232,15 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
 
     const cursor = this.penCursors[event.mac];
     if (pen && pen.penRendererType === IBrushType.ERASER) {
-      const pdf_xy = this.ncodeToPdfXy(dot);
+      let pdf_xy;
+      if (!isPlate) {
+        pdf_xy = this.ncodeToPdfXy(dot);
+      } else if (isPlate) { //플레이트일 경우
+        pdf_xy = this.ncodeToPdfXy_plate(dot, pageInfo);
+      }
+
       if (cursor.eraserLastPoint !== undefined) {
-        this.eraseOnLine(cursor.eraserLastPoint.x, cursor.eraserLastPoint.y, pdf_xy.x, pdf_xy.y, live.stroke);
+        this.eraseOnLine(cursor.eraserLastPoint.x, cursor.eraserLastPoint.y, pdf_xy.x, pdf_xy.y, live.stroke, isPlate);
       }
       cursor.eraserLastPoint = { x: pdf_xy.x, y: pdf_xy.y };
     } else {
@@ -315,9 +326,9 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
     this.localPathArray.push(new_pathObj);
   };
 
-  eraseOnLine(pdf_x0, pdf_y0, pdf_x1, pdf_y1, stroke) {
+  eraseOnLine(pdf_x0, pdf_y0, pdf_x1, pdf_y1, stroke, isPlate) {
     const { section, owner, book, page } = stroke;
-    const pageInfo = {
+    let pageInfo = {
       section: section,
       book: book,
       owner: owner,
@@ -340,6 +351,12 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
       if (this.storage.collisionTest(pathDataStr, eraserLine)) {
         this.canvasFb.remove(fabricPath);
         needThumbnailRedraw = true;
+
+        const activePageNo = store.getState().activePage.activePageNo;
+        const docPageInfo = GridaDoc.getInstance().getPage(activePageNo).pageInfos[0];
+        if (isPlate) {
+          pageInfo = docPageInfo;
+        }
 
         const pageId = InkStorage.makeNPageIdStr(pageInfo);
         const completed = this.storage.completedOnPage.get(pageId);
@@ -516,7 +533,7 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
       isPlate = true;
     }
 
-    if (isPUI(this.currentPageInfo) || isSamePage(this.pageInfo, nullNcode())) {
+    if (this.currentPageInfo !== undefined && (isPUI(this.currentPageInfo) || isSamePage(this.pageInfo, nullNcode()))) {
       return;
     } 
 
