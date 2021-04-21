@@ -26,8 +26,8 @@ const useStyle = makeStyles(theme => ({
 
 
 export default function PenTypeButton () {
-  let classes = useStyle();
-  ;
+  const classes = useStyle();
+  
 
   const manager: PenManager = PenManager.getInstance();
   const [selectedType, setSelectedType] = useState(manager.penRendererType as IBrushType);
