@@ -5,9 +5,9 @@ import { RootState } from '../../store/rootReducer';
 import { setRotationTrigger } from '../../store/reducers/rotate';
 import { useSelector } from 'react-redux';
 import GridaDoc from "../../GridaDoc";
-import { IconButton, makeStyles, SvgIcon } from "@material-ui/core";
+import { IconButton, IconButtonProps, makeStyles, SvgIcon } from "@material-ui/core";
 
-const RotateButton = (props) => {
+const RotateButton = (props: IconButtonProps) => {
   const doc = GridaDoc.getInstance();
   const [isVertical, setIsVertical] = useState(true);
   const rotationTrigger = useSelector((state: RootState) => state.rotate.rotationTrigger);

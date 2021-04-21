@@ -59,10 +59,12 @@ const useStyle = makeStyles(theme => ({
     }
   }
 }));
+type Props = {
+  className : string
+}
 
-
-const InformationButton = (props) => {
-  const {className, ...rest} = props;
+const InformationButton = (props: Props) => {
+  const { className } = props;
   const [isOpen, setIsOpen] = useState(false);
   const classes = useStyle();
   const selectArr = [
@@ -85,7 +87,7 @@ const InformationButton = (props) => {
   return (
     <ClickAwayListener onClickAway={handleClickAway}>
     <div className={className}>
-      <IconButton className={classes.icon} onClick={handleClick} {...rest} >
+      <IconButton className={classes.icon} onClick={handleClick} >
         ?
       </IconButton>
 

@@ -51,9 +51,13 @@ const useStyle = makeStyles(theme => ({
   clear : {
   }
 }));
+type Props = {
+  dontShow : () => void,
+}
 
-const TutorialPage = (props) => {
-  const {dontShow, ...rest} = props;
+
+const TutorialPage = (props: Props) => {
+  const { dontShow } = props;
   const imgName = `/tutorialImg/tutorial_${languageType}.png`;
   const classes = useStyle();
 
@@ -64,7 +68,7 @@ const TutorialPage = (props) => {
 
 
   return (
-    <div {...rest} className={classes.main} onClick={(evt)=>{
+    <div className={classes.main} onClick={(evt)=>{
       evt.preventDefault();
     }}>
       <div>

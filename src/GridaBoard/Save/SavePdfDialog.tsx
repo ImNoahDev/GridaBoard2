@@ -41,9 +41,11 @@ const useStyles = makeStyles((theme) => {
     }
   });
 });
-
-const SavePdfDialog = (props) => {
-  const {saveType, ...rest} = props;
+type Props = {
+  saveType : "grida" | "pdf"
+}
+const SavePdfDialog = (props: Props) => {
+  const {saveType } = props;
 
 
   const classes = useStyles();
