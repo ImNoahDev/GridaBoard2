@@ -32,7 +32,8 @@ function setData(lang: string = null) : string {
 function lang(tag : string) : string{
     let nowText : string = textData[tag];
     if(nowText === undefined){
-        return "";
+        nowText = data[defaultLang][tag];
+        return nowText === undefined? "" : nowText;
     }
 
     if(nowText.indexOf("\\n") != -1){
