@@ -77,6 +77,28 @@ const SavePdfDialog = (props: Props) => {
   };
 
   const handleSavePdf = () => {
+    //공백과 .으로는 시작 할 수 없음
+    if(selectedName.search(/^[. ]/g) !== -1){
+      //첫글자가 공백 혹은 .임
+      alert(getText("filename_cantStart"));
+      return ;
+    }
+    if(selectedName.search(/[^a-zA-Z0-9가-힇ㄱ-ㅎㅏ-ㅣぁ-ゔァ-ヴー々〆〤一-龥0-9.+_\- .]/g) !== -1){
+      /**
+       * 허용된 문자
+       * 알파벳 : a-z , A-Z
+       * 한글 : 가-힇, ㄱ-ㅎ, ㅏ-ㅣ
+       * 일어 : ぁ-ゔ, ァ-ヴ, ー々〆〤
+       * 한자 : 一-龥
+       * 숫자 : 0-9
+       * 특문 : + _ - 공백 .
+       * 
+       * 이외의 것이 있을 경우 진입
+       */
+      alert(getText("filename_onlyallowed"));
+      return ;
+    }
+
     if(saveType == "grida"){
       saveGrida(selectedName);
     }else{
