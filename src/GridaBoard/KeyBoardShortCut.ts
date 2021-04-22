@@ -139,8 +139,8 @@ export default function KeyBoardShortCut(evt: KeyboardEvent) {
         const activePageNo = store.getState().activePage.activePageNo;
         //페이지가 하나도 없으면 저장 못함
         if(activePageNo === -1) break;
-        
-        (document.querySelector(".saveButton") as HTMLElement).click();
+        if((document.querySelector(".save_drop_down") as HTMLElement) == null)
+          (document.querySelector(".saveButton") as HTMLElement).click();
         //1틱 뒤에 동작해야함
         setTimeout(()=>{
           const saveBtn = document.querySelector(".save_drop_down") as HTMLElement;
@@ -242,7 +242,7 @@ export default function KeyBoardShortCut(evt: KeyboardEvent) {
         break;
       }
       case "escape" : {
-        (document.querySelector("#drawer_hide_button") as HTMLElement).click();
+        (document.querySelector("#arrow-btn") as HTMLElement).click();
         
         break ;
       }
