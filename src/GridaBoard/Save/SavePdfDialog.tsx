@@ -35,9 +35,35 @@ const useStyles = makeStyles((theme) => {
       fontSize: 20,
       textAlign: "center",
     },
+    dialog : {
+      "& > div > div" : {
+        padding : "8px 0px"
+      }
+    },
+    dialogAction : {
+      paddingBottom : "15px",
+      position: "relative",
+      "& > span" : {
+        color: "red",
+        position: "absolute",
+        left: "0",
+        paddingLeft: "26px",
+        fontSize: "11px",
+        top: "13px",
+      }
+    },
     button: {
       border: "1px solid black",
-      margin: "auto"
+      "&:last-child" : {
+        marginRight : "14px"
+      }
+    },
+    warn : {
+      padding : "0 26px",
+      fontSize: "11px",
+      "&>span" : {
+        color:"red"
+      }
     }
   });
 });
@@ -51,6 +77,7 @@ const SavePdfDialog = (props: Props) => {
   const classes = useStyles();
 
   const [open, setOpen] = React.useState(false);
+  const [warnOpen, setWarnOpen] =  React.useState(false);
 
   let selectedName = '';
 
@@ -78,9 +105,12 @@ const SavePdfDialog = (props: Props) => {
 
   const handleSavePdf = () => {
     //공백과 .으로는 시작 할 수 없음
+    if(selectedName == ""){
+      return ;
+    }
     if(selectedName.search(/^[. ]/g) !== -1){
       //첫글자가 공백 혹은 .임
-      alert(getText("filename_cantStart"));
+      setWarnOpen(true);
       return ;
     }
     if(selectedName.search(/[^a-zA-Z0-9가-힇ㄱ-ㅎㅏ-ㅣぁ-ゔァ-ヴー々〆〤一-龥0-9.+_\- .]/g) !== -1){
@@ -95,7 +125,9 @@ const SavePdfDialog = (props: Props) => {
        * 
        * 이외의 것이 있을 경우 진입
        */
-      alert(getText("filename_onlyallowed"));
+      let text = getText("filename_onlyallowed");
+      text = text.replace("%[allow]", getText("filename_allow"));
+      alert(text);
       return ;
     }
 
@@ -107,6 +139,7 @@ const SavePdfDialog = (props: Props) => {
     setOpen(false);
     onReset();
   }
+  const warnText = getText("filename_onlyallowed").split("%[allow]");
 
   return (
     <div>
@@ -119,19 +152,23 @@ const SavePdfDialog = (props: Props) => {
           {getText("save_to_"+saveType)}
         </Button>
       {/* </GridaToolTip> */}
-      <Dialog open={open} onClose={handleDialogClose} aria-labelledby="form-dialog-title">
+      <Dialog className={classes.dialog} open={open} onClose={handleDialogClose} aria-labelledby="form-dialog-title">
         <DialogTitle id="form-dialog-title" className={classes.title}>
           <Box fontSize={20} fontWeight="fontWeightBold" className={classes.titleBox}>
           {getText("save_"+saveType+"_popup_title")}
           </Box>
         </DialogTitle>
         <PdfDialogTextArea saveType={saveType} onTextAreaChange={(name) => setName(name)}/>
-        <DialogActions>
+        <div className={classes.warn}>
+          {warnText[0]}<span>{getText("filename_allow")}</span>{warnText[1]}
+        </div>
+        <DialogActions className={classes.dialogAction}>
+          {warnOpen? <span>{getText("filename_cantStart")}</span> : ""}
           <Button onClick={handleSavePdf} variant="contained" color="primary" className={`${classes.button}`}>
-          {getText("save_"+saveType+"_popup_save")}
+            {getText("save_"+saveType+"_popup_save")}
           </Button>
           <Button onClick={handleDialogClose} variant="contained" className={classes.button}>
-          {getText("save_"+saveType+"_popup_cancel")}
+            {getText("save_"+saveType+"_popup_cancel")}
           </Button>
         </DialogActions>
       </Dialog>
