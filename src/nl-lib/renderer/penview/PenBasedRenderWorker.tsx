@@ -458,10 +458,8 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
     let platePdfRatio = wRatio
     if (hRatio > wRatio) platePdfRatio = hRatio
 
-    const zoom = store.getState().zoomReducer.zoom;
-
-    const pdf_x = dot.x * zoom * platePdfRatio;
-    const pdf_y = dot.y * zoom * platePdfRatio;
+    const pdf_x = dot.x * platePdfRatio;
+    const pdf_y = dot.y * platePdfRatio;
 
     return {x: pdf_x, y: pdf_y, f: dot.f};
   }

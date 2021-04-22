@@ -4,8 +4,11 @@ import { degrees, degreesToRadians, PDFDocument, rgb, StandardFonts } from 'pdf-
 import GridaDoc from "../GridaDoc";
 
 import { InkStorage } from "nl-lib/common/penstorage";
-import { drawPath } from "nl-lib/common/util";
+import { drawPath, isSamePage } from "nl-lib/common/util";
 import { fabric } from "fabric";
+import { PlateNcode_1, PlateNcode_2 } from "../../nl-lib/common/constants";
+import { adjustNoteItemMarginForFilm, getNPaperInfo } from "../../nl-lib/common/noteserver";
+import { store } from "../client/Root";
 
 const PDF_TO_SCREEN_SCALE = 6.72; // (56/600)*72
 
@@ -113,33 +116,66 @@ export async function savePDF(saveName: string) {
 
       const pointArray = [];
 
-      if (isPdf) {
+      const pageInfo = { section: NeoStrokes[j].section, owner: NeoStrokes[j].owner, book: NeoStrokes[j].book, page: NeoStrokes[j].page }
+      let isPlate = false;
+      if (isSamePage(PlateNcode_1, pageInfo) || isSamePage(PlateNcode_2, pageInfo)) {
+        isPlate = true;
+      }
+
+      if (isPlate) {
         for (let k = 0; k < dotArr.length; k++) {
+          const noteItem = getNPaperInfo(pageInfo); //plate의 item
+          adjustNoteItemMarginForFilm(noteItem, pageInfo);
+      
+          const currentPage = GridaDoc.getInstance().getPage(store.getState().activePage.activePageNo);
+      
+          const npaperWidth = noteItem.margin.Xmax - noteItem.margin.Xmin;
+          const npaperHeight = noteItem.margin.Ymax - noteItem.margin.Ymin;
+      
+          const pageWidth = currentPage.pageOverview.sizePu.width;
+          const pageHeight =currentPage.pageOverview.sizePu.height;
+      
+          const wRatio = pageWidth / npaperWidth;
+          const hRatio = pageHeight / npaperHeight;
+          let platePdfRatio = wRatio
+          if (hRatio > wRatio) platePdfRatio = hRatio
+      
           const dot = dotArr[k];
-          const nominator = g0 * dot.x + h0 * dot.y + 1;
-          const px = (a0 * dot.x + b0 * dot.y + c0) / nominator;
-          const py = (d0 * dot.x + e0 * dot.y + f0) / nominator;
-  
-          const pdf_xy = { x: px, y: py};
-  
-          pointArray.push({ x: pdf_xy.x, y: pdf_xy.y, f: dot.f });
+          const pdf_x = dot.x * platePdfRatio;
+          const pdf_y = dot.y * platePdfRatio;
+          
+          pointArray.push({ x: pdf_x, y: pdf_y, f: dot.f });
         }
         page.setRotation(degrees(rotation));
-
       } else {
-        for (let k = 0; k < dotArr.length; k++) {
-          const dot = dotArr[k];
-          // const pdf_xy = { x: dot.x * PDF_TO_SCREEN_SCALE, y: dot.y * PDF_TO_SCREEN_SCALE};
-          const nominator = g * dot.x + h * dot.y + 1;
-          const px = (a * dot.x + b * dot.y + c) / nominator;
-          const py = (d * dot.x + e * dot.y + f) / nominator;
-  
-          const pdf_xy = { x: px, y: py};
-  
-          pointArray.push({ x: pdf_xy.x, y: pdf_xy.y, f: dot.f });
+        if (isPdf) {
+          for (let k = 0; k < dotArr.length; k++) {
+            const dot = dotArr[k];
+            const nominator = g0 * dot.x + h0 * dot.y + 1;
+            const px = (a0 * dot.x + b0 * dot.y + c0) / nominator;
+            const py = (d0 * dot.x + e0 * dot.y + f0) / nominator;
+            
+            const pdf_xy = { x: px, y: py};
+            
+            pointArray.push({ x: pdf_xy.x, y: pdf_xy.y, f: dot.f });
+          }
+          page.setRotation(degrees(rotation));
+          
+        } else {
+          for (let k = 0; k < dotArr.length; k++) {
+            const dot = dotArr[k];
+            // const pdf_xy = { x: dot.x * PDF_TO_SCREEN_SCALE, y: dot.y * PDF_TO_SCREEN_SCALE};
+            const nominator = g * dot.x + h * dot.y + 1;
+            const px = (a * dot.x + b * dot.y + c) / nominator;
+            const py = (d * dot.x + e * dot.y + f) / nominator;
+            
+            const pdf_xy = { x: px, y: py};
+            
+            pointArray.push({ x: pdf_xy.x, y: pdf_xy.y, f: dot.f });
+          }
         }
       }
-      
+        
 
       let strokeThickness = thickness / 64;
       switch (brushType) {
