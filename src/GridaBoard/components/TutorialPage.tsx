@@ -10,8 +10,15 @@ import "slick-carousel/slick/slick-theme.css";
 import {ArrowBackIos, ArrowForwardIos} from '@material-ui/icons';
 
 
-const TUTORIAL_COUNT = 2;
+const TUTORIAL_COUNT = 3;
 const AUTO_PLAY_TIME = 10; // sec
+
+type SliderProps = {
+  imgSrcs? : Array<string>
+}
+type TutorialProps = {
+  dontShow?: ()=>void
+}
 
 const useStyle = props=> makeStyles(theme => ({
   main : {
@@ -151,19 +158,14 @@ const useStyle = props=> makeStyles(theme => ({
 
 
 let intervalCount = null as NodeJS.Timeout;
-
-const MySlider = (props)=>{
+const MySlider = (props: SliderProps)=>{
   const brZoom = useSelector((state: RootState) => state.ui.browser.zoom);
   const {imgSrcs } = props;
   const classes = useStyle({brZoom:brZoom})();
-  const imgNames = [
-    "test name1",
-    "test name2"
-  ];
-  let slider = null as Slider;
+  
+  let slider = null as any;
   let sliderDot = Array<HTMLDivElement>(imgSrcs.length);
-
-
+  
   const setDotInterval = (currentDotDiv)=>{
     const now = Date.now();
     clearInterval(intervalCount);
@@ -184,8 +186,7 @@ const MySlider = (props)=>{
       (el.querySelector("div:nth-child(3)") as HTMLDivElement).style.transform = "scaleX(0)";
     })
     const currentDotDiv = sliderDot[next].querySelector("div:nth-child(3)") as HTMLDivElement;
-    // currentDotDiv.style.transform = "scaleX(0)";
-    // console.log(sliderDot[current]);
+
     setDotInterval(currentDotDiv);
   }
 
@@ -205,8 +206,8 @@ const MySlider = (props)=>{
     slidesToScroll: 1,
     autoplay: true,
     autoplaySpeed: 1000 * AUTO_PLAY_TIME,
-    pauseOnHover: true,
-    pauseOnFocus : true,
+    pauseOnHover: false,
+    pauseOnFocus : false,
     nextArrow: nextArrow,
     prevArrow: prevArrow,
     beforeChange: beforeChange,
@@ -217,10 +218,21 @@ const MySlider = (props)=>{
   useEffect(() => {
     intervalCount = setDotInterval(sliderDot[0].querySelector("div:nth-child(3)") as HTMLDivElement);
   }, []);
+  const mouseOverStop=()=>{
+    slider.slickPause();
+    clearInterval(intervalCount);
+  }
+  const mouseUpStart = ()=> {
+    if(slider.innerSlider.state.autoplaying == "paused"){
+      slider.slickPlay();
+      
+      intervalCount = setDotInterval(sliderDot[slider.innerSlider.state.currentSlide].querySelector("div:nth-child(3)") as HTMLDivElement);
+    }
+  }
 
   return (
-    <Slider ref={(el)=>slider=el} {...sliderSettings} className={classes.slider}
-      appendDots= {(dots) => (
+    <Slider ref={e=>slider=e} {...sliderSettings} className={classes.slider} 
+      appendDots={(dots) => (
         <div
           style={{
             bottom: "-75px",
@@ -230,7 +242,7 @@ const MySlider = (props)=>{
           <ul className={classes.sliderDot}> {dots} </ul>
         </div>
       )}
-      customPaging= {i => (
+      customPaging={i => (
         <div ref={el=>{return sliderDot[i]=el}}>
           <div></div>
           <div />
@@ -239,13 +251,18 @@ const MySlider = (props)=>{
       )}>
       {
         imgSrcs.map((el, idx)=>(
-          <div key={idx} className={classes.sliderImg}><img src={el}/></div>
+          <div key={idx} className={classes.sliderImg}
+           onMouseDown={mouseOverStop}
+           onMouseUp={mouseUpStart}
+           onMouseOut={mouseUpStart}
+          >
+            <img src={el}/>
+          </div>
       ))}
     </Slider>);
 }
 
-
-const TutorialPageNew = (props) => {
+const TutorialPageNew = (props:TutorialProps) => {
   const brZoom = useSelector((state: RootState) => state.ui.browser.zoom);
   const {dontShow, ...rest} = props;
   console.log(brZoom);
@@ -268,10 +285,10 @@ const TutorialPageNew = (props) => {
         <MySlider imgSrcs={imgSrcs}/>
         <div> 
           <Button className={classes.buttonStyle} variant="contained" color="inherit" onClick={function(){window.open("about:blank").location.href="https://store.neosmartpen.com/goods/goods_list.php?cateCd=010007"}}>
-            제품 구매하러 가기
+            {getText("linkto_buyPen")}
           </Button>
           <Button className={classes.buttonStyle} variant="contained" color="primary" onClick={setClose} >
-            그리다보드 시작하기
+            {getText("start_grida")}
           </Button>
         </div>
       </div>
@@ -284,7 +301,8 @@ const TutorialPageNew = (props) => {
     </div>
   );
 }
-const TutorialPageOld = (props) => {
+
+const TutorialPageOld = (props:TutorialProps) => {
   const {dontShow, ...rest} = props;
   const imgName = `/tutorialImg/tutorial_${languageType}.png`;
   const brZoom = useSelector((state: RootState) => state.ui.browser.zoom);
