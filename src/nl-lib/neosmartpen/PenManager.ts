@@ -304,7 +304,9 @@ export default class PenManager {
   public onDisconnected = (opt: { pen: INeoSmartpen, event: IPenEvent }) => {
     const { pen } = opt;
     const btDeviceId = pen.getBtDevice().id;
-
+    if (_active_pen.getMac() === pen.getMac()) {
+      alert('펜 연결이 끊어졌습니다. \n펜 확인 후 다시 연결해주세요.');
+    }
     const index = this.penArray.findIndex(penInfo => penInfo.id === btDeviceId);
     if (index > -1) {
       this.penArray.splice(index, 1);
