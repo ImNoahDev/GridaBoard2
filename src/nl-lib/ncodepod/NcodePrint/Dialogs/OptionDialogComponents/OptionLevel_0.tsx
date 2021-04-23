@@ -27,7 +27,7 @@ export const cellRadioStyle = {
 };
 
 const lineBreak = 15;
-export function LineBreak(props) {
+export function LineBreak() {
   return (
     <TableRow style={{ height: `${lineBreak}px` }}>
       <TableCell style={cellRadioStyle}></TableCell>

@@ -143,7 +143,9 @@ export default function KeyBoardShortCut(evt: KeyboardEvent) {
           (document.querySelector(".saveButton") as HTMLElement).click();
         //1틱 뒤에 동작해야함
         setTimeout(()=>{
-          (document.querySelector(".save_drop_down") as HTMLElement).click();
+          const saveBtn = document.querySelector(".save_drop_down") as HTMLElement;
+          if(saveBtn !== null)
+            saveBtn.click();
         },0);
         break;
       }

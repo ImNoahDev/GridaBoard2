@@ -156,7 +156,6 @@ const useStyle = props=> makeStyles(theme => ({
   }
 }));
 
-
 let intervalCount = null as NodeJS.Timeout;
 const MySlider = (props: SliderProps)=>{
   const brZoom = useSelector((state: RootState) => state.ui.browser.zoom);
@@ -303,7 +302,7 @@ const TutorialPageNew = (props:TutorialProps) => {
 }
 
 const TutorialPageOld = (props:TutorialProps) => {
-  const {dontShow, ...rest} = props;
+  const {dontShow } = props;
   const imgName = `/tutorialImg/tutorial_${languageType}.png`;
   const brZoom = useSelector((state: RootState) => state.ui.browser.zoom);
   const classes = useStyle({brZoom:brZoom})();
@@ -315,7 +314,7 @@ const TutorialPageOld = (props:TutorialProps) => {
 
 
   return (
-    <div {...rest} className={classes.main} onClick={(evt)=>{
+    <div className={classes.main} onClick={(evt)=>{
       evt.preventDefault();
     }}>
       <div>

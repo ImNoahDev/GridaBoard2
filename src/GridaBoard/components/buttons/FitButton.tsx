@@ -70,7 +70,7 @@ export default function FitButton() {
       else if(selected == 1)
         delta = 100;
       
-      let newZoom = zoom * 0.9985 ** delta;
+      const newZoom = zoom * 0.9985 ** delta;
   
       setZoomStore(newZoom);
     }else{

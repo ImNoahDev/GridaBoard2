@@ -31,18 +31,13 @@
       var isEdge = userAgent.indexOf("Edge");
       var isIE = userAgent.indexOf("Trident"); // if (isEdge > -1 || isIE > -1) 
       // alert( isIE);
-      if (isIE > -1) {
+      if (isIE > -1 || isEdge > -1 || ver < 56) {
           alert("Please, use Google Chrome browser to use GridaBoard");
-          window.close();
-      }
-
-      if (isEdge > -1) {
-          alert("Please, use Google Chrome browser to use GridaBoard");
-          window.close();
-      }
-
-      if (ver < 56) {
-          alert("Please, use Google Chrome browser to use GridaBoard");
+          if(isIE > -1){
+            //IE일 경우, 이 함수를 통해 prompt 창을 안띄우고 강제로 종료시킬 수 있다.
+            //다른 브라우저에서 불가능한것으로 보임
+            window.open('', '_self', ''); 
+          }
           window.close();
       }
     </script>
@@ -66,16 +61,32 @@
     <!-- <input type="file" id="pdf_file_append" style="display:none;" name="pdf" accept="application/pdf" /> -->
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="root"></div>
+    
+    <!-- The core Firebase JS SDK is always required and must be listed first -->
+    <script src="https://www.gstatic.com/firebasejs/8.4.1/firebase-app.js"></script>
+
+    <!-- TODO: Add SDKs for Firebase products that you want to use
+        https://firebase.google.com/docs/web/setup#available-libraries -->
+    <script src="https://www.gstatic.com/firebasejs/8.4.1/firebase-analytics.js"></script>
+
+    <script>
+      // Your web app's Firebase configuration
+      // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+      var firebaseConfig = {
+        apiKey: "AIzaSyCQ7i4k-LLa4nEVv8zi9inyT7T68l0-1RI",
+        authDomain: "gridaboard-v2-test.firebaseapp.com",
+        projectId: "gridaboard-v2-test",
+        storageBucket: "gridaboard-v2-test.appspot.com",
+        messagingSenderId: "380346205591",
+        appId: "1:380346205591:web:d1148a041c72a385dcf0d2",
+        measurementId: "G-K6TXR3674W"
+      };
+      // Initialize Firebase
+      firebase.initializeApp(firebaseConfig);
+      firebase.analytics();
+    </script>
   </body>
-
-  <!-- The core Firebase JS SDK is always required and must be listed first -->
-  <script src="/__/firebase/8.3.0/firebase-app.js"></script>
-
-  <!-- TODO: Add SDKs for Firebase products that you want to use
-      https://firebase.google.com/docs/web/setup#available-libraries -->
-  <script src="/__/firebase/8.3.0/firebase-analytics.js"></script>
-
-  <!-- Initialize Firebase -->
-  <script src="/__/firebase/init.js"></script>
+  
+  
 
 </html>
