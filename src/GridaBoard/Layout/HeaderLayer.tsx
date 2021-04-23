@@ -21,6 +21,7 @@ import { NCODE_CLASS6_NUM_DOTS } from "nl-lib/common/constants";
 import { theme as myTheme } from "../styles/theme";
 import { CalibrationButton } from 'nl-lib/ncodepod';
 import CustomBadge from "../components/CustomElement/CustomBadge";
+import LogoSvg from "../logo.svg";
 
 const useStyles = props => makeStyles((theme) => ({
     buttonStyle : {
@@ -248,7 +249,7 @@ const HeaderLayer = (props: Props) => {
     <React.Fragment>
       <div id="header" className={`${classes.headerStyle}`}>
         <div >
-          <img src="grida_logo.png" className={classes.imgStyle}></img>
+          <img src={LogoSvg} className={classes.imgStyle}></img>
           <div>
             <ClickAwayListener onClickAway={handleClickSaveAway}>
               <div>
