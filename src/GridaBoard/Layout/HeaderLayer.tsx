@@ -155,12 +155,14 @@ const HeaderLayer = (props: Props) => {
   const makePdfUrl = async () => {
     const doc = GridaDoc.getInstance();
     const docPages = doc.pages;
+    let isPdfEdited = false;
 
     let pdfUrl, pdfDoc = undefined;
 
     for (const page of docPages) {
       if (page.pdf === undefined) {
         //ncode page일 경우
+        isPdfEdited = true; //여긴 무조건 pdf를 새로 만들어야 하는 상황
         if (pdfDoc === undefined) {
           pdfDoc = await PDFDocument.create();
         }
@@ -181,6 +183,8 @@ const HeaderLayer = (props: Props) => {
 
           if (pdfDoc !== undefined) {
             //ncode 페이지가 미리 생성돼서 그 뒤에다 붙여야하는 경우
+            isPdfEdited = true; //여기 들어오면 pdf가 여러개든지 pdf가 편집된 상황이다.
+
             const srcLen = pdfDocSrc.getPages().length;
             const totalPageArr = [];
             for (let i = 0; i < srcLen; i++) {
@@ -188,6 +192,7 @@ const HeaderLayer = (props: Props) => {
             }
 
             const copiedPages = await pdfDoc.copyPages(pdfDocSrc, totalPageArr);
+            
 
             for (const copiedPage of copiedPages) {
               await pdfDoc.addPage(copiedPage);
@@ -199,6 +204,11 @@ const HeaderLayer = (props: Props) => {
           continue;
         }
       }
+    }
+
+    if (!isPdfEdited) {
+      //pdf가 편집되지 않았으면 새로운 createObjectURL 할 필요 없음
+      return pdfUrl;
     }
 
     const pdfBytes = await pdfDoc.save();
