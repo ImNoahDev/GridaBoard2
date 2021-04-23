@@ -55,7 +55,7 @@ const useStyle = props => makeStyles(theme=>({
       duration: theme.transitions.duration.enteringScreen,
     }),
     marginLeft: "190px",
-  },
+  }
 }));
 
 const LeftSideLayer = () => {
