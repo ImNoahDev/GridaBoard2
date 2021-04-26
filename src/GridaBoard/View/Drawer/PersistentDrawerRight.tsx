@@ -141,31 +141,9 @@ export default function PersistentDrawerRight(props: Props) {
   // const [handleDrawerClose, setHandleDrawerClose] = React.useState(props.handleDrawerClose);
 
   // const [drawerWidth, setDrawerWidth] = React.useState(defaultDrawerWidth);
-  const drawerWidth = useSelector((state: RootState) => state.ui.drawer.width);
-  const setDrawerWidth = (width: number) => updateDrawerWidth({ width });
-
-
+  // const drawerWidth = useSelector((state: RootState) => state.ui.drawer.width);
+  // const setDrawerWidth = (width: number) => updateDrawerWidth({ width });
   useEffect(() => { setOpen(props.open); }, [props.open]);
-
-  const handleMouseDown = e => {
-    document.addEventListener("mouseup", handleMouseUp, true);
-    document.addEventListener("mousemove", handleMouseMove, true);
-  };
-
-  const handleMouseUp = () => {
-    document.removeEventListener("mouseup", handleMouseUp, true);
-    document.removeEventListener("mousemove", handleMouseMove, true);
-  };
-
-  const handleMouseMove = useCallback(e => {
-    const newWidth = document.body.offsetWidth - e.clientX;
-    // const newWidth = e.clientX - document.body.offsetLeft;
-    if (newWidth > minDrawerWidth && newWidth < maxDrawerWidth) {
-      setDrawerWidth(newWidth);
-      // g_drawerWidth = newWidth;
-      // props.onDrawerResize(newWidth);
-    }
-  }, []);
 
 
   return (
@@ -181,7 +159,6 @@ export default function PersistentDrawerRight(props: Props) {
       >
       {/* <Toolbar className={classes.customizeToolbar} /> */}
         <div id="drawer_content" className={classes.drawerContainer}>
-          <div onMouseDown={e => handleMouseDown(e)} className={classes.dragger} />
           < DrawerPages noInfo={props.noInfo} />
           <div className={classes.liner}></div>
           
