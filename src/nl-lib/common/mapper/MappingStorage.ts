@@ -150,10 +150,10 @@ export class MappingStorage {
     else {
       // 할당해야만 하는 경우
       if (!theBase) needToIssueBaseCode = true;
+      codeDelta += docNumPages;
       const nextCode = getNextNcodePage(this.nextIssuable, codeDelta);
       basePageInfo = { ...nextCode };
       baseCodeIssued = true;
-      codeDelta += docNumPages;
     }
 
 
