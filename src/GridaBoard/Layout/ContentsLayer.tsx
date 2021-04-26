@@ -27,7 +27,7 @@ const useStyle = props=>makeStyles(theme=>({
     flexDirection: "column"
   },
   sideEventer : {
-    position: "absolute",
+    position: "fixed",
     zIndex: 100,
     right: "0px",
     padding: "24px",
@@ -54,7 +54,7 @@ const useStyle = props=>makeStyles(theme=>({
     right: "24px",
     bottom: "24px",
     display: "flex",
-    position : "absolute",
+    position : "fixed",
     zIndex: 100,
     "& > button": {
       marginTop: "16px",
