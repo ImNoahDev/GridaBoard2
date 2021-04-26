@@ -132,8 +132,6 @@ const useStyle = props=> makeStyles(theme => ({
     display: "flex !important",
     justifyContent: "center"
   },
-  clear : {
-  },
   buttonStyle : {
     flexDirection: "row",
     alignItems: 'center',
@@ -152,6 +150,41 @@ const useStyle = props=> makeStyles(theme => ({
     },
     "&:first-child" : {
       marginRight: "15px"
+    }
+  },
+  title : {
+    "&>div:first-child": {
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      marginBottom: "20px",
+      "&>span" : {
+        padding: "8px 22px",
+        border: "2px solid " + theme.palette.primary.main,
+        height: "43px",
+        display: "flex",
+        alignItems: "center",
+        boxSizing: "border-box",
+        borderRadius: "56px",
+        letterSpacing: "0.25px",
+        color: theme.palette.primary.main,
+        fontFamily: "Roboto",
+        fontStyle: "normal",
+        fontWeight: "bold",
+        fontSize: "20px",
+        lineHeight: "23px",
+      }
+    },
+    "& > div:last-child":{
+      fontFamily: "Roboto",
+      fontStyle: "normal",
+      fontWeight: "bold",
+      fontSize: "40px",
+      lineHeight: "47px",
+      textAlign: "center",
+      letterSpacing: "0.25px",
+      color: theme.custom.icon.mono[4],
+      maxWidth: "561px",
     }
   }
 }));
@@ -279,6 +312,14 @@ const TutorialPageNew = (props:TutorialProps) => {
     }}>
       <div className={classes.mainSubNew}>
         <div>
+          {/* <div className={classes.title}>
+            <div>
+              <span>그리다보드 시/작/하/기</span>
+            </div>
+            <div>
+              스마트펜과 종이로 시작하는 쉽고 빠른 디지털 보드
+            </div>
+          </div> */}
           <img src={`/tutorialImg/${languageType}/tutorial_title_${languageType}.png`} />
         </div>
         <MySlider imgSrcs={imgSrcs}/>
