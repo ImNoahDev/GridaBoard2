@@ -107,9 +107,24 @@ export default class PenManager {
     pen.addEventListener(PenEventName.ON_DISCONNECTED, this.onDisconnected);
     pen.addEventListener(PenEventName.ON_PEN_PAGEINFO, this.onLivePenPageInfo);
 
+    // kitty
+    pen.addEventListener(PenEventName.ON_PEN_MOVE, this.onLivePenMove);
+    pen.addEventListener(PenEventName.ON_PEN_UP, this.onLivePenUp);
+
     return pen;
   }
 
+  
+  // kitty
+  onLivePenMove = (event: IPenToViewerEvent) => {
+    this.dispatcher.dispatch(PenEventName.ON_PEN_MOVE, event);
+  }
+
+    // kitty
+    onLivePenUp = (event: IPenToViewerEvent) => {
+      this.dispatcher.dispatch(PenEventName.ON_PEN_UP, event);
+    }
+  
   public createVirtualPen = (): INeoSmartpen => {
     const pen = new VirtualPen();
     this.add(pen, { id: pen.id, name: pen.name });

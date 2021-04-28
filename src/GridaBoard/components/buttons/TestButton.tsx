@@ -36,7 +36,10 @@ const TestButton = (props) => {
 
   return (
     <React.Fragment>
-        <Button className={classes.connectBtn} variant="contained" color="primary">
+        <Button 
+        {...props}
+        className={classes.connectBtn} variant="contained" color="primary"
+        >
           WhiteBoard Test
         </Button>
     </React.Fragment>
