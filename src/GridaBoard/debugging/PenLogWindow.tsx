@@ -30,8 +30,10 @@ export default function PenLogWindow(props) {
     const pg_str = makeNPageIdStr({ section, owner, book, page });
     const dot = e.dot;
 
+    const fw_ver = e.pen.protocolHandler.deviceInfo.firmwareVer;
+
     const time = new Date();
-    const time_str = `${time.toLocaleTimeString("en-US")} [${mac}]`;
+    const time_str = `${time.toLocaleTimeString("en-US")} [${mac}(${fw_ver})]`;
     const page_str = `${pg_str}`;
     const xy = `(${dot.x}, ${dot.y})`;
     // setLast(xy_str);
