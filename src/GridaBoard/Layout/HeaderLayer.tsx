@@ -22,6 +22,7 @@ import { theme as myTheme } from "../styles/theme";
 import { CalibrationButton } from 'nl-lib/ncodepod';
 import CustomBadge from "../components/CustomElement/CustomBadge";
 import LogoSvg from "../logo.svg";
+import TestButton from "../components/buttons/TestButton";
 
 const useStyles = props => makeStyles((theme) => ({
     buttonStyle : {
@@ -295,7 +296,10 @@ const HeaderLayer = (props: Props) => {
         </div>
 
         <div >
-
+          <div>
+            <TestButton className={`${classes.buttonStyle}`} />
+          </div>
+          
           <div>
             <ConnectButton className={`${classes.buttonStyle}`} onPenLinkChanged={e => onPenLinkChanged(e)} />
           </div>
