@@ -39,11 +39,18 @@ export default function PenLogWindow(props) {
 
     last_page = page_str;
     last_xy = xy;
+
+    log.unshift({ last_time: last_time + " __", last_page, last_xy });
+    setLog([...log]);
   }
 
   const onPenUp = (e) => {
-    log.unshift({ last_time, last_page, last_xy });
+    log.unshift({ last_time: last_time + " UP", last_page, last_xy });
     setLog([...log]);
+
+    last_time = "";
+    last_page = "";
+    last_xy = "";
   }
 
   if (props.open) {
@@ -54,7 +61,7 @@ export default function PenLogWindow(props) {
             return (
               // <div key={i} style={{ color: "#000" }}>
               <div key={i} style={{ alignContent: "flex-start" }}>
-                {v.last_time}:                 
+                {v.last_time}:
                 {v.last_page} /
                 <b>{v.last_xy}</b>
               </div>
