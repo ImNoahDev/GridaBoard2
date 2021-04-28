@@ -31,9 +31,10 @@ export default function PenLogWindow(props) {
     const dot = e.dot;
 
     const fw_ver = e.pen.protocolHandler.deviceInfo.firmwareVer;
-
+    const model_name = e.pen.protocolHandler.deviceInfo.modelName;
+    
     const time = new Date();
-    const time_str = `${time.toLocaleTimeString("en-US")} [${mac}(v${fw_ver})]`;
+    const time_str = `${time.toLocaleTimeString("en-US")} [${mac}] (${model_name} v${fw_ver}) `;
     const page_str = `${pg_str}`;
     const xy = `(${dot.x}, ${dot.y})`;
     // setLast(xy_str);
