@@ -5,14 +5,13 @@ import { makeNPageIdStr } from "../../nl-lib/common/util";
 import { PenManager } from "../../nl-lib/neosmartpen";
 
 
-const _pen_log = [] as string[];
+let move_log = [];
 let last_time = "";
 let last_page = "";
 let last_xy = "";
 export default function PenLogWindow(props) {
 
   const [log, setLog] = useState([]);
-  // const [last, setLast] = useState("");
 
   useEffect(() => {
     const pm = PenManager.getInstance();
@@ -23,6 +22,7 @@ export default function PenLogWindow(props) {
 
   const onPageInfo = (e) => {
     console.log(e);
+    move_log = [];
   }
 
   const onPenMove = (e) => {
@@ -40,8 +40,7 @@ export default function PenLogWindow(props) {
     last_page = page_str;
     last_xy = xy;
 
-    log.unshift({ last_time: last_time + " __", last_page, last_xy });
-    setLog([...log]);
+    move_log.unshift({ last_time: last_time + " __", last_page, last_xy });
   }
 
   const onPenUp = (e) => {
@@ -59,12 +58,27 @@ export default function PenLogWindow(props) {
         <div style={{ display: "flex", flexDirection: "column", width: "100%", height: "100%", zIndex: 999999, border: "1px solid black", backgroundColor: "#fff" }}>
           {log.map((v, i) => {
             return (
-              // <div key={i} style={{ color: "#000" }}>
-              <div key={i} style={{ alignContent: "flex-start" }}>
-                {v.last_time}:
-                {v.last_page} /
-                <b>{v.last_xy}</b>
-              </div>
+              <React.Fragment key={i}>
+                <div style={{ alignContent: "flex-start" }}>
+                  {v.last_time} {":"}
+                  {v.last_page} {"/"}
+                  <b>{v.last_xy}</b>
+                </div>
+                {i === 0 ?
+                  move_log.map((mv, mi) => {
+                    return (
+                      <React.Fragment key={mi}>
+                        <div style={{ alignContent: "flex-start" }}>
+                          {mv.last_time} {":"}
+                          {mv.last_page} {"/"}
+                          <b>{mv.last_xy}</b>
+                        </div>
+                      </React.Fragment>
+                    )
+                  })
+                  : ""
+                }
+              </React.Fragment>
             )
           })}
         </div>
