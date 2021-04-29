@@ -87,11 +87,13 @@ const ViewLayer = (props: Props) => {
     setDebugOpen(!debugOpen);
   }
 
+  const hiddenTest = true;
+
   return (
     <div className={classes.wrap}>
       <AppBar position="relative" color="transparent" elevation={0}> 
         <Collapse in={isView} className={classes.headerCollapse} timeout={0}>
-          <HeaderLayer {...props} handlePenLogWindow={handlePenLogWindow} />
+          <HeaderLayer {...props} handlePenLogWindow={handlePenLogWindow} hidden={hiddenTest}/>
           <NavLayer {...props} />
         </Collapse>
         <HeaderController /> {/** 사라지면 안되기 때문에 collapse에서 빠진다 */}
@@ -102,7 +104,7 @@ const ViewLayer = (props: Props) => {
         <LeftSideLayer {...props}/>
       </div>
 
-      <PenLogWindow open={debugOpen}/>
+      <PenLogWindow open={debugOpen} hidden={hiddenTest}/>
 
     </div>
   );

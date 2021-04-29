@@ -11,19 +11,21 @@ let last_page = "";
 let last_xy = "";
 
 export default function PenLogWindow(props) {
-
   const [log, setLog] = useState([]);
 
   useEffect(() => {
-    const pm = PenManager.getInstance();
-    pm.addEventListener(PenEventName.ON_PEN_PAGEINFO, onPageInfo);
-    pm.addEventListener(PenEventName.ON_PEN_MOVE, onPenMove);
-    pm.addEventListener(PenEventName.ON_PEN_UP, onPenUp);
+    if (!props.hidden) {
+      const pm = PenManager.getInstance();
+      pm.addEventListener(PenEventName.ON_PEN_PAGEINFO, onPageInfo);
+      pm.addEventListener(PenEventName.ON_PEN_MOVE, onPenMove);
+      pm.addEventListener(PenEventName.ON_PEN_UP, onPenUp);
+    }
   }, []);
 
   const onPageInfo = (e) => {
     console.log(e);
     move_log = [];
+    setLog([]);
   }
 
   const onPenMove = (e) => {
@@ -48,8 +50,8 @@ export default function PenLogWindow(props) {
   }
 
   const onPenUp = (e) => {
-    log.unshift({ last_time: last_time + " UP", last_page, last_xy });
-    setLog([...log]);
+    // log.unshift({ last_time: last_time + " UP", last_page, last_xy });
+    setLog([{ last_time: last_time + " UP", last_page, last_xy }]);
 
     last_time = "";
     last_page = "";
@@ -58,30 +60,23 @@ export default function PenLogWindow(props) {
 
   if (props.open) {
     return (
-        <div style={{ position: "absolute", right: 0, bottom: 0, width: 620, height: 500, zIndex: 999999, overflow: "auto", border: "1px solid black", backgroundColor: "#fff" }}>
-          <div style={{ display: "flex", flexDirection: "column", width: "100%", height: "100%", zIndex: 999999, border: "1px solid black", backgroundColor: "#fff" }}>
+        <div style={{ position: "absolute", right: 0, bottom: 0, width: 620, height: 500, zIndex: 999999, overflow: "auto", border: "1px solid black", backgroundColor: "#ffffff" }}>
+          <div style={{ display: "flex", flexDirection: "column", width: "100%", height: "100%", zIndex: 999999, backgroundColor: "#efccfa" }}>
             {log.map((v, i) => {
               return (
                 <React.Fragment key={i}>
                   <div style={{ alignContent: "flex-start" }}>
-                    {v.last_time} {":"}
-                    {v.last_page} {"/"}
-                    <b>{v.last_xy}</b>
+                    {v.last_time} {":"} {v.last_page} {"/"} <b>{v.last_xy}</b>
                   </div>
-                  {i === 0 ?
-                    move_log.map((mv, mi) => {
-                      return (
-                        <React.Fragment key={mi}>
-                          <div style={{ alignContent: "flex-start" }}>
-                            {mv.last_time} {":"}
-                            {mv.last_page} {"/"}
-                            <b>{mv.last_xy}</b>
-                          </div>
-                        </React.Fragment>
-                      )
-                    })
-                    : ""
-                  }
+                  {move_log.map((mv, mi) => {
+                    return (
+                      <React.Fragment key={mi}>
+                        <div style={{ alignContent: "flex-end" }}>
+                          {mv.last_time} {":"} {mv.last_page} {"/"} <b>{mv.last_xy}</b>
+                        </div>
+                      </React.Fragment>
+                    )
+                  })}
                 </React.Fragment>
               )
             })}

@@ -145,7 +145,8 @@ const printOption = g_defaultPrintOption;
 
 interface Props {
   handlePdfOpen: (event: IFileBrowserReturn) => void,
-  handlePenLogWindow: () => void;
+  handlePenLogWindow: () => void,
+  hidden: boolean
 }
 
 const HeaderLayer = (props: Props) => {
@@ -302,7 +303,7 @@ const HeaderLayer = (props: Props) => {
           <CalibrationButton className={`${classes.buttonStyle}  ${classes.calibration}`} filename={pdfFilename} handlePdfUrl={makePdfUrl} />
 
           <div>
-            <TestButton className={`${classes.buttonStyle}`} onClick={(e) => handlePenLogWindow()} hidden={false}/>
+            <TestButton className={`${classes.buttonStyle}`} onClick={(e) => handlePenLogWindow()} hidden={props.hidden}/>
           </div>
         </div>
 
