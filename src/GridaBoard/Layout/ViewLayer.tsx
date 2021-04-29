@@ -69,6 +69,7 @@ const useStyles = makeStyles((theme) => {
 const ViewLayer = (props: Props) => {
   const classes = useStyles();
   const [isView, setHeaderView] = useState(true); //헤더 뷰
+  const [debugOpen, setDebugOpen] = useState(false);
 
   //헤더 감추기 버튼
   const HeaderController = ()=>{
@@ -82,25 +83,18 @@ const ViewLayer = (props: Props) => {
     </div>);
   }
 
-
-  const [debugOpen, setDebugOpen] = useState(false);
-
+  const handlePenLogWindow = () => {
+    setDebugOpen(!debugOpen);
+  }
 
   return (
     <div className={classes.wrap}>
       <AppBar position="relative" color="transparent" elevation={0}> 
         <Collapse in={isView} className={classes.headerCollapse} timeout={0}>
-          <HeaderLayer {...props}/>
+          <HeaderLayer {...props} handlePenLogWindow={handlePenLogWindow} />
           <NavLayer {...props} />
         </Collapse>
         <HeaderController /> {/** 사라지면 안되기 때문에 collapse에서 빠진다 */}
-
-        <div>
-            <TestButton 
-              onClick={(e) => setDebugOpen(!debugOpen)}
-            />
-
-          </div>
 
       </AppBar>
       <div className={classes.main}>
@@ -108,7 +102,7 @@ const ViewLayer = (props: Props) => {
         <LeftSideLayer {...props}/>
       </div>
 
-      <PenLogWindow open={debugOpen} />
+      <PenLogWindow open={debugOpen}/>
 
     </div>
   );
