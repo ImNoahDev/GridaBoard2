@@ -196,7 +196,7 @@ const MySlider = (props: SliderProps)=>{
   const classes = useStyle({brZoom:brZoom})();
   
   let slider = null as any;
-  let sliderDot = Array<HTMLDivElement>(imgSrcs.length);
+  const sliderDot = Array<HTMLDivElement>(imgSrcs.length);
   
   const setDotInterval = (currentDotDiv)=>{
     const now = Date.now();

@@ -170,7 +170,7 @@ export default class GridaDoc {
       //pageNo 와 pageInfo의 page 는 여기서 관리하는 순서와 같음
       nowPage._pageNo -= 1;
       // nowPage.pageInfos[0].page -= 1;
-      if(pages.fingerprint === nowPage.fingerprint){
+      if(pages.fingerprint !== undefined && pages.fingerprint === nowPage.fingerprint){
         //같은 pdf의 경우에만 pdfPageNo또한 변경해주어야 한다
         nowPage._pdfPageNo -= 1;
       }
@@ -179,8 +179,10 @@ export default class GridaDoc {
     //스트로크 데이터 삭제
     InkStorage.getInstance().removePage(pages.pageInfos[0]);
     //맴핑 데이터 삭제
-    const msi = MappingStorage.getInstance();
-    msi.removeNcodeByPage(changedPdf.fingerprint, page);
+    if(changedPdf !== undefined){
+      const msi = MappingStorage.getInstance();
+      msi.removeNcodeByPage(changedPdf.fingerprint, page);
+    }
 
 
     //마지막 페이지를 보고 있을때 이전 페이지 보여주기    
