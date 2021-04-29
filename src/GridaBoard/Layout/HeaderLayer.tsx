@@ -169,8 +169,9 @@ const HeaderLayer = (props: Props) => {
         if (pdfDoc === undefined) {
           pdfDoc = await PDFDocument.create();
         }
-
-        const pdfPage = await pdfDoc.addPage();
+        const pageWidth = page.pageOverview.sizePu.width;
+        const pageHeight = page.pageOverview.sizePu.height;
+        const pdfPage = await pdfDoc.addPage([pageWidth, pageHeight]);
         if (page._rotation === 90 || page._rotation === 270) {
           const tmpWidth = pdfPage.getWidth();
           pdfPage.setWidth(pdfPage.getHeight());
