@@ -35,7 +35,7 @@ export class NeoPdfDocument {
   _pdfDoc: PdfJs.PDFDocumentProxy;
 
   // _ready: PdfJs.PDFLoadingTask<PdfJs.PDFDocumentProxy>;
-  removedPage : number[];
+  removedPage ?: number[] = [];
 
   _uuid: string;
 
