@@ -72,6 +72,16 @@ export async function saveGrida(gridaName: string) {
         pdfUrl = page.pdf.url;
         const existingPdfBytes = await fetch(page.pdf.url).then(res => res.arrayBuffer());
         const pdfDocSrc = await PDFDocument.load(existingPdfBytes);
+        page.pdf.removedPage.forEach(el => {
+          pdfDocSrc.removePage(el);
+        });
+        /******************* pdfDoc에서 remove를 할경우
+         * pageCache에 값이 변하지 않아서 아래 getPages에서 기존의 개수가 그대로 나온다.
+         * pageCache는 원래 직접접근 하면 안되는 privite 이지만, 강제로 value를 업데이트 해준다
+         * 직접 접근 이외의 방법으로 업데이트가 가능하거나(현재 못찾음)
+         * pdf-lib가 업데이트 되어 필요없다면 삭제 필요
+         */
+        (pdfDocSrc as any).pageCache.value = (pdfDocSrc as any).pageCache.populate();
 
         if (pdfDoc !== undefined) {
           //ncode 페이지가 미리 생성돼서 그 뒤에다 붙여야하는 경우

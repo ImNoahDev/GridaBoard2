@@ -35,6 +35,7 @@ export class NeoPdfDocument {
   _pdfDoc: PdfJs.PDFDocumentProxy;
 
   // _ready: PdfJs.PDFLoadingTask<PdfJs.PDFDocumentProxy>;
+  removedPage : number[];
 
   _uuid: string;
 
@@ -90,6 +91,7 @@ export class NeoPdfDocument {
     this._fingerprint = pdfDoc.fingerprint;
     this._numPages = pdfDoc.numPages;
     this._pdfDoc = pdfDoc;
+    this.removedPage = [];
     _doc_fingerprint = pdfDoc.fingerprint;
 
     // page를 로드한다
@@ -106,6 +108,16 @@ export class NeoPdfDocument {
     }
 
     return undefined;
+  }
+  deletePage = async (pageNo:number)=>{
+    this._pages.splice(pageNo,1);
+    this._pagesOverview.splice(pageNo,1);
+    this._numPages -= 1;
+    
+    for(let i = pageNo; i < this._numPages; i++){
+      this._pages[0].pageNo -= 1;
+    }
+    this.removedPage.push(pageNo);
   }
 
   gridaLoad = async (options: IPdfOpenOption, gridaStruct: any, neoStroke: any) => {

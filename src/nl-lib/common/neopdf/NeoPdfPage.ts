@@ -56,6 +56,8 @@ export class NeoPdfPage {
   private _pageNo: number;
 
   get pageNo() { return this._pageNo }
+  
+  set pageNo(pageNo : number) { this._pageNo = pageNo; }
 
   _doc: NeoPdfDocument;
 

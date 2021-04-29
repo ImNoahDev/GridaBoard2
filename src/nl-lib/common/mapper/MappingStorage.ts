@@ -323,6 +323,7 @@ export class MappingStorage {
         filename: undefined as string,
         fingerprint: undefined as string,
         numPages: undefined as number,
+        pdfParams: undefined as IPageMapItem[],
 
         pdfPageNo: undefined as number,
         pagesPerSheet: undefined as number,
@@ -358,22 +359,26 @@ export class MappingStorage {
     // 2) Mapping된 PDF 페이지인지 확인한다.
     const pdfItem = this.findPdfPage({ ...pageInfo, x: 10, y: 10 });
     if (pdfItem) {
-      const pageMap = pdfItem.pageMapping;
-      ret.h = pageMap.h;
-      ret.type = "pod";
-      ret.pageInfo = pageMap.pageInfo;
-      ret.basePageInfo = pageMap.basePageInfo;
-
-      ret.pdf = {
-        url: pdfItem.pdf.url,
-        filename: pdfItem.pdf.filename,
-        fingerprint: pdfItem.pdf.fingerprint,
-        numPages: pdfItem.pdf.numPages,
-
-        pdfPageNo: pageMap.pdfPageNo,
-        pagesPerSheet: pdfItem.pdf.pagesPerSheet,
+      //pageMapping이 없으면 삭제된 페이지일것
+      if(pdfItem.pageMapping !== undefined){
+        const pageMap = pdfItem.pageMapping;
+        ret.h = pageMap.h;
+        ret.type = "pod";
+        ret.pageInfo = pageMap.pageInfo;
+        ret.basePageInfo = pageMap.basePageInfo;
+  
+        ret.pdf = {
+          url: pdfItem.pdf.url,
+          filename: pdfItem.pdf.filename,
+          fingerprint: pdfItem.pdf.fingerprint,
+          numPages: pdfItem.pdf.numPages,
+          pdfParams: pdfItem.pdf.params,
+  
+          pdfPageNo: pageMap.pdfPageNo,
+          pagesPerSheet: pdfItem.pdf.pagesPerSheet,
+        }
+        return ret;
       }
-      return ret;
     }
 
 
@@ -489,7 +494,17 @@ export class MappingStorage {
     this.storeMappingInfo();
     if (_debug) this.dump("mapping");
   }
+  public removeNcodeByPage = (fingerprint:string ,pageNo : number) => {
+    const mapData = this._data.arrDocMap.filter(m => fingerprint === m.fingerprint);
 
+    mapData.forEach(el=>{
+        el.params.splice(pageNo,1);
+        el.numPages -= 1;
+    });
+
+    //데이터 저장
+    this.storeMappingInfo();
+  }
   public getCloudData() {
     cloud_util_func.readMappingInfo();
   }

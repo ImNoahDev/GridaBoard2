@@ -80,6 +80,8 @@ const LeftSideLayer = () => {
   let disabled = true;
   if (activePageNo_store !== -1) {
     disabled = false;
+  }else if(drawerOpen){
+    setDrawerOpen(false);
   }
   
   return (

@@ -90,7 +90,7 @@ export default class GridaPage {
   // 여기까지
 
   get pageOverview() {
-    if (this._pdf) {
+    if (this._pdf && this._pdf.pagesOverview[this._pdfPageNo - 1]) {
       this._pdf.pagesOverview[this._pdfPageNo - 1].rotation = this._rotation;
       return this._pdf.pagesOverview[this._pdfPageNo - 1];
     }

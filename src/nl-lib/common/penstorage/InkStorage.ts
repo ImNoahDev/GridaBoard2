@@ -100,6 +100,15 @@ export default class InkStorage {
 
     return [];
   }
+  public removePage(pageInfo: IPageSOBP) {
+    const { section, owner, book, page } = pageInfo;
+    const pageId = InkStorage.makeNPageIdStr({ section, owner, book, page });
+    const completed = this.completedOnPage;
+
+    //지울 페이지 지우기
+    completed.delete(pageId);
+
+  }
 
   public removeStrokeFromPage(pageInfo: IPageSOBP) {
     const { section, owner, book, page } = pageInfo;
@@ -162,6 +171,7 @@ export default class InkStorage {
     let pageId = InkStorage.makeNPageIdStr({ section, owner, book, page });
 
     const activePageNo = store.getState().activePage.activePageNo;
+    console.log(activePageNo);
     if (activePageNo === -1) {
       alert(getText("alert_needPage"));
       return;

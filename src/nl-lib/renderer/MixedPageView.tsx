@@ -660,6 +660,7 @@ class MixedPageView_module extends React.Component<MixedViewProps, State>  {
             parentName={this.props.parentName}
             basePageInfo={this.props.basePageInfo}
             pdfPageNo={this._internal.pdfPageNo}
+            pdfNumPages={this._internal.pdf !== undefined? this._internal.pdf.numPages : 0}
             viewSize={{ ...{ width: this._internal.width, height: this._internal.height } }}
             isBlankPage={isBlankPage}
           />
