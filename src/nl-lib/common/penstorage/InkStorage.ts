@@ -7,6 +7,7 @@ import intersect from 'path-intersection';
 import { store } from "GridaBoard/client/Root";
 import GridaDoc from "GridaBoard/GridaDoc";
 import getText from "GridaBoard/language/language";
+import { isPlatePaper, isPUI } from "../noteserver";
 
 /** @type {InkStorage} */
 let _storage_instance = null;
@@ -168,12 +169,14 @@ export default class InkStorage {
    */
   private addCompletedToPage(stroke: NeoStroke) {
     const { section, owner, book, page } = stroke;
+    const pageInfo = { section, owner, book, page }
     let pageId = InkStorage.makeNPageIdStr({ section, owner, book, page });
 
     const activePageNo = store.getState().activePage.activePageNo;
-    console.log(activePageNo);
-    if (activePageNo === -1) {
-      alert(getText("alert_needPage"));
+    if ((isPlatePaper(pageInfo) || isPUI(pageInfo)) && activePageNo === -1) {
+      if (isPlatePaper(pageInfo)) {
+        alert(getText("alert_needPage"));
+      }
       return;
     }
     const basePageInfo = GridaDoc.getInstance().getPage(activePageNo).basePageInfo;
