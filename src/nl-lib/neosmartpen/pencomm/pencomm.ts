@@ -76,6 +76,8 @@ export default class PenComm extends ProtocolHandlerBase {
     /** @type {number} */
     protocolVer: 100, // 1.00 ==> 100
 
+    firmwareVer: "",
+
     /** @type {DeviceTypeEnum} */
     deviceType: DeviceTypeEnum.NONE,
 
@@ -297,11 +299,20 @@ export default class PenComm extends ProtocolHandlerBase {
     }
     const modelNameString = String.fromCharCode.apply(null, modelNameArry);
 
+
+    const firmwareVersionArry = []; //NWP-F30 ~ NWP-F121HL
+    for (let i = 21; i < 37; i++) {
+      if (buf[i] > 0) firmwareVersionArry.push(buf[i] & 0xff);
+    }
+    const firmwareVersionString = String.fromCharCode.apply(null, firmwareVersionArry);
+
+
     const protocolVer = (buf[37] - 0x30) * 100 + (buf[39] - 0x30) * 10 + (buf[40] - 0x30);
     console.log(`    BT protocol #1 <- connection result: ${Errcode} ${protocolVer}`);
 
     this.deviceInfo.modelName = modelNameString;
     this.deviceInfo.protocolVer = protocolVer;
+    this.deviceInfo.firmwareVer = firmwareVersionString;
     // this.deviceInfo.mac = intFromBytes(buf, 63, 6).toString(16).toUpperCase();
     this.deviceInfo.mac = decimalToHex(buf[63], 2) + ":" +
       decimalToHex(buf[64], 2) + ":" +

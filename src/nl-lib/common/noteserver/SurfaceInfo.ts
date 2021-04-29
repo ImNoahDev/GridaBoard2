@@ -19,7 +19,14 @@ export function isPlatePaper(pageInfo: IPageSOBP): boolean {
   return false;
 }
 
-
+export function isWhiteBoard(pageInfo: IPageSOBP): boolean {
+  const {section, owner, book} = pageInfo;
+  if (section === 14 && owner === 27 && book === 1) {
+    return true;
+  }
+  
+  return false;
+}
 
 /**
  *

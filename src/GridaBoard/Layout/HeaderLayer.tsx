@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Button, Popover, SvgIcon, makeStyles, ClickAwayListener} from "@material-ui/core";
+import { Button, Popover, SvgIcon, makeStyles, ClickAwayListener } from "@material-ui/core";
 import KeyboardArrowDownRoundedIcon from '@material-ui/icons/KeyboardArrowDownRounded';
 import { saveGrida } from "../Save/SaveGrida";
 // import LoadGrida from "../Load/LoadGrida";
@@ -22,120 +22,122 @@ import { theme as myTheme } from "../styles/theme";
 import { CalibrationButton } from 'nl-lib/ncodepod';
 import CustomBadge from "../components/CustomElement/CustomBadge";
 import LogoSvg from "../logo.svg";
+import TestButton from "../components/buttons/TestButton";
+import PenLogWindow from "../debugging/PenLogWindow";
 
 const useStyles = props => makeStyles((theme) => ({
-    buttonStyle : {
-      padding: 0,
-      minWidth: "0px",
-      minHeight: "0px"
-    },
-    calibration : {
-      background: theme.custom.white[50],
-      border: "1px solid #CFCFCF",
-      boxSizing: "border-box",
-      borderRadius: "4px",
-      fontSize: "12px",
-      fontFamily: "Roboto",
-      padding : "8px",
-      textTransform: 'none'
-    },
-    buttonFontStyle : {
-      minWidth: "0px",
-      fontFamily: "Roboto",
-      fontStyle: "normal",
-      fontWeight: 600,
-      lineHeight: "16.41px",
-      fontSize: "14px",
-      textAlign: "right",
-      letterSpacing: "0.25px",
-      color: theme.palette.text.primary,
-      "&:hover": {
-        color: theme.palette.action.hover,
-        fontWeight: 700
-      }
-    },
-    saveDropdownStyle : {
-      display: "flex",
-      flexDirection: "column",
-      alignItems: "flex-start",
-      padding: "8px",
-      position: "absolute",
-      background: theme.custom.icon.mono[4],
-      boxShadow: theme.custom.shadows[0],
-      borderRadius: "12px",
-      zIndex: 10000,
-      marginTop: "21px",
-      marginLeft: "-1px"
-    },
-    headerStyle : {
-      display: "flex",
-      zIndex: 2,
-      position: "relative",
-      flexDirection: "row",
-      justifyContent: "space-between",
-      alignItems: "center",
-      flexWrap: "wrap",
-      height: "72px",
-      zoom: 1 / props.brZoom,
-      backdropFilter: "blur(4px)",
-      "& > div":{
-        display: "flex",
-        flexDirection: "row",
-        justifyContent: "flex-start",
-        alignItems: "center",
-        margin: "0 24px"
-      },
-      "& > div > div" : {
-        display: "flex",
-        flexDirection: "row",
-        justifyContent: "flex-start",
-        alignItems: "center",
-      } ,
-      "& > div:first-child > div" : {
-        margin: "0 24px",
-        padding: "10px"
-      } ,
-      "& > div:last-child > div" : {
-        marginLeft: "16px"
-      } ,
-      "& > div > div > div" : {
-        display:"flex",
-        marginRight : "24px"
-      },
-      "& > div > div > div:last-child" : {
-        marginRight : "0px"
-      }
-    },
-    headerLineV : {
-      width: "1px",
-      height: "15px",
-      background: theme.custom.icon.mono[3]
-    },
-    changeUrlStyle : {
-      justifyContent: "center",
-      background: theme.custom.white[50],
-      border: "1px solid #CFCFCF",
-      boxSizing: "border-box",
-      borderRadius: "4px",
-      overflow: "hidden",
-      textOverflow: "ellipsis",
-      whiteSpace: "nowrap",
-      padding: "3px",
-      "& > span": {
-        fontSize: "12px",
-        lineHeight: "14px",
-        padding: "5px",
-        fontWeight:500
-      }
-    },
-    imgStyle: {
-      borderRadius: "8px"
-    },
-    badge: {
-      background: theme.custom.icon.mono[1],
-      color : theme.custom.icon.mono[4]
+  buttonStyle: {
+    padding: 0,
+    minWidth: "0px",
+    minHeight: "0px"
+  },
+  calibration: {
+    background: theme.custom.white[50],
+    border: "1px solid #CFCFCF",
+    boxSizing: "border-box",
+    borderRadius: "4px",
+    fontSize: "12px",
+    fontFamily: "Roboto",
+    padding: "8px",
+    textTransform: 'none'
+  },
+  buttonFontStyle: {
+    minWidth: "0px",
+    fontFamily: "Roboto",
+    fontStyle: "normal",
+    fontWeight: 600,
+    lineHeight: "16.41px",
+    fontSize: "14px",
+    textAlign: "right",
+    letterSpacing: "0.25px",
+    color: theme.palette.text.primary,
+    "&:hover": {
+      color: theme.palette.action.hover,
+      fontWeight: 700
     }
-  }));
+  },
+  saveDropdownStyle: {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "flex-start",
+    padding: "8px",
+    position: "absolute",
+    background: theme.custom.icon.mono[4],
+    boxShadow: theme.custom.shadows[0],
+    borderRadius: "12px",
+    zIndex: 10000,
+    marginTop: "21px",
+    marginLeft: "-1px"
+  },
+  headerStyle: {
+    display: "flex",
+    zIndex: 2,
+    position: "relative",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    flexWrap: "wrap",
+    height: "72px",
+    zoom: 1 / props.brZoom,
+    backdropFilter: "blur(4px)",
+    "& > div": {
+      display: "flex",
+      flexDirection: "row",
+      justifyContent: "flex-start",
+      alignItems: "center",
+      margin: "0 24px"
+    },
+    "& > div > div": {
+      display: "flex",
+      flexDirection: "row",
+      justifyContent: "flex-start",
+      alignItems: "center",
+    },
+    "& > div:first-child > div": {
+      margin: "0 24px",
+      padding: "10px"
+    },
+    "& > div:last-child > div": {
+      marginLeft: "16px"
+    },
+    "& > div > div > div": {
+      display: "flex",
+      marginRight: "24px"
+    },
+    "& > div > div > div:last-child": {
+      marginRight: "0px"
+    }
+  },
+  headerLineV: {
+    width: "1px",
+    height: "15px",
+    background: theme.custom.icon.mono[3]
+  },
+  changeUrlStyle: {
+    justifyContent: "center",
+    background: theme.custom.white[50],
+    border: "1px solid #CFCFCF",
+    boxSizing: "border-box",
+    borderRadius: "4px",
+    overflow: "hidden",
+    textOverflow: "ellipsis",
+    whiteSpace: "nowrap",
+    padding: "3px",
+    "& > span": {
+      fontSize: "12px",
+      lineHeight: "14px",
+      padding: "5px",
+      fontWeight: 500
+    }
+  },
+  imgStyle: {
+    borderRadius: "8px"
+  },
+  badge: {
+    background: theme.custom.icon.mono[1],
+    color: theme.custom.icon.mono[4]
+  }
+}));
 
 
 const printBtnId = "printTestButton";
@@ -152,7 +154,7 @@ const HeaderLayer = (props: Props) => {
   const [pdfUrl, setPdfUrl] = useState(undefined as string);
   const [pdfFilename, setPdfFilename] = useState(undefined as string);
 
-  
+
   const makePdfUrl = async () => {
     const doc = GridaDoc.getInstance();
     const docPages = doc.pages;
@@ -193,7 +195,7 @@ const HeaderLayer = (props: Props) => {
             }
 
             const copiedPages = await pdfDoc.copyPages(pdfDocSrc, totalPageArr);
-            
+
 
             for (const copiedPage of copiedPages) {
               await pdfDoc.addPage(copiedPage);
@@ -230,9 +232,9 @@ const HeaderLayer = (props: Props) => {
   const brZoom = useSelector((state: RootState) => state.ui.browser.zoom);
   const badgeInVisible = !useSelector((state: RootState) => state.ui.shotcut.show);
 
-  const classes = useStyles({brZoom})();
+  const classes = useStyles({ brZoom })();
 
-  const HeaderLine = ()=>{
+  const HeaderLine = () => {
     return (<div className={classes.headerLineV} />);
   }
 
@@ -249,11 +251,12 @@ const HeaderLayer = (props: Props) => {
   function handleClickSave() {
     setIsSaveOpen((prev) => !prev);
   }
-  function handleClickSaveAway(){
+  function handleClickSaveAway() {
     setIsSaveOpen(false);
   }
 
-  
+
+  const [debugOpen, setDebugOpen] = useState(false);
 
   return (
     <React.Fragment>
@@ -263,31 +266,31 @@ const HeaderLayer = (props: Props) => {
           <div>
             <ClickAwayListener onClickAway={handleClickSaveAway}>
               <div>
-                  <CustomBadge badgeContent={`S`}>
-                    <Button className={`${classes.buttonStyle} ${classes.buttonFontStyle} saveButton`}  onClick={handleClickSave} disabled={disabled}>
-                      {getText("save_file")}
-                    </Button>
-                  </CustomBadge>
-                  {isSaveOpen ? (
-                    <div className={`${classes.saveDropdownStyle}`} >
-                      <SavePdfDialog saveType="pdf"/> 
-                      <SavePdfDialog saveType="grida"/>
-                    </div>
-                  ) : null}
+                <CustomBadge badgeContent={`S`}>
+                  <Button className={`${classes.buttonStyle} ${classes.buttonFontStyle} saveButton`} onClick={handleClickSave} disabled={disabled}>
+                    {getText("save_file")}
+                  </Button>
+                </CustomBadge>
+                {isSaveOpen ? (
+                  <div className={`${classes.saveDropdownStyle}`} >
+                    <SavePdfDialog saveType="pdf" />
+                    <SavePdfDialog saveType="grida" />
+                  </div>
+                ) : null}
               </div>
             </ClickAwayListener>
             <div>
               <CustomBadge badgeContent={`Ctrl-O`}>
-                <ConvertFileLoad className={`loadDropDown ${classes.buttonStyle} ${classes.buttonFontStyle}`}  handlePdfOpen={handlePdfOpen}/>
+                <ConvertFileLoad className={`loadDropDown ${classes.buttonStyle} ${classes.buttonFontStyle}`} handlePdfOpen={handlePdfOpen} />
               </CustomBadge>
             </div>
             <div>
               <CustomBadge badgeContent={`P`}>
                 <PrintNcodedPdfButton id="printBtn"
-                className={` ${classes.buttonStyle}  ${classes.buttonFontStyle}`}
-                handkeTurnOnAppShortCutKey={turnOnGlobalKeyShortCut}
-                
-                url={pdfUrl} filename={pdfFilename} handlePdfUrl={makePdfUrl} disabled={disabled} />
+                  className={` ${classes.buttonStyle}  ${classes.buttonFontStyle}`}
+                  handkeTurnOnAppShortCutKey={turnOnGlobalKeyShortCut}
+
+                  url={pdfUrl} filename={pdfFilename} handlePdfUrl={makePdfUrl} disabled={disabled} />
               </CustomBadge>
             </div>
           </div>
@@ -302,7 +305,6 @@ const HeaderLayer = (props: Props) => {
           {/* <HeaderLine />
           
           <InformationBtn /> */}
-
           <HeaderLine />
           <div>
             <Button href="https://gridaboard-v1-30576.web.app/" className={`${classes.buttonStyle} ${classes.changeUrlStyle}`}>
@@ -313,9 +315,11 @@ const HeaderLayer = (props: Props) => {
           <KeyboardArrowDownRoundedIcon /> */}
         </div>
 
-
+    
       </div>
-      <div style={{ height: "1px", background: "rgba(255,255,255,1)", zoom: 1 / brZoom }}></div>
+      <div style={{ height: "1px", background: "rgba(255,255,255,1)", zoom: 1 / brZoom }}>
+     
+      </div>
     </React.Fragment>
   );
 }

@@ -6,6 +6,8 @@ import ContentsLayer from "./ContentsLayer";
 import { ButtonProps, AppBar, makeStyles, Collapse, Button, IconButton } from "@material-ui/core";
 import { IFileBrowserReturn } from "nl-lib/common/structures";
 import {ArrowDropDown, ArrowDropUp} from '@material-ui/icons';
+import PenLogWindow from "../debugging/PenLogWindow";
+import TestButton from "../components/buttons/TestButton";
  
 /**
  *
@@ -81,6 +83,9 @@ const ViewLayer = (props: Props) => {
   }
 
 
+  const [debugOpen, setDebugOpen] = useState(false);
+
+
   return (
     <div className={classes.wrap}>
       <AppBar position="relative" color="transparent" elevation={0}> 
@@ -89,11 +94,22 @@ const ViewLayer = (props: Props) => {
           <NavLayer {...props} />
         </Collapse>
         <HeaderController /> {/** 사라지면 안되기 때문에 collapse에서 빠진다 */}
+
+        <div>
+            <TestButton 
+              onClick={(e) => setDebugOpen(!debugOpen)}
+            />
+
+          </div>
+
       </AppBar>
       <div className={classes.main}>
         <ContentsLayer {...props}/>
         <LeftSideLayer {...props}/>
       </div>
+
+      <PenLogWindow open={debugOpen} />
+
     </div>
   );
 }
