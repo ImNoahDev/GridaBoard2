@@ -9,6 +9,7 @@ let move_log = [];
 let last_time = "";
 let last_page = "";
 let last_xy = "";
+
 export default function PenLogWindow(props) {
 
   const [log, setLog] = useState([]);
@@ -57,35 +58,35 @@ export default function PenLogWindow(props) {
 
   if (props.open) {
     return (
-      <div style={{ position: "absolute", right: 0, bottom: 0, width: 700, height: 500, zIndex: 999999, overflow: "auto", border: "1px solid black", backgroundColor: "#fff" }}>
-        <div style={{ display: "flex", flexDirection: "column", width: "100%", height: "100%", zIndex: 999999, border: "1px solid black", backgroundColor: "#fff" }}>
-          {log.map((v, i) => {
-            return (
-              <React.Fragment key={i}>
-                <div style={{ alignContent: "flex-start" }}>
-                  {v.last_time} {":"}
-                  {v.last_page} {"/"}
-                  <b>{v.last_xy}</b>
-                </div>
-                {i === 0 ?
-                  move_log.map((mv, mi) => {
-                    return (
-                      <React.Fragment key={mi}>
-                        <div style={{ alignContent: "flex-start" }}>
-                          {mv.last_time} {":"}
-                          {mv.last_page} {"/"}
-                          <b>{mv.last_xy}</b>
-                        </div>
-                      </React.Fragment>
-                    )
-                  })
-                  : ""
-                }
-              </React.Fragment>
-            )
-          })}
+        <div style={{ position: "absolute", right: 0, bottom: 0, width: 620, height: 500, zIndex: 999999, overflow: "auto", border: "1px solid black", backgroundColor: "#fff" }}>
+          <div style={{ display: "flex", flexDirection: "column", width: "100%", height: "100%", zIndex: 999999, border: "1px solid black", backgroundColor: "#fff" }}>
+            {log.map((v, i) => {
+              return (
+                <React.Fragment key={i}>
+                  <div style={{ alignContent: "flex-start" }}>
+                    {v.last_time} {":"}
+                    {v.last_page} {"/"}
+                    <b>{v.last_xy}</b>
+                  </div>
+                  {i === 0 ?
+                    move_log.map((mv, mi) => {
+                      return (
+                        <React.Fragment key={mi}>
+                          <div style={{ alignContent: "flex-start" }}>
+                            {mv.last_time} {":"}
+                            {mv.last_page} {"/"}
+                            <b>{mv.last_xy}</b>
+                          </div>
+                        </React.Fragment>
+                      )
+                    })
+                    : ""
+                  }
+                </React.Fragment>
+              )
+            })}
+          </div>
         </div>
-      </div>
     )
   }
   else {

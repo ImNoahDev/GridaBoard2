@@ -145,6 +145,7 @@ const printOption = g_defaultPrintOption;
 
 interface Props {
   handlePdfOpen: (event: IFileBrowserReturn) => void,
+  handlePenLogWindow: () => void;
 }
 
 const HeaderLayer = (props: Props) => {
@@ -169,8 +170,9 @@ const HeaderLayer = (props: Props) => {
         if (pdfDoc === undefined) {
           pdfDoc = await PDFDocument.create();
         }
-
-        const pdfPage = await pdfDoc.addPage();
+        const pageWidth = page.pageOverview.sizePu.width;
+        const pageHeight = page.pageOverview.sizePu.height;
+        const pdfPage = await pdfDoc.addPage([pageWidth, pageHeight]);
         if (page._rotation === 90 || page._rotation === 270) {
           const tmpWidth = pdfPage.getWidth();
           pdfPage.setWidth(pdfPage.getHeight());
@@ -265,6 +267,9 @@ const HeaderLayer = (props: Props) => {
     setIsSaveOpen(false);
   }
 
+  const handlePenLogWindow = () => {
+    props.handlePenLogWindow();
+  }
 
   const [debugOpen, setDebugOpen] = useState(false);
 
@@ -305,6 +310,10 @@ const HeaderLayer = (props: Props) => {
             </div>
           </div>
           <CalibrationButton className={`${classes.buttonStyle}  ${classes.calibration}`} filename={pdfFilename} handlePdfUrl={makePdfUrl} />
+
+          <div>
+            <TestButton className={`${classes.buttonStyle}`} onClick={(e) => handlePenLogWindow()} hidden={false}/>
+          </div>
         </div>
 
         <div >

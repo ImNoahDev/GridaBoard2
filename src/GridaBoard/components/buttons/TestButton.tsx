@@ -14,7 +14,7 @@ import getText from 'GridaBoard/language/language';
 
 const TestButton = (props) => {
   const useStyles = makeStyles(theme => ({
-    connectBtn: {
+    testBtn: {
       padding: "0px",
       borderRadius: '4px',
       "&>span" : {
@@ -36,12 +36,13 @@ const TestButton = (props) => {
 
   return (
     <React.Fragment>
+      {!props.hidden ? 
         <Button 
         {...props}
-        className={classes.connectBtn} variant="contained" color="primary"
+        className={classes.testBtn} variant="contained" color="primary"
         >
-          WhiteBoard Test
-        </Button>
+          Test Log View
+        </Button> : ""}
     </React.Fragment>
   );
 };
