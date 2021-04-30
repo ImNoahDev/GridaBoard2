@@ -121,7 +121,7 @@ const ThumbnailItem = (props: Props) => {
 
   // console.log(`thumbnail - ${pn}: pageNo: ${pdfPageNo} pdf: ${pdf} pdfUrl: ${pdfUrl} fingerprint: ${pdfFingerprint} `)
   return (
-    <Paper key={props.key} className={classes.paper} onClick={e => handleMouseDown(pn)} elevation={3} style={{ height: height }} onMouseOver={e=>{setShowDeleteBtn(true)}} onMouseLeave={e=>setShowDeleteBtn(false)}>
+    <Paper key={props.key} className={classes.paper} onClick={e => handleMouseDown(pn)} elevation={3} style={{ height: height }} onMouseOver={e=>{setShowDeleteBtn(false)}} onMouseLeave={e=>setShowDeleteBtn(false)}>
       <div className={`${classes.mixedViewer} ${(activePageNo === pn? classes.selected:"")}`}>
         <MixedPageView
           pdf={pdf}
