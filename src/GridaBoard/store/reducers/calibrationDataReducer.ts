@@ -1,4 +1,4 @@
-import { store } from "../../client/Root";
+import { store } from "../../client/pages/GridaBoard";
 
 // 액션 타입
 const SET_CALIBRATION_DATA = 'SET_CALIBRATION_DATA';

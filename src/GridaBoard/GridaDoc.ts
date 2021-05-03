@@ -1,5 +1,5 @@
 import GridaPage from "./GridaPage";
-import { store } from "./client/Root";
+import { store } from "./client/pages/GridaBoard";
 import { forceToRenderPanes, setActivePageNo, setActivePdf, setDocNumPages, setUrlAndFilename } from "./store/reducers/activePageReducer";
 import { RootState } from "./store/rootReducer";
 

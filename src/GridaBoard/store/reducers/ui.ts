@@ -1,4 +1,4 @@
-import { store } from "../../client/Root";
+import { store } from "../../client/pages/GridaBoard";
 import { getBrowserZoomFactor } from "nl-lib/common/util";
 
 //[Define Action Types

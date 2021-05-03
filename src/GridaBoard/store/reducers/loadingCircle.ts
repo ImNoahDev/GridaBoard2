@@ -1,4 +1,4 @@
-import { store } from "../../client/Root";
+import { store } from "../../client/pages/GridaBoard";
 const SET_VISIBLILITY = 'loading/SET_VISIBLILITY';
 
 // 액션 생성 함수

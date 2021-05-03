@@ -1,4 +1,4 @@
-import { store } from "../../client/Root";
+import { store } from "../../client/pages/GridaBoard";
 //[Define Action Types
 const ActionGroup = "CALIBRATION_DLG";
 

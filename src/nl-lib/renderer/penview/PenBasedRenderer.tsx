@@ -17,7 +17,7 @@ import { InkStorage } from "nl-lib/common/penstorage";
 import { isPUI } from "nl-lib/common/noteserver";
 
 import { setCalibrationData } from 'GridaBoard/store/reducers/calibrationDataReducer';
-import { store } from "GridaBoard/client/Root";
+import { store } from "GridaBoard/client/pages/GridaBoard";
 import GridaDoc from "GridaBoard/GridaDoc";
 
 /**

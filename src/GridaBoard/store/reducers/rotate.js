@@ -1,4 +1,4 @@
-import { store } from "../../client/Root";
+import { store } from "../../client/pages/GridaBoard";
 const SET_ROTATION_TRRIGER = 'rotate/SET_ROTATION_TRIGGER';
 
 // 액션 생성 함수

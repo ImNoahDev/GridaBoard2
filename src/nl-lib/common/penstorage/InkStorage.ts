@@ -4,7 +4,7 @@ import { NeoStroke, IPageSOBP, StrokeStatus, INeoStrokeProps, NeoDot, TransformP
 import { isSameNcode } from "nl-lib/common/util";
 import { DefaultPlateNcode } from "nl-lib/common/constants";
 import intersect from 'path-intersection';
-import { store } from "GridaBoard/client/Root";
+import { store } from "GridaBoard/client/pages/GridaBoard";
 import GridaDoc from "GridaBoard/GridaDoc";
 import getText from "GridaBoard/language/language";
 import { isPlatePaper, isPUI } from "../noteserver";

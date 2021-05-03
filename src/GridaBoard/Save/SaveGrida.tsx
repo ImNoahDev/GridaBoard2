@@ -6,7 +6,7 @@ import { fabric } from "fabric";
 import { isSamePage } from "../../nl-lib/common/util";
 import { PlateNcode_1, PlateNcode_2 } from "../../nl-lib/common/constants";
 import { adjustNoteItemMarginForFilm, getNPaperInfo } from "../../nl-lib/common/noteserver";
-import { store } from "../client/Root";
+import { store } from "../client/pages/GridaBoard";
 
 const PDF_TO_SCREEN_SCALE = 6.72; // (56/600)*72
 

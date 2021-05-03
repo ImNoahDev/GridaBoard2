@@ -1,4 +1,4 @@
-import { store } from "../../client/Root";
+import { store } from "../../client/pages/GridaBoard";
 import { NeoPdfDocument } from "nl-lib/common/neopdf";
 
 //[Define Action Types

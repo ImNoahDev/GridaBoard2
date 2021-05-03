@@ -1,5 +1,5 @@
 import $ from 'jquery';
-import { store } from "GridaBoard/client/Root";
+import { store } from "GridaBoard/client/pages/GridaBoard";
 import { IBrushType, PageEventName, PEN_THICKNESS, ZoomFitEnum } from 'nl-lib/common/enums';
 import PenManager from 'nl-lib/neosmartpen/PenManager';
 import { setViewFit } from 'GridaBoard/store/reducers/viewFitReducer';
