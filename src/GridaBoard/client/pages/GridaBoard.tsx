@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Provider } from "react-redux";
+import { NavLink } from 'react-router-dom';
 import { Backdrop, CircularProgress, IconButton, makeStyles, MuiThemeProvider, Snackbar } from "@material-ui/core";
 import MuiAlert from "@material-ui/lab/Alert";
 import CloseIcon from "@material-ui/icons/Close";
@@ -120,6 +121,7 @@ const GridaBoard = () => {
 
   return (
     <Provider store={store}>
+        {/* <NavLink exact to="/"> Home </NavLink> */}
         <LoadingCircle />
         <MuiThemeProvider theme={theme}>
           {/* {paperInfoInited ?

@@ -9,8 +9,8 @@ class App extends Component {
         return (
             <div>
               <Route path="/" component={GridaBoard}/>
-              {/* <Route exact path="/" component={About}/>
-              <Route exact path="/app" component={GridaBoard}/> */}
+              {/* <Route exact path="/" component={About}/> */}
+              {/* <Route exact path="/app" component={GridaBoard}/> */}
             </div>
         );
     }
