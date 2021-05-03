@@ -31,7 +31,7 @@ const useStyles = props => makeStyles((theme: Theme) => ({
     display: 'block',
   },
   drawer: {
-    width: "190px",
+    width: props.drawerWidth + "px",
     flexShrink: 0,
   },
   toolbar: theme.mixins.toolbar,
@@ -109,7 +109,7 @@ const useStyles = props => makeStyles((theme: Theme) => ({
     minHeight: "91px"
   },
   drawerPaper : {
-    width: "190px",
+    width: props.drawerWidth + "px",
     flexShrink: 0,
     zIndex: 1100,
     background: "rgba(0,0,0,0)", 
@@ -135,13 +135,13 @@ interface Props extends BoxProps {
 
 export default function PersistentDrawerRight(props: Props) {
   const brZoom = useSelector((state: RootState) => state.ui.browser.zoom);
-  const classes = useStyles({brZoom:brZoom})();
+  const drawerWidth = useSelector((state: RootState) => state.ui.drawer.width);
+  const classes = useStyles({brZoom:brZoom, drawerWidth:drawerWidth})();
   const theme = useTheme();
   const [open, setOpen] = React.useState(props.open);
   // const [handleDrawerClose, setHandleDrawerClose] = React.useState(props.handleDrawerClose);
 
   // const [drawerWidth, setDrawerWidth] = React.useState(defaultDrawerWidth);
-  // const drawerWidth = useSelector((state: RootState) => state.ui.drawer.width);
   // const setDrawerWidth = (width: number) => updateDrawerWidth({ width });
   useEffect(() => { setOpen(props.open); }, [props.open]);
 
