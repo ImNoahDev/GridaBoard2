@@ -17,6 +17,7 @@ import { fetchGzippedFile, getBrowserZoomFactor } from "nl-lib/common/util";
 import { g_paperType, g_paperType_default } from "nl-lib/common/noteserver";
 import Home from "../../View/Home";
 import LoadingCircle from "../../Load/LoadingCircle";
+import { turnOnGlobalKeyShortCut } from "../../GlobalFunctions";
 
 
 
@@ -105,7 +106,7 @@ const GridaBoard = () => {
             g_paperType.definition[key] = g_paperType_default[key];
           }
         }
-        hideUIProgressBackdrop();
+        hideUIProgressBackdrop(); 
         setPaperInfoInited(true);
       }
       ).catch((e) => {
@@ -119,9 +120,12 @@ const GridaBoard = () => {
   const rootState = store.getState() as RootState;
   const shouldWait = rootState.ui.waiting.circular;
 
+  turnOnGlobalKeyShortCut(true);
+
   return (
     <Provider store={store}>
-        {/* <NavLink exact to="/"> Home </NavLink> */}
+      {/* <NavLink exact to="/about"> About </NavLink>
+      <NavLink exact to="/"> Home </NavLink> */}
         <LoadingCircle />
         <MuiThemeProvider theme={theme}>
           {/* {paperInfoInited ?

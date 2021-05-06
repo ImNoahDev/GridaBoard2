@@ -160,7 +160,7 @@ const Home = () => {
   //https://css-tricks.com/controlling-css-animations-transitions-javascript/
 
   //쿠키 확인 후 튜토리얼 띄우기
-  const [cookies, setCookie, removeCookie] = useCookies(['test']);
+  const [cookies, setCookie, removeCookie] = useCookies();
   
   if(cookies.tutorialView === "true" && tutorialOpen === true){//쿠키에 저장될때 문자열로 변환되어서 이렇게 검사해야함
     //이미 봄
@@ -208,7 +208,6 @@ declare global {
   window._pui.push(pui_paper);
   window._pui.push(pui_lamy);
 
-  turnOnGlobalKeyShortCut(true);
 })(window);
 
 let tx = 0;
