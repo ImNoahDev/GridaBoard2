@@ -22,16 +22,46 @@ export async function savePDF(saveName: string) {
   const doc = GridaDoc.getInstance();
   const docPages = doc.pages;
 
+  const pdfDoc = await makePdfDocument();
+
+  addStrokesOnPage(pdfDoc);
+
+  const pdfBytes = await pdfDoc.save();
+  const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+  saveAs(blob, filename);
+}
+
+export async function makePdfDocument() {
+  const doc = GridaDoc.getInstance();
+  const docPages = doc.pages;
+
   let pdfUrl, pdfDoc = undefined;
 
+  const pageInfos = [];
+  const basePageInfos = [];
+
+  let i = 0;
   for (const page of docPages) //병렬처리
   {
+    pageInfos.push({
+      section: page.pageInfos[0].section, 
+      owner:  page.pageInfos[0].owner, 
+      book: page.pageInfos[0].book,
+      page: page.pageInfos[0].page
+    });
+
+    basePageInfos.push({
+      section:  page.basePageInfo.section,
+      owner: page.basePageInfo.owner, 
+      book: page.basePageInfo.book, 
+      page: page.basePageInfo.page
+    });
+
     if (page.pdf === undefined) {
       //ncode page일 경우
       if (pdfDoc === undefined) {
         pdfDoc = await PDFDocument.create();
       }
-
       const pdfPage = await pdfDoc.addPage();
       if (page._rotation === 90 || page._rotation === 270) {
         const tmpWidth = pdfPage.getWidth();
@@ -68,45 +98,53 @@ export async function savePDF(saveName: string) {
           const copiedPages = await pdfDoc.copyPages(pdfDocSrc, totalPageArr);
 
           for (const copiedPage of copiedPages) {
-            await pdfDoc.addPage(copiedPage);
+            const addedPage = await pdfDoc.addPage(copiedPage);
+            addedPage.setRotation(degrees(page._rotation));
           }
         } else {
           pdfDoc = pdfDocSrc;
+          pdfDoc.getPages()[i++].setRotation(degrees(page._rotation));
         }
       } else {
+        pdfDoc.getPages()[i++].setRotation(degrees(page._rotation));
         continue;
       }
     }
   }
 
-  //this.completedOnPage에는 페이지 순서대로 stroke array가 들어가는게 아니기 때문에 key값(sobp)으로 정렬
-  const sortStringKeys = (a, b) => a[0] > b[0] ? 1 : -1;
-  const sortedCompletedOnPage = new Map([...inkSt.completedOnPage].sort(sortStringKeys));
+  return pdfDoc;
+}
+
+export async function findGridaPageObjByStrokeKey(gridaPageObj: {pageNo: number, rotation: number, isPdf: boolean}, key) {
+  const docPages = GridaDoc.getInstance().pages;
+  for (const docPage of docPages) {
+    //page info를 grida doc의 그것과 비교해서 어떤 pdf doc에 stroke를 그릴지 결정
+    const { section, owner, book, page } = docPage.basePageInfo;
+    const pageId = InkStorage.makeNPageIdStr({ section, owner, book, page });
+
+    if (pageId === key) {
+      gridaPageObj.pageNo = docPage.pageNo;
+      gridaPageObj.rotation = docPage._rotation
+
+      if (docPage._pdf === undefined) {
+        gridaPageObj.isPdf = false;
+      }
+    }
+  }
+}
+
+export async function addStrokesOnPage(pdfDoc) {
+  const inkSt = InkStorage.getInstance();
+  const docPages = GridaDoc.getInstance().pages;
 
   const pages = pdfDoc.getPages();
 
-  let i = 0;
-  for (const [key, NeoStrokes] of sortedCompletedOnPage.entries()) {
+  for (const [key, NeoStrokes] of inkSt.completedOnPage.entries()) {
+    //잉크 스토리지에 저장된 스트로크가 몇번째 페이지인지 안전하게 검사
+    let gridaPageObj: {pageNo: number, rotation: number, isPdf: boolean} = {pageNo: 0, rotation: 0, isPdf: true};
+    findGridaPageObjByStrokeKey(gridaPageObj, key);
 
-    let rotation = 0;
-    let isPdf = true;
-
-    for (const docPage of docPages) {
-      //page info를 grida doc의 그것과 비교해서 어떤 pdf doc에 stroke를 그릴지 결정
-      const { section, owner, book, page } = docPage.basePageInfo;
-      const pageId = InkStorage.makeNPageIdStr({ section, owner, book, page });
-
-      if (pageId === key) {
-        i = docPage.pageNo;
-        rotation = docPage._rotation
-
-        if (docPage._pdf === undefined) {
-          isPdf = false;
-        }
-      }
-    }
-
-    const page = pages[i];
+    const page = pages[gridaPageObj.pageNo];
     const pageHeight = page.getHeight();
 
     for (let j = 0; j < NeoStrokes.length; j++) {
@@ -116,23 +154,18 @@ export async function savePDF(saveName: string) {
       const rgbStrArr = NeoStrokes[j].color.match(/\d+/g);
       const stroke_h = NeoStrokes[j].h;
       const stroke_h_origin = NeoStrokes[j].h_origin;
-
       const { a, b, c, d, e, f, g, h } = stroke_h;
       const { a: a0, b: b0, c: c0, d: d0, e: e0, f: f0, g: g0, h: h0 } = stroke_h_origin;
-
       let opacity = 1;
       if (NeoStrokes[j].brushType === 1) {
         opacity = 0.3;
       }
-
       const pointArray = [];
-
       const pageInfo = { section: NeoStrokes[j].section, owner: NeoStrokes[j].owner, book: NeoStrokes[j].book, page: NeoStrokes[j].page }
       let isPlate = false;
       if (isSamePage(PlateNcode_1, pageInfo) || isSamePage(PlateNcode_2, pageInfo)) {
         isPlate = true;
       }
-
       if (isPlate) {
         for (let k = 0; k < dotArr.length; k++) {
           const noteItem = getNPaperInfo(pageInfo); //plate의 item
@@ -154,12 +187,12 @@ export async function savePDF(saveName: string) {
           const dot = dotArr[k];
           const pdf_x = dot.x * platePdfRatio;
           const pdf_y = dot.y * platePdfRatio;
-          
+
           pointArray.push({ x: pdf_x, y: pdf_y, f: dot.f });
         }
-        page.setRotation(degrees(rotation));
+        // page.setRotation(degrees(gridaPageObj.rotation));
       } else {
-        if (isPdf) {
+        if (gridaPageObj.isPdf) {
           for (let k = 0; k < dotArr.length; k++) {
             const dot = dotArr[k];
             const nominator = g0 * dot.x + h0 * dot.y + 1;
@@ -167,15 +200,13 @@ export async function savePDF(saveName: string) {
             const py = (d0 * dot.x + e0 * dot.y + f0) / nominator;
             
             const pdf_xy = { x: px, y: py};
-            
+
             pointArray.push({ x: pdf_xy.x, y: pdf_xy.y, f: dot.f });
           }
-          page.setRotation(degrees(rotation));
-          
+          // page.setRotation(degrees(gridaPageObj.rotation));
         } else {
           for (let k = 0; k < dotArr.length; k++) {
             const dot = dotArr[k];
-            // const pdf_xy = { x: dot.x * PDF_TO_SCREEN_SCALE, y: dot.y * PDF_TO_SCREEN_SCALE};
             const nominator = g * dot.x + h * dot.y + 1;
             const px = (a * dot.x + b * dot.y + c) / nominator;
             const py = (d * dot.x + e * dot.y + f) / nominator;
@@ -186,7 +217,6 @@ export async function savePDF(saveName: string) {
           }
         }
       }
-        
 
       let strokeThickness = thickness / 64;
       switch (brushType) {
@@ -195,7 +225,6 @@ export async function savePDF(saveName: string) {
       }
 
       const pathData = drawPath(pointArray, strokeThickness);
-
       page.moveTo(0, pageHeight);
       page.drawSvgPath(pathData, {
         color: rgb(
@@ -208,10 +237,6 @@ export async function savePDF(saveName: string) {
       });
     }
   }
-
-  const pdfBytes = await pdfDoc.save();
-  const blob = new Blob([pdfBytes], { type: 'application/pdf' });
-  saveAs(blob, filename);
 }
 
 export async function addGraphicAndSavePdf(url: string, saveName: string) {
