@@ -12,9 +12,11 @@ import { PLAYSTATE, ZoomFitEnum } from "nl-lib/common/enums";
 import { nullNcode } from "nl-lib/common/constants";
 import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
 
+const DEFAULT_THUMBNAIL_SIDE_MARGIN = 5;
+
 const useStyle = makeStyles(theme => ({
   paper : {
-    margin: "10px 16px",
+    margin: `10px ${DEFAULT_THUMBNAIL_SIDE_MARGIN}px`,
     overflow: "hidden",
     position: "relative"
   },
@@ -115,7 +117,7 @@ const ThumbnailItem = (props: Props) => {
 
   const wh_ratio = sizePu.width / sizePu.height;
 
-  const height = drawerWidth / wh_ratio * 0.9;
+  const height = (drawerWidth - DEFAULT_THUMBNAIL_SIDE_MARGIN*2) / wh_ratio;
   const playState = PLAYSTATE.live;
   let isMouseDown = false;
 
