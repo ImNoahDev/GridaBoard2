@@ -1,3 +1,12 @@
+/**
+ * ########################
+ * 임시로 저장된 페이지
+ * 사내 서버를 이용하여 로그인 구현한 코드
+ * Home.tsx 에서 firebase로 로그인 새로 구현
+ * 추후에 혹시나 다시 Inkserver를 이용하라 할때를 위해 임시로 _Home으로 남김
+ */
+
+
 import React, {useState} from 'react';
 import { Redirect } from "react-router-dom";
 import Menu from "./Menu";

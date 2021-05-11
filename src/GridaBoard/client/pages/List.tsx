@@ -13,7 +13,7 @@ const logOut = ()=>{
     cookies.remove("user_email");
 }
 
-const About = () => {
+const List = () => {
     const activeStyle = {
         color: 'green',
         fontSize: '2rem'
@@ -22,7 +22,7 @@ const About = () => {
     const database = firebase.database();
 
     return (
-        <div>About
+        <div>List
             <ul>
                 <li><NavLink exact to="/" activeStyle={activeStyle}>Home</NavLink></li>
                 <li><NavLink to="/app" activeStyle={activeStyle}>app</NavLink></li>
@@ -33,4 +33,4 @@ const About = () => {
     );
 };
 
-export default About;
+export default List;

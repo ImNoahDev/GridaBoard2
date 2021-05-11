@@ -1,4 +1,4 @@
-export { default as Home } from './Home';
-export { default as About} from "./About";
+export { default as Login } from './Login';
+export { default as List} from "./List";
 export { default as GridaBoard} from "./GridaBoard";
 export { default as LoginCheck } from "./LoginCheck";
