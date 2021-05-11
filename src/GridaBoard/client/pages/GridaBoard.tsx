@@ -124,8 +124,10 @@ const GridaBoard = () => {
 
   return (
     <Provider store={store}>
+      {/* 임시 네비 버튼 */}
       {/* <NavLink exact to="/about"> About </NavLink>
       <NavLink exact to="/"> Home </NavLink> */}
+      {/* 임시 네비 버튼 */}
         <LoadingCircle />
         <MuiThemeProvider theme={theme}>
           {/* {paperInfoInited ?
