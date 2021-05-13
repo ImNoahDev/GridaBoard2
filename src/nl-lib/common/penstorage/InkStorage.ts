@@ -401,6 +401,9 @@ export default class InkStorage {
     // closeStroke(stroke);
     stroke.close();
 
+    if (stroke.page === -1) {
+      return;
+    }
     this.completed.push(stroke);
 
     this.addCompletedToPage(stroke);

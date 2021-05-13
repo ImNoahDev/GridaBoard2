@@ -25,10 +25,10 @@ export const g_paperType_default: IPaperTypeSet = {
     "owner": 27,
     "book": 1,
     "margin": {
-      "Xmin": 244,
-      "Ymin": 90,
-      "Xmax": 1045,
-      "Ymax": 550
+      "Xmin": 245,
+      "Ymin": 86,
+      "Xmax": 997,
+      "Ymax": 548
     },
     "title": "whiteboard",
     "pdf_name": "whiteboard",
