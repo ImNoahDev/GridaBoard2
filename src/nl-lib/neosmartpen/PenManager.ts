@@ -151,12 +151,12 @@ export default class PenManager {
     if (pen.name === "NeoSmartPen" && device.name !== undefined) {
       const penNamePrefix = device.name.split('_', 1)
       if (penNamePrefix[0] === 'BLUE1' || penNamePrefix[0] === 'BLUE2') {
-        pen.setColor("rgb(0,171,235)");
-        pen.setThickness(2);
+        this.setColor(5);
+        this.setThickness(PEN_THICKNESS.THICKNESS5);
       }
       if (penNamePrefix[0] === 'RED1' || penNamePrefix[0] === 'RED2') {
-        pen.setColor("rgb(255,101,0)");
-        pen.setThickness(2);
+        this.setColor(0);
+        this.setThickness(PEN_THICKNESS.THICKNESS5);
       }
     }
 
