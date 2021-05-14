@@ -24,6 +24,7 @@ import CustomBadge from "../components/CustomElement/CustomBadge";
 import LogoSvg from "../logo.svg";
 import TestButton from "../components/buttons/TestButton";
 import PenLogWindow from "../debugging/PenLogWindow";
+import { saveThumbnail } from "../Save/SaveThumbnail";
 
 const useStyles = props => makeStyles((theme) => ({
   buttonStyle: {
@@ -291,6 +292,9 @@ const HeaderLayer = (props: Props) => {
                   <div className={`${classes.saveDropdownStyle}`} >
                     <SavePdfDialog saveType="pdf" />
                     <SavePdfDialog saveType="grida" />
+                    <Button style={{width: "200px", height: "40px", justifyContent: "left", }} onClick={saveThumbnail}>
+                      썸네일 저장
+                    </Button>
                   </div>
                 ) : null}
               </div>

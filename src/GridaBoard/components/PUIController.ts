@@ -171,12 +171,12 @@ export default class PUIController {
 
       case "strokesize_2":
       case "0.5": //lamy
-        PenManager.getInstance().setThickness(PEN_THICKNESS.THICKNESS2);
+        PenManager.getInstance().setThickness(PEN_THICKNESS.THICKNESS3);
         break;
 
       case "strokesize_3":
       case "1.7": //lamy
-        PenManager.getInstance().setThickness(PEN_THICKNESS.THICKNESS3);
+        PenManager.getInstance().setThickness(PEN_THICKNESS.THICKNESS5);
         break;
 
       case "pen":
