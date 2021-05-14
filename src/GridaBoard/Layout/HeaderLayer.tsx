@@ -292,9 +292,7 @@ const HeaderLayer = (props: Props) => {
                   <div className={`${classes.saveDropdownStyle}`} >
                     <SavePdfDialog saveType="pdf" />
                     <SavePdfDialog saveType="grida" />
-                    <Button style={{width: "200px", height: "40px", justifyContent: "left", }} onClick={saveThumbnail}>
-                      썸네일 저장
-                    </Button>
+                    <SavePdfDialog saveType="thumb" />
                   </div>
                 ) : null}
               </div>

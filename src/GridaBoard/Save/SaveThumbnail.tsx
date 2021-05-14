@@ -8,6 +8,7 @@ import { adjustNoteItemMarginForFilm, getNPaperInfo } from "../../nl-lib/common/
 import { store } from "../client/pages/GridaBoard";
 import * as PdfJs from "pdfjs-dist";
 import { clearCanvas } from "nl-lib/common/util";
+import firebase from "GridaBoard/util/firebase_config";
 
 const makePdfJsDoc = async (loadingTask: any) => {
 
@@ -53,8 +54,8 @@ const makePdfJsDoc = async (loadingTask: any) => {
   })
 }
 
-export async function saveThumbnail() {
-
+export async function saveThumbnail(docName: string) {
+ 
   let pdfDoc = undefined;
   const doc = GridaDoc.getInstance();
   const docPages = doc.pages;
@@ -265,10 +266,77 @@ export async function saveThumbnail() {
       byteArray[i] = byteCharacters.charCodeAt(i);
   }
   var blob = new Blob([byteArray], {type: 'image/png'});
-  saveAs(blob, 'abc.png');
+
+  var storageRef = firebase.storage().ref();
+
+  const userId = firebase.auth().currentUser.email;
+  const date = Date.now();
+  const fileName = `${userId}_${docName}_${date}_.png`
+  var pngRef = storageRef.child(`thumbnail/${fileName}`);
+
+
+/** Upload thumbnail image using Firebase
+  * -----------------------------------------------------------------------------------
+  */
+  var uploadTask = pngRef.put(blob);
+  await uploadTask.on(firebase.storage.TaskEvent.STATE_CHANGED,
+    function(snapshot) {
+      var progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+      console.log('Upload is ' + progress + '% done');
+      switch (snapshot.state) {
+        case firebase.storage.TaskState.PAUSED: // or 'paused'
+          console.log('Upload is paused');
+          break;
+        case firebase.storage.TaskState.RUNNING: // or 'running'
+          console.log('Upload is running');
+          break;
+      }
+    }, function(error) {
+      switch (error.code) {
+        case 'storage/unauthorized':
+          // User doesn't have permission to access the object
+          break;
+    
+        case 'storage/canceled':
+          // User canceled the upload
+          break;
+   
+        case 'storage/unknown':
+          // Unknown error occurred, inspect error.serverResponse
+          break;
+      }
+    }, async function() {
+      uploadTask.snapshot.ref.getDownloadURL().then(function(downloadURL) {
+        console.log('File available at', downloadURL);
+
+        saveToDB(docName, downloadURL)
+      });
+    });
+
+  // saveAs(blob, 'abc.png');
 
 }
 
+const saveToDB = (docName: string, downloadURL: string) => {
+  const db = firebase.firestore();
+  const userId = firebase.auth().currentUser.email;
+  
+  db.collection(userId).doc(docName).set({
+      category: "None",
+      date: new Date(),
+      doc_name: docName,
+      favorite: false,
+      id: userId,
+      grida_path : "somewhere",
+      thumb_downloadURL : downloadURL,
+  })
+  .then(function() {
+      console.log(`${docName} is created`);
+  })
+  .catch((error) => {
+      console.error("Error adding document: ", error);
+  });
+}
 
 //div screenshot sample
 

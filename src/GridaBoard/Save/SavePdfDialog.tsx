@@ -10,6 +10,7 @@ import { turnOnGlobalKeyShortCut } from '../GlobalFunctions';
 import GridaToolTip from '../styles/GridaToolTip';
 import $ from "jquery";
 import getText from "../language/language";
+import { saveThumbnail } from './SaveThumbnail';
 
 
 
@@ -68,7 +69,7 @@ const useStyles = makeStyles((theme) => {
   });
 });
 type Props = {
-  saveType : "grida" | "pdf"
+  saveType : "grida" | "pdf" | "thumb"
 }
 const SavePdfDialog = (props: Props) => {
   const {saveType } = props;
@@ -133,8 +134,10 @@ const SavePdfDialog = (props: Props) => {
 
     if(saveType == "grida"){
       saveGrida(selectedName);
-    }else{
+    }else if (saveType === "pdf") {
       savePDF(selectedName);
+    } else if (saveType === "thumb") {
+      saveThumbnail(selectedName);
     }
     setOpen(false);
     onReset();
@@ -149,13 +152,13 @@ const SavePdfDialog = (props: Props) => {
         tail: "키보드 버튼 ?로 선택 가능합니다"
       }} title={undefined}> */}
         <Button className={`${classes.dropdownBtn} ${saveType==="pdf"? "save_drop_down": ""}`} onClick={handleDialogOpen}>
-          {getText("save_to_"+saveType)}
+          {saveType !== "thumb" ? getText("save_to_"+saveType) : "썸네이이일"}
         </Button>
       {/* </GridaToolTip> */}
       <Dialog className={classes.dialog} open={open} onClose={handleDialogClose} aria-labelledby="form-dialog-title">
         <DialogTitle id="form-dialog-title" className={classes.title}>
           <Box fontSize={20} fontWeight="fontWeightBold" className={classes.titleBox}>
-          {getText("save_"+saveType+"_popup_title")}
+          {saveType !== "thumb" ? getText("save_"+saveType+"_popup_title") : "썸네일 업로드"}
           </Box>
         </DialogTitle>
         <PdfDialogTextArea saveType={saveType} onTextAreaChange={(name) => setName(name)}/>
@@ -165,10 +168,10 @@ const SavePdfDialog = (props: Props) => {
         <DialogActions className={classes.dialogAction}>
           {warnOpen? <span>{getText("filename_cantStart")}</span> : ""}
           <Button onClick={handleSavePdf} variant="contained" color="primary" className={`${classes.button}`}>
-            {getText("save_"+saveType+"_popup_save")}
+            {saveType !== "thumb" ? getText("save_"+saveType+"_popup_save") : "업로드"}
           </Button>
           <Button onClick={handleDialogClose} variant="contained" className={classes.button}>
-            {getText("save_"+saveType+"_popup_cancel")}
+            {saveType !== "thumb" ? getText("save_"+saveType+"_popup_cancel") : "취소"}
           </Button>
         </DialogActions>
       </Dialog>

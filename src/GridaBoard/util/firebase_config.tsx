@@ -4,6 +4,7 @@ const firebaseConfig = {
   apiKey: "AIzaSyCQ7i4k-LLa4nEVv8zi9inyT7T68l0-1RI",
   authDomain: "gridaboard-v2-test.firebaseapp.com",
   projectId: "gridaboard-v2-test",
+  databaseURL: "https://gridaboard-v2-test-default-rtdb.asia-southeast1.firebasedatabase.app/",
   storageBucket: "gridaboard-v2-test.appspot.com",
   messagingSenderId: "380346205591",
   appId: "1:380346205591:web:d1148a041c72a385dcf0d2",

@@ -9,7 +9,7 @@ const App = ()=>{
      * 커밋할 경우 true로 고정
      */
     const isOnlyGrida = true;
-    if(isOnlyGrida){
+    if(!isOnlyGrida){
         // 기본 경로를 그리다로 고정
         return (<div>
           <Route path="/" component={GridaBoard}/>

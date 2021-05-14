@@ -46,7 +46,7 @@ const PdfDialogTextArea = (props: Props) => {
       <TextField
         autoFocus
         margin="dense"
-        placeholder={getText("save_"+saveType+"_popup_holder")}
+        placeholder={saveType !== "thumb" ? getText("save_"+saveType+"_popup_holder") : "마음대로 저장"}
         type="text"
         name="title"
         value={pdfName}
