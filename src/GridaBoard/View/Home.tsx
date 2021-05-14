@@ -18,6 +18,7 @@ import { useBeforeunload } from 'react-beforeunload';
 import getText from "../language/language";
 import TutorialPage from "../components/TutorialPage";
 import {useCookies} from 'react-cookie';
+import HelpMenu, { setHelpMenu } from "../components/CustomElement/HelpMenu";
 
 const useStyle = makeStyles(theme=>({
   rootDiv :{
@@ -165,6 +166,10 @@ const Home = () => {
   if(cookies.tutorialView === "true" && tutorialOpen === true){//쿠키에 저장될때 문자열로 변환되어서 이렇게 검사해야함
     //이미 봄
     setTutorialOpen(false);
+  
+    if(!(cookies.firstHelp === "true")){//쿠키에 저장될때 문자열로 변환되어서 이렇게 검사해야함
+      setHelpMenu(true);
+    }
   }
 
   const setDontShowTuto = ()=>{
@@ -174,7 +179,12 @@ const Home = () => {
     });
     //view 전환
     setTutorialOpen(false);
+    
+    if(!(cookies.firstHelp === "true")){//쿠키에 저장될때 문자열로 변환되어서 이렇게 검사해야함
+      setHelpMenu(true);
+    }
   }
+
 
 
 
@@ -184,6 +194,7 @@ const Home = () => {
   return (
     <div id={`background`} className={classes.rootDiv}>
       {tutorialOpen ? <TutorialPage dontShow={setDontShowTuto}/> : "" }
+      <HelpMenu />
       <ViewLayer id="view-layer" handlePdfOpen={handlePdfOpen} style={{display: "flex"}}/>
       <input type="file" id={g_hiddenFileInputBtnId} onChange={onFileInputChanged} onClick={onFileInputClicked} style={{ display: "none" }} name="pdf" accept=".pdf,.grida" />
     </div>
