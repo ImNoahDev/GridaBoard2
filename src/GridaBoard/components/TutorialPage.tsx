@@ -10,7 +10,7 @@ import "slick-carousel/slick/slick-theme.css";
 import {ArrowBackIos, ArrowForwardIos} from '@material-ui/icons';
 
 
-const TUTORIAL_COUNT = 3;
+const TUTORIAL_COUNT = 2;
 const AUTO_PLAY_TIME = 10; // sec
 
 type SliderProps = {
