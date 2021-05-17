@@ -157,6 +157,9 @@ const HelpViewer = (props : Props)=>{
 			slider.slickNext();
 		}
 	}
+	const stopPropagation = (e)=>{
+		e.stopPropagation();
+	}
 
 	const sliderSettings : Settings = {
 		dots: false,
@@ -188,14 +191,14 @@ const HelpViewer = (props : Props)=>{
 				<div>{myHelpData[nowView].subtext.replace("\\n","\n")}</div>
 			</div>
 			<div className={`${classes.buttonDiv} ${nowView == 0 ? classes.buttonStart : classes.buttonNormal}`}> {/* 버튼 */}
-				<Button onClick={goPrev} variant="contained" color="secondary"> 
+				<Button onMouseDown={stopPropagation} onClick={goPrev} variant="contained" color="secondary"> 
 					{
 						nowView == 0 ? 
 							getText("helpMenu_skip")
 						: getText("helpMenu_prev")
 					}
 				</Button>
-				<Button onClick={goNext} variant="contained" color="primary">
+				<Button onMouseDown={stopPropagation} onClick={goNext} variant="contained" color="primary">
 					{
 						nowView == 0 ? 
 							getText("helpMenu_start")
