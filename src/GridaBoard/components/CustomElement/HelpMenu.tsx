@@ -11,7 +11,6 @@ export const setHelpMenu = (show: boolean) => {
 
   if(!show){
     const cookies = new Cookies();
-    cookies.remove("firstHelp");
     cookies.set("firstHelp", true, {
       maxAge: 99999999
     });
@@ -37,7 +36,37 @@ const HelpMenu = ()=>{
 	const inVisible = useSelector((state: RootState) => state.ui.helpMenu.show);
 	const classes = useStyle();
 
-	const movePopup = (ref)=>{
+	const movePopup = (e:React.MouseEvent<HTMLDivElement, MouseEvent>)=>{
+    let div = e.currentTarget;
+    div.style.cursor = "grabbing";
+    
+    const startDivX = div.offsetLeft, startDivY = div.offsetTop;
+    const startMouseX = e.clientX, startMouseY = e.clientY;
+    div.style.opacity = "0.8";
+    const mouseMove = (e)=>{
+      const nowMouseX = e.clientX, nowMouseY = e.clientY;
+      
+      let newLeft = startDivX + (nowMouseX - startMouseX);
+      newLeft = newLeft <= 0 ? 0 : newLeft;
+      let newRight = (window.innerWidth - (newLeft + div.offsetWidth));
+      newRight = newRight <= 0 ? 0 : newRight;
+      let newTop = startDivY + (nowMouseY - startMouseY);
+      newTop = newTop <= 0 ? 0 : newTop;
+      let newBottom = (window.innerHeight - (newTop + div.offsetHeight));
+      newBottom = newBottom <= 0 ? 0 : newBottom;
+      
+      div.style.right = newRight + "px";
+      div.style.bottom = newBottom + "px";
+    }
+    const mouseUp = (e)=>{
+      mouseMove(e);
+      div.style.cursor = "";
+      div.style.opacity = "";
+      document.removeEventListener("mousemove", mouseMove);
+      document.removeEventListener("mouseup", mouseUp);
+    }
+    document.addEventListener("mousemove", mouseMove);
+    document.addEventListener("mouseup", mouseUp);
 
 	}
 	return (

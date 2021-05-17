@@ -9,12 +9,14 @@ import { default as Slider, Settings, CustomArrowProps } from "react-slick";
 
 const useStyle = makeStyles(theme=>({
 	wrap : {
+		userSelect: "none",
 		right : "24px",
 		bottom : "88px",
 		position: "absolute",
 		width: "380px",
 		height: "552px",
 		overflow: "hidden",
+		cursor: "grab",
 		
 		background: theme.custom.white[90],
 		boxShadow : theme.custom.shadows[0],
@@ -86,19 +88,15 @@ const useStyle = makeStyles(theme=>({
 	},
 	buttonNormal : {
 		"& > *": {
-			width: "72px"
+			minWidth: "72px"
 		},
 	}
 }));
 
-// type Props = {
-// 	onHeaderClick ?: ()=>void,
-// 	className ?: clas
-// }
 interface Props extends  React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement> {
 	mainNo : number,
 	subNo : number,
-	onHeaderClick ?: (ref)=>void,
+	onHeaderClick ?: (ref:React.MouseEvent<HTMLDivElement, MouseEvent>)=>void,
 	setHelpMenu: (boolean)=>void
 }
 //우선 데이터 하나짜리
@@ -111,14 +109,16 @@ const HelpViewer = (props : Props)=>{
 	let slider = null as Slider;
 	let [nowView,setNowView] = useState(0);
 
-	const goPrev = ()=>{
+	const goPrev = (e)=>{
+		e.stopPropagation();
 		if(nowView == 0){
 			//스킵
 			props.setHelpMenu(false);
 		}
 		slider.slickPrev();
 	}
-	const goNext = ()=>{
+	const goNext = (e)=>{
+		e.stopPropagation();
 		if(myHelpData[nowView].link !== null){
 			// window.open("about:blank").location.href = "/nbs_v2.json.gz";
 			// var href = "https://drive.google.com/file/d/1l4C0q8xe6JIZPYEY6DdUFQLeGlikbayR";
@@ -173,7 +173,7 @@ const HelpViewer = (props : Props)=>{
 	}
 
 	return (
-		<div id="testtest" className={`${classes.wrap} ${props.className}`}/*  onClick={(evt)=>{alert(1)}} */ >
+		<div className={`${classes.wrap} ${props.className}`}/*  onClick={(evt)=>{alert(1)}} */ onMouseDown={props.onHeaderClick} >
 			<Slider ref={e=>slider=e} {...sliderSettings} className={classes.slider}>
 				{
 					images.map((el, idx)=>(
