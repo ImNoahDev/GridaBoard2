@@ -120,36 +120,7 @@ const HelpViewer = (props : Props)=>{
 	const goNext = (e)=>{
 		e.stopPropagation();
 		if(myHelpData[nowView].link !== null){
-			// window.open("about:blank").location.href = "/nbs_v2.json.gz";
-			// var href = "https://drive.google.com/file/d/1l4C0q8xe6JIZPYEY6DdUFQLeGlikbayR";
-			// var href = "/2P_test.pdf";
-			// var anchor = document.createElement('a');
-			// anchor.href = href;
-			// anchor.download = href;
-			// document.body.appendChild(anchor);
-			// anchor.click();
-			// document.body.removeChild(anchor);
-			// fetch("/2P_test.pdf").then(function(t) {
-			// 	return t.blob().then((b)=>{
-			// 		var a = document.createElement("a");
-			// 		a.href = URL.createObjectURL(b);
-			// 		a.setAttribute("download", "test.pdf");
-			// 		a.click();
-			// 	}
-			// 	);
-			// });
-			// var xhr = new XMLHttpRequest();
-			// xhr.responseType = 'blob';
-			// xhr.onload = function () {
-			// 	var a = document.createElement('a');
-			// 	a.href = window.URL.createObjectURL(xhr.response); // xhr.response is a blob
-			// 	a.download = "test.pdf"; // Set the file name.
-			// 	a.style.display = 'none';
-			// 	document.body.appendChild(a);
-			// 	a.click();
-			// };
-			// xhr.open('GET', "https://drive.google.com/file/d/1l4C0q8xe6JIZPYEY6DdUFQLeGlikbayR");
-			// xhr.send();
+			window.open(myHelpData[nowView].link);
 			slider.slickNext();
 		}else if(nowView == myHelpData.length-1){
 			props.setHelpMenu(false);
