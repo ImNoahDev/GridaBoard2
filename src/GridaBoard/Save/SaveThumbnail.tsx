@@ -9,6 +9,8 @@ import { store } from "../client/pages/GridaBoard";
 import * as PdfJs from "pdfjs-dist";
 import { clearCanvas } from "nl-lib/common/util";
 import firebase from "GridaBoard/util/firebase_config";
+import { makePdfDocument } from "./SavePdf";
+import { getPageInfosFromDoc, makeGridaBlob } from "./SaveGrida";
 
 const makePdfJsDoc = async (loadingTask: any) => {
 
@@ -271,15 +273,20 @@ export async function saveThumbnail(docName: string) {
 
   const userId = firebase.auth().currentUser.email;
   const date = Date.now();
-  const fileName = `${userId}_${docName}_${date}_.png`
-  var pngRef = storageRef.child(`thumbnail/${fileName}`);
 
+  const thumbFileName = `${userId}_${docName}_${date}_.png`
+  var pngRef = storageRef.child(`thumbnail/${thumbFileName}`);
 
-/** Upload thumbnail image using Firebase
+  const gridaFileName = `${userId}_${docName}_${date}_.grida`
+  var gridaRef = storageRef.child(`grida/${gridaFileName}`);
+
+/** Make & Upload Grida
   * -----------------------------------------------------------------------------------
   */
-  var uploadTask = pngRef.put(blob);
-  await uploadTask.on(firebase.storage.TaskEvent.STATE_CHANGED,
+  const gridaBlob = await makeGridaBlob();
+  let grida_downloadURL;
+  var gridaUploadTask = gridaRef.put(gridaBlob);
+  await gridaUploadTask.on(firebase.storage.TaskEvent.STATE_CHANGED,
     function(snapshot) {
       var progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
       console.log('Upload is ' + progress + '% done');
@@ -306,10 +313,47 @@ export async function saveThumbnail(docName: string) {
           break;
       }
     }, async function() {
-      uploadTask.snapshot.ref.getDownloadURL().then(function(downloadURL) {
+      gridaUploadTask.snapshot.ref.getDownloadURL().then(function(downloadURL) {
+        grida_downloadURL = downloadURL;
+    });
+  });
+    
+
+/** Upload thumbnail image using Firebase
+  * -----------------------------------------------------------------------------------
+  */
+  var thumbUploadTask = pngRef.put(blob);
+  await thumbUploadTask.on(firebase.storage.TaskEvent.STATE_CHANGED,
+    function(snapshot) {
+      var progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+      console.log('Upload is ' + progress + '% done');
+      switch (snapshot.state) {
+        case firebase.storage.TaskState.PAUSED: // or 'paused'
+          console.log('Upload is paused');
+          break;
+        case firebase.storage.TaskState.RUNNING: // or 'running'
+          console.log('Upload is running');
+          break;
+      }
+    }, function(error) {
+      switch (error.code) {
+        case 'storage/unauthorized':
+          // User doesn't have permission to access the object
+          break;
+    
+        case 'storage/canceled':
+          // User canceled the upload
+          break;
+   
+        case 'storage/unknown':
+          // Unknown error occurred, inspect error.serverResponse
+          break;
+      }
+    }, async function() {
+      thumbUploadTask.snapshot.ref.getDownloadURL().then(function(downloadURL) {
         console.log('File available at', downloadURL);
 
-        saveToDB(docName, downloadURL)
+        saveToDB(docName, downloadURL, grida_downloadURL)
       });
     });
 
@@ -317,7 +361,7 @@ export async function saveThumbnail(docName: string) {
 
 }
 
-const saveToDB = (docName: string, downloadURL: string) => {
+const saveToDB = (docName: string, thumb_downloadURL: string, grida_downloadURL: string) => {
   const db = firebase.firestore();
   const userId = firebase.auth().currentUser.email;
   
@@ -327,8 +371,8 @@ const saveToDB = (docName: string, downloadURL: string) => {
       doc_name: docName,
       favorite: false,
       id: userId,
-      grida_path : "somewhere",
-      thumb_downloadURL : downloadURL,
+      grida_path : grida_downloadURL,
+      thumb_downloadURL : thumb_downloadURL,
   })
   .then(function() {
       console.log(`${docName} is created`);
