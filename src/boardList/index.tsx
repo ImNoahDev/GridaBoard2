@@ -8,6 +8,7 @@ import "firebase/database";
 import firebase , { auth } from "GridaBoard/util/firebase_config";
 import { useSelector } from 'react-redux';
 import GridaDoc from '../GridaBoard/GridaDoc';
+import { InkStorage } from '../nl-lib/common/penstorage';
 
 const logOut = ()=>{
     auth.signOut();
@@ -22,18 +23,12 @@ const BoardList = () => {
 
     const history = useHistory();
 
-    var storage = firebase.storage();
-    var storageRef = storage.ref();
-  
-    var pngRef = storageRef.child('thumbnail/thumb.png');
-
     const activeStyle = {
         color: 'green',
         fontSize: '2rem'
     };
     turnOnGlobalKeyShortCut(false);
 
-    const database = firebase.database();
     const db = firebase.firestore();
 
     useEffect(() => {
@@ -71,18 +66,66 @@ const BoardList = () => {
         });
     }
 
+    const getJSON = async url => {
+        try {
+            const response = await fetch(url);
+            if(!response.ok) // check if response worked (no 404 errors etc...)
+            throw new Error(response.statusText);
+        
+            const data = await response.json(); // get JSON from the response
+            return data; // returns a promise, which resolves to this data value
+        } catch(error) {
+            return error;
+        }
+    }
+
     const routeChange = async (i) =>{ 
-        let path = `/app`; 
+        const path = `/app`; 
         await history.push(path);
 
-        i.grida_path;
-        
-        const filename = "2P_test.pdf";
-        const url = "./2P_test.pdf";
+        getJSON(url);
 
-        const doc = GridaDoc.getInstance();
-        doc.openPdfFile({ url, filename });
-      }
+        //firebase storage에 url로 json을 갖고 오기 위해서 CORS 구성이 선행되어야 함(gsutil 사용)
+        fetch(i.grida_path)
+        .then(response => response.json())
+        .then(async (data) => {
+            const pdfRawData = data.pdf.pdfInfo.rawData;
+            const neoStroke = data.stroke;
+
+            const pageInfos = data.pdf.pdfInfo.pageInfos;
+            const basePageInfos = data.pdf.pdfInfo.basePageInfos;
+
+            const rawDataBuf = new ArrayBuffer(pdfRawData.length*2);
+            const rawDataBufView = new Uint8Array(rawDataBuf);
+            for (let i = 0; i < pdfRawData.length; i++) {
+              rawDataBufView[i] = pdfRawData.charCodeAt(i);
+            }
+            const blob = new Blob([rawDataBufView], {type: 'application/pdf'});
+            const url = await URL.createObjectURL(blob);
+
+            const completed = InkStorage.getInstance().completedOnPage;
+            completed.clear();
+      
+            const gridaArr = [];
+            const pageId = []
+      
+            for (let i = 0; i < neoStroke.length; i++) {
+      
+              pageId[i] = InkStorage.makeNPageIdStr(neoStroke[i][0]);
+              if (!completed.has(pageId[i])) {
+                completed.set(pageId[i], new Array(0));
+              }
+      
+              gridaArr[i] = completed.get(pageId[i]);
+              for (let j = 0; j < neoStroke[i].length; j++){
+                gridaArr[i].push(neoStroke[i][j]);
+              }
+            }
+
+            await GridaDoc.getInstance().openGridaFile(
+                { url: url, filename: i.doc_name }, pdfRawData, neoStroke, pageInfos, basePageInfos);
+        });
+    }
 
     return (
         <div>BoardList
