@@ -8,15 +8,15 @@ const App = ()=>{
     /**
      * 커밋할 경우 true로 고정
      */
-    const isOnlyGrida = true;
-    if(!isOnlyGrida){
+    const isOnlyGrida = false;
+    if(isOnlyGrida){
         // 기본 경로를 그리다로 고정
         return (<div>
           <Route path="/" component={GridaBoard}/>
         </div>);
     }else{
         // 경로 옵션 사용하고 싶을떄
-        return (<div>
+        return (<div style={{position:"relative", width:"100%", height:"100%"}}>
           <Route exact path="/" component={Login}/>
           <Route exact path="/list" component={List}/>
           <Route exact path="/app" component={GridaBoard}/>

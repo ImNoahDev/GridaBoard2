@@ -372,6 +372,7 @@ const saveToDB = (docName: string, thumb_downloadURL: string, grida_downloadURL:
   db.collection(userId).doc(docName).set({
       category: "None",
       date: new Date(),
+      last_modified : new Date(),
       doc_name: docName,
       favorite: false,
       id: userId,
