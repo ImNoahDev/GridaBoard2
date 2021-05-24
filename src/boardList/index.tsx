@@ -36,6 +36,7 @@ const logOut = () => {
   cookies.remove('user_email');
 };
 
+
 const BoardList = () => {
   const cookies = new Cookies();
   const [theme, settheme] = useState(neolabTheme.theme);
@@ -68,7 +69,7 @@ const BoardList = () => {
 
   const database = firebase.database();
   const db = firebase.firestore();
-
+  
   useEffect(() => {
     if (userId !== '') {
       db.collection(userId)
@@ -128,6 +129,31 @@ const BoardList = () => {
         });
       });
   };
+  
+  const createCategory = async (categoryName)=>{
+    await db
+    .collection(userId)
+    .doc('categoryData')
+    .get()
+    .then(async (res)=>{
+      let data:Array<string> = res.data().data;
+      if(data.includes(categoryName)){
+        console.log("already had")
+      }else{
+        await db
+          .collection(userId)
+          .doc('categoryData')
+          .set({
+            data: [...data, categoryName],
+          });
+
+          setDocsObj({
+            docs: docsObj.docs,
+            category: [...docsObj.category, categoryName],
+          });
+      }
+    })
+  }
 
   const getJSON = async url => {
     try {
@@ -198,13 +224,13 @@ const BoardList = () => {
         );
       });
   };
-  console.log(routeChange);
 
   const selectCategory = (select: string) => {
     console.log(select);
     setCategory(select);
   };
 
+  console.log(createCategory);
   const classes = useStyle();
   return (
     <MuiThemeProvider theme={theme}>
@@ -213,7 +239,7 @@ const BoardList = () => {
           <Header />
         </AppBar>
         <div className={classes.main}>
-          <Leftside selected={category} category={categoryObj} categoryKey={categoryKey} selectCategory={selectCategory} />
+          <Leftside selected={category} category={categoryObj} categoryKey={categoryKey} selectCategory={selectCategory} createCategory={createCategory} />
           <MainContent selected={category} category={categoryObj} docs={docsObj.docs} routeChange={routeChange} />
         </div>
       </div>

@@ -3,7 +3,6 @@ interface Props extends  React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivEle
    docsList?: Array<any>,
    selectedContent ?: number,
    selectedClass ?: string,
-
    routeChange ?: (idx:number)=>void
 }
 

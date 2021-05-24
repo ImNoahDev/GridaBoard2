@@ -106,7 +106,8 @@ interface Props extends  React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivEle
   // categoryList ?: Array<{name:string, count:number}>,
   category ?: Object,
   categoryKey ?: Array<string>
-  selectCategory ?: (select:string|number)=>void
+  selectCategory ?: (select:string|number)=>void,
+  createCategory ?: (categoryName:string)=>void
 }
 
 const Leftside = (props : Props)=>{
