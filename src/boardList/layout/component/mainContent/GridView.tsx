@@ -13,11 +13,11 @@ const GridView = (props : Props)=>{
   return (
     <React.Fragment>
       {docsList.map((el, idx) => {
-        let times = new Date(el.date.seconds*1000);
+        let times = new Date(el.last_modified.seconds*1000);
         let category = el.category == "Unshelved" ? "" : el.category;
         return (
           <div key={idx} className="contentItem"  onClick={() => routeChange(el.key)} >
-            <div style={{backgroundImage:`url(${el.thumb_downloadURL})`}} />
+            <div style={{backgroundImage:`url(${el.thumb_path})`}} />
             <div>
               <div>{el.doc_name}</div>
               <div className="contentData">

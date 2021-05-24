@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Button, Popover, SvgIcon, makeStyles, ClickAwayListener } from "@material-ui/core";
 import KeyboardArrowDownRoundedIcon from '@material-ui/icons/KeyboardArrowDownRounded';
-import { saveGrida } from "../Save/SaveGrida";
+import { makeGridaBlob, saveGrida } from "../Save/SaveGrida";
 // import LoadGrida from "../Load/LoadGrida";
 import ConvertFileLoad from "../Load/ConvertFileLoad";
 import GridaDoc from "../GridaDoc";
@@ -24,9 +24,22 @@ import CustomBadge from "../components/CustomElement/CustomBadge";
 import LogoSvg from "../logo.svg";
 import TestButton from "../components/buttons/TestButton";
 import PenLogWindow from "../debugging/PenLogWindow";
-import { saveThumbnail } from "../Save/SaveThumbnail";
+import { makeThumbnail, saveThumbnail, saveToDB, updateDB } from "../Save/SaveThumbnail";
+import { store } from "../client/pages/GridaBoard";
+import firebase from 'GridaBoard/util/firebase_config';
 
 const useStyles = props => makeStyles((theme) => ({
+  dropdownBtn : {
+    width: "200px",
+    height: "40px",
+    padding: "4px 12px",
+    display: "flex",
+    justifyContent: "left",
+    "&:hover" : {
+      background : theme.custom.icon.blue[3],
+      color: theme.palette.action.hover
+    }
+  },
   buttonStyle: {
     padding: 0,
     minWidth: "0px",
@@ -273,6 +286,105 @@ const HeaderLayer = (props: Props) => {
     props.handlePenLogWindow();
   }
 
+  const overwrite = async () => {
+    //1. 썸네일 새로 만들기
+    const imageBlob = await makeThumbnail();
+
+    //2. grida 새로 만들기
+    const gridaBlob = await makeGridaBlob();
+
+    //3. thumbnail, last_modifed, grida 업데이트
+    const docName = store.getState().docConfig.docName;
+    const date = store.getState().docConfig.date;
+    const userId = firebase.auth().currentUser.email;
+
+    const gridaFileName = `${userId}_${docName}_${date}_.grida`;
+
+    const storageRef = firebase.storage().ref();
+    const gridaRef = storageRef.child(`grida/${gridaFileName}`);
+
+    const gridaUploadTask = gridaRef.put(gridaBlob);
+    await gridaUploadTask.on(
+      firebase.storage.TaskEvent.STATE_CHANGED,
+      function (snapshot) {
+        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+        console.log('Grida Upload is ' + progress + '% done');
+        switch (snapshot.state) {
+          case firebase.storage.TaskState.PAUSED: // or 'paused'
+            console.log('Upload is paused');
+            break;
+          case firebase.storage.TaskState.RUNNING: // or 'running'
+            console.log('Upload is running');
+            break;
+        }
+      },
+      function (error) {
+        switch (error.code) {
+          case 'storage/unauthorized':
+            // User doesn't have permission to access the object
+            break;
+  
+          case 'storage/canceled':
+            // User canceled the upload
+            break;
+  
+          case 'storage/unknown':
+            // Unknown error occurred, inspect error.serverResponse
+            break;
+        }
+      },
+      async function () {
+        gridaUploadTask.snapshot.ref.getDownloadURL().then(async function (downloadURL) {
+          const grida_path = downloadURL;
+  
+          const thumbFileName = `${userId}_${docName}_${date}_.png`;
+          const pngRef = storageRef.child(`thumbnail/${thumbFileName}`);
+  
+          const thumbUploadTask = pngRef.put(imageBlob);
+          await thumbUploadTask.on(
+            firebase.storage.TaskEvent.STATE_CHANGED,
+            function (snapshot) {
+              const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+              console.log('Thumbnail Upload is ' + progress + '% done');
+              switch (snapshot.state) {
+                case firebase.storage.TaskState.PAUSED: // or 'paused'
+                  console.log('Upload is paused');
+                  break;
+                case firebase.storage.TaskState.RUNNING: // or 'running'
+                  console.log('Upload is running');
+                  break;
+              }
+            },
+            function (error) {
+              switch (error.code) {
+                case 'storage/unauthorized':
+                  // User doesn't have permission to access the object
+                  break;
+  
+                case 'storage/canceled':
+                  // User canceled the upload
+                  break;
+  
+                case 'storage/unknown':
+                  // Unknown error occurred, inspect error.serverResponse
+                  break;
+              }
+            },
+            async function () {
+              thumbUploadTask.snapshot.ref.getDownloadURL().then(function (thumb_path) {
+                updateDB(docName, thumb_path, grida_path);
+              });
+            }
+          );
+        });
+      }
+    );
+
+
+
+
+  }
+
   const [debugOpen, setDebugOpen] = useState(false);
 
   return (
@@ -292,7 +404,10 @@ const HeaderLayer = (props: Props) => {
                   <div className={`${classes.saveDropdownStyle}`} >
                     <SavePdfDialog saveType="pdf" />
                     <SavePdfDialog saveType="grida" />
-                    <SavePdfDialog saveType="thumb" />
+                    <SavePdfDialog saveType="saveAs" />
+                    <Button className={`${classes.dropdownBtn}`} onClick={overwrite} >
+                      저장하기(덮어쓰기)
+                    </Button>
                   </div>
                 ) : null}
               </div>
