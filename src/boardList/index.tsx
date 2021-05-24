@@ -25,7 +25,8 @@ const useStyle = makeStyles(theme=>({
     display: "flex", 
     flex: 1, 
     flexDirection: "row", 
-    justifyContent: "flex-start"
+    justifyContent: "flex-start",
+    maxHeight: "calc(100% - 72px)"
   }
 }));
 
@@ -75,8 +76,8 @@ const BoardList = () => {
 				querySnapshot.forEach((doc) => {
 					if(doc.id === "categoryData") newCategoryData = doc.data().data;
 					else{
-						console.log(doc.id, " => ", doc.data());
 						newDocs.push(doc.data());
+            newDocs[newDocs.length-1].key = newDocs.length-1;
 					}
 				});
 				setDocsObj({
@@ -174,6 +175,7 @@ const BoardList = () => {
             { url: url, filename: nowDocs.doc_name }, pdfRawData, neoStroke, pageInfos, basePageInfos);
     });
   }
+  console.log(routeChange);
 
   const selectCategory = (select: string) => {
     console.log(select);
@@ -189,7 +191,7 @@ const BoardList = () => {
         </AppBar>
         <div className={classes.main}>
           <Leftside selected={category} category={categoryObj} categoryKey={categoryKey} selectCategory={selectCategory}/>
-          <MainContent selected={category} category={categoryObj} docs={docsObj.docs}/>
+          <MainContent selected={category} category={categoryObj} docs={docsObj.docs} routeChange={routeChange}/>
         </div>
       </div>
     </MuiThemeProvider>
