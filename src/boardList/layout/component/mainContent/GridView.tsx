@@ -3,11 +3,13 @@ interface Props extends  React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivEle
    docsList?: Array<any>,
    selectedContent ?: number,
    selectedClass ?: string,
+
+   routeChange ?: (idx:number)=>void
 }
 
 const GridView = (props : Props)=>{
   console.log(props);
-  const {docsList,selectedContent, selectedClass,ref, ...rest} = props;
+  const {docsList,selectedContent, selectedClass,ref,routeChange, ...rest} = props;
   console.log(rest);
   return (
     <React.Fragment>
@@ -15,7 +17,7 @@ const GridView = (props : Props)=>{
         let times = new Date(el.date.seconds*1000);
         let category = el.category == "Unshelved" ? "" : el.category;
         return (
-          <div key={idx} className="contentItem" /* onClick={() => routeChange(el.key)} */>
+          <div key={idx} className="contentItem"  onClick={() => routeChange(el.key)} >
             <div style={{backgroundImage:`url(${el.thumb_downloadURL})`}} />
             <div>
               <div>{el.doc_name}</div>

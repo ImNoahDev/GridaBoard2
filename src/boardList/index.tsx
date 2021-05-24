@@ -186,7 +186,10 @@ const BoardList = () => {
           }
         }
 
-        await GridaDoc.getInstance().openGridaFile(
+        const doc = GridaDoc.getInstance();
+        doc.pages = [];
+
+        await doc.openGridaFile(
           { url: url, filename: nowDocs.doc_name },
           pdfRawData,
           neoStroke,
