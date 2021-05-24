@@ -110,14 +110,9 @@ const BoardList = () => {
   for (let i = 0; i < docsObj.category.length; i++) {
     categoryObj[docsObj.category[i]] = 0;
   }
-  categoryObj['Unshelved'] = 0;
   for (let i = 0; i < docsObj.docs.length; i++) {
     let now = docsObj.docs[i];
-    if (now.category == 'Unshelved') {
-      categoryObj['Unshelved'] += 1;
-    } else {
-      categoryObj[now.category] += 1;
-    }
+    categoryObj[now.category] += 1;
   }
   const categoryKey = docsObj.category;
 

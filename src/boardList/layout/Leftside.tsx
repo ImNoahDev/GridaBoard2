@@ -113,6 +113,7 @@ const Leftside = (props : Props)=>{
   const classes = useStyle();
   const selected = props.selected;
   const keyList = props.categoryKey;
+  console.log(keyList);
 
   const selectCategory = (select)=>{
     if(select == selected) return ;
@@ -141,11 +142,11 @@ const Leftside = (props : Props)=>{
           </Button>
         </div>
         {keyList.map(el=>{
-          let title = el === "none" ? getText("boardList_unshelved").replace("%d", props.category[el]) : el + ` (${props.category[el]})`;
+          let title = el === "Unshelved" ? getText("boardList_unshelved").replace("%d", props.category[el]) : el + ` (${props.category[el]})`;
           return (
           <div key={el} onClick={e=>selectCategory(el)} className={selected === el? classes.selected : "" }>
             <span>{title}</span>
-            {el !== "none" ? (
+            {el !== "Unshelved" ? (
               <IconButton onClick={(e)=>{e.stopPropagation(); alert(123)}}><MoreVert /></IconButton>
             ) : ""}
           </div>
