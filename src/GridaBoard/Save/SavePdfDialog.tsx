@@ -4,14 +4,14 @@ import {
 } from '@material-ui/core';
 import React from 'react';
 import { savePDF } from "./SavePdf";
-import { saveGrida } from "./SaveGrida";
+import { makeGridaBlob, saveGrida } from "./SaveGrida";
 import PdfDialogTextArea from './PdfDialogTextArea';
 import { turnOnGlobalKeyShortCut } from '../GlobalFunctions';
 import GridaToolTip from '../styles/GridaToolTip';
-import $ from "jquery";
 import getText from "../language/language";
-import { saveThumbnail } from './SaveThumbnail';
-
+import { makeThumbnail, saveThumbnail, updateDB } from './SaveThumbnail';
+import { store } from '../client/pages/GridaBoard';
+import firebase from 'GridaBoard/util/firebase_config';
 
 
 const useStyles = makeStyles((theme) => {
@@ -69,7 +69,7 @@ const useStyles = makeStyles((theme) => {
   });
 });
 type Props = {
-  saveType : "grida" | "pdf" | "saveAs"
+  saveType : "grida" | "pdf" | "saveAs" | "overwrite"
 }
 const SavePdfDialog = (props: Props) => {
   const {saveType } = props;
@@ -94,15 +94,116 @@ const SavePdfDialog = (props: Props) => {
     turnOnGlobalKeyShortCut(true);
   };
 
-  const handleDialogOpen = () => {
-    setOpen(true);
-    turnOnGlobalKeyShortCut(false);
+  const handleDialogOpen = (saveType: string) => {
+    const isNewDoc = store.getState().docConfig.isNewDoc;
+    if (saveType === "overwrite" && !isNewDoc) {
+      setOpen(false)
+      overwrite();
+    } else {
+      setOpen(true);
+      turnOnGlobalKeyShortCut(false);
+    }
   };
 
   const handleDialogClose = () => {
     setOpen(false);
     onReset();
   };
+
+  const overwrite = async () => {
+    //1. 썸네일 새로 만들기
+    const imageBlob = await makeThumbnail();
+
+    //2. grida 새로 만들기
+    const gridaBlob = await makeGridaBlob();
+
+    //3. thumbnail, last_modifed, grida 업데이트
+    const docName = store.getState().docConfig.docName;
+    const date = store.getState().docConfig.date;
+    const userId = firebase.auth().currentUser.email;
+
+    const gridaFileName = `${userId}_${docName}_${date}_.grida`;
+
+    const storageRef = firebase.storage().ref();
+    const gridaRef = storageRef.child(`grida/${gridaFileName}`);
+
+    const gridaUploadTask = gridaRef.put(gridaBlob);
+    await gridaUploadTask.on(
+      firebase.storage.TaskEvent.STATE_CHANGED,
+      function (snapshot) {
+        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+        console.log('Grida Upload is ' + progress + '% done');
+        switch (snapshot.state) {
+          case firebase.storage.TaskState.PAUSED: // or 'paused'
+            console.log('Upload is paused');
+            break;
+          case firebase.storage.TaskState.RUNNING: // or 'running'
+            console.log('Upload is running');
+            break;
+        }
+      },
+      function (error) {
+        switch (error.code) {
+          case 'storage/unauthorized':
+            // User doesn't have permission to access the object
+            break;
+  
+          case 'storage/canceled':
+            // User canceled the upload
+            break;
+  
+          case 'storage/unknown':
+            // Unknown error occurred, inspect error.serverResponse
+            break;
+        }
+      },
+      async function () {
+        gridaUploadTask.snapshot.ref.getDownloadURL().then(async function (downloadURL) {
+          const grida_path = downloadURL;
+  
+          const thumbFileName = `${userId}_${docName}_${date}_.png`;
+          const pngRef = storageRef.child(`thumbnail/${thumbFileName}`);
+  
+          const thumbUploadTask = pngRef.put(imageBlob);
+          await thumbUploadTask.on(
+            firebase.storage.TaskEvent.STATE_CHANGED,
+            function (snapshot) {
+              const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+              console.log('Thumbnail Upload is ' + progress + '% done');
+              switch (snapshot.state) {
+                case firebase.storage.TaskState.PAUSED: // or 'paused'
+                  console.log('Upload is paused');
+                  break;
+                case firebase.storage.TaskState.RUNNING: // or 'running'
+                  console.log('Upload is running');
+                  break;
+              }
+            },
+            function (error) {
+              switch (error.code) {
+                case 'storage/unauthorized':
+                  // User doesn't have permission to access the object
+                  break;
+  
+                case 'storage/canceled':
+                  // User canceled the upload
+                  break;
+  
+                case 'storage/unknown':
+                  // Unknown error occurred, inspect error.serverResponse
+                  break;
+              }
+            },
+            async function () {
+              thumbUploadTask.snapshot.ref.getDownloadURL().then(function (thumb_path) {
+                updateDB(docName, thumb_path, grida_path);
+              });
+            }
+          );
+        });
+      }
+    );
+  }
 
   const handleSavePdf = () => {
     //공백과 .으로는 시작 할 수 없음
@@ -136,9 +237,9 @@ const SavePdfDialog = (props: Props) => {
       saveGrida(selectedName);
     }else if (saveType === "pdf") {
       savePDF(selectedName);
-    } else if (saveType === "saveAs") {
+    } else if (saveType === "saveAs" || saveType === "overwrite") {
       saveThumbnail(selectedName);
-    }
+    } 
     setOpen(false);
     onReset();
   }
@@ -151,7 +252,7 @@ const SavePdfDialog = (props: Props) => {
         msg: "PDF 파일을 로컬에 저장하는 버튼입니다.",
         tail: "키보드 버튼 ?로 선택 가능합니다"
       }} title={undefined}> */}
-        <Button className={`${classes.dropdownBtn} ${saveType==="pdf"? "save_drop_down": ""}`} onClick={handleDialogOpen}>
+        <Button className={`${classes.dropdownBtn} ${saveType==="pdf"? "save_drop_down": ""}`} onClick={() => handleDialogOpen(saveType)}>
           {getText("save_to_"+saveType)}
         </Button>
       {/* </GridaToolTip> */}

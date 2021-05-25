@@ -216,13 +216,6 @@ const BoardList = () => {
         const doc = GridaDoc.getInstance();
         doc.pages = [];
 
-        setDocName(nowDocs.doc_name);
-        setIsNewDoc(false);
-
-        const n_sec = nowDocs.created.nanoseconds.toString().substring(0,3);
-        const sec = nowDocs.created.seconds.toString();
-        const m_sec = sec + n_sec;
-        setDate(m_sec);
         
         await doc.openGridaFile(
           { url: url, filename: nowDocs.doc_name },
@@ -230,7 +223,15 @@ const BoardList = () => {
           neoStroke,
           pageInfos,
           basePageInfos
-        );
+          );
+          
+          setDocName(nowDocs.doc_name);
+          setIsNewDoc(false);
+  
+          const n_sec = nowDocs.created.nanoseconds.toString().substring(0,3);
+          const sec = nowDocs.created.seconds.toString();
+          const m_sec = sec + n_sec;
+          setDate(m_sec);
       });
   };
 

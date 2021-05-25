@@ -43,7 +43,7 @@ type ActionValue = {
 //[Reducer
 const initialState = {
   docName: 'undefined',
-  isNew: true,
+  isNewDoc: true,
   date: '',
 };
 

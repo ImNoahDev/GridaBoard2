@@ -2,6 +2,10 @@ import { Button, ButtonGroup, ClickAwayListener, Grow, makeStyles, MenuItem, Men
 import React, { useState } from 'react';
 import getText from "GridaBoard/language/language";
 import { ArrowDropDown, Add } from '@material-ui/icons';
+import { useHistory } from 'react-router';
+import GridaDoc from '../../../../GridaBoard/GridaDoc';
+import { setActivePageNo } from '../../../../GridaBoard/store/reducers/activePageReducer';
+import { setIsNewDoc } from '../../../../GridaBoard/store/reducers/docConfigReducer';
 
 
 const menuStyle = makeStyles(theme =>({
@@ -49,9 +53,21 @@ const MainNewButton = ()=>{
   const [selectedIndex, setSelectedIndex] = useState(0);
   const options = [getText("word_New"),"anything"];
   const classes = menuStyle();
+  const history = useHistory();
 
-  const handleClick = () => {
+  const handleClick = async () => {
     console.info(`You clicked ${options[selectedIndex]}`);
+
+    const path = `/app`;
+    await history.push(path);
+
+    const doc = GridaDoc.getInstance();
+    doc.pages = [];
+
+    const pageNo = await doc.addBlankPage();
+    setActivePageNo(pageNo);
+
+    setIsNewDoc(true);
   };
 
   const handleMenuItemClick = (
