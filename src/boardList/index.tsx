@@ -35,6 +35,7 @@ const logOut = () => {
   const cookies = new Cookies();
   cookies.remove('user_email');
 };
+console.log(logOut);
 
 
 const BoardList = () => {
@@ -45,21 +46,15 @@ const BoardList = () => {
     category: [],
   });
   const [category, setCategory] = useState('recent');
-  // const [userId, setUserId] = useState("");
   const userId = cookies.get('user_email');
 
-  if (userId === undefined) {
-    //로그인시 자동으로 넘기기
-    return <Redirect to="/" />;
-  }
-  console.log(userId);
-
+  
   const history = useHistory();
 
   var storage = firebase.storage();
   // var storageRef = storage.ref();
 
-  // var pngRef = storageRef.child('thumbnail/thumb.png');
+  // var pngRef = storageRef.child('thumbnail/thumb.png'); 
 
   const activeStyle = {
     color: 'green',
@@ -71,7 +66,7 @@ const BoardList = () => {
   const db = firebase.firestore();
   
   useEffect(() => {
-    if (userId !== '') {
+    if (userId !== undefined) {
       db.collection(userId)
         .get()
         .then(async querySnapshot => {
@@ -115,7 +110,6 @@ const BoardList = () => {
     let now = docsObj.docs[i];
     categoryObj[now.category] += 1;
   }
-  const categoryKey = docsObj.category;
 
   const readThumbnailFromDB = () => {
     const userId = firebase.auth().currentUser.email;
@@ -229,9 +223,12 @@ const BoardList = () => {
     console.log(select);
     setCategory(select);
   };
-
-  console.log(createCategory);
   const classes = useStyle();
+  
+  if (userId === undefined) {
+    //로그인으로 자동으로 넘기기
+    return <Redirect to="/" />;
+  }
   return (
     <MuiThemeProvider theme={theme}>
       <div className={classes.mainBackground}>
@@ -239,7 +236,7 @@ const BoardList = () => {
           <Header />
         </AppBar>
         <div className={classes.main}>
-          <Leftside selected={category} category={categoryObj} categoryKey={categoryKey} selectCategory={selectCategory} createCategory={createCategory} />
+          <Leftside selected={category} category={categoryObj} categoryKey={docsObj.category} selectCategory={selectCategory} createCategory={createCategory} />
           <MainContent selected={category} category={categoryObj} docs={docsObj.docs} routeChange={routeChange} />
         </div>
       </div>
@@ -248,23 +245,3 @@ const BoardList = () => {
 };
 
 export default BoardList;
-
-{
-  /* <ul>
-<li><NavLink exact to="/" activeStyle={activeStyle}>Home</NavLink></li>
-<li><NavLink to="/app" activeStyle={activeStyle}>app</NavLink></li>
-<li><Button onClick = {logOut}> 로그아웃 </Button></li>
-</ul>
-<hr/>
-
-
-{docs.map((i) => {
-return (
-  <div key={i} style={{display: 'flex', justifyContent: "left", float: "left", flexDirection: "column", alignItems: "cneter", }}
-  onClick={() => routeChange(i)}>
-    <img src={i.thumb_downloadURL} style={{ width: "200px", height: "166px" }}  />
-    {i.doc_name}
-  </div>
-)
-})} */
-}
