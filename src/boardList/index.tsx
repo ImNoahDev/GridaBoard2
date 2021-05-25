@@ -13,6 +13,7 @@ import * as neolabTheme from 'GridaBoard/theme';
 import Header from './layout/Header';
 import Leftside from './layout/Leftside';
 import MainContent from './layout/MainContent';
+import { setDate, setDocName, setIsNewDoc } from '../GridaBoard/store/reducers/docConfigReducer';
 const useStyle = makeStyles(theme => ({
   mainBackground: {
     width: '100%',
@@ -167,7 +168,7 @@ const BoardList = () => {
     const path = `/app`;
     await history.push(path);
 
-    let url = nowDocs.thumb_downloadURL;
+    let url = nowDocs.thumb_path;
     getJSON(url);
 
     //firebase storage에 url로 json을 갖고 오기 위해서 CORS 구성이 선행되어야 함(gsutil 사용)
@@ -209,13 +210,22 @@ const BoardList = () => {
         const doc = GridaDoc.getInstance();
         doc.pages = [];
 
+        
         await doc.openGridaFile(
           { url: url, filename: nowDocs.doc_name },
           pdfRawData,
           neoStroke,
           pageInfos,
           basePageInfos
-        );
+          );
+          
+          setDocName(nowDocs.doc_name);
+          setIsNewDoc(false);
+  
+          const n_sec = nowDocs.created.nanoseconds.toString().substring(0,3);
+          const sec = nowDocs.created.seconds.toString();
+          const m_sec = sec + n_sec;
+          setDate(m_sec);
       });
   };
 

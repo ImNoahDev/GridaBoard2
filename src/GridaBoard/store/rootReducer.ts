@@ -12,6 +12,7 @@ import progressDlgReducer from "./reducers/progressDlgReducer";
 import calibrationReducer from "./reducers/calibrationReducer";
 import calibrationDataReducer from "./reducers/calibrationDataReducer";
 import appConfigReducer from './reducers/appConfigReducer';
+import docConfigReducer from './reducers/docConfigReducer';
 import zoomReducer from './reducers/zoomReducer';
 
 const rootReducer = combineReducers({
@@ -20,6 +21,7 @@ const rootReducer = combineReducers({
   calibration: calibrationReducer,
   calibrationDataReducer,
   appConfig: appConfigReducer,
+  docConfig: docConfigReducer,
 
   auth: authorizationReducer,
   ui: uiReducer,
