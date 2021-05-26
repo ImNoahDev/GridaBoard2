@@ -25,7 +25,6 @@ export interface IOpenStrokeArg {
   h_origin: TransformParameters;
 }
 
-
 export default class InkStorage {
   completed: NeoStroke[] = [];  // completed strokes
 
@@ -42,6 +41,7 @@ export default class InkStorage {
 
   lastPageInfo: IPageSOBP = { section: -1, book: -1, owner: -1, page: -1 };
 
+  needAlert = true;
 
   /** @type {InkStorage} */
   // static instance;
@@ -175,10 +175,15 @@ export default class InkStorage {
     const activePageNo = store.getState().activePage.activePageNo;
     if ((isPlatePaper(pageInfo) || isPUI(pageInfo)) && activePageNo === -1) {
       if (isPlatePaper(pageInfo)) {
-        alert(getText("alert_needPage"));
+        if (this.needAlert) {
+          this.needAlert = false;
+          alert(getText("alert_needPage"));
+        }
       }
       return;
     }
+
+    this.needAlert = true;
     const basePageInfo = GridaDoc.getInstance().getPage(activePageNo).basePageInfo;
 
     if (isSameNcode(DefaultPlateNcode, {section, owner, book, page})) {
