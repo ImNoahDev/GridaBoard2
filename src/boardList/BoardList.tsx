@@ -6,7 +6,7 @@ import Cookies from 'universal-cookie';
 import 'firebase/auth';
 import 'firebase/database';
 import firebase, { auth } from 'GridaBoard/util/firebase_config';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import GridaDoc from '../GridaBoard/GridaDoc';
 import { InkStorage } from '../nl-lib/common/penstorage';
 import * as neolabTheme from 'GridaBoard/theme';
@@ -14,6 +14,8 @@ import Header from './layout/Header';
 import Leftside from './layout/Leftside';
 import MainContent from './layout/MainContent';
 import { setDate, setDocName, setIsNewDoc } from '../GridaBoard/store/reducers/docConfigReducer';
+import { RootState } from '../GridaBoard/store/rootReducer';
+import { setDocsNum } from '../GridaBoard/store/reducers/appConfigReducer';
 const useStyle = makeStyles(theme => ({
   mainBackground: {
     width: '100%',
@@ -51,19 +53,12 @@ const BoardList = () => {
 
   
   const history = useHistory();
+  const dispatch = useDispatch();
 
-  var storage = firebase.storage();
-  // var storageRef = storage.ref();
+  const docsNum = useSelector((state: RootState) => state.appConfig.docsNum);
 
-  // var pngRef = storageRef.child('thumbnail/thumb.png'); 
-
-  const activeStyle = {
-    color: 'green',
-    fontSize: '2rem',
-  };
   turnOnGlobalKeyShortCut(false);
 
-  const database = firebase.database();
   const db = firebase.firestore();
   
   useEffect(() => {
@@ -95,6 +90,8 @@ const BoardList = () => {
             newCategoryData = ['Unshelved'];
           }
 
+          dispatch(setDocsNum(newDocs.length));
+
           setDocsObj({
             docs: newDocs,
             category: newCategoryData,
@@ -109,7 +106,9 @@ const BoardList = () => {
   }
   for (let i = 0; i < docsObj.docs.length; i++) {
     let now = docsObj.docs[i];
-    categoryObj[now.category] += 1;
+    if (now.dateDeleted === 0) {
+      categoryObj[now.category] += 1;
+    }
   }
 
   const readThumbnailFromDB = () => {
@@ -150,26 +149,12 @@ const BoardList = () => {
     })
   }
 
-  const getJSON = async url => {
-    try {
-      const response = await fetch(url);
-      if (!response.ok)
-        // check if response worked (no 404 errors etc...)
-        throw new Error(response.statusText);
 
-      const data = await response.json(); // get JSON from the response
-      return data; // returns a promise, which resolves to this data value
-    } catch (error) {
-      return error;
-    }
-  };
+
   const routeChange = async idx => {
     const nowDocs = docsObj.docs[idx];
     const path = `/app`;
     await history.push(path);
-
-    let url = nowDocs.thumb_path;
-    getJSON(url);
 
     //firebase storage에 url로 json을 갖고 오기 위해서 CORS 구성이 선행되어야 함(gsutil 사용)
     fetch(nowDocs.grida_path)
@@ -210,7 +195,6 @@ const BoardList = () => {
         const doc = GridaDoc.getInstance();
         doc.pages = [];
 
-        
         await doc.openGridaFile(
           { url: url, filename: nowDocs.doc_name },
           pdfRawData,

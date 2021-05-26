@@ -192,20 +192,21 @@ const MainContent = (props : Props)=>{
 
   if(["recent", "trash"].includes(selected)){
     title = getText("boardList_" + selected);
-    if(selected == "recent"){
-      nowDocs = [...docs];
+    if(selected === "recent"){
+      nowDocs = docs.filter(el=>el.dateDeleted === 0);
     }else{
-      //삭제 정보 확인 필요
-      console.log(123);
+      nowDocs = docs.filter(el=>el.dateDeleted !== 0);
     }
-
   }else{
-    if(selected === "none"){
-      nowDocs = docs.filter(el=>el.category=="None");
-
+    if(selected === "Unshelved"){
+      nowDocs = docs.filter(el=> {
+        return el.category === "Unshelved" && el.dateDeleted === 0
+      });
       title = getText("boardList_unshelved").replace("%d", nowDocs.length.toString());
     }else{
-      nowDocs = docs.filter(el=>el.category==selected);
+      nowDocs = docs.filter(el=> {
+        return el.category === selected && el.dateDeleted === 0;
+      });
       title = `${selected} (${nowDocs.length})`;
     }
   }
