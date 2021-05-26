@@ -106,7 +106,7 @@ const HelpViewer = (props : Props)=>{
 	let myHelpData = helpData[languageType] === undefined? helpData["ko"] : helpData[languageType];
 	myHelpData = myHelpData["main" + props.mainNo].sub[props.subNo-1].text;
 	const imageUrl = `/helpImg/${languageType}/main${props.mainNo}/sub${props.subNo}`;
-	const images = Array.from({length:myHelpData.length}, (el,idx)=>`${imageUrl}/${idx+1}.png`);
+	const images = Array.from({length:myHelpData.length}, (el,idx)=>`${imageUrl}/${idx}.png`);
 	let slider = null as Slider;
 	let [nowView,setNowView] = useState(0);
 
