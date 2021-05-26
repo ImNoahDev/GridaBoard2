@@ -93,6 +93,7 @@ const useStyle = makeStyles(theme=>({
 	}
 }));
 
+
 interface Props extends  React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement> {
 	mainNo : number,
 	subNo : number,
@@ -114,13 +115,13 @@ const HelpViewer = (props : Props)=>{
 		if(nowView == 0){
 			//스킵
 			props.setHelpMenu(false);
-		}
+		} 
 		slider.slickPrev();
 	}
 	const goNext = (e)=>{
 		e.stopPropagation();
 		if(myHelpData[nowView].link !== null){
-			window.open(myHelpData[nowView].link);
+      window.open("./fileDownload.html?file="+myHelpData[nowView].link);
 			slider.slickNext();
 		}else if(nowView == myHelpData.length-1){
 			props.setHelpMenu(false);
