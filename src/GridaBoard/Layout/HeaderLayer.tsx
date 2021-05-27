@@ -1,7 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { Button, Popover, SvgIcon, makeStyles, ClickAwayListener } from "@material-ui/core";
-import KeyboardArrowDownRoundedIcon from '@material-ui/icons/KeyboardArrowDownRounded';
-import { saveGrida } from "../Save/SaveGrida";
+import React, { useState } from "react";
+import { Button, makeStyles, ClickAwayListener } from "@material-ui/core";
 // import LoadGrida from "../Load/LoadGrida";
 import ConvertFileLoad from "../Load/ConvertFileLoad";
 import GridaDoc from "../GridaDoc";
@@ -17,16 +15,23 @@ import { useSelector } from 'react-redux';
 import { RootState } from '../store/rootReducer';
 import { turnOnGlobalKeyShortCut } from "../GlobalFunctions";
 import getText from "../language/language";
-import { NCODE_CLASS6_NUM_DOTS } from "nl-lib/common/constants";
-import { theme as myTheme } from "../styles/theme";
 import { CalibrationButton } from 'nl-lib/ncodepod';
 import CustomBadge from "../components/CustomElement/CustomBadge";
 import LogoSvg from "../logo.svg";
 import TestButton from "../components/buttons/TestButton";
-import PenLogWindow from "../debugging/PenLogWindow";
-import { saveThumbnail } from "../Save/SaveThumbnail";
 
 const useStyles = props => makeStyles((theme) => ({
+  dropdownBtn : {
+    width: "200px",
+    height: "40px",
+    padding: "4px 12px",
+    display: "flex",
+    justifyContent: "left",
+    "&:hover" : {
+      background : theme.custom.icon.blue[3],
+      color: theme.palette.action.hover
+    }
+  },
   buttonStyle: {
     padding: 0,
     minWidth: "0px",
@@ -292,9 +297,8 @@ const HeaderLayer = (props: Props) => {
                   <div className={`${classes.saveDropdownStyle}`} >
                     <SavePdfDialog saveType="pdf" />
                     <SavePdfDialog saveType="grida" />
-                    {/* <Button style={{width: "200px", height: "40px", justifyContent: "left", }} onClick={saveThumbnail}>
-                      썸네일 저장
-                    </Button> */}
+                    <SavePdfDialog saveType="saveAs" />
+                    <SavePdfDialog saveType="overwrite" />
                   </div>
                 ) : null}
               </div>

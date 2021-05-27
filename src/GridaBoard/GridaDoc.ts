@@ -422,6 +422,10 @@ export default class GridaDoc {
     return this._pages;
   }
 
+  set pages(pages: GridaPage[]) {
+    this._pages = pages;
+  }
+
   getPdfUrlAt = (pageNo: number) => {
     if (pageNo < this.numPages) return this._pages[pageNo].url;
     return undefined;

@@ -1,41 +1,45 @@
-import { saveAs } from "file-saver";
+import { saveAs } from 'file-saver';
 import { degrees, PDFDocument, rgb } from 'pdf-lib';
-import GridaDoc from "../GridaDoc";
-import { InkStorage } from "nl-lib/common/penstorage";
-import { isSamePage, drawPath } from "../../nl-lib/common/util";
-import { PlateNcode_1, PlateNcode_2 } from "../../nl-lib/common/constants";
-import { adjustNoteItemMarginForFilm, getNPaperInfo } from "../../nl-lib/common/noteserver";
-import { store } from "../client/pages/GridaBoard";
-import * as PdfJs from "pdfjs-dist";
-import { clearCanvas } from "nl-lib/common/util";
+import GridaDoc from '../GridaDoc';
+import { InkStorage } from 'nl-lib/common/penstorage';
+import { isSamePage, drawPath } from '../../nl-lib/common/util';
+import { PlateNcode_1, PlateNcode_2 } from '../../nl-lib/common/constants';
+import { adjustNoteItemMarginForFilm, getNPaperInfo } from '../../nl-lib/common/noteserver';
+import { store } from '../client/pages/GridaBoard';
+import * as PdfJs from 'pdfjs-dist';
+import { clearCanvas } from 'nl-lib/common/util';
+import firebase from 'GridaBoard/util/firebase_config';
+import { makePdfDocument } from './SavePdf';
+import { getPageInfosFromDoc, makeGridaBlob } from './SaveGrida';
 
 const makePdfJsDoc = async (loadingTask: any) => {
-
   return new Promise(resolve => {
-    loadingTask.promise.then(pdf => {
-      resolve(pdf);
-    }, function (e) {
-      console.error('error code : ' + e)
-    });
-  })
+    loadingTask.promise.then(
+      pdf => {
+        resolve(pdf);
+      },
+      function (e) {
+        console.error('error code : ' + e);
+      }
+    );
+  });
 
   return new Promise(resolve => {
     loadingTask.promise.then(async function (pdfDocument) {
-      console.log("# PDF document loaded.");
-      
+      console.log('# PDF document loaded.');
+
       // Get the first page.
       pdfDocument.getPage(1).then(async function (page) {
         // Render the page on a Node canvas with 100% scale.
-        const canvas: any = document.createElement("canvas");
-        
+        const canvas: any = document.createElement('canvas');
+
         const viewport = page.getViewport({ scale: 1, rotation: 0 });
         const ctx = canvas.getContext('2d');
-        
+
         // const canvas = document.createElement("canvas");
         canvas.id = `scratchCanvas`;
         canvas.width = Math.floor(viewport.width);
         canvas.height = Math.floor(viewport.height);
-        
 
         clearCanvas(canvas, ctx);
 
@@ -49,22 +53,20 @@ const makePdfJsDoc = async (loadingTask: any) => {
 
         resolve(canvas);
       });
-    })
-  })
-}
+    });
+  });
+};
 
-export async function saveThumbnail() {
-
+export async function makeThumbnail() {
   let pdfDoc = undefined;
   const doc = GridaDoc.getInstance();
   const docPages = doc.pages;
 
   const docPage = docPages[0];
 
-
-/** Make the first page of pdf doc
-  * -----------------------------------------------------------------------------------
-  */
+  /** Make the first page of pdf doc
+   * -----------------------------------------------------------------------------------
+   */
   if (docPage.pdf === undefined) {
     if (pdfDoc === undefined) {
       pdfDoc = await PDFDocument.create();
@@ -76,28 +78,26 @@ export async function saveThumbnail() {
       pdfPage.setHeight(tmpWidth);
     }
   } else {
-     const existingPdfBytes = await fetch(docPage.pdf.url).then(res => res.arrayBuffer());
+    const existingPdfBytes = await fetch(docPage.pdf.url).then(res => res.arrayBuffer());
     pdfDoc = await PDFDocument.load(existingPdfBytes);
     pdfDoc.getPages()[0].setRotation(degrees(docPage._rotation));
   }
 
-  
-/** Add strokes on the first page
-  * -----------------------------------------------------------------------------------
-  */
+  /** Add strokes on the first page
+   * -----------------------------------------------------------------------------------
+   */
   const { section, owner, book, page } = docPage.basePageInfo;
   const docPageId = InkStorage.makeNPageIdStr({ section, owner, book, page });
-  
-  let isPdf = docPage._pdf === undefined ? false : true;
+
+  const isPdf = docPage._pdf === undefined ? false : true;
 
   const inkSt = InkStorage.getInstance();
   for (const [key, NeoStrokes] of inkSt.completedOnPage.entries()) {
-    
     if (docPageId !== key) {
       continue;
     }
 
-    const pdfPage = pdfDoc.getPages()[0]
+    const pdfPage = pdfDoc.getPages()[0];
     const pageHeight = pdfPage.getHeight();
 
     for (let j = 0; j < NeoStrokes.length; j++) {
@@ -114,7 +114,12 @@ export async function saveThumbnail() {
         opacity = 0.3;
       }
       const pointArray = [];
-      const pageInfo = { section: NeoStrokes[j].section, owner: NeoStrokes[j].owner, book: NeoStrokes[j].book, page: NeoStrokes[j].page }
+      const pageInfo = {
+        section: NeoStrokes[j].section,
+        owner: NeoStrokes[j].owner,
+        book: NeoStrokes[j].book,
+        page: NeoStrokes[j].page,
+      };
       let isPlate = false;
       if (isSamePage(PlateNcode_1, pageInfo) || isSamePage(PlateNcode_2, pageInfo)) {
         isPlate = true;
@@ -123,20 +128,20 @@ export async function saveThumbnail() {
         for (let k = 0; k < dotArr.length; k++) {
           const noteItem = getNPaperInfo(pageInfo); //plate의 item
           adjustNoteItemMarginForFilm(noteItem, pageInfo);
-      
+
           const currentPage = GridaDoc.getInstance().getPage(store.getState().activePage.activePageNo);
-      
+
           const npaperWidth = noteItem.margin.Xmax - noteItem.margin.Xmin;
           const npaperHeight = noteItem.margin.Ymax - noteItem.margin.Ymin;
-      
+
           const pageWidth = currentPage.pageOverview.sizePu.width;
-          const pageHeight =currentPage.pageOverview.sizePu.height;
-      
+          const pageHeight = currentPage.pageOverview.sizePu.height;
+
           const wRatio = pageWidth / npaperWidth;
           const hRatio = pageHeight / npaperHeight;
-          let platePdfRatio = wRatio
-          if (hRatio > wRatio) platePdfRatio = hRatio
-      
+          let platePdfRatio = wRatio;
+          if (hRatio > wRatio) platePdfRatio = hRatio;
+
           const dot = dotArr[k];
           const pdf_x = dot.x * platePdfRatio;
           const pdf_y = dot.y * platePdfRatio;
@@ -150,8 +155,8 @@ export async function saveThumbnail() {
             const nominator = g0 * dot.x + h0 * dot.y + 1;
             const px = (a0 * dot.x + b0 * dot.y + c0) / nominator;
             const py = (d0 * dot.x + e0 * dot.y + f0) / nominator;
-            
-            const pdf_xy = { x: px, y: py};
+
+            const pdf_xy = { x: px, y: py };
 
             pointArray.push({ x: pdf_xy.x, y: pdf_xy.y, f: dot.f });
           }
@@ -161,9 +166,9 @@ export async function saveThumbnail() {
             const nominator = g * dot.x + h * dot.y + 1;
             const px = (a * dot.x + b * dot.y + c) / nominator;
             const py = (d * dot.x + e * dot.y + f) / nominator;
-            
-            const pdf_xy = { x: px, y: py};
-            
+
+            const pdf_xy = { x: px, y: py };
+
             pointArray.push({ x: pdf_xy.x, y: pdf_xy.y, f: dot.f });
           }
         }
@@ -171,27 +176,26 @@ export async function saveThumbnail() {
 
       let strokeThickness = thickness / 64;
       switch (brushType) {
-        case 1: strokeThickness *= 5; break;
-        default: break;
+        case 1:
+          strokeThickness *= 5;
+          break;
+        default:
+          break;
       }
 
       const pathData = drawPath(pointArray, strokeThickness);
       pdfPage.moveTo(0, pageHeight);
       pdfPage.drawSvgPath(pathData, {
-        color: rgb(
-          Number(rgbStrArr[0]) / 255,
-          Number(rgbStrArr[1]) / 255,
-          Number(rgbStrArr[2]) / 255
-        ),
+        color: rgb(Number(rgbStrArr[0]) / 255, Number(rgbStrArr[1]) / 255, Number(rgbStrArr[2]) / 255),
         opacity: opacity,
         scale: 1,
       });
     }
   }
 
-/** Render pdf on canvas by PdfJs
-  * -----------------------------------------------------------------------------------
-  */
+  /** Render pdf on canvas by PdfJs
+   * -----------------------------------------------------------------------------------
+   */
   const pdfBytes = await pdfDoc.save();
   const blob1 = new Blob([pdfBytes], { type: 'image/png' });
   const myUrl = await URL.createObjectURL(blob1);
@@ -203,13 +207,13 @@ export async function saveThumbnail() {
   let PDF_PAGE: PdfJs.PDFPageProxy;
   await pdfJsDoc.getPage(1).then(page => {
     PDF_PAGE = page;
-  })
+  });
 
-  const canvas: any = await document.createElement("canvas");
-        
+  const canvas: any = await document.createElement('canvas');
+
   const viewport = PDF_PAGE.getViewport({ scale: 1, rotation: 0 });
   const ctx = canvas.getContext('2d');
-  
+
   canvas.width = Math.floor(viewport.width);
   canvas.height = Math.floor(viewport.height);
 
@@ -224,51 +228,199 @@ export async function saveThumbnail() {
   await PDF_PAGE.render(renderContext).promise;
 
 
-/** Sample Code for thumbnail layout
-  * -----------------------------------------------------------------------------------
- const canvas2 = document.createElement("canvas");
- canvas2.id = `1234`;
- canvas2.width = 800;
- canvas2.height = 800;
- const ctx2 = canvas2.getContext('2d');
- clearCanvas(canvas2, ctx2, 'rgb(220,220,220)');
- 
- const src = { width: 595, height: 800 };
- const dx = (800 - src.width) / 2;
- const dy = (800 - src.height) / 2;
- 
- ctx2.drawImage(canvas, 0, 0);
- 
- const dataURL = canvas.toDataURL();
- const imageData = ctx2.getImageData(0, 0, 800, 800);
- 
- const canvas1 = document.createElement("canvas");
- const uuid = uuidv4();
- canvas1.id = `scratchCanvas`;
- canvas1.width = 800;
- canvas1.height = 800;
- const ctx1 = canvas1.getContext('2d');
- ctx1.putImageData(imageData, 0, 0);
- */
- 
-
-/** Save Thumbnail as PNG file
-  * -----------------------------------------------------------------------------------
-  */
+/** Make Image Blob and Return
+   * -----------------------------------------------------------------------------------
+   */
   const dataURL = canvas.toDataURL();
 
   const byteCharacters = atob(dataURL.split(',')[1]);
-  const byteNumbers = new ArrayBuffer(byteCharacters.length*2);
+  const byteNumbers = new ArrayBuffer(byteCharacters.length * 2);
   const byteArray = new Uint8Array(byteNumbers);
 
   for (let i = 0; i < byteCharacters.length; i++) {
-      byteArray[i] = byteCharacters.charCodeAt(i);
+    byteArray[i] = byteCharacters.charCodeAt(i);
   }
-  var blob = new Blob([byteArray], {type: 'image/png'});
-  saveAs(blob, 'abc.png');
+  const imageBlob = new Blob([byteArray], { type: 'image/png' });
 
+  return imageBlob;
+  
+/** Sample Code for thumbnail layout
+  * -----------------------------------------------------------------------------------
+  const canvas2 = document.createElement("canvas");
+  canvas2.id = `1234`;
+  canvas2.width = 800;
+  canvas2.height = 800;
+  const ctx2 = canvas2.getContext('2d');
+  clearCanvas(canvas2, ctx2, 'rgb(220,220,220)');
+  
+  const src = { width: 595, height: 800 };
+  const dx = (800 - src.width) / 2;
+  const dy = (800 - src.height) / 2;
+  
+  ctx2.drawImage(canvas, 0, 0);
+  
+  const dataURL = canvas.toDataURL();
+  const imageData = ctx2.getImageData(0, 0, 800, 800);
+  
+  const canvas1 = document.createElement("canvas");
+  const uuid = uuidv4();
+  canvas1.id = `scratchCanvas`;
+  canvas1.width = 800;
+  canvas1.height = 800;
+  const ctx1 = canvas1.getContext('2d');
+  ctx1.putImageData(imageData, 0, 0);
+  */
 }
 
+export async function saveThumbnail(docName: string) {
+
+  const imageBlob = await makeThumbnail();
+
+  /** Save Thumbnail as PNG file
+   * -----------------------------------------------------------------------------------
+   */
+  const storageRef = firebase.storage().ref();
+
+  const userId = firebase.auth().currentUser.email;
+  const date = new Date();
+  const timeStamp = date.getTime();
+
+  const gridaFileName = `${userId}_${docName}_${timeStamp}_.grida`;
+  const gridaRef = storageRef.child(`grida/${gridaFileName}`);
+
+  /** Make & Upload Grida
+   * -----------------------------------------------------------------------------------
+   */
+  const gridaBlob = await makeGridaBlob();
+
+  const gridaUploadTask = gridaRef.put(gridaBlob);
+  await gridaUploadTask.on(
+    firebase.storage.TaskEvent.STATE_CHANGED,
+    function (snapshot) {
+      const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+      console.log('Grida Upload is ' + progress + '% done');
+      switch (snapshot.state) {
+        case firebase.storage.TaskState.PAUSED: // or 'paused'
+          console.log('Upload is paused');
+          break;
+        case firebase.storage.TaskState.RUNNING: // or 'running'
+          console.log('Upload is running');
+          break;
+      }
+    },
+    function (error) {
+      switch (error.code) {
+        case 'storage/unauthorized':
+          // User doesn't have permission to access the object
+          break;
+
+        case 'storage/canceled':
+          // User canceled the upload
+          break;
+
+        case 'storage/unknown':
+          // Unknown error occurred, inspect error.serverResponse
+          break;
+      }
+    },
+    async function () {
+      gridaUploadTask.snapshot.ref.getDownloadURL().then(async function (downloadURL) {
+        const grida_path = downloadURL;
+
+        const thumbFileName = `${userId}_${docName}_${timeStamp}_.png`;
+        const pngRef = storageRef.child(`thumbnail/${thumbFileName}`);
+
+        const thumbUploadTask = pngRef.put(imageBlob);
+        await thumbUploadTask.on(
+          firebase.storage.TaskEvent.STATE_CHANGED,
+          function (snapshot) {
+            const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+            console.log('Thumbnail Upload is ' + progress + '% done');
+            switch (snapshot.state) {
+              case firebase.storage.TaskState.PAUSED: // or 'paused'
+                console.log('Upload is paused');
+                break;
+              case firebase.storage.TaskState.RUNNING: // or 'running'
+                console.log('Upload is running');
+                break;
+            }
+          },
+          function (error) {
+            switch (error.code) {
+              case 'storage/unauthorized':
+                // User doesn't have permission to access the object
+                break;
+
+              case 'storage/canceled':
+                // User canceled the upload
+                break;
+
+              case 'storage/unknown':
+                // Unknown error occurred, inspect error.serverResponse
+                break;
+            }
+          },
+          async function () {
+            thumbUploadTask.snapshot.ref.getDownloadURL().then(function (thumb_path) {
+              saveToDB(docName, thumb_path, grida_path, date);
+            });
+          }
+        );
+      });
+    }
+  );
+
+  /** Upload thumbnail image using Firebase
+   * -----------------------------------------------------------------------------------
+   */
+
+  // saveAs(blob, 'abc.png');
+}
+
+export async function updateDB(docName: string, thumb_path: string, grida_path: string) {
+  const db = firebase.firestore();
+  const userId = firebase.auth().currentUser.email;
+
+  db.collection(userId)
+    .doc(docName)
+    .update({
+      last_modified: new Date(),
+      grida_path: grida_path,
+      thumb_path: thumb_path,
+    })
+    .then(function () {
+      console.log(`${docName} is created`);
+    })
+    .catch(error => {
+      console.error('Error adding document: ', error);
+    });
+};
+
+export async function saveToDB(docName: string, thumb_path: string, grida_path: string, nowDate: any) {
+  const db = firebase.firestore();
+  const userId = firebase.auth().currentUser.email;
+
+  db.collection(userId);
+  db.collection(userId)
+    .doc(docName)
+    .set({
+      category: 'Unshelved',
+      created: nowDate,
+      last_modified: nowDate,
+      doc_name: docName,
+      favorite: false,
+      id: userId,
+      grida_path: grida_path,
+      thumb_path: thumb_path,
+      dateDeleted: 0,
+    })
+    .then(function () {
+      console.log(`${docName} is created`);
+    })
+    .catch(error => {
+      console.error('Error adding document: ', error);
+    });
+};
 
 //div screenshot sample
 
