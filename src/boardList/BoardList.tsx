@@ -98,7 +98,7 @@ const BoardList = () => {
           });
         });
     }
-  }, []);
+  }, [docsNum]);
 
   const categoryObj = {};
   for (let i = 0; i < docsObj.category.length; i++) {

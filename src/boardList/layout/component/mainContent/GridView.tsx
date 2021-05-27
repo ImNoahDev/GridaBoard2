@@ -1,8 +1,9 @@
-import { makeStyles, Grow, SvgIcon, Popper, ClickAwayListener, Paper, MenuList, MenuItem } from "@material-ui/core";
+import { makeStyles, Grow, SvgIcon, Popper, ClickAwayListener, Paper, MenuList, MenuItem, IconButton } from "@material-ui/core";
 import React, { useState } from "react";
 import firebase from 'GridaBoard/util/firebase_config';
 import { setDocsNum } from "../../../../GridaBoard/store/reducers/appConfigReducer";
 import { useDispatch } from "react-redux";
+import MoreVert from "@material-ui/icons/MoreVert";
 
 interface Props extends  React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement> {
    docsList?: Array<any>,
@@ -118,26 +119,8 @@ const GridView = (props : Props)=>{
               {selectedContent === idx ? (<div className={selectedClass}/>) : ""}
 
               <Grow in={true} >
-                <div className={classes.removeBtn} ref={setRefs} onClick={() => handleMenuListClick(idx)} >
-
-                <SvgIcon key={el.name} >
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <rect width="24" height="24" rx="12" fill="#FFFFFF" opacity="0.5"/>
-                  <path d="M12 8C13.1 8 14 7.1 14 6C14 4.9 13.1 4 12 4C10.9 4 10 4.9 10 6C10 7.1 10.9 8 12 8ZM12 10C10.9 10 10 10.9 10 12C10 13.1 10.9 14 12 14C13.1 14 14 13.1 14 12C14 10.9 13.1 10 12 10ZM12 16C10.9 16 10 16.9 10 18C10 19.1 10.9 20 12 20C13.1 20 14 19.1 14 18C14 16.9 13.1 16 12 16Z" fill="#121212"/>
-                  </svg>
-                </SvgIcon>
-
-                <div
-                onMouseDown={e=>{
-                  e.currentTarget.parentElement.classList.add(classes.removeBtnMouseDown);
-                }}
-                onMouseUp={e=>{
-                  e.currentTarget.parentElement.classList.remove(classes.removeBtnMouseDown);
-                }}
-                onMouseOut={e=>{
-                  e.currentTarget.parentElement.classList.remove(classes.removeBtnMouseDown);
-                }}></div>
-
+                <div className={classes.removeBtn} ref={setRefs}>
+                  <IconButton onClick={() => handleMenuListClick(idx)}><MoreVert/></IconButton>
                 </div>
               </Grow>
 
