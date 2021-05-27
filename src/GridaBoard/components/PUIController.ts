@@ -1,5 +1,5 @@
 import $ from 'jquery';
-import { store } from "GridaBoard/client/Root";
+import { store } from "GridaBoard/client/pages/GridaBoard";
 import { IBrushType, PageEventName, PEN_THICKNESS, ZoomFitEnum } from 'nl-lib/common/enums';
 import PenManager from 'nl-lib/neosmartpen/PenManager';
 import { setViewFit } from 'GridaBoard/store/reducers/viewFitReducer';
@@ -165,19 +165,22 @@ export default class PUIController {
 
     switch (cmd) {
       case "strokesize_1":
+      case "0.1": //lamy
         PenManager.getInstance().setThickness(PEN_THICKNESS.THICKNESS1);
         break;
 
       case "strokesize_2":
-        PenManager.getInstance().setThickness(PEN_THICKNESS.THICKNESS2);
-        break;
-
-      case "strokesize_3":
+      case "0.5": //lamy
         PenManager.getInstance().setThickness(PEN_THICKNESS.THICKNESS3);
         break;
 
+      case "strokesize_3":
+      case "1.7": //lamy
+        PenManager.getInstance().setThickness(PEN_THICKNESS.THICKNESS5);
+        break;
+
       case "pen":
-        PenManager.getInstance().setPenRendererType(IBrushType.PEN);
+        PenManager.getInstance().setPenRendererType(IBrushType.PEN); 
         break;
 
       case "highlighter":
@@ -199,6 +202,7 @@ export default class PUIController {
         break;
 
       case "#FFAAAAAA": // DG
+      case "#AAAAAA": //lamy
         PenManager.getInstance().setColor(2)
         break;
 

@@ -4,9 +4,10 @@ import { NeoStroke, IPageSOBP, StrokeStatus, INeoStrokeProps, NeoDot, TransformP
 import { isSameNcode } from "nl-lib/common/util";
 import { DefaultPlateNcode } from "nl-lib/common/constants";
 import intersect from 'path-intersection';
-import { store } from "GridaBoard/client/Root";
+import { store } from "GridaBoard/client/pages/GridaBoard";
 import GridaDoc from "GridaBoard/GridaDoc";
 import getText from "GridaBoard/language/language";
+import { isPlatePaper, isPUI } from "../noteserver";
 
 /** @type {InkStorage} */
 let _storage_instance = null;
@@ -24,7 +25,6 @@ export interface IOpenStrokeArg {
   h_origin: TransformParameters;
 }
 
-
 export default class InkStorage {
   completed: NeoStroke[] = [];  // completed strokes
 
@@ -41,6 +41,7 @@ export default class InkStorage {
 
   lastPageInfo: IPageSOBP = { section: -1, book: -1, owner: -1, page: -1 };
 
+  needAlert = true;
 
   /** @type {InkStorage} */
   // static instance;
@@ -99,6 +100,15 @@ export default class InkStorage {
     if (arr) return arr;
 
     return [];
+  }
+  public removePage(pageInfo: IPageSOBP) {
+    const { section, owner, book, page } = pageInfo;
+    const pageId = InkStorage.makeNPageIdStr({ section, owner, book, page });
+    const completed = this.completedOnPage;
+
+    //지울 페이지 지우기
+    completed.delete(pageId);
+
   }
 
   public removeStrokeFromPage(pageInfo: IPageSOBP) {
@@ -159,13 +169,21 @@ export default class InkStorage {
    */
   private addCompletedToPage(stroke: NeoStroke) {
     const { section, owner, book, page } = stroke;
+    const pageInfo = { section, owner, book, page }
     let pageId = InkStorage.makeNPageIdStr({ section, owner, book, page });
 
     const activePageNo = store.getState().activePage.activePageNo;
-    if (activePageNo === -1) {
-      alert(getText("alert_needPage"));
+    if ((isPlatePaper(pageInfo) || isPUI(pageInfo)) && activePageNo === -1) {
+      if (isPlatePaper(pageInfo)) {
+        if (this.needAlert) {
+          this.needAlert = false;
+          alert(getText("alert_needPage"));
+        }
+      }
       return;
     }
+
+    this.needAlert = true;
     const basePageInfo = GridaDoc.getInstance().getPage(activePageNo).basePageInfo;
 
     if (isSameNcode(DefaultPlateNcode, {section, owner, book, page})) {
@@ -388,6 +406,9 @@ export default class InkStorage {
     // closeStroke(stroke);
     stroke.close();
 
+    if (stroke.page === -1) {
+      return;
+    }
     this.completed.push(stroke);
 
     this.addCompletedToPage(stroke);

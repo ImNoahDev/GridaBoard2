@@ -17,7 +17,7 @@ import { InkStorage } from "nl-lib/common/penstorage";
 import { isPUI } from "nl-lib/common/noteserver";
 
 import { setCalibrationData } from 'GridaBoard/store/reducers/calibrationDataReducer';
-import { store } from "GridaBoard/client/Root";
+import { store } from "GridaBoard/client/pages/GridaBoard";
 import GridaDoc from "GridaBoard/GridaDoc";
 
 /**
@@ -62,6 +62,7 @@ interface Props { // extends MixedViewProps {
 
   basePageInfo: IPageSOBP,
   pdfPageNo: number,
+  pdfNumPages: number,
   renderCountNo: number,
 
   calibrationData: any,
@@ -85,6 +86,8 @@ interface State {
   playState: PLAYSTATE,
 
   renderCount: number,
+
+  numDocPages : number
 }
 
 /**
@@ -107,6 +110,8 @@ class PenBasedRenderer extends React.Component<Props, State> {
     playState: PLAYSTATE.live,
 
     renderCount: 0,
+
+    numDocPages : store.getState().activePage.numDocPages
   };
 
   _renderer: PenBasedRenderWorker;
@@ -168,7 +173,6 @@ class PenBasedRenderer extends React.Component<Props, State> {
 
   private subScriptStorageEvent = () => {
     const inkStorage = this.inkStorage;
-    // console.log(`Renderer(${this.props.parentName}): subScriptStorageEvent`);
 
     if (inkStorage) {
       const filter = { mac: null };
@@ -309,6 +313,18 @@ class PenBasedRenderer extends React.Component<Props, State> {
       } else {
         this.renderer.canvasFb.setBackgroundColor('rgba(255,255,255,0.1)', null);
       }
+    }
+    
+    const storeNumDocPages = store.getState().activePage.numDocPages;
+    if(storeNumDocPages !== this.state.numDocPages){
+      //전체 페이지가 줄었을때(페이지가 삭제되었을때) 리드로우
+      if(storeNumDocPages < this.state.numDocPages){
+        this.renderer.redrawStrokes(nextProps.pageInfo);
+      }
+      if(storeNumDocPages < 1){
+        this.renderer.pageInfo = undefined;
+      }
+      this.setState({ numDocPages: storeNumDocPages });
     }
 
     if ((this.props.rotation !== nextProps.rotation) && isSamePage(this.props.basePageInfo, nextProps.basePageInfo)) {

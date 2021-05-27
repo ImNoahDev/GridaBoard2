@@ -24,6 +24,7 @@ export type IGetNPageTransformType = {
     filename: string;
     fingerprint: string;
     numPages: number;
+    pdfParams ?: IPageMapItem[];
 
     pdfPageNo: number;
     pagesPerSheet: number;

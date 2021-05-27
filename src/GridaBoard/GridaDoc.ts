@@ -1,5 +1,5 @@
 import GridaPage from "./GridaPage";
-import { store } from "./client/Root";
+import { store } from "./client/pages/GridaBoard";
 import { forceToRenderPanes, setActivePageNo, setActivePdf, setDocNumPages, setUrlAndFilename } from "./store/reducers/activePageReducer";
 import { RootState } from "./store/rootReducer";
 
@@ -9,6 +9,7 @@ import { IPdfToNcodeMapItem, IPageSOBP, IGetNPageTransformType } from "nl-lib/co
 import { isSamePage, makeNPageIdStr } from "nl-lib/common/util";
 
 
+import { InkStorage } from "nl-lib/common/penstorage";
 import { MappingStorageEventName, IMappingStorageEvent, MappingStorage } from "nl-lib/common/mapper";
 import { scrollToBottom } from "nl-lib/common/util";
 import getText from "./language/language";
@@ -157,6 +158,40 @@ export default class GridaDoc {
     }
   }
 
+  public removePages = async (page:number) => {
+    //_page에서 삭제
+    if(page >= this._pages.length) return ;
+    const pages = this._pages.splice(page, 1)[0] as GridaPage;
+    const changedPdf = pages._pdf;
+    if(changedPdf !== undefined) await changedPdf.deletePage(pages.pdfPageNo - 1);
+    
+    for(let i = page; i < this._pages.length; i++){
+      const nowPage = this._pages[i];
+      //pageNo 와 pageInfo의 page 는 여기서 관리하는 순서와 같음
+      nowPage._pageNo -= 1;
+      // nowPage.pageInfos[0].page -= 1;
+      if(pages.fingerprint !== undefined && pages.fingerprint === nowPage.fingerprint){
+        //같은 pdf의 경우에만 pdfPageNo또한 변경해주어야 한다
+        nowPage._pdfPageNo -= 1;
+      }
+    }
+
+    //스트로크 데이터 삭제
+    InkStorage.getInstance().removePage(pages.pageInfos[0]);
+    //맴핑 데이터 삭제
+    if(changedPdf !== undefined){
+      const msi = MappingStorage.getInstance();
+      msi.removeNcodeByPage(changedPdf.fingerprint, page);
+    }
+
+
+    //마지막 페이지를 보고 있을때 이전 페이지 보여주기    
+    if(store.getState().activePage.activePageNo >= this._pages.length){
+      setActivePageNo(this._pages.length-1);
+    }
+
+    setDocNumPages(this._pages.length);
+  }
   private appendPdfDocumentForGrida = (pdfDoc: NeoPdfDocument, pageInfos: IPageSOBP[], basePageInfos: IPageSOBP[]) => {
     this._pdfd = [];
 
@@ -313,7 +348,7 @@ export default class GridaDoc {
 
           const pageInfo = { ...found.pageInfo };
           const basePageInfo = { ...found.basePageInfo };
-
+          const pdfParmas = found.pdf.pdfParams;
           // PDF의 시작 페이지
           const m0 = g_availablePagesInSection[pageInfo.section];
           pageInfo.page = (pageInfo.page - (found.pdf.pdfPageNo - 1) + m0) % m0;
@@ -326,8 +361,7 @@ export default class GridaDoc {
 
           const firstPageNo = this.numPages;
           for (let i = 0; i < found.pdf.numPages; i++) {
-            const bpi = { ...basePageInfo };
-            bpi.page = (bpi.page + i) % m1;
+            const bpi = pdfParmas[i].basePageInfo;
             const activePageNo = this.addNcodePage(bpi);
           }
           setDocNumPages(this._pages.length);

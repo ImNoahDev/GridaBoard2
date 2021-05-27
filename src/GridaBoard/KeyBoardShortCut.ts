@@ -1,7 +1,7 @@
 
 // 2020-12-09 현재 구현되어 있는 기능까지 단축키 완성(추가 구현된 기능 넣고 다른 버튼들 단축키 지정하기)
 
-import { store } from "./client/Root";
+import { store } from "./client/pages/GridaBoard";
 import { IBrushType, ZoomFitEnum } from "nl-lib/common/enums";
 import PenManager from "nl-lib/neosmartpen/PenManager";
 import { setActivePageNo } from "./store/reducers/activePageReducer";
@@ -143,7 +143,9 @@ export default function KeyBoardShortCut(evt: KeyboardEvent) {
           (document.querySelector(".saveButton") as HTMLElement).click();
         //1틱 뒤에 동작해야함
         setTimeout(()=>{
-          (document.querySelector(".save_drop_down") as HTMLElement).click();
+          const saveBtn = document.querySelector(".save_drop_down") as HTMLElement;
+          if(saveBtn !== null)
+            saveBtn.click();
         },0);
         break;
       }

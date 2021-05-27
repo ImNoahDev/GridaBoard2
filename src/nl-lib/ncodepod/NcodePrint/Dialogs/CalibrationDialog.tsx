@@ -18,6 +18,7 @@ import GridaApp from "GridaBoard//GridaApp";
 import ConnectButton from "GridaBoard//components/buttons/ConnectButton";
 import getText from "GridaBoard//language/language";
 import GridaDoc from 'GridaBoard/GridaDoc';
+import { isWhiteBoard } from '../../../common/noteserver';
 
 const _penImageUrl = "/icons/image_calibration.png";
 
@@ -203,6 +204,11 @@ const CalibrationDialog = (props: IDialogProps) => {
           pu.p0.x = pageSize.width * 0.1;
           pu.p0.y = pageSize.height * 0.1
 
+          if (isWhiteBoard(calibratedPageInfo)) {
+            pu.p0.x = 5 * 72 / 2.54; //왼쪽 위에서 5cm 지점
+            pu.p0.y = 5 * 72 / 2.54; 
+          }
+
           pageInfos.push(calibratedPageInfo);
           break;
         }
@@ -211,7 +217,13 @@ const CalibrationDialog = (props: IDialogProps) => {
           nu.p2.y = calibrationData.nu.y;
 
           pu.p2.x = pageSize.width * 0.9;
-          pu.p2.y = pageSize.height * 0.9
+          pu.p2.y = pageSize.height * 0.9;
+
+          if (isWhiteBoard(calibratedPageInfo)) {
+            pu.p2.x = pageSize.width - 5 * 72 /2.54; //오른쪽 아래에서 5cm 지점
+            pu.p2.y = pageSize.height - 5 * 72 /2.54; 
+          }
+
           break;
         }
         default: {

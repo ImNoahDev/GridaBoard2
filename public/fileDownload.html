@@ -1,0 +1,27 @@
+<script>
+  let query = location.search.split("?")[1].split("=");
+  let qs = {};
+  for(let i = 0; i < query.length; i++){
+    let key = query[i];
+    i++;
+    let val  =query[i];
+    qs[key] = val;
+  }
+
+  console.log(qs);
+    setTimeout(()=>{
+    fetch("./downloadFiles/" + qs.file).then(resp => resp.arrayBuffer()).then(resp => {
+      // set the blog type to final pdf
+      const file = new Blob([resp], {type: 'application/pdf'});
+      console.log(file);
+      // process to auto download it
+      const fileURL = URL.createObjectURL(file);
+      const link = document.createElement('a');
+      link.href = fileURL;
+      link.download = qs.file + ".pdf";
+      link.click();
+      console.log("!!!!!!!!!!!!!!!!");
+      window.close();
+    });
+  }, 200);
+</script>

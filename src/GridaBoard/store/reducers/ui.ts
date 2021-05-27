@@ -1,4 +1,4 @@
-import { store } from "../../client/Root";
+import { store } from "../../client/pages/GridaBoard";
 import { getBrowserZoomFactor } from "nl-lib/common/util";
 
 //[Define Action Types
@@ -24,6 +24,7 @@ export const UIActionTypes = Object.freeze({
   REPORT_BROWSER_ZOOM: `${ActionGroup}.REPORT_BROWSER_ZOOM`,
   
   SHOW_SHORTCUT: `${ActionGroup}.SHOW_SHORTCUT`,
+  SHOW_HELPMENU: `${ActionGroup}.SHOW_HELPMENU`,
 });
 //]
 
@@ -40,7 +41,6 @@ export const showShortCut = (show: boolean) => {
     type: UIActionTypes.SHOW_SHORTCUT,
     show: show
   });
-
 }
 
 
@@ -156,11 +156,17 @@ export const updateSelectedPage = async (option: { pageNo: number }) => {
     pageNo: option.pageNo,
   });
 }
+export const showHelpMenu = (show: boolean) => {
+  store.dispatch({
+    type: UIActionTypes.SHOW_HELPMENU,
+    show: show
+  });
+}
 
 //]
 
 
-const defaultDrawerWidth = 180;
+const defaultDrawerWidth = 220;
 // export let g_drawerWidth = defaultDrawerWidth;
 const initialState = {
   waiting: {
@@ -195,6 +201,9 @@ const initialState = {
     zoom: getBrowserZoomFactor(),
   },
   shotcut : {
+    show : false
+  },
+  helpMenu : {
     show : false
   }
 }
@@ -311,6 +320,15 @@ export default (state = initialState, action) => {
           pageNo: action.pageNo,
         }
       }
+    }
+    
+    case UIActionTypes.SHOW_HELPMENU: {
+      return {
+        ...state,
+        helpMenu: {
+          show: action.show,
+        }
+      };
     }
 
 

@@ -1,5 +1,5 @@
 import React from "react";
-import { IconButton, makeStyles, SvgIcon, Theme, Tooltip, TooltipProps } from '@material-ui/core';
+import { IconButton, IconButtonProps, makeStyles, SvgIcon, Theme, Tooltip, TooltipProps } from '@material-ui/core';
 import { useSelector } from "react-redux";
 
 import { InkStorage } from "nl-lib/common/penstorage";
@@ -9,7 +9,7 @@ import { RootState } from "GridaBoard/store/rootReducer";
 import GridaDoc from "GridaBoard/GridaDoc";
 
 
-const PageClearButton = (props) => {
+const PageClearButton = (props: IconButtonProps) => {
   const activePageNo = useSelector((state: RootState) => state.activePage.activePageNo);
 
   const handlePageClearBtn = () => {

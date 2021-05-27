@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import {makeStyles, Badge} from "@material-ui/core";
+import {makeStyles, Badge, BadgeProps, BadgeOrigin} from "@material-ui/core";
 import { useSelector } from 'react-redux';
 import { RootState } from '../../store/rootReducer';
 
@@ -10,11 +10,11 @@ const useStyle = makeStyles(theme=>({
   }
 }));
 
-const CustomBadge = (props) => {
+const CustomBadge = (props: BadgeProps) => {
   const {children,anchorOrigin, ...rest} = props;
   const classes = useStyle();
   const badgeInVisible = !useSelector((state: RootState) => state.ui.shotcut.show);
-  const defaultAnchor = {
+  const defaultAnchor : BadgeOrigin = {
     vertical: 'bottom',
     horizontal: 'right',
   };

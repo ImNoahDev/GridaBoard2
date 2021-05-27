@@ -1,4 +1,5 @@
 import React, {useState} from "react";
+import { setHelpMenu } from "../CustomElement/HelpMenu";
 import { IconButton, Button, SvgIcon, makeStyles, ClickAwayListener } from '@material-ui/core';
 import getText from "../../language/language";
 import { isWhiteSpace } from "../../../../public/pdf.worker.2.5.207";
@@ -40,7 +41,7 @@ const useStyle = makeStyles(theme => ({
     color : theme.custom.icon.mono[0],
     background: theme.custom.white[90],
     padding: "10px",
-    "& > a" : {
+    "& > *" : {
       minWidth: "184px",
       height: "40px",
       padding: "0px",
@@ -59,20 +60,33 @@ const useStyle = makeStyles(theme => ({
     }
   }
 }));
+type Props = {
+  className : string
+}
 
-
-const InformationButton = (props) => {
-  const {className, ...rest} = props;
+const InformationButton = (props: Props) => {
+  const { className } = props;
   const [isOpen, setIsOpen] = useState(false);
   const classes = useStyle();
   const selectArr = [
     {
+      type : "href",
       title : "go_to_neolab",
       link : "https://labs.neostudio.io/forum/15/"
     },
     {
+      type : "href",
       title : "go_to_guide",
       link : "https://neolabdev.gitbook.io/gridaboard/"
+    },
+    {
+      type : "onClick",
+      title : "go_to_help",
+      event : ()=>{
+        setIsOpen(false);
+        // openTutorial();
+        setHelpMenu(true);
+      }
     }
   ]
 
@@ -85,18 +99,23 @@ const InformationButton = (props) => {
   return (
     <ClickAwayListener onClickAway={handleClickAway}>
     <div className={className}>
-      <IconButton className={classes.icon} onClick={handleClick} {...rest} >
+      <IconButton className={classes.icon} onClick={handleClick} >
         ?
       </IconButton>
 
       {isOpen ? (<div id="fitDrop" className={classes.dropDown}>
         {selectArr.map((el, idx)=>(
-            <Button key={idx} target="_blank" href={el.link}>
+            el.type == "href" ? 
+            (<Button key={idx} target="_blank" href={el.link}>
                 {getText(el.title)}
                 {/* {el.title} */}
-            </Button>
+            </Button>) : 
+            (<Button key = {idx} onClick={el.event}>
+              {getText(el.title)}
+            </Button>)
         ))}
         </div>) : null}
+      
     </div>
     </ClickAwayListener>
   );

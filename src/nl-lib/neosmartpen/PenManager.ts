@@ -107,9 +107,24 @@ export default class PenManager {
     pen.addEventListener(PenEventName.ON_DISCONNECTED, this.onDisconnected);
     pen.addEventListener(PenEventName.ON_PEN_PAGEINFO, this.onLivePenPageInfo);
 
+    // kitty
+    pen.addEventListener(PenEventName.ON_PEN_MOVE, this.onLivePenMove);
+    pen.addEventListener(PenEventName.ON_PEN_UP, this.onLivePenUp);
+
     return pen;
   }
 
+  
+  // kitty
+  onLivePenMove = (event: IPenToViewerEvent) => {
+    this.dispatcher.dispatch(PenEventName.ON_PEN_MOVE, event);
+  }
+
+    // kitty
+    onLivePenUp = (event: IPenToViewerEvent) => {
+      this.dispatcher.dispatch(PenEventName.ON_PEN_UP, event);
+    }
+  
   public createVirtualPen = (): INeoSmartpen => {
     const pen = new VirtualPen();
     this.add(pen, { id: pen.id, name: pen.name });
@@ -136,12 +151,12 @@ export default class PenManager {
     if (pen.name === "NeoSmartPen" && device.name !== undefined) {
       const penNamePrefix = device.name.split('_', 1)
       if (penNamePrefix[0] === 'BLUE1' || penNamePrefix[0] === 'BLUE2') {
-        pen.setColor("rgb(0,171,235)");
-        pen.setThickness(2);
+        this.setColor(5);
+        this.setThickness(PEN_THICKNESS.THICKNESS5);
       }
       if (penNamePrefix[0] === 'RED1' || penNamePrefix[0] === 'RED2') {
-        pen.setColor("rgb(255,101,0)");
-        pen.setThickness(2);
+        this.setColor(0);
+        this.setThickness(PEN_THICKNESS.THICKNESS5);
       }
     }
 
@@ -304,7 +319,9 @@ export default class PenManager {
   public onDisconnected = (opt: { pen: INeoSmartpen, event: IPenEvent }) => {
     const { pen } = opt;
     const btDeviceId = pen.getBtDevice().id;
-
+    if (_active_pen.getMac() === pen.getMac()) {
+      alert('펜 연결이 끊어졌습니다. \n펜 확인 후 다시 연결해주세요.');
+    }
     const index = this.penArray.findIndex(penInfo => penInfo.id === btDeviceId);
     if (index > -1) {
       this.penArray.splice(index, 1);

@@ -1,4 +1,4 @@
-import {store} from "../../client/Root";
+import {store} from "../../client/pages/GridaBoard";
 import cookie from 'react-cookies';
 
 // Define Action Types

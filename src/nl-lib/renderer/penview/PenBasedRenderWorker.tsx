@@ -17,7 +17,7 @@ import { nullNcode, PlateNcode_1, PlateNcode_2 } from 'nl-lib/common/constants';
 
 import GridaDoc from 'GridaBoard/GridaDoc';
 import { setActivePageNo } from 'GridaBoard/store/reducers/activePageReducer';
-import { store } from "GridaBoard/client/Root";
+import { store } from "GridaBoard/client/pages/GridaBoard";
 
 const NUM_HOVER_POINTERS = 6;
 const DFAULT_BRUSH_SIZE = 10;

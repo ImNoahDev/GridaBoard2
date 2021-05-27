@@ -1,4 +1,4 @@
-import { store } from "../../client/Root";
+import { store } from "../../client/pages/GridaBoard";
 import GridaDoc from "../../GridaDoc";
 import { INeoSmartpen } from "nl-lib/common/neopen";
 

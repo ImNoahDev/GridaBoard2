@@ -1,4 +1,4 @@
-import { store } from "../../client/Root";
+import { store } from "../../client/pages/GridaBoard";
 
 const SET_ZOOM = 'rotate/SET_ZOOM';
 

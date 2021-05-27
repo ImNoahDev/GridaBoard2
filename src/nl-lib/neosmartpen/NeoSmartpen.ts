@@ -11,7 +11,7 @@ import { isPUI } from "nl-lib/common/noteserver";
 
 import getText from "GridaBoard/language/language";
 import PUIController from "GridaBoard/components/PUIController";
-import { store } from "GridaBoard/client/Root";
+import { store } from "GridaBoard/client/pages/GridaBoard";
 
 interface IPenMovement {
   downEvent: IPenEvent,

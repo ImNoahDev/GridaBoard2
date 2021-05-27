@@ -12,7 +12,7 @@ const useStyle = props => makeStyles(theme=>({
   wrap: {
     display: "flex",
     height:"100%",
-    width: props.drawerOpen ? "190px" : 0,
+    width: props.drawerOpen ? props.drawerWidth + "px" : 0,
     zoom: 1 / props.brZoom,
     zIndex: 1000,
     position:"relative",
@@ -54,14 +54,13 @@ const useStyle = props => makeStyles(theme=>({
       easing: theme.transitions.easing.easeOut,
       duration: theme.transitions.duration.enteringScreen,
     }),
-    marginLeft: "190px",
+    marginLeft: props.drawerWidth + "px",
   }
 }));
 
 const LeftSideLayer = () => {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const setDrawerWidth = (width: number) => updateDrawerWidth({ width });
-  
   const activePageNo_store = useSelector((state: RootState) => state.activePage.activePageNo);
   
   const handleDrawerOpen = () => {
@@ -74,12 +73,15 @@ const LeftSideLayer = () => {
   }
 
   const brZoom = useSelector((state: RootState) => state.ui.browser.zoom);
-  const classes = useStyle({brZoom:brZoom, drawerOpen:drawerOpen})()
+  const drawerWidth = useSelector((state: RootState) => state.ui.drawer.width);
+  const classes = useStyle({brZoom:brZoom, drawerOpen:drawerOpen, drawerWidth:drawerWidth})()
 
 
   let disabled = true;
   if (activePageNo_store !== -1) {
     disabled = false;
+  }else if(drawerOpen){
+    setDrawerOpen(false);
   }
   
   return (

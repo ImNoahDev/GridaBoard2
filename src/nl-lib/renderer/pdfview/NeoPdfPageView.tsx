@@ -27,6 +27,7 @@ interface PageState {
   pdf: NeoPdfDocument,
   pdfPageNo: number,
 
+  pdfNumPages : number,
   zoom: number,
 }
 
@@ -47,6 +48,7 @@ export default class NeoPdfPageView extends Component<PageProps, PageState> {
 
     pdf: undefined,
     pdfPageNo: -1,
+    pdfNumPages : 0,
     zoom: this.props.position?.zoom,
   };
 
@@ -85,9 +87,10 @@ export default class NeoPdfPageView extends Component<PageProps, PageState> {
     let pdfChanged = nextProps.pdf !== this.state.pdf;
     if ((!!nextProps.pdf) && (!!this.state.pdf)) pdfChanged = pdfChanged || (nextProps.pdf.fingerprint !== this.state.pdf.fingerprint);
     const pdfPageNoChanged = nextProps.pdfPageNo !== this.state.pdfPageNo;
-
-    if (pdfChanged || pdfPageNoChanged) {
-      this.setState({ pdf: nextProps.pdf, pdfPageNo: nextProps.pdfPageNo });
+    const pdfMaxChanged = nextProps.pdf !== undefined && nextProps.pdf.numPages !== this.state.pdfNumPages;
+    
+    if (pdfChanged || pdfPageNoChanged || pdfMaxChanged) {
+      this.setState({ pdf: nextProps.pdf, pdfPageNo: nextProps.pdfPageNo , pdfNumPages: (nextProps.pdf === undefined? 1 : nextProps.pdf.numPages)});
       this.loadPage(nextProps.pdf, nextProps.pdfPageNo);
     }
 
@@ -196,7 +199,7 @@ export default class NeoPdfPageView extends Component<PageProps, PageState> {
       pageNo = pdf.numPages;
     }
 
-    if (this.pdfPageNo === pageNo && this.lastPdfFingerprint === pdf.fingerprint) {
+    if (this.pdfPageNo === pageNo && this.state.pdfNumPages === pdf.numPages && this.lastPdfFingerprint === pdf.fingerprint) {
       console.log(`PDFVIEWER, LOAD  same doc/page`)
       return;
     }
@@ -285,7 +288,7 @@ export default class NeoPdfPageView extends Component<PageProps, PageState> {
   }
 
   renderPage = async (page: NeoPdfPage, zoom: number, pdfPageNo: number, fingerprint: string, rotationChagned: boolean) => {
-    this.setState({ page, status: 'rendering check canvas' });
+    this.setState({ status: 'rendering check canvas' });
     if (!this.canvas) {
       console.log(`*State PageView ${pdfPageNo}:* CANVAS NOT FOUND`);
       return;
@@ -303,7 +306,7 @@ export default class NeoPdfPageView extends Component<PageProps, PageState> {
 
     // console.log(`BACKPLANE RENDERPAGE start`)
 
-    this.setState({ page, status: 'rendering' });
+    this.setState({ status: 'rendering' });
 
     //아래 viewport의 rotation은 설정안해줘도 된다고 생각했는데 안해주면 문제생긴다
     const viewport: any = page.getViewport({ scale: 1, rotation: page.viewport.rotation });

@@ -1,4 +1,4 @@
-import { store } from "./client/Root";
+import { store } from "./client/pages/GridaBoard";
 import { PenEventName } from "nl-lib/common/enums";
 import { IPageSOBP } from "nl-lib/common/structures";
 import { MappingStorage } from "nl-lib/common/mapper";

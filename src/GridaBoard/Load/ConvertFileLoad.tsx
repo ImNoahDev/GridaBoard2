@@ -246,7 +246,7 @@ const ConvertFileLoad = (props: Props) => {
             console.log(url);
       
             const doc = GridaDoc.getInstance();
-            doc.openPdfFile({ url: url, filename: job.tasks[0].result.files[0].filename });
+            await doc.openPdfFile({ url: url, filename: job.tasks[0].result.files[0].filename });
           }  
         }
       }catch(e){

@@ -10,7 +10,7 @@ import "slick-carousel/slick/slick-theme.css";
 import {ArrowBackIos, ArrowForwardIos} from '@material-ui/icons';
 
 
-const TUTORIAL_COUNT = 3;
+const TUTORIAL_COUNT = 2;
 const AUTO_PLAY_TIME = 10; // sec
 
 type SliderProps = {
@@ -132,8 +132,6 @@ const useStyle = props=> makeStyles(theme => ({
     display: "flex !important",
     justifyContent: "center"
   },
-  clear : {
-  },
   buttonStyle : {
     flexDirection: "row",
     alignItems: 'center',
@@ -153,9 +151,43 @@ const useStyle = props=> makeStyles(theme => ({
     "&:first-child" : {
       marginRight: "15px"
     }
+  },
+  title : {
+    "&>div:first-child": {
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      marginBottom: "20px",
+      "&>span" : {
+        padding: "8px 22px",
+        border: "2px solid " + theme.palette.primary.main,
+        height: "43px",
+        display: "flex",
+        alignItems: "center",
+        boxSizing: "border-box",
+        borderRadius: "56px",
+        letterSpacing: "0.25px",
+        color: theme.palette.primary.main,
+        fontFamily: "Roboto",
+        fontStyle: "normal",
+        fontWeight: "bold",
+        fontSize: "20px",
+        lineHeight: "23px",
+      }
+    },
+    "& > div:last-child":{
+      fontFamily: "Roboto",
+      fontStyle: "normal",
+      fontWeight: "bold",
+      fontSize: "40px",
+      lineHeight: "47px",
+      textAlign: "center",
+      letterSpacing: "0.25px",
+      color: theme.custom.icon.mono[4],
+      maxWidth: "561px",
+    }
   }
 }));
-
 
 let intervalCount = null as NodeJS.Timeout;
 const MySlider = (props: SliderProps)=>{
@@ -164,7 +196,7 @@ const MySlider = (props: SliderProps)=>{
   const classes = useStyle({brZoom:brZoom})();
   
   let slider = null as any;
-  let sliderDot = Array<HTMLDivElement>(imgSrcs.length);
+  const sliderDot = Array<HTMLDivElement>(imgSrcs.length);
   
   const setDotInterval = (currentDotDiv)=>{
     const now = Date.now();
@@ -280,6 +312,14 @@ const TutorialPageNew = (props:TutorialProps) => {
     }}>
       <div className={classes.mainSubNew}>
         <div>
+          {/* <div className={classes.title}>
+            <div>
+              <span>그리다보드 시/작/하/기</span>
+            </div>
+            <div>
+              스마트펜과 종이로 시작하는 쉽고 빠른 디지털 보드
+            </div>
+          </div> */}
           <img src={`/tutorialImg/${languageType}/tutorial_title_${languageType}.png`} />
         </div>
         <MySlider imgSrcs={imgSrcs}/>
@@ -303,7 +343,7 @@ const TutorialPageNew = (props:TutorialProps) => {
 }
 
 const TutorialPageOld = (props:TutorialProps) => {
-  const {dontShow, ...rest} = props;
+  const {dontShow } = props;
   const imgName = `/tutorialImg/tutorial_${languageType}.png`;
   const brZoom = useSelector((state: RootState) => state.ui.browser.zoom);
   const classes = useStyle({brZoom:brZoom})();
@@ -315,7 +355,7 @@ const TutorialPageOld = (props:TutorialProps) => {
 
 
   return (
-    <div {...rest} className={classes.main} onClick={(evt)=>{
+    <div className={classes.main} onClick={(evt)=>{
       evt.preventDefault();
     }}>
       <div>
