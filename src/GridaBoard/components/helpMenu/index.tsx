@@ -37,6 +37,7 @@ const useStyle = makeStyles(theme=>({
 		paddingBottom: "0px",
 		"& > div" : {
 			position: "relative",
+      whiteSpace: "pre-wrap",
 		},
 		"& > div:first-child":{
 			fontFamily : "Roboto",
@@ -160,7 +161,7 @@ const HelpViewer = (props : Props)=>{
 			<div className={classes.content}>
 				<div>{nowView != 0 ? `${nowView}/${myHelpData.length-1}` : ""}</div>
 				<div>{myHelpData[nowView].subtitle}</div>
-				<div>{myHelpData[nowView].subtext.replace("\\n","\n")}</div>
+				<div>{myHelpData[nowView].subtext.replaceAll("\\n","\n")}</div>
 			</div>
 			<div className={`${classes.buttonDiv} ${nowView == 0 ? classes.buttonStart : classes.buttonNormal}`}> {/* 버튼 */}
 				<Button onMouseDown={stopPropagation} onClick={goPrev} variant="contained" color="secondary"> 
