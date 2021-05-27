@@ -9,12 +9,14 @@ import { default as Slider, Settings, CustomArrowProps } from "react-slick";
 
 const useStyle = makeStyles(theme=>({
 	wrap : {
+		userSelect: "none",
 		right : "24px",
 		bottom : "88px",
 		position: "absolute",
 		width: "380px",
 		height: "552px",
 		overflow: "hidden",
+		cursor: "grab",
 		
 		background: theme.custom.white[90],
 		boxShadow : theme.custom.shadows[0],
@@ -35,6 +37,7 @@ const useStyle = makeStyles(theme=>({
 		paddingBottom: "0px",
 		"& > div" : {
 			position: "relative",
+      whiteSpace: "pre-wrap",
 		},
 		"& > div:first-child":{
 			fontFamily : "Roboto",
@@ -86,19 +89,16 @@ const useStyle = makeStyles(theme=>({
 	},
 	buttonNormal : {
 		"& > *": {
-			width: "72px"
+			minWidth: "72px"
 		},
 	}
 }));
 
-// type Props = {
-// 	onHeaderClick ?: ()=>void,
-// 	className ?: clas
-// }
+
 interface Props extends  React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement> {
 	mainNo : number,
 	subNo : number,
-	onHeaderClick ?: (ref)=>void,
+	onHeaderClick ?: (ref:React.MouseEvent<HTMLDivElement, MouseEvent>)=>void,
 	setHelpMenu: (boolean)=>void
 }
 //우선 데이터 하나짜리
@@ -107,55 +107,31 @@ const HelpViewer = (props : Props)=>{
 	let myHelpData = helpData[languageType] === undefined? helpData["ko"] : helpData[languageType];
 	myHelpData = myHelpData["main" + props.mainNo].sub[props.subNo-1].text;
 	const imageUrl = `/helpImg/${languageType}/main${props.mainNo}/sub${props.subNo}`;
-	const images = Array.from({length:myHelpData.length}, (el,idx)=>`${imageUrl}/${idx+1}.png`);
+	const images = Array.from({length:myHelpData.length}, (el,idx)=>`${imageUrl}/${idx}.png`);
 	let slider = null as Slider;
 	let [nowView,setNowView] = useState(0);
 
-	const goPrev = ()=>{
+	const goPrev = (e)=>{
+		e.stopPropagation();
 		if(nowView == 0){
 			//스킵
 			props.setHelpMenu(false);
-		}
+		} 
 		slider.slickPrev();
 	}
-	const goNext = ()=>{
+	const goNext = (e)=>{
+		e.stopPropagation();
 		if(myHelpData[nowView].link !== null){
-			// window.open("about:blank").location.href = "/nbs_v2.json.gz";
-			// var href = "https://drive.google.com/file/d/1l4C0q8xe6JIZPYEY6DdUFQLeGlikbayR";
-			// var href = "/2P_test.pdf";
-			// var anchor = document.createElement('a');
-			// anchor.href = href;
-			// anchor.download = href;
-			// document.body.appendChild(anchor);
-			// anchor.click();
-			// document.body.removeChild(anchor);
-			// fetch("/2P_test.pdf").then(function(t) {
-			// 	return t.blob().then((b)=>{
-			// 		var a = document.createElement("a");
-			// 		a.href = URL.createObjectURL(b);
-			// 		a.setAttribute("download", "test.pdf");
-			// 		a.click();
-			// 	}
-			// 	);
-			// });
-			// var xhr = new XMLHttpRequest();
-			// xhr.responseType = 'blob';
-			// xhr.onload = function () {
-			// 	var a = document.createElement('a');
-			// 	a.href = window.URL.createObjectURL(xhr.response); // xhr.response is a blob
-			// 	a.download = "test.pdf"; // Set the file name.
-			// 	a.style.display = 'none';
-			// 	document.body.appendChild(a);
-			// 	a.click();
-			// };
-			// xhr.open('GET', "https://drive.google.com/file/d/1l4C0q8xe6JIZPYEY6DdUFQLeGlikbayR");
-			// xhr.send();
+      window.open("./fileDownload.html?file="+myHelpData[nowView].link);
 			slider.slickNext();
 		}else if(nowView == myHelpData.length-1){
 			props.setHelpMenu(false);
 		}else{
 			slider.slickNext();
 		}
+	}
+	const stopPropagation = (e)=>{
+		e.stopPropagation();
 	}
 
 	const sliderSettings : Settings = {
@@ -173,7 +149,7 @@ const HelpViewer = (props : Props)=>{
 	}
 
 	return (
-		<div id="testtest" className={`${classes.wrap} ${props.className}`}/*  onClick={(evt)=>{alert(1)}} */ >
+		<div className={`${classes.wrap} ${props.className}`}/*  onClick={(evt)=>{alert(1)}} */ onMouseDown={props.onHeaderClick} >
 			<Slider ref={e=>slider=e} {...sliderSettings} className={classes.slider}>
 				{
 					images.map((el, idx)=>(
@@ -185,17 +161,17 @@ const HelpViewer = (props : Props)=>{
 			<div className={classes.content}>
 				<div>{nowView != 0 ? `${nowView}/${myHelpData.length-1}` : ""}</div>
 				<div>{myHelpData[nowView].subtitle}</div>
-				<div>{myHelpData[nowView].subtext.replace("\\n","\n")}</div>
+				<div>{myHelpData[nowView].subtext.replaceAll("\\n","\n")}</div>
 			</div>
 			<div className={`${classes.buttonDiv} ${nowView == 0 ? classes.buttonStart : classes.buttonNormal}`}> {/* 버튼 */}
-				<Button onClick={goPrev} variant="contained" color="secondary"> 
+				<Button onMouseDown={stopPropagation} onClick={goPrev} variant="contained" color="secondary"> 
 					{
 						nowView == 0 ? 
 							getText("helpMenu_skip")
 						: getText("helpMenu_prev")
 					}
 				</Button>
-				<Button onClick={goNext} variant="contained" color="primary">
+				<Button onMouseDown={stopPropagation} onClick={goNext} variant="contained" color="primary">
 					{
 						nowView == 0 ? 
 							getText("helpMenu_start")

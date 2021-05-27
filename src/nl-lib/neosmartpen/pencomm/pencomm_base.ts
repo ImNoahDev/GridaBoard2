@@ -31,6 +31,7 @@ export async function deviceSelectDlg(): Promise<BluetoothDevice> {
       { namePrefix: "BLUE2" },
       { namePrefix: "F50" },
       { namePrefix: "Mbest" },
+      { namePrefix: "Dimo" },
     ]
   }
   // let result = await Bluetooth.requestDeviceAsync(options);
