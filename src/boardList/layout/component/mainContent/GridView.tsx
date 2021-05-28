@@ -1,5 +1,5 @@
 import { makeStyles, Grow, SvgIcon, Popper, ClickAwayListener, Paper, MenuList, MenuItem, IconButton } from "@material-ui/core";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import firebase from 'GridaBoard/util/firebase_config';
 import { setDocsNum } from "../../../../GridaBoard/store/reducers/appConfigReducer";
 import { useDispatch } from "react-redux";
@@ -49,6 +49,10 @@ const GridView = (props : Props)=>{
   const dispatch = useDispatch();
 
   let anchorRef = React.useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    refs = [];
+  }, []);
 
   const handleClose = (event: React.MouseEvent<Document, MouseEvent>) => {
     if (anchorRef.current && anchorRef.current.contains(event.target as HTMLElement)) {
