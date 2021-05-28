@@ -153,6 +153,9 @@ const BoardList = () => {
 
   const routeChange = async idx => {
     const nowDocs = docsObj.docs[idx];
+    if (nowDocs.dateDeleted !== 0) {
+      return;
+    }
     const path = `/app`;
     await history.push(path);
 
