@@ -15,7 +15,7 @@ import {
 } from "nl-lib/common/neopdf";
 import { IPageSOBP, IFileBrowserReturn, IGetNPageTransformType } from "nl-lib/common/structures";
 import { useBeforeunload } from 'react-beforeunload';
-import getText from "../language/language";
+import getText, { languageType } from "../language/language";
 import TutorialPage from "../components/TutorialPage";
 import {useCookies} from 'react-cookie';
 import HelpMenu, { setHelpMenu } from "../components/CustomElement/HelpMenu";
@@ -168,7 +168,8 @@ const Home = () => {
     setTutorialOpen(false);
   
     if(!(cookies.firstHelp === "true")){//쿠키에 저장될때 문자열로 변환되어서 이렇게 검사해야함
-      setHelpMenu(true);
+      if(languageType == "ko") //한글만 준비되어 있음
+        setHelpMenu(true);
     }
   }
 
@@ -181,7 +182,8 @@ const Home = () => {
     setTutorialOpen(false);
     
     if(!(cookies.firstHelp === "true")){//쿠키에 저장될때 문자열로 변환되어서 이렇게 검사해야함
-      setHelpMenu(true);
+      if(languageType == "ko") //한글만 준비되어 있음
+        setHelpMenu(true);
     }
   }
 
