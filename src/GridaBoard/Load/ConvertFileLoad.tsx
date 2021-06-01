@@ -6,6 +6,7 @@ import CloudConvert from 'cloudconvert';
 import { setLoadingVisibility } from '../store/reducers/loadingCircle';
 import GridaDoc from "../GridaDoc";
 import { InkStorage } from '../../nl-lib/common/penstorage';
+import { useHistory } from 'react-router';
 
 // import {fileConvert} from "./LoadGrida";
 
@@ -28,7 +29,6 @@ interface cloudImportResponse {
 
 interface Props extends ButtonProps {
   handlePdfOpen: (event: IFileBrowserReturn) => void,
-  className: string
 }
 // 그리다 파일을 불러왔을때 이용
 function fileConvert(selectedFile){
@@ -114,15 +114,14 @@ const checkPdfIsEncryptted = (selectedFile) => {
 
 const ConvertFileLoad = (props: Props) => {
   const [canConvert, setCanConvert] = useState(true);
-  const { handlePdfOpen , className} = props;
-  function fileOpenHandler() {
-    // const selectedFile = await openFileBrowser();
-    // console.log(selectedFile);
-    const input = document.querySelector("#fileForconvert") as HTMLInputElement;
-    input.value = "";
-    input.click();
-  }
-  async function inputChange(){
+  const { handlePdfOpen } = props;
+  const history = useHistory();
+
+  async function inputChange()
+  {
+    const path = `/app`;
+    history.push(path);
+
     const inputer = document.getElementById("fileForconvert") as HTMLInputElement;
     const fileName = inputer.files[0].name.split(".");
     const fileType = fileName[fileName.length-1];
@@ -144,10 +143,11 @@ const ConvertFileLoad = (props: Props) => {
         fileConvert(result as IFileBrowserReturn);
       }
     }else{
-      doFileConvert();
+      doFileConvert(inputer);
     }
   }
-  async function doFileConvert(){
+
+  async function doFileConvert(inputer: HTMLInputElement){
     if(!canConvert) return ;
     
     //converting을 기다려야 하기 때문에 로딩 서클 켜주기
@@ -164,7 +164,7 @@ const ConvertFileLoad = (props: Props) => {
     const responJson:cloudImportResponse = await res.json();
 
     //전송할 form 데이터 생성
-    const inputer = document.getElementById("fileForconvert") as HTMLInputElement;
+    // const inputer = document.getElementById("fileForconvert") as HTMLInputElement;
     const formData = new FormData();
 
     for(const key in responJson.data.result.form.parameters){
@@ -185,8 +185,8 @@ const ConvertFileLoad = (props: Props) => {
         }
     }
     xhr.send(formData);
-    console.log(123);
   } 
+
   async function setTask(res:HTMLAllCollection){
     //컨버팅 중
       try{
@@ -292,13 +292,9 @@ const ConvertFileLoad = (props: Props) => {
   }
 
   return (
-    <Button id="loadFileButton" className={`${className}`}
-    onClick={fileOpenHandler}>
-      {getText("load_file")}
-      <input type="file" id="fileForconvert" style={{ display: "none" }} onChange={inputChange} accept=".3FR,.ABW,.AI,.ARW,.AVIF,.AZW,.AZW3,.AZW4,.BMP,.CBC,.CBR,.CBZ,.CDR,.CGM,.CHM,.CR2,.CR3,.CRW,.CSV,.DCR,.DJVU,.DNG,.DOC,.DOCM,.DOCX,.DOT,.DOTX,.DPS,.DWG,.DXF,.EMF,.EPS,.EPUB,.ERF,.ET,.FB2,.GIF,.HEIC,.HTM,.HTML,.HTMLZ,.HWP,.ICO,.JFIF,.JPEG,.JPG,.KEY,.LIT,.LRF,.LWP,.MD,.MOBI,.MOS,.MRW,.NEF,.NUMBERS,.ODD,.ODP,.ODS,.ODT,.ORF,.PAGES,.PDB,.PDF,.PEF,.PML,.PNG,.POT,.POTX,.PPM,.PPS,.PPSX,.PPT,.PPTM,.PPTX,.PRC,.PS,.PSD,.RAF,.RAW,.RB,.RST,.RTF,.RW2,.SDA,.SDC,.SDW,.SK,.SK1,.SNB,.SVG,.SVGZ,.TCR,.TEX,.TIF,.TIFF,.TXT,.TXTZ,.VSD,.WEBP,.WMF,.WPD,.WPS,.X3F,.XCF,.XLS,.XLSM,.XLSX,.XPS,.ZABW, .grida"/> 
-      {/* getText("load_from_grida") */}
-    </Button>);
-
+      <input type="file" id="fileForconvert" style={{ display: "none" }} onChange={inputChange} 
+      accept=".3FR,.ABW,.AI,.ARW,.AVIF,.AZW,.AZW3,.AZW4,.BMP,.CBC,.CBR,.CBZ,.CDR,.CGM,.CHM,.CR2,.CR3,.CRW,.CSV,.DCR,.DJVU,.DNG,.DOC,.DOCM,.DOCX,.DOT,.DOTX,.DPS,.DWG,.DXF,.EMF,.EPS,.EPUB,.ERF,.ET,.FB2,.GIF,.HEIC,.HTM,.HTML,.HTMLZ,.HWP,.ICO,.JFIF,.JPEG,.JPG,.KEY,.LIT,.LRF,.LWP,.MD,.MOBI,.MOS,.MRW,.NEF,.NUMBERS,.ODD,.ODP,.ODS,.ODT,.ORF,.PAGES,.PDB,.PDF,.PEF,.PML,.PNG,.POT,.POTX,.PPM,.PPS,.PPSX,.PPT,.PPTM,.PPTX,.PRC,.PS,.PSD,.RAF,.RAW,.RB,.RST,.RTF,.RW2,.SDA,.SDC,.SDW,.SK,.SK1,.SNB,.SVG,.SVGZ,.TCR,.TEX,.TIF,.TIFF,.TXT,.TXTZ,.VSD,.WEBP,.WMF,.WPD,.WPS,.X3F,.XCF,.XLS,.XLSM,.XLSX,.XPS,.ZABW, .grida"/> 
+  )
 }
 
 export default ConvertFileLoad;

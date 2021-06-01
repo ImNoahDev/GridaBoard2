@@ -162,6 +162,11 @@ const HeaderLayer = (props: Props) => {
   const [pdfUrl, setPdfUrl] = useState(undefined as string);
   const [pdfFilename, setPdfFilename] = useState(undefined as string);
 
+  function fileOpenHandler() {
+    const input = document.querySelector("#fileForconvert") as HTMLInputElement;
+    input.value = "";
+    input.click();
+  }
 
   const makePdfUrl = async () => {
     const doc = GridaDoc.getInstance();
@@ -305,7 +310,11 @@ const HeaderLayer = (props: Props) => {
             </ClickAwayListener>
             <div>
               <CustomBadge badgeContent={`Ctrl-O`}>
-                <ConvertFileLoad className={`loadDropDown ${classes.buttonStyle} ${classes.buttonFontStyle}`} handlePdfOpen={handlePdfOpen} />
+                <Button id="loadFileButton" className={`loadDropDown ${classes.buttonStyle} ${classes.buttonFontStyle}`}
+                onClick={fileOpenHandler}>
+                  {getText("load_file")}
+                  <ConvertFileLoad handlePdfOpen={handlePdfOpen} />
+                </Button>
               </CustomBadge>
             </div>
             <div>
