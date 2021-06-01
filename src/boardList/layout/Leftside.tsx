@@ -3,6 +3,7 @@ import { relative } from 'node:path';
 import React, { useEffect, useState } from 'react';
 import getText from "GridaBoard/language/language";
 import { AccessTime, DeleteOutline, Add, MoreVert } from '@material-ui/icons';
+import { showGroupDialog } from 'GridaBoard/store/reducers/listReducer';
 const useStyle = makeStyles(theme=>({
   wrap : {
     background : theme.custom.white[50],
@@ -137,7 +138,7 @@ const Leftside = (props : Props)=>{
           <span>
             {getText("boardList_groupTitle")}
           </span>
-          <Button className={classes.addGroup} variant="contained" color="secondary" disableElevation>
+          <Button className={classes.addGroup} variant="contained" color="secondary" disableElevation onClick={e=>{showGroupDialog({type:"newGroup"})}}>
             <Add />
             <span>{getText("boardList_add")}</span>
           </Button>

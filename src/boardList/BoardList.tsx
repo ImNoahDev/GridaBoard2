@@ -7,15 +7,17 @@ import 'firebase/auth';
 import 'firebase/database';
 import firebase, { auth } from 'GridaBoard/util/firebase_config';
 import { useDispatch, useSelector } from 'react-redux';
-import GridaDoc from '../GridaBoard/GridaDoc';
-import { InkStorage } from '../nl-lib/common/penstorage';
+import GridaDoc from 'GridaBoard/GridaDoc';
+import { InkStorage } from 'nl-lib/common/penstorage';
 import * as neolabTheme from 'GridaBoard/theme';
 import Header from './layout/Header';
 import Leftside from './layout/Leftside';
 import MainContent from './layout/MainContent';
-import { setDate, setDocName, setIsNewDoc } from '../GridaBoard/store/reducers/docConfigReducer';
-import { RootState } from '../GridaBoard/store/rootReducer';
-import { setDocsNum } from '../GridaBoard/store/reducers/appConfigReducer';
+import { setDate, setDocName, setIsNewDoc } from 'GridaBoard/store/reducers/docConfigReducer';
+import { RootState } from 'GridaBoard/store/rootReducer';
+import { setDocsNum } from 'GridaBoard/store/reducers/appConfigReducer';
+import { showGroupDialog, hideGroupDialog } from 'GridaBoard/store/reducers/listReducer';
+import CombineDialog from './layout/component/dialog/CombineDialog';
 const useStyle = makeStyles(theme => ({
   mainBackground: {
     width: '100%',
@@ -56,6 +58,9 @@ const BoardList = () => {
   const dispatch = useDispatch();
 
   const docsNum = useSelector((state: RootState) => state.appConfig.docsNum);
+  const isShowDialog = useSelector((state: RootState) => state.list.groupDialog.show);
+  console.log(showGroupDialog, hideGroupDialog);
+
 
   turnOnGlobalKeyShortCut(false);
 
@@ -237,6 +242,7 @@ const BoardList = () => {
           <MainContent selected={category} category={categoryObj} docs={docsObj.docs} routeChange={routeChange} />
         </div>
       </div>
+      <CombineDialog open={isShowDialog} />
     </MuiThemeProvider>
   );
 };
