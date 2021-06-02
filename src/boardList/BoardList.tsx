@@ -59,7 +59,6 @@ const BoardList = () => {
   const dispatch = useDispatch();
 
   const updateCount = useSelector((state: RootState) => state.appConfig.updateCount);
-  const docsNum = useSelector((state: RootState) => state.appConfig.docsNum);
   const isShowDialog = useSelector((state: RootState) => state.list.groupDialog.show);
   const isShowDropdown = useSelector((state: RootState) => state.list.dropDown.show);
   const isCategoryChange = useSelector((state: RootState) => state.list.groupDialog.change);
