@@ -132,7 +132,7 @@ const MainNewButton = () => {
             }}>
             <Paper>
               <ClickAwayListener onClickAway={handleClose}>
-                <MenuList id="split-button-menu">
+                <MenuList>
                   {/* map으로 돌릴 경우 onClick에 모든 index가 한번씩 들어옴 */}
                   <MenuItem className={classes.menuItem} onClick={startGrida}>
                     <span style={{ marginLeft: '10px' }}>{options[0]}</span>

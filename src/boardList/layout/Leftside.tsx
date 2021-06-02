@@ -3,6 +3,8 @@ import { relative } from 'node:path';
 import React, { useEffect, useState } from 'react';
 import getText from "GridaBoard/language/language";
 import { AccessTime, DeleteOutline, Add, MoreVert } from '@material-ui/icons';
+import { showGroupDialog } from 'GridaBoard/store/reducers/listReducer';
+import { showDropDown } from 'GridaBoard/store/reducers/listReducer';
 const useStyle = makeStyles(theme=>({
   wrap : {
     background : theme.custom.white[50],
@@ -114,7 +116,6 @@ const Leftside = (props : Props)=>{
   const classes = useStyle();
   const selected = props.selected;
   const keyList = props.categoryKey;
-  console.log(keyList);
 
   const selectCategory = (select)=>{
     if(select == selected) return ;
@@ -137,7 +138,7 @@ const Leftside = (props : Props)=>{
           <span>
             {getText("boardList_groupTitle")}
           </span>
-          <Button className={classes.addGroup} variant="contained" color="secondary" disableElevation>
+          <Button className={classes.addGroup} variant="contained" color="secondary" disableElevation onClick={e=>{showGroupDialog({type:"newGroup"})}}>
             <Add />
             <span>{getText("boardList_add")}</span>
           </Button>
@@ -148,7 +149,13 @@ const Leftside = (props : Props)=>{
           <div key={el} onClick={e=>selectCategory(el)} className={selected === el? classes.selected : "" }>
             <span>{title}</span>
             {el !== "Unshelved" ? (
-              <IconButton onClick={(e)=>{e.stopPropagation(); alert(123)}}><MoreVert /></IconButton>
+              <IconButton onClick={(e)=>{e.stopPropagation();
+                showDropDown({
+                  type : "group",
+                  event : e,
+                  selected: el
+                });
+              }}><MoreVert /></IconButton>
             ) : ""}
           </div>
           );

@@ -14,6 +14,7 @@ import calibrationDataReducer from "./reducers/calibrationDataReducer";
 import appConfigReducer from './reducers/appConfigReducer';
 import docConfigReducer from './reducers/docConfigReducer';
 import zoomReducer from './reducers/zoomReducer';
+import listReducer from './reducers/listReducer';
 
 const rootReducer = combineReducers({
   progress: progressDlgReducer,
@@ -31,6 +32,7 @@ const rootReducer = combineReducers({
   viewFitReducer,
   activePage: activePageReducer,
   zoomReducer,
+  list : listReducer
 });
 
 export default rootReducer;

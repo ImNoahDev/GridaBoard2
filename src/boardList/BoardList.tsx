@@ -7,15 +7,18 @@ import 'firebase/auth';
 import 'firebase/database';
 import firebase, { auth } from 'GridaBoard/util/firebase_config';
 import { useDispatch, useSelector } from 'react-redux';
-import GridaDoc from '../GridaBoard/GridaDoc';
-import { InkStorage } from '../nl-lib/common/penstorage';
+import GridaDoc from 'GridaBoard/GridaDoc';
+import { InkStorage } from 'nl-lib/common/penstorage';
 import * as neolabTheme from 'GridaBoard/theme';
 import Header from './layout/Header';
 import Leftside from './layout/Leftside';
 import MainContent from './layout/MainContent';
 import { setDate, setDocName, setIsNewDoc } from '../GridaBoard/store/reducers/docConfigReducer';
 import { RootState } from '../GridaBoard/store/rootReducer';
-
+import { showGroupDialog, hideGroupDialog } from 'GridaBoard/store/reducers/listReducer';
+import CombineDialog from './layout/component/dialog/CombineDialog';
+import { getCategoryArray } from "./BoardListPageFunc2";
+import GlobalDropdown from './layout/component/GlobalDropdown';
 const useStyle = makeStyles(theme => ({
   mainBackground: {
     width: '100%',
@@ -56,6 +59,29 @@ const BoardList = () => {
   const dispatch = useDispatch();
 
   const updateCount = useSelector((state: RootState) => state.appConfig.updateCount);
+  const docsNum = useSelector((state: RootState) => state.appConfig.docsNum);
+  const isShowDialog = useSelector((state: RootState) => state.list.groupDialog.show);
+  const isShowDropdown = useSelector((state: RootState) => state.list.dropDown.show);
+  const isCategoryChange = useSelector((state: RootState) => state.list.groupDialog.change);
+  
+  const categoryChange = async ()=>{
+    let dataArr = await getCategoryArray();
+
+    console.log("!!!!!!!!!!!!!!!!!", dataArr);
+    
+    setDocsObj({
+      ...docsObj,
+      category: dataArr,
+    });
+  }
+  
+  useEffect(()=>{
+    hideGroupDialog(false);
+
+    if(isCategoryChange){
+      categoryChange();
+    }
+  },[isCategoryChange]);
 
   turnOnGlobalKeyShortCut(false);
 
@@ -98,6 +124,7 @@ const BoardList = () => {
     }
   }, [updateCount]);
 
+  
   const categoryObj = {};
   for (let i = 0; i < docsObj.category.length; i++) {
     categoryObj[docsObj.category[i]] = 0;
@@ -122,30 +149,6 @@ const BoardList = () => {
       });
   };
   
-  const createCategory = async (categoryName)=>{
-    await db
-    .collection(userId)
-    .doc('categoryData')
-    .get()
-    .then(async (res)=>{
-      let data:Array<string> = res.data().data;
-      if(data.includes(categoryName)){
-        console.log("already had")
-      }else{
-        await db
-          .collection(userId)
-          .doc('categoryData')
-          .set({
-            data: [...data, categoryName],
-          });
-
-          setDocsObj({
-            docs: docsObj.docs,
-            category: [...docsObj.category, categoryName],
-          });
-      }
-    })
-  }
 
   const routeChange = async idx => {
     const nowDocs = docsObj.docs[idx];
@@ -229,10 +232,12 @@ const BoardList = () => {
           <Header />
         </AppBar>
         <div className={classes.main}>
-          <Leftside selected={category} category={categoryObj} categoryKey={docsObj.category} selectCategory={selectCategory} createCategory={createCategory} />
+          <Leftside selected={category} category={categoryObj} categoryKey={docsObj.category} selectCategory={selectCategory} />
           <MainContent selected={category} category={categoryObj} docs={docsObj.docs} routeChange={routeChange} />
         </div>
       </div>
+      <CombineDialog open={isShowDialog} />
+      <GlobalDropdown open={isShowDropdown} />
     </MuiThemeProvider>
   );
 };
