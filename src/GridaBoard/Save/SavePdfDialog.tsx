@@ -122,7 +122,7 @@ const SavePdfDialog = (props: Props) => {
     const date = store.getState().docConfig.date;
     const userId = firebase.auth().currentUser.email;
 
-    const gridaFileName = `${userId}_${docName}_${date}_.grida`;
+    const gridaFileName = `${userId}_${docName}_${date}.grida`;
 
     const storageRef = firebase.storage().ref();
     const gridaRef = storageRef.child(`grida/${gridaFileName}`);
@@ -161,7 +161,7 @@ const SavePdfDialog = (props: Props) => {
         gridaUploadTask.snapshot.ref.getDownloadURL().then(async function (downloadURL) {
           const grida_path = downloadURL;
   
-          const thumbFileName = `${userId}_${docName}_${date}_.png`;
+          const thumbFileName = `${userId}_${docName}_${date}.png`;
           const pngRef = storageRef.child(`thumbnail/${thumbFileName}`);
   
           const thumbUploadTask = pngRef.put(imageBlob);

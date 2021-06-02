@@ -285,7 +285,7 @@ export async function saveThumbnail(docName: string) {
   const date = new Date();
   const timeStamp = date.getTime();
 
-  const gridaFileName = `${userId}_${docName}_${timeStamp}_.grida`;
+  const gridaFileName = `${userId}_${docName}_${timeStamp}.grida`;
   const gridaRef = storageRef.child(`grida/${gridaFileName}`);
 
   /** Make & Upload Grida
@@ -327,7 +327,7 @@ export async function saveThumbnail(docName: string) {
       gridaUploadTask.snapshot.ref.getDownloadURL().then(async function (downloadURL) {
         const grida_path = downloadURL;
 
-        const thumbFileName = `${userId}_${docName}_${timeStamp}_.png`;
+        const thumbFileName = `${userId}_${docName}_${timeStamp}.png`;
         const pngRef = storageRef.child(`thumbnail/${thumbFileName}`);
 
         const thumbUploadTask = pngRef.put(imageBlob);
@@ -396,13 +396,14 @@ export async function updateDB(docName: string, thumb_path: string, grida_path: 
     });
 };
 
-export async function saveToDB(docName: string, thumb_path: string, grida_path: string, nowDate: any) {
+export async function saveToDB(docName: string, thumb_path: string, grida_path: string, nowDate: Date) {
   const db = firebase.firestore();
   const userId = firebase.auth().currentUser.email;
 
-  db.collection(userId);
+  const docId = `${userId}_${docName}_${nowDate.getTime()}`;
+
   db.collection(userId)
-    .doc(docName)
+    .doc(docId)
     .set({
       category: 'Unshelved',
       created: nowDate,

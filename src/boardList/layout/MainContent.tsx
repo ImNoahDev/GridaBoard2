@@ -1,12 +1,12 @@
-import { Button, ButtonGroup, Checkbox, ClickAwayListener, createStyles, Grow, IconButton, InputBase, makeStyles, MenuItem, MenuList, NativeSelect, Paper, Popper, Select, SvgIcon, withStyles } from '@material-ui/core';
+import { Checkbox, makeStyles } from '@material-ui/core';
 import React, { useEffect, useState } from 'react';
 import getText from "GridaBoard/language/language";
-import { ArrowDropDown, Add } from '@material-ui/icons';
 import MainNavSelector from "./component/mainContent/MainNavSelector";
 import MainNewButton from "./component/mainContent/MainNewButton";
+import MainTrashButton from "./component/mainContent/MainTrashButton";
 import GridView from "./component/mainContent/GridView"
 import ListView from './component/mainContent/ListView';
-
+import { forceUpdateBoardList } from '../../GridaBoard/store/reducers/appConfigReducer';
 
 const useStyle = makeStyles(theme =>({
   wrap : {
@@ -173,14 +173,15 @@ const MainContent = (props : Props)=>{
   const [orderBy, setOrderBy] = useState(0);
   const [listType, setListType] = useState("grid" as ( "grid" | "list"));
   const classes = useStyle();
-
+  
+  let nowDocs = [];
+  let title = "";
+  let contentRef = React.useRef<HTMLDivElement>(null);
+  
   useEffect(()=>{
     contentRef.current.scrollTop = 0;
     setOrderBy(0);
   },[props.selected])
-  let nowDocs = [];
-  let title = "";
-  let contentRef = React.useRef<HTMLDivElement>(null);
 
   
   const orderFunctionList = [
@@ -188,8 +189,6 @@ const MainContent = (props : Props)=>{
     (a,b)=>b.doc_name - a.doc_name
   ];
   
-
-
   if(["recent", "trash"].includes(selected)){
     title = getText("boardList_" + selected);
     if(selected === "recent"){
@@ -224,7 +223,7 @@ const MainContent = (props : Props)=>{
       <div className={classes.title}>
         {title}
       </div>
-      <MainNewButton />
+      {selected === 'trash'? <MainTrashButton /> :<MainNewButton />}
     </div>
     <div className={classes.nav}>
       <div>

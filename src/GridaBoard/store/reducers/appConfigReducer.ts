@@ -12,7 +12,7 @@ const ACTION_TYPE = Object.freeze({
   SET: `${ActionGroup}.SET`,
   SET_PRINTOPTION: `${ActionGroup}.SET_PRINTOPTION`,
   SET_PENS: `${ActionGroup}.SET_PENS`,
-  SET_DOCS_NUM: `${ActionGroup}.SET_DOCS_NUM`,
+  UPDATE_BOARDLIST: `${ActionGroup}.UPDATE_BOARDLIST`,
   GET: `${ActionGroup}.GET`,
 });
 //]
@@ -33,9 +33,9 @@ export const setPens = async (pens: INeoSmartpen[]) => {
   })
 }
 
-export const setDocsNum = (docsNum: number) => ({
-    type: ACTION_TYPE.SET_DOCS_NUM,
-    value: docsNum,
+export const forceUpdateBoardList = () => ({
+    type: ACTION_TYPE.UPDATE_BOARDLIST,
+    value: 1,
 })
 //]
 
@@ -45,7 +45,7 @@ const initialState = {
   printOption: g_defaultPrintOption,
   pens: [] as INeoSmartpen[],
   num_pens: 0,
-  docsNum: 0,
+  updateCount: 1,
 };
 
 export type IAppConfig = typeof initialState;
@@ -68,10 +68,11 @@ export default (state = initialState, action) => {
         printOption: action.value,
       };
     }
-    case ACTION_TYPE.SET_DOCS_NUM: {
+    case ACTION_TYPE.UPDATE_BOARDLIST: {
+      const cnt = state.updateCount;
       return {
         ...state,
-        docsNum: action.value,
+        updateCount: cnt + action.value,
         
       };
 

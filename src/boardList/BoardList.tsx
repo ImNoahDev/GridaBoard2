@@ -15,7 +15,7 @@ import Leftside from './layout/Leftside';
 import MainContent from './layout/MainContent';
 import { setDate, setDocName, setIsNewDoc } from '../GridaBoard/store/reducers/docConfigReducer';
 import { RootState } from '../GridaBoard/store/rootReducer';
-import { setDocsNum } from '../GridaBoard/store/reducers/appConfigReducer';
+
 const useStyle = makeStyles(theme => ({
   mainBackground: {
     width: '100%',
@@ -55,7 +55,7 @@ const BoardList = () => {
   const history = useHistory();
   const dispatch = useDispatch();
 
-  const docsNum = useSelector((state: RootState) => state.appConfig.docsNum);
+  const updateCount = useSelector((state: RootState) => state.appConfig.updateCount);
 
   turnOnGlobalKeyShortCut(false);
 
@@ -90,15 +90,13 @@ const BoardList = () => {
             newCategoryData = ['Unshelved'];
           }
 
-          dispatch(setDocsNum(newDocs.length));
-
           setDocsObj({
             docs: newDocs,
             category: newCategoryData,
           });
         });
     }
-  }, [docsNum]);
+  }, [updateCount]);
 
   const categoryObj = {};
   for (let i = 0; i < docsObj.category.length; i++) {
@@ -149,8 +147,6 @@ const BoardList = () => {
     })
   }
 
-
-
   const routeChange = async idx => {
     const nowDocs = docsObj.docs[idx];
     if (nowDocs.dateDeleted !== 0) {
@@ -161,59 +157,59 @@ const BoardList = () => {
 
     //firebase storage에 url로 json을 갖고 오기 위해서 CORS 구성이 선행되어야 함(gsutil 사용)
     fetch(nowDocs.grida_path)
-      .then(response => response.json())
-      .then(async data => {
-        const pdfRawData = data.pdf.pdfInfo.rawData;
-        const neoStroke = data.stroke;
+    .then(response => response.json())
+    .then(async data => {
+      const pdfRawData = data.pdf.pdfInfo.rawData;
+      const neoStroke = data.stroke;
 
-        const pageInfos = data.pdf.pdfInfo.pageInfos;
-        const basePageInfos = data.pdf.pdfInfo.basePageInfos;
+      const pageInfos = data.pdf.pdfInfo.pageInfos;
+      const basePageInfos = data.pdf.pdfInfo.basePageInfos;
 
-        const rawDataBuf = new ArrayBuffer(pdfRawData.length * 2);
-        const rawDataBufView = new Uint8Array(rawDataBuf);
-        for (let i = 0; i < pdfRawData.length; i++) {
-          rawDataBufView[i] = pdfRawData.charCodeAt(i);
-        }
-        const blob = new Blob([rawDataBufView], { type: 'application/pdf' });
-        const url = await URL.createObjectURL(blob);
+      const rawDataBuf = new ArrayBuffer(pdfRawData.length * 2);
+      const rawDataBufView = new Uint8Array(rawDataBuf);
+      for (let i = 0; i < pdfRawData.length; i++) {
+        rawDataBufView[i] = pdfRawData.charCodeAt(i);
+      }
+      const blob = new Blob([rawDataBufView], { type: 'application/pdf' });
+      const url = await URL.createObjectURL(blob);
 
-        const completed = InkStorage.getInstance().completedOnPage;
-        completed.clear();
+      const completed = InkStorage.getInstance().completedOnPage;
+      completed.clear();
 
-        const gridaArr = [];
-        const pageId = [];
+      const gridaArr = [];
+      const pageId = [];
 
-        for (let i = 0; i < neoStroke.length; i++) {
-          pageId[i] = InkStorage.makeNPageIdStr(neoStroke[i][0]);
-          if (!completed.has(pageId[i])) {
-            completed.set(pageId[i], new Array(0));
-          }
-
-          gridaArr[i] = completed.get(pageId[i]);
-          for (let j = 0; j < neoStroke[i].length; j++) {
-            gridaArr[i].push(neoStroke[i][j]);
-          }
+      for (let i = 0; i < neoStroke.length; i++) {
+        pageId[i] = InkStorage.makeNPageIdStr(neoStroke[i][0]);
+        if (!completed.has(pageId[i])) {
+          completed.set(pageId[i], new Array(0));
         }
 
-        const doc = GridaDoc.getInstance();
-        doc.pages = [];
+        gridaArr[i] = completed.get(pageId[i]);
+        for (let j = 0; j < neoStroke[i].length; j++) {
+          gridaArr[i].push(neoStroke[i][j]);
+        }
+      }
 
-        await doc.openGridaFile(
-          { url: url, filename: nowDocs.doc_name },
-          pdfRawData,
-          neoStroke,
-          pageInfos,
-          basePageInfos
-          );
-          
-          setDocName(nowDocs.doc_name);
-          setIsNewDoc(false);
-  
-          const n_sec = nowDocs.created.nanoseconds.toString().substring(0,3);
-          const sec = nowDocs.created.seconds.toString();
-          const m_sec = sec + n_sec;
-          setDate(m_sec);
-      });
+      const doc = GridaDoc.getInstance();
+      doc.pages = [];
+
+      await doc.openGridaFile(
+        { url: url, filename: nowDocs.doc_name },
+        pdfRawData,
+        neoStroke,
+        pageInfos,
+        basePageInfos
+        );
+        
+        setDocName(nowDocs.doc_name);
+        setIsNewDoc(false);
+
+        const n_sec = nowDocs.created.nanoseconds.toString().substring(0,3);
+        const sec = nowDocs.created.seconds.toString();
+        const m_sec = sec + n_sec;
+        setDate(m_sec);
+    });
   };
 
   const selectCategory = (select: string) => {

@@ -1,9 +1,10 @@
 import { makeStyles, Grow, SvgIcon, Popper, ClickAwayListener, Paper, MenuList, MenuItem, IconButton } from "@material-ui/core";
 import React, { useEffect, useState } from "react";
 import firebase from 'GridaBoard/util/firebase_config';
-import { setDocsNum } from "../../../../GridaBoard/store/reducers/appConfigReducer";
+import { forceUpdateBoardList } from "../../../../GridaBoard/store/reducers/appConfigReducer";
 import { useDispatch } from "react-redux";
 import MoreVert from "@material-ui/icons/MoreVert";
+import { deleteBoardFromLive } from "../../../BoardListPageFunc";
 
 interface Props extends  React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement> {
    docsList?: Array<any>,
@@ -42,7 +43,7 @@ let refs = [];
 const GridView = (props : Props)=>{
   const classes = useStyle();
   const {selectedContent, selectedClass,ref,routeChange, ...rest} = props;
-  let {docsList} = props;
+  const {docsList} = props;
   const [open, setOpen] = useState(false);
   const [listIdx, setListIdx] = useState(0);
   const itemList = ["삭제","무언가"];
@@ -62,26 +63,20 @@ const GridView = (props : Props)=>{
     setOpen(false);
   };
 
-  const handleMenuItemClick = (
+  const handleMenuItemClick = async (
     index: number,
   ) => {
     switch (index) {
       case 0 : { //삭제
-        const docName = docsList[listIdx].doc_name;
-        const userId = firebase.auth().currentUser.email;
+        const result = await deleteBoardFromLive(docsList[listIdx]);
+        
+        await docsList.splice(listIdx, 1);
 
-        docsList.splice(listIdx, 1);
+        await setOpen(false);
 
-        const db = firebase.firestore();
-        db.collection(userId)
-        .doc(docName)
-        .update({
-          dateDeleted : Date.now(),
-        })
-
-        setOpen(false);
-
-        dispatch(setDocsNum(docsList.length));
+        if (result === 1) {
+          dispatch(forceUpdateBoardList());
+        }
 
         break;
       }
@@ -121,15 +116,12 @@ const GridView = (props : Props)=>{
                 </div>
               </div>
               {selectedContent === idx ? (<div className={selectedClass}/>) : ""}
-
               <Grow in={true} >
                 <div className={classes.removeBtn} ref={setRefs}>
                   <IconButton onClick={() => handleMenuListClick(idx)}><MoreVert/></IconButton>
                 </div>
               </Grow>
-
             </div>
-
         </React.Fragment>
         )
         })} 
