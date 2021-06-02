@@ -19,6 +19,7 @@ import { setDocsNum } from 'GridaBoard/store/reducers/appConfigReducer';
 import { showGroupDialog, hideGroupDialog } from 'GridaBoard/store/reducers/listReducer';
 import CombineDialog from './layout/component/dialog/CombineDialog';
 import { getCategoryArray } from "./BoardListPageFunc2";
+import GlobalDropdown from './layout/component/GlobalDropdown';
 const useStyle = makeStyles(theme => ({
   mainBackground: {
     width: '100%',
@@ -60,6 +61,7 @@ const BoardList = () => {
 
   const docsNum = useSelector((state: RootState) => state.appConfig.docsNum);
   const isShowDialog = useSelector((state: RootState) => state.list.groupDialog.show);
+  const isShowDropdown = useSelector((state: RootState) => state.list.dropDown.show);
   const isCategoryChange = useSelector((state: RootState) => state.list.groupDialog.change);
   
   const categoryChange = async ()=>{
@@ -240,6 +242,7 @@ const BoardList = () => {
         </div>
       </div>
       <CombineDialog open={isShowDialog} />
+      <GlobalDropdown open={isShowDropdown} />
     </MuiThemeProvider>
   );
 };

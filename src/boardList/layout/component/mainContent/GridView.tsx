@@ -45,7 +45,6 @@ const GridView = (props : Props)=>{
   let {docsList} = props;
   const [open, setOpen] = useState(false);
   const [listIdx, setListIdx] = useState(0);
-  const itemList = ["삭제","무언가"];
   const dispatch = useDispatch();
 
   let anchorRef = React.useRef<HTMLDivElement>(null);
@@ -96,9 +95,9 @@ const GridView = (props : Props)=>{
     setOpen((prevOpen) => !prevOpen);
   };
 
-  const setRefs = (ref) => {
-    refs.push(ref)
-  }
+  // const setRefs = (ref) => {
+  //   refs.push(ref)
+  // }
 
   return (
     <React.Fragment>
@@ -123,7 +122,7 @@ const GridView = (props : Props)=>{
               {selectedContent === idx ? (<div className={selectedClass}/>) : ""}
 
               <Grow in={true} >
-                <div className={classes.removeBtn} ref={setRefs}>
+                <div className={classes.removeBtn} /* ref={setRefs} */>
                   <IconButton onClick={() => handleMenuListClick(idx)}><MoreVert/></IconButton>
                 </div>
               </Grow>
@@ -133,33 +132,6 @@ const GridView = (props : Props)=>{
         </React.Fragment>
         )
         })} 
-        <Popper open={open} anchorEl={refs[listIdx]} role={undefined} transition disablePortal>
-          {({ TransitionProps, placement }) => (
-            <Grow
-              {...TransitionProps}
-              style={{
-                transformOrigin: placement === 'bottom' ? 'center top' : 'center bottom',
-              }}
-            >
-              <Paper>
-                <ClickAwayListener onClickAway={handleClose}>
-                  <MenuList id="split-button-menu">
-                    {itemList.map((item, index) => (
-                      <MenuItem
-                        className={classes.menuItem}
-                        key={item}
-                        // selected={index === selectedIndex}
-                        onClick={() => handleMenuItemClick(index)}
-                      >
-                        {item}
-                      </MenuItem>
-                    ))}
-                  </MenuList>
-                </ClickAwayListener>
-              </Paper>
-            </Grow>
-          )}
-        </Popper>
     </React.Fragment>
     );
 }

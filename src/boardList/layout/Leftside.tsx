@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import getText from "GridaBoard/language/language";
 import { AccessTime, DeleteOutline, Add, MoreVert } from '@material-ui/icons';
 import { showGroupDialog } from 'GridaBoard/store/reducers/listReducer';
+import { showDropDown } from 'GridaBoard/store/reducers/listReducer';
 const useStyle = makeStyles(theme=>({
   wrap : {
     background : theme.custom.white[50],
@@ -148,7 +149,13 @@ const Leftside = (props : Props)=>{
           <div key={el} onClick={e=>selectCategory(el)} className={selected === el? classes.selected : "" }>
             <span>{title}</span>
             {el !== "Unshelved" ? (
-              <IconButton onClick={(e)=>{e.stopPropagation(); alert(123)}}><MoreVert /></IconButton>
+              <IconButton onClick={(e)=>{e.stopPropagation();
+                showDropDown({
+                  type : "group",
+                  event : e,
+                  selected: el
+                });
+              }}><MoreVert /></IconButton>
             ) : ""}
           </div>
           );

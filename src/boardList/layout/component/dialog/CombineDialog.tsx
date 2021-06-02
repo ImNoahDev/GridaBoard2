@@ -5,7 +5,6 @@ import { RootState } from "GridaBoard/store/rootReducer";
 import { showGroupDialog, hideGroupDialog } from 'GridaBoard/store/reducers/listReducer';
 import getText from "GridaBoard/language/language";
 import GroupDialog from "./detail/GroupDialog"
-import classes from "*.module.sass";
 
 const useStyle = makeStyles(theme=>({
   paper : {
@@ -92,15 +91,13 @@ const CombineDialog = (props : Props)=>{
     type:diaType,
     classes : {
       paper : classes.paper
-    },
-    defaultText : ""
+    }
   };
   let returnDialog = null;
   if(["newGroup", "changeGroupName"].includes(diaType)){
-    if(diaType === "changeGroupName"){
-      groupProps.defaultText = "test";
-    }
     returnDialog = (<GroupDialog {...groupProps} />);
+  }else if(diaType == "tra"){
+    returnDialog = (<div />);
   }
 
   return returnDialog;

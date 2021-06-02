@@ -2,7 +2,9 @@ import classes from "*.module.css";
 import { Button, Dialog, DialogProps } from "@material-ui/core";
 import { hideGroupDialog } from 'GridaBoard/store/reducers/listReducer';
 import React, { useState } from "react";
-import {createCategory} from "boardList/BoardListPageFunc2";
+import { useSelector } from "react-redux";
+import {createCategory, changeCategoryName} from "boardList/BoardListPageFunc2";
+import { RootState } from "GridaBoard/store/rootReducer";
 
 const dialogTypes = {
   "newGroup" : {
@@ -21,7 +23,6 @@ const dialogTypes = {
 interface Props extends  DialogProps {
   type ?: string
   closeEvent ?: (isChange:boolean)=>void
-  defaultText ?: string | "test"
 }
 
 const textCheck = (text:string|false)=>{
@@ -35,8 +36,8 @@ const textCheck = (text:string|false)=>{
  
 
 const GroupDialog = (props : Props)=>{
-  const { open, closeEvent, type, defaultText, ...rest } = props;
-  const defaultValue = defaultText || "";
+  const { open, closeEvent, type,  ...rest } = props;
+  const defaultValue = useSelector((state: RootState) => state.list.groupDialog.selected);
   let inputer = null as HTMLInputElement;
   
   const [disabled, setDisabled] = useState(true);
@@ -78,7 +79,27 @@ const GroupDialog = (props : Props)=>{
     await createCategory(newText as string);
 
     closeEvent(true);
+  }
+  const changeGroup = async ()=>{
+    let newText:string|false = inputer.value;
+    newText = textCheck(newText);
 
+    if(newText === false){
+      //못바꿈
+      return false;
+    }
+
+    await changeCategoryName(defaultValue, newText as string);
+
+    closeEvent(true);
+  }
+
+  const save = async ()=>{
+    if(type == "newGroup"){
+      await createGroup();
+    }else if(type == "changeGroupName"){
+      await changeGroup();
+    }
   }
 
   return (
@@ -93,7 +114,7 @@ const GroupDialog = (props : Props)=>{
     <div className="warn">{mainWarn}</div>
     <div className="footer">
       <Button variant="contained" disableElevation color="secondary" onClick={()=>{closeEvent(false)}} >취소</Button>
-      <Button variant="contained" disableElevation color="primary" disabled={disabled} onClick={()=>{createGroup()}}>저장</Button>
+      <Button variant="contained" disableElevation color="primary" disabled={disabled} onClick={()=>{save()}}>저장</Button>
     </div>
   </Dialog> );
 }
