@@ -115,7 +115,6 @@ const Leftside = (props : Props)=>{
   const classes = useStyle();
   const selected = props.selected;
   const keyList = props.categoryKey;
-  console.log(keyList);
 
   const selectCategory = (select)=>{
     if(select == selected) return ;

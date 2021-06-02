@@ -82,8 +82,8 @@ const CombineDialog = (props : Props)=>{
   
   const diaType = useSelector((state: RootState) => state.list.groupDialog.type);
 
-  const closeEvent = ()=>{
-    hideGroupDialog();
+  const closeEvent = (isChange:boolean)=>{
+    hideGroupDialog(isChange);
   }
 
   const groupProps = {

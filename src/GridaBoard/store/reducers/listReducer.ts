@@ -14,9 +14,10 @@ export const showGroupDialog = (option : {type : string, selected ?: string}) =>
     selected : option.selected || ""
   });
 };
-export const hideGroupDialog = () => {
+export const hideGroupDialog = (isChange: boolean) => {
   store.dispatch({ 
-    type: LISTActionTypes.HIDE_GROUP_DIALOG
+    type: LISTActionTypes.HIDE_GROUP_DIALOG,
+    change : isChange
   });
 };
 
@@ -25,7 +26,8 @@ const initialState = {
   groupDialog : {
     show : false,
     type : "",
-    selected : ""
+    selected : "",
+    change : false
   }
 };
 
@@ -48,7 +50,8 @@ export default function loadingVisible(state = initialState, action) {
         groupDialog : {
           show : false,
           type : "",
-          selected : ""
+          selected : "",
+          change : action.change
         }
       };
     default:

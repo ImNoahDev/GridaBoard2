@@ -18,6 +18,7 @@ import { RootState } from 'GridaBoard/store/rootReducer';
 import { setDocsNum } from 'GridaBoard/store/reducers/appConfigReducer';
 import { showGroupDialog, hideGroupDialog } from 'GridaBoard/store/reducers/listReducer';
 import CombineDialog from './layout/component/dialog/CombineDialog';
+import { getCategoryArray } from "./BoardListPageFunc2";
 const useStyle = makeStyles(theme => ({
   mainBackground: {
     width: '100%',
@@ -59,7 +60,26 @@ const BoardList = () => {
 
   const docsNum = useSelector((state: RootState) => state.appConfig.docsNum);
   const isShowDialog = useSelector((state: RootState) => state.list.groupDialog.show);
-  console.log(showGroupDialog, hideGroupDialog);
+  const isCategoryChange = useSelector((state: RootState) => state.list.groupDialog.change);
+  
+  const categoryChange = async ()=>{
+    let dataArr = await getCategoryArray();
+
+    console.log("!!!!!!!!!!!!!!!!!", dataArr);
+    
+    setDocsObj({
+      ...docsObj,
+      category: dataArr,
+    });
+  }
+  
+  useEffect(()=>{
+    hideGroupDialog(false);
+
+    if(isCategoryChange){
+      categoryChange();
+    }
+  },[isCategoryChange]);
 
 
   turnOnGlobalKeyShortCut(false);
@@ -105,6 +125,7 @@ const BoardList = () => {
     }
   }, [docsNum]);
 
+  
   const categoryObj = {};
   for (let i = 0; i < docsObj.category.length; i++) {
     categoryObj[docsObj.category[i]] = 0;
@@ -129,30 +150,6 @@ const BoardList = () => {
       });
   };
   
-  const createCategory = async (categoryName)=>{
-    await db
-    .collection(userId)
-    .doc('categoryData')
-    .get()
-    .then(async (res)=>{
-      let data:Array<string> = res.data().data;
-      if(data.includes(categoryName)){
-        console.log("already had")
-      }else{
-        await db
-          .collection(userId)
-          .doc('categoryData')
-          .set({
-            data: [...data, categoryName],
-          });
-
-          setDocsObj({
-            docs: docsObj.docs,
-            category: [...docsObj.category, categoryName],
-          });
-      }
-    })
-  }
 
 
 
@@ -238,7 +235,7 @@ const BoardList = () => {
           <Header />
         </AppBar>
         <div className={classes.main}>
-          <Leftside selected={category} category={categoryObj} categoryKey={docsObj.category} selectCategory={selectCategory} createCategory={createCategory} />
+          <Leftside selected={category} category={categoryObj} categoryKey={docsObj.category} selectCategory={selectCategory} />
           <MainContent selected={category} category={categoryObj} docs={docsObj.docs} routeChange={routeChange} />
         </div>
       </div>

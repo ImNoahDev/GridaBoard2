@@ -2,7 +2,7 @@ import classes from "*.module.css";
 import { Button, Dialog, DialogProps } from "@material-ui/core";
 import { hideGroupDialog } from 'GridaBoard/store/reducers/listReducer';
 import React, { useState } from "react";
-
+import {createCategory} from "boardList/BoardListPageFunc2";
 
 const dialogTypes = {
   "newGroup" : {
@@ -20,14 +20,24 @@ const dialogTypes = {
 
 interface Props extends  DialogProps {
   type ?: string
-  closeEvent ?: ()=>void
+  closeEvent ?: (isChange:boolean)=>void
   defaultText ?: string | "test"
+}
+
+const textCheck = (text:string|false)=>{
+  //정규식 조건을 통해서 안될경우 false
+  let a = 1;
+  if(a == 1)
+    return text;
+  else
+    return false;
 }
  
 
 const GroupDialog = (props : Props)=>{
   const { open, closeEvent, type, defaultText, ...rest } = props;
   const defaultValue = defaultText || "";
+  let inputer = null as HTMLInputElement;
   
   const [disabled, setDisabled] = useState(true);
   
@@ -38,18 +48,37 @@ const GroupDialog = (props : Props)=>{
   }
   const inputChange = (e)=>{
     let cantSave = false;
-    const newText = e.target.value;
+    let newText:string|false = e.target.value;
+
 
     if(newText === defaultValue){
       cantSave = true;
     }
     
+    newText = textCheck(newText);
+    if(newText === false)
+      cantSave = true;
     
     if(!cantSave && newText != "" && disabled){
       setDisabled(false);
     }else if(cantSave || (newText == "" && !disabled)){
       setDisabled(true);
     }
+  }
+  const createGroup = async ()=>{
+    let newText:string|false = inputer.value;
+    // createCategory
+    newText = textCheck(newText);
+
+    if(newText === false){
+      //못바꿈
+      return false;
+    }
+
+    await createCategory(newText as string);
+
+    closeEvent(true);
+
   }
 
   return (
@@ -60,11 +89,11 @@ const GroupDialog = (props : Props)=>{
     open={open}
   >
     <div className="title">{title}</div>
-    <input className="inputer" autoFocus placeholder={placeHolder} onChange={inputChange} defaultValue={defaultValue} />
+    <input ref={(e)=>{inputer=e}} className="inputer" autoFocus placeholder={placeHolder} onChange={inputChange} defaultValue={defaultValue} />
     <div className="warn">{mainWarn}</div>
     <div className="footer">
-      <Button variant="contained" disableElevation color="secondary" onClick={()=>{closeEvent()}} >취소</Button>
-      <Button variant="contained" disableElevation color="primary" disabled={disabled}>저장</Button>
+      <Button variant="contained" disableElevation color="secondary" onClick={()=>{closeEvent(false)}} >취소</Button>
+      <Button variant="contained" disableElevation color="primary" disabled={disabled} onClick={()=>{createGroup()}}>저장</Button>
     </div>
   </Dialog> );
 }
