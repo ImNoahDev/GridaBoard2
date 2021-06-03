@@ -1,4 +1,4 @@
-import { Checkbox, makeStyles } from '@material-ui/core';
+import { Button, Checkbox, makeStyles } from '@material-ui/core';
 import React, { useEffect, useState } from 'react';
 import getText from "GridaBoard/language/language";
 import MainNavSelector from "./component/mainContent/MainNavSelector";
@@ -7,6 +7,7 @@ import MainTrashButton from "./component/mainContent/MainTrashButton";
 import GridView from "./component/mainContent/GridView"
 import ListView from './component/mainContent/ListView';
 import { forceUpdateBoardList } from '../../GridaBoard/store/reducers/appConfigReducer';
+import { DeleteOutline, Restore } from '@material-ui/icons';
 
 const useStyle = makeStyles(theme =>({
   wrap : {
@@ -69,6 +70,26 @@ const useStyle = makeStyles(theme =>({
         },
       },
     }
+  },
+  trashNav : {
+    position: "relative",
+    display: "flex",
+    width: "100%",
+    minHeight : "40px",
+    marginBottom: "24px",
+    justifyContent: "space-between",
+    alignItems: "center",
+    "& > div:first-child" : {
+      display: "flex",
+      alignItems: "center",
+      fontFamily: "Roboto",
+      fontStyle: "normal",
+      fontWeight: "normal",
+      fontSize: "14px",
+      lineHeight: "16px",
+      letterSpacing: "0.25px",
+      color : theme.palette.text.secondary
+    },
   },
   gridContent : {
     position:"relative",
@@ -156,6 +177,28 @@ const useStyle = makeStyles(theme =>({
     border: `2px solid ${theme.palette.primary.main}`,
     pointerEvents: "none",
   },
+  buttonStyle : {
+    width: "93px",
+    height: "40px",
+    radius: "4px",
+    padding: "8px",
+    "&:hover" : {
+      cursor : "pointer !important",
+    },
+  },
+  buttonFontStyle: {
+    fontFamily: "Roboto",
+    fontStyle: "normal",
+    fontWeight: 400,
+    lineHeight: "14.06px",
+    fontSize: "12px",
+    letterSpacing: "0.25px",
+    color : theme.palette.text.secondary,
+    "&:hover": {
+      color: theme.palette.action.hover,
+      fontWeight: 400
+    }
+  },
 }))
 
 interface Props extends  React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement> {
@@ -219,6 +262,9 @@ const MainContent = (props : Props)=>{
     setListType(val);
   } 
 
+  const deletebtnClick = () => {
+    console.log('hi')
+  }
   return (<div className={classes.wrap}>
     <div className={classes.header}>
       <div className={classes.title}>
@@ -226,12 +272,32 @@ const MainContent = (props : Props)=>{
       </div>
       {selected === 'trash'? <MainTrashButton /> :<MainNewButton />}
     </div>
-    <div className={classes.nav}>
+
+    {selected !== 'trash' ? 
+    (<div className={classes.nav}>
       <div>
         <Checkbox color="primary"/>{getText("word_select").replace("%d", "0")}
       </div>
       <MainNavSelector orderBy={orderBy} listOrderChange={listOrderChange} listViewType={listViewType}/>
-    </div>
+    </div>)
+    :
+    (<div className={classes.trashNav}>
+      <div>
+        <Checkbox color="primary"/>{getText("word_select").replace("%d", "0")}
+      </div>
+
+      <div>
+        <Button className={`${classes.buttonStyle} ${classes.buttonFontStyle} deleteForeverBtn`} onClick={deletebtnClick}>
+            <DeleteOutline/><span>완전 삭제</span>
+          </Button> 
+        <Button className={`${classes.buttonStyle} ${classes.buttonFontStyle} deleteForeverBtn`} onClick={deletebtnClick}>
+          <Restore style={{width: "28px", height: "24px"}}/><span>복원</span>
+        </Button>
+      </div>
+    </div>)
+    }
+
+
     <div className={classes.gridContent} ref={contentRef}>
       {listType === "grid" ? 
       (<GridView docsList={nowDocs} selectedContent={selectedContent} selectedClass={classes.selected} routeChange={routeChange} />)
