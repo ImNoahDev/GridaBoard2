@@ -3,6 +3,9 @@ import 'firebase/database';
 import firebase, { auth } from 'GridaBoard/util/firebase_config';
 import Cookies from 'universal-cookie';
 
+import {getTimeStamp} from "./BoardListPageFunc";
+
+
 export default {}
 
 
@@ -12,7 +15,16 @@ const cookies = new Cookies();
 
 
 const objectToArray = (obj)=>{
-  return Object.values(obj);
+  let keys = Object.keys(obj);
+  let lastKey = Number(keys[keys.length-1]);
+  let returnArr = [];
+  for(let i = 0; i < lastKey+1; i++){
+    returnArr[i] = obj[i];
+    // if(obj[i] === undefined){
+    //   returnArr[i] = ["", -1];
+    // }
+  }
+  return returnArr;
 }
 const arrayToObject = (array)=>{
   return Object.assign({}, array);
@@ -68,35 +80,47 @@ export const createCategory = async (categoryName:string)=>{
     console.log("already had");
     return "";
   }else{
-    dataArr.push([categoryName, dataArr.length]);
+    let newData = [...dataArr];
+    newData.sort((a,b)=>b[1]-a[1]);
+
+    dataArr.push([categoryName, newData[0][1]+1]);
     await saveCategory(dataArr);
 
     return categoryName;
   }
-
-  // if(dataArr.includes(categoryName)){
-  // }else{
-    // await saveCategory([...dataArr, categoryName]);
-
-  // }
 };
 
 
 /**
  * (category name) => new categoryList
  */
- export const deleteCategory = async (categoryName:string) => {
+ export const deleteCategory = async (selected) => {
   const userId = cookies.get('user_email');
   if(userId === undefined){
     return false;
   }
+  let selectedIdx = selected[3];
   
   let dataArr = await getCategoryArray();
   
-  const idx = dataArr.indexOf(categoryName);
-  if(idx === -1) return false;
+  let nowSortIdx = dataArr[selectedIdx][1];
+  dataArr[selectedIdx] = ["",-1];
 
-  dataArr.splice(idx , 1);
+  for(let i = 0; i < dataArr.length; i++){
+    let now = dataArr[i];
+    if(now[1] > nowSortIdx)
+      now[1] -= 1;
+  }
+
+
+  let docsData = await getDatabase();
+  if(docsData !== false){
+    docsData.docs.forEach(async el=>{
+      if(el.category == selectedIdx){
+        await docCategoryChange(el, "0");
+      }
+    });
+  }
 
   await saveCategory(dataArr);
   return dataArr;
@@ -116,6 +140,62 @@ export const changeCategoryName = async (prevName:any[], nextName:string) => {
   await saveCategory(dataArr);
   return dataArr;
 }
+
+export const changeCategorySort = async (selected, type:"up"|"down", alpha:number) => {
+  const userId = cookies.get('user_email');
+  if(userId === undefined){
+    return false;
+  }
+  
+
+  let dataArr = await getCategoryArray();
+  // let alpha = 1;
+  
+  if(type == "up"){
+    if(selected[1]-alpha <= 0){
+      //최상단(0은 unshelved 고정)
+      return false;
+    }
+    alpha *= -1;
+
+  }else{
+    if(selected[1]+alpha >= dataArr.length){
+      //맨 마지막
+      return false;
+    }
+    alpha *= 1;
+  }
+
+
+  for(let i = 0; i < dataArr.length; i++){
+    if(dataArr[i][1] == dataArr[selected[3]][1] + alpha){
+      dataArr[i][1] -= alpha;
+    }
+  }
+  dataArr[selected[3]][1] += alpha;
+
+
+  await saveCategory(dataArr);
+  return true;
+}
+
+///////////////////////////////////////////////////////////
+
+export const docCategoryChange = async (doc, categoryKey)=>{
+  const userId = cookies.get('user_email');
+  if(userId === undefined){
+    return false;
+  }
+
+
+  let docId = `${userId}_${doc.doc_name}_${getTimeStamp(doc.created)}`
+  await db
+  .collection(userId)
+  .doc(docId).update({
+    category : categoryKey
+  })
+}
+
 
 
 

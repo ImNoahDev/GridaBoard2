@@ -15,7 +15,7 @@ import Leftside from './layout/Leftside';
 import MainContent from './layout/MainContent';
 import { setDate, setDocName, setIsNewDoc } from '../GridaBoard/store/reducers/docConfigReducer';
 import { RootState } from '../GridaBoard/store/rootReducer';
-import { showGroupDialog, hideGroupDialog } from 'GridaBoard/store/reducers/listReducer';
+import { showGroupDialog, hideGroupDialog, changeGroup } from 'GridaBoard/store/reducers/listReducer';
 import CombineDialog from './layout/component/dialog/CombineDialog';
 import { getCategoryArray } from "./BoardListPageFunc2";
 import GlobalDropdown from './layout/component/GlobalDropdown';
@@ -63,7 +63,7 @@ const BoardList = () => {
   const updateCount = useSelector((state: RootState) => state.appConfig.updateCount);
   const isShowDialog = useSelector((state: RootState) => state.list.groupDialog.show);
   const isShowDropdown = useSelector((state: RootState) => state.list.dropDown.show);
-  const isCategoryChange = useSelector((state: RootState) => state.list.groupDialog.change);
+  const isCategoryChange = useSelector((state: RootState) => state.list.isChange.group);
   
   const categoryChange = async ()=>{
     let dataArr = await getCategoryArray();
@@ -71,7 +71,11 @@ const BoardList = () => {
     for (let i = 0; i < dataArr.length; i++) {
       dataArr[i][3] = i;
     }
-    
+
+    if(!isNaN(Number(category)) && Number(category) >= dataArr.length){
+      setCategory((dataArr.length-1).toString());
+    }
+
     setDocsObj({
       ...docsObj,
       category: dataArr,
@@ -79,7 +83,7 @@ const BoardList = () => {
   }
   
   useEffect(()=>{
-    hideGroupDialog(false);
+    changeGroup(false);
 
     if(isCategoryChange){
       categoryChange();
@@ -96,8 +100,9 @@ const BoardList = () => {
       if(data === false) return false;
 
       for (let i = 0; i < data.category.length; i++) {
-        data.category[i][3] = i;
+          data.category[i][3] = i;
       }
+      
       
       setDocsObj({
         docs: data.docs,
@@ -114,11 +119,12 @@ const BoardList = () => {
   }
   for (let i = 0; i < docsObj.docs.length; i++) {
     let now = docsObj.docs[i];
+    // console.log(docsObj.category, now);
     if (now.dateDeleted === 0) {
       docsObj.category[now.category][2] += 1;
     }
   }
-
+  
   const readThumbnailFromDB = () => {
     const userId = firebase.auth().currentUser.email;
 

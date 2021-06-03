@@ -2,8 +2,8 @@ import React from "react";
 import { makeStyles, ClickAwayListener, Grow, MenuList, Paper, Popper, MenuItem, PopperProps } from "@material-ui/core";
 import { useSelector } from "react-redux";
 import { RootState } from "GridaBoard/store/rootReducer";
-import { hideDropDown } from 'GridaBoard/store/reducers/listReducer';
-import { showGroupDialog } from 'GridaBoard/store/reducers/listReducer';
+import { hideDropDown, showGroupDialog, changeGroup } from 'GridaBoard/store/reducers/listReducer';
+import { changeCategorySort, deleteCategory } from "../../BoardListPageFunc2";
 
 const useStyle = makeStyles(theme=>({
   paper : {
@@ -45,11 +45,17 @@ const itemData = {
           selected:val
         })
       },
-      "moveUp" : (val)=>{
+      "moveUp" : async (val)=>{
+        await changeCategorySort(val, "up", 1);
+        changeGroup(true);
       },
-      "moveDown" : (val)=>{
+      "moveDown" : async (val)=>{
+        await changeCategorySort(val, "down", 1);
+        changeGroup(true);
       },
-      "delete" : (val)=>{
+      "delete" : async (val)=>{
+        await deleteCategory(val);
+        changeGroup(true);
       }
     }
   },

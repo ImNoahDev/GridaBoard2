@@ -2,7 +2,7 @@ import React from "react";
 import { makeStyles, Dialog, DialogProps} from "@material-ui/core";
 import { useSelector } from "react-redux";
 import { RootState } from "GridaBoard/store/rootReducer";
-import { showGroupDialog, hideGroupDialog } from 'GridaBoard/store/reducers/listReducer';
+import { showGroupDialog, hideGroupDialog, changeGroup } from 'GridaBoard/store/reducers/listReducer';
 import getText from "GridaBoard/language/language";
 import GroupDialog from "./detail/GroupDialog"
 
@@ -82,7 +82,8 @@ const CombineDialog = (props : Props)=>{
   const diaType = useSelector((state: RootState) => state.list.groupDialog.type);
 
   const closeEvent = (isChange:boolean)=>{
-    hideGroupDialog(isChange);
+    hideGroupDialog();
+    changeGroup(isChange);
   }
 
   const groupProps = {

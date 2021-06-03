@@ -217,6 +217,7 @@ const MainContent = (props : Props)=>{
   const [listType, setListType] = useState("grid" as ( "grid" | "list"));
   const classes = useStyle();
   
+  // console.log(selected, category);
   const selectedCategory = category[selected];
   let nowDocs = [];
   let title = "";
@@ -232,6 +233,7 @@ const MainContent = (props : Props)=>{
     (a,b)=>b.last_modified.seconds - a.last_modified.seconds,
     (a,b)=>b.doc_name - a.doc_name
   ];
+
   
   if(["recent", "trash"].includes(selected)){
     title = getText("boardList_" + selected);
@@ -248,7 +250,7 @@ const MainContent = (props : Props)=>{
       title = getText("boardList_unshelved").replace("%d", nowDocs.length.toString());
     }else{
       nowDocs = docs.filter(el=> {
-        return el.category === selected && el.dateDeleted === 0;
+        return el.category == selected && el.dateDeleted === 0;
       });
       title = `${selectedCategory[0]} (${nowDocs.length})`;
     }

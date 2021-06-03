@@ -405,7 +405,7 @@ export async function saveToDB(docName: string, thumb_path: string, grida_path: 
   db.collection(userId)
     .doc(docId)
     .set({
-      category: 'Unshelved',
+      category: '0',
       created: nowDate,
       last_modified: nowDate,
       doc_name: docName,

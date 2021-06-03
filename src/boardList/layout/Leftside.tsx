@@ -116,8 +116,9 @@ const Leftside = (props : Props)=>{
   const classes = useStyle();
   const selected = props.selected;
   // const keyList = props.categoryKey;
-  const category = props.category;
+  const category = [...props.category];
   category.sort((a,b)=>a[1]-b[1]);
+  // console.log(category);
 
   const selectCategory = (select)=>{
     if(select == selected) return ;
@@ -146,6 +147,7 @@ const Leftside = (props : Props)=>{
           </Button>
         </div>
         {category.map((el, idx)=>{
+          if(el[1] == -1) return ;
           let title = idx === 0 ? getText("boardList_unshelved").replace("%d", el[2]) : el[0] + ` (${el[2]})`;
           return (
           <div key={el[0]} onClick={e=>selectCategory(el[3])} className={selected === el[3]? classes.selected : "" }>
