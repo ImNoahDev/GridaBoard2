@@ -69,27 +69,28 @@ export const deleteAllFromTrash = async () => {
   return result;
 }
 
-export const deleteBoardFromLive = async (docItem: IBoardData) => {
+export const deleteBoardFromLive = async (docItems: IBoardData[]) => {
   const userId = firebase.auth().currentUser.email;
-  const docName = docItem.doc_name;
-  const m_sec = getTimeStamp(docItem.created);
-
-  const docId = `${userId}_${docName}_${m_sec}`;
-
   const db = firebase.firestore();
 
   let result = 0;
 
-  await db.collection(userId)
-  .doc(docId)
-  .update({
-    dateDeleted : Date.now(),
-  }).then(() => {
-    result = 1;
-  }).catch((error) => {
-    console.error("error updating document: ", error);
-    result = 0;
-  });
+  for await (const docItem of docItems) {
+    const docName = docItem.doc_name;
+    const m_sec = getTimeStamp(docItem.created);
+    const docId = `${userId}_${docName}_${m_sec}`;
+  
+    await db.collection(userId)
+    .doc(docId)
+    .update({
+      dateDeleted : Date.now(),
+    }).then(() => {
+      result = 1;
+    }).catch((error) => {
+      console.error("error updating document: ", error);
+      result = 0;
+    });
+  }
 
   return result;
 }

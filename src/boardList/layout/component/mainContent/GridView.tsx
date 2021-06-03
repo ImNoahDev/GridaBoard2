@@ -1,16 +1,18 @@
-import { makeStyles, Grow, SvgIcon, Popper, ClickAwayListener, Paper, MenuList, MenuItem, IconButton } from "@material-ui/core";
+import { makeStyles, Grow, SvgIcon, Popper, ClickAwayListener, Paper, MenuList, MenuItem, IconButton, Checkbox } from "@material-ui/core";
 import React, { useEffect, useState } from "react";
 import firebase from 'GridaBoard/util/firebase_config';
 import { forceUpdateBoardList } from "../../../../GridaBoard/store/reducers/appConfigReducer";
 import { useDispatch } from "react-redux";
 import MoreVert from "@material-ui/icons/MoreVert";
 import { deleteBoardFromLive } from "../../../BoardListPageFunc";
+import { IBoardData } from "../../../structures/BoardStructures";
 
 interface Props extends  React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement> {
    docsList?: Array<any>,
    selectedContent ?: number,
    selectedClass ?: string,
-   routeChange ?: (idx:number)=>void
+   routeChange ?: (idx:number)=>void,
+   updateSelectedItems ?: (el: IBoardData, checked: boolean) => void,
 }
 
 const useStyle = makeStyles(theme => ({
@@ -32,6 +34,21 @@ const useStyle = makeStyles(theme => ({
   removeBtnMouseDown : {
     transform: "scale(0.85) !important",
     color: "#555555"
+  },
+  selectBtn : {
+    position: "absolute",
+    left: "7px",
+    top : "5px",
+    zIndex: 1000,
+    opacity: 0.78,
+    transform: "scale(1)",
+    "& > div:last-child": {
+      width:"100%",
+      height: "100%",
+      position: "absolute",
+      top: "0px",
+      right: "0px",
+    }
   },
   menuItem : {
     minWidth : "130px"
@@ -90,6 +107,9 @@ const GridView = (props : Props)=>{
     setOpen((prevOpen) => !prevOpen);
   };
 
+  const handleCheckBoxChange = (event: React.ChangeEvent<HTMLInputElement>, el: IBoardData) => {
+      props.updateSelectedItems(el, event.target.checked)
+  }
   // const setRefs = (ref) => {
   //   refs.push(ref)
   // }
@@ -101,8 +121,8 @@ const GridView = (props : Props)=>{
         let category = el.category == "Unshelved" ? "" : el.category;
         return (
           <React.Fragment key={idx}>
-            <div key={idx} className="contentItem"   >
-              <div style={{backgroundImage:`url(${el.thumb_path})`}} onClick={() => routeChange(el.key)}/>
+            <div key={idx} className={`contentItem`}>
+              <div style={{backgroundImage:`url(${el.thumb_path})`}} onClick={() => routeChange(el.key)} />
               <div>
                 <div>{el.doc_name}</div>
                 <div className="contentData">
@@ -111,12 +131,20 @@ const GridView = (props : Props)=>{
                   </div>
                   {category === "" ? "" : (<div />)}
                   {category === "" ? "" : (<div>{category}</div>)}
-                  
                 </div>
               </div>
+              <Grow in={true} >
+                <div className={classes.selectBtn}>
+                  <Checkbox
+                      color="primary"
+                      inputProps={{ 'aria-label': 'secondary checkbox' }}
+                      onChange={(event) => handleCheckBoxChange(event, el)}
+                    />
+                </div>
+              </Grow>
               {selectedContent === idx ? (<div className={selectedClass}/>) : ""}
               <Grow in={true} >
-                <div className={classes.removeBtn} /* ref={setRefs} */>
+                <div className={classes.removeBtn}>
                   <IconButton onClick={() => handleMenuListClick(idx)}><MoreVert/></IconButton>
                 </div>
               </Grow>

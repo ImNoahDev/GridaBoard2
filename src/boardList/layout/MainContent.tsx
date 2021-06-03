@@ -8,6 +8,8 @@ import GridView from "./component/mainContent/GridView"
 import ListView from './component/mainContent/ListView';
 import { forceUpdateBoardList } from '../../GridaBoard/store/reducers/appConfigReducer';
 import { DeleteOutline, Restore } from '@material-ui/icons';
+import { IBoardData } from '../structures/BoardStructures';
+import { deleteBoardFromLive } from '../BoardListPageFunc';
 
 const useStyle = makeStyles(theme =>({
   wrap : {
@@ -217,6 +219,8 @@ const MainContent = (props : Props)=>{
   const [listType, setListType] = useState("grid" as ( "grid" | "list"));
   const classes = useStyle();
   
+  const [selectedItems, setSelectedItems] = useState([]);
+
   const selectedCategory = category[selected];
   let nowDocs = [];
   let title = "";
@@ -262,9 +266,25 @@ const MainContent = (props : Props)=>{
     setListType(val);
   } 
 
-  const deletebtnClick = () => {
-    console.log('hi')
+  const deleteBtnClick = () => {
+    console.log('delete')
+    deleteBoardFromLive(selectedItems);
   }
+
+  const restoreBtnClick = () => {
+    console.log('restore')
+  }
+
+  const updateSelectedItems = (item: IBoardData, checked: boolean) => {
+    if (checked) {
+      setSelectedItems([...selectedItems, item]);
+    } else {
+      const index = selectedItems.findIndex(function(i) {return i.key === item.key})
+      selectedItems.splice(index, 1);
+      setSelectedItems([selectedItems]);
+    }
+  }
+
   return (<div className={classes.wrap}>
     <div className={classes.header}>
       <div className={classes.title}>
@@ -287,10 +307,10 @@ const MainContent = (props : Props)=>{
       </div>
 
       <div>
-        <Button className={`${classes.buttonStyle} ${classes.buttonFontStyle} deleteForeverBtn`} onClick={deletebtnClick}>
+        <Button className={`${classes.buttonStyle} ${classes.buttonFontStyle}`} onClick={deleteBtnClick}>
             <DeleteOutline/><span>완전 삭제</span>
           </Button> 
-        <Button className={`${classes.buttonStyle} ${classes.buttonFontStyle} deleteForeverBtn`} onClick={deletebtnClick}>
+        <Button className={`${classes.buttonStyle} ${classes.buttonFontStyle}`} onClick={restoreBtnClick}>
           <Restore style={{width: "28px", height: "24px"}}/><span>복원</span>
         </Button>
       </div>
@@ -300,7 +320,7 @@ const MainContent = (props : Props)=>{
 
     <div className={classes.gridContent} ref={contentRef}>
       {listType === "grid" ? 
-      (<GridView docsList={nowDocs} selectedContent={selectedContent} selectedClass={classes.selected} routeChange={routeChange} />)
+      (<GridView docsList={nowDocs} updateSelectedItems={updateSelectedItems} selectedContent={selectedContent} selectedClass={classes.selected} routeChange={routeChange} />)
     : (<ListView docsList={nowDocs} selectedContent={selectedContent} selectedClass={classes.selected}/>)}
       
     </div>

@@ -11,6 +11,7 @@ export type IBoardData = {
   grida_path: string,
   thumb_path: string,
   favorite?: boolean,
+  key?: number,
 }
 
 
