@@ -106,7 +106,7 @@ const useStyle = makeStyles(theme=>({
 interface Props extends  React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement> {
   selected ?: string
   // categoryList ?: Array<{name:string, count:number}>,
-  category ?: Object,
+  category ?: Array<any>,
   categoryKey ?: Array<string>
   selectCategory ?: (select:string|number)=>void,
   createCategory ?: (categoryName:string)=>void
@@ -115,7 +115,9 @@ interface Props extends  React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivEle
 const Leftside = (props : Props)=>{
   const classes = useStyle();
   const selected = props.selected;
-  const keyList = props.categoryKey;
+  // const keyList = props.categoryKey;
+  const category = props.category;
+  category.sort((a,b)=>a[1]-b[1]);
 
   const selectCategory = (select)=>{
     if(select == selected) return ;
@@ -143,12 +145,12 @@ const Leftside = (props : Props)=>{
             <span>{getText("boardList_add")}</span>
           </Button>
         </div>
-        {keyList.map(el=>{
-          let title = el === "Unshelved" ? getText("boardList_unshelved").replace("%d", props.category[el]) : el + ` (${props.category[el]})`;
+        {category.map((el, idx)=>{
+          let title = idx === 0 ? getText("boardList_unshelved").replace("%d", el[2]) : el[0] + ` (${el[2]})`;
           return (
-          <div key={el} onClick={e=>selectCategory(el)} className={selected === el? classes.selected : "" }>
+          <div key={el[0]} onClick={e=>selectCategory(el[3])} className={selected === el[3]? classes.selected : "" }>
             <span>{title}</span>
-            {el !== "Unshelved" ? (
+            {el[0] !== "Unshelved" ? (
               <IconButton onClick={(e)=>{e.stopPropagation();
                 showDropDown({
                   type : "group",

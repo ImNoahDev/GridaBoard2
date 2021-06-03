@@ -174,6 +174,7 @@ const MainContent = (props : Props)=>{
   const [listType, setListType] = useState("grid" as ( "grid" | "list"));
   const classes = useStyle();
   
+  const selectedCategory = category[selected];
   let nowDocs = [];
   let title = "";
   let contentRef = React.useRef<HTMLDivElement>(null);
@@ -197,16 +198,16 @@ const MainContent = (props : Props)=>{
       nowDocs = docs.filter(el=>el.dateDeleted !== 0);
     }
   }else{
-    if(selected === "Unshelved"){
+    if(selectedCategory[0] === "Unshelved"){
       nowDocs = docs.filter(el=> {
-        return el.category === "Unshelved" && el.dateDeleted === 0
+        return el.category == selected && el.dateDeleted === 0
       });
       title = getText("boardList_unshelved").replace("%d", nowDocs.length.toString());
     }else{
       nowDocs = docs.filter(el=> {
         return el.category === selected && el.dateDeleted === 0;
       });
-      title = `${selected} (${nowDocs.length})`;
+      title = `${selectedCategory[0]} (${nowDocs.length})`;
     }
   }
   nowDocs.sort(orderFunctionList[orderBy]);

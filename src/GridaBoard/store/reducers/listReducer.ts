@@ -9,11 +9,11 @@ export const LISTActionTypes = Object.freeze({
   HIDE_DROP_DOWN : `${ActionGroup}.HIDE_DROP_DOWN`,
 });
 // 액션 생성 함수
-export const showGroupDialog = (option : {type : string, selected ?: string}) => {
+export const showGroupDialog = (option : {type : string, selected ?: any}) => {
   store.dispatch({ 
     type: LISTActionTypes.SHOW_GROUP_DIALOG, 
     diaType : option.type,
-    selected : option.selected || ""
+    selected : option.selected || null
   });
 };
 export const hideGroupDialog = (isChange: boolean) => {
@@ -22,7 +22,7 @@ export const hideGroupDialog = (isChange: boolean) => {
     change : isChange
   });
 };
-export const showDropDown = (option : {type : string, event, selected:string}) => {
+export const showDropDown = (option : {type : string, event, selected:any}) => {
   store.dispatch({ 
     type: LISTActionTypes.SHOW_DROP_DOWN,
     ddType : option.type,
@@ -43,7 +43,7 @@ const initialState = {
   groupDialog : {
     show : false,
     type : "",
-    selected : "",
+    selected : null,
     change : false
   },
   dropDown : {
@@ -51,12 +51,12 @@ const initialState = {
     type : "",
     event : null,
     openType : "vert",
-    selected : ""
+    selected : null
   }
 };
 
 // 리듀서 작성
-export default function loadingVisible(state = initialState, action) {
+export default function listReducer(state = initialState, action) {
   switch (action.type) {
     case LISTActionTypes.SHOW_GROUP_DIALOG :
       return {
@@ -65,7 +65,7 @@ export default function loadingVisible(state = initialState, action) {
           ...state.groupDialog,
           show : true,
           type : action.diaType as string,
-          selected : action.selected as string,
+          selected : action.selected,
         }
       };
     case LISTActionTypes.HIDE_GROUP_DIALOG : 
@@ -97,7 +97,7 @@ export default function loadingVisible(state = initialState, action) {
           type : "",
           event : null,
           openType : "vert",
-          selected : ""
+          selected : null
         }
       };
     default:

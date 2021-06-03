@@ -19,6 +19,8 @@ import { showGroupDialog, hideGroupDialog } from 'GridaBoard/store/reducers/list
 import CombineDialog from './layout/component/dialog/CombineDialog';
 import { getCategoryArray } from "./BoardListPageFunc2";
 import GlobalDropdown from './layout/component/GlobalDropdown';
+import { setDefaultCategory, getDatabase } from "./BoardListPageFunc2"
+
 const useStyle = makeStyles(theme => ({
   mainBackground: {
     width: '100%',
@@ -66,7 +68,9 @@ const BoardList = () => {
   const categoryChange = async ()=>{
     let dataArr = await getCategoryArray();
 
-    console.log("!!!!!!!!!!!!!!!!!", dataArr);
+    for (let i = 0; i < dataArr.length; i++) {
+      dataArr[i][3] = i;
+    }
     
     setDocsObj({
       ...docsObj,
@@ -87,51 +91,31 @@ const BoardList = () => {
   const db = firebase.firestore();
   
   useEffect(() => {
+    const getDb = async ()=>{
+      let data = await getDatabase();
+      if(data === false) return false;
+
+      for (let i = 0; i < data.category.length; i++) {
+        data.category[i][3] = i;
+      }
+      
+      setDocsObj({
+        docs: data.docs,
+        category: data.category,
+      });
+    }
     if (userId !== undefined) {
-      db.collection(userId)
-        .get()
-        .then(async querySnapshot => {
-          const newDocs = [];
-          let newCategoryData = null;
-          let isCategoryExist = false;
-
-          querySnapshot.forEach(doc => {
-            if (doc.id === 'categoryData') {
-              newCategoryData = doc.data().data;
-              isCategoryExist = true;
-            } else {
-              newDocs.push(doc.data());
-              newDocs[newDocs.length - 1].key = newDocs.length - 1;
-            }
-          });
-
-          if (!isCategoryExist) {
-            await db
-              .collection(userId)
-              .doc('categoryData')
-              .set({
-                data: ['Unshelved'],
-              });
-            newCategoryData = ['Unshelved'];
-          }
-
-          setDocsObj({
-            docs: newDocs,
-            category: newCategoryData,
-          });
-        });
+      getDb();
     }
   }, [updateCount]);
 
-  
-  const categoryObj = {};
   for (let i = 0; i < docsObj.category.length; i++) {
-    categoryObj[docsObj.category[i]] = 0;
+    docsObj.category[i][2] = 0;
   }
   for (let i = 0; i < docsObj.docs.length; i++) {
     let now = docsObj.docs[i];
     if (now.dateDeleted === 0) {
-      categoryObj[now.category] += 1;
+      docsObj.category[now.category][2] += 1;
     }
   }
 
@@ -215,7 +199,6 @@ const BoardList = () => {
   };
 
   const selectCategory = (select: string) => {
-    console.log(select);
     setCategory(select);
   };
   const classes = useStyle();
@@ -231,8 +214,8 @@ const BoardList = () => {
           <Header />
         </AppBar>
         <div className={classes.main}>
-          <Leftside selected={category} category={categoryObj} categoryKey={docsObj.category} selectCategory={selectCategory} />
-          <MainContent selected={category} category={categoryObj} docs={docsObj.docs} routeChange={routeChange} />
+          <Leftside selected={category} category={docsObj.category} selectCategory={selectCategory} />
+          <MainContent selected={category} category={docsObj.category} docs={docsObj.docs} routeChange={routeChange} />
         </div>
       </div>
       <CombineDialog open={isShowDialog} />

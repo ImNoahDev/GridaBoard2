@@ -38,6 +38,10 @@ const textCheck = (text:string|false)=>{
 const GroupDialog = (props : Props)=>{
   const { open, closeEvent, type,  ...rest } = props;
   const defaultValue = useSelector((state: RootState) => state.list.groupDialog.selected);
+  let defaultText = "";
+  if(defaultValue !== null){
+    defaultText = defaultValue[0];
+  }
   let inputer = null as HTMLInputElement;
   
   const [disabled, setDisabled] = useState(true);
@@ -45,14 +49,14 @@ const GroupDialog = (props : Props)=>{
   let { title, placeHolder, mainWarn } = dialogTypes[type];
 
   if(type === "changeGroupName"){
-    placeHolder = defaultValue;
+    placeHolder = defaultValue[0];
   }
   const inputChange = (e)=>{
     let cantSave = false;
     let newText:string|false = e.target.value;
 
 
-    if(newText === defaultValue){
+    if(newText === defaultText){
       cantSave = true;
     }
     
@@ -110,7 +114,7 @@ const GroupDialog = (props : Props)=>{
     open={open}
   >
     <div className="title">{title}</div>
-    <input ref={(e)=>{inputer=e}} className="inputer" autoFocus placeholder={placeHolder} onChange={inputChange} defaultValue={defaultValue} />
+    <input ref={(e)=>{inputer=e}} className="inputer" autoFocus placeholder={placeHolder} onChange={inputChange} defaultValue={defaultText} />
     <div className="warn">{mainWarn}</div>
     <div className="footer">
       <Button variant="contained" disableElevation color="secondary" onClick={()=>{closeEvent(false)}} >취소</Button>
