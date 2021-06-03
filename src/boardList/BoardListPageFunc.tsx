@@ -94,6 +94,31 @@ export const deleteBoardFromLive = async (docItem: IBoardData) => {
   return result;
 }
 
+export const restoreFromTrash = async (docItem: IBoardData) => {
+  const userId = firebase.auth().currentUser.email;
+  const docName = docItem.doc_name;
+  const m_sec = getTimeStamp(docItem.created);
+
+  const docId = `${userId}_${docName}_${m_sec}`;
+
+  const db = firebase.firestore();
+
+  let result = 0;
+
+  await db.collection(userId)
+  .doc(docId)
+  .update({
+    dateDeleted : 0,
+  }).then(() => {
+    result = 1;
+  }).catch((error) => {
+    console.error("error updating document: ", error);
+    result = 0;
+  });
+
+  return result;
+}
+
 export const getTimeStamp = (created: {nanoseconds: number, seconds: number}) => {
   const nano_sec = Number(created.nanoseconds) / 1000000;
   let nano_sec_str = nano_sec.toString();
