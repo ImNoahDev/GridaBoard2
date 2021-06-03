@@ -7,6 +7,7 @@ export const LISTActionTypes = Object.freeze({
   HIDE_GROUP_DIALOG: `${ActionGroup}.HIDE_GROUP_DIALOG`,
   SHOW_DROP_DOWN : `${ActionGroup}.SHOW_DROP_DOWN`,
   HIDE_DROP_DOWN : `${ActionGroup}.HIDE_DROP_DOWN`,
+  CHANGE_GROUP : `${ActionGroup}.CHANGE_GROUP`,
 });
 // 액션 생성 함수
 export const showGroupDialog = (option : {type : string, selected ?: any}) => {
@@ -16,10 +17,9 @@ export const showGroupDialog = (option : {type : string, selected ?: any}) => {
     selected : option.selected || null
   });
 };
-export const hideGroupDialog = (isChange: boolean) => {
+export const hideGroupDialog = () => {
   store.dispatch({ 
-    type: LISTActionTypes.HIDE_GROUP_DIALOG,
-    change : isChange
+    type: LISTActionTypes.HIDE_GROUP_DIALOG
   });
 };
 export const showDropDown = (option : {type : string, event, selected:any}) => {
@@ -35,16 +35,25 @@ export const hideDropDown = () => {
     type: LISTActionTypes.HIDE_DROP_DOWN
   });
 };
+export const changeGroup = (isChange: boolean) => {
+  store.dispatch({ 
+    type: LISTActionTypes.CHANGE_GROUP,
+    change : isChange
+  });
+};
+
 
 
 
 // 초기 상태
 const initialState = {
+  isChange : {
+    group : false
+  },
   groupDialog : {
     show : false,
     type : "",
-    selected : null,
-    change : false
+    selected : null
   },
   dropDown : {
     show : false,
@@ -74,8 +83,7 @@ export default function listReducer(state = initialState, action) {
         groupDialog : {
           show : false,
           type : "",
-          selected : "",
-          change : action.change
+          selected : ""
         }
       };
     case LISTActionTypes.SHOW_DROP_DOWN : 
@@ -100,6 +108,14 @@ export default function listReducer(state = initialState, action) {
           selected : null
         }
       };
+    case LISTActionTypes.CHANGE_GROUP : 
+      return {
+        ...state,
+        isChange : {
+          ...state.isChange,
+          group : action.change
+        }
+      }
     default:
       return state;
   }
