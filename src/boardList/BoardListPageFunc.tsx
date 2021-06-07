@@ -79,7 +79,7 @@ export const deleteBoardFromLive = async (docItems: IBoardData[]) => {
     const docName = docItem.doc_name;
     const m_sec = getTimeStamp(docItem.created);
     const docId = `${userId}_${docName}_${m_sec}`;
-  
+
     await db.collection(userId)
     .doc(docId)
     .update({
@@ -91,31 +91,58 @@ export const deleteBoardFromLive = async (docItems: IBoardData[]) => {
       result = 0;
     });
   }
+  return result;
+}
+
+export const deleteBoardsFromTrash = async (docItems: IBoardData[]) => {
+  const db = firebase.firestore();
+  const userId = firebase.auth().currentUser.email;
+
+  let result = 0;
+
+  for await (const docItem of docItems) {
+    const docName = docItem.doc_name;
+    if (docName === undefined) continue;
+    const m_sec = getTimeStamp(docItem.created);
+    const docId = `${userId}_${docName}_${m_sec}`;
+  
+    await db.collection(userId)
+    .doc(docId)
+    .delete()
+    .then(() => {
+      result = 1;
+    }).catch((error) => {
+      console.error("error delete document: ", error);
+      result = 0;
+    });
+  }
 
   return result;
 }
 
-export const restoreFromTrash = async (docItem: IBoardData) => {
-  const userId = firebase.auth().currentUser.email;
-  const docName = docItem.doc_name;
-  const m_sec = getTimeStamp(docItem.created);
-
-  const docId = `${userId}_${docName}_${m_sec}`;
-
+export const restoreBoardsFromTrash = async (docItems: IBoardData[]) => {
   const db = firebase.firestore();
+  const userId = firebase.auth().currentUser.email;
 
   let result = 0;
 
-  await db.collection(userId)
-  .doc(docId)
-  .update({
-    dateDeleted : 0,
-  }).then(() => {
-    result = 1;
-  }).catch((error) => {
-    console.error("error updating document: ", error);
-    result = 0;
-  });
+  for await (const docItem of docItems) {
+    const docName = docItem.doc_name;
+    if (docName === undefined) continue;
+    const m_sec = getTimeStamp(docItem.created);
+    const docId = `${userId}_${docName}_${m_sec}`;
+  
+    await db.collection(userId)
+    .doc(docId)
+    .update({
+      dateDeleted : 0,
+    }).then(() => {
+      result = 1;
+    }).catch((error) => {
+      console.error("error updating document: ", error);
+      result = 0;
+    });
+  }
 
   return result;
 }

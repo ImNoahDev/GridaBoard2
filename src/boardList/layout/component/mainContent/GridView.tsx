@@ -1,12 +1,13 @@
 import { makeStyles, Grow, SvgIcon, Popper, ClickAwayListener, Paper, MenuList, MenuItem, IconButton, Checkbox } from "@material-ui/core";
-import React, { useEffect, useState } from "react";
+import React, { BaseSyntheticEvent, useEffect, useState, useRef } from "react";
 import firebase from 'GridaBoard/util/firebase_config';
 import { forceUpdateBoardList } from "../../../../GridaBoard/store/reducers/appConfigReducer";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import MoreVert from "@material-ui/icons/MoreVert";
 import { deleteBoardFromLive } from "../../../BoardListPageFunc";
 import { IBoardData } from "../../../structures/BoardStructures";
 import { showDropDown } from 'GridaBoard/store/reducers/listReducer';
+import { RootState } from "../../../../GridaBoard/store/rootReducer";
 
 interface Props extends  React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement> {
    docsList?: Array<any>,
@@ -17,7 +18,7 @@ interface Props extends  React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivEle
 }
 
 const useStyle = makeStyles(theme => ({
-  removeBtn : {
+  moreBtn : {
     position: "absolute",
     right: "7px",
     top : "5px",
@@ -43,20 +44,12 @@ const useStyle = makeStyles(theme => ({
     zIndex: 1000,
     opacity: 0.78,
     transform: "scale(1)",
-    "& > div:last-child": {
-      width:"100%",
-      height: "100%",
-      position: "absolute",
-      top: "0px",
-      right: "0px",
-    }
+
   },
   menuItem : {
     minWidth : "130px"
   }
 }));
-
-let refs = [];
 
 const GridView = (props : Props)=>{
   const classes = useStyle();
@@ -65,17 +58,22 @@ const GridView = (props : Props)=>{
   const [open, setOpen] = useState(false);
   const [listIdx, setListIdx] = useState(0);
   const dispatch = useDispatch();
-
-  let anchorRef = React.useRef<HTMLDivElement>(null);
+  const itemList = ["삭제", "do sth"];
+  const [anchorEl, setAnchorEl] = useState();
+  const [checkedList, setCheckedList] = useState([]);
 
   useEffect(() => {
-    refs = [];
-  }, []);
+    const arr = [];
+    for (let i = 0; i < docsList.length; i++) {
+      arr.push(false);
+    }
+    setCheckedList(arr);
+  }, [docsList.length])
 
   const handleClose = (event: React.MouseEvent<Document, MouseEvent>) => {
-    if (anchorRef.current && anchorRef.current.contains(event.target as HTMLElement)) {
-      return;
-    }
+    // if (anch  b norRef.current && anchorRef.current.contains(event.target as HTMLElement)) {
+    //   return;
+    // }
 
     setOpen(false);
   };
@@ -84,11 +82,10 @@ const GridView = (props : Props)=>{
     index: number,
   ) => {
     switch (index) {
-      case 0 : { //삭제
+      case 0 : { //아이템 휴지통으로 이동
         const result = await deleteBoardFromLive(docsList[listIdx]);
         
         await docsList.splice(listIdx, 1);
-
         await setOpen(false);
 
         if (result === 1) {
@@ -102,18 +99,21 @@ const GridView = (props : Props)=>{
   };
 
   const handleMenuListClick = (
+    e: BaseSyntheticEvent,
     index: number,
   ) => {
+    setAnchorEl(e.currentTarget);
     setListIdx(index);
     setOpen((prevOpen) => !prevOpen);
   };
 
-  const handleCheckBoxChange = (event: React.ChangeEvent<HTMLInputElement>, el: IBoardData) => {
+  const handleCheckBoxChange = (event: React.ChangeEvent<HTMLInputElement>, el: IBoardData, idx: number) => {
       props.updateSelectedItems(el, event.target.checked)
+      
+      // checkedList[idx] = event.target.checked;
+
+      // setCheckedList(checkedList);
   }
-  // const setRefs = (ref) => {
-  //   refs.push(ref)
-  // }
 
   return (
     <React.Fragment>
@@ -134,18 +134,16 @@ const GridView = (props : Props)=>{
                   {category === "" ? "" : (<div>{category}</div>)}
                 </div>
               </div>
-              <Grow in={true} >
-                <div className={classes.selectBtn}>
-                  <Checkbox
-                      color="primary"
-                      inputProps={{ 'aria-label': 'secondary checkbox' }}
-                      onChange={(event) => handleCheckBoxChange(event, el)}
-                    />
-                </div>
-              </Grow>
+              <div className={classes.selectBtn}>
+                <Checkbox
+                  checked={checkedList[idx]}
+                  color="primary"
+                  onChange={(event) => handleCheckBoxChange(event, el, idx)}
+                />
+              </div>
               {selectedContent === idx ? (<div className={selectedClass}/>) : ""}
               <Grow in={true} >
-                <div className={classes.removeBtn}>
+                <div className={classes.moreBtn}>
                   <IconButton onClick={(e) =>{
                     e.stopPropagation();
                     showDropDown({
@@ -159,7 +157,7 @@ const GridView = (props : Props)=>{
             </div>
         </React.Fragment>
         )
-        })} 
+      })} 
     </React.Fragment>
     );
 }

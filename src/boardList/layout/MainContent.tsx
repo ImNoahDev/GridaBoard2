@@ -9,7 +9,8 @@ import ListView from './component/mainContent/ListView';
 import { forceUpdateBoardList } from '../../GridaBoard/store/reducers/appConfigReducer';
 import { DeleteOutline, Restore } from '@material-ui/icons';
 import { IBoardData } from '../structures/BoardStructures';
-import { deleteBoardFromLive } from '../BoardListPageFunc';
+import { deleteBoardFromLive, deleteBoardsFromTrash, restoreBoardsFromTrash } from '../BoardListPageFunc';
+import { useDispatch } from 'react-redux';
 
 const useStyle = makeStyles(theme =>({
   wrap : {
@@ -218,7 +219,8 @@ const MainContent = (props : Props)=>{
   const [orderBy, setOrderBy] = useState(0);
   const [listType, setListType] = useState("grid" as ( "grid" | "list"));
   const classes = useStyle();
-  
+  const dispatch = useDispatch();
+
   const [selectedItems, setSelectedItems] = useState([]);
 
   // console.log(selected, category);
@@ -268,13 +270,22 @@ const MainContent = (props : Props)=>{
     setListType(val);
   } 
 
-  const deleteBtnClick = () => {
+  const deleteForeverBtnClick = async () => {
     console.log('delete')
-    deleteBoardFromLive(selectedItems);
+    const result = await deleteBoardsFromTrash(selectedItems);
+    if (result === 1) {
+      dispatch(forceUpdateBoardList()); 
+    }
+    selectedItems.length = 0;
   }
 
-  const restoreBtnClick = () => {
+  const restoreBtnClick = async () => {
     console.log('restore')
+    const result = await restoreBoardsFromTrash(selectedItems);
+    if (result === 1) {
+      dispatch(forceUpdateBoardList()); 
+    }
+    selectedItems.length = 0;
   }
 
   const updateSelectedItems = (item: IBoardData, checked: boolean) => {
@@ -309,7 +320,7 @@ const MainContent = (props : Props)=>{
       </div>
 
       <div>
-        <Button className={`${classes.buttonStyle} ${classes.buttonFontStyle}`} onClick={deleteBtnClick}>
+        <Button className={`${classes.buttonStyle} ${classes.buttonFontStyle}`} onClick={deleteForeverBtnClick}>
             <DeleteOutline/><span>완전 삭제</span>
           </Button> 
         <Button className={`${classes.buttonStyle} ${classes.buttonFontStyle}`} onClick={restoreBtnClick}>

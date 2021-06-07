@@ -1,3 +1,4 @@
+import { IBoardData } from "../../../boardList/structures/BoardStructures";
 import { store } from "../../client/pages/GridaBoard";
 
 const ActionGroup = 'LIST';
@@ -43,7 +44,7 @@ export const changeGroup = (isChange: boolean) => {
     change : isChange
   });
 };
-export const showAlert = (option : {type : string, selected ?: any, sub ?:any}) => {
+export const showAlert = (option : {type : string, selected ?: IBoardData, sub ?:any}) => {
   store.dispatch({ 
     type: LISTActionTypes.SHOW_ALERT,
     diaType : option.type,
