@@ -333,7 +333,7 @@ const MainContent = (props : Props)=>{
 
     <div className={classes.gridContent} ref={contentRef}>
       {listType === "grid" ? 
-      (<GridView docsList={nowDocs} updateSelectedItems={updateSelectedItems} selectedContent={selectedContent} selectedClass={classes.selected} routeChange={routeChange} />)
+      (<GridView category={selected} docsList={nowDocs} updateSelectedItems={updateSelectedItems} selectedContent={selectedContent} selectedClass={classes.selected} routeChange={routeChange} />)
     : (<ListView docsList={nowDocs} selectedContent={selectedContent} selectedClass={classes.selected}/>)}
       
     </div>

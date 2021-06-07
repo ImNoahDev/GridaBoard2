@@ -13,6 +13,7 @@ interface Props extends  React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivEle
    docsList?: Array<any>,
    selectedContent ?: number,
    selectedClass ?: string,
+   category?: string,
    routeChange ?: (idx:number)=>void,
    updateSelectedItems ?: (el: IBoardData, checked: boolean) => void,
 }
@@ -53,7 +54,7 @@ const useStyle = makeStyles(theme => ({
 
 const GridView = (props : Props)=>{
   const classes = useStyle();
-  const {selectedContent, selectedClass,ref,routeChange, ...rest} = props;
+  const {selectedContent, selectedClass,ref,routeChange,category, ...rest} = props;
   const {docsList} = props;
   const [checkedList, setCheckedList] = useState([]);
 
@@ -66,7 +67,7 @@ const GridView = (props : Props)=>{
       }
       setCheckedList(arr);
     }
-  }, [docsList.length])
+  }, [docsList.length, category])
 
   const handleCheckBoxChange = (event: React.ChangeEvent<HTMLInputElement>, el: IBoardData, idx: number) => {
       props.updateSelectedItems(el, event.target.checked)
