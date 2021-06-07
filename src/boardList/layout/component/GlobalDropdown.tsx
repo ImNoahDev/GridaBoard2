@@ -60,7 +60,7 @@ const itemData = {
     }
   },
   "docs" : {
-    placement : "bottom-end",
+    placement : "bottom-start",
     list:["nameChange", "delete"],
     runFunction : {
       "nameChange":(val)=>{},

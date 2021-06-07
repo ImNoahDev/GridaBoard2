@@ -1,8 +1,10 @@
 import React from "react";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { Button, Dialog, DialogProps } from "@material-ui/core";
 import {createCategory, changeCategoryName} from "boardList/BoardListPageFunc2";
 import { RootState } from "GridaBoard/store/rootReducer";
+import { deleteBoardFromLive } from "boardList/BoardListPageFunc";
+import { forceUpdateBoardList } from "GridaBoard/store/reducers/appConfigReducer";
 
 
 const dialogTypes = {
@@ -25,22 +27,39 @@ interface Props extends  DialogProps {
 
 const AlertDialog = (props : Props)=>{
   const { open, closeEvent, type,  ...rest } = props;
-  const defaultValue = useSelector((state: RootState) => state.list.dialog.selected);
+  const selected = useSelector((state: RootState) => state.list.dialog.selected);
+  const subData = useSelector((state: RootState) => state.list.dialog.sub);
+  const dispatch = useDispatch();
+
+
   const selectedData = dialogTypes[type];
   console.log(selectedData);
 
   let subText = selectedData.sub;
 
   if(type == "deleteDoc"){
-    subText = subText.replace("%d","1");
+    let count = 1;
+    if(subData !== null){
+      count = subData.data.lnegth;
+    }
+    subText = subText.replace("%d", count);
   }
 
 
-  const success = ()=>{
+  const success = async ()=>{
     if(type == "deleteDoc"){
-      alert("1");
+      console.log(selected);
+      let deleteData = [selected];
+      if(subData !== null){
+        deleteData = subData.data;
+      }
+      const result = await deleteBoardFromLive(deleteData);
+      
+      if (result === 1) {
+        dispatch(forceUpdateBoardList());
+      }
     }
-    // closeEvent(true);
+    closeEvent(false)
   }
   return (
     <Dialog
