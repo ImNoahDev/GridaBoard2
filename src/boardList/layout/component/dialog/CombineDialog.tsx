@@ -4,21 +4,56 @@ import { useSelector } from "react-redux";
 import { RootState } from "GridaBoard/store/rootReducer";
 import { showGroupDialog, hideGroupDialog, changeGroup } from 'GridaBoard/store/reducers/listReducer';
 import getText from "GridaBoard/language/language";
-import GroupDialog from "./detail/GroupDialog"
+import GroupDialog from "./detail/GroupDialog";
+import DocsDialog from "./detail/DocsDialog";
+import AlertDialog from "./detail/AlertDialog";
 
 const useStyle = makeStyles(theme=>({
+  groupDialog : {
+    minWidth : "360px",
+    minHeight : "255px",
+    "& > .title" : {
+      marginTop : "40px",
+    },
+    "& > .inputer" : {
+      marginTop : "16px",
+    },
+    "& > .warn" : {
+      width: "272px",
+      height : "32px",
+      fontSize: "12px",
+      lineHeight: "14px",
+      marginTop: "8px",
+    },
+  },
+  alertDialog: {
+    minWidth : "360px",
+    minHeight : "215px",
+    "& > .title" : {
+      marginTop : "40px",
+    },
+    "& > .warn" : {
+      width: "100%",
+      height : "40px",
+      fontSize: "14px",
+      lineHeight: "16px",
+      marginTop: "16px",
+      display: "flex",
+      textAlign : "center",
+      justifyContent : "center",
+      alignItems : "center",
+    },
+
+  },
   paper : {
     background: theme.custom.white[90],
     boxShadow : theme.custom.shadows[0],
     borderRadius: "12px",
-    minWidth : "360px",
-    minHeight : "255px",
     alignItems: "center",
     "& > .title" : {
       display: "flex",
       justifyContent : "center",
       alignItems : "center",
-      marginTop : "40px",
       fontFamily: "Roboto",
       fontStyle: "normal",
       fontWeight: "bold",
@@ -30,24 +65,18 @@ const useStyle = makeStyles(theme=>({
     "& > .inputer" : {
       width: "296px",
       height: "40px",
-      marginTop : "16px",
       border: "1px solid " + theme.custom.grey[3],
       boxSizing: "border-box",
       borderRadius: "8px",
       paddingLeft : "12px",
     },
     "& > .warn" : {
-      width: "272px",
-      height : "32px",
       fontFamily: "Roboto",
       fontStyle: "normal",
       fontWeight: "normal",
-      fontSize: "12px",
-      lineHeight: "14px",
       display: "flex",
       letterSpacing: "0.25px",
       color : theme.palette.text.secondary,
-      marginTop: "8px",
       marginBottom: "8px",
     },
     "& > .footer" : {
@@ -62,7 +91,6 @@ const useStyle = makeStyles(theme=>({
         width: "152px",
         boxSizing: "border-box",
         borderRadius: "60px",
-
         "&:first-child" : {
           border: "1px solid" + theme.custom.icon.mono[2],
         }
@@ -79,7 +107,7 @@ const CombineDialog = (props : Props)=>{
   const { onClose, open } = props;
   const classes = useStyle();
   
-  const diaType = useSelector((state: RootState) => state.list.groupDialog.type);
+  const diaType = useSelector((state: RootState) => state.list.dialog.type);
 
   const closeEvent = (isChange:boolean)=>{
     hideGroupDialog();
@@ -91,14 +119,18 @@ const CombineDialog = (props : Props)=>{
     open:open,
     type:diaType,
     classes : {
-      paper : classes.paper
+      paper : `${classes.paper}`
     }
   };
   let returnDialog = null;
   if(["newGroup", "changeGroupName"].includes(diaType)){
+    groupProps.classes.paper += `  ${classes.groupDialog}`;
     returnDialog = (<GroupDialog {...groupProps} />);
   }else if(diaType == "tra"){
-    returnDialog = (<div />);
+    returnDialog = (<DocsDialog {...groupProps} />);
+  }else if(["deleteDoc"].includes(diaType)){
+    groupProps.classes.paper += `  ${classes.alertDialog}`;
+    returnDialog = (<AlertDialog {...groupProps} />);
   }
 
   return returnDialog;

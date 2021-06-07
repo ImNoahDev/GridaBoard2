@@ -1,4 +1,3 @@
-import classes from "*.module.css";
 import { Button, Dialog, DialogProps } from "@material-ui/core";
 import { hideGroupDialog } from 'GridaBoard/store/reducers/listReducer';
 import React, { useState } from "react";
@@ -37,7 +36,7 @@ const textCheck = (text:string|false)=>{
 
 const GroupDialog = (props : Props)=>{
   const { open, closeEvent, type,  ...rest } = props;
-  const defaultValue = useSelector((state: RootState) => state.list.groupDialog.selected);
+  const defaultValue = useSelector((state: RootState) => state.list.dialog.selected);
   let defaultText = "";
   if(defaultValue !== null){
     defaultText = defaultValue[0];

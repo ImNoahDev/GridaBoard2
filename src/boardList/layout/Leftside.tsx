@@ -153,7 +153,8 @@ const Leftside = (props : Props)=>{
           <div key={el[0]} onClick={e=>selectCategory(el[3])} className={selected === el[3]? classes.selected : "" }>
             <span>{title}</span>
             {el[0] !== "Unshelved" ? (
-              <IconButton onClick={(e)=>{e.stopPropagation();
+              <IconButton onClick={(e)=>{
+                e.stopPropagation();
                 showDropDown({
                   type : "group",
                   event : e,

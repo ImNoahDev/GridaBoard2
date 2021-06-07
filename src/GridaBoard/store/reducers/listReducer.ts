@@ -8,6 +8,8 @@ export const LISTActionTypes = Object.freeze({
   SHOW_DROP_DOWN : `${ActionGroup}.SHOW_DROP_DOWN`,
   HIDE_DROP_DOWN : `${ActionGroup}.HIDE_DROP_DOWN`,
   CHANGE_GROUP : `${ActionGroup}.CHANGE_GROUP`,
+  SHOW_ALERT : `${ActionGroup}.SHOW_ALERT`,
+  HIDE_ALERT : `${ActionGroup}.HIDE_ALERT`,
 });
 // 액션 생성 함수
 export const showGroupDialog = (option : {type : string, selected ?: any}) => {
@@ -41,7 +43,19 @@ export const changeGroup = (isChange: boolean) => {
     change : isChange
   });
 };
-
+export const showAlert = (option : {type : string, selected ?: any, sub ?:any}) => {
+  store.dispatch({ 
+    type: LISTActionTypes.SHOW_ALERT,
+    diaType : option.type,
+    selected : option.selected || null,
+    sub : option.sub || null
+  });
+};
+export const hideAlert = () => {
+  store.dispatch({ 
+    type: LISTActionTypes.HIDE_ALERT
+  });
+};
 
 
 
@@ -50,10 +64,11 @@ const initialState = {
   isChange : {
     group : false
   },
-  groupDialog : {
+  dialog : {
     show : false,
     type : "",
-    selected : null
+    selected : null,
+    sub : null
   },
   dropDown : {
     show : false,
@@ -70,20 +85,11 @@ export default function listReducer(state = initialState, action) {
     case LISTActionTypes.SHOW_GROUP_DIALOG :
       return {
         ...state,
-        groupDialog : {
-          ...state.groupDialog,
+        dialog : {
+          ...state.dialog,
           show : true,
           type : action.diaType as string,
           selected : action.selected,
-        }
-      };
-    case LISTActionTypes.HIDE_GROUP_DIALOG : 
-      return {
-        ...state,
-        groupDialog : {
-          show : false,
-          type : "",
-          selected : ""
         }
       };
     case LISTActionTypes.SHOW_DROP_DOWN : 
@@ -114,6 +120,29 @@ export default function listReducer(state = initialState, action) {
         isChange : {
           ...state.isChange,
           group : action.change
+        }
+      }
+    case LISTActionTypes.SHOW_ALERT : 
+      return {
+        ...state,
+        dialog : {
+          ...state.dialog,
+          show : true,
+          type : action.diaType as string,
+          selected : action.selected,
+          sub : action.sub
+        }
+      }
+    case LISTActionTypes.HIDE_GROUP_DIALOG : 
+    case LISTActionTypes.HIDE_ALERT : 
+      return {
+        ...state,
+        dialog : {
+          ...state.dialog,
+          show : false,
+          type : "",
+          selected : null,
+          sub : null
         }
       }
     default:

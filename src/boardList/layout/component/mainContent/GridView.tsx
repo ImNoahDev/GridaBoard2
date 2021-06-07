@@ -6,6 +6,7 @@ import { useDispatch } from "react-redux";
 import MoreVert from "@material-ui/icons/MoreVert";
 import { deleteBoardFromLive } from "../../../BoardListPageFunc";
 import { IBoardData } from "../../../structures/BoardStructures";
+import { showDropDown } from 'GridaBoard/store/reducers/listReducer';
 
 interface Props extends  React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement> {
    docsList?: Array<any>,
@@ -145,7 +146,14 @@ const GridView = (props : Props)=>{
               {selectedContent === idx ? (<div className={selectedClass}/>) : ""}
               <Grow in={true} >
                 <div className={classes.removeBtn}>
-                  <IconButton onClick={() => handleMenuListClick(idx)}><MoreVert/></IconButton>
+                  <IconButton onClick={(e) =>{
+                    e.stopPropagation();
+                    showDropDown({
+                      type : "docs",
+                      event : e,
+                      selected: el
+                    })
+                  }}><MoreVert/></IconButton>
                 </div>
               </Grow>
             </div>

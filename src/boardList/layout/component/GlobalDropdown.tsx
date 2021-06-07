@@ -2,7 +2,7 @@ import React from "react";
 import { makeStyles, ClickAwayListener, Grow, MenuList, Paper, Popper, MenuItem, PopperProps } from "@material-ui/core";
 import { useSelector } from "react-redux";
 import { RootState } from "GridaBoard/store/rootReducer";
-import { hideDropDown, showGroupDialog, changeGroup } from 'GridaBoard/store/reducers/listReducer';
+import { hideDropDown, showGroupDialog, changeGroup, showAlert } from 'GridaBoard/store/reducers/listReducer';
 import { changeCategorySort, deleteCategory } from "../../BoardListPageFunc2";
 
 const useStyle = makeStyles(theme=>({
@@ -63,8 +63,13 @@ const itemData = {
     placement : "bottom-end",
     list:["nameChange", "delete"],
     runFunction : {
-      "nameChange":()=>{},
-      "delete": ()=>{}
+      "nameChange":(val)=>{},
+      "delete": (val)=>{
+        showAlert({
+          type:"deleteDoc",
+          selected:val
+        });
+      }
     }
   },
 };
