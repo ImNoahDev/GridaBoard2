@@ -4,7 +4,7 @@ import firebase from 'GridaBoard/util/firebase_config';
 import { forceUpdateBoardList } from "../../../../GridaBoard/store/reducers/appConfigReducer";
 import { useDispatch, useSelector } from "react-redux";
 import MoreVert from "@material-ui/icons/MoreVert";
-import { deleteBoardFromLive } from "../../../BoardListPageFunc";
+import { deleteBoardFromLive, getTimeStamp } from "../../../BoardListPageFunc";
 import { IBoardData } from "../../../structures/BoardStructures";
 import { showDropDown } from 'GridaBoard/store/reducers/listReducer';
 import { RootState } from "../../../../GridaBoard/store/rootReducer";
@@ -55,64 +55,24 @@ const GridView = (props : Props)=>{
   const classes = useStyle();
   const {selectedContent, selectedClass,ref,routeChange, ...rest} = props;
   const {docsList} = props;
-  const [open, setOpen] = useState(false);
-  const [listIdx, setListIdx] = useState(0);
-  const dispatch = useDispatch();
-  const itemList = ["삭제", "do sth"];
-  const [anchorEl, setAnchorEl] = useState();
   const [checkedList, setCheckedList] = useState([]);
 
   useEffect(() => {
-    const arr = [];
-    for (let i = 0; i < docsList.length; i++) {
-      arr.push(false);
-    }
-    setCheckedList(arr);
-  }, [docsList.length])
-
-  const handleClose = (event: React.MouseEvent<Document, MouseEvent>) => {
-    // if (anch  b norRef.current && anchorRef.current.contains(event.target as HTMLElement)) {
-    //   return;
-    // }
-
-    setOpen(false);
-  };
-
-  const handleMenuItemClick = async (
-    index: number,
-  ) => {
-    switch (index) {
-      case 0 : { //아이템 휴지통으로 이동
-        const result = await deleteBoardFromLive(docsList[listIdx]);
-        
-        await docsList.splice(listIdx, 1);
-        await setOpen(false);
-
-        if (result === 1) {
-          dispatch(forceUpdateBoardList());
-        }
-
-        break;
+    if (docsList.length === 0) return;
+    else {
+      const arr = [];
+      for (let i = 0; i < docsList.length; i++) {
+        arr.push(false);
       }
-      default: break;
+      setCheckedList(arr);
     }
-  };
-
-  const handleMenuListClick = (
-    e: BaseSyntheticEvent,
-    index: number,
-  ) => {
-    setAnchorEl(e.currentTarget);
-    setListIdx(index);
-    setOpen((prevOpen) => !prevOpen);
-  };
+  }, [docsList.length])
 
   const handleCheckBoxChange = (event: React.ChangeEvent<HTMLInputElement>, el: IBoardData, idx: number) => {
       props.updateSelectedItems(el, event.target.checked)
       
-      // checkedList[idx] = event.target.checked;
-
-      // setCheckedList(checkedList);
+      checkedList[idx] = event.target.checked;
+      setCheckedList(checkedList);
   }
 
   return (
@@ -120,9 +80,12 @@ const GridView = (props : Props)=>{
       {docsList.map((el, idx) => {
         let times = new Date(el.last_modified.seconds*1000);
         let category = el.category == "Unshelved" ? "" : el.category;
+        const timestamp = getTimeStamp(el.created)
+        const keyStr = el.doc_name + '_' + timestamp + '_' + idx; 
+        //key가 이전과 같으면 react는 dom 요소가 이전과 동일한 내용을 나타낸다고 가정해서 checkbox를 re-render 하지 않음. 따라서 unique 하게 만들어준다
         return (
-          <React.Fragment key={idx}>
-            <div key={idx} className={`contentItem`}>
+          <React.Fragment key={keyStr}>
+            <div key={keyStr} className={`contentItem`}>
               <div style={{backgroundImage:`url(${el.thumb_path})`}} onClick={() => routeChange(el.key)} />
               <div>
                 <div>{el.doc_name}</div>
