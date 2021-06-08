@@ -247,6 +247,7 @@ const MainContent = (props : Props)=>{
   const [listType, setListType] = useState("grid" as ( "grid" | "list"));
   const [selectedItems, setSelectedItems] = useState([]);
   const [nowDocs, setNowDocs] = useState([]);
+  const [allItemsChecked, setAllItemsChecked] = useState(false);
   
   const classes = useStyle();
   const dispatch = useDispatch();
@@ -258,11 +259,15 @@ const MainContent = (props : Props)=>{
   useEffect(()=>{
     contentRef.current.scrollTop = 0;
     setOrderBy(0);
+    
+    setSelectedItems([]);
+    setAllItemsChecked(false);
   },[props.selected])
 
   useEffect(() => {
     const tmpDocs = getNowDocs();
     setNowDocs(tmpDocs);
+    setAllItemsChecked(false);
   }, [docs, selected])
   
   const getNowDocs = () => {
@@ -338,6 +343,8 @@ const MainContent = (props : Props)=>{
     } else {
       setSelectedItems([]);
     }
+    
+    setAllItemsChecked(checked);
   }
 
   return (<div className={classes.wrap}>
@@ -351,14 +358,14 @@ const MainContent = (props : Props)=>{
     {selected !== 'trash' ? 
     (<div className={`${classes.nav} ${classes.checkedNav}`}>
       <div>
-        <Checkbox color="primary" onChange={(event) => handleCheckAllBoxChange(event)}/>{getText("word_select").replace("%d", "0")}
+        <Checkbox color="primary" checked={allItemsChecked} onChange={(event) => handleCheckAllBoxChange(event)}/>{getText("word_select").replace("%d", "0")}
       </div>
       <MainNavSelector orderBy={orderBy} listOrderChange={listOrderChange} listViewType={listViewType} selectedItems={selectedItems} />
     </div>)
     :
     (<div className={classes.trashNav}>
       <div>
-        <Checkbox color="primary" onChange={(event) => handleCheckAllBoxChange(event)}/>{getText("word_select").replace("%d", "0")}
+        <Checkbox color="primary" checked={allItemsChecked} onChange={(event) => handleCheckAllBoxChange(event)}/>{getText("word_select").replace("%d", "0")}
       </div>
 
       <div>
