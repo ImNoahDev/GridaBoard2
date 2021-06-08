@@ -215,17 +215,15 @@ interface Props extends  React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivEle
 
 const MainContent = (props : Props)=>{
   const {category, selected, docs, routeChange, ...rest} = props;
-  const [selectedContent, setSelectedContent] = useState(-1);
   const [orderBy, setOrderBy] = useState(0);
   const [listType, setListType] = useState("grid" as ( "grid" | "list"));
+  const [selectedItems, setSelectedItems] = useState([]);
+  const [nowDocs, setNowDocs] = useState([]);
+  
   const classes = useStyle();
   const dispatch = useDispatch();
 
-  const [selectedItems, setSelectedItems] = useState([]);
-
-  // console.log(selected, category);
   const selectedCategory = category[selected];
-  let nowDocs = [];
   let title = "";
   let contentRef = React.useRef<HTMLDivElement>(null);
   
@@ -234,34 +232,41 @@ const MainContent = (props : Props)=>{
     setOrderBy(0);
   },[props.selected])
 
+  useEffect(() => {
+    const tmpDocs = getNowDocs();
+    setNowDocs(tmpDocs);
+  }, [docs, selected])
   
+  const getNowDocs = () => {
+    let tmpDocs = [];
+    if(["recent", "trash"].includes(selected)){
+      title = getText("boardList_" + selected);
+      if(selected === "recent"){
+        tmpDocs = docs.filter(el=>el.dateDeleted === 0);
+      }else{
+        tmpDocs = docs.filter(el=>el.dateDeleted !== 0);
+      }
+    }else{
+      if(selectedCategory[0] === "Unshelved"){
+        tmpDocs = docs.filter(el=> {
+          return el.category == selected && el.dateDeleted === 0
+        });
+        title = getText("boardList_unshelved").replace("%d", tmpDocs.length.toString());
+      }else{
+        tmpDocs = docs.filter(el=> {
+          return el.category == selected && el.dateDeleted === 0;
+        });
+        title = `${selectedCategory[0]} (${tmpDocs.length})`;
+      }
+    }
+    tmpDocs.sort(orderFunctionList[orderBy]);
+    return tmpDocs;
+  }
+
   const orderFunctionList = [
     (a,b)=>b.last_modified.seconds - a.last_modified.seconds,
     (a,b)=>b.doc_name - a.doc_name
   ];
-
-  
-  if(["recent", "trash"].includes(selected)){
-    title = getText("boardList_" + selected);
-    if(selected === "recent"){
-      nowDocs = docs.filter(el=>el.dateDeleted === 0);
-    }else{
-      nowDocs = docs.filter(el=>el.dateDeleted !== 0);
-    }
-  }else{
-    if(selectedCategory[0] === "Unshelved"){
-      nowDocs = docs.filter(el=> {
-        return el.category == selected && el.dateDeleted === 0
-      });
-      title = getText("boardList_unshelved").replace("%d", nowDocs.length.toString());
-    }else{
-      nowDocs = docs.filter(el=> {
-        return el.category == selected && el.dateDeleted === 0;
-      });
-      title = `${selectedCategory[0]} (${nowDocs.length})`;
-    }
-  }
-  nowDocs.sort(orderFunctionList[orderBy]);
   
   const listOrderChange = (event)=>{
     setOrderBy(event.target.value);
@@ -292,9 +297,18 @@ const MainContent = (props : Props)=>{
     if (checked) {
       setSelectedItems([...selectedItems, item]);
     } else {
-      const index = selectedItems.findIndex(function(i) {return i.key === item.key})
-      selectedItems.splice(index, 1);
-      setSelectedItems([selectedItems]);
+      setSelectedItems(selectedItems.filter(selectedItem => item.key !== selectedItem.key))
+    }
+  }
+
+  const handleCheckAllBoxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { checked } = event.target
+    const tmpDocs = getNowDocs();
+
+    if (checked) {
+      setSelectedItems(tmpDocs);
+    } else {
+      setSelectedItems([]);
     }
   }
 
@@ -309,14 +323,14 @@ const MainContent = (props : Props)=>{
     {selected !== 'trash' ? 
     (<div className={classes.nav}>
       <div>
-        <Checkbox color="primary"/>{getText("word_select").replace("%d", "0")}
+        <Checkbox color="primary" onChange={(event) => handleCheckAllBoxChange(event)}/>{getText("word_select").replace("%d", "0")}
       </div>
       <MainNavSelector orderBy={orderBy} listOrderChange={listOrderChange} listViewType={listViewType}/>
     </div>)
     :
     (<div className={classes.trashNav}>
       <div>
-        <Checkbox color="primary"/>{getText("word_select").replace("%d", "0")}
+        <Checkbox color="primary" onChange={(event) => handleCheckAllBoxChange(event)}/>{getText("word_select").replace("%d", "0")}
       </div>
 
       <div>
@@ -333,8 +347,8 @@ const MainContent = (props : Props)=>{
 
     <div className={classes.gridContent} ref={contentRef}>
       {listType === "grid" ? 
-      (<GridView category={selected} docsList={nowDocs} updateSelectedItems={updateSelectedItems} selectedContent={selectedContent} selectedClass={classes.selected} routeChange={routeChange} />)
-    : (<ListView docsList={nowDocs} selectedContent={selectedContent} selectedClass={classes.selected}/>)}
+      (<GridView selectedItems={selectedItems} category={selected} docsList={nowDocs} updateSelectedItems={updateSelectedItems} selectedClass={classes.selected} routeChange={routeChange} />)
+    : (<ListView docsList={nowDocs} selectedClass={classes.selected}/>)}
       
     </div>
   </div>);

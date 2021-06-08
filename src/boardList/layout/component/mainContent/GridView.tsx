@@ -1,19 +1,15 @@
-import { makeStyles, Grow, SvgIcon, Popper, ClickAwayListener, Paper, MenuList, MenuItem, IconButton, Checkbox } from "@material-ui/core";
-import React, { BaseSyntheticEvent, useEffect, useState, useRef } from "react";
-import firebase from 'GridaBoard/util/firebase_config';
-import { forceUpdateBoardList } from "../../../../GridaBoard/store/reducers/appConfigReducer";
-import { useDispatch, useSelector } from "react-redux";
+import { makeStyles, Grow, IconButton, Checkbox } from "@material-ui/core";
+import React from "react";
 import MoreVert from "@material-ui/icons/MoreVert";
-import { deleteBoardFromLive, getTimeStamp } from "../../../BoardListPageFunc";
+import { getTimeStamp } from "../../../BoardListPageFunc";
 import { IBoardData } from "../../../structures/BoardStructures";
 import { showDropDown } from 'GridaBoard/store/reducers/listReducer';
-import { RootState } from "../../../../GridaBoard/store/rootReducer";
 
 interface Props extends  React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement> {
    docsList?: Array<any>,
-   selectedContent ?: number,
    selectedClass ?: string,
    category?: string,
+   selectedItems?: IBoardData[],
    routeChange ?: (idx:number)=>void,
    updateSelectedItems ?: (el: IBoardData, checked: boolean) => void,
 }
@@ -54,26 +50,23 @@ const useStyle = makeStyles(theme => ({
 
 const GridView = (props : Props)=>{
   const classes = useStyle();
-  const {selectedContent, selectedClass,ref,routeChange,category, ...rest} = props;
+  const {selectedClass, ref, routeChange, category, selectedItems, ...rest} = props;
   const {docsList} = props;
-  const [checkedList, setCheckedList] = useState([]);
 
-  useEffect(() => {
-    if (docsList.length === 0) return;
-    else {
-      const arr = [];
-      for (let i = 0; i < docsList.length; i++) {
-        arr.push(false);
+  const isChecked = (keyStr) => {
+    for (const selectedItem of selectedItems) {
+      if (selectedItem.doc_name === undefined) continue;
+      const timestamp = getTimeStamp(selectedItem.created);
+      const itemKey = selectedItem.doc_name + '_' + timestamp;
+      if (keyStr === itemKey) {
+        return true;
       }
-      setCheckedList(arr);
     }
-  }, [docsList.length, category])
+    return false;
+  }
 
   const handleCheckBoxChange = (event: React.ChangeEvent<HTMLInputElement>, el: IBoardData, idx: number) => {
       props.updateSelectedItems(el, event.target.checked)
-      
-      checkedList[idx] = event.target.checked;
-      setCheckedList(checkedList);
   }
 
   return (
@@ -82,8 +75,7 @@ const GridView = (props : Props)=>{
         let times = new Date(el.last_modified.seconds*1000);
         let category = el.category == "Unshelved" ? "" : el.category;
         const timestamp = getTimeStamp(el.created)
-        const keyStr = el.doc_name + '_' + timestamp + '_' + idx; 
-        //key가 이전과 같으면 react는 dom 요소가 이전과 동일한 내용을 나타낸다고 가정해서 checkbox를 re-render 하지 않음. 따라서 unique 하게 만들어준다
+        const keyStr = el.doc_name + '_' + timestamp; 
         return (
           <React.Fragment key={keyStr}>
             <div key={keyStr} className={`contentItem`}>
@@ -100,12 +92,13 @@ const GridView = (props : Props)=>{
               </div>
               <div className={classes.selectBtn}>
                 <Checkbox
-                  checked={checkedList[idx]}
+                  checked={isChecked(keyStr)}
                   color="primary"
+                  value={keyStr}
                   onChange={(event) => handleCheckBoxChange(event, el, idx)}
                 />
               </div>
-              {selectedContent === idx ? (<div className={selectedClass}/>) : ""}
+              {/* {selectedContent === idx ? (<div className={selectedClass}/>) : ""} */}
               <Grow in={true} >
                 <div className={classes.moreBtn}>
                   <IconButton onClick={(e) =>{
