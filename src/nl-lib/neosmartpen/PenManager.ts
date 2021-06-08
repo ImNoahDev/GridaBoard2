@@ -175,7 +175,11 @@ export default class PenManager {
    * @param device
    */
   public isAlreadyConnected = (device: BluetoothDevice): boolean => {
-    const index = this.penArray.findIndex(pen => pen.id === device.id);
+    const index = this.penArray.findIndex(function(pen) {
+      if (pen.id === device.id && pen.connected === true) {
+        return true;
+      }
+    });
     if (index > -1) return true;
 
     return false;
@@ -319,11 +323,10 @@ export default class PenManager {
   public onDisconnected = (opt: { pen: INeoSmartpen, event: IPenEvent }) => {
     const { pen } = opt;
     const btDeviceId = pen.getBtDevice().id;
-    if (_active_pen.getMac() === pen.getMac()) {
-      alert('펜 연결이 끊어졌습니다. \n펜 확인 후 다시 연결해주세요.');
-    }
+    
     const index = this.penArray.findIndex(penInfo => penInfo.id === btDeviceId);
     if (index > -1) {
+      alert('펜 연결이 끊어졌습니다. \n펜 확인 후 다시 연결해주세요.');
       this.penArray.splice(index, 1);
     }
     else {
