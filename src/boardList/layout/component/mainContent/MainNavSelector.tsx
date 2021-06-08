@@ -1,6 +1,10 @@
 import React from 'react';
-import { createStyles, IconButton, InputBase, MenuItem, Select, SvgIcon, withStyles } from '@material-ui/core';
+import { createStyles, IconButton, InputBase, MenuItem, Select, SvgIcon, withStyles, Button } from '@material-ui/core';
 import getText from "GridaBoard/language/language";
+import { IBoardData } from "../../../structures/BoardStructures";
+import { OpenInBrowser, DeleteOutline } from '@material-ui/icons';
+import { showAlert } from 'GridaBoard/store/reducers/listReducer';
+
 
 const BootstrapInput = withStyles((theme) =>
   createStyles({
@@ -44,11 +48,38 @@ const BootstrapInput = withStyles((theme) =>
 interface Props extends  React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement> {
   listOrderChange ?: (event)=>void,
   listViewType ?: (val)=>void,
-  orderBy ?: number
+  orderBy ?: number,
+  selectedItems ?: Array<IBoardData>
 }
 
 const MainNavSelector = (props : Props)=>{
-  const {listOrderChange, listViewType, orderBy, ...rest } = props;
+  const {listOrderChange, listViewType, orderBy, selectedItems, ...rest } = props;
+
+  console.log(selectedItems);
+  
+  let viewType = 0;
+  if(selectedItems.length == 1) viewType = 1;
+  else if(selectedItems.length > 1) viewType = 2;
+
+
+  return (
+    <React.Fragment>
+      {viewType==0? <ListSelectType listViewType={listViewType} listOrderChange={listOrderChange} orderBy={orderBy} />
+      : <CheckedNav viewType={viewType} selectedItems={selectedItems}/>}
+    </React.Fragment>)
+}
+
+export default MainNavSelector;
+
+
+type listSelectProps = {
+  listViewType : (val:any)=>void,
+  listOrderChange ?: (event)=>void,
+  orderBy ?: number,
+}
+
+const ListSelectType = (props:listSelectProps)=>{
+  const { listViewType, listOrderChange, orderBy} = props;
 
   const orderList = [{
     // name : "lastOpened",
@@ -58,7 +89,7 @@ const MainNavSelector = (props : Props)=>{
     // name : "lastMake",
     title : "이름순?",
     value : 1
-  }]
+  }];
 
   const viewList = [{
     name: "grid",
@@ -66,43 +97,121 @@ const MainNavSelector = (props : Props)=>{
   },{
     name: "list",
     path : "M3 4H21V6H3V4ZM3 11H21V13H3V11ZM21 18H3V20H21V18Z"
-  }]
+  }];
   return (
+  <div className="listNav">
+    <Select
+      onChange={listOrderChange}
+      defaultValue={0}
+      value={orderBy}
+      MenuProps={{
+        anchorOrigin: {
+          vertical: "bottom",
+          horizontal: "left",
+        },
+        transformOrigin: {
+          vertical: "top",
+          horizontal: "left",
+        },
+        getContentAnchorEl: null,
+      }}
+      input={<BootstrapInput />}
+    >
+      {orderList.map(el=>(<MenuItem value={el.value} key={el.value}>{el.title}</MenuItem>))}
+      
+    </Select>
     <div>
-      <Select
-        onChange={listOrderChange}
-        defaultValue={0}
-        value={orderBy}
-        MenuProps={{
-          anchorOrigin: {
-            vertical: "bottom",
-            horizontal: "left",
-          },
-          transformOrigin: {
-            vertical: "top",
-            horizontal: "left",
-          },
-          getContentAnchorEl: null,
-        }}
-        input={<BootstrapInput />}
-      >
-        {orderList.map(el=>(<MenuItem value={el.value} key={el.value}>{el.title}</MenuItem>))}
-        
-      </Select>
-      <div>
-        {viewList.map(el=>(<IconButton key={el.name} onClick={e=>listViewType(el.name)}>
-          <SvgIcon>
-            <path
-              fillRule="evenodd"
-              clipRule="evenodd"
-              d={el.path}
-            />
-          </SvgIcon>
-        </IconButton>))}
-        
-        
-      </div>
-    </div>)
+      {viewList.map(el=>(<IconButton key={el.name} onClick={e=>listViewType(el.name)}>
+        <SvgIcon>
+          <path
+            fillRule="evenodd"
+            clipRule="evenodd"
+            d={el.path}
+          />
+        </SvgIcon>
+      </IconButton>))}
+      
+    </div>
+  </div>);
 }
 
-export default MainNavSelector;
+
+
+type checkedNavProp = {
+  viewType ?: number
+  selectedItems ?: Array<IBoardData>
+}
+
+const langtype = {
+  "open" : "열기",
+  "nameChange" : "이름 변경",
+  "copy" : "복제",
+  "delete" : "삭제",
+  "move" : "이동"
+}
+const CheckedNav = (props: checkedNavProp)=>{
+  const {viewType, selectedItems, ...rest} = props;
+  console.log(selectedItems);
+
+  const clickEvent = (e, title)=>{
+    if(title === "delete"){
+      showAlert({
+        type:"deleteDoc",
+        selected:selectedItems[0],
+        sub:{
+          data : selectedItems
+        }
+      });
+    }else{
+      alert(title);
+    }
+  }
+
+  const items = [
+    {
+      title : "open",
+      itemType : "icon",
+      item : (<OpenInBrowser />),
+      type : [1]
+    },{
+      title : "nameChange",
+      itemType : "svg",
+      item : "M15.586 3a2 2 0 012.828 0L21 5.586a2 2 0 010 2.828l-12 12A2 2 0 017.586 21H5a2 2 0 01-2-2v-2.586A2 2 0 013.586 15l12-12zm-.172 3L18 8.586 19.586 7 17 4.414 15.414 6zm1.172 4L14 7.414l-9 9V19h2.586l9-9z",
+      type : [1]
+    },{
+      title : "copy",
+      itemType : "svg",
+      item : "M4 3h11v2H6v13H4V3zm4 4h12v14H8V7zm2 2v10h8V9h-8z",
+      type : [1]
+    },{
+      title : "delete",
+      itemType : "icon",
+      item : (<DeleteOutline />),
+      type : [1,2]
+    },{
+      title : "move",
+      itemType : "svg",
+      item : "M20 18H4V8h16v10zM12 6l-2-2H4a2 2 0 00-2 2v12a2 2 0 002 2h16c1.11 0 2-.89 2-2V8a2 2 0 00-2-2h-8zm-1 8v-2h4V9l4 4-4 4v-3h-4z",
+      type : [1,2]
+    },
+  ];
+
+  return (
+  <div className="checkedNav">
+    {items.filter(el=>el.type.includes(viewType)).map((el,idx)=> (
+      <Button key={idx} onClick={e=>clickEvent(e, el.title )}>
+        {el.itemType === "icon" ? el.item :
+        (<SvgIcon>
+          <path
+            fillRule="evenodd"
+            clipRule="evenodd"
+            d={el.item as string}
+          />
+        </SvgIcon>)
+        }
+        <span>{langtype[el.title]}</span>
+      </Button>)
+    )}
+  </div>
+  );
+}

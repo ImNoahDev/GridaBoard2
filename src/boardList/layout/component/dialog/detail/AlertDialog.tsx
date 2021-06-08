@@ -40,7 +40,7 @@ const AlertDialog = (props : Props)=>{
   if(type == "deleteDoc"){
     let count = 1;
     if(subData !== null){
-      count = subData.data.lnegth;
+      count = subData.data.length;
     }
     subText = subText.replace("%d", count);
   }
@@ -53,6 +53,7 @@ const AlertDialog = (props : Props)=>{
       if(subData !== null){
         deleteData = subData.data;
       }
+      console.log(deleteData);
       const result = await deleteBoardFromLive(deleteData);
       
       if (result === 1) {

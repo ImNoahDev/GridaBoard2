@@ -54,7 +54,7 @@ const useStyle = makeStyles(theme =>({
       letterSpacing: "0.25px",
       color : theme.palette.text.secondary
     },
-    "& > div:last-child" : {
+    "& > .listNav" : {
       display: "flex",
       "& > div:first-child" : {
         marginRight: "24px"
@@ -72,6 +72,34 @@ const useStyle = makeStyles(theme =>({
         "& > *:last-child":{
         },
       },
+    },
+  },
+  checkedNav: {
+    "& .checkedNav" :{
+      "& > button" : {
+        padding: "8px",
+        paddingLeft : "11px",
+        marginLeft : "8px",
+        color : theme.palette.text.secondary,
+        fontFamily: "Roboto",
+        fontStyle: "normal",
+        fontWeight: "normal",
+        fontSize: "12px",
+        lineHeight: "14px",
+        alignItems: "center",
+        letterSpacing: "0.25px",
+        "& > span:first-child > span" : {
+          marginLeft : "4px",
+        },
+        "&:first-child" : {
+          marginLeft: "0px"
+        },
+        "&:hover": {
+          color: theme.palette.action.hover,
+          fontWeight: 400
+        }
+      }
+
     }
   },
   trashNav : {
@@ -237,7 +265,7 @@ const MainContent = (props : Props)=>{
   
   const orderFunctionList = [
     (a,b)=>b.last_modified.seconds - a.last_modified.seconds,
-    (a,b)=>b.doc_name - a.doc_name
+    ((a, b) => a.doc_name < b.doc_name ? -1 : a.doc_name > b.doc_name ? 1 : 0)
   ];
 
   
@@ -307,11 +335,11 @@ const MainContent = (props : Props)=>{
     </div>
 
     {selected !== 'trash' ? 
-    (<div className={classes.nav}>
+    (<div className={`${classes.nav} ${classes.checkedNav}`}>
       <div>
         <Checkbox color="primary"/>{getText("word_select").replace("%d", "0")}
       </div>
-      <MainNavSelector orderBy={orderBy} listOrderChange={listOrderChange} listViewType={listViewType}/>
+      <MainNavSelector orderBy={orderBy} listOrderChange={listOrderChange} listViewType={listViewType} selectedItems={selectedItems} />
     </div>)
     :
     (<div className={classes.trashNav}>
