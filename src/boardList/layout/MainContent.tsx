@@ -267,6 +267,7 @@ const MainContent = (props : Props)=>{
   useEffect(() => {
     const tmpDocs = getNowDocs();
     setNowDocs(tmpDocs);
+    setSelectedItems([]);
     setAllItemsChecked(false);
   }, [docs, selected])
   
@@ -329,7 +330,11 @@ const MainContent = (props : Props)=>{
   const updateSelectedItems = (item: IBoardData, checked: boolean) => {
     if (checked) {
       setSelectedItems([...selectedItems, item]);
+      setAllItemsChecked(checked);
     } else {
+      if (selectedItems.length === 1) {
+        setAllItemsChecked(checked);
+      }
       setSelectedItems(selectedItems.filter(selectedItem => item.key !== selectedItem.key))
     }
   }
@@ -347,6 +352,8 @@ const MainContent = (props : Props)=>{
     setAllItemsChecked(checked);
   }
 
+  const numSelected = selectedItems.length.toString();
+
   return (<div className={classes.wrap}>
     <div className={classes.header}>
       <div className={classes.title}>
@@ -358,14 +365,14 @@ const MainContent = (props : Props)=>{
     {selected !== 'trash' ? 
     (<div className={`${classes.nav} ${classes.checkedNav}`}>
       <div>
-        <Checkbox color="primary" checked={allItemsChecked} onChange={(event) => handleCheckAllBoxChange(event)}/>{getText("word_select").replace("%d", "0")}
+        <Checkbox color="primary" checked={allItemsChecked} onChange={(event) => handleCheckAllBoxChange(event)}/>{getText("word_select").replace("%d", numSelected)}
       </div>
       <MainNavSelector orderBy={orderBy} listOrderChange={listOrderChange} listViewType={listViewType} selectedItems={selectedItems} />
     </div>)
     :
     (<div className={classes.trashNav}>
       <div>
-        <Checkbox color="primary" checked={allItemsChecked} onChange={(event) => handleCheckAllBoxChange(event)}/>{getText("word_select").replace("%d", "0")}
+        <Checkbox color="primary" checked={allItemsChecked} onChange={(event) => handleCheckAllBoxChange(event)}/>{getText("word_select").replace("%d", numSelected)}
       </div>
 
       <div>
@@ -389,4 +396,4 @@ const MainContent = (props : Props)=>{
   </div>);
 }
 
-export default MainContent;
+export default MainContent; 

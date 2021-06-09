@@ -65,10 +65,6 @@ const GridView = (props : Props)=>{
     return false;
   }
 
-  const handleCheckBoxChange = (event: React.ChangeEvent<HTMLInputElement>, el: IBoardData, idx: number) => {
-      props.updateSelectedItems(el, event.target.checked)
-  }
-
   return (
     <React.Fragment>
       {docsList.map((el, idx) => {
@@ -95,7 +91,7 @@ const GridView = (props : Props)=>{
                   checked={isChecked(keyStr)}
                   color="primary"
                   value={keyStr}
-                  onChange={(event) => handleCheckBoxChange(event, el, idx)}
+                  onChange={(event) => props.updateSelectedItems(el, event.target.checked)}
                 />
               </div>
               {/* {selectedContent === idx ? (<div className={selectedClass}/>) : ""} */}
@@ -118,6 +114,5 @@ const GridView = (props : Props)=>{
     </React.Fragment>
     );
 }
-
 
 export default GridView;
