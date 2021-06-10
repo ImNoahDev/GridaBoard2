@@ -188,15 +188,28 @@ export const docCategoryChange = async (doc, categoryKey)=>{
   }
 
 
-  let docId = `${userId}_${doc.doc_name}_${getTimeStamp(doc.created)}`
   await db
   .collection(userId)
-  .doc(docId).update({
+  .doc(doc.docId).update({
     category : categoryKey
   })
 }
 
 
+export const changeDocName = async (doc, changeName)=>{
+  const userId = cookies.get('user_email');
+  if(userId === undefined){
+    return false;
+  }
+  console.log(doc);
+
+  await db
+  .collection(userId)
+  .doc(doc.docId).update({
+    doc_name : changeName
+  });
+
+}
 
 
 

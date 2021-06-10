@@ -414,6 +414,7 @@ export async function saveToDB(docName: string, thumb_path: string, grida_path: 
       grida_path: grida_path,
       thumb_path: thumb_path,
       dateDeleted: 0,
+      docId : docId
     })
     .then(function () {
       console.log(`${docName} is created`);

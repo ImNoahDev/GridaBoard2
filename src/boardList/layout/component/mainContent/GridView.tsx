@@ -131,7 +131,7 @@ const GridView = (props : Props)=>{
 
     props.updateSelectedItems(el, checked);
   }
-
+  console.log(showCheckBoxes);
   return (
     <React.Fragment>
       {docsList.map((el, idx) => {
@@ -163,7 +163,7 @@ const GridView = (props : Props)=>{
                   />
                 </div>
               </Grow>
-              {/* {selectedContent === idx ? (<div className={selectedClass}/>) : ""} */}
+              {selectedItems.includes(el) ? (<div className={selectedClass}/>) : ""}
               <Grow in={showMoreBtns[idx]} >
                 <div className={classes.moreBtn}>
                   <IconButton onClick={(e) =>{

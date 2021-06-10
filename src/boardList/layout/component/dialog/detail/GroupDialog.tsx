@@ -1,10 +1,10 @@
 import { Button, Dialog, DialogProps } from "@material-ui/core";
 import { hideGroupDialog } from 'GridaBoard/store/reducers/listReducer';
 import React, { useState } from "react";
-import { useSelector } from "react-redux";
-import {createCategory, changeCategoryName} from "boardList/BoardListPageFunc2";
+import { useSelector, useDispatch } from "react-redux";
+import {createCategory, changeCategoryName, changeDocName} from "boardList/BoardListPageFunc2";
 import { RootState } from "GridaBoard/store/rootReducer";
-import { isObject } from "node:util";
+import { forceUpdateBoardList } from "GridaBoard/store/reducers/appConfigReducer";
 
 const dialogTypes = {
   "newGroup" : {
@@ -55,6 +55,8 @@ const GroupDialog = (props : Props)=>{
   
   let { title, placeHolder, mainWarn, selectedType } = dialogTypes[type];
   const defaultValue = useSelector((state: RootState) => state.list.dialog.selected);
+  const dispatch = useDispatch();
+  
   let defaultText = "";
   if(defaultValue !== null){
     if(selectedType === "group"){
@@ -121,13 +123,28 @@ const GroupDialog = (props : Props)=>{
     closeEvent(true);
   }
 
+  const changeDoc = async ()=>{
+    let newText:string|false = inputer.value;
+    newText = textCheckForDoc(newText);
+
+    if(newText === false){
+      //못바꿈
+      return false;
+    }
+
+    await changeDocName(defaultValue, newText as string);
+
+    closeEvent(false);
+    dispatch(forceUpdateBoardList());
+  }
+
   const save = async ()=>{
     if(type == "newGroup"){
       await createGroup();
     }else if(type == "changeGroupName"){
       await changeGroup();
     }else if(type == "changeDocName"){
-      console.log(123);
+      await changeDoc()
     }
   }
 

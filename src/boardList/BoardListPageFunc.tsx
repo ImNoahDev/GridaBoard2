@@ -39,7 +39,8 @@ export const deleteAllFromTrash = async () => {
 
   for await (const el of docArr) {
     const m_sec = getTimeStamp(el.created);
-    const deletedDocId = `${userId}_${el.doc_name}_${m_sec}`;
+    // const deletedDocId = `${userId}_${el.doc_name}_${m_sec}`;
+    const deletedDocId = el.docId;
 
     await db.collection(userId)
     .doc(deletedDocId).delete().then(() => {
@@ -78,7 +79,8 @@ export const deleteBoardFromLive = async (docItems: IBoardData[]) => {
   for await (const docItem of docItems) {
     const docName = docItem.doc_name;
     const m_sec = getTimeStamp(docItem.created);
-    const docId = `${userId}_${docName}_${m_sec}`;
+    // const docId = `${userId}_${docName}_${m_sec}`;
+    const docId = docItem.docId;
 
     await db.collection(userId)
     .doc(docId)
@@ -104,7 +106,8 @@ export const deleteBoardsFromTrash = async (docItems: IBoardData[]) => {
     const docName = docItem.doc_name;
     if (docName === undefined) continue;
     const m_sec = getTimeStamp(docItem.created);
-    const docId = `${userId}_${docName}_${m_sec}`;
+    // const docId = `${userId}_${docName}_${m_sec}`;
+    const docId = docItem.docId;
   
     await db.collection(userId)
     .doc(docId)
@@ -130,7 +133,8 @@ export const restoreBoardsFromTrash = async (docItems: IBoardData[]) => {
     const docName = docItem.doc_name;
     if (docName === undefined) continue;
     const m_sec = getTimeStamp(docItem.created);
-    const docId = `${userId}_${docName}_${m_sec}`;
+    // const docId = `${userId}_${docName}_${m_sec}`;
+    const docId = docItem.docId;
   
     await db.collection(userId)
     .doc(docId)
