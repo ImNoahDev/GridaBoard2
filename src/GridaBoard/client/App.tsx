@@ -1,13 +1,9 @@
 import React, { Component } from 'react';
 import { Provider } from 'react-redux';
 import { Route } from 'react-router-dom';
-// import GridaBoard from "./page/GridaBoard";
-// import About from "./page/About";
 import { Login, BoardList, GridaBoard, LoginCheck } from "./pages"
-// import configureStore from "../store/configureStore";
 import { store } from '../client/pages/GridaBoard';
 
-// export const store = configureStore();
 
 const App = ()=>{
     /**

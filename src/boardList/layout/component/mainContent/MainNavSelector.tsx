@@ -4,7 +4,7 @@ import getText from "GridaBoard/language/language";
 import { IBoardData } from "../../../structures/BoardStructures";
 import { OpenInBrowser, DeleteOutline } from '@material-ui/icons';
 import { showAlert, showGroupDialog } from 'GridaBoard/store/reducers/listReducer';
-
+import { copyBoard } from '../../../BoardListPageFunc';
 
 const BootstrapInput = withStyles((theme) =>
   createStyles({
@@ -154,7 +154,7 @@ const CheckedNav = (props: checkedNavProp)=>{
   const {viewType, selectedItems, routeChange, ...rest} = props;
   console.log(selectedItems);
 
-  const clickEvent = (e, title)=>{
+  const clickEvent = async (e, title)=>{
     if(title === "delete"){
       showAlert({
         type:"deleteDoc",
@@ -171,7 +171,17 @@ const CheckedNav = (props: checkedNavProp)=>{
         selected: selectedItems[0]
       });
     }else{
-      alert(title);
+      switch (title) {
+        case 'nameChange': {
+          //hi
+          break;
+        }
+        case 'copy': {
+          copyBoard(selectedItems[0]); //하나만 선택됐을때 활성화되는 버튼
+          break;
+        }
+        default: break;
+      }
     }
   }
 
