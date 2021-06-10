@@ -6,6 +6,7 @@ import { OpenInBrowser, DeleteOutline } from '@material-ui/icons';
 import { showAlert, showGroupDialog } from 'GridaBoard/store/reducers/listReducer';
 import { copyBoard } from '../../../BoardListPageFunc';
 
+
 const BootstrapInput = withStyles((theme) =>
   createStyles({
     root: {
