@@ -360,7 +360,7 @@ const MainContent = (props : Props)=>{
       <div>
         <Checkbox color="primary" checked={allItemsChecked} onChange={(event) => handleCheckAllBoxChange(event)}/>{getText("word_select").replace("%d", "0")}
       </div>
-      <MainNavSelector orderBy={orderBy} listOrderChange={listOrderChange} listViewType={listViewType} selectedItems={selectedItems} />
+      <MainNavSelector orderBy={orderBy} listOrderChange={listOrderChange} listViewType={listViewType} selectedItems={selectedItems} routeChange={routeChange} />
     </div>)
     :
     (<div className={classes.trashNav}>

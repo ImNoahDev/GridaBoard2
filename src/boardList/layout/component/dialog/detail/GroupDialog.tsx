@@ -4,17 +4,26 @@ import React, { useState } from "react";
 import { useSelector } from "react-redux";
 import {createCategory, changeCategoryName} from "boardList/BoardListPageFunc2";
 import { RootState } from "GridaBoard/store/rootReducer";
+import { isObject } from "node:util";
 
 const dialogTypes = {
   "newGroup" : {
     title : "새 그룹 생성",
     placeHolder : "그룹 이름",
     mainWarn  : "새로운 그룹 이름을 입력해주세요",
+    selectedType : "group"
   },
   "changeGroupName" : {
     title : "그룹 이름 변경",
     placeHolder : "",
     mainWarn  : "새로운 그룹 이름을 입력해주세요",
+    selectedType : "group"
+  },
+  "changeDocName" : {
+    title : "보드 이름 변경",
+    placeHolder : "",
+    mainWarn  : "새로운 보드 이름을 입력해주세요",
+    selectedType : "doc"
   }
 };
 
@@ -24,8 +33,15 @@ interface Props extends  DialogProps {
   closeEvent ?: (isChange:boolean)=>void
 }
 
-const textCheck = (text:string|false)=>{
+const textCheckForGroup = (text:string|false)=>{
   //정규식 조건을 통해서 안될경우 false
+  let a = 1;
+  if(a == 1)
+    return text;
+  else
+    return false;
+}
+const textCheckForDoc = (text:string|false)=>{
   let a = 1;
   if(a == 1)
     return text;
@@ -35,17 +51,21 @@ const textCheck = (text:string|false)=>{
  
 
 const GroupDialog = (props : Props)=>{
-  const { open, closeEvent, type,  ...rest } = props;
+  const { open, closeEvent, type, ...rest } = props;
+  
+  let { title, placeHolder, mainWarn, selectedType } = dialogTypes[type];
   const defaultValue = useSelector((state: RootState) => state.list.dialog.selected);
   let defaultText = "";
   if(defaultValue !== null){
-    defaultText = defaultValue[0];
+    if(selectedType === "group"){
+      defaultText = defaultValue[0];
+    }else if(selectedType === "doc"){
+      defaultText = defaultValue.doc_name;
+    }
   }
   let inputer = null as HTMLInputElement;
   
   const [disabled, setDisabled] = useState(true);
-  
-  let { title, placeHolder, mainWarn } = dialogTypes[type];
 
   if(type === "changeGroupName"){
     placeHolder = defaultValue[0];
@@ -59,7 +79,11 @@ const GroupDialog = (props : Props)=>{
       cantSave = true;
     }
     
-    newText = textCheck(newText);
+    if(selectedType === "group"){
+      newText = textCheckForGroup(newText);
+    }else if(selectedType === "doc"){
+      newText = textCheckForDoc(newText);
+    }
     if(newText === false)
       cantSave = true;
     
@@ -72,7 +96,7 @@ const GroupDialog = (props : Props)=>{
   const createGroup = async ()=>{
     let newText:string|false = inputer.value;
     // createCategory
-    newText = textCheck(newText);
+    newText = textCheckForGroup(newText);
 
     if(newText === false){
       //못바꿈
@@ -85,7 +109,7 @@ const GroupDialog = (props : Props)=>{
   }
   const changeGroup = async ()=>{
     let newText:string|false = inputer.value;
-    newText = textCheck(newText);
+    newText = textCheckForGroup(newText);
 
     if(newText === false){
       //못바꿈
@@ -102,6 +126,8 @@ const GroupDialog = (props : Props)=>{
       await createGroup();
     }else if(type == "changeGroupName"){
       await changeGroup();
+    }else if(type == "changeDocName"){
+      console.log(123);
     }
   }
 

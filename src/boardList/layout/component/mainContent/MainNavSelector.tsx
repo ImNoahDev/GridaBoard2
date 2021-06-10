@@ -3,7 +3,7 @@ import { createStyles, IconButton, InputBase, MenuItem, Select, SvgIcon, withSty
 import getText from "GridaBoard/language/language";
 import { IBoardData } from "../../../structures/BoardStructures";
 import { OpenInBrowser, DeleteOutline } from '@material-ui/icons';
-import { showAlert } from 'GridaBoard/store/reducers/listReducer';
+import { showAlert, showGroupDialog } from 'GridaBoard/store/reducers/listReducer';
 
 
 const BootstrapInput = withStyles((theme) =>
@@ -49,13 +49,13 @@ interface Props extends  React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivEle
   listOrderChange ?: (event)=>void,
   listViewType ?: (val)=>void,
   orderBy ?: number,
-  selectedItems ?: Array<IBoardData>
+  selectedItems ?: Array<IBoardData>,
+  routeChange ?: (idx: number) => void
 }
 
 const MainNavSelector = (props : Props)=>{
-  const {listOrderChange, listViewType, orderBy, selectedItems, ...rest } = props;
+  const {listOrderChange, listViewType, routeChange, orderBy, selectedItems, ...rest } = props;
 
-  console.log(selectedItems);
   
   let viewType = 0;
   if(selectedItems.length == 1) viewType = 1;
@@ -65,7 +65,7 @@ const MainNavSelector = (props : Props)=>{
   return (
     <React.Fragment>
       {viewType==0? <ListSelectType listViewType={listViewType} listOrderChange={listOrderChange} orderBy={orderBy} />
-      : <CheckedNav viewType={viewType} selectedItems={selectedItems}/>}
+      : <CheckedNav viewType={viewType} selectedItems={selectedItems} routeChange={routeChange}/>}
     </React.Fragment>)
 }
 
@@ -140,6 +140,7 @@ const ListSelectType = (props:listSelectProps)=>{
 type checkedNavProp = {
   viewType ?: number
   selectedItems ?: Array<IBoardData>
+  routeChange ?: (idx: number) => void
 }
 
 const langtype = {
@@ -150,7 +151,7 @@ const langtype = {
   "move" : "이동"
 }
 const CheckedNav = (props: checkedNavProp)=>{
-  const {viewType, selectedItems, ...rest} = props;
+  const {viewType, selectedItems, routeChange, ...rest} = props;
   console.log(selectedItems);
 
   const clickEvent = (e, title)=>{
@@ -161,6 +162,13 @@ const CheckedNav = (props: checkedNavProp)=>{
         sub:{
           data : selectedItems
         }
+      });
+    }else if(title === "open"){
+      routeChange(selectedItems[0].key);
+    }else if(title === "nameChange"){
+      showGroupDialog({
+        type:"changeDocName",
+        selected: selectedItems[0]
       });
     }else{
       alert(title);

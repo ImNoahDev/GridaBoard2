@@ -123,11 +123,9 @@ const CombineDialog = (props : Props)=>{
     }
   };
   let returnDialog = null;
-  if(["newGroup", "changeGroupName"].includes(diaType)){
+  if(["newGroup", "changeGroupName", "changeDocName"].includes(diaType)){
     groupProps.classes.paper += `  ${classes.groupDialog}`;
     returnDialog = (<GroupDialog {...groupProps} />);
-  }else if(diaType == "tra"){
-    returnDialog = (<DocsDialog {...groupProps} />);
   }else if(["deleteDoc"].includes(diaType)){
     groupProps.classes.paper += `  ${classes.alertDialog}`;
     returnDialog = (<AlertDialog {...groupProps} />);

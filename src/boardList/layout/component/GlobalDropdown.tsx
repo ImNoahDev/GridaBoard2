@@ -63,7 +63,12 @@ const itemData = {
     placement : "bottom-start",
     list:["nameChange", "delete"],
     runFunction : {
-      "nameChange":(val)=>{},
+      "nameChange":(val)=>{
+        showGroupDialog({
+          type:"changeDocName",
+          selected:val
+        })
+      },
       "delete": (val)=>{
         showAlert({
           type:"deleteDoc",
