@@ -4,6 +4,7 @@ import { setIsNewDoc } from '../GridaBoard/store/reducers/docConfigReducer';
 import firebase from 'GridaBoard/util/firebase_config';
 import { IBoardData } from './structures/BoardStructures';
 import { DeveloperBoardRounded, DoubleArrowRounded } from '@material-ui/icons';
+import { saveToDB } from '../GridaBoard/Save/SaveThumbnail';
 
 export const addNewPage = async () => {
   const doc = GridaDoc.getInstance();
@@ -145,6 +146,116 @@ export const restoreBoardsFromTrash = async (docItems: IBoardData[]) => {
   }
 
   return result;
+}
+
+export const copyBoard = async (docItem: IBoardData) => {
+  const db = firebase.firestore();
+  const userId = firebase.auth().currentUser.email;
+
+  const docName = docItem.doc_name;
+  const date = new Date();
+  const timeStamp = date.getTime();
+  const docId = `${userId}_${docName}_${timeStamp}`;
+  
+  const srcGridaPath = docItem.grida_path; //얘를 다운받아서 
+  const srcThumbPath = docItem.thumb_path;
+
+  let imageBlob;
+  await fetch(srcThumbPath)
+  .then(res => { return res.blob(); })
+  .then(async data => {
+    imageBlob = data;
+  })
+
+  await fetch(srcGridaPath)
+  .then(res => res.json())
+  .then(async data => {
+    
+    console.log('hihi');
+    const gridaStr = JSON.stringify(data);
+    const gridaBlob = new Blob([gridaStr], { type: 'application/json' });
+
+    const storageRef = firebase.storage().ref();
+    const gridaFileName = `${docId}.grida`;
+    const gridaRef = storageRef.child(`grida/${gridaFileName}`);
+
+    const gridaUploadTask = gridaRef.put(gridaBlob);
+    await gridaUploadTask.on(
+      firebase.storage.TaskEvent.STATE_CHANGED,
+      function (snapshot) {
+        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+        console.log('Grida Upload is ' + progress + '% done');
+        switch (snapshot.state) {
+          case firebase.storage.TaskState.PAUSED: // or 'paused'
+            console.log('Upload is paused');
+            break;
+          case firebase.storage.TaskState.RUNNING: // or 'running'
+            console.log('Upload is running');
+            break;
+        }
+      },
+      function (error) {
+        switch (error.code) {
+          case 'storage/unauthorized':
+            // User doesn't have permission to access the object
+            break;
+  
+          case 'storage/canceled':
+            // User canceled the upload
+            break;
+  
+          case 'storage/unknown':
+            // Unknown error occurred, inspect error.serverResponse
+            break;
+        }
+      },
+      async function () {
+        gridaUploadTask.snapshot.ref.getDownloadURL().then(async function (downloadURL) {
+          const grida_path = downloadURL;
+  
+          const thumbFileName = `${userId}_${docName}_${timeStamp}.png`;
+          const pngRef = storageRef.child(`thumbnail/${thumbFileName}`);
+  
+          const thumbUploadTask = pngRef.put(imageBlob);
+          await thumbUploadTask.on(
+            firebase.storage.TaskEvent.STATE_CHANGED,
+            function (snapshot) {
+              const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+              console.log('Thumbnail Upload is ' + progress + '% done');
+              switch (snapshot.state) {
+                case firebase.storage.TaskState.PAUSED: // or 'paused'
+                  console.log('Upload is paused');
+                  break;
+                case firebase.storage.TaskState.RUNNING: // or 'running'
+                  console.log('Upload is running');
+                  break;
+              }
+            },
+            function (error) {
+              switch (error.code) {
+                case 'storage/unauthorized':
+                  // User doesn't have permission to access the object
+                  break;
+  
+                case 'storage/canceled':
+                  // User canceled the upload
+                  break;
+  
+                case 'storage/unknown':
+                  // Unknown error occurred, inspect error.serverResponse
+                  break;
+              }
+            },
+            async function () {
+              thumbUploadTask.snapshot.ref.getDownloadURL().then(async function (thumb_path) {
+                saveToDB(docName, thumb_path, grida_path, date, true);
+              });
+            }
+          );
+        });
+      }
+    );
+  })
 }
 
 export const getTimeStamp = (created: {nanoseconds: number, seconds: number}) => {

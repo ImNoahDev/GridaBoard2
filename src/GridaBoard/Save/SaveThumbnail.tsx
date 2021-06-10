@@ -11,6 +11,7 @@ import { clearCanvas } from 'nl-lib/common/util';
 import firebase from 'GridaBoard/util/firebase_config';
 import { makePdfDocument } from './SavePdf';
 import { getPageInfosFromDoc, makeGridaBlob } from './SaveGrida';
+import { forceUpdateBoardList } from '../store/reducers/appConfigReducer';
 
 const makePdfJsDoc = async (loadingTask: any) => {
   return new Promise(resolve => {
@@ -362,7 +363,7 @@ export async function saveThumbnail(docName: string) {
           },
           async function () {
             thumbUploadTask.snapshot.ref.getDownloadURL().then(function (thumb_path) {
-              saveToDB(docName, thumb_path, grida_path, date);
+              saveToDB(docName, thumb_path, grida_path, date, false);
             });
           }
         );
@@ -396,13 +397,13 @@ export async function updateDB(docName: string, thumb_path: string, grida_path: 
     });
 };
 
-export async function saveToDB(docName: string, thumb_path: string, grida_path: string, nowDate: Date) {
+export async function saveToDB(docName: string, thumb_path: string, grida_path: string, nowDate: Date, isCopyProcess: boolean) {
   const db = firebase.firestore();
   const userId = firebase.auth().currentUser.email;
 
   const docId = `${userId}_${docName}_${nowDate.getTime()}`;
 
-  db.collection(userId)
+  await db.collection(userId)
     .doc(docId)
     .set({
       category: '0',
@@ -417,6 +418,9 @@ export async function saveToDB(docName: string, thumb_path: string, grida_path: 
     })
     .then(function () {
       console.log(`${docName} is created`);
+      if (isCopyProcess) {
+        store.dispatch(forceUpdateBoardList());
+      }      
     })
     .catch(error => {
       console.error('Error adding document: ', error);
