@@ -224,7 +224,7 @@ const BoardList = () => {
           <MainContent selected={category} category={docsObj.category} docs={docsObj.docs} routeChange={routeChange} />
         </div>
       </div>
-      <CombineDialog open={isShowDialog} />
+      <CombineDialog open={isShowDialog} docsObj={docsObj} />
       <GlobalDropdown open={isShowDropdown} />
     </MuiThemeProvider>
   );

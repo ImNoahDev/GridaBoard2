@@ -131,7 +131,6 @@ const GridView = (props : Props)=>{
 
     props.updateSelectedItems(el, checked);
   }
-  console.log(showCheckBoxes);
   return (
     <React.Fragment>
       {docsList.map((el, idx) => {

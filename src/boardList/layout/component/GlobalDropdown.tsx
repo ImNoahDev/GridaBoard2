@@ -4,6 +4,7 @@ import { useSelector } from "react-redux";
 import { RootState } from "GridaBoard/store/rootReducer";
 import { hideDropDown, showGroupDialog, changeGroup, showAlert } from 'GridaBoard/store/reducers/listReducer';
 import { changeCategorySort, deleteCategory } from "../../BoardListPageFunc2";
+import { IBoardData } from "boardList/structures/BoardStructures";
 
 const useStyle = makeStyles(theme=>({
   paper : {
@@ -61,15 +62,21 @@ const itemData = {
   },
   "docs" : {
     placement : "bottom-start",
-    list:["nameChange", "delete"],
+    list:["nameChange","move", "delete"],
     runFunction : {
-      "nameChange":(val)=>{
+      "nameChange":(val:IBoardData)=>{
         showGroupDialog({
           type:"changeDocName",
           selected:val
         })
       },
-      "delete": (val)=>{
+      "move" : (val:IBoardData)=>{
+        showGroupDialog({
+          type:"moveDoc",
+          selected: [val],
+        });
+      },
+      "delete": (val:IBoardData)=>{
         showAlert({
           type:"deleteDoc",
           selected:val

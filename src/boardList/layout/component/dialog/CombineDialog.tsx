@@ -5,7 +5,7 @@ import { RootState } from "GridaBoard/store/rootReducer";
 import { showGroupDialog, hideGroupDialog, changeGroup } from 'GridaBoard/store/reducers/listReducer';
 import getText from "GridaBoard/language/language";
 import GroupDialog from "./detail/GroupDialog";
-import DocsDialog from "./detail/DocsDialog";
+import MoveDialog from "./detail/MoveDialog";
 import AlertDialog from "./detail/AlertDialog";
 
 const useStyle = makeStyles(theme=>({
@@ -99,12 +99,16 @@ const useStyle = makeStyles(theme=>({
   }
 }))
 interface Props extends  DialogProps {
-  test ?: string
+  test ?: string,
+  docsObj :{
+    docs: any[],
+    category: any[],
+  }
 }
 
 
 const CombineDialog = (props : Props)=>{
-  const { onClose, open } = props;
+  const { onClose, open , docsObj} = props;
   const classes = useStyle();
   
   const diaType = useSelector((state: RootState) => state.list.dialog.type);
@@ -126,6 +130,9 @@ const CombineDialog = (props : Props)=>{
   if(["newGroup", "changeGroupName", "changeDocName"].includes(diaType)){
     groupProps.classes.paper += `  ${classes.groupDialog}`;
     returnDialog = (<GroupDialog {...groupProps} />);
+  }else if(["moveDoc"].includes(diaType)){
+    groupProps.classes.paper += `  ${classes.groupDialog}`;
+    returnDialog = (<MoveDialog {...groupProps} docsObj={docsObj}/>);
   }else if(["deleteDoc"].includes(diaType)){
     groupProps.classes.paper += `  ${classes.alertDialog}`;
     returnDialog = (<AlertDialog {...groupProps} />);

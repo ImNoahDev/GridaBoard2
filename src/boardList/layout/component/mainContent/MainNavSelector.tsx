@@ -171,18 +171,14 @@ const CheckedNav = (props: checkedNavProp)=>{
         type:"changeDocName",
         selected: selectedItems[0]
       });
-    }else{
-      switch (title) {
-        case 'nameChange': {
-          //hi
-          break;
-        }
-        case 'copy': {
-          copyBoard(selectedItems[0]); //하나만 선택됐을때 활성화되는 버튼
-          break;
-        }
-        default: break;
-      }
+    }else if(title === "copy"){
+      copyBoard(selectedItems[0]); //하나만 선택됐을때 활성화되는 버튼
+    }else if(title === "move"){
+      showGroupDialog({
+        type:"moveDoc",
+        selected: selectedItems,
+      });
+
     }
   }
 

@@ -33,7 +33,7 @@ interface Props extends  DialogProps {
   closeEvent ?: (isChange:boolean)=>void
 }
 
-const textCheckForGroup = (text:string|false)=>{
+export const textCheckForGroup = (text:string|false)=>{
   //정규식 조건을 통해서 안될경우 false
   let a = 1;
   if(a == 1)
@@ -41,12 +41,25 @@ const textCheckForGroup = (text:string|false)=>{
   else
     return false;
 }
-const textCheckForDoc = (text:string|false)=>{
+export const textCheckForDoc = (text:string|false)=>{
   let a = 1;
   if(a == 1)
     return text;
   else
     return false;
+}
+export const createGroup = async (newText:string, closeEvent:(isChange: boolean) => void)=>{
+  // createCategory
+  let text = textCheckForGroup(newText);
+
+  if(text === false){
+    //못만듬
+    return false;
+  }
+
+  await createCategory(newText as string);
+
+  closeEvent(true);
 }
  
 
@@ -56,7 +69,7 @@ const GroupDialog = (props : Props)=>{
   let { title, placeHolder, mainWarn, selectedType } = dialogTypes[type];
   const defaultValue = useSelector((state: RootState) => state.list.dialog.selected);
   const dispatch = useDispatch();
-  
+
   let defaultText = "";
   if(defaultValue !== null){
     if(selectedType === "group"){
@@ -95,20 +108,6 @@ const GroupDialog = (props : Props)=>{
       setDisabled(true);
     }
   }
-  const createGroup = async ()=>{
-    let newText:string|false = inputer.value;
-    // createCategory
-    newText = textCheckForGroup(newText);
-
-    if(newText === false){
-      //못바꿈
-      return false;
-    }
-
-    await createCategory(newText as string);
-
-    closeEvent(true);
-  }
   const changeGroup = async ()=>{
     let newText:string|false = inputer.value;
     newText = textCheckForGroup(newText);
@@ -139,8 +138,9 @@ const GroupDialog = (props : Props)=>{
   }
 
   const save = async ()=>{
+    let newText:string|false = inputer.value;
     if(type == "newGroup"){
-      await createGroup();
+      await createGroup(newText, closeEvent);
     }else if(type == "changeGroupName"){
       await changeGroup();
     }else if(type == "changeDocName"){

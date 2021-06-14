@@ -96,10 +96,10 @@ const useStyle = makeStyles(theme=>({
     }
   },
   selected : {
-    background : "rgba(104, 143, 255, 0.1)",
+    background : theme.custom.icon.blue[3],
     cursor : "context-menu !important",
     "&:hover" : {
-      backgroundColor: "rgba(104, 143, 255, 0.1) !important"
+      backgroundColor: theme.custom.icon.blue[3] + " !important"
     },
   }
 }));
