@@ -51,12 +51,12 @@ const useStyles = props => makeStyles((theme) => ({
     minWidth: "0px",
     fontFamily: "Roboto",
     fontStyle: "normal",
-    fontWeight: 600,
+    fontWeight: 400,
     lineHeight: "16.41px",
     fontSize: "14px",
     textAlign: "right",
     letterSpacing: "0.25px",
-    color: theme.palette.text.primary,
+    color: "#666666",
     "&:hover": {
       color: theme.palette.action.hover,
       fontWeight: 700
@@ -74,6 +74,11 @@ const useStyles = props => makeStyles((theme) => ({
     zIndex: 10000,
     marginTop: "21px",
     marginLeft: "-1px"
+  },
+  headerButtons: {
+    display: "flex",
+    flexDirection: "column",
+    flexFlow: "column"
   },
   headerStyle: {
     display: "flex",
@@ -93,26 +98,31 @@ const useStyles = props => makeStyles((theme) => ({
       alignItems: "center",
       margin: "0 24px"
     },
-    "& > div > div": {
+    "& > div > div": { //캘리브 제외하고 전부
       display: "flex",
-      flexDirection: "row",
+      flexDirection: "column",
       justifyContent: "flex-start",
-      alignItems: "center",
+      // alignItems: "center",
     },
-    "& > div:first-child > div": {
-      margin: "0 24px",
-      padding: "10px"
+    "& > div:first-child > div": { //앞에 애들 전부
+      marginLeft: "24px",
+      marginRight: "24px",
+      padding: "10px",
     },
-    "& > div:last-child > div": {
-      marginLeft: "16px"
+    "& > div:last-child > div": { //연결버튼 + 구버전버튼
+      marginLeft: "16px",
     },
     "& > div > div > div": {
       display: "flex",
-      marginRight: "24px"
+      flexDirection: "row",
     },
-    "& > div > div > div:last-child": {
-      marginRight: "0px"
-    }
+    "& > div > div > div:first-child": { //문서 제목
+      fontWeight: 700,
+      fontSize: "18px",
+    },
+    "& > div > div > div:last-child > div": { //파일 수정 보기 기타등등
+      marginRight: "24px",
+    },
   },
   headerLineV: {
     width: "1px",
@@ -126,7 +136,7 @@ const useStyles = props => makeStyles((theme) => ({
     boxSizing: "border-box",
     borderRadius: "4px",
     overflow: "hidden",
-    textOverflow: "ellipsis",
+    textOverflow: "ellipsis", 
     whiteSpace: "nowrap",
     padding: "3px",
     "& > span": {
@@ -161,6 +171,7 @@ const HeaderLayer = (props: Props) => {
 
   const [pdfUrl, setPdfUrl] = useState(undefined as string);
   const [pdfFilename, setPdfFilename] = useState(undefined as string);
+  const docName = useSelector((state: RootState) => state.docConfig.docName);
 
   function fileOpenHandler() {
     const input = document.querySelector("#fileForconvert") as HTMLInputElement;
@@ -290,43 +301,49 @@ const HeaderLayer = (props: Props) => {
       <div id="header" className={`${classes.headerStyle}`}>
         <div >
           <img src={LogoSvg} className={classes.imgStyle}></img>
-          <div>
-            <ClickAwayListener onClickAway={handleClickSaveAway}>
+          <div>  
+            <div>{docName}</div> {/* & > div > div > div:first-child */}
+            <div> {/* & > div > div > div:last-child */}
+              <ClickAwayListener onClickAway={handleClickSaveAway}>
+                <div>
+                  <CustomBadge badgeContent={`S`}>
+                    <Button className={`${classes.buttonStyle} ${classes.buttonFontStyle} saveButton`} onClick={handleClickSave} disabled={disabled}>
+                      {getText("save_file")}
+                    </Button>
+                  </CustomBadge>
+                  {isSaveOpen ? (
+                    <div className={`${classes.saveDropdownStyle}`} >
+                      <SavePdfDialog saveType="pdf" />
+                      <SavePdfDialog saveType="grida" />
+                      <SavePdfDialog saveType="saveAs" />
+                      <SavePdfDialog saveType="overwrite" />
+                    </div>
+                  ) : null}
+                </div>
+              </ClickAwayListener>
               <div>
-                <CustomBadge badgeContent={`S`}>
-                  <Button className={`${classes.buttonStyle} ${classes.buttonFontStyle} saveButton`} onClick={handleClickSave} disabled={disabled}>
-                    {getText("save_file")}
+                <CustomBadge badgeContent={`Ctrl-O`}>
+                  <Button id="loadFileButton" className={`loadDropDown ${classes.buttonStyle} ${classes.buttonFontStyle}`}
+                  onClick={fileOpenHandler}>
+                    {getText("load_file")}
+                    <ConvertFileLoad handlePdfOpen={handlePdfOpen} />
                   </Button>
                 </CustomBadge>
-                {isSaveOpen ? (
-                  <div className={`${classes.saveDropdownStyle}`} >
-                    <SavePdfDialog saveType="pdf" />
-                    <SavePdfDialog saveType="grida" />
-                    <SavePdfDialog saveType="saveAs" />
-                    <SavePdfDialog saveType="overwrite" />
-                  </div>
-                ) : null}
               </div>
-            </ClickAwayListener>
-            <div>
-              <CustomBadge badgeContent={`Ctrl-O`}>
-                <Button id="loadFileButton" className={`loadDropDown ${classes.buttonStyle} ${classes.buttonFontStyle}`}
-                onClick={fileOpenHandler}>
-                  {getText("load_file")}
-                  <ConvertFileLoad handlePdfOpen={handlePdfOpen} />
-                </Button>
-              </CustomBadge>
-            </div>
-            <div>
-              <CustomBadge badgeContent={`P`}>
-                <PrintNcodedPdfButton id="printBtn"
-                  className={` ${classes.buttonStyle}  ${classes.buttonFontStyle}`}
-                  handkeTurnOnAppShortCutKey={turnOnGlobalKeyShortCut}
+              <div>
+                <CustomBadge badgeContent={`P`}>
+                  <PrintNcodedPdfButton id="printBtn"
+                    className={` ${classes.buttonStyle}  ${classes.buttonFontStyle}`}
+                    handkeTurnOnAppShortCutKey={turnOnGlobalKeyShortCut}
 
-                  url={pdfUrl} filename={pdfFilename} handlePdfUrl={makePdfUrl} disabled={disabled} />
-              </CustomBadge>
+                    url={pdfUrl} filename={pdfFilename} handlePdfUrl={makePdfUrl} disabled={disabled} />
+                </CustomBadge>
+              </div>
             </div>
+            
           </div>
+
+ 
           <CalibrationButton className={`${classes.buttonStyle}  ${classes.calibration}`} filename={pdfFilename} handlePdfUrl={makePdfUrl} />
 
           <div>
@@ -335,7 +352,6 @@ const HeaderLayer = (props: Props) => {
         </div>
 
         <div >
-
           <div>
             <ConnectButton className={`${classes.buttonStyle}`} onPenLinkChanged={e => onPenLinkChanged(e)} />
           </div>
@@ -351,8 +367,6 @@ const HeaderLayer = (props: Props) => {
           {/* <div>구글 이메일</div>
           <KeyboardArrowDownRoundedIcon /> */}
         </div>
-
-    
       </div>
       <div style={{ height: "1px", background: "rgba(255,255,255,1)", zoom: 1 / brZoom }}>
      
