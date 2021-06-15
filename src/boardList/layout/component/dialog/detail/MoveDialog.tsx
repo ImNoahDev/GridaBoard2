@@ -4,10 +4,11 @@ import React, { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "GridaBoard/store/rootReducer";
 import { Clear, Add } from '@material-ui/icons';
-import { createGroup } from "./GroupDialog";
+import { textCheckForGroup, createGroup } from "./GroupDialog";
 import { forceUpdateBoardList } from "GridaBoard/store/reducers/appConfigReducer";
 import { IBoardData } from "boardList/structures/BoardStructures";
 import { docCategoryChange } from "boardList/BoardListPageFunc2";
+import { changeGroup } from 'GridaBoard/store/reducers/listReducer';
 
 
 const useStyle = makeStyles(theme=>({
@@ -140,6 +141,59 @@ const useStyle = makeStyles(theme=>({
     "&:hover" : {
       backgroundColor: theme.custom.icon.blue[3] + " !important"
     },
+  },
+  newCategoryDiv : {
+    display:"flex",
+    minHeight: "40px",
+    height : "40px",
+    width: "100%",
+    justifyContent: "center",
+    alignItems: "center",
+    "& > input" :{
+      width: "456px",
+      height: "100%",
+      background : theme.custom.icon.mono[4],
+      border : "1px solid " + theme.custom.icon.mono[0],
+      boxSizing : "border-box",
+      borderRadius : "8px",
+      padding: "11px 12px",
+      fontFamily: "Roboto",
+      fontStyle: "normal",
+      fontWeight: "normal",
+      fontSize: "14px",
+      lineHeight: "16px",
+      letterSpacing: "0.25px",
+      color : theme.palette.text.primary
+    },
+    "& > .disable" : {
+      border : `1px solid ${theme.palette.error.main} !important` 
+    },
+  },
+  newCategoryWarn : {
+    display:"flex",
+    minHeight: "40px",
+    width: "100%",
+    justifyContent : "center",
+    "& > div" : {
+      width : "450px",
+      height : "14px",
+      marginTop: "8px",
+      fontFamily: "Roboto",
+      fontStyle: "normal",
+      fontWeight: "normal",
+      fontSize: "12px",
+      lineHeight: "14px",
+      /* identical to box height */
+      
+      display: "flex",
+      alignItems: "center",
+      letterSpacing: "0.25px",
+      justifyContent : "flex-start",
+      color: theme.palette.error.main
+    }
+  },
+  hidden : {
+    visibility : "hidden",
   }
 }))
 
@@ -164,6 +218,7 @@ const MoveDialog = (props: Props)=>{
   const selected = useSelector((state: RootState) => state.list.dialog.selected);
   const dispatch = useDispatch();
 
+  console.log(categoryData);
   let defaultCategory = -1;
   if(selected.length === 1){
     defaultCategory = selected[0].category;
@@ -175,11 +230,40 @@ const MoveDialog = (props: Props)=>{
   const moveClasses = useStyle();
 
 
-  console.log(selected);
   let inputer = null as HTMLInputElement;
+  const [createNewVisible, setCreateNewVisible] = useState(false);
+  const [createNewDisable, setCreateNewDisible] = useState(false);
   
   const [disabled, setDisabled] = useState(true);
+  const categoryUpdate = (val:boolean)=>{
+    setCreateNewDisible(false);
+    setCreateNewVisible(false);
+    changeGroup(true);
+  }
   
+  const enterCheck = async (e)=>{
+    if(e.key !== "Enter") return ;
+    await createGroup(inputer.value, categoryUpdate)
+  }
+  const inputChange = (e)=>{
+    let cantSave = false;
+    let newText:string|false = e.target.value;
+
+    console.log(newText);
+    newText = textCheckForGroup(newText);
+
+    if(newText === false)
+      cantSave = true;
+    
+      console.log(!cantSave , newText != "" , createNewDisable)
+    if(!cantSave && newText != "" && createNewDisable){
+      setCreateNewDisible(false);
+    }else if(cantSave || (newText == "" && !createNewDisable)){
+      console.log("!!!!!!!!!!")
+      setCreateNewDisible(true);
+    }
+
+  }
 
   const selectCategory = (selectCategoryIdx)=>{
     const nowData = categoryData[selectCategoryIdx];
@@ -232,11 +316,22 @@ const MoveDialog = (props: Props)=>{
           </SvgIcon> : ""}
           </div>)
       })}
+      {createNewVisible ? (
+      <div className={`${moveClasses.newCategoryDiv}`}>
+        <input ref={(e)=>{inputer=e}} onKeyUp={enterCheck} className={`${createNewDisable? "disable" : ""}`} autoFocus defaultValue={`Untitle Group`} onChange={inputChange} />
+
+      </div>
+      ):""}
+      
+      {createNewDisable && createNewVisible ? (
+      <div className={moveClasses.newCategoryWarn}>
+        <div>특수문자는 + - _ . 만 입력 가능합니다</div>
+      </div>) : ""}
     </div>
     <div className="footer">
-      <Button>
+      <Button onClick={e=>{setCreateNewVisible(prev=>!prev)}}>
         <Add />
-        <div>그룹 추가하기</div>
+        <div>그룹 추가하기</div>  
       </Button>
       <div>
         <Button variant="contained" disableElevation color="secondary" onClick={()=>{closeEvent(false)}} >취소</Button>

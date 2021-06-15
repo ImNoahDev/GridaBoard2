@@ -68,7 +68,7 @@ export const theme = createMuiTheme({
       contrastText : "#666666"
     },
     error: {
-      main: "#ff0000",
+      main: "#FF4C4C",
     },
     background: {
       paper: "#FFFFFF", 
