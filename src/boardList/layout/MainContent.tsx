@@ -198,6 +198,12 @@ const useStyle = makeStyles(theme =>({
           color: theme.palette.text.secondary,
     
         }
+      },
+      "& > .hover" : {
+        width: "100%",
+        height: "135px",
+        background : "rgba(0, 0, 0, 0.2)",
+        position: "absolute",
       }
     }
   },
@@ -206,12 +212,7 @@ const useStyle = makeStyles(theme =>({
     width: "100%",
     height: "100%",
     border: `2px solid ${theme.palette.primary.main}`,
-    pointerEvents: "none",
-    "& > div:first-child" : {
-      width: "100%",
-      height: "133px",
-      background : "rgba(0, 0, 0, 0.2)"
-    }
+    pointerEvents: "none"
   },
   buttonStyle : {
     width: "93px",

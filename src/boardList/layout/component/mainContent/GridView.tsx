@@ -1,4 +1,4 @@
-import { makeStyles, Grow, IconButton, Checkbox } from "@material-ui/core";
+import { makeStyles, Grow, IconButton, Checkbox, Fade } from "@material-ui/core";
 import React, { useEffect, useState } from "react";
 import MoreVert from "@material-ui/icons/MoreVert";
 import { getTimeStamp } from "../../../BoardListPageFunc";
@@ -162,11 +162,10 @@ const GridView = (props : Props)=>{
                   />
                 </div>
               </Grow>
-              {selectedItems.includes(el) ? (
-              <div className={selectedClass}>
-                <div />
-              </div>
-              ) : ""}
+              <Fade in={showCheckBoxes[idx]}>
+              <div className="hover"/>
+              </Fade>
+              {selectedItems.includes(el) ? (<div className={selectedClass} />) : ""}
               <Grow in={showMoreBtns[idx]} >
                 <div className={classes.moreBtn}>
                   <IconButton onClick={(e) =>{
