@@ -11,18 +11,21 @@ import { makeNPageIdStr } from "nl-lib/common/util";
 import { PLAYSTATE, ZoomFitEnum } from "nl-lib/common/enums";
 import { nullNcode } from "nl-lib/common/constants";
 import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
+import $ from 'jquery';
 
-const DEFAULT_THUMBNAIL_SIDE_MARGIN = 5;
+const DEFAULT_THUMBNAIL_SIDE_MARGIN = 26;
 
 const useStyle = makeStyles(theme => ({
   paper : {
-    margin: `10px ${DEFAULT_THUMBNAIL_SIDE_MARGIN}px`,
+    margin: `10px 0px`,
+    marginLeft: "40px",
+    marginRight: "26px",
     overflow: "hidden",
     position: "relative"
   },
   mixedViewer : {
     position: "absolute",
-    margin: 0,
+    margin: "0",
     padding: 0,
     right: 0,
     left: 0,
@@ -63,7 +66,16 @@ const useStyle = makeStyles(theme => ({
   removeBtnMouseDown : {
     transform: "scale(0.85) !important",
     color: "#555555"
-  }
+  },
+  pageNumber: {
+    float: "left", 
+    marginLeft: "24px", 
+    alignItems: "center",
+    fontSize: "14px",
+    fontWeight: 400,
+    lineHeight: "16.41px",
+    fontFamily: "Roboto",
+  },
 }));
 interface Props {
   pageNo: number,
@@ -72,6 +84,7 @@ interface Props {
   active: boolean,
 
   noInfo?: boolean,
+  scrollbarVisible: boolean,
 }
 
 const ThumbnailItem = (props: Props) => {
@@ -117,66 +130,82 @@ const ThumbnailItem = (props: Props) => {
 
   const wh_ratio = sizePu.width / sizePu.height;
 
-  const height = (drawerWidth - DEFAULT_THUMBNAIL_SIDE_MARGIN*2) / wh_ratio;
+  let height;
+  if (!props.scrollbarVisible) {
+    height = (drawerWidth - (DEFAULT_THUMBNAIL_SIDE_MARGIN*2 + 14)) / wh_ratio; //14 : 추가된 왼쪽 마진
+  } else {
+    height = (drawerWidth - (DEFAULT_THUMBNAIL_SIDE_MARGIN*2 + 14 + 17)) / wh_ratio; //17 : 스크롤바
+  }
+
+
   const playState = PLAYSTATE.live;
   let isMouseDown = false;
 
   // console.log(`thumbnail - ${pn}: pageNo: ${pdfPageNo} pdf: ${pdf} pdfUrl: ${pdfUrl} fingerprint: ${pdfFingerprint} `)
   return (
-    <Paper key={props.key} className={classes.paper} onClick={e => handleMouseDown(pn)} elevation={3} style={{ height: height }} onMouseOver={e=>{setShowDeleteBtn(false)}} onMouseLeave={e=>setShowDeleteBtn(false)}>
-      <div className={`${classes.mixedViewer} ${(activePageNo === pn? classes.selected:"")}`}>
-        <MixedPageView
-          pdf={pdf}
-          pdfUrl={pdfUrl} filename={pdfFilename}
-          pdfPageNo={pdfPageNo}
-          playState={playState} pens={[]}
-          rotation={rotation}
-          isMainView={false}
+    <React.Fragment>
+    <div id="thumbnail"> 
+      <span className={classes.pageNumber}>{pn+1}</span>
+      <Paper key={props.key} className={classes.paper} onClick={e => handleMouseDown(pn)} elevation={3} style={{ height: height }} 
+      onMouseOver={e=>{setShowDeleteBtn(false)}} onMouseLeave={e=>setShowDeleteBtn(false)}>
+        <div className={`${classes.mixedViewer} ${(activePageNo === pn? classes.selected:"")}`}>
+          <MixedPageView  
+            pdf={pdf}
+            pdfUrl={pdfUrl} filename={pdfFilename}
+            pdfPageNo={pdfPageNo}
+            playState={playState} pens={[]}
+            rotation={rotation}
+            isMainView={false}
 
-          pageInfo={pageInfo}
-          basePageInfo={basePageInfo}
+            pageInfo={pageInfo}
+            basePageInfo={basePageInfo}
 
-          parentName={`thumbnail - ${pn} `}
-          viewFit={ZoomFitEnum.FULL}
-          autoPageChange={false}
-          fromStorage={true}
-          fitMargin={5}
-          // fixed
-          noInfo
+            parentName={`thumbnail - ${pn} `}
+            viewFit={ZoomFitEnum.FULL}
+            autoPageChange={false}
+            fromStorage={true}
+            fitMargin={5}
+            // fixed
+            noInfo
 
-          activePageNo={activePageNo}
+            activePageNo={activePageNo}
 
-          renderCountNo={renderCountNo}
-        />
-      </div>
-      <Grow in={showDeleteBtn}>
-        <div className={classes.removeBtn}>
-          <DeleteForeverIcon />
-          <div
-        onMouseDown={e=>{
-          isMouseDown = true;
-          e.currentTarget.parentElement.classList.add(classes.removeBtnMouseDown);
-        }}
-        onMouseUp={e=>{
-          if(!isMouseDown) return ;
-          isMouseDown = false;
-          e.currentTarget.parentElement.classList.remove(classes.removeBtnMouseDown);
-
-          GridaDoc.getInstance().removePages(pn);
-        }}
-        onMouseOut={e=>{
-          isMouseDown = false;
-          e.currentTarget.parentElement.classList.remove(classes.removeBtnMouseDown);
-        }}></div>
+            renderCountNo={renderCountNo}
+          />
         </div>
-      </Grow>
-      <div className={classes.debuggerInfo}>
-        {!props.noInfo
-          ? <Typography style={{ color: "#f00" }}> {makeNPageIdStr(page.pageInfos[0])}</Typography>
-          : ""
-        }
-      </div>
-    </Paper>
+        
+        <Grow in={showDeleteBtn}>
+          <div className={classes.removeBtn}>
+            <DeleteForeverIcon />
+            <div
+          onMouseDown={e=>{
+            isMouseDown = true;
+            e.currentTarget.parentElement.classList.add(classes.removeBtnMouseDown);
+          }}
+          onMouseUp={e=>{
+            if(!isMouseDown) return ;
+            isMouseDown = false;
+            e.currentTarget.parentElement.classList.remove(classes.removeBtnMouseDown);
+
+            GridaDoc.getInstance().removePages(pn);
+          }}
+          onMouseOut={e=>{
+            isMouseDown = false;
+            e.currentTarget.parentElement.classList.remove(classes.removeBtnMouseDown);
+          }}></div>
+          </div>
+        </Grow>
+
+        <div className={classes.debuggerInfo}>
+          {!props.noInfo
+            ? <Typography style={{ color: "#f00" }}> {makeNPageIdStr(page.pageInfos[0])}</Typography>
+            : ""
+          }
+        </div>
+        
+      </Paper>
+    </div>
+    </React.Fragment>
   )
 }
 
