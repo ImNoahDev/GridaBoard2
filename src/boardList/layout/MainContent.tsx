@@ -204,6 +204,7 @@ const useStyle = makeStyles(theme =>({
         height: "135px",
         background : "rgba(0, 0, 0, 0.2)",
         position: "absolute",
+        pointerEvents: "none"
       }
     }
   },
