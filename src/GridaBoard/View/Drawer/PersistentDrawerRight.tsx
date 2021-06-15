@@ -1,22 +1,15 @@
-import React, { useCallback, useEffect } from 'react';
-import { makeStyles, useTheme, Theme, createStyles } from '@material-ui/core/styles';
+import React, { useEffect } from 'react';
+import { makeStyles, useTheme, Theme } from '@material-ui/core/styles';
 import Drawer from '@material-ui/core/Drawer';
-import IconButton from '@material-ui/core/IconButton';
-import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
-import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import { BoxProps, Button } from '@material-ui/core';
 import DrawerPages from './DrawerPages';
-import { updateDrawerWidth } from '../../store/reducers/ui';
 import { RootState } from '../../store/rootReducer';
 import { useSelector } from "react-redux";
 import AddIcon from '@material-ui/icons/Add';
 import GridaDoc from '../../GridaDoc';
 import { setActivePageNo } from "../../store/reducers/activePageReducer";
 import { scrollToBottom } from '../../../nl-lib/common/util';
-import $ from "jquery";
-import { sum } from 'pdf-lib';
 import getText from "../../language/language";
-import CustomBadge from "../../components/CustomElement/CustomBadge";
 
 
 const addBlankPage = async (event) => {
@@ -120,12 +113,6 @@ const useStyles = props => makeStyles((theme: Theme) => ({
 }));
 
 
-
-const minDrawerWidth = 50;
-const maxDrawerWidth = 1000;
-
-
-
 interface Props extends BoxProps {
   onDrawerResize: (size: number) => void,
   open: boolean,
@@ -139,12 +126,23 @@ export default function PersistentDrawerRight(props: Props) {
   const classes = useStyles({brZoom:brZoom, drawerWidth:drawerWidth})();
   const theme = useTheme();
   const [open, setOpen] = React.useState(props.open);
+  const drawerContent = document.getElementById("drawer_content")
+  // const [scrollbarVisible, setScrollbarVisible] = useState(false);
   // const [handleDrawerClose, setHandleDrawerClose] = React.useState(props.handleDrawerClose);
 
   // const [drawerWidth, setDrawerWidth] = React.useState(defaultDrawerWidth);
   // const setDrawerWidth = (width: number) => updateDrawerWidth({ width });
   useEffect(() => { setOpen(props.open); }, [props.open]);
 
+  let scrollbarVisible = false;
+
+  if (drawerContent !== null) {
+    if (drawerContent.scrollHeight > drawerContent.clientHeight) {
+      scrollbarVisible = true;
+    } else {
+      scrollbarVisible = false;
+    }
+  }
 
   return (
       <Drawer
@@ -159,7 +157,7 @@ export default function PersistentDrawerRight(props: Props) {
       >
       {/* <Toolbar className={classes.customizeToolbar} /> */}
         <div id="drawer_content" className={classes.drawerContainer}>
-          < DrawerPages noInfo={props.noInfo} />
+          < DrawerPages noInfo={props.noInfo} scrollbarVisible={scrollbarVisible} />
           <div className={classes.liner}></div>
           
           <div className={classes.drawerFooter} >
