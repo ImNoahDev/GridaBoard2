@@ -162,7 +162,11 @@ const GridView = (props : Props)=>{
                   />
                 </div>
               </Grow>
-              {selectedItems.includes(el) ? (<div className={selectedClass}/>) : ""}
+              {selectedItems.includes(el) ? (
+              <div className={selectedClass}>
+                <div />
+              </div>
+              ) : ""}
               <Grow in={showMoreBtns[idx]} >
                 <div className={classes.moreBtn}>
                   <IconButton onClick={(e) =>{

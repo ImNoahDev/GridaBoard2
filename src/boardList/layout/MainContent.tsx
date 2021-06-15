@@ -207,6 +207,11 @@ const useStyle = makeStyles(theme =>({
     height: "100%",
     border: `2px solid ${theme.palette.primary.main}`,
     pointerEvents: "none",
+    "& > div:first-child" : {
+      width: "100%",
+      height: "133px",
+      background : "rgba(0, 0, 0, 0.2)"
+    }
   },
   buttonStyle : {
     width: "93px",
