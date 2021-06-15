@@ -7,7 +7,6 @@ import $ from 'jquery';
 
 interface Props {
   noInfo?: boolean,
-  scrollbarVisible: boolean,
 }
 
 interface State {
@@ -32,7 +31,7 @@ const DrawerPages = (props: Props, state:State) => {
       </Box> */}
       {pages.map((page, i) =>
         // ""
-        <ThumbnailItem key={i} noInfo={props.noInfo} pageNo={i} active={activePageNo === i} scrollbarVisible={props.scrollbarVisible}/>
+        <ThumbnailItem key={i} noInfo={props.noInfo} pageNo={i} active={activePageNo === i} />
       )}
     </div>
   );
