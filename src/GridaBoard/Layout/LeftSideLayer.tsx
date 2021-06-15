@@ -58,16 +58,12 @@ const useStyle = props => makeStyles(theme=>({
   }
 }));
 
-const LeftSideLayer = () => {
-  const [drawerOpen, setDrawerOpen] = useState(false);
+const LeftSideLayer = (props) => {
+  const {drawerOpen} = props;
+  // const [drawerOpen, setDrawerOpen] = useState(false);
   const setDrawerWidth = (width: number) => updateDrawerWidth({ width });
   const activePageNo_store = useSelector((state: RootState) => state.activePage.activePageNo);
   
-  const handleDrawerOpen = () => {
-    if(activePageNo_store === -1) return ;
-    setDrawerOpen((prev)=>!prev);
-  };
-
   const onDrawerResize = (size) => {
     setDrawerWidth(size);
   }
@@ -76,12 +72,10 @@ const LeftSideLayer = () => {
   const drawerWidth = useSelector((state: RootState) => state.ui.drawer.width);
   const classes = useStyle({brZoom:brZoom, drawerOpen:drawerOpen, drawerWidth:drawerWidth})()
 
-
   let disabled = true;
+
   if (activePageNo_store !== -1) {
     disabled = false;
-  }else if(drawerOpen){
-    setDrawerOpen(false);
   }
   
   return (
@@ -91,16 +85,6 @@ const LeftSideLayer = () => {
             open={drawerOpen} onDrawerResize={onDrawerResize}
             noInfo = {true}
           />
-          <div id="arrow-btn" className={clsx(classes.opener,{
-            [classes.contentShift] : drawerOpen,
-            [classes.openerHover] : !disabled
-          })} onClick={handleDrawerOpen}>
-          <CustomBadge badgeContent={`L`}>
-            <IconButton disabled={disabled}>
-              {drawerOpen? (<ArrowLeft />) : (<ArrowRight />)}
-            </IconButton>
-          </CustomBadge>
-          </div>
       </div>
   );
 }

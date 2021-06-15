@@ -4,19 +4,13 @@ import { RootState } from "../store/rootReducer";
 import GridaDoc from "../GridaDoc";
 import { NeoPdfDocument } from "nl-lib/common/neopdf";
 import { IFileBrowserReturn } from "nl-lib/common/structures";
-
 import { nullNcode } from "nl-lib/common/constants";
 import { MixedPageView } from "nl-lib/renderer";
 import { PLAYSTATE } from "nl-lib/common/enums";
 import { PenManager } from "nl-lib/neosmartpen";
-import RotateButton from "../components/buttons/RotateButton";
-import GridaToolTip from "../styles/GridaToolTip";
-import { Button, IconButton, makeStyles, Popover } from "@material-ui/core";
-import HelpIcon from '@material-ui/icons/Help';
-import PageClearButton from "../components/buttons/PageClearButton";
-import CustomBadge from "../components/CustomElement/CustomBadge";
+import { makeStyles } from "@material-ui/core";
 import InformationButton from "../components/buttons/InformationButton";
-import getText, { languageType } from "../language/language";
+import { languageType } from "../language/language";
 
 const useStyle = props=>makeStyles(theme=>({
   root : {
@@ -25,30 +19,6 @@ const useStyle = props=>makeStyles(theme=>({
     flex: 1,
     overflow: "auto",
     flexDirection: "column"
-  },
-  sideEventer : {
-    position: "fixed",
-    zIndex: 100,
-    right: "0px",
-    padding: "24px",
-    "& > span" : {
-      display: "flex",
-      "& > button": {
-        width: "56px",
-        height: "56px",
-        background: theme.custom.white[80],
-        boxShadow: "2px 0px 24px rgba(0, 0, 0, 0.15), inset 0px 2px 0px rgba(255, 255, 255, 1)",
-        borderRadius: "50%",
-        display: "block",
-        zoom: 1 / props.brZoom,
-        "&:hover": {
-          color: theme.palette.action.hover,
-        },
-      }
-    },
-    "& > span:first-child": {
-      marginBottom: "16px"
-    }
   },
   information : {
     right: "24px",
@@ -149,14 +119,6 @@ const ContentsLayer = (props: Props) => {
 
   return (
     <div id="main" className={`${classes.root}`}>
-      <div className={`${classes.sideEventer}`}>
-        <CustomBadge badgeContent={`TAB`}>
-          <RotateButton disabled={activePageNo_store === -1} />
-        </CustomBadge>
-        <CustomBadge badgeContent={`Y`}>
-          <PageClearButton disabled={activePageNo_store === -1} />
-        </CustomBadge>
-      </div>
       {(languageType === "ko") ? <InformationButton className={classes.information}/> : ""}
       
       <div id="mixed-viewer-layer" style={{
