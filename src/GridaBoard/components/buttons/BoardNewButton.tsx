@@ -45,7 +45,6 @@ const menuStyle = makeStyles(theme => ({
     borderRight: '0px !important',
   },
   menuItem: {
-    minWidth: '130px',
   },
 }));
 
@@ -89,6 +88,7 @@ const BoardNewButton = () => {
     const pageNo = await doc.addBlankPage();
     setActivePageNo(pageNo);
     scrollToBottom("drawer_content");
+    setOpen(false);
   }
 
   return (
@@ -100,7 +100,7 @@ const BoardNewButton = () => {
           <div style={{ marginRight: "15px"}}><ArrowDropDown /></div>
         </Button>
       </div>
-      <Popper open={open} anchorEl={anchorRef.current} role={undefined} transition disablePortal style={{ zIndex: 10 }}>
+      <Popper open={open} anchorEl={anchorRef.current} role={undefined} transition disablePortal style={{ zIndex: 10, width: 500 }}>
         {({ TransitionProps, placement }) => (
           <Grow
             {...TransitionProps}
@@ -109,6 +109,8 @@ const BoardNewButton = () => {
               borderRadius: '12px',
               height: '96px',
               width: '240px',
+              marginLeft: '20px',
+              marginTop: '5px'
             }}>
             <Paper>
               <ClickAwayListener onClickAway={handleClose}>

@@ -7,6 +7,7 @@ import { useSelector } from 'react-redux';
 import GridaDoc from "../../GridaDoc";
 import { IconButton, IconButtonProps, makeStyles, SvgIcon } from "@material-ui/core";
 import { RotateRight } from "@material-ui/icons";
+import SimpleTooltip2 from "../SimpleTooltip2";
 
 const RotateButton = (props: IconButtonProps) => {
   const doc = GridaDoc.getInstance();
@@ -56,7 +57,9 @@ const RotateButton = (props: IconButtonProps) => {
     //   }} title={undefined}>
   return (
     <IconButton id="pageRotateButton" onClick={onToggleRotate} {...props}>
-      <RotateRight/>
+      <SimpleTooltip2 title="회전">
+        <RotateRight/>
+      </SimpleTooltip2>
     </IconButton>
   );
 }

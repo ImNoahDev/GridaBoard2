@@ -34,7 +34,7 @@ const useStyle = makeStyles(theme => ({
     boxShadow: theme.custom.shadows[0],
     borderRadius: "12px",
     zIndex: 10000,
-    marginLeft: "-160px",
+    marginLeft: "-130px",
     color : theme.custom.icon.mono[0],
     background: theme.custom.white[90],
     "& > span > button" : {

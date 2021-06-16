@@ -7,6 +7,7 @@ import { setLoadingVisibility } from '../store/reducers/loadingCircle';
 import GridaDoc from "../GridaDoc";
 import { InkStorage } from '../../nl-lib/common/penstorage';
 import { useHistory } from 'react-router';
+import { scrollToBottom } from '../../nl-lib/common/util';
 
 // import {fileConvert} from "./LoadGrida";
 
@@ -81,6 +82,8 @@ function fileConvert(selectedFile){
       const doc = GridaDoc.getInstance();
       await doc.openGridaFile({ url: url, filename: file.name }, pdfRawData, neoStroke, pageInfos, basePageInfos);
       setLoadingVisibility(false);
+      scrollToBottom("drawer_content");
+      
     }
   } else {
       alert(getText("alert_fileOpenCancel"));
