@@ -148,12 +148,12 @@ export default function PersistentDrawerRight(props: Props) {
           < DrawerPages noInfo={props.noInfo} />
           <div className={classes.liner}></div>
           
-          <div className={classes.drawerFooter} >
+          {/* <div className={classes.drawerFooter} >
             <Button variant="contained" color="primary" onClick={(evnet) => addBlankPage(event)} >
               <AddIcon />
               <span >{getText("add_page")}</span>
             </Button>
-          </div>
+          </div> */}
         </div>
       </Drawer>
   );

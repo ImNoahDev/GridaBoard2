@@ -142,7 +142,7 @@ const ThumbnailItem = (props: Props) => {
     <React.Fragment>
     <div id="thumbnail"> 
       <div className={classes.pageNumber}>{pn+1}</div>
-      <Paper key={props.key} className={classes.paper} onClick={e => handleMouseDown(pn)} elevation={3} style={{ height: height }} 
+      <Paper key={props.key} className={classes.paper} onClick={e => handleMouseDown(pn)} elevation={3} style={{ width: width, height: height }} 
       onMouseOver={e=>{setShowDeleteBtn(false)}} onMouseLeave={e=>setShowDeleteBtn(false)}>
         <div className={`${classes.mixedViewer} ${(activePageNo === pn? classes.selected:"")}`}>
           <MixedPageView  

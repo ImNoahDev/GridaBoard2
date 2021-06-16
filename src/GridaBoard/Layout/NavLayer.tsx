@@ -22,6 +22,7 @@ import { RootState } from "../store/rootReducer";
 import { Collapse, IconButton, makeStyles } from "@material-ui/core";
 import CustomBadge from "../components/CustomElement/CustomBadge"
 import { ArrowDropDown, ArrowDropUp } from "@material-ui/icons";
+import BoardNewButton from "../components/buttons/BoardNewButton";
 
 const useStyle = props => makeStyles(theme => ({
   navStyle : {
@@ -143,6 +144,7 @@ const NavLayer = (props) => {
   return (
     <div className={classes.navStyle}>
         <div>
+          <BoardNewButton />
           <PenTypeButton />
 
           <CustomBadge badgeContent={`1~0`}>
@@ -159,7 +161,7 @@ const NavLayer = (props) => {
         </div>
 
         <div>
-          <PageNumbering />
+          {/* <PageNumbering /> */}
         </div>
 
         <div>
