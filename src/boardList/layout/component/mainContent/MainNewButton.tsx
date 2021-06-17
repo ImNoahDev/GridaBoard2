@@ -4,7 +4,7 @@ import getText from 'GridaBoard/language/language';
 import { ArrowDropDown, Add } from '@material-ui/icons';
 import { useHistory } from 'react-router';
 import GridaDoc from '../../../../GridaBoard/GridaDoc';
-import { addNewPage } from '../../../BoardListPageFunc';
+import { startNewGridaPage } from '../../../BoardListPageFunc';
 import { IFileBrowserReturn, IPageSOBP } from '../../../../nl-lib/common/structures';
 import ConvertFileLoad from '../../../../GridaBoard/Load/ConvertFileLoad';
 
@@ -90,10 +90,12 @@ const MainNewButton = () => {
     input.click();
   };
 
-  const startGrida = () => {
+  const startGrida = async () => {
+    await startNewGridaPage();
+
+    //이거 하면 contents layer의 useEffect부터 불리고 거기서 이전 activePageNo로 로직이 수행돼서 에러나니까 페이지 바뀌기 전에 activePageNo을 미리 바꿔줘야함
     const path = `/app`;
-    history.push(path);
-    addNewPage();
+    history.push(path); 
 
     setOpen(false);
   };

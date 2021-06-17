@@ -44,6 +44,9 @@ interface Props {
 const ContentsLayer = (props: Props) => {
   const { handlePdfOpen, ...rest } = props;
   const [pageWidth, setPageWidth] = useState(0);
+  const [pdfPageNo, setPdfPageNo] = useState(1);
+  const [pageInfos, setPageInfos] = useState([nullNcode()]);
+
   const {zoomStore} = useSelector((state: RootState) =>({
     zoomStore: state.zoomReducer.zoom as number,
   }));
@@ -68,11 +71,8 @@ const ContentsLayer = (props: Props) => {
   const pdfUrl = undefined as string;
   const pdfFilename = undefined as string;
   let pdf = undefined as NeoPdfDocument;
-  let pdfPageNo = 1;
   let rotation = 0;
-  let pageInfos = [nullNcode()];
   let basePageInfo = nullNcode();
-  let pdfFingerprint = undefined as string;
 
   const viewFit_store = useSelector((state: RootState) => state.viewFitReducer.viewFit);
 
@@ -86,23 +86,23 @@ const ContentsLayer = (props: Props) => {
     if (activePageNo_store !== activePageNo) {
       setLocalActivePageNo(activePageNo_store);
     }
+
+    if (activePageNo_store >= 0) {
+      const doc = GridaDoc.getInstance();
+      const page = doc.getPageAt(activePageNo_store)
+      if (page._pdfPage !== undefined) {
+        rotation = page._pdfPage.viewport.rotation;
+      } else {
+        rotation = page.pageOverview.rotation;
+      }
+      pdf = page.pdf;
+  
+      setPdfPageNo(doc.getPdfPageNoAt(activePageNo_store))
+      setPageInfos(doc.getPageInfosAt(activePageNo_store));
+      basePageInfo = doc.getBasePageInfoAt(activePageNo_store);
+    }
   }, [activePageNo_store])
 
-  if (activePageNo_store >= 0) {
-    const doc = GridaDoc.getInstance();
-    const page = doc.getPageAt(activePageNo_store)
-    if (page._pdfPage !== undefined) {
-      rotation = page._pdfPage.viewport.rotation;
-    } else {
-      rotation = page.pageOverview.rotation;
-    }
-    pdf = page.pdf;
-
-    pdfFingerprint = doc.getPdfFingerprintAt(activePageNo_store);
-    pdfPageNo = doc.getPdfPageNoAt(activePageNo_store);
-    pageInfos = doc.getPageInfosAt(activePageNo_store);
-    basePageInfo = doc.getBasePageInfoAt(activePageNo_store);
-  }
 
   const {renderCountNo_store} = useSelector((state: RootState) =>({
     renderCountNo_store: state.activePage.renderCount,

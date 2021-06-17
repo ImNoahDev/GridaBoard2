@@ -91,6 +91,14 @@ export class MappingStorage {
       arrDocMap: [],
     };
   }
+
+  public resetTemporary = () => {
+    this._temporary = {
+      nextIssuable: { ...g_defaultNcode },
+      arrDocMap: [],
+    };
+  }
+
   get nextIssuable() {
     return this._data.nextIssuable;
   }

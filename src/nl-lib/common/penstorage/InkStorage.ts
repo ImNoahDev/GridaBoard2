@@ -65,6 +65,10 @@ export default class InkStorage {
     return _storage_instance;
   }
 
+  public resetStrokes() {
+    this.completed = [];
+    this.completedOnPage = new Map();
+  }
   /**
    *
    * @param eventName
