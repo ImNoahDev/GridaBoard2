@@ -196,7 +196,7 @@ const SavePdfDialog = (props: Props) => {
             },
             async function () {
               thumbUploadTask.snapshot.ref.getDownloadURL().then(function (thumb_path) {
-                updateDB(docName, thumb_path, grida_path);
+                updateDB(docName, thumb_path, grida_path, date);
               });
             }
           );

@@ -20,6 +20,7 @@ import CombineDialog from './layout/component/dialog/CombineDialog';
 import { getCategoryArray } from "./BoardListPageFunc2";
 import GlobalDropdown from './layout/component/GlobalDropdown';
 import { setDefaultCategory, getDatabase } from "./BoardListPageFunc2"
+import { getTimeStamp } from './BoardListPageFunc';
 
 const useStyle = makeStyles(theme => ({
   mainBackground: {
@@ -197,9 +198,7 @@ const BoardList = () => {
         setDocName(nowDocs.doc_name);
         setIsNewDoc(false);
 
-        const n_sec = nowDocs.created.nanoseconds.toString().substring(0,3);
-        const sec = nowDocs.created.seconds.toString();
-        const m_sec = sec + n_sec;
+        const m_sec = getTimeStamp(nowDocs.created)
         setDate(m_sec);
     });
   };

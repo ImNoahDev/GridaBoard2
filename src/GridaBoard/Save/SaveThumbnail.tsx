@@ -378,12 +378,14 @@ export async function saveThumbnail(docName: string) {
   // saveAs(blob, 'abc.png');
 }
 
-export async function updateDB(docName: string, thumb_path: string, grida_path: string) {
+export async function updateDB(docName: string, thumb_path: string, grida_path: string, date) {
   const db = firebase.firestore();
   const userId = firebase.auth().currentUser.email;
 
+  const docId = `${userId}_${docName}_${date}`;
+
   db.collection(userId)
-    .doc(docName)
+    .doc(docId)
     .update({
       last_modified: new Date(),
       grida_path: grida_path,

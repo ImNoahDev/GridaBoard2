@@ -95,7 +95,7 @@ const GridaBoard = () => {
   const classes = useStyle();
   useEffect(() => {
     if (!paperInfoInited) {
-      showUIProgressBackdrop();
+      // showUIProgressBackdrop();
       fetchGzippedFile("./nbs_v2.json.gz").then(async (nbs) => {
         if (nbs.length > 10) {
           g_paperType.definition = JSON.parse(nbs);
@@ -106,7 +106,7 @@ const GridaBoard = () => {
             g_paperType.definition[key] = g_paperType_default[key];
           }
         }
-        hideUIProgressBackdrop(); 
+        // hideUIProgressBackdrop(); 
         setPaperInfoInited(true);
       }
       ).catch((e) => {
