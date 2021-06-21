@@ -12,6 +12,7 @@ import getText from "../language/language";
 import { makeThumbnail, saveThumbnail, updateDB } from './SaveThumbnail';
 import { store } from '../client/pages/GridaBoard';
 import firebase from 'GridaBoard/util/firebase_config';
+import { setDocName } from '../store/reducers/docConfigReducer';
 
 
 const useStyles = makeStyles((theme) => {
@@ -239,6 +240,7 @@ const SavePdfDialog = (props: Props) => {
       savePDF(selectedName);
     } else if (saveType === "saveAs" || saveType === "overwrite") {
       saveThumbnail(selectedName);
+      setDocName(selectedName);
     } 
     setOpen(false);
     onReset();
