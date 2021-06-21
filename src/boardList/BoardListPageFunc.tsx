@@ -11,6 +11,7 @@ import { InkStorage } from '../nl-lib/common/penstorage';
 export const startNewGridaPage = async () => {
   const doc = GridaDoc.getInstance();
   doc.pages = [];
+  doc._pdfd = [];
   
   MappingStorage.getInstance().resetTemporary();
   InkStorage.getInstance().resetStrokes();
