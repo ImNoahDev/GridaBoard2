@@ -5,15 +5,21 @@ import GridaToolTip from "../../styles/GridaToolTip";
 import { Button, makeStyles, ClickAwayListener, Icon } from "@material-ui/core";
 import $ from "jquery";
 import getText from "../../language/language";
+import { ArrowDropDown, KeyboardArrowDown } from "@material-ui/icons";
 
 const themeManager: ThemeManager = ThemeManager.getInstance();
 const useStyle = makeStyles(theme => ({
   buttonStyle : {
-    marginRight: "4px",
+    width: "180px",
+    height: "40px",
     color : theme.custom.icon.mono[0],
+    background: '#FFFFFF',
     "&:hover" : {
       color : theme.palette.action.hover
-    }
+    },
+    "& > span" : {
+    },
+
   },
   dropDown : {
     display: "flex",
@@ -81,9 +87,10 @@ export default function BackgroundButton() {
       <div>
         <div>
           <Button variant="outlined" type="button" className={classes.buttonStyle} onClick={handleClick}>
-                <span>
-                  {getText(`nav_background_${themeNameArr[theme]}`)}
-                </span>
+            <div style={{width: "122px", textAlign: "left"}}>
+              {getText(`nav_background_${themeNameArr[theme]}`)}
+            </div>
+            <div ><KeyboardArrowDown /></div>
           </Button>
         </div>
         {isOpen? (<div className={classes.dropDown}>

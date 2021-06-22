@@ -1,19 +1,21 @@
-import { Button, ClickAwayListener, Grow, makeStyles, MenuItem, MenuList, Paper, Popper, SvgIcon } from '@material-ui/core';
+import { Button, ClickAwayListener, Grow, makeStyles, MenuItem, MenuList, Paper, Popper } from '@material-ui/core';
 import React, { useState } from 'react';
 import getText from 'GridaBoard/language/language';
-import { ArrowDropDown, Add } from '@material-ui/icons';
-import { useHistory } from 'react-router';
-import GridaDoc from '../../../../GridaBoard/GridaDoc';
-import { startNewGridaPage } from '../../../BoardListPageFunc';
-import { IFileBrowserReturn, IPageSOBP } from '../../../../nl-lib/common/structures';
-import ConvertFileLoad from '../../../../GridaBoard/Load/ConvertFileLoad';
+ import { ArrowDropDown, Add } from '@material-ui/icons';
+import GridaDoc from 'GridaBoard/GridaDoc';
+import { IFileBrowserReturn, IPageSOBP } from 'nl-lib/common/structures';
+import ConvertFileLoad from 'GridaBoard/Load/ConvertFileLoad';
+import { scrollToBottom } from '../../../nl-lib/common/util';
+import { setActivePageNo } from '../../store/reducers/activePageReducer';
 
 const menuStyle = makeStyles(theme => ({
   headerButton: {
-    width: '137px',
+    width: '73px',
     height: '40px',
-    backgroundColor: theme.palette.primary.main,
-    borderRadius: '28px',
+    marginLeft: '24px',
+    borderRadius: '4px',
+    borderColor: '#688FFF',
+    borderWidth: '1px',
     alignItems: 'center',
     '& > button': {
       textTransform: 'initial',
@@ -37,48 +39,25 @@ const menuStyle = makeStyles(theme => ({
     width: '1px',
     minWidth: '1px',
     minHeight: '1px',
-    height: '16px',
-    background: theme.custom.white[25],
-    borderRadius: '28px !important',
+    height: '15px',
+    background: theme.custom.grey[1],
+    borderRadius: '4px !important',
     borderRight: '0px !important',
   },
   menuItem: {
-    minWidth: '130px',
-  },
-  buttonStyle: {
-    padding: 0,
-    minWidth: '0px',
-    minHeight: '0px',
-  },
-  buttonFontStyle: {
-    minWidth: '0px',
-    fontFamily: 'Roboto',
-    fontStyle: 'normal',
-    fontWeight: 600,
-    lineHeight: '16.41px',
-    fontSize: '14px',
-    textAlign: 'right',
-    letterSpacing: '0.25px',
-    color: theme.palette.text.primary,
-    '&:hover': {
-      color: theme.palette.action.hover,
-      fontWeight: 700,
-    },
   },
 }));
 
-const MainNewButton = () => {
+const BoardNewButton = () => {
   const [open, setOpen] = useState(false);
   const anchorRef = React.useRef<HTMLDivElement>(null);
-  const options = [getText('create_new_board'), getText('import_pdf_pptx')];
+  const options = [getText('add_page'), getText('import_pdf_pptx')];
   const classes = menuStyle();
-  const history = useHistory();
 
   const handlePdfOpen = async (event: IFileBrowserReturn, pageInfo?: IPageSOBP, basePageInfo?: IPageSOBP) => {
     console.log(event.url);
     if (event.result === 'success') {
       const doc = GridaDoc.getInstance();
-      doc._pdfd = [];
       await doc.openPdfFile({ url: event.url, filename: event.file.name }, pageInfo, basePageInfo);
     } else if (event.result === 'canceled') {
       alert(getText('alert_fileOpenCancel'));
@@ -91,15 +70,6 @@ const MainNewButton = () => {
     input.click();
   };
 
-  const startGrida = async () => {
-    await startNewGridaPage();
-
-    //이거 하면 contents layer의 useEffect부터 불리고 거기서 이전 activePageNo로 로직이 수행돼서 에러나니까 페이지 바뀌기 전에 activePageNo을 미리 바꿔줘야함
-    const path = `/app`;
-    history.push(path); 
-
-    setOpen(false);
-  };
 
   const handleToggle = () => {
     setOpen(prevOpen => !prevOpen);
@@ -113,17 +83,24 @@ const MainNewButton = () => {
     setOpen(false);
   };
 
+  const addBlankPage = async (event) => {
+    const doc = GridaDoc.getInstance();
+    const pageNo = await doc.addBlankPage();
+    setActivePageNo(pageNo);
+    scrollToBottom("drawer_content");
+    setOpen(false);
+  }
+
   return (
     <React.Fragment>
       <div ref={anchorRef}>
-        <Button className={classes.headerButton} variant="contained" color="primary" onClick={handleToggle}>
-          <div style={{ marginRight: '15px' }}>{<Add />}</div>
-          <div style={{ marginRight: '16px' }}>{getText('word_New')}</div>
-          <div className={classes.headerButtonLiner} style={{ marginRight: '5px' }} />
-          <ArrowDropDown />
+        <Button className={classes.headerButton} variant="outlined" onClick={handleToggle}>
+          <div style={{ marginLeft: '13px' }}>{<Add />}</div>
+          <div className={classes.headerButtonLiner} style={{margin: '3px'}} />
+          <div style={{ marginRight: "15px"}}><ArrowDropDown /></div>
         </Button>
       </div>
-      <Popper open={open} anchorEl={anchorRef.current} role={undefined} transition disablePortal style={{ zIndex: 10 }}>
+      <Popper open={open} anchorEl={anchorRef.current} role={undefined} transition disablePortal style={{ zIndex: 10, width: 500 }}>
         {({ TransitionProps, placement }) => (
           <Grow
             {...TransitionProps}
@@ -132,12 +109,14 @@ const MainNewButton = () => {
               borderRadius: '12px',
               height: '96px',
               width: '240px',
+              marginLeft: '20px',
+              marginTop: '5px'
             }}>
             <Paper>
               <ClickAwayListener onClickAway={handleClose}>
                 <MenuList>
                   {/* map으로 돌릴 경우 onClick에 모든 index가 한번씩 들어옴 */}
-                  <MenuItem className={classes.menuItem} onClick={startGrida}>
+                  <MenuItem className={classes.menuItem} onClick={addBlankPage}>
                     <span style={{ marginLeft: '10px' }}>{options[0]}</span>
                   </MenuItem>
                   <MenuItem className={classes.menuItem} onClick={fileOpenHandler}>
@@ -154,4 +133,4 @@ const MainNewButton = () => {
   );
 };
 
-export default MainNewButton;
+export default BoardNewButton;

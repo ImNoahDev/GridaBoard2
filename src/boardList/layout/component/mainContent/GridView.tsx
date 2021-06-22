@@ -141,7 +141,7 @@ const GridView = (props : Props)=>{
         return (
           <React.Fragment key={keyStr}>
             <div key={keyStr} className={`contentItem`} onMouseOver={e => updateShowBtns(idx, true)} onMouseLeave={e => updateShowBtns(idx, false)}>
-              <div style={{backgroundImage:`url(${el.thumb_path})`}} onClick={() => routeChange(el.key)} />
+              <div style={{backgroundImage:`url(${el.thumb_path})`}} />
               <div>
                 <div>{el.doc_name}</div>
                 <div className="contentData">
@@ -162,8 +162,8 @@ const GridView = (props : Props)=>{
                   />
                 </div>
               </Grow>
-              <Fade in={showCheckBoxes[idx]}>
-              <div className="hover"/>
+              <Fade in={showCheckBoxes[idx]} >
+              <div className="hover" onClick={() => routeChange(el.key)}/>
               </Fade>
               {selectedItems.includes(el) ? (<div className={selectedClass} />) : ""}
               <Grow in={showMoreBtns[idx]} >

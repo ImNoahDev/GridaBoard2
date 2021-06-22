@@ -126,23 +126,11 @@ export default function PersistentDrawerRight(props: Props) {
   const classes = useStyles({brZoom:brZoom, drawerWidth:drawerWidth})();
   const theme = useTheme();
   const [open, setOpen] = React.useState(props.open);
-  const drawerContent = document.getElementById("drawer_content")
-  // const [scrollbarVisible, setScrollbarVisible] = useState(false);
   // const [handleDrawerClose, setHandleDrawerClose] = React.useState(props.handleDrawerClose);
 
   // const [drawerWidth, setDrawerWidth] = React.useState(defaultDrawerWidth);
   // const setDrawerWidth = (width: number) => updateDrawerWidth({ width });
   useEffect(() => { setOpen(props.open); }, [props.open]);
-
-  let scrollbarVisible = false;
-
-  if (drawerContent !== null) {
-    if (drawerContent.scrollHeight > drawerContent.clientHeight) {
-      scrollbarVisible = true;
-    } else {
-      scrollbarVisible = false;
-    }
-  }
 
   return (
       <Drawer
@@ -157,15 +145,15 @@ export default function PersistentDrawerRight(props: Props) {
       >
       {/* <Toolbar className={classes.customizeToolbar} /> */}
         <div id="drawer_content" className={classes.drawerContainer}>
-          < DrawerPages noInfo={props.noInfo} scrollbarVisible={scrollbarVisible} />
+          < DrawerPages noInfo={props.noInfo} />
           <div className={classes.liner}></div>
           
-          <div className={classes.drawerFooter} >
+          {/* <div className={classes.drawerFooter} >
             <Button variant="contained" color="primary" onClick={(evnet) => addBlankPage(event)} >
               <AddIcon />
               <span >{getText("add_page")}</span>
             </Button>
-          </div>
+          </div> */}
         </div>
       </Drawer>
   );

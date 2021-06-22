@@ -57,7 +57,7 @@ const useStyle = makeStyles(theme =>({
     "& > .listNav" : {
       display: "flex",
       "& > div:first-child" : {
-        marginRight: "24px"
+        marginRight: "0px"
       },
       "& > *:nth-child(2)":{
         "& > *" : {
@@ -393,7 +393,7 @@ const MainContent = (props : Props)=>{
     </div>)
     }
 
-
+ 
     <div className={classes.gridContent} ref={contentRef}>
       {listType === "grid" ? 
       (<GridView selectedItems={selectedItems} category={selected} docsList={nowDocs} updateSelectedItems={updateSelectedItems} selectedClass={classes.selected} routeChange={routeChange} />)

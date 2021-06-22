@@ -1,18 +1,24 @@
 import GridaDoc from 'GridaBoard/GridaDoc';
 import { setActivePageNo } from '../GridaBoard/store/reducers/activePageReducer';
-import { setIsNewDoc } from '../GridaBoard/store/reducers/docConfigReducer';
+import { setDocName, setIsNewDoc } from '../GridaBoard/store/reducers/docConfigReducer';
 import firebase from 'GridaBoard/util/firebase_config';
 import { IBoardData } from './structures/BoardStructures';
 import { DeveloperBoardRounded, DoubleArrowRounded } from '@material-ui/icons';
 import { saveToDB } from '../GridaBoard/Save/SaveThumbnail';
+import { MappingStorage } from '../nl-lib/common/mapper';
+import { InkStorage } from '../nl-lib/common/penstorage';
 
-export const addNewPage = async () => {
+export const startNewGridaPage = async () => {
   const doc = GridaDoc.getInstance();
   doc.pages = [];
+  doc._pdfd = [];
+  
+  MappingStorage.getInstance().resetTemporary();
+  InkStorage.getInstance().resetStrokes();
 
   const pageNo = await doc.addBlankPage();
   setActivePageNo(pageNo);
-
+  setDocName('undefined');
   setIsNewDoc(true);
 }
 

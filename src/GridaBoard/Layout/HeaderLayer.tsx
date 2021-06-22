@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Button, makeStyles, ClickAwayListener } from "@material-ui/core";
+import { Button, makeStyles, ClickAwayListener, IconButton } from "@material-ui/core";
 // import LoadGrida from "../Load/LoadGrida";
 import ConvertFileLoad from "../Load/ConvertFileLoad";
 import GridaDoc from "../GridaDoc";
@@ -19,6 +19,8 @@ import { CalibrationButton } from 'nl-lib/ncodepod';
 import CustomBadge from "../components/CustomElement/CustomBadge";
 import LogoSvg from "../logo.svg";
 import TestButton from "../components/buttons/TestButton";
+import { useHistory } from "react-router";
+import SimpleTooltip from "../components/SimpleTooltip";
 
 const useStyles = props => makeStyles((theme) => ({
   dropdownBtn : {
@@ -173,6 +175,8 @@ const HeaderLayer = (props: Props) => {
   const [pdfFilename, setPdfFilename] = useState(undefined as string);
   const docName = useSelector((state: RootState) => state.docConfig.docName);
 
+  const history = useHistory();
+
   function fileOpenHandler() {
     const input = document.querySelector("#fileForconvert") as HTMLInputElement;
     input.value = "";
@@ -294,13 +298,20 @@ const HeaderLayer = (props: Props) => {
     props.handlePenLogWindow();
   }
 
+  const routeChange = async () => {
+    const path = `/list`;
+    await history.push(path);
+  }
+
   const [debugOpen, setDebugOpen] = useState(false);
 
   return (
     <React.Fragment>
       <div id="header" className={`${classes.headerStyle}`}>
         <div >
-          <img src={LogoSvg} className={classes.imgStyle}></img>
+            <SimpleTooltip title="그리다보드 홈">
+              <IconButton><img src={LogoSvg} className={classes.imgStyle} onClick={routeChange}></img></IconButton>
+            </SimpleTooltip>
           <div>  
             <div>{docName}</div> {/* & > div > div > div:first-child */}
             <div> {/* & > div > div > div:last-child */}

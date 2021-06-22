@@ -15,6 +15,7 @@ import { RootState } from "../store/rootReducer";
 import RotateButton from "../components/buttons/RotateButton";
 import PageClearButton from "../components/buttons/PageClearButton";
 import PageDeleteButton from "../components/buttons/PageDeleteButton";
+import SimpleTooltip from "../components/SimpleTooltip";
 
 /**
  *
@@ -143,15 +144,18 @@ const ViewLayer = (props: Props) => {
           </div>
 
           <div className={classes.pageOptions}>
-            <CustomBadge badgeContent={`TAB`}>
-              <RotateButton disabled={activePageNo_store === -1} />
-            </CustomBadge>
-            <CustomBadge badgeContent={`Y`}>
-              <PageClearButton disabled={activePageNo_store === -1} />
-            </CustomBadge>
-            <CustomBadge badgeContent={`D`}>
-              <PageDeleteButton disabled={activePageNo_store === -1} />
-            </CustomBadge>
+            
+              <CustomBadge badgeContent={`TAB`}>
+                <RotateButton disabled={activePageNo_store === -1} />
+              </CustomBadge>
+
+              <CustomBadge badgeContent={`Y`}>
+                <PageClearButton disabled={activePageNo_store === -1} />
+              </CustomBadge>
+
+              <CustomBadge badgeContent={`D`}>
+                <PageDeleteButton disabled={activePageNo_store === -1} />
+              </CustomBadge>
           </div>
 
         </div>

@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import { useSelector } from "react-redux";
 import { makeStyles, Paper, Typography, Grow } from "@material-ui/core";
 
@@ -69,12 +69,14 @@ const useStyle = makeStyles(theme => ({
   },
   pageNumber: {
     float: "left", 
-    marginLeft: "24px", 
+    width: "23.58px",
+    marginLeft: "8.28px",
     alignItems: "center",
     fontSize: "14px",
     fontWeight: 400,
     lineHeight: "16.41px",
     fontFamily: "Roboto",
+    textAlign: "right",
   },
 }));
 interface Props {
@@ -84,13 +86,12 @@ interface Props {
   active: boolean,
 
   noInfo?: boolean,
-  scrollbarVisible: boolean,
 }
 
 const ThumbnailItem = (props: Props) => {
   const classes = useStyle();
   const pn = props.pageNo;
-
+  
   const doc = GridaDoc.getInstance();
 
   const drawerWidth = useSelector((state: RootState) => state.ui.drawer.width);
@@ -99,7 +100,7 @@ const ThumbnailItem = (props: Props) => {
   const renderCountNo = useSelector((state: RootState) => state.activePage.renderCount);
 
   const [showDeleteBtn, setShowDeleteBtn] = useState(false);
-  
+
   const pdfUrl = undefined;
   const pdfFilename = undefined;
   const pdfFingerprint = undefined;
@@ -120,23 +121,18 @@ const ThumbnailItem = (props: Props) => {
     basePageInfo = page.basePageInfo;
   }
 
-  const handleMouseDown = (pageNo:number) => {
-    setActivePageNo(pageNo);
-  };
-
   const pageOverview = page.pageOverview;
   const sizePu = pageOverview.sizePu;
   const pageInfo = page.pageInfos[0];
 
+  const handleMouseDown = (pageNo:number) => {
+    setActivePageNo(pageNo);
+  };
+
   const wh_ratio = sizePu.width / sizePu.height;
 
-  let height;
-  if (!props.scrollbarVisible) {
-    height = (drawerWidth - (DEFAULT_THUMBNAIL_SIDE_MARGIN*2 + 14)) / wh_ratio; //14 : 추가된 왼쪽 마진
-  } else {
-    height = (drawerWidth - (DEFAULT_THUMBNAIL_SIDE_MARGIN*2 + 14 + 17)) / wh_ratio; //17 : 스크롤바
-  }
-
+  let width = (drawerWidth - (DEFAULT_THUMBNAIL_SIDE_MARGIN*2 + 14 + 17)); //14: 페이지 넘버 추가되며 생긴 왼쪽 여백, 17: 스크롤바를 위한 추가 여백
+  let height = width / wh_ratio;
 
   const playState = PLAYSTATE.live;
   let isMouseDown = false;
@@ -145,8 +141,8 @@ const ThumbnailItem = (props: Props) => {
   return (
     <React.Fragment>
     <div id="thumbnail"> 
-      <span className={classes.pageNumber}>{pn+1}</span>
-      <Paper key={props.key} className={classes.paper} onClick={e => handleMouseDown(pn)} elevation={3} style={{ height: height }} 
+      <div className={classes.pageNumber}>{pn+1}</div>
+      <Paper key={props.key} className={classes.paper} onClick={e => handleMouseDown(pn)} elevation={3} style={{ width: width, height: height }} 
       onMouseOver={e=>{setShowDeleteBtn(false)}} onMouseLeave={e=>setShowDeleteBtn(false)}>
         <div className={`${classes.mixedViewer} ${(activePageNo === pn? classes.selected:"")}`}>
           <MixedPageView  
@@ -204,7 +200,7 @@ const ThumbnailItem = (props: Props) => {
         </div>
         
       </Paper>
-    </div>
+      </div>
     </React.Fragment>
   )
 }
