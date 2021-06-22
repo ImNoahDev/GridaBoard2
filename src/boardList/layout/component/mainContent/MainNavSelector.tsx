@@ -122,7 +122,7 @@ const ListSelectType = (props:listSelectProps)=>{
       
     </Select>
     <div>
-      {viewList.map(el=>(<IconButton key={el.name} onClick={e=>listViewType(el.name)}>
+      {/* {viewList.map(el=>(<IconButton key={el.name} onClick={e=>listViewType(el.name)}>
         <SvgIcon>
           <path
             fillRule="evenodd"
@@ -130,7 +130,7 @@ const ListSelectType = (props:listSelectProps)=>{
             d={el.path}
           />
         </SvgIcon>
-      </IconButton>))}
+      </IconButton>))} */}
       
     </div>
   </div>);
