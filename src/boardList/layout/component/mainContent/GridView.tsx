@@ -149,7 +149,7 @@ const GridView = (props : Props)=>{
                     {`${times.getFullYear()}/${times.getMonth()}/${times.getDate()}`}
                   </div>
                   {category === "" ? "" : (<div />)}
-                  {category === "" ? "" : (<div>{category}</div>)}
+                  {category === "" ? "" : (<div>{el.docNumPages} page</div>)}
                 </div>
               </div>
               <Grow in={showCheckBoxes[idx]}>
