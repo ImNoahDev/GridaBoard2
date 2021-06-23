@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import firebase , { auth } from "GridaBoard/util/firebase_config";
 import { Button, makeStyles } from '@material-ui/core';
-import LogoSvg from "GridaBoard/logo.svg";
+import LogoTextSvg from "GridaBoard/logoText.svg";
 import { KeyboardArrowDown } from "@material-ui/icons";
 
 const useStyle = makeStyles(theme=>({
@@ -30,8 +30,7 @@ const Header = ()=>{
   return (
     <React.Fragment>
       <div className={classes.wrap}>
-        <img src={LogoSvg} className={classes.imgStyle}></img>
-
+        <img src={LogoTextSvg} className={classes.imgStyle}></img>
         <Button style={{textTransform: 'none'}}>
           {userId}
           <KeyboardArrowDown/>
