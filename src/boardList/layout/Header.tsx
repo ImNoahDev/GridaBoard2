@@ -23,9 +23,12 @@ const useStyle = makeStyles(theme=>({
 
 
 const Header = ()=>{
-  console.log(auth.currentUser);
   const classes = useStyle();
-  const userId = auth.currentUser.email;
+
+  let userId = "";
+  if (auth.currentUser !== null) {
+    userId = auth.currentUser.email;
+  }
 
   return (
     <React.Fragment>

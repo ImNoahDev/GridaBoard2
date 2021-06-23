@@ -254,13 +254,14 @@ const MainContent = (props : Props)=>{
   const [selectedItems, setSelectedItems] = useState([]);
   const [nowDocs, setNowDocs] = useState([]);
   const [allItemsChecked, setAllItemsChecked] = useState(false);
+  const [title, setTitle] = useState("");
   
   const classes = useStyle();
   const dispatch = useDispatch();
 
   const selectedCategory = category[selected];
-  let title = "";
-  let contentRef = React.useRef<HTMLDivElement>(null);
+  
+  const contentRef = React.useRef<HTMLDivElement>(null);
   
   useEffect(()=>{
     contentRef.current.scrollTop = 0;
@@ -280,7 +281,7 @@ const MainContent = (props : Props)=>{
   const getNowDocs = () => {
     let tmpDocs = [];
     if(["recent", "trash"].includes(selected)){
-      title = getText("boardList_" + selected);
+      setTitle(getText("boardList_" + selected));
       if(selected === "recent"){
         tmpDocs = docs.filter(el=>el.dateDeleted === 0);
       }else{
@@ -291,12 +292,12 @@ const MainContent = (props : Props)=>{
         tmpDocs = docs.filter(el=> {
           return el.category == selected && el.dateDeleted === 0
         });
-        title = getText("boardList_unshelved").replace("%d", tmpDocs.length.toString());
+        setTitle(getText("boardList_unshelved").replace("%d", tmpDocs.length.toString()));
       }else{
         tmpDocs = docs.filter(el=> {
           return el.category == selected && el.dateDeleted === 0;
         });
-        title = `${selectedCategory[0]} (${tmpDocs.length})`;
+        setTitle(`${selectedCategory[0]} (${tmpDocs.length})`);
       }
     }
     tmpDocs.sort(orderFunctionList[orderBy]);
