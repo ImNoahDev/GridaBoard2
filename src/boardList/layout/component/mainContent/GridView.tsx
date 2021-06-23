@@ -72,14 +72,14 @@ const GridView = (props : Props)=>{
   
   useEffect(() => {
     if (selectedItems.length === docsList.length) { //select all
-      let newArr = [...forcedToShowCheckBoxes];
+      const newArr = [...forcedToShowCheckBoxes];
       for (let i = 0; i < newArr.length; i++) {
         newArr[i] = true;
       }
       setShowCheckBoxes(newArr);
       setForcedToShowCheckBoxes(newArr);
     } else if (selectedItems.length === 0) { //deselect all
-      let newArr = [...forcedToShowCheckBoxes];
+      const newArr = [...forcedToShowCheckBoxes];
       for (let i = 0; i < newArr.length; i++) {
         newArr[i] = false;
       }
@@ -89,7 +89,7 @@ const GridView = (props : Props)=>{
     }
 
     if (selectedItems.length > 0) {
-      let newArr = [...showMoreBtns];
+      const newArr = [...showMoreBtns];
       for (let i = 0; i < newArr.length; i++) {
         newArr[i] = false;
       }
@@ -100,13 +100,13 @@ const GridView = (props : Props)=>{
 
   const updateShowBtns = (idx: number, show: boolean) => {
     if (forcedNotToShowMoreBtns === false) {
-      let newArr = [...showMoreBtns];
+      const newArr = [...showMoreBtns];
       newArr[idx] = show;
       setShowMoreBtns(newArr);
     }
 
     if (forcedToShowCheckBoxes[idx] === false) {
-      let newArr = [...showCheckBoxes];
+      const newArr = [...showCheckBoxes];
       newArr[idx] = show;
       setShowCheckBoxes(newArr);
     }
@@ -125,7 +125,7 @@ const GridView = (props : Props)=>{
   }
 
   const updateSelectedItems = (idx: number, el: IBoardData, checked: boolean) => {
-    let newArr = [...forcedToShowCheckBoxes];
+    const newArr = [...forcedToShowCheckBoxes];
     newArr[idx] = checked; 
     setForcedToShowCheckBoxes(newArr);
 
@@ -134,8 +134,8 @@ const GridView = (props : Props)=>{
   return (
     <React.Fragment>
       {docsList.map((el, idx) => {
-        let times = new Date(el.last_modified.seconds*1000);
-        let category = el.category == "Unshelved" ? "" : el.category;
+        const times = new Date(el.last_modified.seconds*1000);
+        const category = el.category == "Unshelved" ? "" : el.category;
         const timestamp = getTimeStamp(el.created)
         const keyStr = el.doc_name + '_' + timestamp; 
         return (
