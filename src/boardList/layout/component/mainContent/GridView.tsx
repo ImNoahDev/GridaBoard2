@@ -9,6 +9,7 @@ interface Props extends  React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivEle
    docsList?: Array<any>,
    selectedClass ?: string,
    category?: string,
+   allCategory?: Object,
    selectedItems?: IBoardData[],
    routeChange ?: (idx:number)=>void,
    updateSelectedItems ?: (el: IBoardData, checked: boolean) => void,
@@ -50,7 +51,7 @@ const useStyle = makeStyles(theme => ({
 
 const GridView = (props : Props)=>{
   const classes = useStyle();
-  const {selectedClass, ref, routeChange, category, selectedItems, ...rest} = props;
+  const {selectedClass, ref, routeChange, category, selectedItems, allCategory, ...rest} = props;
   const {docsList} = props;
 
   const [showMoreBtns, setShowMoreBtns] = useState([]);
@@ -149,7 +150,7 @@ const GridView = (props : Props)=>{
                     {`${times.getFullYear()}/${times.getMonth()}/${times.getDate()}`}
                   </div>
                   {category === "" ? "" : (<div />)}
-                  {category === "" ? "" : (<div>{el.docNumPages} page</div>)}
+                  {props.category === 'trash' ? (<div>{allCategory[el.category][0]}</div>) : (<div>{el.docNumPages} page</div>)}
                 </div>
               </div>
               <Grow in={showCheckBoxes[idx]}>

@@ -97,7 +97,7 @@ const BoardList = () => {
   
   useEffect(() => {
     const getDb = async ()=>{
-      let data = await getDatabase();
+      const data = await getDatabase();
       if(data === false) return false;
 
       for (let i = 0; i < data.category.length; i++) {
