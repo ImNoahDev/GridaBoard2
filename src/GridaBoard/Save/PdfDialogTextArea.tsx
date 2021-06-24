@@ -31,7 +31,7 @@ const PdfDialogTextArea = (props: Props) => {
     //이름 설정시 바로 특정 문자만 사용할 수 있도록 수정
     const checkAllow = pdfName.match(/[^a-zA-Z0-9가-힇ㄱ-ㅎㅏ-ㅣぁ-ゔァ-ヴー々〆〤一-龥0-9.+_\-.]/g);
     if(checkAllow !== null){
-      let newName = pdfName.split(checkAllow[0]);
+      const newName = pdfName.split(checkAllow[0]);
       pdfName = newName[0] + newName[1];
       textRef.querySelector("input").value = pdfName;
     }

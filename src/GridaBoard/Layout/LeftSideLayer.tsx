@@ -1,12 +1,9 @@
 import React, { useState } from "react";
-import clsx from 'clsx';
 import { RootState } from "../store/rootReducer";
 import { useSelector } from "react-redux";
-import { IconButton, makeStyles } from "@material-ui/core";
+import { makeStyles } from "@material-ui/core";
 import PersistentDrawerRight from "../View/Drawer/PersistentDrawerRight";
 import { updateDrawerWidth } from "../store/reducers/ui";
-import CustomBadge from "../components/CustomElement/CustomBadge";
-import {ArrowLeft, ArrowRight} from '@material-ui/icons';
 
 const useStyle = props => makeStyles(theme=>({
   wrap: {
@@ -58,7 +55,11 @@ const useStyle = props => makeStyles(theme=>({
   }
 }));
 
-const LeftSideLayer = (props) => {
+interface Props {
+  drawerOpen: boolean,
+}
+
+const LeftSideLayer = (props: Props) => {
   const {drawerOpen} = props;
   // const [drawerOpen, setDrawerOpen] = useState(false);
   const setDrawerWidth = (width: number) => updateDrawerWidth({ width });

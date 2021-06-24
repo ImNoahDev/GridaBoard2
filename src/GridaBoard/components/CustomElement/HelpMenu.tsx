@@ -37,7 +37,7 @@ const HelpMenu = ()=>{
 	const classes = useStyle();
 
 	const movePopup = (e:React.MouseEvent<HTMLDivElement, MouseEvent>)=>{
-    let div = e.currentTarget;
+    const div = e.currentTarget;
     div.style.cursor = "grabbing";
     
     const startDivX = div.offsetLeft, startDivY = div.offsetTop;

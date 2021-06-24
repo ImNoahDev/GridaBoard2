@@ -67,7 +67,7 @@ const BoardList = () => {
   const isCategoryChange = useSelector((state: RootState) => state.list.isChange.group);
   
   const categoryChange = async ()=>{
-    let dataArr = await getCategoryArray();
+    const dataArr = await getCategoryArray();
 
     for (let i = 0; i < dataArr.length; i++) {
       dataArr[i][3] = i;
@@ -119,7 +119,7 @@ const BoardList = () => {
     docsObj.category[i][2] = 0;
   }
   for (let i = 0; i < docsObj.docs.length; i++) {
-    let now = docsObj.docs[i];
+    const now = docsObj.docs[i];
     // console.log(docsObj.category, now);
     if (now.dateDeleted === 0) {
       docsObj.category[now.category][2] += 1;

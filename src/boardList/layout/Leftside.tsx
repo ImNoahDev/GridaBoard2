@@ -148,7 +148,7 @@ const Leftside = (props : Props)=>{
         </div>
         {category.map((el, idx)=>{
           if(el[1] == -1) return ;
-          let title = idx === 0 ? getText("boardList_unshelved").replace("%d", el[2]) : el[0] + ` (${el[2]})`;
+          const title = idx === 0 ? getText("boardList_unshelved").replace("%d", el[2]) : el[0] + ` (${el[2]})`;
           return (
           <div key={el[0]} onClick={e=>selectCategory(el[3])} className={selected === el[3]? classes.selected : "" }>
             <span>{title}</span>

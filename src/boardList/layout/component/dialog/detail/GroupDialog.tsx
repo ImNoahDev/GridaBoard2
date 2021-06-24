@@ -35,14 +35,14 @@ interface Props extends  DialogProps {
 
 export const textCheckForGroup = (text:string|false)=>{
   //정규식 조건을 통해서 안될경우 false
-  let a = 1;
+  const a = 1;
   if(a == 1)
     return text;
   else
     return false;
 }
 export const textCheckForDoc = (text:string|false)=>{
-  let a = 1;
+  const a = 1;
   if(a == 1)
     return text;
   else
@@ -50,7 +50,7 @@ export const textCheckForDoc = (text:string|false)=>{
 }
 export const createGroup = async (newText:string, closeEvent:(isChange: boolean) => void)=>{
   // createCategory
-  let text = textCheckForGroup(newText);
+  const text = textCheckForGroup(newText);
 
   if(text === false){
     //못만듬
@@ -66,7 +66,9 @@ export const createGroup = async (newText:string, closeEvent:(isChange: boolean)
 const GroupDialog = (props : Props)=>{
   const { open, closeEvent, type, ...rest } = props;
   
-  let { title, placeHolder, mainWarn, selectedType } = dialogTypes[type];
+  let { placeHolder } = dialogTypes[type];
+  const { title, mainWarn, selectedType } = dialogTypes[type];
+  
   const defaultValue = useSelector((state: RootState) => state.list.dialog.selected);
   const dispatch = useDispatch();
 
@@ -138,7 +140,7 @@ const GroupDialog = (props : Props)=>{
   }
 
   const save = async ()=>{
-    let newText:string|false = inputer.value;
+    const newText:string|false = inputer.value;
     if(type == "newGroup"){
       await createGroup(newText, closeEvent);
     }else if(type == "changeGroupName"){

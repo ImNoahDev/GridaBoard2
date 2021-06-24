@@ -102,7 +102,7 @@ const GlobalDropdown = (props: Prop) => {
   if(open === false) return null;
   const dropDown = useSelector((state: RootState) => state.list.dropDown);
 
-  let nowItemData = itemData[dropDown.type];
+  const nowItemData = itemData[dropDown.type];
   
   const targetRef = dropDown.event.target as HTMLElement;
   const classes = useStyle();

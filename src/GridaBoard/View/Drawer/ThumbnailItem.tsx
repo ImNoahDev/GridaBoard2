@@ -131,8 +131,8 @@ const ThumbnailItem = (props: Props) => {
 
   const wh_ratio = sizePu.width / sizePu.height;
 
-  let width = (drawerWidth - (DEFAULT_THUMBNAIL_SIDE_MARGIN*2 + 14 + 17)); //14: 페이지 넘버 추가되며 생긴 왼쪽 여백, 17: 스크롤바를 위한 추가 여백
-  let height = width / wh_ratio;
+  const width = (drawerWidth - (DEFAULT_THUMBNAIL_SIDE_MARGIN*2 + 14 + 17)); //14: 페이지 넘버 추가되며 생긴 왼쪽 여백, 17: 스크롤바를 위한 추가 여백
+  const height = width / wh_ratio;
 
   const playState = PLAYSTATE.live;
   let isMouseDown = false;

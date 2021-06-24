@@ -15,9 +15,9 @@ const cookies = new Cookies();
 
 
 const objectToArray = (obj)=>{
-  let keys = Object.keys(obj);
-  let lastKey = Number(keys[keys.length-1]);
-  let returnArr = [];
+  const keys = Object.keys(obj);
+  const lastKey = Number(keys[keys.length-1]);
+  const returnArr = [];
   for(let i = 0; i < lastKey+1; i++){
     returnArr[i] = obj[i];
     // if(obj[i] === undefined){
@@ -64,7 +64,7 @@ export const getCategoryArray = async () => {
     return [];
   }
   
-  let res = await db.collection(userId).doc('categoryData').get();
+  const res = await db.collection(userId).doc('categoryData').get();
 
   return objectToArray(res.data());  
 }
@@ -80,7 +80,7 @@ export const createCategory = async (categoryName:string)=>{
     console.log("already had");
     return "";
   }else{
-    let newData = [...dataArr];
+    const newData = [...dataArr];
     newData.sort((a,b)=>b[1]-a[1]);
 
     dataArr.push([categoryName, newData[0][1]+1]);
@@ -99,21 +99,21 @@ export const createCategory = async (categoryName:string)=>{
   if(userId === undefined){
     return false;
   }
-  let selectedIdx = selected[3];
+  const selectedIdx = selected[3];
   
-  let dataArr = await getCategoryArray();
+  const dataArr = await getCategoryArray();
   
-  let nowSortIdx = dataArr[selectedIdx][1];
+  const nowSortIdx = dataArr[selectedIdx][1];
   dataArr[selectedIdx] = ["",-1];
 
   for(let i = 0; i < dataArr.length; i++){
-    let now = dataArr[i];
+    const now = dataArr[i];
     if(now[1] > nowSortIdx)
       now[1] -= 1;
   }
 
 
-  let docsData = await getDatabase();
+  const docsData = await getDatabase();
   if(docsData !== false){
     docsData.docs.forEach(async el=>{
       if(el.category == selectedIdx){
@@ -133,7 +133,7 @@ export const changeCategoryName = async (prevName:any[], nextName:string) => {
     return false;
   }
   
-  let dataArr = await getCategoryArray();
+  const dataArr = await getCategoryArray();
   console.log(prevName, nextName);
   dataArr[prevName[3]][0] = nextName;
   
@@ -148,7 +148,7 @@ export const changeCategorySort = async (selected, type:"up"|"down", alpha:numbe
   }
   
 
-  let dataArr = await getCategoryArray();
+  const dataArr = await getCategoryArray();
   // let alpha = 1;
   
   if(type == "up"){
@@ -222,7 +222,7 @@ export const getDatabase = async ()=>{
   }
 
 
-  let data = await db.collection(userId).get();
+  const data = await db.collection(userId).get();
  
   const newDocs = [];
   let newCategoryData = null;

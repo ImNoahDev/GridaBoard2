@@ -11,8 +11,13 @@ import { INeoSmartpen } from 'nl-lib/common/neopen';
 import { RootState } from 'GridaBoard/store/rootReducer';
 import getText from 'GridaBoard/language/language';
 
+interface Props {
+  hidden: boolean,
+  className: string,
+  onClick: (e) => void,
+}
 
-const TestButton = (props) => {
+const TestButton = (props: Props) => {
   const useStyles = makeStyles(theme => ({
     testBtn: {
       padding: "0px",

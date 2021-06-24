@@ -400,7 +400,7 @@ export async function updateDB(docName: string, thumb_path: string, grida_path: 
     .catch(error => {
       console.error('Error adding document: ', error);
     });
-};
+}
 
 export async function saveToDB(docName: string, thumb_path: string, grida_path: string, nowDate: Date, isCopyProcess: boolean) {
   const doc = GridaDoc.getInstance();
@@ -434,7 +434,7 @@ export async function saveToDB(docName: string, thumb_path: string, grida_path: 
     .catch(error => {
       console.error('Error adding document: ', error);
     });
-};
+}
 
 //div screenshot sample
 
