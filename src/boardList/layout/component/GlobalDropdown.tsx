@@ -1,10 +1,11 @@
 import React from "react";
 import { makeStyles, ClickAwayListener, Grow, MenuList, Paper, Popper, MenuItem, PopperProps } from "@material-ui/core";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "GridaBoard/store/rootReducer";
 import { hideDropDown, showGroupDialog, changeGroup, showAlert } from 'GridaBoard/store/reducers/listReducer';
 import { changeCategorySort, deleteCategory } from "../../BoardListPageFunc2";
 import { IBoardData } from "boardList/structures/BoardStructures";
+import { forceUpdateBoardList } from "../../../GridaBoard/store/reducers/appConfigReducer";
 
 const useStyle = makeStyles(theme=>({
   paper : {
@@ -96,6 +97,8 @@ type Prop = {
 
 const GlobalDropdown = (props: Prop) => {
   const {open, ...rest} = props;
+  const dispatch = useDispatch();
+
   if(open === false) return null;
   const dropDown = useSelector((state: RootState) => state.list.dropDown);
 
@@ -105,10 +108,13 @@ const GlobalDropdown = (props: Prop) => {
   const classes = useStyle();
   
   console.log(dropDown.selected);
-  const runEvent = (item)=>{
+  const runEvent = async (item)=>{
     const type = dropDown.type;
 
-    nowItemData.runFunction[item](dropDown.selected);
+    await nowItemData.runFunction[item](dropDown.selected);
+    if (item === 'delete') {
+      dispatch(forceUpdateBoardList());
+    }
     hideDropDown();
   }
 
