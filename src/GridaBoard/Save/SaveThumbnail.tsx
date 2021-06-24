@@ -379,6 +379,8 @@ export async function saveThumbnail(docName: string) {
 }
 
 export async function updateDB(docName: string, thumb_path: string, grida_path: string, date) {
+  const doc = GridaDoc.getInstance();
+
   const db = firebase.firestore();
   const userId = firebase.auth().currentUser.email;
 
@@ -390,6 +392,7 @@ export async function updateDB(docName: string, thumb_path: string, grida_path: 
       last_modified: new Date(),
       grida_path: grida_path,
       thumb_path: thumb_path,
+      docNumPages: doc.numPages
     })
     .then(function () {
       console.log(`${docName} is created`);
@@ -400,6 +403,8 @@ export async function updateDB(docName: string, thumb_path: string, grida_path: 
 };
 
 export async function saveToDB(docName: string, thumb_path: string, grida_path: string, nowDate: Date, isCopyProcess: boolean) {
+  const doc = GridaDoc.getInstance();
+  
   const db = firebase.firestore();
   const userId = firebase.auth().currentUser.email;
 
@@ -417,7 +422,8 @@ export async function saveToDB(docName: string, thumb_path: string, grida_path: 
       grida_path: grida_path,
       thumb_path: thumb_path,
       dateDeleted: 0,
-      docId : docId
+      docId : docId,
+      docNumPages: doc.numPages
     })
     .then(function () {
       console.log(`${docName} is created`);

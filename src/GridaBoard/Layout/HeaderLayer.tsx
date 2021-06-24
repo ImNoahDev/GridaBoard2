@@ -21,6 +21,8 @@ import LogoSvg from "../logo.svg";
 import TestButton from "../components/buttons/TestButton";
 import { useHistory } from "react-router";
 import SimpleTooltip from "../components/SimpleTooltip";
+import { KeyboardArrowDown } from "@material-ui/icons";
+import { auth } from 'GridaBoard/util/firebase_config';
 
 const useStyles = props => makeStyles((theme) => ({
   dropdownBtn : {
@@ -305,6 +307,7 @@ const HeaderLayer = (props: Props) => {
 
   const [debugOpen, setDebugOpen] = useState(false);
 
+  const userId = auth.currentUser.email;
   return (
     <React.Fragment>
       <div id="header" className={`${classes.headerStyle}`}>
@@ -370,11 +373,17 @@ const HeaderLayer = (props: Props) => {
           
           <InformationBtn /> */}
           <HeaderLine />
-          <div>
+          
+          <Button style={{textTransform: 'none'}}>
+            {userId}
+            <KeyboardArrowDown/>
+          </Button>
+
+          {/* <div>
             <Button href="https://gridaboard-v1-30576.web.app/" className={`${classes.buttonStyle} ${classes.changeUrlStyle}`}>
               {getText("go_to_old")}
             </Button>
-          </div>
+          </div> */}
           {/* <div>구글 이메일</div>
           <KeyboardArrowDownRoundedIcon /> */}
         </div>
