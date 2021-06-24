@@ -311,6 +311,7 @@ const MainContent = (props : Props)=>{
   
   const listOrderChange = (event)=>{
     setOrderBy(event.target.value);
+    dispatch(forceUpdateBoardList()); 
   }
   const listViewType = (val)=>{
     setListType(val);

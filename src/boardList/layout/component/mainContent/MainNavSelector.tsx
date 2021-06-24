@@ -84,11 +84,11 @@ const ListSelectType = (props:listSelectProps)=>{
 
   const orderList = [{
     // name : "lastOpened",
-    title : getText("boardList_lastOpened"),
+    title : getText("boardList_byUpdateDate"),
     value : 0
   },{
     // name : "lastMake",
-    title : "이름순?",
+    title : getText("boardList_byName"),
     value : 1
   }];
 
