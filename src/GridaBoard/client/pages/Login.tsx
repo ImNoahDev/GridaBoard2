@@ -179,6 +179,19 @@ const sliderStyle = makeStyles(theme=>({
       alignItems: "center",
       position: "relative !important",
       bottom: "0px",
+      "& > li:first-child" : {
+        marginLeft: "0px !important"
+      },
+      "& > li" : {
+        marginLeft: "8px",
+        width: "8px",
+        height: "8px",
+        margin : "0px",
+        "& > svg" : {
+          width: "8px",
+          height: "8px",
+        }
+      },
       "& > li:not(.slick-active)" : {
         color : theme.custom.grey[3]
       },
@@ -268,7 +281,7 @@ const CustomSlider = ()=>{
 
 
   const customPaging= (i:number)=>(
-    <SvgIcon>
+    <SvgIcon viewBox="0 0 8 8">
       <path fillRule="evenodd" clipRule="evenodd" d="M8 4C8 6.209 6.2092 8 3.99986 8C1.79079 8 0 6.209 0 4C0 1.791 1.79079 0 3.99986 0C6.2092 0 8 1.791 8 4Z"/>
     </SvgIcon>
   )
