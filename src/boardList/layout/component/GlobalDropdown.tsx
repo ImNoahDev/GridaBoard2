@@ -6,6 +6,8 @@ import { hideDropDown, showGroupDialog, changeGroup, showAlert } from 'GridaBoar
 import { changeCategorySort, deleteCategory } from "../../BoardListPageFunc2";
 import { IBoardData } from "boardList/structures/BoardStructures";
 import { forceUpdateBoardList } from "../../../GridaBoard/store/reducers/appConfigReducer";
+import getText from "GridaBoard/language/language";
+import { copyBoard } from "../../BoardListPageFunc";
 
 const useStyle = makeStyles(theme=>({
   paper : {
@@ -36,6 +38,10 @@ const useStyle = makeStyles(theme=>({
   }
 }))
 
+const openStr = getText("boardList_gridView_menu_open");
+const changeNameStr = getText("boardList_gridView_menu_changeName");
+const copyStr =  getText("boardList_gridView_menu_copy");
+
 const itemData = {
   "group" : {
     placement : "bottom-start",
@@ -63,25 +69,19 @@ const itemData = {
   },
   "docs" : {
     placement : "bottom-start",
-    list:["nameChange","move", "delete"],
+    list:[openStr, changeNameStr, copyStr],
     runFunction : {
-      "nameChange":(val:IBoardData)=>{
+      0: (val:IBoardData, routeChange)=>{
+        routeChange(val.key);
+      },
+      1: (val:IBoardData)=>{
         showGroupDialog({
           type:"changeDocName",
-          selected:val
-        })
-      },
-      "move" : (val:IBoardData)=>{
-        showGroupDialog({
-          type:"moveDoc",
-          selected: [val],
+          selected: val,
         });
       },
-      "delete": (val:IBoardData)=>{
-        showAlert({
-          type:"deleteDoc",
-          selected:val
-        });
+      2: (val:IBoardData)=>{
+        copyBoard(val);
       }
     }
   },
@@ -91,12 +91,13 @@ const itemData = {
 
 type Prop = {
   test ?: string,
-  open : boolean
+  open : boolean,
+  routeChange ?: (idx:number)=>void
 }
 
 
 const GlobalDropdown = (props: Prop) => {
-  const {open, ...rest} = props;
+  const {open, routeChange, ...rest} = props;
   const dispatch = useDispatch();
 
   if(open === false) return null;
@@ -107,14 +108,11 @@ const GlobalDropdown = (props: Prop) => {
   const targetRef = dropDown.event.target as HTMLElement;
   const classes = useStyle();
   
-  console.log(dropDown.selected);
-  const runEvent = async (item)=>{
+  const runEvent = async (index)=>{
     const type = dropDown.type;
 
-    await nowItemData.runFunction[item](dropDown.selected);
-    if (item === 'delete') {
-      dispatch(forceUpdateBoardList());
-    }
+    await nowItemData.runFunction[index](dropDown.selected, routeChange);
+
     hideDropDown();
   }
 
@@ -123,10 +121,10 @@ const GlobalDropdown = (props: Prop) => {
       <Paper className={classes.paper}>
         <ClickAwayListener onClickAway={()=>{hideDropDown()}}>
           <MenuList>
-            {nowItemData.list.map(item => (
+            {nowItemData.list.map((item, index) => (
               <MenuItem
                 key={item}
-                onClick={() => {runEvent(item)}}
+                onClick={() => {runEvent(index)}}
                 className={classes.menuItem}
               >
                 {item}
