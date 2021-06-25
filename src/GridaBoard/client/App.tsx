@@ -18,8 +18,8 @@ const App = ()=>{
     }else{
         // 경로 옵션 사용하고 싶을떄
         return (<div style={{position:"relative", width:"100%", height:"100%"}}>
-          <Route exact path="/" component={Login}/>
           <Provider store={store}>
+            <Route exact path="/" component={Login}/>
             <Route exact path="/list" component={BoardList}/>
           </Provider>
           <Route exact path="/app" component={GridaBoard}/>

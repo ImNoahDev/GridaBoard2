@@ -1,6 +1,7 @@
 import { store } from "../../client/pages/GridaBoard";
 import { getBrowserZoomFactor } from "nl-lib/common/util";
 
+
 //[Define Action Types
 const ActionGroup = 'UI';
 
@@ -25,10 +26,18 @@ export const UIActionTypes = Object.freeze({
   
   SHOW_SHORTCUT: `${ActionGroup}.SHOW_SHORTCUT`,
   SHOW_HELPMENU: `${ActionGroup}.SHOW_HELPMENU`,
+  GET_THEME: `${ActionGroup}.GET_THEME`,
+  SET_THEME: `${ActionGroup}.SET_THEME`,
 });
 //]
 
 //[Action Methods
+export const setTheme = (theme: String) => {
+  store.dispatch({
+    type: UIActionTypes.SET_THEME,
+    theme: theme
+  });
+}
 export const reportBrowserZoomFactor = (zoom: number) => {
   store.dispatch({
     type: UIActionTypes.REPORT_BROWSER_ZOOM,
@@ -205,12 +214,19 @@ const initialState = {
   },
   helpMenu : {
     show : false
-  }
+  },
+  theme : "theme"
 }
 
 //[Reducer
 export default (state = initialState, action) => {
   switch (action.type) {
+    case UIActionTypes.SET_THEME: {
+      return {
+        ...state,
+        theme : action.theme
+      };
+    }
     case UIActionTypes.REPORT_BROWSER_ZOOM: {
       return {
         ...state,
