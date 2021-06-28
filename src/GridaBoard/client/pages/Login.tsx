@@ -114,6 +114,7 @@ const Login = () => {
   const [logined, setLogined] = useState(false);
   const selectedTheme = useSelector((state: RootState) => state.ui.theme);
   const theme : Theme = neolabTheme[selectedTheme];
+  const classes = useStyle(theme)();
   
   const userEmail = cookies.get("user_email");
 
@@ -138,7 +139,6 @@ const Login = () => {
     }
   })
   
-  const classes = useStyle(theme)();
   return (
     <MuiThemeProvider theme={theme}>
       <div className={classes.wrap}>
