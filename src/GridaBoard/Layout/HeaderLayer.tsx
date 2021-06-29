@@ -23,6 +23,7 @@ import { useHistory } from "react-router";
 import SimpleTooltip from "../components/SimpleTooltip";
 import { KeyboardArrowDown } from "@material-ui/icons";
 import { auth } from 'GridaBoard/util/firebase_config';
+import ProfileButton from "../components/buttons/ProfileButton";
 
 const useStyles = props => makeStyles((theme) => ({
   dropdownBtn : {
@@ -374,10 +375,8 @@ const HeaderLayer = (props: Props) => {
           <InformationBtn /> */}
           <HeaderLine />
           
-          <Button style={{textTransform: 'none'}}>
-            {userId}
-            <KeyboardArrowDown/>
-          </Button>
+          <ProfileButton/>
+          
 
           {/* <div>
             <Button href="https://gridaboard-v1-30576.web.app/" className={`${classes.buttonStyle} ${classes.changeUrlStyle}`}>

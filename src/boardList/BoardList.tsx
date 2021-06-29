@@ -39,14 +39,6 @@ const useStyle = makeStyles(theme => ({
   },
 }));
 
-const logOut = () => {
-  auth.signOut();
-  const cookies = new Cookies();
-  cookies.remove('user_email');
-};
-console.log(logOut);
-
-
 const BoardList = () => {
   const cookies = new Cookies();
   const [theme, settheme] = useState(neolabTheme.theme);

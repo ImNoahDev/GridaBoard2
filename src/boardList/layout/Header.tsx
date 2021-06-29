@@ -1,8 +1,7 @@
-import React, { useEffect, useState } from 'react';
-import firebase , { auth } from "GridaBoard/util/firebase_config";
-import { Button, makeStyles } from '@material-ui/core';
+import React from 'react';
+import { makeStyles } from '@material-ui/core';
 import LogoTextSvg from "GridaBoard/logoText.svg";
-import { KeyboardArrowDown } from "@material-ui/icons";
+import ProfileButton from '../../GridaBoard/components/buttons/ProfileButton';
 
 const useStyle = makeStyles(theme=>({
   wrap : {
@@ -21,23 +20,13 @@ const useStyle = makeStyles(theme=>({
   },
 }))
 
-
 const Header = ()=>{
   const classes = useStyle();
-
-  let userId = "";
-  if (auth.currentUser !== null) {
-    userId = auth.currentUser.email;
-  }
-
   return (
     <React.Fragment>
       <div className={classes.wrap}>
         <img src={LogoTextSvg} className={classes.imgStyle}></img>
-        <Button style={{textTransform: 'none'}}>
-          {userId}
-          <KeyboardArrowDown/>
-        </Button>
+        <ProfileButton/>
       </div>
     </React.Fragment>
   );
