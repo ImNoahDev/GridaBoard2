@@ -2,7 +2,7 @@ import React from 'react';
 import { createStyles, IconButton, InputBase, MenuItem, Select, SvgIcon, withStyles, Button } from '@material-ui/core';
 import getText from "GridaBoard/language/language";
 import { IBoardData } from "../../../structures/BoardStructures";
-import { OpenInBrowser, DeleteOutline } from '@material-ui/icons';
+import { OpenInBrowser, DeleteOutline, Restore } from '@material-ui/icons';
 import { showAlert, showGroupDialog } from 'GridaBoard/store/reducers/listReducer';
 import { copyBoard } from '../../../BoardListPageFunc';
 
@@ -51,22 +51,30 @@ interface Props extends  React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivEle
   listViewType ?: (val)=>void,
   orderBy ?: number,
   selectedItems ?: Array<IBoardData>,
-  routeChange ?: (idx: number) => void
+  selected ?: string,
+  routeChange ?: (idx: number) => void,
+  deleteForeverBtnClick ?: () => Promise<void>
+  restoreBtnClick ?: () => Promise<void>
 }
 
 const MainNavSelector = (props : Props)=>{
-  const {listOrderChange, listViewType, routeChange, orderBy, selectedItems, ...rest } = props;
+  const {listOrderChange, listViewType, routeChange, deleteForeverBtnClick, restoreBtnClick, orderBy, selectedItems, selected, ...rest } = props;
 
   
   let viewType = 0;
-  if(selectedItems.length == 1) viewType = 1;
+  if(selected === "trash") viewType = 3;
+  else if(selectedItems.length == 1) viewType = 1;
   else if(selectedItems.length > 1) viewType = 2;
 
 
   return (
     <React.Fragment>
       {viewType==0? <ListSelectType listViewType={listViewType} listOrderChange={listOrderChange} orderBy={orderBy} />
-      : <CheckedNav viewType={viewType} selectedItems={selectedItems} routeChange={routeChange}/>}
+      : (
+        viewType === 3? <TrashNav deleteForeverBtnClick={deleteForeverBtnClick} restoreBtnClick={restoreBtnClick} /> : 
+        <CheckedNav viewType={viewType} selectedItems={selectedItems} routeChange={routeChange}/>
+      )
+      }
     </React.Fragment>)
 }
 
@@ -229,4 +237,25 @@ const CheckedNav = (props: checkedNavProp)=>{
     )}
   </div>
   );
+}
+
+
+type trashProp = {
+  deleteForeverBtnClick ?: () => Promise<void>
+  restoreBtnClick ?: () => Promise<void>
+}
+
+const TrashNav = (props:trashProp)=>{
+  const {deleteForeverBtnClick, restoreBtnClick} = props;
+  
+  return (
+      <div className="checkedNav">
+        <Button onClick={deleteForeverBtnClick}>
+            <DeleteOutline/><span>완전 삭제</span>
+          </Button> 
+        <Button onClick={restoreBtnClick}>
+          <Restore /><span>복원</span>
+        </Button>
+      </div>
+    )
 }

@@ -102,26 +102,6 @@ const useStyle = makeStyles(theme =>({
 
     }
   },
-  trashNav : {
-    position: "relative",
-    display: "flex",
-    width: "100%",
-    minHeight : "40px",
-    marginBottom: "24px",
-    justifyContent: "space-between",
-    alignItems: "center",
-    "& > div:first-child" : {
-      display: "flex",
-      alignItems: "center",
-      fontFamily: "Roboto",
-      fontStyle: "normal",
-      fontWeight: "normal",
-      fontSize: "14px",
-      lineHeight: "16px",
-      letterSpacing: "0.25px",
-      color : theme.palette.text.secondary
-    },
-  },
   gridContent : {
     position:"relative",
     display: "grid",
@@ -214,29 +194,7 @@ const useStyle = makeStyles(theme =>({
     height: "100%",
     border: `2px solid ${theme.palette.primary.main}`,
     pointerEvents: "none"
-  },
-  buttonStyle : {
-    width: "93px",
-    height: "40px",
-    radius: "4px",
-    padding: "8px",
-    "&:hover" : {
-      cursor : "pointer !important",
-    },
-  },
-  buttonFontStyle: {
-    fontFamily: "Roboto",
-    fontStyle: "normal",
-    fontWeight: 400,
-    lineHeight: "14.06px",
-    fontSize: "12px",
-    letterSpacing: "0.25px",
-    color : theme.palette.text.secondary,
-    "&:hover": {
-      color: theme.palette.action.hover,
-      fontWeight: 400
-    }
-  },
+  }
 }))
 
 interface Props extends  React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement> {
@@ -326,7 +284,7 @@ const MainContent = (props : Props)=>{
     }
     selectedItems.length = 0;
   }
-
+  
   const restoreBtnClick = async () => {
     console.log('restore')
     const result = await restoreBoardsFromTrash(selectedItems);
@@ -371,29 +329,13 @@ const MainContent = (props : Props)=>{
       {selected === 'trash'? <MainTrashButton /> :<MainNewButton />}
     </div>
 
-    {selected !== 'trash' ? 
-    (<div className={`${classes.nav} ${classes.checkedNav}`}>
+   
+    <div className={`${classes.nav} ${classes.checkedNav}`}>
       <div>
         <Checkbox color="primary" checked={allItemsChecked} onChange={(event) => handleCheckAllBoxChange(event)}/>{getText("word_select").replace("%d", numSelected)}
       </div>
-      <MainNavSelector orderBy={orderBy} listOrderChange={listOrderChange} listViewType={listViewType} selectedItems={selectedItems} routeChange={routeChange} />
-    </div>)
-    :
-    (<div className={classes.trashNav}>
-      <div>
-        <Checkbox color="primary" checked={allItemsChecked} onChange={(event) => handleCheckAllBoxChange(event)}/>{getText("word_select").replace("%d", numSelected)}
-      </div>
-
-      <div>
-        <Button className={`${classes.buttonStyle} ${classes.buttonFontStyle}`} onClick={deleteForeverBtnClick}>
-            <DeleteOutline/><span>완전 삭제</span>
-          </Button> 
-        <Button className={`${classes.buttonStyle} ${classes.buttonFontStyle}`} onClick={restoreBtnClick}>
-          <Restore style={{width: "28px", height: "24px"}}/><span>복원</span>
-        </Button>
-      </div>
-    </div>)
-    }
+      <MainNavSelector orderBy={orderBy} listOrderChange={listOrderChange} listViewType={listViewType} selectedItems={selectedItems} selected={selected} routeChange={routeChange} deleteForeverBtnClick={deleteForeverBtnClick} restoreBtnClick={restoreBtnClick} />
+    </div>
 
  
     <div className={classes.gridContent} ref={contentRef}>
