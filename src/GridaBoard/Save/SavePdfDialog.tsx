@@ -11,7 +11,7 @@ import GridaToolTip from '../styles/GridaToolTip';
 import getText from "../language/language";
 import { makeThumbnail, saveThumbnail, updateDB } from './SaveThumbnail';
 import { store } from '../client/pages/GridaBoard';
-import firebase from 'GridaBoard/util/firebase_config';
+import firebase, { secondaryFirebase } from 'GridaBoard/util/firebase_config';
 import { setDocName } from '../store/reducers/docConfigReducer';
 
 
@@ -125,7 +125,7 @@ const SavePdfDialog = (props: Props) => {
 
     const gridaFileName = `${userId}_${docName}_${date}.grida`;
 
-    const storageRef = firebase.storage().ref();
+    const storageRef = secondaryFirebase.storage().ref();
     const gridaRef = storageRef.child(`grida/${gridaFileName}`);
 
     const gridaUploadTask = gridaRef.put(gridaBlob);

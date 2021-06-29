@@ -3,20 +3,18 @@ import firebase from "firebase";
 
 
 //neostudio staging
-// const firebaseConfig = {
-//   apiKey: "AIzaSyD7Yh_sCRUO-vmsF5dURj5xOLBeP8ekVto",
-//   authDomain: "neostudio-staging.firebaseapp.com",
-//   databaseURL: "https://neostudio-staging.firebaseio.com",
-//   // databaseURL: "https://gridaboard-v2-test-default-rtdb.asia-southeast1.firebasedatabase.app/",
-//   projectId: "neostudio-staging",
-//   storageBucket: "neostudio-staging.appspot.com",
-//   // storageBucket: "gridaboard-v2-test.appspot.com",
-//   messagingSenderId: "382410551029",
-//   appId: "1:382410551029:web:9fa2a23bfc9c7e3f955fbc"
-// };
+const firebaseConfig = {
+  apiKey: "AIzaSyD7Yh_sCRUO-vmsF5dURj5xOLBeP8ekVto",
+  authDomain: "neostudio-staging.firebaseapp.com",
+  databaseURL: "https://neostudio-staging.firebaseio.com",
+  projectId: "neostudio-staging",
+  storageBucket: "neostudio-staging.appspot.com",
+  messagingSenderId: "382410551029",
+  appId: "1:382410551029:web:9fa2a23bfc9c7e3f955fbc"
+};
 
 //v2 test
-const firebaseConfig = {
+const secondaryFirebaseConfig = {
   apiKey: "AIzaSyCQ7i4k-LLa4nEVv8zi9inyT7T68l0-1RI",
   authDomain: "gridaboard-v2-test.firebaseapp.com",
   projectId: "gridaboard-v2-test",
@@ -38,11 +36,10 @@ const firebaseConfig = {
 // };
 
 // Initialize Firebase
-firebase.initializeApp(firebaseConfig);
-// firebase2.initializeApp(firebaseConfig2);
+const mainFirebase = firebase.initializeApp(firebaseConfig);
+export const secondaryFirebase = firebase.initializeApp(secondaryFirebaseConfig, "secondary");
 
 export const auth = firebase.auth();
-// export const firestore = firebase2.firestore();
 
 const provider = new firebase.auth.GoogleAuthProvider();
 
