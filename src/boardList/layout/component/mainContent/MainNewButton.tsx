@@ -33,6 +33,9 @@ const menuStyle = makeStyles(theme => ({
       },
     },
   },
+  ButtonBorder : {
+    border: "1px solid " + theme.custom.icon.mono[0],
+  },
   headerButtonLiner: {
     width: '1px',
     minWidth: '1px',
@@ -41,9 +44,6 @@ const menuStyle = makeStyles(theme => ({
     background: theme.custom.white[25],
     borderRadius: '28px !important',
     borderRight: '0px !important',
-  },
-  menuItem: {
-    minWidth: '130px',
   },
   buttonStyle: {
     padding: 0,
@@ -65,8 +65,41 @@ const menuStyle = makeStyles(theme => ({
       fontWeight: 700,
     },
   },
+  dropper : {
+    marginTop: "8px",
+    "& > div" : {
+      borderRadius: '12px',
+      width: "240px",
+      padding: "8px",
+      " & > ul":{
+        padding: "0px !important",
+        "& > li" : {
+          height: "40px",
+          padding: "8px 12px",
+          borderRadius: "8px",
+          fontFamily: "Roboto",
+          fontStyle: "normal",
+          fontWeight: "normal",
+          fontSize: "14px",
+          lineHeight: "16px",
+          letterSpacing: "0.25px",
+          "& > svg" : {
+            marginRight: "8px",
+            color : theme.custom.grey[4]
+          }
+        },
+        "& > li:hover" : {
+          fontWeight: "bold",
+          background: theme.custom.icon.blue[3],
+          color: theme.palette.primary.main,
+          "& > svg" : {
+            color: theme.palette.primary.main,
+          }
+        }
+      }
+    }
+  }
 }));
-
 const MainNewButton = () => {
   const [open, setOpen] = useState(false);
   const anchorRef = React.useRef<HTMLDivElement>(null);
@@ -113,35 +146,41 @@ const MainNewButton = () => {
     setOpen(false);
   };
 
+  console.log(open);
   return (
     <React.Fragment>
       <div ref={anchorRef}>
-        <Button className={classes.headerButton} variant="contained" color="primary" onClick={handleToggle}>
+        <Button className={`${classes.headerButton} ${open? classes.ButtonBorder : ""}`} variant="contained" color="primary" onClick={handleToggle}>
           <div style={{ marginRight: '15px' }}>{<Add />}</div>
           <div style={{ marginRight: '16px' }}>{getText('word_New')}</div>
           <div className={classes.headerButtonLiner} style={{ marginRight: '5px' }} />
           <ArrowDropDown />
         </Button>
       </div>
-      <Popper open={open} anchorEl={anchorRef.current} role={undefined} transition disablePortal style={{ zIndex: 10 }}>
-        {({ TransitionProps, placement }) => (
-          <Grow
-            {...TransitionProps}
-            style={{
-              transformOrigin: placement === 'bottom' ? 'center top' : 'center bottom',
-              borderRadius: '12px',
-              height: '96px',
-              width: '240px',
-            }}>
+      <Popper className={classes.dropper} open={open} anchorEl={anchorRef.current} role={undefined} transition disablePortal style={{ zIndex: 10 }} placement="bottom-end">
+        {({ TransitionProps }) => (
+          <Grow {...TransitionProps}>
             <Paper>
               <ClickAwayListener onClickAway={handleClose}>
                 <MenuList>
                   {/* map으로 돌릴 경우 onClick에 모든 index가 한번씩 들어옴 */}
-                  <MenuItem className={classes.menuItem} onClick={startGrida}>
-                    <span style={{ marginLeft: '10px' }}>{options[0]}</span>
+                  <MenuItem onClick={startGrida}>
+                    <SvgIcon>
+                      <path
+                        fillRule="evenodd"
+                        clipRule="evenodd"
+                        d="M18 10v10H6V4h6v6h6zm2-2v12a2 2 0 01-2 2H6a2 2 0 01-2-2V4a2 2 0 012-2h8l6 6zm-6-3.172L17.172 8H14V4.828z"
+                      />
+                    </SvgIcon>
+                    <span>{options[0]}</span>
                   </MenuItem>
-                  <MenuItem className={classes.menuItem} onClick={fileOpenHandler}>
-                    <span style={{ marginLeft: '10px' }}>{options[1]}</span>
+                  <MenuItem onClick={fileOpenHandler}>
+                    <SvgIcon>
+                      <path
+                        d="M14 12l-4-4v3H2v2h8v3l4-4zm6 6V6a2 2 0 00-2-2H6a2 2 0 00-2 2v3h2V6h12v12H6v-3H4v3a2 2 0 002 2h12a2 2 0 002-2z"
+                      />
+                    </SvgIcon>
+                    <span>{options[1]}</span>
                     <ConvertFileLoad handlePdfOpen={handlePdfOpen} />
                   </MenuItem>
                 </MenuList>
