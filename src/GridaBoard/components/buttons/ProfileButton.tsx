@@ -3,12 +3,17 @@ import { auth } from "GridaBoard/util/firebase_config";
 import { Button, ClickAwayListener, Grow, makeStyles, MenuItem, MenuList, Paper, Popper } from '@material-ui/core';
 import { KeyboardArrowDown } from "@material-ui/icons";
 import { useHistory } from 'react-router-dom';
-import { fbLogout } from '../../../boardList/BoardListPageFunc';
 import { showAlert } from '../../store/reducers/listReducer';
+import getText from 'GridaBoard/language/language';
 
 const useStyle = makeStyles(theme=>({
   menuItem: {
-    minWidth: '130px',
+    minWidth: '180px',
+    justifyContent: 'center',
+    "&:hover": {
+      background: theme.custom.icon.blue[3],
+      color : theme.palette.primary.main
+    },
   },
 }))
 
@@ -66,7 +71,7 @@ const ProfileButton = () => {
               <ClickAwayListener onClickAway={handleClose}>
                 <MenuList>
                   <MenuItem className={classes.menuItem} onClick={logout}>
-                    <span style={{ marginLeft: '10px' }}>로그아웃</span>
+                    <div>{getText('profile_logout')}</div>
                   </MenuItem>
                 </MenuList>
               </ClickAwayListener>

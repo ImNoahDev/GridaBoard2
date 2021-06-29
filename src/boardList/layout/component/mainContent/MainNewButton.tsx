@@ -43,7 +43,14 @@ const menuStyle = makeStyles(theme => ({
     borderRight: '0px !important',
   },
   menuItem: {
-    minWidth: '130px',
+    minWidth: '224px',
+    height: '40px',
+    padding: '4px 12px 4px 12px',
+    borderRadius: '8px',
+    "&:hover": {
+      background: theme.custom.icon.blue[3],
+      color : theme.palette.primary.main
+    },
   },
   buttonStyle: {
     padding: 0,
@@ -96,7 +103,7 @@ const MainNewButton = () => {
 
     //이거 하면 contents layer의 useEffect부터 불리고 거기서 이전 activePageNo로 로직이 수행돼서 에러나니까 페이지 바뀌기 전에 activePageNo을 미리 바꿔줘야함
     const path = `/app`;
-    history.push(path); 
+    history.push(path);
 
     setOpen(false);
   };
@@ -138,10 +145,22 @@ const MainNewButton = () => {
                 <MenuList>
                   {/* map으로 돌릴 경우 onClick에 모든 index가 한번씩 들어옴 */}
                   <MenuItem className={classes.menuItem} onClick={startGrida}>
-                    <span style={{ marginLeft: '10px' }}>{options[0]}</span>
+                    <SvgIcon viewBox='-4 -2 24 24'>
+                      <path
+                        fillRule="evenodd"
+                        clipRule="evenodd"
+                        d="M14 8V18H2V2H8V8H14ZM16 6V8V18C16 19.1046 15.1046 20 14 20H2C0.895431 20 0 19.1046 0 18V2C0 0.895431 0.895431 0 2 0H8H10L16 6ZM10 2.82843L13.1716 6H10V2.82843Z"
+                        />
+                    </SvgIcon>
+                    <span style={{ marginLeft: '8px' }}>{options[0]}</span>
                   </MenuItem>
                   <MenuItem className={classes.menuItem} onClick={fileOpenHandler}>
-                    <span style={{ marginLeft: '10px' }}>{options[1]}</span>
+                    <SvgIcon viewBox='-3 -4 24 24'>
+                      <path
+                        d="M12 8L8 4V7H0V9H8V12L12 8ZM18 14V2C18 1.46957 17.7893 0.960859 17.4142 0.585786C17.0391 0.210714 16.5304 0 16 0H4C3.46957 0 2.96086 0.210714 2.58579 0.585786C2.21071 0.960859 2 1.46957 2 2V5H4V2H16V14H4V11H2V14C2 14.5304 2.21071 15.0391 2.58579 15.4142C2.96086 15.7893 3.46957 16 4 16H16C16.5304 16 17.0391 15.7893 17.4142 15.4142C17.7893 15.0391 18 14.5304 18 14Z"
+                      />
+                    </SvgIcon>
+                    <span style={{ marginLeft: '9px' }}>{options[1]}</span>
                     <ConvertFileLoad handlePdfOpen={handlePdfOpen} />
                   </MenuItem>
                 </MenuList>
