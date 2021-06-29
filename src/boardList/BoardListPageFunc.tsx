@@ -1,12 +1,12 @@
 import GridaDoc from 'GridaBoard/GridaDoc';
 import { setActivePageNo } from '../GridaBoard/store/reducers/activePageReducer';
 import { setDocName, setIsNewDoc } from '../GridaBoard/store/reducers/docConfigReducer';
-import firebase from 'GridaBoard/util/firebase_config';
+import firebase, { auth } from 'GridaBoard/util/firebase_config';
 import { IBoardData } from './structures/BoardStructures';
-import { DeveloperBoardRounded, DoubleArrowRounded } from '@material-ui/icons';
 import { saveToDB } from '../GridaBoard/Save/SaveThumbnail';
 import { MappingStorage } from '../nl-lib/common/mapper';
 import { InkStorage } from '../nl-lib/common/penstorage';
+import Cookies from 'universal-cookie';
 
 export const startNewGridaPage = async () => {
   const doc = GridaDoc.getInstance();
@@ -276,3 +276,9 @@ export const getTimeStamp = (created: {nanoseconds: number, seconds: number}) =>
   const sec = created.seconds.toString();
   return sec + nano_sec_str;
 }
+
+export const fbLogout = () => {
+  auth.signOut();
+  const cookies = new Cookies();
+  cookies.remove('user_email');
+};
