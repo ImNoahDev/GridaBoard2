@@ -133,7 +133,7 @@ const CombineDialog = (props : Props)=>{
   }else if(["moveDoc"].includes(diaType)){
     groupProps.classes.paper += `  ${classes.groupDialog}`;
     returnDialog = (<MoveDialog {...groupProps} docsObj={docsObj}/>);
-  }else if(["deleteDoc"].includes(diaType)){
+  }else if(["deleteDoc", "logout"].includes(diaType)){
     groupProps.classes.paper += `  ${classes.alertDialog}`;
     returnDialog = (<AlertDialog {...groupProps} />);
   }
