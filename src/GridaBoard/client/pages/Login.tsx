@@ -7,7 +7,7 @@ import { turnOnGlobalKeyShortCut } from "GridaBoard/GlobalFunctions";
 import Cookies from 'universal-cookie';
 import "firebase/firestore";
 import "firebase/auth";
-import { signInWithGoogle, auth } from "GridaBoard/util/firebase_config";
+import { signInWithGoogle, signInWithApple, auth } from "GridaBoard/util/firebase_config";
 import { useSelector } from 'react-redux';
 import { RootState } from 'GridaBoard/store/rootReducer';
 import * as neolabTheme from "GridaBoard/theme";
@@ -152,7 +152,7 @@ const Login = () => {
               <div>그리다보드는 로그인이 필요한 서비스입니다.</div>
               <div className={classes.loginBtns}>
                 <Button onClick = {signInWithGoogle}> <img src={googleLogo} alt="" /> Google 로그인 </Button>
-                <Button onClick={e=>{alert("apple login")}}> <img src={appleLogo} alt="" />Apple로 로그인 </Button>
+                <Button onClick={signInWithApple}> <img src={appleLogo} alt="" />Apple로 로그인 </Button>
               </div>
             </div>
           </div>

@@ -1,4 +1,19 @@
 import firebase from "firebase";
+// import firebase2 from "firebase";
+
+
+//neostudio staging
+// const firebaseConfig = {
+//   apiKey: "AIzaSyD7Yh_sCRUO-vmsF5dURj5xOLBeP8ekVto",
+//   authDomain: "neostudio-staging.firebaseapp.com",
+//   databaseURL: "https://neostudio-staging.firebaseio.com",
+//   // databaseURL: "https://gridaboard-v2-test-default-rtdb.asia-southeast1.firebasedatabase.app/",
+//   projectId: "neostudio-staging",
+//   storageBucket: "neostudio-staging.appspot.com",
+//   // storageBucket: "gridaboard-v2-test.appspot.com",
+//   messagingSenderId: "382410551029",
+//   appId: "1:382410551029:web:9fa2a23bfc9c7e3f955fbc"
+// };
 
 //v2 test
 const firebaseConfig = {
@@ -24,14 +39,18 @@ const firebaseConfig = {
 
 // Initialize Firebase
 firebase.initializeApp(firebaseConfig);
+// firebase2.initializeApp(firebaseConfig2);
 
 export const auth = firebase.auth();
-export const firestore = firebase.firestore();
+// export const firestore = firebase2.firestore();
 
 const provider = new firebase.auth.GoogleAuthProvider();
+
+const AppleAuthProvider = new firebase.auth.OAuthProvider('apple.com')
 
 provider.setCustomParameters({prompt:"select_account"});
 
 export const signInWithGoogle = () => auth.signInWithPopup(provider);
+export const signInWithApple = () => auth.signInWithPopup(AppleAuthProvider)
 
 export default firebase;
