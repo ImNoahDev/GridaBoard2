@@ -1,6 +1,6 @@
 import 'firebase/auth';
 import 'firebase/database';
-import firebase, { auth } from 'GridaBoard/util/firebase_config';
+import firebase, { auth, secondaryFirebase } from 'GridaBoard/util/firebase_config';
 import Cookies from 'universal-cookie';
 
 import {getTimeStamp} from "./BoardListPageFunc";
@@ -9,7 +9,7 @@ import {getTimeStamp} from "./BoardListPageFunc";
 export default {}
 
 
-const db = firebase.firestore();
+const db = secondaryFirebase.firestore();
 const cookies = new Cookies();
 
 

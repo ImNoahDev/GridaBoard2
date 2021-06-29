@@ -1,7 +1,7 @@
 import GridaDoc from 'GridaBoard/GridaDoc';
 import { setActivePageNo } from '../GridaBoard/store/reducers/activePageReducer';
 import { setDocName, setIsNewDoc } from '../GridaBoard/store/reducers/docConfigReducer';
-import firebase, { auth } from 'GridaBoard/util/firebase_config';
+import firebase, { secondaryFirebase, auth } from 'GridaBoard/util/firebase_config';
 import { IBoardData } from './structures/BoardStructures';
 import { saveToDB } from '../GridaBoard/Save/SaveThumbnail';
 import { MappingStorage } from '../nl-lib/common/mapper';
@@ -24,7 +24,7 @@ export const startNewGridaPage = async () => {
 
 export const deleteAllFromTrash = async () => {
   const docArr = [];
-  const db = firebase.firestore();
+  const db = secondaryFirebase.firestore();
   const userId = firebase.auth().currentUser.email;
 
   //delete from db
@@ -40,7 +40,7 @@ export const deleteAllFromTrash = async () => {
 
 
   //delete from storage
-  const storageRef = firebase.storage().ref();
+  const storageRef = secondaryFirebase.storage().ref();
 
   let result = 0;
 
@@ -79,7 +79,7 @@ export const deleteAllFromTrash = async () => {
 
 export const deleteBoardFromLive = async (docItems: IBoardData[]) => {
   const userId = firebase.auth().currentUser.email;
-  const db = firebase.firestore();
+  const db = secondaryFirebase.firestore();
 
   let result = 0;
 
@@ -104,7 +104,7 @@ export const deleteBoardFromLive = async (docItems: IBoardData[]) => {
 }
 
 export const deleteBoardsFromTrash = async (docItems: IBoardData[]) => {
-  const db = firebase.firestore();
+  const db = secondaryFirebase.firestore();
   const userId = firebase.auth().currentUser.email;
 
   let result = 0;
@@ -131,7 +131,7 @@ export const deleteBoardsFromTrash = async (docItems: IBoardData[]) => {
 }
 
 export const restoreBoardsFromTrash = async (docItems: IBoardData[]) => {
-  const db = firebase.firestore();
+  const db = secondaryFirebase.firestore();
   const userId = firebase.auth().currentUser.email;
 
   let result = 0;
@@ -159,7 +159,7 @@ export const restoreBoardsFromTrash = async (docItems: IBoardData[]) => {
 }
 
 export const copyBoard = async (docItem: IBoardData) => {
-  const db = firebase.firestore();
+  const db = secondaryFirebase.firestore();
   const userId = firebase.auth().currentUser.email;
 
   const docName = docItem.doc_name;
@@ -185,7 +185,7 @@ export const copyBoard = async (docItem: IBoardData) => {
     const gridaStr = JSON.stringify(data);
     const gridaBlob = new Blob([gridaStr], { type: 'application/json' });
 
-    const storageRef = firebase.storage().ref();
+    const storageRef = secondaryFirebase.storage().ref();
     const gridaFileName = `${docId}.grida`;
     const gridaRef = storageRef.child(`grida/${gridaFileName}`);
 

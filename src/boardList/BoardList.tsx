@@ -5,7 +5,7 @@ import { turnOnGlobalKeyShortCut } from 'GridaBoard/GlobalFunctions';
 import Cookies from 'universal-cookie';
 import 'firebase/auth';
 import 'firebase/database';
-import firebase, { auth } from 'GridaBoard/util/firebase_config';
+import firebase, { auth, secondaryFirebase } from 'GridaBoard/util/firebase_config';
 import { useDispatch, useSelector } from 'react-redux';
 import GridaDoc from 'GridaBoard/GridaDoc';
 import { InkStorage } from 'nl-lib/common/penstorage';
@@ -85,7 +85,7 @@ const BoardList = () => {
 
   turnOnGlobalKeyShortCut(false);
 
-  const db = firebase.firestore();
+  const db = secondaryFirebase.firestore();
   
   useEffect(() => {
     const getDb = async ()=>{

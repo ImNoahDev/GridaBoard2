@@ -8,7 +8,7 @@ import { adjustNoteItemMarginForFilm, getNPaperInfo } from '../../nl-lib/common/
 import { store } from '../client/pages/GridaBoard';
 import * as PdfJs from 'pdfjs-dist';
 import { clearCanvas } from 'nl-lib/common/util';
-import firebase from 'GridaBoard/util/firebase_config';
+import firebase,{secondaryFirebase} from 'GridaBoard/util/firebase_config';
 import { makePdfDocument } from './SavePdf';
 import { getPageInfosFromDoc, makeGridaBlob } from './SaveGrida';
 import { forceUpdateBoardList } from '../store/reducers/appConfigReducer';
@@ -280,7 +280,7 @@ export async function saveThumbnail(docName: string) {
   /** Save Thumbnail as PNG file
    * -----------------------------------------------------------------------------------
    */
-  const storageRef = firebase.storage().ref();
+  const storageRef = secondaryFirebase.storage().ref();
 
   const userId = firebase.auth().currentUser.email;
   const date = new Date();
@@ -381,7 +381,7 @@ export async function saveThumbnail(docName: string) {
 export async function updateDB(docName: string, thumb_path: string, grida_path: string, date) {
   const doc = GridaDoc.getInstance();
 
-  const db = firebase.firestore();
+  const db = secondaryFirebase.firestore();
   const userId = firebase.auth().currentUser.email;
 
   const docId = `${userId}_${docName}_${date}`;
@@ -405,7 +405,7 @@ export async function updateDB(docName: string, thumb_path: string, grida_path: 
 export async function saveToDB(docName: string, thumb_path: string, grida_path: string, nowDate: Date, isCopyProcess: boolean) {
   const doc = GridaDoc.getInstance();
   
-  const db = firebase.firestore();
+  const db = secondaryFirebase.firestore();
   const userId = firebase.auth().currentUser.email;
 
   const docId = `${userId}_${docName}_${nowDate.getTime()}`;
