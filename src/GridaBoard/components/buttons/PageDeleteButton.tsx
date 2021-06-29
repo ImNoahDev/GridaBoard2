@@ -6,13 +6,17 @@ import { RootState } from "GridaBoard/store/rootReducer";
 import GridaDoc from "GridaBoard/GridaDoc";
 import { DeleteOutline } from "@material-ui/icons";
 import SimpleTooltip2 from "../SimpleTooltip2";
+import { showAlert } from "../../store/reducers/listReducer";
 
 const PageDeleteButton = (props: IconButtonProps) => {
   const activePageNo = useSelector((state: RootState) => state.activePage.activePageNo);
 
   const handlePageDeleteBtn = () => {
-    if(activePageNo === -1) return ;
-    GridaDoc.getInstance().removePages(activePageNo);
+    showAlert({
+      type: "deletePage",
+      selected: null,
+      sub: "hihihi"
+    })
   }
 
   return (

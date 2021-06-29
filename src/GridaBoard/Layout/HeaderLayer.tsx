@@ -24,6 +24,7 @@ import SimpleTooltip from "../components/SimpleTooltip";
 import { KeyboardArrowDown } from "@material-ui/icons";
 import { auth } from 'GridaBoard/util/firebase_config';
 import ProfileButton from "../components/buttons/ProfileButton";
+import { showAlert } from "../store/reducers/listReducer";
 
 const useStyles = props => makeStyles((theme) => ({
   dropdownBtn : {
@@ -301,9 +302,12 @@ const HeaderLayer = (props: Props) => {
     props.handlePenLogWindow();
   }
 
-  const routeChange = async () => {
-    const path = `/list`;
-    await history.push(path);
+  const toBoardList = async () => {
+    showAlert({
+      type:"toBoardList",
+      selected: null,
+      sub: null
+    });
   }
 
   const [debugOpen, setDebugOpen] = useState(false);
@@ -314,7 +318,7 @@ const HeaderLayer = (props: Props) => {
       <div id="header" className={`${classes.headerStyle}`}>
         <div >
             <SimpleTooltip title="그리다보드 홈">
-              <IconButton><img src={LogoSvg} className={classes.imgStyle} onClick={routeChange}></img></IconButton>
+              <IconButton><img src={LogoSvg} className={classes.imgStyle} onClick={toBoardList}></img></IconButton>
             </SimpleTooltip>
           <div>  
             <div>{docName}</div> {/* & > div > div > div:first-child */}
