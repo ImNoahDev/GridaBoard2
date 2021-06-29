@@ -4,6 +4,7 @@ import { Button, ClickAwayListener, Grow, makeStyles, MenuItem, MenuList, Paper,
 import { KeyboardArrowDown } from "@material-ui/icons";
 import { useHistory } from 'react-router-dom';
 import { fbLogout } from '../../../boardList/BoardListPageFunc';
+import { showAlert } from '../../store/reducers/listReducer';
 
 const useStyle = makeStyles(theme=>({
   menuItem: {
@@ -36,14 +37,12 @@ const ProfileButton = () => {
   };
   
   const logout = () => {
-    fbLogout();
-    routeChange();
+    showAlert({
+      type:"logout",
+      selected: null,
+      sub: null
+    });
   };
-
-  const routeChange = () => {
-    const path = `/`;
-    history.push(path);
-  }
 
   return (
     <React.Fragment>

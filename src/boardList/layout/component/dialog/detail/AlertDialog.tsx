@@ -3,8 +3,9 @@ import { useSelector, useDispatch } from "react-redux";
 import { Button, Dialog, DialogProps } from "@material-ui/core";
 import {createCategory, changeCategoryName} from "boardList/BoardListPageFunc2";
 import { RootState } from "GridaBoard/store/rootReducer";
-import { deleteBoardFromLive } from "boardList/BoardListPageFunc";
+import { deleteBoardFromLive, fbLogout } from "boardList/BoardListPageFunc";
 import { forceUpdateBoardList } from "GridaBoard/store/reducers/appConfigReducer";
+import { useHistory } from "react-router-dom";
 
 
 const dialogTypes = {
@@ -13,24 +14,25 @@ const dialogTypes = {
     sub : "%d개의 파일 휴지동 ㄱㄱ",
     cancel : "취소",
     success : "확인"
+  },
+  "logout" : {
+    title : "로그아웃 하실래요?",
+    cancel: "취소",
+    success : "확인"
   }
 }
-
-
 
 interface Props extends  DialogProps {
   type ?: string
   closeEvent ?: (isChange:boolean)=>void
 }
 
-
-
 const AlertDialog = (props : Props)=>{
   const { open, closeEvent, type,  ...rest } = props;
   const selected = useSelector((state: RootState) => state.list.dialog.selected);
   const subData = useSelector((state: RootState) => state.list.dialog.sub);
   const dispatch = useDispatch();
-
+  const history = useHistory();
 
   const selectedData = dialogTypes[type];
   console.log(selectedData);
@@ -59,9 +61,18 @@ const AlertDialog = (props : Props)=>{
       if (result === 1) {
         dispatch(forceUpdateBoardList());
       }
+    } else if (type === "logout") {
+      fbLogout();
+      routeChange();
     }
     closeEvent(false)
   }
+
+  const routeChange = () => {
+    const path = `/`;
+    history.push(path);
+  }
+
   return (
     <Dialog
       disableBackdropClick
