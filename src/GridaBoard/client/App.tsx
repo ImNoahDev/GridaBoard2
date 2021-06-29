@@ -21,8 +21,8 @@ const App = ()=>{
           <Provider store={store}>
             <Route exact path="/" component={Login}/>
             <Route exact path="/list" component={BoardList}/>
+            <Route exact path="/app" component={GridaBoard}/>
           </Provider>
-          <Route exact path="/app" component={GridaBoard}/>
           <Route exact path="/loginCheck" component={LoginCheck}/>
         </div>);
     }

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Provider } from "react-redux";
+import { useSelector } from "react-redux";
 import { NavLink } from 'react-router-dom';
 import { Backdrop, CircularProgress, IconButton, makeStyles, MuiThemeProvider, Snackbar } from "@material-ui/core";
 import MuiAlert from "@material-ui/lab/Alert";
@@ -18,6 +18,7 @@ import { g_paperType, g_paperType_default } from "nl-lib/common/noteserver";
 import Home from "../../View/Home";
 import LoadingCircle from "../../Load/LoadingCircle";
 import { turnOnGlobalKeyShortCut } from "../../GlobalFunctions";
+import CombineDialog from 'boardList/layout/component/dialog/CombineDialog';
 
 
 
@@ -119,29 +120,32 @@ const GridaBoard = () => {
 
   const rootState = store.getState() as RootState;
   const shouldWait = rootState.ui.waiting.circular;
+  const isShowDialog = useSelector((state: RootState) => state.list.dialog.show);
+
 
   turnOnGlobalKeyShortCut(true);
 
   return (
-    <Provider store={store}>
+    <React.Fragment>
       {/* 임시 네비 버튼 */}
       {/* <NavLink exact to="/about"> About </NavLink>
       <NavLink exact to="/"> Home </NavLink> */}
       {/* 임시 네비 버튼 */}
-        <LoadingCircle />
-        <MuiThemeProvider theme={theme}>
-          {/* {paperInfoInited ?
-          <Home /> : <></>} */}
-          <Home />
+      <LoadingCircle />
+      <MuiThemeProvider theme={theme}>
+        {/* {paperInfoInited ?
+        <Home /> : <></>} */}
+        <Home />
 
-          <Backdrop className={classes.backdrop} open={shouldWait} >
-            <CircularProgress color="inherit" />
-          </Backdrop>
+        <Backdrop className={classes.backdrop} open={shouldWait} >
+          <CircularProgress color="inherit" />
+        </Backdrop>
+        <CombineDialog open={isShowDialog} />
 
 
-          {renderToastMessage()}
-        </MuiThemeProvider>
-    </Provider>
+        {renderToastMessage()}
+      </MuiThemeProvider>
+    </React.Fragment>
   );
 }
 

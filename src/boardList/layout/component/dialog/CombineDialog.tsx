@@ -100,7 +100,7 @@ const useStyle = makeStyles(theme=>({
 }))
 interface Props extends  DialogProps {
   test ?: string,
-  docsObj :{
+  docsObj ?:{
     docs: any[],
     category: any[],
   }
