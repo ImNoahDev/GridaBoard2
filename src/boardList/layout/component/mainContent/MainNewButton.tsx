@@ -174,7 +174,6 @@ const MainNewButton = () => {
               <ClickAwayListener onClickAway={handleClose}>
                 <MenuList>
                   {/* map으로 돌릴 경우 onClick에 모든 index가 한번씩 들어옴 */}
-<<<<<<< HEAD
                   <MenuItem className={classes.menuItem} onClick={startGrida}>
                     <SvgIcon viewBox='-4 -2 24 24'>
                       <path
@@ -192,25 +191,6 @@ const MainNewButton = () => {
                       />
                     </SvgIcon>
                     <span style={{ marginLeft: '9px' }}>{options[1]}</span>
-=======
-                  <MenuItem onClick={startGrida}>
-                    <SvgIcon>
-                      <path
-                        fillRule="evenodd"
-                        clipRule="evenodd"
-                        d="M18 10v10H6V4h6v6h6zm2-2v12a2 2 0 01-2 2H6a2 2 0 01-2-2V4a2 2 0 012-2h8l6 6zm-6-3.172L17.172 8H14V4.828z"
-                      />
-                    </SvgIcon>
-                    <span>{options[0]}</span>
-                  </MenuItem>
-                  <MenuItem onClick={fileOpenHandler}>
-                    <SvgIcon>
-                      <path
-                        d="M14 12l-4-4v3H2v2h8v3l4-4zm6 6V6a2 2 0 00-2-2H6a2 2 0 00-2 2v3h2V6h12v12H6v-3H4v3a2 2 0 002 2h12a2 2 0 002-2z"
-                      />
-                    </SvgIcon>
-                    <span>{options[1]}</span>
->>>>>>> f9a0a51ed553ea6912d0c582ca9932b5d5a809b4
                     <ConvertFileLoad handlePdfOpen={handlePdfOpen} />
                   </MenuItem>
                 </MenuList>
