@@ -7,30 +7,33 @@ import { deleteBoardFromLive, fbLogout } from "boardList/BoardListPageFunc";
 import { forceUpdateBoardList } from "GridaBoard/store/reducers/appConfigReducer";
 import { useHistory } from "react-router-dom";
 import GridaDoc from "../../../../../GridaBoard/GridaDoc";
+import getText from "GridaBoard/language/language";
 
+const confirmText = getText('print_popup_yes');
+const cancelText = getText('print_popup_no');
 
 const dialogTypes = {
   "deleteDoc" : {
-    title : "삭제하시겠습니까",
-    sub : "%d개의 파일 휴지동 ㄱㄱ",
-    cancel : "취소",
-    success : "확인"
+    title : getText('deleteBoard_title'),
+    sub : getText('deleteBoard_sub'),
+    cancel : cancelText,
+    success : confirmText
   },
   "logout" : {
-    title : "로그아웃 하실래요?",
-    cancel: "취소",
-    success : "확인"
+    title : getText('profile_logout_msg'),
+    cancel: cancelText,
+    success : confirmText
   },
   "toBoardList" : {
-    title : "페이지를 벗어나시겠습니까?",
-    cancel: "취소",
-    success : "확인"
+    title : getText('toBoardList_title'),
+    sub: getText('toBoardList_sub'),
+    cancel: cancelText,
+    success : confirmText
   },
   "deletePage" : {
-    title: "페이지를 삭제하시겠습니까?",
-    sub : "페이지에 있는 모든 스트로크도 함께 제거됩니다",
-    cancel: "취소",
-    success : "확인"
+    title: getText('deletePage_title'),
+    cancel: cancelText,
+    success : confirmText
   }
 }
 
@@ -57,7 +60,7 @@ const AlertDialog = (props : Props)=>{
     if(subData !== null){
       count = subData.data.length;
     }
-    subText = subText.replace("%d", count);
+    selectedData.title = selectedData.title.replace("%d", count);
   }
 
 
