@@ -1,4 +1,4 @@
-import { Button, Checkbox, makeStyles } from '@material-ui/core';
+import { Button, Checkbox, makeStyles, Snackbar } from '@material-ui/core';
 import React, { useEffect, useState } from 'react';
 import getText from "GridaBoard/language/language";
 import MainNavSelector from "./component/mainContent/MainNavSelector";
@@ -214,7 +214,8 @@ const MainContent = (props : Props)=>{
   const [nowDocs, setNowDocs] = useState([]);
   const [allItemsChecked, setAllItemsChecked] = useState(false);
   const [title, setTitle] = useState("");
-  
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+
   const classes = useStyle();
   const dispatch = useDispatch();
 
@@ -281,6 +282,7 @@ const MainContent = (props : Props)=>{
     const result = await deleteBoardsFromTrash(selectedItems);
     if (result === 1) {
       dispatch(forceUpdateBoardList()); 
+      setOpenSnackbar(true);
     }
     selectedItems.length = 0;
   }
@@ -319,6 +321,15 @@ const MainContent = (props : Props)=>{
     setAllItemsChecked(checked);
   }
 
+  const handleClose = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+
+    setOpenSnackbar(false);
+  };
+
+
   const numSelected = selectedItems.length.toString();
 
   return (<div className={classes.wrap}>
@@ -334,7 +345,7 @@ const MainContent = (props : Props)=>{
       <div>
         <Checkbox color="primary" checked={allItemsChecked} onChange={(event) => handleCheckAllBoxChange(event)}/>{getText("word_select").replace("%d", numSelected)}
       </div>
-      <MainNavSelector orderBy={orderBy} listOrderChange={listOrderChange} listViewType={listViewType} selectedItems={selectedItems} selected={selected} routeChange={routeChange} deleteForeverBtnClick={deleteForeverBtnClick} restoreBtnClick={restoreBtnClick} />
+      <MainNavSelector orderBy={orderBy} listOrderChange={listOrderChange} listViewType={listViewType} selectedItems={selectedItems} selected={ selected} routeChange={routeChange} deleteForeverBtnClick={deleteForeverBtnClick} restoreBtnClick={restoreBtnClick} />
     </div>
 
  
@@ -344,6 +355,8 @@ const MainContent = (props : Props)=>{
     : (<ListView docsList={nowDocs} selectedClass={classes.selected}/>)}
       
     </div>
+
+    <Snackbar open={openSnackbar} autoHideDuration={6000} onClose={handleClose} message={getText('deleteForever_msg')} />
   </div>);
 }
 
