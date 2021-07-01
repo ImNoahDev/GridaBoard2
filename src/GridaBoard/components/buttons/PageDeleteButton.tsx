@@ -15,7 +15,6 @@ const PageDeleteButton = (props: IconButtonProps) => {
     showAlert({
       type: "deletePage",
       selected: null,
-      sub: "hihihi"
     })
   }
 

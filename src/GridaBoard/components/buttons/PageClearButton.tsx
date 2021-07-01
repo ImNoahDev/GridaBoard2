@@ -8,6 +8,7 @@ import { PageEventName } from "nl-lib/common/enums";
 import { RootState } from "GridaBoard/store/rootReducer";
 import GridaDoc from "GridaBoard/GridaDoc";
 import SimpleTooltip2 from "../SimpleTooltip2";
+import { showAlert } from "../../store/reducers/listReducer";
 
 
 const PageClearButton = (props: IconButtonProps) => {
@@ -16,14 +17,11 @@ const PageClearButton = (props: IconButtonProps) => {
   const handlePageClearBtn = () => {
     if(activePageNo === -1) return ;
 
-    const doc = GridaDoc.getInstance();
-    const pageInfo = doc.getPage(activePageNo).pageInfos[0];
-
-    const inkStorage = InkStorage.getInstance();
-    inkStorage.dispatcher.dispatch(PageEventName.PAGE_CLEAR, pageInfo);
-    inkStorage.removeStrokeFromPage(pageInfo);
+    showAlert({
+      type: "clearPage",
+      selected: null,
+    })
   }
-
 
   return (
     <IconButton id="pageClearButton" onClick={handlePageClearBtn} {...props} >

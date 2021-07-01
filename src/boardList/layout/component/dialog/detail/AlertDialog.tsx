@@ -6,8 +6,10 @@ import { RootState } from "GridaBoard/store/rootReducer";
 import { deleteBoardFromLive, fbLogout } from "boardList/BoardListPageFunc";
 import { forceUpdateBoardList } from "GridaBoard/store/reducers/appConfigReducer";
 import { useHistory } from "react-router-dom";
-import GridaDoc from "../../../../../GridaBoard/GridaDoc";
+import GridaDoc from "GridaBoard/GridaDoc";
 import getText from "GridaBoard/language/language";
+import { InkStorage } from "nl-lib/common/penstorage";
+import { PageEventName } from "nl-lib/common/enums";
 
 const confirmText = getText('print_popup_yes');
 const cancelText = getText('print_popup_no');
@@ -32,6 +34,11 @@ const dialogTypes = {
   },
   "deletePage" : {
     title: getText('deletePage_title'),
+    cancel: cancelText,
+    success : confirmText
+  },
+  "clearPage" : {
+    title: getText('clearPage_title'),
     cancel: cancelText,
     success : confirmText
   }
@@ -65,27 +72,46 @@ const AlertDialog = (props : Props)=>{
 
 
   const success = async ()=>{
-    if(type == "deleteDoc"){
-      console.log(selected);
-      let deleteData = [selected];
-      if(subData !== null){
-        deleteData = subData.data;
+
+    switch (type) {
+      case "deleteDoc" : {
+        let deleteData = [selected];
+        if(subData !== null){
+          deleteData = subData.data;
+        }
+        const result = await deleteBoardFromLive(deleteData);
+        
+        if (result === 1) {
+          dispatch(forceUpdateBoardList());
+        }
+        break;
       }
-      console.log(deleteData);
-      const result = await deleteBoardFromLive(deleteData);
-      
-      if (result === 1) {
-        dispatch(forceUpdateBoardList());
+      case "logout" : {
+        fbLogout();
+        routeChangeToLogin();
+        break;
       }
-    } else if (type === "logout") {
-      fbLogout();
-      routeChangeToLogin();
-    } else if (type === "toBoardList") {
-      routeChangeToBoardList();
-    } else if (type === "deletePage") {
-      if(activePageNo === -1) return ;
-      GridaDoc.getInstance().removePages(activePageNo);
+      case "toBoardList" : {
+        routeChangeToBoardList();
+        break;
+      }
+      case "deletePage" : {
+        if (activePageNo === -1) return ;
+        GridaDoc.getInstance().removePages(activePageNo);
+        break;
+      }
+      case "clearPage" : {
+        const doc = GridaDoc.getInstance();
+        const pageInfo = doc.getPage(activePageNo).pageInfos[0];
+    
+        const inkStorage = InkStorage.getInstance();
+        inkStorage.dispatcher.dispatch(PageEventName.PAGE_CLEAR, pageInfo);
+        inkStorage.removeStrokeFromPage(pageInfo);
+        break;
+      }
+      default: break;
     }
+    
     closeEvent(false)
   }
 

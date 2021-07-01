@@ -11,9 +11,12 @@ import AlertDialog from "./detail/AlertDialog";
 const useStyle = makeStyles(theme=>({
   groupDialog : {
     minWidth : "360px",
+    maxWidth : "436px",
     minHeight : "255px",
     "& > .title" : {
       marginTop : "40px",
+      marginLeft : "10px",
+      marginRight : "10px",
     },
     "& > .inputer" : {
       marginTop : "16px",
@@ -28,9 +31,12 @@ const useStyle = makeStyles(theme=>({
   },
   alertDialog: {
     minWidth : "360px",
+    maxWidth : "436px",
     minHeight : "215px",
     "& > .title" : {
       marginTop : "40px",
+      marginLeft : "10px",
+      marginRight : "10px",
     },
     "& > .warn" : {
       width: "100%",
@@ -50,6 +56,7 @@ const useStyle = makeStyles(theme=>({
     boxShadow : theme.custom.shadows[0],
     borderRadius: "12px",
     alignItems: "center",
+    wordBreak : "break-all",
     "& > .title" : {
       display: "flex",
       justifyContent : "center",
@@ -133,7 +140,7 @@ const CombineDialog = (props : Props)=>{
   }else if(["moveDoc"].includes(diaType)){
     groupProps.classes.paper += `  ${classes.groupDialog}`;
     returnDialog = (<MoveDialog {...groupProps} docsObj={docsObj}/>);
-  }else if(["deleteDoc", "logout", "toBoardList", "deletePage"].includes(diaType)){
+  }else if(["deleteDoc", "logout", "toBoardList", "deletePage", "clearPage"].includes(diaType)){
     groupProps.classes.paper += `  ${classes.alertDialog}`;
     returnDialog = (<AlertDialog {...groupProps} />);
   }
