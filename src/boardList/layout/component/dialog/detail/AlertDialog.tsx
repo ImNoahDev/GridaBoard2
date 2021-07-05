@@ -10,6 +10,7 @@ import GridaDoc from "GridaBoard/GridaDoc";
 import getText from "GridaBoard/language/language";
 import { InkStorage } from "nl-lib/common/penstorage";
 import { PageEventName } from "nl-lib/common/enums";
+import { showSnackbar } from "../../../../../GridaBoard/store/reducers/listReducer";
 
 const confirmText = getText('print_popup_yes');
 const cancelText = getText('print_popup_no');
@@ -65,6 +66,7 @@ const AlertDialog = (props : Props)=>{
   if(type == "deleteDoc"){
     let count = 1;
     if(subData !== null){
+      selectedData.title = getText('deleteBoard_title');
       count = subData.data.length;
     }
     selectedData.title = selectedData.title.replace("%d", count);
@@ -83,6 +85,16 @@ const AlertDialog = (props : Props)=>{
         
         if (result === 1) {
           dispatch(forceUpdateBoardList());
+
+          const selectedDocNames: string[] = [];
+          for (const doc of subData.data) {
+            selectedDocNames.push(doc.doc_name);
+          }
+          showSnackbar({
+            snackbarType : "deleteDoc",
+            selectedDocName : selectedDocNames,
+            selectedCategory : getText('trash')
+          })
         }
         break;
       }

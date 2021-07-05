@@ -147,7 +147,6 @@ const MainNewButton = () => {
     setOpen(false);
   };
 
-  console.log(open);
   return (
     <React.Fragment>
       <div ref={anchorRef}>

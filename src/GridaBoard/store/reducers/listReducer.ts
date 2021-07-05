@@ -1,3 +1,4 @@
+import { stroke } from "pdf-lib";
 import { IBoardData } from "../../../boardList/structures/BoardStructures";
 import { store } from "../../client/pages/GridaBoard";
 
@@ -11,6 +12,7 @@ export const LISTActionTypes = Object.freeze({
   CHANGE_GROUP : `${ActionGroup}.CHANGE_GROUP`,
   SHOW_ALERT : `${ActionGroup}.SHOW_ALERT`,
   HIDE_ALERT : `${ActionGroup}.HIDE_ALERT`,
+  SHOW_SNACKBAR : `${ActionGroup}.SHOW_SNACKBAR`,
 });
 // 액션 생성 함수
 export const showGroupDialog = (option : {type : string, selected ?: any}) => {
@@ -58,7 +60,14 @@ export const hideAlert = () => {
   });
 };
 
-
+export const showSnackbar = (option: { snackbarType: string, selectedDocName?: string[], selectedCategory?: string }) => {
+  store.dispatch({
+    type : LISTActionTypes.SHOW_SNACKBAR,
+    snackbarType: option.snackbarType,
+    selectedDocName: option.selectedDocName,
+    selectedCategory: option.selectedCategory
+  });
+};
 
 // 초기 상태
 const initialState = {
@@ -77,12 +86,29 @@ const initialState = {
     event : null,
     openType : "vert",
     selected : null
+  },
+  snackbar : {
+    type : "",
+    snackbarType : "",
+    selectedCategory: "",
+    selectedDocName : [""]
   }
 };
 
 // 리듀서 작성
 export default function listReducer(state = initialState, action) {
   switch (action.type) {
+    case LISTActionTypes.SHOW_SNACKBAR : {
+      return {
+        ...state,
+        snackbar : {
+          ...state.snackbar,
+          type : action.snackbarType as string,
+          selectedDocName: action.selectedDocName,
+          selectedCategory : action.selectedCategory
+        }
+      }
+    }
     case LISTActionTypes.SHOW_GROUP_DIALOG :
       return {
         ...state,

@@ -12,6 +12,7 @@ import firebase,{secondaryFirebase} from 'GridaBoard/util/firebase_config';
 import { makePdfDocument } from './SavePdf';
 import { getPageInfosFromDoc, makeGridaBlob } from './SaveGrida';
 import { forceUpdateBoardList } from '../store/reducers/appConfigReducer';
+import { showSnackbar } from '../store/reducers/listReducer';
 
 const makePdfJsDoc = async (loadingTask: any) => {
   return new Promise(resolve => {
@@ -429,6 +430,11 @@ export async function saveToDB(docName: string, thumb_path: string, grida_path: 
       console.log(`${docName} is created`);
       if (isCopyProcess) {
         store.dispatch(forceUpdateBoardList());
+        showSnackbar({
+          snackbarType : "copyDoc",
+          selectedDocName : [docName],
+          selectedCategory : ""
+        });
       }      
     })
     .catch(error => {

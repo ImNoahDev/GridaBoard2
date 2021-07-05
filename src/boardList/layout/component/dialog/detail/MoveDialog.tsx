@@ -8,7 +8,7 @@ import { textCheckForGroup, createGroup } from "./GroupDialog";
 import { forceUpdateBoardList } from "GridaBoard/store/reducers/appConfigReducer";
 import { IBoardData } from "boardList/structures/BoardStructures";
 import { docCategoryChange } from "boardList/BoardListPageFunc2";
-import { changeGroup } from 'GridaBoard/store/reducers/listReducer';
+import { changeGroup, showSnackbar } from 'GridaBoard/store/reducers/listReducer';
 
 
 const useStyle = makeStyles(theme=>({
@@ -259,7 +259,6 @@ const MoveDialog = (props: Props)=>{
     if(!cantSave && newText != "" && createNewDisable){
       setCreateNewDisible(false);
     }else if(cantSave || (newText == "" && !createNewDisable)){
-      console.log("!!!!!!!!!!")
       setCreateNewDisible(true);
     }
 
@@ -283,7 +282,19 @@ const MoveDialog = (props: Props)=>{
     
     closeEvent(false);
     dispatch(forceUpdateBoardList());
+    
+    const selectedDocNames: string[] = [];
+    for (const doc of selected) {
+      selectedDocNames.push(doc.doc_name);
+    }
+
+    showSnackbar({
+      snackbarType: "moveDoc",
+      selectedDocName: selectedDocNames,
+      selectedCategory: nowData[0],
+    });
   }
+  
   return (<Dialog
     disableBackdropClick
     onClose={closeEvent}

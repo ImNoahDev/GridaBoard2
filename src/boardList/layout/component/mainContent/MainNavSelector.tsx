@@ -1,5 +1,5 @@
 import React from 'react';
-import { createStyles, IconButton, InputBase, MenuItem, Select, SvgIcon, withStyles, Button } from '@material-ui/core';
+import { createStyles, IconButton, InputBase, MenuItem, Select, SvgIcon, withStyles, Button, Snackbar } from '@material-ui/core';
 import getText from "GridaBoard/language/language";
 import { IBoardData } from "../../../structures/BoardStructures";
 import { OpenInBrowser, DeleteOutline, Restore } from '@material-ui/icons';
@@ -53,8 +53,8 @@ interface Props extends  React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivEle
   selectedItems ?: Array<IBoardData>,
   selected ?: string,
   routeChange ?: (idx: number) => void,
-  deleteForeverBtnClick ?: () => Promise<void>
-  restoreBtnClick ?: () => Promise<void>
+  deleteForeverBtnClick ?: () => Promise<void>,
+  restoreBtnClick ?: () => Promise<void>,
 }
 
 const MainNavSelector = (props : Props)=>{
@@ -186,7 +186,6 @@ const CheckedNav = (props: checkedNavProp)=>{
         type:"moveDoc",
         selected: selectedItems,
       });
-
     }
   }
 
