@@ -93,7 +93,7 @@ const AlertDialog = (props : Props)=>{
           showSnackbar({
             snackbarType : "deleteDoc",
             selectedDocName : selectedDocNames,
-            selectedCategory : getText('trash')
+            selectedCategory : getText('boardList_trashBin')
           })
         }
         break;
