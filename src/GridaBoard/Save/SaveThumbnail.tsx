@@ -13,6 +13,7 @@ import { makePdfDocument } from './SavePdf';
 import { getPageInfosFromDoc, makeGridaBlob } from './SaveGrida';
 import { forceUpdateBoardList } from '../store/reducers/appConfigReducer';
 import { showSnackbar } from '../store/reducers/listReducer';
+import { setLoadingVisibility } from '../store/reducers/loadingCircle';
 
 const makePdfJsDoc = async (loadingTask: any) => {
   return new Promise(resolve => {
@@ -336,6 +337,7 @@ export async function saveThumbnail(docName: string) {
         await thumbUploadTask.on(
           firebase.storage.TaskEvent.STATE_CHANGED,
           function (snapshot) {
+            setLoadingVisibility(true);
             const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
             console.log('Thumbnail Upload is ' + progress + '% done');
             switch (snapshot.state) {
@@ -397,6 +399,7 @@ export async function updateDB(docName: string, thumb_path: string, grida_path: 
     })
     .then(function () {
       console.log(`${docName} is created`);
+      setLoadingVisibility(false);
     })
     .catch(error => {
       console.error('Error adding document: ', error);
@@ -435,7 +438,8 @@ export async function saveToDB(docName: string, thumb_path: string, grida_path: 
           selectedDocName : [docName],
           selectedCategory : ""
         });
-      }      
+      }
+      setLoadingVisibility(false);
     })
     .catch(error => {
       console.error('Error adding document: ', error);

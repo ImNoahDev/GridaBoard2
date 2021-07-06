@@ -13,6 +13,7 @@ import { makeThumbnail, saveThumbnail, updateDB } from './SaveThumbnail';
 import { store } from '../client/pages/GridaBoard';
 import firebase, { secondaryFirebase } from 'GridaBoard/util/firebase_config';
 import { setDocName } from '../store/reducers/docConfigReducer';
+import { setLoadingVisibility } from '../store/reducers/loadingCircle';
 
 
 const useStyles = makeStyles((theme) => {
@@ -169,6 +170,7 @@ const SavePdfDialog = (props: Props) => {
           await thumbUploadTask.on(
             firebase.storage.TaskEvent.STATE_CHANGED,
             function (snapshot) {
+              setLoadingVisibility(true);
               const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
               console.log('Thumbnail Upload is ' + progress + '% done');
               switch (snapshot.state) {
