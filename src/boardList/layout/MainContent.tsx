@@ -332,24 +332,20 @@ const MainContent = (props: Props) => {
   };
 
   const deleteForeverBtnClick = async () => {
-    console.log('delete');
     const result = await deleteBoardsFromTrash(selectedItems);
-    if (result === 1) {
+    if (result) {
       dispatch(forceUpdateBoardList());
       showSnackbar({
         snackbarType :"deleteForever",
         selectedDocName: [""],
       });
-      
-      // setOpenSnackbar(true);
     }
     selectedItems.length = 0;
   };
 
   const restoreBtnClick = async () => {
-    console.log('restore');
     const result = await restoreBoardsFromTrash(selectedItems);
-    if (result === 1) {
+    if (result) {
       dispatch(forceUpdateBoardList());
     }
     selectedItems.length = 0;

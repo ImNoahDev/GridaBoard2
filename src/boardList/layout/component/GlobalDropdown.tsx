@@ -2,11 +2,13 @@ import React from 'react';
 import { makeStyles, ClickAwayListener, MenuList, Paper, Popper, MenuItem, PopperProps } from '@material-ui/core';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from 'GridaBoard/store/rootReducer';
-import { hideDropDown, showGroupDialog, changeGroup } from 'GridaBoard/store/reducers/listReducer';
+import { hideDropDown, showGroupDialog, changeGroup, showSnackbar } from 'GridaBoard/store/reducers/listReducer';
 import { changeCategorySort, deleteCategory } from '../../BoardListPageFunc2';
 import { IBoardData } from 'boardList/structures/BoardStructures';
 import getText from 'GridaBoard/language/language';
-import { copyBoard } from '../../BoardListPageFunc';
+import { copyBoard, deleteBoardsFromTrash, restoreBoardsFromTrash } from '../../BoardListPageFunc';
+import { forceUpdateBoardList } from '../../../GridaBoard/store/reducers/appConfigReducer';
+import { store } from 'GridaBoard/client/pages/GridaBoard';
 
 const useStyle = makeStyles(theme => ({
   paper: {
@@ -43,6 +45,9 @@ const copyStr = getText('boardList_gridView_menu_copy');
 const moveUpStr = getText('categoryMenu_moveUp');
 const moveDownStr = getText('categoryMenu_moveDown');
 const deleteStr = getText('categoryMenu_delete');
+
+const deleteForeverStr = getText('deleteForeverBtn');
+const restoreStr = getText('restoreBtn');
 
 const itemData = {
   group: {
@@ -88,6 +93,28 @@ const itemData = {
       },
     },
   },
+  trash: {
+    placement: 'bottom-start',
+    list: [deleteForeverStr, restoreStr],
+    runFunction: {
+      0: async (val) => { //완전 삭제
+        const result = await deleteBoardsFromTrash([val]);
+        if (result) {
+          store.dispatch(forceUpdateBoardList());
+          showSnackbar({
+            snackbarType :"deleteForever",
+            selectedDocName: [""],
+          });
+        }
+      },
+      1: async (val) => { //복원
+        const result = await restoreBoardsFromTrash([val]);
+        if (result) {
+          store.dispatch(forceUpdateBoardList());
+        }
+      },
+    },
+  }
 };
 
 type Prop = {
@@ -98,6 +125,7 @@ type Prop = {
 
 const GlobalDropdown = (props: Prop) => {
   const { open, routeChange, ...rest } = props;
+  const dispatch = useDispatch();
 
   if (open === false) return null;
   const dropDown = useSelector((state: RootState) => state.list.dropDown);

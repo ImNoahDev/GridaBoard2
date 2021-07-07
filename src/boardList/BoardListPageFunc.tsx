@@ -108,12 +108,9 @@ export const deleteBoardsFromTrash = async (docItems: IBoardData[]) => {
   const userId = firebase.auth().currentUser.email;
 
   let result = 0;
-
   for await (const docItem of docItems) {
     const docName = docItem.doc_name;
     if (docName === undefined) continue;
-    const m_sec = getTimeStamp(docItem.created);
-    // const docId = `${userId}_${docName}_${m_sec}`;
     const docId = docItem.docId;
   
     await db.collection(userId)
@@ -135,12 +132,9 @@ export const restoreBoardsFromTrash = async (docItems: IBoardData[]) => {
   const userId = firebase.auth().currentUser.email;
 
   let result = 0;
-
   for await (const docItem of docItems) {
     const docName = docItem.doc_name;
     if (docName === undefined) continue;
-    const m_sec = getTimeStamp(docItem.created);
-    // const docId = `${userId}_${docName}_${m_sec}`;
     const docId = docItem.docId;
   
     await db.collection(userId)

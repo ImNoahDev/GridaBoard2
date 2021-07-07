@@ -6,7 +6,6 @@ import { OpenInBrowser, DeleteOutline, Restore } from '@material-ui/icons';
 import { showAlert, showGroupDialog } from 'GridaBoard/store/reducers/listReducer';
 import { copyBoard } from '../../../BoardListPageFunc';
 
-
 const BootstrapInput = withStyles((theme) =>
   createStyles({
     root: {
@@ -53,8 +52,8 @@ interface Props extends  React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivEle
   selectedItems ?: Array<IBoardData>,
   selected ?: string,
   routeChange ?: (idx: number) => void,
-  deleteForeverBtnClick ?: () => Promise<void>,
-  restoreBtnClick ?: () => Promise<void>,
+  deleteForeverBtnClick ?: () => void,
+  restoreBtnClick ?: () => void,
 }
 
 const MainNavSelector = (props : Props)=>{
@@ -240,8 +239,8 @@ const CheckedNav = (props: checkedNavProp)=>{
 
 
 type trashProp = {
-  deleteForeverBtnClick ?: () => Promise<void>
-  restoreBtnClick ?: () => Promise<void>
+  deleteForeverBtnClick ?: () => void,
+  restoreBtnClick ?: () => void
 }
 
 const TrashNav = (props:trashProp)=>{
@@ -250,10 +249,10 @@ const TrashNav = (props:trashProp)=>{
   return (
       <div className="checkedNav">
         <Button onClick={deleteForeverBtnClick}>
-            <DeleteOutline/><span>완전 삭제</span>
+            <DeleteOutline/><span>{getText('deleteForeverBtn')}</span>
           </Button> 
         <Button onClick={restoreBtnClick}>
-          <Restore /><span>복원</span>
+          <Restore /><span>{getText('restoreBtn')}</span>
         </Button>
       </div>
     )

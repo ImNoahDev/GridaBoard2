@@ -312,7 +312,6 @@ const HeaderLayer = (props: Props) => {
 
   const [debugOpen, setDebugOpen] = useState(false);
 
-  const userId = auth.currentUser.email;
   return (
     <React.Fragment>
       <div id="header" className={`${classes.headerStyle}`}>
