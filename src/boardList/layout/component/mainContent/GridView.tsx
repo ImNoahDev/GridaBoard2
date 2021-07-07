@@ -59,6 +59,7 @@ const GridView = (props: Props) => {
   const [forcedNotToShowMoreBtns, setForcedNotToShowMoreBtns] = useState(false);
 
   useEffect(() => {
+    //초기화 
     showMoreBtns.length = 0;
     showCheckBoxes.length = 0;
     forcedToShowCheckBoxes.length = 0;
@@ -68,6 +69,8 @@ const GridView = (props: Props) => {
       showCheckBoxes.push(false);
       forcedToShowCheckBoxes.push(false);
     }
+    
+    setForcedNotToShowMoreBtns(false);
   }, [docsList.length]);
 
   useEffect(() => {
