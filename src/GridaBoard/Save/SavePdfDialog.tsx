@@ -7,9 +7,8 @@ import { savePDF } from "./SavePdf";
 import { makeGridaBlob, saveGrida } from "./SaveGrida";
 import PdfDialogTextArea from './PdfDialogTextArea';
 import { turnOnGlobalKeyShortCut } from '../GlobalFunctions';
-import GridaToolTip from '../styles/GridaToolTip';
 import getText from "../language/language";
-import { makeThumbnail, saveThumbnail, updateDB } from './SaveThumbnail';
+import { makeThumbnail, saveThumbnail, updateDB } from 'boardList/BoardListPageFunc';
 import { store } from '../client/pages/GridaBoard';
 import firebase, { secondaryFirebase } from 'GridaBoard/util/firebase_config';
 import { setDocName } from '../store/reducers/docConfigReducer';
@@ -113,6 +112,8 @@ const SavePdfDialog = (props: Props) => {
   };
 
   const overwrite = async () => {
+    setLoadingVisibility(true);
+
     //1. 썸네일 새로 만들기
     const imageBlob = await makeThumbnail();
 
@@ -170,7 +171,6 @@ const SavePdfDialog = (props: Props) => {
           await thumbUploadTask.on(
             firebase.storage.TaskEvent.STATE_CHANGED,
             function (snapshot) {
-              setLoadingVisibility(true);
               const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
               console.log('Thumbnail Upload is ' + progress + '% done');
               switch (snapshot.state) {
