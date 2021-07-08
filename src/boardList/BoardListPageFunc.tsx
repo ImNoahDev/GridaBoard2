@@ -8,7 +8,7 @@ import { MappingStorage } from '../nl-lib/common/mapper';
 import { InkStorage } from '../nl-lib/common/penstorage';
 import Cookies from 'universal-cookie';
 
-export const startNewGridaPage = async () => {
+export const resetGridaBoard = async () => {
   const doc = GridaDoc.getInstance();
   doc.pages = [];
   doc._pdfd = [];
@@ -16,7 +16,12 @@ export const startNewGridaPage = async () => {
   MappingStorage.getInstance().resetTemporary();
   InkStorage.getInstance().resetStrokes();
 
-  const pageNo = await doc.addBlankPage();
+}
+
+export const startNewGridaPage = async () => {
+  resetGridaBoard();
+
+  const pageNo = await GridaDoc.getInstance().addBlankPage();
   setActivePageNo(pageNo);
   setDocName('undefined');
   setIsNewDoc(true);

@@ -4,7 +4,7 @@ import getText from 'GridaBoard/language/language';
 import { ArrowDropDown, Add } from '@material-ui/icons';
 import { useHistory } from 'react-router';
 import GridaDoc from '../../../../GridaBoard/GridaDoc';
-import { startNewGridaPage } from '../../../BoardListPageFunc';
+import { resetGridaBoard, startNewGridaPage } from '../../../BoardListPageFunc';
 import { IFileBrowserReturn, IPageSOBP } from '../../../../nl-lib/common/structures';
 import ConvertFileLoad from '../../../../GridaBoard/Load/ConvertFileLoad';
 
@@ -120,6 +120,8 @@ const MainNewButton = () => {
   };
 
   const fileOpenHandler = () => {
+    resetGridaBoard();
+
     const input = document.querySelector('#fileForconvert') as HTMLInputElement;
     input.value = '';
     input.click();
