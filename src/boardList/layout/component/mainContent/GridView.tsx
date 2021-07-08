@@ -150,7 +150,7 @@ const GridView = (props: Props) => {
               className={`contentItem`}
               onMouseOver={e => updateShowBtns(idx, true)}
               onMouseLeave={e => updateShowBtns(idx, false)}>
-              <div style={{ backgroundImage: `url(${el.thumb_path})` }} />
+              <div style={{ backgroundImage: `url(${el.thumb_path})` }} onClick={() => routeChange(el.key)} />
               <div>
                 <div>{el.doc_name}</div>
                 <div className="contentData">
@@ -170,7 +170,7 @@ const GridView = (props: Props) => {
                 </div>
               </Grow>
               <Fade in={showCheckBoxes[idx]}>
-                <div className="hover" onClick={() => routeChange(el.key)} />
+                <div className="hover"  />
               </Fade>
               {selectedItems.includes(el) ? <div className={selectedClass} /> : ''}
               {category === 'trash' ? (
