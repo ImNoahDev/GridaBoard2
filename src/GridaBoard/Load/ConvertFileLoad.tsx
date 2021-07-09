@@ -8,6 +8,7 @@ import GridaDoc from "../GridaDoc";
 import { InkStorage } from '../../nl-lib/common/penstorage';
 import { useHistory } from 'react-router';
 import { scrollToBottom } from '../../nl-lib/common/util';
+import { setDocName } from '../store/reducers/docConfigReducer';
 
 // import {fileConvert} from "./LoadGrida";
 
@@ -126,9 +127,23 @@ const ConvertFileLoad = (props: Props) => {
     history.push(path);
 
     const inputer = document.getElementById("fileForconvert") as HTMLInputElement;
-    const fileName = inputer.files[0].name.split(".");
-    const fileType = fileName[fileName.length-1];
+    let fullFileName = inputer.files[0].name;
     
+    let pos = 0;
+    const searchvalue = '.';
+    const foundPosArr = []
+
+    for (;;) {
+      const foundPos = inputer.files[0].name.indexOf(searchvalue, pos)
+      if (foundPos === -1) break;
+      foundPosArr.push(foundPos);  
+      pos = foundPos + 1;
+    }
+    
+    const fileType = fullFileName.substring(foundPosArr[foundPosArr.length - 1] + 1, fullFileName.length);
+    fullFileName = fullFileName.substring(0, foundPosArr[foundPosArr.length - 1]);
+    setDocName(fullFileName);
+
     const result = {
       result : "success",
       file : null,
