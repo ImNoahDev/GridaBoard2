@@ -326,7 +326,7 @@ const HeaderLayer = (props: Props) => {
     <React.Fragment>
       <div id="header" className={`${classes.headerStyle}`}>
         <div>
-          <SimpleTooltip title="그리다보드 홈">
+          <SimpleTooltip title={getText('gridaBoard_home')}>
             <IconButton>
               <img src={LogoSvg} className={classes.imgStyle} onClick={toBoardList}></img>
             </IconButton>
@@ -361,7 +361,7 @@ const HeaderLayer = (props: Props) => {
                       className={`${classes.buttonStyle} ${classes.buttonFontStyle} saveButton`}
                       onClick={handleClickExport}
                       disabled={disabled}>
-                      내보내기
+                      {getText('export_file')}
                     </Button>
                   </CustomBadge>
                   {isExportOpen ? (
