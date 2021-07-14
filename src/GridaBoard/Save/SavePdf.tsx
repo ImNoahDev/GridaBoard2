@@ -15,12 +15,7 @@ const PDF_TO_SCREEN_SCALE = 6.72; // (56/600)*72
 // https://pdf-lib.js.org/
 
 export async function savePDF(saveName: string) {
-
   const filename = saveName;
-
-  const doc = GridaDoc.getInstance();
-  const docPages = doc.pages;
-
   const pdfDoc = await makePdfDocument();
 
   addStrokesOnPage(pdfDoc);
