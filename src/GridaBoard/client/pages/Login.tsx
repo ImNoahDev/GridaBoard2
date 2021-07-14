@@ -128,14 +128,14 @@ const Login = () => {
       //로그인 완료
       console.log("logined", user);
       user.getIdTokenResult().then(function(result){
-        console.log(new Date(result.expirationTime));
+        const expirationTime = new Date(result.expirationTime)
+        // const time = expirationTime.getTime() - 3540000; //새로운 expiration time 설정 필요할 때
+        // const newExTime = new Date(time);
         cookies.set("user_email", user.email, {
-          expires: new Date(result.expirationTime)
+          expires: expirationTime
         });
-  
         setLogined(true);
       });
-
     }
   })
   

@@ -21,6 +21,7 @@ import { getCategoryArray } from "./BoardListPageFunc2";
 import GlobalDropdown from './layout/component/GlobalDropdown';
 import { setDefaultCategory, getDatabase } from "./BoardListPageFunc2"
 import { getTimeStamp } from './BoardListPageFunc';
+import { forceUpdateBoardList } from '../GridaBoard/store/reducers/appConfigReducer';
 
 const useStyle = makeStyles(theme => ({
   mainBackground: {
@@ -48,10 +49,9 @@ const BoardList = () => {
   });
   const [category, setCategory] = useState('recent');
   const userId = cookies.get('user_email');
-
+  const dispatch = useDispatch();
   
   const history = useHistory();
-  const dispatch = useDispatch();
 
   const updateCount = useSelector((state: RootState) => state.appConfig.updateCount);
   const isShowDialog = useSelector((state: RootState) => state.list.dialog.show);
@@ -107,6 +107,8 @@ const BoardList = () => {
     }
   }, [updateCount]);
 
+
+
   for (let i = 0; i < docsObj.category.length; i++) {
     docsObj.category[i][2] = 0;
   }
@@ -117,20 +119,7 @@ const BoardList = () => {
       docsObj.category[now.category][2] += 1;
     }
   }
-  
-  const readThumbnailFromDB = () => {
-    const userId = firebase.auth().currentUser.email;
-
-    db.collection(userId)
-      .get()
-      .then(querySnapshot => {
-        querySnapshot.forEach(doc => {
-          console.log(doc.id, ' => ', doc.data());
-          // setUrl(doc.data().thumb_downloadURL);
-        });
-      });
-  };
-  
+ 
 
   const routeChange = async idx => {
     const nowDocs = docsObj.docs[idx];
@@ -202,8 +191,21 @@ const BoardList = () => {
   
   if (userId === undefined) {
     //로그인으로 자동으로 넘기기
-    return <Redirect to="/" />;
+    auth.onAuthStateChanged(user => {
+      if(user !== null){
+        //로그인 완료
+        user.getIdTokenResult().then(function(result){
+          const expirationTime = new Date(result.expirationTime)
+          cookies.set("user_email", user.email, {
+            expires: expirationTime
+          });
+        });
+      } else {
+        return <Redirect to="/" />
+      }
+    })
   }
+
   return (
     <MuiThemeProvider theme={theme}>
       <div className={classes.mainBackground}>
