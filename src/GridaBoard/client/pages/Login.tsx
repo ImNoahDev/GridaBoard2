@@ -324,7 +324,7 @@ const CustomSlider = ()=>{
             <div>{el.title}</div>
             <div>{el.text}</div>
             <div>
-              <div>Tip!</div>
+              <div>{getText("login_banner_tipTitle")}</div>
               <div>{el.tip}</div>
             </div>
           </div>
