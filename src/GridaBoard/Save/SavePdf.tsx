@@ -14,7 +14,6 @@ const PDF_TO_SCREEN_SCALE = 6.72; // (56/600)*72
 
 // https://pdf-lib.js.org/
 
-const inkSt = InkStorage.getInstance();
 export async function savePDF(saveName: string) {
 
   const filename = saveName;
