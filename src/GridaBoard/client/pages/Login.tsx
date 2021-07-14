@@ -14,6 +14,7 @@ import * as neolabTheme from "GridaBoard/theme";
 import googleLogo from "GridaBoard/googleLogo.png";
 import appleLogo from "GridaBoard/appleLogo.png";
 import { default as Slider, Settings, CustomArrowProps } from "react-slick";
+import getText from "GridaBoard/language/language";
 
 const useStyle = (theme:Theme) => makeStyles(_theme=>({
   wrap : {
@@ -122,6 +123,7 @@ const Login = () => {
     //로그인시 자동으로 넘기기
     return (<Redirect to="/list" />);
   }
+
   auth.onAuthStateChanged(user => {
     // user.email
     if(user !== null){
@@ -148,11 +150,11 @@ const Login = () => {
           </div>
           <div>
             <div className={classes.login}>
-              <div>로그인</div>
-              <div>그리다보드는 로그인이 필요한 서비스입니다.</div>
+              <div>{getText("login_title")}</div>
+              <div>{getText("login_subtitle")}</div>
               <div className={classes.loginBtns}>
-                <Button onClick = {signInWithGoogle}> <img src={googleLogo} alt="" /> Google 로그인 </Button>
-                <Button onClick={signInWithApple}> <img src={appleLogo} alt="" />Apple로 로그인 </Button>
+                <Button onClick = {signInWithGoogle}> <img src={googleLogo} alt="" />{getText("login_withGoogle")}</Button>
+                <Button onClick={signInWithApple}> <img src={appleLogo} alt="" />{getText("login_withApple")} </Button>
               </div>
             </div>
           </div>
@@ -303,15 +305,14 @@ const CustomSlider = ()=>{
 		// 	setNowView(current)
 		// },
 	}
-  let data = [{
-    title: "원격지에서도 효과적인 브레인스토밍",
-    text : "스마트펜으로 작성한 아이디어를 실시간으로 공유할 수 있어 팀원들과 효과적인 회의를 진행할 수 있습니다. 회의 후 작성 내용을 그대로 저장해 빠르게 공유할 수도 있습니다.",
-    tip: "Zoom, Google Meet 등 다양한 화상회의 서비스에 사용 가능"
-  },{
-    title: "집중력을 끌어올리는 원격 수업",
-    text : "그리다보드에서 출력한 종이로 기록하여 빠르게 수업을 진행할 수 있습니다. 수업 후 수업 내용을 저장해 손쉽게 공유할 수 있도록 지원합니다.",
-    tip: "Zoom, Google Meet 등 다양한 화상회의 서비스에 사용 가능"
-  }];
+  const data = [];
+  for(let i = 0; i < 2; i++){
+    data.push({
+      title: getText("login_banner_data" + (i+1) + "_title"),
+      text : getText("login_banner_data" + (i+1) + "_text"),
+      tip: getText("login_banner_data" + (i+1) + "_tip")
+    })
+  }
   
   return (
     <Slider ref={e=>slider=e} {...sliderSettings} className={classes.slider} >

@@ -5,24 +5,25 @@ import { useSelector, useDispatch } from "react-redux";
 import {createCategory, changeCategoryName, changeDocName} from "boardList/BoardListPageFunc2";
 import { RootState } from "GridaBoard/store/rootReducer";
 import { forceUpdateBoardList } from "GridaBoard/store/reducers/appConfigReducer";
+import getText from "GridaBoard/language/language";
 
 const dialogTypes = {
   "newGroup" : {
-    title : "새 그룹 생성",
-    placeHolder : "그룹 이름",
-    mainWarn  : "새로운 그룹 이름을 입력해주세요",
+    title : getText("boardList_dialog_newGroup_title"),
+    placeHolder : getText("boardList_dialog_newGroup_placeHolder"),
+    mainWarn  : getText("boardList_dialog_newGroup_mainWarn"),
     selectedType : "group"
   },
   "changeGroupName" : {
-    title : "그룹 이름 변경",
-    placeHolder : "",
-    mainWarn  : "새로운 그룹 이름을 입력해주세요",
+    title : getText("boardList_dialog_changeGroupName_title"),
+    placeHolder : getText("boardList_dialog_changeGroupName_placeHolder"),
+    mainWarn  : getText("boardList_dialog_changeGroupName_mainWarn"),
     selectedType : "group"
   },
   "changeDocName" : {
-    title : "보드 이름 변경",
-    placeHolder : "",
-    mainWarn  : "새로운 보드 이름을 입력해주세요",
+    title : getText("boardList_dialog_changeDocName_title"),
+    placeHolder : getText("boardList_dialog_changeDocName_placeHolder"),
+    mainWarn  : getText("boardList_dialog_changeDocName_mainWarn"),
     selectedType : "doc"
   }
 };
@@ -161,8 +162,8 @@ const GroupDialog = (props : Props)=>{
     <input ref={(e)=>{inputer=e}} className="inputer" autoFocus placeholder={placeHolder} onChange={inputChange} defaultValue={defaultText} />
     <div className="warn">{mainWarn}</div>
     <div className="footer">
-      <Button variant="contained" disableElevation color="secondary" onClick={()=>{closeEvent(false)}} >취소</Button>
-      <Button variant="contained" disableElevation color="primary" disabled={disabled} onClick={()=>{save()}}>저장</Button>
+      <Button variant="contained" disableElevation color="secondary" onClick={()=>{closeEvent(false)}} >{getText("save_pdf_popup_cancel")}</Button>
+      <Button variant="contained" disableElevation color="primary" disabled={disabled} onClick={()=>{save()}}>{getText("save_pdf_popup_save")}</Button>
     </div>
   </Dialog> );
 }

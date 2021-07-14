@@ -152,11 +152,11 @@ type checkedNavProp = {
 }
 
 const langtype = {
-  "open" : "열기",
-  "nameChange" : "이름 변경",
-  "copy" : "복제",
-  "delete" : "삭제",
-  "move" : "이동"
+  "open" : getText("boardList_gridView_menu_open"),
+  "nameChange" : getText("boardList_gridView_menu_changeName"),
+  "copy" : getText("boardList_gridView_menu_copy"),
+  "delete" : getText("categoryMenu_delete"),
+  "move" : getText("boardList_gridView_menu_move")
 }
 const CheckedNav = (props: checkedNavProp)=>{
   const {viewType, selectedItems, routeChange, ...rest} = props;
