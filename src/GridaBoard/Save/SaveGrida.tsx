@@ -16,7 +16,7 @@ const inkSt = InkStorage.getInstance();
 
 export async function saveGrida(gridaName: string) {
 
-  const blob = makeGridaBlob();
+  const blob = await makeGridaBlob();
   saveAs(blob, gridaName);
 }
 
