@@ -136,6 +136,7 @@ const Login = () => {
         cookies.set("user_email", user.email, {
           expires: expirationTime
         });
+        localStorage.GridaBoard_userData = JSON.stringify(user);
         setLogined(true);
       });
     }

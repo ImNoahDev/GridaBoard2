@@ -5,6 +5,8 @@ import { KeyboardArrowDown } from "@material-ui/icons";
 import { useHistory } from 'react-router-dom';
 import { showAlert } from '../../store/reducers/listReducer';
 import getText from 'GridaBoard/language/language';
+import UserInfo from "../CustomElement/UserInfo"
+import Cookies from 'universal-cookie';
 
 const useStyle = makeStyles(theme=>({
   menuItem: {
@@ -24,12 +26,16 @@ const ProfileButton = () => {
   const classes = useStyle();
   const anchorRef = React.useRef<HTMLDivElement>(null);
   
-  let userId = "";
-  if (auth.currentUser !== null) {
-    userId = auth.currentUser.email;
-  }
+  const cookies = new Cookies();
+  const userId = cookies.get("user_email");
+
+  // let userId = "";
+  // if (auth.currentUser !== null) {
+  //   userId = auth.currentUser.email;
+  // }
 
   const handleClose = (event: React.MouseEvent<Document, MouseEvent>) => {
+    console.log("!!!!!!!!!!");
     if (anchorRef.current && anchorRef.current.contains(event.target as HTMLElement)) {
       return;
     }
@@ -41,45 +47,31 @@ const ProfileButton = () => {
     setOpen(prevOpen => !prevOpen);
   };
   
-  const logout = () => {
-    showAlert({
-      type:"logout",
-      selected: null,
-      sub: null
-    });
-  };
 
   return (
-    <React.Fragment>
+    <div>
         <div ref={anchorRef} onClick={handleToggle}>
           <Button style={{textTransform: 'none'}}>
             {userId}
             <KeyboardArrowDown/>
           </Button>
         </div>
-        <Popper open={open} anchorEl={anchorRef.current} role={undefined} transition disablePortal style={{ zIndex: 10 }}>
-        {({ TransitionProps, placement }) => (
-          <Grow
-            {...TransitionProps}
-            style={{
-              transformOrigin: placement === 'bottom' ? 'center top' : 'center bottom',
-              borderRadius: '12px',
-              height: '48px',
-              width: '180px',
-            }}>
-            <Paper>
-              <ClickAwayListener onClickAway={handleClose}>
-                <MenuList>
-                  <MenuItem className={classes.menuItem} onClick={logout}>
+      <ClickAwayListener onClickAway={handleClose}>
+        <Popper open={open} anchorEl={anchorRef.current} role={undefined} placement={'bottom-end'} transition disablePortal >
+          {({ TransitionProps }) => (
+            <Grow
+              {...TransitionProps}>
+                <UserInfo />
+                {/* <MenuList>
+                  <MenuItem className={classes.menuItem} >
                     <div>{getText('profile_logout')}</div>
                   </MenuItem>
-                </MenuList>
-              </ClickAwayListener>
-            </Paper>
-          </Grow>
-        )}
-       </Popper>
-    </React.Fragment>
+                </MenuList> */}
+            </Grow>
+            )}
+          </Popper>
+      </ClickAwayListener>
+    </div>
   );
 }
 
