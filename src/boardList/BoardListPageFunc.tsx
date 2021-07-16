@@ -17,6 +17,7 @@ import { makeGridaBlob } from 'GridaBoard/Save/SaveGrida';
 import { forceUpdateBoardList } from 'GridaBoard/store/reducers/appConfigReducer';
 import { showSnackbar } from 'GridaBoard/store/reducers/listReducer';
 import { setLoadingVisibility } from 'GridaBoard/store/reducers/loadingCircle';
+import getText from "GridaBoard/language/language";
 
 export const resetGridaBoard = async () => {
   const doc = GridaDoc.getInstance();
@@ -171,7 +172,7 @@ export const copyBoard = async (docItem: IBoardData) => {
   const db = secondaryFirebase.firestore();
   const userId = firebase.auth().currentUser.email;
 
-  const docName = docItem.doc_name;
+  const docName = docItem.doc_name + getText('boardList_copied');
   const date = new Date();
   const timeStamp = date.getTime();
   const docId = `${userId}_${docName}_${timeStamp}`;
