@@ -137,6 +137,9 @@ const AlertDialog = (props : Props)=>{
     history.push(path);
   }
 
+  const isWarn = subText !== undefined;
+  console.log(subText);
+
   return (
     <Dialog
       disableBackdropClick
@@ -144,8 +147,8 @@ const AlertDialog = (props : Props)=>{
       {...rest}
       open={open}
     >
-      <div className="title">{selectedData.title}</div>
-      <div className="warn">{subText}</div>
+      <div className={`title ${isWarn?"" : "noWarnTitle" }`}>{selectedData.title}</div>
+      {isWarn ? (<div className="warn">{subText}</div>) : ""}      
       <div className="footer">
         <Button variant="contained" disableElevation color="secondary" onClick={()=>{closeEvent(false)}} >{selectedData.cancel}</Button>
         <Button variant="contained" disableElevation color="primary" onClick={()=>{success()}}>{selectedData.success}</Button>

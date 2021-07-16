@@ -49,7 +49,10 @@ const useStyle = makeStyles(theme=>({
       justifyContent : "center",
       alignItems : "center",
     },
-
+    "& > .noWarnTitle" : {
+      marginBottom: "34px",
+      marginTop: "70px !important"
+    },
   },
   paper : {
     background: theme.custom.white[90],
