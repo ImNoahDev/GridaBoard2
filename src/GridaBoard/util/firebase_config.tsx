@@ -51,7 +51,30 @@ export const signInWithGoogle = async () => {
   const mainAuth = await auth.signInWithPopup(provider);
   secondaryFirebase.auth().signInWithCredential(mainAuth.credential);
 }
-export const signInWithApple = () => auth.signInWithPopup(AppleAuthProvider)
+export const signInWithApple = async () => {
+  const mainAuth = await auth.signInWithPopup(AppleAuthProvider);
+  secondaryFirebase.auth().signInWithCredential(mainAuth.credential);
+}
 
 export default firebase;
 
+
+
+
+const test = async ()=>{
+  window["testFirebase"] = firebase;
+  window["secondaryFirebase"] = secondaryFirebase;
+  window["auth"] = auth;
+  // var auth = firebase.auth();
+
+  var provider = new firebase.auth.GoogleAuthProvider();
+  window["provider"] = provider;
+  // var a = await auth.signInWithPopup(provider);
+  // console.log(a);
+  var auth2 = secondaryFirebase.auth()
+  window["auth2"] = auth2;
+  // var b= auth2.signInWithCredential(a.credential);
+  // console.log(b);
+}
+
+console.log(test);
