@@ -47,7 +47,11 @@ const AppleAuthProvider = new firebase.auth.OAuthProvider('apple.com')
 
 provider.setCustomParameters({prompt:"select_account"});
 
-export const signInWithGoogle = () => auth.signInWithPopup(provider);
+export const signInWithGoogle = async () => {
+  const mainAuth = await auth.signInWithPopup(provider);
+  secondaryFirebase.auth().signInWithCredential(mainAuth.credential);
+}
 export const signInWithApple = () => auth.signInWithPopup(AppleAuthProvider)
 
 export default firebase;
+
