@@ -288,6 +288,7 @@ export const getTimeStamp = (created: {nanoseconds: number, seconds: number}) =>
 
 export const fbLogout = () => {
   auth.signOut();
+  secondaryFirebase.auth().signOut();
   const cookies = new Cookies();
   cookies.remove('user_email');
 };
