@@ -191,7 +191,6 @@ export const copyBoard = async (docItem: IBoardData) => {
   .then(res => res.json())
   .then(async data => {
     
-    console.log('hihi');
     const gridaStr = JSON.stringify(data);
     const gridaBlob = new Blob([gridaStr], { type: 'application/json' });
 
@@ -687,7 +686,7 @@ export async function updateDB(docName: string, thumb_path: string, grida_path: 
     });
 }
 
-export async function saveToDB(docName: string, thumb_path: string, grida_path: string, nowDate: Date, isCopyProcess: boolean) {
+export async function saveToDB(docName: string, thumb_path: string, grida_path: string, nowDate: Date, isCopyProcess: boolean, docNumPages?: number) {
   const doc = GridaDoc.getInstance();
   
   const db = secondaryFirebase.firestore();
