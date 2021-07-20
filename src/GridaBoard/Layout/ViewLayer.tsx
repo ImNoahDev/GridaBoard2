@@ -102,7 +102,7 @@ const ViewLayer = (props: Props) => {
   const classes = useStyles();
   const [isView, setHeaderView] = useState(true); //헤더 뷰
   const [debugOpen, setDebugOpen] = useState(false);
-  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(true);
 
   const activePageNo_store = useSelector((state: RootState) => state.activePage.activePageNo);
 
