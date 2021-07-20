@@ -6,6 +6,7 @@ import ThemeManager from "GridaBoard/styles/ThemeManager"
 import { INeoSmartpen, IPenToViewerEvent } from "nl-lib/common/neopen/INeoSmartpen";
 import NeoSmartpen from "./NeoSmartpen";
 import VirtualPen from "./VirtualPen";
+import getText from "GridaBoard/language/language";
 
 let _penmanager_instance = null as PenManager;
 let _active_pen: INeoSmartpen = null;
@@ -320,7 +321,7 @@ export default class PenManager {
     const { pen } = opt;
     const btDeviceId = pen.getBtDevice().id;
     if (_active_pen.getMac() === pen.getMac()) {
-      alert('펜 연결이 끊어졌습니다. \n펜 확인 후 다시 연결해주세요.');
+      alert(getText('pen_disconnected_alert'));
     }
     const index = this.penArray.findIndex(penInfo => penInfo.id === btDeviceId);
     if (index > -1) {

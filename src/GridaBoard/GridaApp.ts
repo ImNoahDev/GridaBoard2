@@ -101,6 +101,10 @@ export default class GridaApp {
     if (e.event.event === 'on_connected') {
       this._pens.push(pen);
       setPens([...this._pens]);
+      if (this._pens.length === 1) {
+        //첫 펜 연결의 경우 pen down 하지 않더라도 active pen
+        this._penManager.setActivePen(pen.getMac());
+      }
     }
     else if (e.event.event === 'on_disconnected') {
       const mac = pen.getMac();

@@ -17,6 +17,7 @@ import { makeGridaBlob } from 'GridaBoard/Save/SaveGrida';
 import { forceUpdateBoardList } from 'GridaBoard/store/reducers/appConfigReducer';
 import { showSnackbar } from 'GridaBoard/store/reducers/listReducer';
 import { setLoadingVisibility } from 'GridaBoard/store/reducers/loadingCircle';
+import getText from "GridaBoard/language/language";
 
 export const resetGridaBoard = async () => {
   const doc = GridaDoc.getInstance();
@@ -171,7 +172,7 @@ export const copyBoard = async (docItem: IBoardData) => {
   const db = secondaryFirebase.firestore();
   const userId = firebase.auth().currentUser.email;
 
-  const docName = docItem.doc_name;
+  const docName = docItem.doc_name + getText('boardList_copied');
   const date = new Date();
   const timeStamp = date.getTime();
   const docId = `${userId}_${docName}_${timeStamp}`;
@@ -190,7 +191,6 @@ export const copyBoard = async (docItem: IBoardData) => {
   .then(res => res.json())
   .then(async data => {
     
-    console.log('hihi');
     const gridaStr = JSON.stringify(data);
     const gridaBlob = new Blob([gridaStr], { type: 'application/json' });
 
@@ -686,7 +686,7 @@ export async function updateDB(docName: string, thumb_path: string, grida_path: 
     });
 }
 
-export async function saveToDB(docName: string, thumb_path: string, grida_path: string, nowDate: Date, isCopyProcess: boolean) {
+export async function saveToDB(docName: string, thumb_path: string, grida_path: string, nowDate: Date, isCopyProcess: boolean, docNumPages?: number) {
   const doc = GridaDoc.getInstance();
   
   const db = secondaryFirebase.firestore();
