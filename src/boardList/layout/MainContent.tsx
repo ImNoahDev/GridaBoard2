@@ -231,8 +231,15 @@ const MainContent = (props: Props) => {
 
   useEffect(() => {
     switch (snackbarType) {
+      case "restoreDoc": {
+        setSnackbarMsg(getText("boardList_restore_doc"));
+        setSnackbarMsgSuffix("");
+        setOpenSnackbar(true);
+        break;
+      }
       case "deleteForever": {
         setSnackbarMsg(getText('deleteForever_msg'));
+        setSnackbarMsgSuffix("");
         setOpenSnackbar(true);
         break;
       }
@@ -348,6 +355,12 @@ const MainContent = (props: Props) => {
     if (result) {
       dispatch(forceUpdateBoardList());
     }
+    const nameArr = Array.from(selectedItems,(el)=>el.doc_name);
+    showSnackbar({
+      snackbarType : "restoreDoc",
+      selectedDocName : nameArr,
+      selectedCategory : null
+    })
     selectedItems.length = 0;
   };
 
