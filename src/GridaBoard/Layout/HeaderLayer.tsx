@@ -348,8 +348,8 @@ const HeaderLayer = (props: Props) => {
                   </CustomBadge>
                   {isSaveOpen ? (
                     <div className={`${classes.saveDropdownStyle}`}>
-                      <SavePdfDialog saveType="saveAs" />
-                      <SavePdfDialog saveType="overwrite" />
+                      <SavePdfDialog saveType="saveAs" handleClickSaveAway={handleClickSaveAway} />
+                      <SavePdfDialog saveType="overwrite" handleClickSaveAway={handleClickSaveAway} />
                     </div>
                   ) : null}
                 </div>
@@ -366,8 +366,8 @@ const HeaderLayer = (props: Props) => {
                   </CustomBadge>
                   {isExportOpen ? (
                     <div className={`${classes.saveDropdownStyle}`}>
-                      <SavePdfDialog saveType="pdf" />
-                      <SavePdfDialog saveType="grida" />
+                      <SavePdfDialog saveType="pdf" handleClickSaveAway={handleClickSaveAway} />
+                      <SavePdfDialog saveType="grida" handleClickSaveAway={handleClickSaveAway} />
                     </div>
                   ) : null}
                 </div>

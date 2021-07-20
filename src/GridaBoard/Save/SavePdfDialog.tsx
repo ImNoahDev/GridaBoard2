@@ -70,10 +70,11 @@ const useStyles = makeStyles((theme) => {
   });
 });
 type Props = {
-  saveType : "grida" | "pdf" | "saveAs" | "overwrite"
+  saveType : "grida" | "pdf" | "saveAs" | "overwrite",
+  handleClickSaveAway ?: ()=>void
 }
 const SavePdfDialog = (props: Props) => {
-  const {saveType } = props;
+  const {saveType, handleClickSaveAway } = props;
 
 
   const classes = useStyles();
@@ -201,6 +202,7 @@ const SavePdfDialog = (props: Props) => {
               thumbUploadTask.snapshot.ref.getDownloadURL().then(function (thumb_path) {
                 updateDB(docName, thumb_path, grida_path, date);
               });
+              handleClickSaveAway();
             }
           );
         });
@@ -246,6 +248,7 @@ const SavePdfDialog = (props: Props) => {
     } 
     setOpen(false);
     onReset();
+    handleClickSaveAway();
   }
   const warnText = getText("filename_onlyallowed").split("%[allow]");
   // const handleEntering = () => {
