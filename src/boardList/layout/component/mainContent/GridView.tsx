@@ -1,6 +1,6 @@
 import { makeStyles, Grow, IconButton, Checkbox, Fade, SvgIcon } from '@material-ui/core';
 import React, { useEffect, useState } from 'react';
-import MoreVert from '@material-ui/icons/MoreVert';
+import {MoreVert, DeleteOutline} from '@material-ui/icons';
 import { getTimeStamp } from '../../../BoardListPageFunc';
 import { IBoardData } from '../../../structures/BoardStructures';
 import { showDropDown } from 'GridaBoard/store/reducers/listReducer';
@@ -166,18 +166,22 @@ const GridView = (props: Props) => {
 
     props.updateSelectedItems(el, checked);
   };
+
   if(docsList.length === 0){
+    console.log()
     return (
       <React.Fragment>
         <div className={classes.emptyField}>
-          <SvgIcon>
+          {category === "trash" ? (<DeleteOutline />) : (<SvgIcon>
             <path
               fillRule="evenodd"
               clipRule="evenodd"
               d="M18 10v10H6V4h6v6h6zm2-2v12a2 2 0 01-2 2H6a2 2 0 01-2-2V4a2 2 0 012-2h8l6 6zm-6-3.172L17.172 8H14V4.828z"
             />
-          </SvgIcon>
-          <div>{getText("boardList_emptyContent")}</div>
+          </SvgIcon>)}
+          
+          
+          <div>{category === "trash" ? getText("boardList_emptyTrash") : getText("boardList_emptyContent")}</div>
         </div>
       </React.Fragment>
     );
