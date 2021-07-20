@@ -1,6 +1,4 @@
 import firebase from "firebase";
-// import firebase2 from "firebase";
-
 
 //neostudio staging
 const firebaseConfig = {
@@ -52,8 +50,33 @@ export const signInWithGoogle = async () => {
   secondaryFirebase.auth().signInWithCredential(mainAuth.credential);
 }
 export const signInWithApple = async () => {
+  // SHA256-hashed nonce in hex
+  // const hashedNonceHex = crypto.createHash('sha256')
+  //   .update(unhashedNonce).digest().toString('hex');
+
+
   const mainAuth = await auth.signInWithPopup(AppleAuthProvider);
-  secondaryFirebase.auth().signInWithCredential(mainAuth.credential);
+  // const authCredential = AppleAuthProvider.credential({
+  //   idToken: (mainAuth.credential as any).idToken,
+  //   accessToken: (mainAuth.credential as any).accessToken,
+  //   rawNonce: unhashedNonce,
+  // });
+  const email = mainAuth.user.email + ".apple.com";
+  let tryLogin = null;
+
+  try{
+    tryLogin = await secondaryFirebase.auth().signInWithEmailAndPassword(email, mainAuth.user.uid);
+  }catch(e){
+    if(e.code === "auth/user-not-found"){
+      console.log("create new user");
+      tryLogin = await secondaryFirebase.auth().createUserWithEmailAndPassword(email, mainAuth.user.uid);
+    }
+  }
+  // var b = await secondaryFirebase.auth().signInAnonymously();
+  // console.log(b);
+  // secondaryFirebase.auth().signInWithPopup(AppleAuthProvider);
+  // console.log(mainAuth.user.email,mainAuth.user.email);
+  // secondaryFirebase.auth().signInWithCredential(mainAuth.credential);
 }
 
 export default firebase;
