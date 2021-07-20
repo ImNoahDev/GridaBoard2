@@ -109,7 +109,8 @@ const AlertDialog = (props : Props)=>{
       }
       case "deletePage" : {
         if (activePageNo === -1) return ;
-        GridaDoc.getInstance().removePages(activePageNo);
+        await GridaDoc.getInstance().removePages(activePageNo);
+        console.log("!!");
         break;
       }
       case "clearPage" : {

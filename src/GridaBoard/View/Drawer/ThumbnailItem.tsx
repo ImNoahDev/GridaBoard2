@@ -109,7 +109,7 @@ const ThumbnailItem = (props: Props) => {
   let rotation = 0;
   let basePageInfo = nullNcode();
   const page = doc.getPageAt(pn)
-
+  
   if (activePageNo >= 0) {
     pdfPageNo = doc.getPdfPageNoAt(pn);
     pdf = page.pdf;
