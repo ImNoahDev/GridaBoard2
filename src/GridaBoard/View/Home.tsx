@@ -35,7 +35,7 @@ const Home = () => {
   const [loadConfirmDlgOn, setLoadConfirmDlgOn] = useState(false);
   const [loadConfirmDlgStep, setLoadConfirmDlgStep] = useState(0);
   const [noMoreAutoLoad, setNoMoreAutoLoad] = useState(false);
-  const [tutorialOpen, setTutorialOpen] = useState(true);
+  //const [tutorialOpen, setTutorialOpen] = useState(true);
 
   const [activePageNo, setLocalActivePageNo] = useState(-1);
   const [pageWidth, setPageWidth] = useState(0);
@@ -163,15 +163,15 @@ const Home = () => {
   //쿠키 확인 후 튜토리얼 띄우기
   const [cookies, setCookie, removeCookie] = useCookies();
   
-  if(cookies.tutorialView === "true" && tutorialOpen === true){//쿠키에 저장될때 문자열로 변환되어서 이렇게 검사해야함
-    //이미 봄
-    setTutorialOpen(false);
+  // if(cookies.tutorialView === "true" && tutorialOpen === true){//쿠키에 저장될때 문자열로 변환되어서 이렇게 검사해야함
+  //   //이미 봄
+  //   setTutorialOpen(false);
   
-    if(!(cookies.firstHelp === "true")){//쿠키에 저장될때 문자열로 변환되어서 이렇게 검사해야함
-      if(languageType == "ko") //한글만 준비되어 있음
-        setHelpMenu(true);
-    }
+  if(!(cookies.firstHelp === "true")){//쿠키에 저장될때 문자열로 변환되어서 이렇게 검사해야함
+    if(languageType == "ko") //한글만 준비되어 있음
+      setHelpMenu(true);
   }
+  // }
 
   const setDontShowTuto = ()=>{
     //쿠키 저장
@@ -179,7 +179,7 @@ const Home = () => {
       expires: new Date((new Date()).setHours(24,0,0,0)) //오늘의 24시면 내일 0시이기 때문
     });
     //view 전환
-    setTutorialOpen(false);
+    // setTutorialOpen(false);
     
     if(!(cookies.firstHelp === "true")){//쿠키에 저장될때 문자열로 변환되어서 이렇게 검사해야함
       if(languageType == "ko") //한글만 준비되어 있음
@@ -195,7 +195,7 @@ const Home = () => {
 
   return (
     <div id={`background`} className={classes.rootDiv}>
-      {tutorialOpen ? <TutorialPage dontShow={setDontShowTuto}/> : "" }
+      {/* {tutorialOpen ? <TutorialPage dontShow={setDontShowTuto}/> : "" } */}
       <HelpMenu />
       <ViewLayer id="view-layer" handlePdfOpen={handlePdfOpen} style={{display: "flex"}}/>
       <input type="file" id={g_hiddenFileInputBtnId} onChange={onFileInputChanged} onClick={onFileInputClicked} style={{ display: "none" }} name="pdf" accept=".pdf,.grida" />
