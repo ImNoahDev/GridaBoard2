@@ -60,12 +60,13 @@ export const hideAlert = () => {
   });
 };
 
-export const showSnackbar = (option: { snackbarType: string, selectedDocName?: string[], selectedCategory?: string }) => {
+export const showSnackbar = (option: { snackbarType: string, selectedDocName?: string[], selectedCategory?: string, categoryData?:any }) => {
   store.dispatch({
     type : LISTActionTypes.SHOW_SNACKBAR,
     snackbarType: option.snackbarType,
     selectedDocName: option.selectedDocName,
-    selectedCategory: option.selectedCategory
+    selectedCategory: option.selectedCategory,
+    categoryData : option.categoryData
   });
 };
 
@@ -91,7 +92,8 @@ const initialState = {
     type : "",
     snackbarType : "",
     selectedCategory: "",
-    selectedDocName : [""]
+    selectedDocName : [""],
+    categoryData : undefined
   }
 };
 
@@ -105,7 +107,8 @@ export default function listReducer(state = initialState, action) {
           ...state.snackbar,
           type : action.snackbarType as string,
           selectedDocName: action.selectedDocName,
-          selectedCategory : action.selectedCategory
+          selectedCategory : action.selectedCategory,
+          categoryData : action.categoryData
         }
       }
     }

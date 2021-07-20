@@ -293,6 +293,7 @@ const MoveDialog = (props: Props)=>{
       snackbarType: "moveDoc",
       selectedDocName: selectedDocNames,
       selectedCategory: nowData[0],
+      categoryData : nowData
     });
   }
   

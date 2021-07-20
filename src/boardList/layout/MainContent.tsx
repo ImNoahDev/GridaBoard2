@@ -200,6 +200,9 @@ const useStyle = makeStyles(theme => ({
     display: "flex",
     width: "100%",
     height: "100%",
+  },
+  canClick: {
+    cursor : "pointer"
   }
 }));
 
@@ -210,10 +213,11 @@ interface Props extends React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElem
   docs?: Array<any>;
 
   routeChange?: (idx: number) => void;
+  selectCategory ?: (select:string|number)=>void,
 }
 
 const MainContent = (props: Props) => {
-  const { category, selected, docs, routeChange, ...rest } = props;
+  const { category, selected, docs, routeChange, selectCategory, ...rest } = props;
   const [orderBy, setOrderBy] = useState(0);
   const [listType, setListType] = useState('grid' as 'grid' | 'list');
   const [selectedItems, setSelectedItems] = useState([]);
@@ -230,6 +234,7 @@ const MainContent = (props: Props) => {
 
   const [snackbarMsg, setSnackbarMsg] = useState("");
   const [snackbarMsgSuffix, setSnackbarMsgSuffix] = useState("");
+  const [snackBarMoveTo, setSnackBarMoveTo] = useState(undefined as any);
 
   const selectedCategory = category[selected];
 
@@ -240,12 +245,14 @@ const MainContent = (props: Props) => {
       case "restoreDoc": {
         setSnackbarMsg(getText("boardList_restore_doc"));
         setSnackbarMsgSuffix("");
+        setSnackBarMoveTo(undefined);
         setOpenSnackbar(true);
         break;
       }
       case "deleteForever": {
         setSnackbarMsg(getText('deleteForever_msg'));
         setSnackbarMsgSuffix("");
+        setSnackBarMoveTo(undefined);
         setOpenSnackbar(true);
         break;
       }
@@ -257,6 +264,7 @@ const MainContent = (props: Props) => {
         
         setSnackbarMsg(moveDocMsg);
         setSnackbarMsgSuffix(store.getState().list.snackbar.selectedCategory);
+        setSnackBarMoveTo(store.getState().list.snackbar.categoryData);
         setOpenSnackbar(true);
 
         break;
@@ -264,6 +272,7 @@ const MainContent = (props: Props) => {
       case "copyDoc" : {
         setSnackbarMsg(getText('copyDoc_msg'));
         setSnackbarMsgSuffix(store.getState().list.snackbar.selectedDocName[0]);
+        setSnackBarMoveTo(store.getState().list.snackbar.categoryData);
         setOpenSnackbar(true);
         break;
       }
@@ -275,6 +284,7 @@ const MainContent = (props: Props) => {
         
         setSnackbarMsg(moveDocMsg);
         setSnackbarMsgSuffix(store.getState().list.snackbar.selectedCategory);
+        setSnackBarMoveTo(store.getState().list.snackbar.categoryData);
         setOpenSnackbar(true);
         
         break;
@@ -455,7 +465,16 @@ const MainContent = (props: Props) => {
           message={
             <React.Fragment>
               <span>{snackbarMsg} </span>
-              <span style={{borderBottom: "1px solid"}}>{snackbarMsgSuffix}</span>
+              <span style={{borderBottom: "1px solid"}} className={`${snackBarMoveTo===undefined? "" : classes.canClick}`} onClick={()=>{
+                if(snackBarMoveTo !== undefined){
+                  console.log(snackBarMoveTo);
+                  if(snackBarMoveTo.constructor === String){
+                    selectCategory(snackBarMoveTo as string);
+                  }else{
+                    selectCategory(snackBarMoveTo[3] as string);
+                  }
+                }
+              }}>{snackbarMsgSuffix}</span>
             </React.Fragment>
           } 
         />

@@ -214,7 +214,7 @@ const BoardList = () => {
         </AppBar>
         <div className={classes.main}>
           <Leftside selected={category} category={docsObj.category} selectCategory={selectCategory} />
-          <MainContent selected={category} category={docsObj.category} docs={docsObj.docs} routeChange={routeChange} />
+          <MainContent selected={category} category={docsObj.category} docs={docsObj.docs} selectCategory={selectCategory}  routeChange={routeChange} />
         </div>
       </div>
       <CombineDialog open={isShowDialog} docsObj={docsObj} />
