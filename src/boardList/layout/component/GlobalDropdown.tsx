@@ -164,7 +164,6 @@ const GlobalDropdown = (props: Prop) => {
     // console.log(dropDown.selected);
     // console.log(realCategoryData);
   }
-  console.log(canMoveUp,canMoveDown);
 
   return (
     <Popper open={open} anchorEl={targetRef} placement={nowItemData.placement} disablePortal className="test">

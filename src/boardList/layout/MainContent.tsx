@@ -195,6 +195,12 @@ const useStyle = makeStyles(theme => ({
     border: `2px solid ${theme.palette.primary.main}`,
     pointerEvents: 'none',
   },
+  emptyContent : {
+    position: 'relative',
+    display: "flex",
+    width: "100%",
+    height: "100%",
+  }
 }));
 
 interface Props extends React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement> {
@@ -423,21 +429,21 @@ const MainContent = (props: Props) => {
         />
       </div>
 
-      <div className={classes.gridContent} ref={contentRef}>
-        {listType === 'grid' ? (
-          <GridView
-            selectedItems={selectedItems}
-            allCategory={category}
-            category={selected}
-            docsList={nowDocs}
-            updateSelectedItems={updateSelectedItems}
-            selectedClass={classes.selected}
-            routeChange={routeChange}
-          />
-        ) : (
-          <ListView docsList={nowDocs} selectedClass={classes.selected} />
-        )}
-      </div>
+    <div className={`${nowDocs.length === 0 ? classes.emptyContent : classes.gridContent}`} ref={contentRef}>
+      {listType === 'grid' ? (
+        <GridView
+          selectedItems={selectedItems}
+          allCategory={category}
+          category={selected}
+          docsList={nowDocs}
+          updateSelectedItems={updateSelectedItems}
+          selectedClass={classes.selected}
+          routeChange={routeChange}
+        />
+      ) : (
+        <ListView docsList={nowDocs} selectedClass={classes.selected} />
+      )}
+    </div>
 
       <Snackbar
         open={openSnackbar}
