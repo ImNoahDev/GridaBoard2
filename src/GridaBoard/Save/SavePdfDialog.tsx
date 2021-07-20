@@ -248,6 +248,11 @@ const SavePdfDialog = (props: Props) => {
     onReset();
   }
   const warnText = getText("filename_onlyallowed").split("%[allow]");
+  // const handleEntering = () => {
+  //   if (radioGroupRef.current != null) {
+  //     radioGroupRef.current.focus();
+  //   }
+  // };
 
   return (
     <div>
@@ -260,7 +265,7 @@ const SavePdfDialog = (props: Props) => {
           {getText("save_to_"+saveType)}
         </Button>
       {/* </GridaToolTip> */}
-      <Dialog className={classes.dialog} open={open} onClose={handleDialogClose} aria-labelledby="form-dialog-title">
+      <Dialog className={classes.dialog} open={open} aria-labelledby="form-dialog-title">
         <DialogTitle id="form-dialog-title" className={classes.title}>
           <Box fontSize={20} fontWeight="fontWeightBold" className={classes.titleBox}>
           {getText("save_"+saveType+"_popup_title")}
