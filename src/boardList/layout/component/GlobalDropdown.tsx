@@ -31,11 +31,19 @@ const useStyle = makeStyles(theme => ({
     display: 'flex',
     alignItems: 'center',
     letterSpacing: '0.25px',
-    '&:hover': {
+    '&:not(.cantUse):hover': {
       background: theme.custom.icon.blue[3],
       color: theme.palette.primary.main,
     },
   },
+  cantUse : {
+    cursor : "auto",
+    color : theme.custom.grey[1],
+    '&:hover': {
+      background: "rgba(0,0,0,0)",
+    },
+
+  }
 }));
 
 const openStr = getText('boardList_gridView_menu_open');
@@ -118,13 +126,13 @@ const itemData = {
 };
 
 type Prop = {
-  test?: string;
   open: boolean;
+  category?: Array<Array<any>>;
   routeChange?: (idx: number) => void;
 };
 
 const GlobalDropdown = (props: Prop) => {
-  const { open, routeChange, ...rest } = props;
+  const { open, routeChange, category, ...rest } = props;
   const dispatch = useDispatch();
 
   if (open === false) return null;
@@ -140,6 +148,24 @@ const GlobalDropdown = (props: Prop) => {
     hideDropDown();
   };
 
+  let canMoveUp = true, canMoveDown = true;
+
+  if(dropDown.type === "group"){
+    const realCategoryData = category.filter(el=>el[1] != -1);
+    realCategoryData.sort((a,b)=>a[1]-b[1]);
+
+    const idx = realCategoryData.indexOf(dropDown.selected);
+    if(idx === 1)
+      canMoveUp = false;
+    
+    if(idx === realCategoryData.length-1)
+      canMoveDown = false;
+    
+    // console.log(dropDown.selected);
+    // console.log(realCategoryData);
+  }
+  console.log(canMoveUp,canMoveDown);
+
   return (
     <Popper open={open} anchorEl={targetRef} placement={nowItemData.placement} disablePortal className="test">
       <Paper className={classes.paper}>
@@ -148,16 +174,29 @@ const GlobalDropdown = (props: Prop) => {
             hideDropDown();
           }}>
           <MenuList>
-            {nowItemData.list.map((item, index) => (
-              <MenuItem
-                key={item}
-                onClick={() => {
-                  runEvent(index);
-                }}
-                className={classes.menuItem}>
-                {item}
-              </MenuItem>
-            ))}
+            {nowItemData.list.map((item, index) => {
+              let isVisible = true;
+
+              if(dropDown.type === "group"){
+                if(index === 1 && !canMoveUp){
+                    isVisible = false;
+                }else if(index === 2 && !canMoveDown){
+                    isVisible = false;
+                }
+              }
+              return (
+                <MenuItem
+                  key={item}
+                  disabled={!isVisible}
+                  onClick={() => {
+                    if(!isVisible) return ;
+                    runEvent(index);
+                  }}
+                  className={`${classes.menuItem} ${isVisible ? "" : `cantUse ${classes.cantUse}`}` }>
+                  {item}
+                </MenuItem>
+              );
+            })}
           </MenuList>
         </ClickAwayListener>
       </Paper>

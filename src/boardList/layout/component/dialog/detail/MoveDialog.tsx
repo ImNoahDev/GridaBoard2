@@ -9,6 +9,7 @@ import { forceUpdateBoardList } from "GridaBoard/store/reducers/appConfigReducer
 import { IBoardData } from "boardList/structures/BoardStructures";
 import { docCategoryChange } from "boardList/BoardListPageFunc2";
 import { changeGroup, showSnackbar } from 'GridaBoard/store/reducers/listReducer';
+import getText from "GridaBoard/language/language";
 
 
 const useStyle = makeStyles(theme=>({
@@ -305,11 +306,11 @@ const MoveDialog = (props: Props)=>{
     open={open}
   >
     <div className="header">
-      <div>파일 이동</div>
+      <div>{getText("boardList_filemove_title")}</div>
       <Button onClick={(e)=>{closeEvent(false)}}><Clear /></Button>
     </div>
     <div className="subtitle">
-      파일을 이동시킬 그룹을 선택해 주세요.
+      {getText("boardList_filemove_subTitle")}
     </div>
     <div className="content">
       {categoryData.map((el,idx)=>{
@@ -336,17 +337,17 @@ const MoveDialog = (props: Props)=>{
       
       {createNewDisable && createNewVisible ? (
       <div className={moveClasses.newCategoryWarn}>
-        <div>특수문자는 + - _ . 만 입력 가능합니다</div>
+        <div>{getText("boardList_filemove_warn")}</div>
       </div>) : ""}
     </div>
     <div className="footer">
       <Button onClick={e=>{setCreateNewVisible(prev=>!prev)}}>
         <Add />
-        <div>그룹 추가하기</div>  
+        <div>{getText("boardList_filemove_add")}</div>  
       </Button>
       <div>
-        <Button variant="contained" disableElevation color="secondary" onClick={()=>{closeEvent(false)}} >취소</Button>
-        <Button variant="contained" disableElevation color="primary" disabled={disabled} onClick={()=>{save()}}>저장</Button>
+        <Button variant="contained" disableElevation color="secondary" onClick={()=>{closeEvent(false)}} >{getText("save_grida_popup_cancel")}</Button>
+        <Button variant="contained" disableElevation color="primary" disabled={disabled} onClick={()=>{save()}}>{getText("save_saveAs_popup_save")}</Button>
       </div>
     </div>
   </Dialog>);
