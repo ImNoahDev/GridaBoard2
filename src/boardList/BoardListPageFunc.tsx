@@ -173,6 +173,7 @@ export const copyBoard = async (docItem: IBoardData) => {
   const userId = firebase.auth().currentUser.email;
 
   const docName = docItem.doc_name + getText('boardList_copied');
+  const numPages = docItem.docNumPages;
   const date = new Date();
   const timeStamp = date.getTime();
   const docId = `${userId}_${docName}_${timeStamp}`;
@@ -267,7 +268,7 @@ export const copyBoard = async (docItem: IBoardData) => {
             },
             async function () {
               thumbUploadTask.snapshot.ref.getDownloadURL().then(async function (thumb_path) {
-                saveToDB(docName, thumb_path, grida_path, date, true);
+                saveToDB(docName, thumb_path, grida_path, date, true, numPages);
               });
             }
           );
@@ -693,6 +694,13 @@ export async function saveToDB(docName: string, thumb_path: string, grida_path: 
   const userId = firebase.auth().currentUser.email;
 
   const docId = `${userId}_${docName}_${nowDate.getTime()}`;
+  
+  let numPages = 0;
+  if (docNumPages > 0) {
+    numPages = docNumPages;
+  } else {
+    numPages = doc.numPages;
+  }
 
   await db.collection(userId)
     .doc(docId)
@@ -707,7 +715,7 @@ export async function saveToDB(docName: string, thumb_path: string, grida_path: 
       thumb_path: thumb_path,
       dateDeleted: 0,
       docId : docId,
-      docNumPages: doc.numPages
+      docNumPages: numPages
     })
     .then(function () {
       console.log(`${docName} is created`);

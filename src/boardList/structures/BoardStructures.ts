@@ -13,6 +13,7 @@ export type IBoardData = {
   favorite?: boolean,
   docId : string,
   key?: number,
+  docNumPages?: number,
 }
 
 
