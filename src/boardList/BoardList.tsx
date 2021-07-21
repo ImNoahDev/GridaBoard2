@@ -21,6 +21,8 @@ import { getCategoryArray } from "./BoardListPageFunc2";
 import GlobalDropdown from './layout/component/GlobalDropdown';
 import { setDefaultCategory, getDatabase } from "./BoardListPageFunc2"
 import { getTimeStamp } from './BoardListPageFunc';
+import LoadingCircle from "GridaBoard/Load/LoadingCircle";
+import { setLoadingVisibility } from 'GridaBoard/store/reducers/loadingCircle'
 import { forceUpdateBoardList } from '../GridaBoard/store/reducers/appConfigReducer';
 
 const useStyle = makeStyles(theme => ({
@@ -200,6 +202,7 @@ const BoardList = () => {
             expires: expirationTime
           });
         });
+        dispatch(forceUpdateBoardList());
       } else {
         return <Redirect to="/" />
       }
@@ -217,6 +220,7 @@ const BoardList = () => {
           <MainContent selected={category} category={docsObj.category} docs={docsObj.docs} selectCategory={selectCategory}  routeChange={routeChange} />
         </div>
       </div>
+      <LoadingCircle />
       <CombineDialog open={isShowDialog} docsObj={docsObj} />
       <GlobalDropdown open={isShowDropdown} category={docsObj.category} routeChange={routeChange}/>
     </MuiThemeProvider>
