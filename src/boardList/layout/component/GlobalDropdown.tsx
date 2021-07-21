@@ -146,6 +146,7 @@ const GlobalDropdown = (props: Prop) => {
   const runEvent = async index => {
     await nowItemData.runFunction[index](dropDown.selected, routeChange);
     hideDropDown();
+    store.dispatch(forceUpdateBoardList());
   };
 
   let canMoveUp = true, canMoveDown = true;

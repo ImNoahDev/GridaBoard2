@@ -349,7 +349,7 @@ const HeaderLayer = (props: Props) => {
                   {isSaveOpen ? (
                     <div className={`${classes.saveDropdownStyle}`}>
                       <SavePdfDialog saveType="saveAs" handleClickSaveAway={handleClickSaveAway} />
-                      <SavePdfDialog saveType="overwrite" handleClickSaveAway={handleClickSaveAway} />
+                      <SavePdfDialog saveType="overwrite" handleClickSaveAway={handleClickSaveAway} disabled={disabled}/>
                     </div>
                   ) : null}
                 </div>

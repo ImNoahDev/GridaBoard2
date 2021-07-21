@@ -71,7 +71,8 @@ const useStyles = makeStyles((theme) => {
 });
 type Props = {
   saveType : "grida" | "pdf" | "saveAs" | "overwrite",
-  handleClickSaveAway ?: ()=>void
+  handleClickSaveAway ?: ()=>void,
+  disabled?: boolean,
 }
 const SavePdfDialog = (props: Props) => {
   const {saveType, handleClickSaveAway } = props;
@@ -264,7 +265,7 @@ const SavePdfDialog = (props: Props) => {
         msg: "PDF 파일을 로컬에 저장하는 버튼입니다.",
         tail: "키보드 버튼 ?로 선택 가능합니다"
       }} title={undefined}> */}
-        <Button className={`${classes.dropdownBtn} ${saveType==="pdf"? "save_drop_down": ""}`} onClick={() => handleDialogOpen(saveType)}>
+        <Button className={`${classes.dropdownBtn} ${saveType==="pdf"? "save_drop_down": ""}`} onClick={() => handleDialogOpen(saveType)} disabled={props.disabled}>
           {getText("save_to_"+saveType)}
         </Button>
       {/* </GridaToolTip> */}
