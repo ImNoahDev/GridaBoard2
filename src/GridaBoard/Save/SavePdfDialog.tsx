@@ -216,6 +216,9 @@ const SavePdfDialog = (props: Props) => {
     if(selectedName == ""){
       return ;
     }
+    if(selectedName.length > 20){
+      return ;
+    }
     if(selectedName.search(/^[. ]/g) !== -1){
       //첫글자가 공백 혹은 .임
       setWarnOpen(true);

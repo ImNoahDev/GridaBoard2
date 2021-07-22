@@ -36,18 +36,70 @@ interface Props extends  DialogProps {
 
 export const textCheckForGroup = (text:string|false)=>{
   //정규식 조건을 통해서 안될경우 false
-  const a = 1;
-  if(a == 1)
-    return text;
-  else
+  if(text === false) return false;
+
+
+  const selectedName = text as string;
+  if(selectedName.length > 15){
     return false;
+  }
+  if(selectedName == ""){
+    return false;
+  }
+  if(selectedName.search(/^[. ]/g) !== -1){
+    //첫글자가 공백 혹은 .임
+    // setWarnOpen(true);
+    return false;
+  }
+  if(selectedName.search(/[^a-zA-Z0-9가-힇ㄱ-ㅎㅏ-ㅣぁ-ゔァ-ヴー々〆〤一-龥0-9.+_\- .]/g) !== -1){
+    /**
+     * 허용된 문자
+     * 알파벳 : a-z , A-Z
+     * 한글 : 가-힇, ㄱ-ㅎ, ㅏ-ㅣ
+     * 일어 : ぁ-ゔ, ァ-ヴ, ー々〆〤
+     * 한자 : 一-龥
+     * 숫자 : 0-9
+     * 특문 : + _ - 공백 .
+     * 
+     * 이외의 것이 있을 경우 진입
+     */
+    return false;
+  }
+
+  return text;
 }
 export const textCheckForDoc = (text:string|false)=>{
-  const a = 1;
-  if(a == 1)
-    return text;
-  else
+  if(text === false) return false;
+
+  
+  const selectedName = text as string;
+  if(selectedName.length > 20){
     return false;
+  }
+  if(selectedName == ""){
+    return false;
+  }
+  if(selectedName.search(/^[. ]/g) !== -1){
+    //첫글자가 공백 혹은 .임
+    // setWarnOpen(true);
+    return false;
+  }
+  if(selectedName.search(/[^a-zA-Z0-9가-힇ㄱ-ㅎㅏ-ㅣぁ-ゔァ-ヴー々〆〤一-龥0-9.+_\- .]/g) !== -1){
+    /**
+     * 허용된 문자
+     * 알파벳 : a-z , A-Z
+     * 한글 : 가-힇, ㄱ-ㅎ, ㅏ-ㅣ
+     * 일어 : ぁ-ゔ, ァ-ヴ, ー々〆〤
+     * 한자 : 一-龥
+     * 숫자 : 0-9
+     * 특문 : + _ - 공백 .
+     * 
+     * 이외의 것이 있을 경우 진입
+     */
+    return false;
+  }
+
+  return text;
 }
 export const createGroup = async (newText:string, closeEvent:(isChange: boolean) => void)=>{
   // createCategory
