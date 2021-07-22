@@ -204,7 +204,7 @@ const GridView = (props: Props) => {
               <div>
                 <div>{el.doc_name}</div>
                 <div className="contentData">
-                  <div>{`${times.getFullYear()}/${times.getMonth()}/${times.getDate()}`}</div>
+                  <div>{`${times.getFullYear()}/${times.getMonth()+1}/${times.getDate()}`}</div>
                   <div />
                   {props.category === 'trash' ? <div>{allCategory[el.category][0]}</div> : <div>{el.docNumPages} page</div>}
                 </div>
