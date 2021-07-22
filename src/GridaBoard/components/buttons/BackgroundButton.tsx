@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import '../../styles/buttons.css';
 import ThemeManager from "../../styles/ThemeManager";
 import GridaToolTip from "../../styles/GridaToolTip";
@@ -57,13 +57,32 @@ const neoStyle = {
 } as React.CSSProperties;
 
 export default function BackgroundButton() {
-  const [theme, setTheme] = useState(0);
+  let backgroundTheme;
+  if(localStorage.GridaBoard_theme === undefined){
+    backgroundTheme = 0;
+  }else{
+    backgroundTheme = parseInt(localStorage.GridaBoard_theme);
+  }
+  const [theme, setTheme] = useState(backgroundTheme);
   const [isOpen, setIsOpen] = useState(false);
   const classes = useStyle();
   const themeNameArr = ["basic", "neoprism"];
 
-  const setBackground = (background) => {
+  const setBackground = (background:number) => {
     setTheme(background);
+    setBg(background)
+    setIsOpen(false);
+    localStorage.GridaBoard_theme = background;
+  }
+
+  function handleClick() {
+    setIsOpen((prev) => !prev);
+  }
+  function handleClickAway(){
+    setIsOpen(false);
+  }
+  
+  function setBg(background){
     if(background === 0) {
       themeManager.setT1();
     } else if(background === 1) {
@@ -73,15 +92,12 @@ export default function BackgroundButton() {
     } else {
       themeManager.setT5();
     }
-    setIsOpen(false);
   }
 
-  function handleClick() {
-    setIsOpen((prev) => !prev);
-  }
-  function handleClickAway(){
-    setIsOpen(false);
-  }
+  useEffect(()=>{
+    setBg(theme);
+  },[])
+
   return (
     <ClickAwayListener onClickAway={handleClickAway}>
       <div>
