@@ -356,14 +356,12 @@ const HeaderLayer = (props: Props) => {
               </ClickAwayListener>
               <ClickAwayListener onClickAway={handleClickExportAway}>
                 <div>
-                  <CustomBadge badgeContent={`S`}>
-                    <Button
-                      className={`${classes.buttonStyle} ${classes.buttonFontStyle} saveButton`}
-                      onClick={handleClickExport}
-                      disabled={disabled}>
-                      {getText('export_file')}
-                    </Button>
-                  </CustomBadge>
+                  <Button
+                    className={`${classes.buttonStyle} ${classes.buttonFontStyle} saveButton`}
+                    onClick={handleClickExport}
+                    disabled={disabled}>
+                    {getText('export_file')}
+                  </Button>
                   {isExportOpen ? (
                     <div className={`${classes.saveDropdownStyle}`}>
                       <SavePdfDialog saveType="pdf" handleClickSaveAway={handleClickExportAway} />

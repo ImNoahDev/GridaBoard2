@@ -9,6 +9,7 @@ import GridaDoc from "./GridaDoc";
 import { setViewFit } from "./store/reducers/viewFitReducer";
 import { setZoomStore } from "./store/reducers/zoomReducer";
 import { setRotationTrigger } from "./store/reducers/rotate";
+import { showAlert } from "./store/reducers/listReducer";
 import { PEN_THICKNESS } from '../nl-lib/common/enums';
 import $ from "jquery";
 import { setPointerTracer } from "./store/reducers/pointerTracer";
@@ -93,6 +94,10 @@ export default function KeyBoardShortCut(evt: KeyboardEvent) {
 
       case "d": // d
         // setPenThickness(3);
+        showAlert({
+          type: "deletePage",
+          selected: null,
+        })
         break;
 
       case "e": // e
