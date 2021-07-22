@@ -366,8 +366,8 @@ const HeaderLayer = (props: Props) => {
                   </CustomBadge>
                   {isExportOpen ? (
                     <div className={`${classes.saveDropdownStyle}`}>
-                      <SavePdfDialog saveType="pdf" handleClickSaveAway={handleClickSaveAway} />
-                      <SavePdfDialog saveType="grida" handleClickSaveAway={handleClickSaveAway} />
+                      <SavePdfDialog saveType="pdf" handleClickSaveAway={handleClickExportAway} />
+                      <SavePdfDialog saveType="grida" handleClickSaveAway={handleClickExportAway} />
                     </div>
                   ) : null}
                 </div>
