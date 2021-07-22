@@ -11,7 +11,7 @@ import getText from "../language/language";
 import { makeThumbnail, saveThumbnail, updateDB } from 'boardList/BoardListPageFunc';
 import { store } from '../client/pages/GridaBoard';
 import firebase, { secondaryFirebase } from 'GridaBoard/util/firebase_config';
-import { setDocName } from '../store/reducers/docConfigReducer';
+import { setDocName, setIsNewDoc } from '../store/reducers/docConfigReducer';
 import { setLoadingVisibility } from '../store/reducers/loadingCircle';
 
 
@@ -249,6 +249,7 @@ const SavePdfDialog = (props: Props) => {
     } else if (saveType === "saveAs" || saveType === "overwrite") {
       saveThumbnail(selectedName);
       setDocName(selectedName);
+      setIsNewDoc(false);
     } 
     setOpen(false);
     onReset();
