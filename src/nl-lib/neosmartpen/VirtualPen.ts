@@ -105,7 +105,7 @@ export default class VirtualPen implements INeoSmartpen {
   getBtDevice = (): BluetoothDevice => {
     return undefined;
   }
-  getThickness = (): Number => {
+  getThickness = (): number => {
     return this.penState[this.penRendererType].thickness;
   }
 
