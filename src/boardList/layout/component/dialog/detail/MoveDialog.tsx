@@ -66,12 +66,12 @@ const useStyle = makeStyles(theme=>({
     },
     "& > .footer" : {
       display : "flex",
-      justifyContent : "space-between",
+      justifyContent : "flex-end",
       width : "100%",
       height : "88px",
       padding : "0 24px",
       alignItems : "center",
-      "& > *:first-child" : {
+      "& > button:first-child" : {
         padding: "0px",
         display : "flex",
         alignItems: "center",
@@ -85,7 +85,7 @@ const useStyle = makeStyles(theme=>({
           marginLeft : "8px",
         }
       },
-      "& > div:nth-child(2)" : {
+      "& > div:nth-child(1)" : {
         "& > button" : {
           width: "71px",
           height: "40px",
@@ -342,10 +342,10 @@ const MoveDialog = (props: Props)=>{
       </div>) : ""}
     </div>
     <div className="footer">
-      <Button onClick={e=>{setCreateNewVisible(prev=>!prev)}}>
+      {/* <Button onClick={e=>{setCreateNewVisible(prev=>!prev)}}>
         <Add />
         <div>{getText("boardList_filemove_add")}</div>  
-      </Button>
+      </Button> */}
       <div>
         <Button variant="contained" disableElevation color="secondary" onClick={()=>{closeEvent(false)}} >{getText("save_grida_popup_cancel")}</Button>
         <Button variant="contained" disableElevation color="primary" disabled={disabled} onClick={()=>{save()}}>{getText("save_saveAs_popup_save")}</Button>
