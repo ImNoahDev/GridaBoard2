@@ -11,6 +11,7 @@ import getText from "GridaBoard/language/language";
 import { InkStorage } from "nl-lib/common/penstorage";
 import { PageEventName } from "nl-lib/common/enums";
 import { showSnackbar } from "../../../../../GridaBoard/store/reducers/listReducer";
+import { showMessageToast } from "../../../../../GridaBoard/store/reducers/ui";
 
 const confirmText = getText('print_popup_yes');
 const cancelText = getText('print_popup_no');
@@ -111,7 +112,7 @@ const AlertDialog = (props : Props)=>{
       case "deletePage" : {
         if (activePageNo === -1) return ;
         await GridaDoc.getInstance().removePages(activePageNo);
-        console.log("!!");
+        showMessageToast(getText("page_deleted"));
         break;
       }
       case "clearPage" : {
