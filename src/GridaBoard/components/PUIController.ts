@@ -164,6 +164,23 @@ export default class PUIController {
     const page_num = $('#page_input').val() - 1
 
     switch (cmd) {
+      case "strokesize_up": {
+        let thickness: number = PenManager.getInstance().getThickness();
+        if (thickness < 0.2) {
+          thickness = thickness + 0.04;
+          PenManager.getInstance().setThickness(thickness);
+        }
+        break;
+      }
+      case "strokesize_down": {
+        let thickness: number = PenManager.getInstance().getThickness();
+        if (thickness > 0.04) {
+          thickness = thickness - 0.04;
+          thickness = Number(thickness.toFixed(2));
+          PenManager.getInstance().setThickness(thickness);
+        }
+        break;
+      }
       case "strokesize_1":
       case "0.1": //lamy
         PenManager.getInstance().setThickness(PEN_THICKNESS.THICKNESS1);

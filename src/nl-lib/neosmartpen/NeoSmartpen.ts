@@ -111,7 +111,7 @@ export default class NeoSmartpen implements INeoSmartpen {
   getBtDevice = (): BluetoothDevice => {
     return this.protocolHandler.getBtDevice();
   }
-  getThickness = (): Number => {
+  getThickness = (): number => {
     return this.penState[this.penRendererType].thickness;
   }
 

@@ -265,6 +265,13 @@ export default class PenManager {
     }
   }
 
+  getThickness() {
+    if (_active_pen) {
+      return _active_pen.getThickness();
+    } else {
+      return this.thickness;
+    }
+  }
 
   setThickness(thickness: PEN_THICKNESS) {
     this.thickness = thickness;
