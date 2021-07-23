@@ -208,9 +208,15 @@ const ConvertFileLoad = (props: Props) => {
   async function setTask(res:HTMLAllCollection){
     //컨버팅 중
       try{
+        const subOption = {};
+
+        if(res[3].textContent.split("/")[1].split(".")[1] === "txt"){
+          (subOption as any).engine = "calibre";
+        }
         let job = await cloudConvert.jobs.create({
             "tasks": {
                 "task-1": {
+                    ...subOption,
                     "operation": "convert", 
                     "input": [res[3].textContent.split("/")[0]],
                     "output_format": "pdf"
