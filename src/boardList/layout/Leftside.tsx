@@ -126,6 +126,7 @@ const Leftside = (props : Props)=>{
     props.selectCategory(select);
   }
 
+  console.log(category)
   return (
     <div className={classes.wrap}>
       <div className={classes.recentGroup}>
@@ -150,7 +151,7 @@ const Leftside = (props : Props)=>{
           if(el[1] == -1) return ;
           const title = idx === 0 ? getText("boardList_unshelved").replace("%d", el[2]) : el[0] + ` (${el[2]})`;
           return (
-          <div key={el[0]} onClick={e=>selectCategory(el[3])} className={selected === el[3]? classes.selected : "" }>
+          <div key={el[1]} onClick={e=>selectCategory(el[3])} className={selected === el[3]? classes.selected : "" }>
             <span>{title}</span>
             {el[0] !== "Unshelved" ? (
               <IconButton onClick={(e)=>{

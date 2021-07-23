@@ -12,7 +12,7 @@ import configureStore from "../../store/configureStore";
 import { RootState } from '../../store/rootReducer';
 
 import GridaApp from "../../GridaApp";
-import { hideUIProgressBackdrop, reportBrowserZoomFactor, showUIProgressBackdrop } from "../../store/reducers/ui";
+import { hideToastMessage, hideUIProgressBackdrop, reportBrowserZoomFactor, showUIProgressBackdrop } from "../../store/reducers/ui";
 import { fetchGzippedFile, getBrowserZoomFactor } from "nl-lib/common/util";
 import { g_paperType, g_paperType_default } from "nl-lib/common/noteserver";
 import Home from "../../View/Home";
@@ -38,11 +38,12 @@ const useStyle = makeStyles(theme=>({
 
 const handleToastClose = (e) => {
   console.log(e);
+  hideToastMessage();
 }
 const renderToastMessage = () => {
   let isAlertToast = false;
-  const rootState = store.getState() as RootState;
-  const toast = rootState.ui.toast;
+  const toast = useSelector((state: RootState) => state.ui.toast);
+  
 
   if (toast.toastType === "error" || toast.toastType === "warning" || toast.toastType === "info" || toast.toastType === "success") {
     isAlertToast = true;
@@ -50,8 +51,8 @@ const renderToastMessage = () => {
   return (
     <Snackbar
       anchorOrigin={{
-        vertical: "top",
-        horizontal: "right",
+        vertical: "bottom",
+        horizontal: "center",
       }}
       message={toast.message}
       open={toast.show}

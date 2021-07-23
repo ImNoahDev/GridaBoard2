@@ -270,8 +270,10 @@ const MainContent = (props: Props) => {
         break;
       }
       case "copyDoc" : {
-        setSnackbarMsg(getText('copyDoc_msg'));
-        setSnackbarMsgSuffix(store.getState().list.snackbar.selectedDocName[0]);
+        let text = getText('copyDoc_msg').replace("%NAME" , store.getState().list.snackbar.selectedDocName[0]);
+        console.log(getText('copyDoc_msg'));
+        setSnackbarMsg(text);
+        setSnackbarMsgSuffix("");
         setSnackBarMoveTo(store.getState().list.snackbar.categoryData);
         setOpenSnackbar(true);
         break;

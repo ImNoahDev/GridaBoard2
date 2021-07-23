@@ -207,6 +207,9 @@ const BoardList = () => {
         return <Redirect to="/" />
       }
     })
+    const auth2 = secondaryFirebase.auth();
+    auth2.onAuthStateChanged(user => {
+    })
   }
 
   return (
