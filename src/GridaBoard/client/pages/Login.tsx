@@ -213,7 +213,7 @@ const sliderStyle = makeStyles(theme=>({
       height: "360px",
     },
     "& > div.textarea" : {
-      width: "480px",
+      width: "430px",
       height: "194px",
       display: "flex",
       flexDirection: "column",
@@ -243,7 +243,7 @@ const sliderStyle = makeStyles(theme=>({
         marginTop: "16px",
         display: "flex",
         alignItems: "center",
-        width: "432px",
+        // width: "432px",
         
         "& > div:first-child": {//tip
           width: "38px",
