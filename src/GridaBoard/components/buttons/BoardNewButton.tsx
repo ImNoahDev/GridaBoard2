@@ -51,7 +51,7 @@ const menuStyle = makeStyles(theme => ({
 const BoardNewButton = () => {
   const [open, setOpen] = useState(false);
   const anchorRef = React.useRef<HTMLDivElement>(null);
-  const options = [getText('add_page'), getText('import_pdf_pptx')];
+  const options = [getText('add_page'), getText('add_pdf_pptx')];
   const classes = menuStyle();
 
   const handlePdfOpen = async (event: IFileBrowserReturn, pageInfo?: IPageSOBP, basePageInfo?: IPageSOBP) => {
