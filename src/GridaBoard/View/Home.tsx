@@ -18,6 +18,7 @@ import { useBeforeunload } from 'react-beforeunload';
 import getText, { languageType } from "../language/language";
 import TutorialPage from "../components/TutorialPage";
 import {useCookies} from 'react-cookie';
+import Cookies from 'universal-cookie';
 import HelpMenu, { setHelpMenu } from "../components/CustomElement/HelpMenu";
 
 const useStyle = makeStyles(theme=>({
@@ -161,31 +162,33 @@ const Home = () => {
   //https://css-tricks.com/controlling-css-animations-transitions-javascript/
 
   //쿠키 확인 후 튜토리얼 띄우기
-  const [cookies, setCookie, removeCookie] = useCookies();
-  
+  // const [cookies, setCookie, removeCookie] = useCookies();
+  const cookies = new Cookies();
+  const firstHelp = cookies.get("firstHelp");
   // if(cookies.tutorialView === "true" && tutorialOpen === true){//쿠키에 저장될때 문자열로 변환되어서 이렇게 검사해야함
   //   //이미 봄
   //   setTutorialOpen(false);
   
-  if(!(cookies.firstHelp === "true")){//쿠키에 저장될때 문자열로 변환되어서 이렇게 검사해야함
+  console.log(firstHelp);
+  if(!(firstHelp === "true")){//쿠키에 저장될때 문자열로 변환되어서 이렇게 검사해야함
     if(languageType == "ko") //한글만 준비되어 있음
       setHelpMenu(true);
   }
   // }
 
-  const setDontShowTuto = ()=>{
-    //쿠키 저장
-    setCookie("tutorialView",true, {
-      expires: new Date((new Date()).setHours(24,0,0,0)) //오늘의 24시면 내일 0시이기 때문
-    });
-    //view 전환
-    // setTutorialOpen(false);
+  // const setDontShowTuto = ()=>{
+  //   //쿠키 저장
+  //   setCookie("tutorialView",true, {
+  //     expires: new Date((new Date()).setHours(24,0,0,0)) //오늘의 24시면 내일 0시이기 때문
+  //   });
+  //   //view 전환
+  //   // setTutorialOpen(false);
     
-    if(!(cookies.firstHelp === "true")){//쿠키에 저장될때 문자열로 변환되어서 이렇게 검사해야함
-      if(languageType == "ko") //한글만 준비되어 있음
-        setHelpMenu(true);
-    }
-  }
+  //   if(!(cookies.firstHelp === "true")){//쿠키에 저장될때 문자열로 변환되어서 이렇게 검사해야함
+  //     if(languageType == "ko") //한글만 준비되어 있음
+  //       setHelpMenu(true);
+  //   }
+  // }
 
 
 
