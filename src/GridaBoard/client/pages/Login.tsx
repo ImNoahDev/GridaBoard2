@@ -7,7 +7,7 @@ import { turnOnGlobalKeyShortCut } from "GridaBoard/GlobalFunctions";
 import Cookies from 'universal-cookie';
 import "firebase/firestore";
 import "firebase/auth";
-import { signInWithGoogle, signInWithApple, auth } from "GridaBoard/util/firebase_config";
+import { signInWithGoogle, signInWithApple, auth, secondaryAuth, signInWith} from "GridaBoard/util/firebase_config";
 import { useSelector } from 'react-redux';
 import { RootState } from 'GridaBoard/store/rootReducer';
 import * as neolabTheme from "GridaBoard/theme";
@@ -113,16 +113,13 @@ const Login = () => {
   turnOnGlobalKeyShortCut(false);
   const cookies = new Cookies();
   const [logined, setLogined] = useState(false);
+  const [logined2, setLogined2] = useState(false);
+  
   const selectedTheme = useSelector((state: RootState) => state.ui.theme);
   const theme : Theme = neolabTheme[selectedTheme];
   const classes = useStyle(theme)();
   
-  const userEmail = cookies.get("user_email");
-
-  if(userEmail !== undefined || logined){
-    //로그인시 자동으로 넘기기
-    return (<Redirect to="/list" />);
-  }
+  // const userEmail = cookies.get("user_email");
 
   auth.onAuthStateChanged(user => {
     // user.email
@@ -137,10 +134,24 @@ const Login = () => {
           expires: expirationTime
         });
         localStorage.GridaBoard_userData = JSON.stringify(user);
-        setLogined(true);
+        
+        if(secondaryAuth.currentUser === null){
+          signInWith(user).then(()=>{
+            setLogined(true);
+          });
+        }else{
+          setLogined(true);
+        }
       });
     }
-  })
+  });
+  
+  if(logined){
+    console.log(auth.currentUser);
+    console.log(secondaryAuth.currentUser);
+    //로그인시 자동으로 넘기기
+    return (<Redirect to="/list" />);
+  }
   
   return (
     <MuiThemeProvider theme={theme}>

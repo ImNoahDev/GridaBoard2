@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { NavLink } from 'react-router-dom';
+import { NavLink, Redirect, useHistory } from 'react-router-dom';
 import { Backdrop, CircularProgress, IconButton, makeStyles, MuiThemeProvider, Snackbar } from "@material-ui/core";
 import MuiAlert from "@material-ui/lab/Alert";
 import CloseIcon from "@material-ui/icons/Close";
@@ -19,6 +19,8 @@ import Home from "../../View/Home";
 import LoadingCircle from "../../Load/LoadingCircle";
 import { turnOnGlobalKeyShortCut } from "../../GlobalFunctions";
 import CombineDialog from 'boardList/layout/component/dialog/CombineDialog';
+import firebase, { auth, secondaryAuth, secondaryFirebase, signInWith } from 'GridaBoard/util/firebase_config';
+import Cookies from "universal-cookie";
 
 
 
@@ -120,8 +122,41 @@ const GridaBoard = () => {
 
 
   const rootState = store.getState() as RootState;
-  const shouldWait = rootState.ui.waiting.circular;
+  const shouldWait = useSelector((state: RootState) => state.ui.waiting.circular);
   const isShowDialog = useSelector((state: RootState) => state.list.dialog.show);
+
+  const cookies = new Cookies();
+  const userId = cookies.get('user_email');
+  const history = useHistory();
+  const [forsedUpdate, setForsedUpdate] = useState(0);
+
+  let forsedWait = false;
+  if (userId === undefined) {
+    //로그인으로 자동으로 넘기기
+    forsedWait = true;
+    auth.onAuthStateChanged(user => {
+      if(user !== null){
+        //로그인 완료
+        user.getIdTokenResult().then(function(result){
+          const expirationTime = new Date(result.expirationTime)
+          cookies.set("user_email", user.email, {
+            expires: expirationTime
+          });
+          if(secondaryAuth.currentUser === null){
+            signInWith(user).then(()=>{
+              setForsedUpdate(forsedUpdate+1);
+              // dispatch(forceUpdateBoardList());
+            });
+          }else{
+            setForsedUpdate(forsedUpdate+1);
+            // dispatch(forceUpdateBoardList());
+          }
+        });
+      } else {
+        history.push("/");
+      }
+    })
+  }
 
 
   turnOnGlobalKeyShortCut(true);
@@ -138,7 +173,7 @@ const GridaBoard = () => {
         <Home /> : <></>} */}
         <Home />
 
-        <Backdrop className={classes.backdrop} open={shouldWait} >
+        <Backdrop className={classes.backdrop} open={shouldWait || forsedWait} >
           <CircularProgress color="inherit" />
         </Backdrop>
         <CombineDialog open={isShowDialog} />

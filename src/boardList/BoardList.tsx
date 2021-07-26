@@ -5,7 +5,7 @@ import { turnOnGlobalKeyShortCut } from 'GridaBoard/GlobalFunctions';
 import Cookies from 'universal-cookie';
 import 'firebase/auth';
 import 'firebase/database';
-import firebase, { auth, secondaryFirebase } from 'GridaBoard/util/firebase_config';
+import firebase, { auth, secondaryAuth, secondaryFirebase, signInWith } from 'GridaBoard/util/firebase_config';
 import { useDispatch, useSelector } from 'react-redux';
 import GridaDoc from 'GridaBoard/GridaDoc';
 import { InkStorage } from 'nl-lib/common/penstorage';
@@ -201,14 +201,17 @@ const BoardList = () => {
           cookies.set("user_email", user.email, {
             expires: expirationTime
           });
+          if(secondaryAuth.currentUser === null){
+            signInWith(user).then(()=>{
+              dispatch(forceUpdateBoardList());
+            });
+          }else{
+            dispatch(forceUpdateBoardList());
+          }
         });
-        dispatch(forceUpdateBoardList());
       } else {
-        return <Redirect to="/" />
+        history.push("/");
       }
-    })
-    const auth2 = secondaryFirebase.auth();
-    auth2.onAuthStateChanged(user => {
     })
   }
 

@@ -38,6 +38,7 @@ const mainFirebase = firebase.initializeApp(firebaseConfig);
 export const secondaryFirebase = firebase.initializeApp(secondaryFirebaseConfig, "secondary");
 
 export const auth = firebase.auth();
+export const secondaryAuth = secondaryFirebase.auth();
 
 const provider = new firebase.auth.GoogleAuthProvider();
 
@@ -47,36 +48,26 @@ provider.setCustomParameters({prompt:"select_account"});
 
 export const signInWithGoogle = async () => {
   const mainAuth = await auth.signInWithPopup(provider);
-  secondaryFirebase.auth().signInWithCredential(mainAuth.credential);
+  
+  await signInWith(mainAuth.user);  
 }
 export const signInWithApple = async () => {
-  // SHA256-hashed nonce in hex
-  // const hashedNonceHex = crypto.createHash('sha256')
-  //   .update(unhashedNonce).digest().toString('hex');
-
-
   const mainAuth = await auth.signInWithPopup(AppleAuthProvider);
-  // const authCredential = AppleAuthProvider.credential({
-  //   idToken: (mainAuth.credential as any).idToken,
-  //   accessToken: (mainAuth.credential as any).accessToken,
-  //   rawNonce: unhashedNonce,
-  // });
-  const email = mainAuth.user.email + ".apple.com";
-  let tryLogin = null;
 
-  try{
-    tryLogin = await secondaryFirebase.auth().signInWithEmailAndPassword(email, mainAuth.user.uid);
-  }catch(e){
-    if(e.code === "auth/user-not-found"){
-      console.log("create new user");
-      tryLogin = await secondaryFirebase.auth().createUserWithEmailAndPassword(email, mainAuth.user.uid);
-    }
+  await signInWith(mainAuth.user);
+
+}
+
+export const signInWith = async (user: firebase.User) => {
+  let res = await fetch("https://us-central1-neostudio-staging.cloudfunctions.net/login?uid="+user.uid);
+  var token = await res.text();
+
+  const secondaryAuth = secondaryFirebase.auth();
+  const loginData = await secondaryAuth.signInWithCustomToken(token);
+
+  if(loginData.user.email === null){
+    await fetch(`https://us-central1-neostudio-staging.cloudfunctions.net/createEmail?uid=${user.uid}&email=${user.email}&name=${user.displayName}`);
   }
-  // var b = await secondaryFirebase.auth().signInAnonymously();
-  // console.log(b);
-  // secondaryFirebase.auth().signInWithPopup(AppleAuthProvider);
-  // console.log(mainAuth.user.email,mainAuth.user.email);
-  // secondaryFirebase.auth().signInWithCredential(mainAuth.credential);
 }
 
 export default firebase;
