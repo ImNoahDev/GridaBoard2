@@ -91,11 +91,11 @@ function OptionLevel_1(props: ILeveledDialogProps) {
               </SelectField >
             </TableCell>
 
-            <TableCell colSpan={1} style={cellRadioStyle}>
+            {/* <TableCell colSpan={1} style={cellRadioStyle}>
               <RadioField showHelp={help} checked={printOption.drawFrame} handleChange={handleChange2} color={color} name="drawFrame">
                 {getText("print_popup_detail_outline")}:
               </RadioField >
-            </TableCell>
+            </TableCell> */}
 
           </TableRow>
 
