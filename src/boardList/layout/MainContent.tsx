@@ -357,6 +357,8 @@ const MainContent = (props: Props) => {
   };
 
   const deleteForeverBtnClick = async () => {
+    if(selectedItems.length === 0) return ;
+    
     const result = await deleteBoardsFromTrash(selectedItems);
     if (result) {
       dispatch(forceUpdateBoardList());
@@ -369,6 +371,7 @@ const MainContent = (props: Props) => {
   };
 
   const restoreBtnClick = async () => {
+    if(selectedItems.length === 0) return ;
     const result = await restoreBoardsFromTrash(selectedItems);
     if (result) {
       dispatch(forceUpdateBoardList());
