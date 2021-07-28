@@ -61,8 +61,10 @@ const MainNavSelector = (props : Props)=>{
 
   
   let viewType = 0;
-  if(selected === "trash") viewType = 3;
-  else if(selectedItems.length == 1) viewType = 1;
+  if(selected === "trash"){
+    if(selectedItems.length !== 0)  viewType = 3;
+    else  viewType = 4;
+  }else if(selectedItems.length == 1) viewType = 1;
   else if(selectedItems.length > 1) viewType = 2;
 
 
@@ -71,6 +73,7 @@ const MainNavSelector = (props : Props)=>{
       {viewType==0? <ListSelectType listViewType={listViewType} listOrderChange={listOrderChange} orderBy={orderBy} />
       : (
         viewType === 3? <TrashNav deleteForeverBtnClick={deleteForeverBtnClick} restoreBtnClick={restoreBtnClick} /> : 
+        viewType === 4? ("") :
         <CheckedNav viewType={viewType} selectedItems={selectedItems} routeChange={routeChange}/>
       )
       }
