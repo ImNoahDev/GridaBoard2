@@ -106,6 +106,19 @@ const useStyle = (theme:Theme) => makeStyles(_theme=>({
         }
       },
     }
+  },
+  terms : {
+    fontFamily: "Roboto",
+    fontStyle: "normal",
+    fontWeight: "normal",
+    fontSize: "11px",
+    lineHeight: "13px",
+    
+    textAlign: "center",
+    letterSpacing: "-0.75px",
+    
+    color: theme.palette.text.secondary,
+    marginTop: "24px"
   }
 }))
 
@@ -152,7 +165,17 @@ const Login = () => {
     //로그인시 자동으로 넘기기
     return (<Redirect to="/list" />);
   }
+
+  let termsText = [];
+  let tempTerm = getText("signin_agree").split("[%TERM]");
+  termsText.push(tempTerm[0]);
+  termsText.push("signin_agree_term");
+  tempTerm = tempTerm[1].split("[%POLICY]");
+  termsText.push(tempTerm[0]);
+  termsText.push("signin_agree_policy");
+  termsText.push(tempTerm[1]);
   
+  console.log(termsText);
   return (
     <MuiThemeProvider theme={theme}>
       <div className={classes.wrap}>
@@ -167,6 +190,17 @@ const Login = () => {
               <div className={classes.loginBtns}>
                 <Button onClick = {signInWithGoogle}> <img src={googleLogo} alt="" />{getText("login_withGoogle")}</Button>
                 <Button onClick={signInWithApple}> <img src={appleLogo} alt="" />{getText("login_withApple")} </Button>
+              </div>
+              <div className={classes.terms}>
+                {termsText.map(el=>{
+                  if(el === "signin_agree_term"){
+                    return <a href="https://www.neostudio.io/nlc_termofuse/" target="_blank" rel="noreferrer">{getText(el)}</a>;
+                  }else if(el === "signin_agree_policy"){
+                    return <a href="https://www.neostudio.io/nlc_privacy/" target="_blank" rel="noreferrer">{getText(el)}</a>;
+                  }else{
+                    return (el);
+                  }
+                })}
               </div>
             </div>
           </div>
