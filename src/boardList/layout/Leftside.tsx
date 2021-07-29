@@ -5,6 +5,7 @@ import getText from "GridaBoard/language/language";
 import { AccessTime, DeleteOutline, Add, MoreVert } from '@material-ui/icons';
 import { showGroupDialog } from 'GridaBoard/store/reducers/listReducer';
 import { showDropDown } from 'GridaBoard/store/reducers/listReducer';
+import copylightLogo from "../copylight_logo.png";
 const useStyle = makeStyles(theme=>({
   wrap : {
     background : theme.custom.white[50],
@@ -12,6 +13,7 @@ const useStyle = makeStyles(theme=>({
     width : "321px",
     display : "flex",
     flexDirection: "column",
+    position: "relative",
   },
   recentGroup : {
     marginTop : "16px",
@@ -51,9 +53,9 @@ const useStyle = makeStyles(theme=>({
     width : "320px",
     display: "flex",
     alignItems : "center",
-    justifyContent : "center",
     flexDirection: "column",
-    "& > div" : {
+    maxHeight: "calc(100% - 250px)",
+    "& > div:first-child" : {
       paddingRight: "24px",
       paddingLeft: "32px",
       height : "48px",
@@ -61,25 +63,40 @@ const useStyle = makeStyles(theme=>({
       display: "flex",
       alignItems : "center",
       justifyContent : "space-between",
-      color : theme.custom.icon.mono[0],
       fontFamily: "Roboto",
       fontStyle: "normal",
       fontWeight: "normal",
-      fontSize: "16px",
       lineHeight: "19px",
       letterSpacing: "0.25px",
-      "&:not(&:first-child)":{
+      
+      color : theme.palette.text.disabled,
+      fontSize: "14px",
+      "&:hover" : {
+        backgroundColor: ""
+      },
+    },
+    "& > div.category" : {
+      width : "320px",
+      overflowY: "auto",
+      position: "relative",
+      "& > div" : {
+        paddingRight: "24px",
+        paddingLeft: "32px",
+        height : "48px",
+        width : "100%",
+        display: "flex",
+        alignItems : "center",
+        justifyContent : "space-between",
+        color : theme.custom.icon.mono[0],
+        fontFamily: "Roboto",
+        fontStyle: "normal",
+        fontWeight: "normal",
+        fontSize: "16px",
+        lineHeight: "19px",
+        letterSpacing: "0.25px",
         cursor : "pointer",
-      },
-      "&:hover:not(&:first-child)" : {
-        backgroundColor: "rgba(18, 18, 18, 0.04)"
-      },
-      "&:first-child": {
-        color : theme.palette.text.disabled,
-        fontSize: "14px",
-        lineHeight: "16px",
         "&:hover" : {
-          backgroundColor: ""
+          backgroundColor: "rgba(18, 18, 18, 0.04)"
         },
       }
     }
@@ -101,6 +118,19 @@ const useStyle = makeStyles(theme=>({
     "&:hover" : {
       backgroundColor: theme.custom.icon.blue[3] + " !important"
     },
+  },
+  banner : {
+    display: "flex",
+    bottom : "0px",
+    width: "100%",
+    position: "absolute",
+    "& > .copylight" : {
+      height: "70px",
+      width: "100%",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "cetner"
+    }
   }
 }));
 interface Props extends  React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement> {
@@ -147,27 +177,36 @@ const Leftside = (props : Props)=>{
             <span>{getText("boardList_add")}</span>
           </Button>
         </div>
-        {category.map((el, idx)=>{
-          if(el[1] == -1) return ;
-          const title = idx === 0 ? getText("boardList_unshelved").replace("%d", el[2]) : el[0] + ` (${el[2]})`;
-          return (
-          <div key={el[1]} onClick={e=>selectCategory(el[3])} className={selected === el[3]? classes.selected : "" }>
-            <span>{title}</span>
-            {el[0] !== "Unshelved" ? (
-              <IconButton onClick={(e)=>{
-                e.stopPropagation();
-                showDropDown({
-                  type : "group",
-                  event : e,
-                  selected: el
-                });
-              }}><MoreVert /></IconButton>
-            ) : ""}
-          </div>
-          );
-        })}
+        <div className="category">
+          {category.map((el, idx)=>{
+            if(el[1] == -1) return ;
+            const title = idx === 0 ? getText("boardList_unshelved").replace("%d", el[2]) : el[0] + ` (${el[2]})`;
+            return (
+            <div key={el[1]} onClick={e=>selectCategory(el[3])} className={selected === el[3]? classes.selected : "" }>
+              <span>{title}</span>
+              {el[0] !== "Unshelved" ? (
+                <IconButton onClick={(e)=>{
+                  e.stopPropagation();
+                  showDropDown({
+                    type : "group",
+                    event : e,
+                    selected: el
+                  });
+                }}><MoreVert /></IconButton>
+              ) : ""}
+            </div>
+            );
+          })}
+        </div>
       </div>
       <Liner />
+      <div className={classes.banner}>
+        {/* <div className="banner"></div> */}
+        <div className="copylight">
+          <img src={copylightLogo} alt=""/> 
+          <span>© NEOLAB Convergence Inc. All Rights</span>
+        </div>
+      </div>
     </div>
   );
 }
