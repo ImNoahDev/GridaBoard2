@@ -129,7 +129,19 @@ const useStyle = makeStyles(theme=>({
       width: "100%",
       display: "flex",
       alignItems: "center",
-      justifyContent: "cetner"
+      justifyContent: "center",
+      
+      fontFamily: "Roboto",
+      fontStyle: "normal",
+      fontWeight: "normal",
+      fontSize: "11px",
+      lineHeight: "13px",
+      /* identical to box height */
+
+      letterSpacing: "0.25px",
+      "& > span" : {
+        marginLeft: "4px",
+      }
     }
   }
 }));
