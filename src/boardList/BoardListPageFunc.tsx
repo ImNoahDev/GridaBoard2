@@ -1,6 +1,6 @@
 import GridaDoc from 'GridaBoard/GridaDoc';
 import { setActivePageNo } from '../GridaBoard/store/reducers/activePageReducer';
-import { setDocName, setIsNewDoc } from '../GridaBoard/store/reducers/docConfigReducer';
+import { setDate, setDocName, setIsNewDoc } from '../GridaBoard/store/reducers/docConfigReducer';
 import firebase, { secondaryFirebase, auth } from 'GridaBoard/util/firebase_config';
 import { IBoardData } from './structures/BoardStructures';
 import { MappingStorage } from 'nl-lib/common/mapper';
@@ -567,6 +567,7 @@ export async function saveThumbnail(docName: string) {
   const userId = firebase.auth().currentUser.email;
   const date = new Date();
   const timeStamp = date.getTime();
+  setDate(timeStamp.toString());
 
   const gridaFileName = `${userId}_${docName}_${timeStamp}.grida`;
   const gridaRef = storageRef.child(`grida/${gridaFileName}`);
