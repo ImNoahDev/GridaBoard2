@@ -235,7 +235,7 @@ const BoardList = () => {
   
   if(!(firstHelp === "true")){//쿠키에 저장될때 문자열로 변환되어서 이렇게 검사해야함
     if(languageType == "ko") //한글만 준비되어 있음
-      setHelpMenu(true, 1, 1);
+      setHelpMenu(true, 2, 1);
   }
   const openNoticeCookie = cookies.get("openNoticeView");
   let isOpen = false;
@@ -254,7 +254,7 @@ const BoardList = () => {
           <Header />
         </AppBar>
         <div className={classes.main}>
-          {(languageType === "ko") ? <InformationButton className={classes.information} tutorialMain={1} tutorialSub={1} /> : ""}
+          {(languageType === "ko") ? <InformationButton className={classes.information} tutorialMain={2} tutorialSub={1} /> : ""}
           <Leftside selected={category} category={docsObj.category} selectCategory={selectCategory} />
           <MainContent selected={category} category={docsObj.category} docs={docsObj.docs} selectCategory={selectCategory}  routeChange={routeChange} />
         </div>
