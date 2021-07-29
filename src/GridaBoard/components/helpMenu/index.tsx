@@ -106,6 +106,7 @@ const HelpViewer = (props : Props)=>{
 	const classes = useStyle();
 	let myHelpData = helpData[languageType] === undefined? helpData["ko"] : helpData[languageType];
 	myHelpData = myHelpData["main" + props.mainNo].sub[props.subNo-1].text;
+  console.log(myHelpData);
 	const imageUrl = `/helpImg/${languageType}/main${props.mainNo}/sub${props.subNo}`;
 	const images = Array.from({length:myHelpData.length}, (el,idx)=>`${imageUrl}/${idx}.png`);
 	let slider = null as Slider;
@@ -115,7 +116,7 @@ const HelpViewer = (props : Props)=>{
 		e.stopPropagation();
 		if(nowView == 0){
 			//스킵
-			props.setHelpMenu(false, 1, 1);
+			props.setHelpMenu(false, props.mainNo, props.subNo);
 		} 
 		slider.slickPrev();
 	}
@@ -125,7 +126,7 @@ const HelpViewer = (props : Props)=>{
       window.open("./fileDownload.html?file="+myHelpData[nowView].link);
 			slider.slickNext();
 		}else if(nowView == myHelpData.length-1){
-			props.setHelpMenu(false, 1, 1);
+			props.setHelpMenu(false, props.mainNo, props.subNo);
 		}else{
 			slider.slickNext();
 		}

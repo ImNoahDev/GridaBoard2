@@ -15,6 +15,7 @@ import googleLogo from "GridaBoard/googleLogo.png";
 import appleLogo from "GridaBoard/appleLogo.png";
 import { default as Slider, Settings, CustomArrowProps } from "react-slick";
 import getText from "GridaBoard/language/language";
+import OpenNoticePopup from "boardList/layout/OpenNoticePopup"
 
 const useStyle = (theme:Theme) => makeStyles(_theme=>({
   wrap : {
@@ -159,6 +160,14 @@ const Login = () => {
     }
   });
   
+  
+  const openNoticeCookie = cookies.get("openNoticeView");
+  let isOpen = false;
+  if(openNoticeCookie !== "true"){
+    isOpen = true;
+  }
+  const [openNotice, setOpenNotice] = useState(isOpen);
+  
   if(logined){
     console.log(auth.currentUser);
     console.log(secondaryAuth.currentUser);
@@ -174,10 +183,10 @@ const Login = () => {
   termsText.push(tempTerm[0]);
   termsText.push("signin_agree_policy");
   termsText.push(tempTerm[1]);
-  
-  console.log(termsText);
+
   return (
     <MuiThemeProvider theme={theme}>
+    {openNotice ? <OpenNoticePopup setOpenNotice={setOpenNotice} /> : ""}
       <div className={classes.wrap}>
         <div >
           <div className={classes.slider}>
