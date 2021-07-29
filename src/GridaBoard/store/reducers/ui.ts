@@ -165,10 +165,12 @@ export const updateSelectedPage = async (option: { pageNo: number }) => {
     pageNo: option.pageNo,
   });
 }
-export const showHelpMenu = (show: boolean) => {
+export const showHelpMenu = (show: boolean, option : {main: number, sub: number}) => {
   store.dispatch({
     type: UIActionTypes.SHOW_HELPMENU,
-    show: show
+    show: show,
+    main: option.main,
+    sub: option.sub
   });
 }
 
@@ -213,7 +215,9 @@ const initialState = {
     show : false
   },
   helpMenu : {
-    show : false
+    show : false,
+    main : 1,
+    sub : 1
   },
   theme : "theme"
 }
@@ -342,7 +346,10 @@ export default (state = initialState, action) => {
       return {
         ...state,
         helpMenu: {
+          ...state.helpMenu,
           show: action.show,
+          main : action.main,
+          sub: action.sub
         }
       };
     }

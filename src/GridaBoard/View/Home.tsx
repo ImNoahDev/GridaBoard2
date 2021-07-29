@@ -164,7 +164,7 @@ const Home = () => {
   //쿠키 확인 후 튜토리얼 띄우기
   // const [cookies, setCookie, removeCookie] = useCookies();
   const cookies = new Cookies();
-  const firstHelp = cookies.get("firstHelp");
+  const firstHelp = cookies.get("firstHelp_1_1");
   // if(cookies.tutorialView === "true" && tutorialOpen === true){//쿠키에 저장될때 문자열로 변환되어서 이렇게 검사해야함
   //   //이미 봄
   //   setTutorialOpen(false);
@@ -172,8 +172,8 @@ const Home = () => {
   console.log(firstHelp);
   if(!(firstHelp === "true")){//쿠키에 저장될때 문자열로 변환되어서 이렇게 검사해야함
     if(languageType == "ko") //한글만 준비되어 있음
-      setHelpMenu(true);
-  }
+      setHelpMenu(true, 1, 1);
+  } 
   // }
 
   // const setDontShowTuto = ()=>{

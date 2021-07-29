@@ -99,7 +99,7 @@ interface Props extends  React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivEle
 	mainNo : number,
 	subNo : number,
 	onHeaderClick ?: (ref:React.MouseEvent<HTMLDivElement, MouseEvent>)=>void,
-	setHelpMenu: (boolean)=>void
+	setHelpMenu: (boolean, main, sub)=>void
 }
 //우선 데이터 하나짜리
 const HelpViewer = (props : Props)=>{
@@ -115,7 +115,7 @@ const HelpViewer = (props : Props)=>{
 		e.stopPropagation();
 		if(nowView == 0){
 			//스킵
-			props.setHelpMenu(false);
+			props.setHelpMenu(false, 1, 1);
 		} 
 		slider.slickPrev();
 	}
@@ -125,7 +125,7 @@ const HelpViewer = (props : Props)=>{
       window.open("./fileDownload.html?file="+myHelpData[nowView].link);
 			slider.slickNext();
 		}else if(nowView == myHelpData.length-1){
-			props.setHelpMenu(false);
+			props.setHelpMenu(false, 1, 1);
 		}else{
 			slider.slickNext();
 		}

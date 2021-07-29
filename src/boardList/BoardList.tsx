@@ -24,6 +24,9 @@ import { getTimeStamp } from './BoardListPageFunc';
 import LoadingCircle from "GridaBoard/Load/LoadingCircle";
 import { setLoadingVisibility } from 'GridaBoard/store/reducers/loadingCircle'
 import { forceUpdateBoardList } from '../GridaBoard/store/reducers/appConfigReducer';
+import { languageType } from 'GridaBoard/language/language';
+import InformationButton from 'GridaBoard/components/buttons/InformationButton';
+import HelpMenu, { setHelpMenu } from "GridaBoard/components/CustomElement/HelpMenu";
 
 const useStyle = makeStyles(theme => ({
   mainBackground: {
@@ -40,6 +43,19 @@ const useStyle = makeStyles(theme => ({
     justifyContent: 'flex-start',
     maxHeight: 'calc(100% - 72px)',
   },
+  information : {
+    right: "24px",
+    bottom: "24px",
+    display: "flex",
+    position : "fixed",
+    zIndex: 100,
+    "& > button": {
+      marginTop: "16px",
+      boxShadow: "2px 0px 24px rgba(0, 0, 0, 0.15), inset 0px 2px 0px rgba(255, 255, 255, 1)",
+      borderRadius: "50%",
+      display: "block"
+    }
+  }
 }));
 
 const BoardList = () => {
@@ -214,14 +230,23 @@ const BoardList = () => {
       }
     })
   }
+  
+  const firstHelp = cookies.get("firstHelp_2_1");
+  
+  if(!(firstHelp === "true")){//쿠키에 저장될때 문자열로 변환되어서 이렇게 검사해야함
+    if(languageType == "ko") //한글만 준비되어 있음
+      setHelpMenu(true, 1, 1);
+  } 
 
   return (
     <MuiThemeProvider theme={theme}>
+      <HelpMenu />
       <div className={classes.mainBackground}>
         <AppBar position="relative" color="transparent" elevation={0}>
           <Header />
         </AppBar>
         <div className={classes.main}>
+          {(languageType === "ko") ? <InformationButton className={classes.information} tutorialMain={1} tutorialSub={1} /> : ""}
           <Leftside selected={category} category={docsObj.category} selectCategory={selectCategory} />
           <MainContent selected={category} category={docsObj.category} docs={docsObj.docs} selectCategory={selectCategory}  routeChange={routeChange} />
         </div>
