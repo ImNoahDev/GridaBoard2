@@ -45,13 +45,15 @@ const useStyles = makeStyles((theme) => {
     dialogAction : {
       paddingBottom : "15px",
       position: "relative",
-      "& > span" : {
+      "& > div" : {
         color: "red",
         position: "absolute",
         left: "0",
         paddingLeft: "26px",
         fontSize: "11px",
         top: "13px",
+        display: "flex",
+        flexDirection: "column",
       }
     },
     button: {
@@ -81,7 +83,8 @@ const SavePdfDialog = (props: Props) => {
   const classes = useStyles();
 
   const [open, setOpen] = React.useState(false);
-  const [warnOpen, setWarnOpen] =  React.useState(false);
+  const [warn1Open, setWarn1Open] =  React.useState(false);
+  const [warn2Open, setWarn2Open] =  React.useState(false);
 
   let selectedName = '';
 
@@ -213,16 +216,22 @@ const SavePdfDialog = (props: Props) => {
 
   const handleSavePdf = () => {
     //공백과 .으로는 시작 할 수 없음
+    let rtTrue = true;
     if(selectedName == ""){
-      return ;
+      rtTrue = false;
     }
     if(selectedName.length > 20){
-      return ;
+      setWarn2Open(true);
+      rtTrue = false;
+    }else{
+      setWarn2Open(false);
     }
     if(selectedName.search(/^[. ]/g) !== -1){
       //첫글자가 공백 혹은 .임
-      setWarnOpen(true);
-      return ;
+      setWarn1Open(true);
+      rtTrue = false;
+    }else{
+      setWarn1Open(false);
     }
     if(selectedName.search(/[^a-zA-Z0-9가-힇ㄱ-ㅎㅏ-ㅣぁ-ゔァ-ヴー々〆〤一-龥0-9.+_\- .]/g) !== -1){
       /**
@@ -239,8 +248,9 @@ const SavePdfDialog = (props: Props) => {
       let text = getText("filename_onlyallowed");
       text = text.replace("%[allow]", getText("filename_allow"));
       alert(text);
-      return ;
+      rtTrue = false;
     }
+    if(!rtTrue) return ;
 
     if(saveType == "grida"){
       saveGrida(selectedName);
@@ -284,7 +294,10 @@ const SavePdfDialog = (props: Props) => {
           {warnText[0]}<span>{getText("filename_allow")}</span>{warnText[1]}
         </div>
         <DialogActions className={classes.dialogAction}>
-          {warnOpen? <span>{getText("filename_cantStart")}</span> : ""}
+          <div>
+            {warn1Open? <span>{getText("filename_cantStart")}</span> : ""}
+            {warn2Open? <span>{getText("filename_limitLength")}</span> : ""}
+          </div>
           <Button onClick={handleSavePdf} variant="contained" color="primary" className={`${classes.button}`}>
             {getText("save_"+saveType+"_popup_save")}
           </Button>
