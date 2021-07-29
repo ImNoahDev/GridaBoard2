@@ -3,6 +3,7 @@ import React from 'react';
 import { useDispatch } from 'react-redux';
 import { forceUpdateBoardList } from '../../../../GridaBoard/store/reducers/appConfigReducer';
 import { deleteAllFromTrash } from '../../../BoardListPageFunc';
+import getText from 'GridaBoard/language/language';
 
 const menuStyle = makeStyles(theme => ({
   headerButton: {
@@ -64,7 +65,7 @@ const MainTrashButton  = () => {
   return (
     <React.Fragment>
       <Button className={classes.headerButton} variant="contained" color="primary" onClick={clearTrash}>
-        <div>휴지통 비우기</div>
+        <div>{getText('empty_trash')}</div>
       </Button>
     </React.Fragment>
   );

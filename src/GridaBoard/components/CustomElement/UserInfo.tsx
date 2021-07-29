@@ -3,7 +3,6 @@ import { showAlert } from "../../store/reducers/listReducer";
 import getText from "GridaBoard/language/language";
 import { Button, IconButton, makeStyles, SvgIcon } from "@material-ui/core";
 
-
 const useStyle = makeStyles(theme=>({
   wrap : {
     marginRight: "0px !important",
@@ -131,15 +130,15 @@ const UserInfo = (props)=>{
       <div>{userData.email}</div>
     </div>
     <Button className={classes.logout} onClick={logout}>
-      로그아웃
+      {getText('profile_logout')}
     </Button>
     <div className={classes.liner}/>
     <div className={classes.terms}>
       <div>
-        개인정보처리방침 <IconButton onClick={e=>{window.open("_blank").location.href="https://www.neostudio.io/nlc_privacy/";}} ><ActionLinkLine /></IconButton>
+        {getText('signin_agree_policy')}<IconButton onClick={e=>{window.open("_blank").location.href="https://www.neostudio.io/nlc_privacy/";}} ><ActionLinkLine /></IconButton>
       </div>
       <div>
-        이용약관 <IconButton onClick={e=>{window.open("_blank").location.href="https://www.neostudio.io/nlc_termofuse/";}}><ActionLinkLine /></IconButton>
+        {getText('signin_agree_term')}<IconButton onClick={e=>{window.open("_blank").location.href="https://www.neostudio.io/nlc_termofuse/";}}><ActionLinkLine /></IconButton>
       </div>
     </div>
   </div>)
