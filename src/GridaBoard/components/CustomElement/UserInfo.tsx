@@ -3,7 +3,6 @@ import { showAlert } from "../../store/reducers/listReducer";
 import getText from "GridaBoard/language/language";
 import { Button, IconButton, makeStyles, SvgIcon } from "@material-ui/core";
 
-
 const useStyle = makeStyles(theme=>({
   wrap : {
     marginRight: "0px !important",
@@ -131,16 +130,16 @@ const UserInfo = (props)=>{
       <div>{userData.email}</div>
     </div>
     <Button className={classes.logout} onClick={logout}>
-      로그아웃
+      {getText('profile_logout')}
     </Button>
       
     <div className={classes.liner}/>
     <div className={classes.terms}>
       <div>
-        개인정보처리방침 <IconButton onClick={e=>{window.open("_blank").location.href="https://naver.com/";}} ><ActionLinkLine /></IconButton>
+        {getText('signin_agree_policy')}<IconButton onClick={e=>{window.open("_blank").location.href="https://naver.com/";}} ><ActionLinkLine /></IconButton>
       </div>
       <div>
-        이용약관 <IconButton onClick={e=>{window.open("_blank").location.href="https://daum.net/";}}><ActionLinkLine /></IconButton>
+        {getText('signin_agree_term')}<IconButton onClick={e=>{window.open("_blank").location.href="https://daum.net/";}}><ActionLinkLine /></IconButton>
       </div>
     </div>
   </div>)
