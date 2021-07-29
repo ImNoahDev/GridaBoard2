@@ -57,7 +57,6 @@ export default function KeyBoardShortCut(evt: KeyboardEvent) {
 
   const cmd = (isCtrl ? 1 : 0) | (isAlt ? 2 : 0) | (isShift ? 4 : 0) | (evt.metaKey ? 8 : 0);
 
-  console.log(evt);
   // console.log(`key down cmd=${cmd} ==> code=${evt.code}  key => ${evt.key}`); 
   if (cmd == 0 || (isShift && evt.key === "+")) {
     switch (evt.code) {
@@ -247,7 +246,7 @@ export default function KeyBoardShortCut(evt: KeyboardEvent) {
           const newZoom = zoom * 0.9985 ** delta
           setZoomStore(newZoom);
         }
-        
+
         break;
       }
       case "NumpadAdd": {
