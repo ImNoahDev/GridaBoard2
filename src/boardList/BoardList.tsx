@@ -27,7 +27,7 @@ import { forceUpdateBoardList } from '../GridaBoard/store/reducers/appConfigRedu
 import { languageType } from 'GridaBoard/language/language';
 import InformationButton from 'GridaBoard/components/buttons/InformationButton';
 import HelpMenu, { setHelpMenu } from "GridaBoard/components/CustomElement/HelpMenu";
-
+import OpenNoticePopup from "./layout/OpenNoticePopup"
 const useStyle = makeStyles(theme => ({
   mainBackground: {
     width: '100%',
@@ -236,10 +236,18 @@ const BoardList = () => {
   if(!(firstHelp === "true")){//쿠키에 저장될때 문자열로 변환되어서 이렇게 검사해야함
     if(languageType == "ko") //한글만 준비되어 있음
       setHelpMenu(true, 1, 1);
-  } 
+  }
+  const openNoticeCookie = cookies.get("openNoticeView");
+  let isOpen = false;
+  if(openNoticeCookie !== "true"){
+    isOpen = true;
+  }
+  const [openNotice, setOpenNotice] = useState(isOpen);
+
 
   return (
     <MuiThemeProvider theme={theme}>
+      {openNotice ? <OpenNoticePopup setOpenNotice={setOpenNotice} /> : ""}
       <HelpMenu />
       <div className={classes.mainBackground}>
         <AppBar position="relative" color="transparent" elevation={0}>
