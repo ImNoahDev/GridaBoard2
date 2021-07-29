@@ -133,14 +133,13 @@ const UserInfo = (props)=>{
     <Button className={classes.logout} onClick={logout}>
       로그아웃
     </Button>
-      
     <div className={classes.liner}/>
     <div className={classes.terms}>
       <div>
-        개인정보처리방침 <IconButton onClick={e=>{window.open("_blank").location.href="https://naver.com/";}} ><ActionLinkLine /></IconButton>
+        개인정보처리방침 <IconButton onClick={e=>{window.open("_blank").location.href="https://www.neostudio.io/nlc_privacy/";}} ><ActionLinkLine /></IconButton>
       </div>
       <div>
-        이용약관 <IconButton onClick={e=>{window.open("_blank").location.href="https://daum.net/";}}><ActionLinkLine /></IconButton>
+        이용약관 <IconButton onClick={e=>{window.open("_blank").location.href="https://www.neostudio.io/nlc_termofuse/";}}><ActionLinkLine /></IconButton>
       </div>
     </div>
   </div>)
