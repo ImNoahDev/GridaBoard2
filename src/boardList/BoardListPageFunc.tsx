@@ -32,8 +32,8 @@ export const resetGridaBoard = async () => {
 export const startNewGridaPage = async () => {
   resetGridaBoard();
 
-  const pageNo = await GridaDoc.getInstance().addBlankPage();
-  setActivePageNo(pageNo);
+  // const pageNo = await GridaDoc.getInstance().addBlankPage();
+  // setActivePageNo(pageNo);
   setDocName('undefined');
   setIsNewDoc(true);
 }
