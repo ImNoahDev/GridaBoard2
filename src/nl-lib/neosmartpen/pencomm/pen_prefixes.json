@@ -1,0 +1,32 @@
+{
+	"filters": [
+		{ "services": ["PEN_SERVICE_UUID_16", "PEN_SERVICE_UUID_128"] },
+		{ "namePrefix": "Neosmartpen" },
+		{ "namePrefix": "LAMY" },
+		{ "namePrefix": "Smartpen" },
+		{ "namePrefix": "RED1" },
+		{ "namePrefix": "RED2" },
+		{ "namePrefix": "BLUE1" },
+		{ "namePrefix": "BLUE2" },
+		{ "namePrefix": "F50" },
+		{ "namePrefix": "Mbest" },
+		{ "namePrefix": "Dimo" },
+		{ "namePrefix": "dimo" },
+		{ "namePrefix": "KYOWON" },
+		{ "namePrefix": "NeosmartpenLINE" },
+		{ "namePrefix": "F50" },
+		{ "namePrefix": "SPP" },
+		{ "namePrefix": "LE" },
+		{ "namePrefix": "F51" },
+		{ "namePrefix": "CarbonCopyPen" },
+		{ "namePrefix": "YANGJISA" },
+		{ "namePrefix": "Pen+" },
+		{ "namePrefix": "AIITP" },
+		{ "namePrefix": "ACE" },
+		{ "namePrefix": "F121" },
+		{ "namePrefix": "NeosmartpenHL" },
+		{ "namePrefix": "NeosmartpenIC" },
+	]
+}
+
+

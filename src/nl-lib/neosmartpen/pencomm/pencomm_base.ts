@@ -13,31 +13,13 @@ import {
 
 import { unescapePacket } from "./pen_util_func";
 import getText from "GridaBoard/language/language";
+import pen_prefixes from "./pen_prefixes.json";
 
 export async function deviceSelectDlg(): Promise<BluetoothDevice> {
   console.log("********* Requesting any Bluetooth Device... **********");
 
-  const options = {
-    // acceptAllDevices: true,
-    filters: [
-      { services: [PEN_SERVICE_UUID_16, PEN_SERVICE_UUID_128] },
-      // { services: [PEN_SERVICE_UUID_128] },
-      { namePrefix: "Neosmartpen" },
-      { namePrefix: "LAMY" },
-      { namePrefix: "Smartpen" },
-      { namePrefix: "Smart" },
-      { namePrefix: "Smart Pen" },
-      { namePrefix: "Smart pen" },
-      { namePrefix: "RED1" },
-      { namePrefix: "RED2" },
-      { namePrefix: "BLUE1" },
-      { namePrefix: "BLUE2" },
-      { namePrefix: "F50" },
-      { namePrefix: "Mbest" },
-      { namePrefix: "Dimo" },
-      { namePrefix: "F130" },
-    ]
-  }
+  const options = pen_prefixes;
+  
   // let result = await Bluetooth.requestDeviceAsync(options);
 
   let result = { device: null, type: "null" };
