@@ -510,6 +510,13 @@ export class MappingStorage {
         el.numPages -= 1;
     });
 
+    const tmpMapData = this._temporary.arrDocMap.filter(m => fingerprint === m.fingerprint);
+
+    tmpMapData.forEach(el => {
+      el.params.splice(pageNo, 1);
+      el.numPages -= 1;
+    })
+
     //데이터 저장
     this.storeMappingInfo();
   }
