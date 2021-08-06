@@ -443,8 +443,8 @@ export default class NeoSmartpen implements INeoSmartpen {
     const pen = this;
 
     // hand the event
-    this.dispatcher.dispatch(PenEventName.ON_PEN_MOVE, { strokeKey, mac: stroke.mac, stroke, dot, pen, event } as IPenToViewerEvent);
     this.storage.appendDot(strokeKey, dot);
+    this.dispatcher.dispatch(PenEventName.ON_PEN_MOVE, { strokeKey, mac: stroke.mac, stroke, dot, pen, event } as IPenToViewerEvent);
 
     // 이벤트 전달
     // console.log("    -> onPenMove" + event);
