@@ -442,11 +442,10 @@ export default class PenComm extends ProtocolHandlerBase {
     console.log("    BT protocol #3 -> input passcode ");
     const bufferArray = new Uint8Array([0xc0, 0x02, 0x10, 0x00, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0xc1]);
 
-    bufferArray[4] = passcode.charCodeAt(0);
-    bufferArray[5] = passcode.charCodeAt(1);
-    bufferArray[6] = passcode.charCodeAt(2);
-    bufferArray[7] = passcode.charCodeAt(3);
-
+    for (let i=0; i<passcode.length; i++) {
+      bufferArray[4+i] = passcode.charCodeAt(i);
+    }
+ 
     // g_btWriteSocket.writeValue(bufferArray);
     this.write(bufferArray);
   }

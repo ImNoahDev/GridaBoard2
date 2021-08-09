@@ -58,7 +58,7 @@ export interface INeoSmartpen {
   getMac(): string;
   getBtDevice(): BluetoothDevice;
   getPenName(): string;
-  getThickness(): Number;
+  getThickness(): number;
 
   connect(): Promise<boolean>;
   connectByWebBtDevice(device: BluetoothDevice): Promise<boolean>;

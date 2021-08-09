@@ -1,9 +1,9 @@
-import React, { useEffect } from "react";
-import { Box } from "@material-ui/core";
+import React from "react";
 import { RootState } from "../../store/rootReducer";
 import { useSelector } from "react-redux";
 import GridaDoc from "../../GridaDoc";
 import ThumbnailItem from "./ThumbnailItem";
+import $ from 'jquery';
 
 interface Props {
   noInfo?: boolean,

@@ -1,12 +1,9 @@
 import React, { useState } from "react";
-import clsx from 'clsx';
 import { RootState } from "../store/rootReducer";
 import { useSelector } from "react-redux";
-import { IconButton, makeStyles } from "@material-ui/core";
+import { makeStyles } from "@material-ui/core";
 import PersistentDrawerRight from "../View/Drawer/PersistentDrawerRight";
 import { updateDrawerWidth } from "../store/reducers/ui";
-import CustomBadge from "../components/CustomElement/CustomBadge";
-import {ArrowLeft, ArrowRight} from '@material-ui/icons';
 
 const useStyle = props => makeStyles(theme=>({
   wrap: {
@@ -58,16 +55,16 @@ const useStyle = props => makeStyles(theme=>({
   }
 }));
 
-const LeftSideLayer = () => {
-  const [drawerOpen, setDrawerOpen] = useState(false);
+interface Props {
+  drawerOpen: boolean,
+}
+
+const LeftSideLayer = (props: Props) => {
+  const {drawerOpen} = props;
+  // const [drawerOpen, setDrawerOpen] = useState(false);
   const setDrawerWidth = (width: number) => updateDrawerWidth({ width });
   const activePageNo_store = useSelector((state: RootState) => state.activePage.activePageNo);
   
-  const handleDrawerOpen = () => {
-    if(activePageNo_store === -1) return ;
-    setDrawerOpen((prev)=>!prev);
-  };
-
   const onDrawerResize = (size) => {
     setDrawerWidth(size);
   }
@@ -76,12 +73,10 @@ const LeftSideLayer = () => {
   const drawerWidth = useSelector((state: RootState) => state.ui.drawer.width);
   const classes = useStyle({brZoom:brZoom, drawerOpen:drawerOpen, drawerWidth:drawerWidth})()
 
-
   let disabled = true;
+
   if (activePageNo_store !== -1) {
     disabled = false;
-  }else if(drawerOpen){
-    setDrawerOpen(false);
   }
   
   return (
@@ -91,16 +86,6 @@ const LeftSideLayer = () => {
             open={drawerOpen} onDrawerResize={onDrawerResize}
             noInfo = {true}
           />
-          <div id="arrow-btn" className={clsx(classes.opener,{
-            [classes.contentShift] : drawerOpen,
-            [classes.openerHover] : !disabled
-          })} onClick={handleDrawerOpen}>
-          <CustomBadge badgeContent={`L`}>
-            <IconButton disabled={disabled}>
-              {drawerOpen? (<ArrowLeft />) : (<ArrowRight />)}
-            </IconButton>
-          </CustomBadge>
-          </div>
       </div>
   );
 }

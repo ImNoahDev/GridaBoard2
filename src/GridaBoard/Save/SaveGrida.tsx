@@ -16,6 +16,12 @@ const inkSt = InkStorage.getInstance();
 
 export async function saveGrida(gridaName: string) {
 
+  const blob = await makeGridaBlob();
+  saveAs(blob, gridaName);
+}
+
+export async function makeGridaBlob() {
+
   const doc = GridaDoc.getInstance();
   const docPages = doc.pages;
 
@@ -68,8 +74,8 @@ export async function saveGrida(gridaName: string) {
   const mappingInfoStr = JSON.stringify(gridaJson);
 
   const blob = new Blob([mappingInfoStr], { type: 'application/json' });
-  saveAs(blob, gridaName);
 
+  return blob;
 }
 
 export async function getPageInfosFromDoc(pageInfos: IPageSOBP[], basePageInfos: IPageSOBP[]) {
