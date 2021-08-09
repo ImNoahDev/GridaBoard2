@@ -2,7 +2,7 @@ import React from 'react';
 import { makeStyles, ClickAwayListener, MenuList, Paper, Popper, MenuItem, PopperProps } from '@material-ui/core';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from 'GridaBoard/store/rootReducer';
-import { hideDropDown, showGroupDialog, changeGroup, showSnackbar } from 'GridaBoard/store/reducers/listReducer';
+import { hideDropDown, showGroupDialog, changeGroup, showSnackbar, showAlert } from 'GridaBoard/store/reducers/listReducer';
 import { changeCategorySort, deleteCategory } from '../../BoardListPageFunc2';
 import { IBoardData } from 'boardList/structures/BoardStructures';
 import getText from 'GridaBoard/language/language';
@@ -78,8 +78,10 @@ const itemData = {
         changeGroup(true);
       },
       3: async val => {
-        await deleteCategory(val);
-        changeGroup(true);
+        showAlert({
+          type:"deleteGroup",
+          selected: val
+        });
       },
     },
   },

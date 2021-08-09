@@ -1,7 +1,7 @@
 import React from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Button, Dialog, DialogProps } from "@material-ui/core";
-import {createCategory, changeCategoryName} from "boardList/BoardListPageFunc2";
+import {createCategory, changeCategoryName, deleteCategory} from "boardList/BoardListPageFunc2";
 import { RootState } from "GridaBoard/store/rootReducer";
 import { deleteBoardFromLive, fbLogout } from "boardList/BoardListPageFunc";
 import { forceUpdateBoardList } from "GridaBoard/store/reducers/appConfigReducer";
@@ -10,8 +10,8 @@ import GridaDoc from "GridaBoard/GridaDoc";
 import getText from "GridaBoard/language/language";
 import { InkStorage } from "nl-lib/common/penstorage";
 import { PageEventName } from "nl-lib/common/enums";
-import { showSnackbar } from "../../../../../GridaBoard/store/reducers/listReducer";
-import { showMessageToast } from "../../../../../GridaBoard/store/reducers/ui";
+import { changeGroup, showSnackbar } from "GridaBoard/store/reducers/listReducer";
+import { showMessageToast } from "GridaBoard/store/reducers/ui";
 
 const confirmText = getText('print_popup_yes');
 const cancelText = getText('print_popup_no');
@@ -41,6 +41,12 @@ const dialogTypes = {
   },
   "clearPage" : {
     title: getText('clearPage_title'),
+    cancel: cancelText,
+    success : confirmText
+  },
+  "deleteGroup" : {
+    title: "선택하신 그룹을 삭제하시겠습니까?",
+    sub: "그룹 삭제 시, 해당 그룹의 보드는\n [기본 그룹]으로 자동 이동됩니다.",
     cancel: cancelText,
     success : confirmText
   }
@@ -122,6 +128,12 @@ const AlertDialog = (props : Props)=>{
         const inkStorage = InkStorage.getInstance();
         inkStorage.dispatcher.dispatch(PageEventName.PAGE_CLEAR, pageInfo);
         inkStorage.removeStrokeFromPage(pageInfo);
+        break;
+      }
+      case "deleteGroup" : {
+        console.log(selected , type);
+        await deleteCategory(selected);
+        changeGroup(true);
         break;
       }
       default: break;
