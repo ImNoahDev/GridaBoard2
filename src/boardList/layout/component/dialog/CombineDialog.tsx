@@ -36,10 +36,11 @@ const useStyle = makeStyles(theme=>({
     "& > .title" : {
       marginTop : "40px",
       marginLeft : "10px",
+      textAlign: "center",
       marginRight : "10px",
     },
     "& > .warn" : {
-      width: "100%",
+      width: "75%",
       height : "40px",
       fontSize: "14px",
       lineHeight: "16px",

@@ -45,8 +45,8 @@ const dialogTypes = {
     success : confirmText
   },
   "deleteGroup" : {
-    title: "선택하신 그룹을 삭제하시겠습니까?",
-    sub: "그룹 삭제 시, 해당 그룹의 보드는\n [기본 그룹]으로 자동 이동됩니다.",
+    title: getText("deleteGroup_title"),
+    sub: getText("deleteGroup_sub"),
     cancel: cancelText,
     success : confirmText
   }
