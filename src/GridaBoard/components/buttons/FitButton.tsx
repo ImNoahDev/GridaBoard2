@@ -9,12 +9,16 @@ import { RootState } from "../../store/rootReducer";
 import { setZoomStore } from '../../store/reducers/zoomReducer';
 import getText from "../../language/language";
 import CustomBadge from "../CustomElement/CustomBadge";
+import { KeyboardArrowDown } from "@material-ui/icons";
 
 const useStyle = makeStyles(theme => ({
   buttonStyle : {
-    marginLeft: "10px",
-    marginRight: "30px",
+    width: "93px",
+    height: "40px",
+    marginLeft: "16px",
+    marginRight: "3px",
     color : theme.custom.icon.mono[0],
+    background: '#FFFFFF',
     "&:hover" : {
       color : theme.palette.action.hover
     }
@@ -30,7 +34,7 @@ const useStyle = makeStyles(theme => ({
     boxShadow: theme.custom.shadows[0],
     borderRadius: "12px",
     zIndex: 10000,
-    marginLeft: "-160px",
+    marginLeft: "-130px",
     color : theme.custom.icon.mono[0],
     background: theme.custom.white[90],
     "& > span > button" : {
@@ -92,7 +96,10 @@ export default function FitButton() {
     <div>
       <div>
         <Button variant="outlined" type="button" id="btn_fit" className={`${classes.buttonStyle}`} onClick={handleClick} style={{}}>
-          <span >{zoomPercent}%</span>
+          <div style={{width: "35px", textAlign: "left"}}>
+            {zoomPercent}%
+          </div>
+          <div><KeyboardArrowDown /></div>
         </Button>
       </div>
 

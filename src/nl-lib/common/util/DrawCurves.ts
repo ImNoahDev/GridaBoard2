@@ -163,7 +163,7 @@ const clone = (obj: any): any => {
  */
 // Drawing Function
 export const drawPath_arr = (points: IPointForce[], strokeThickness: number) => {
-  if (points.length < 3) {
+  if (points.length < 2) {
     return [];
   }
 
@@ -498,7 +498,7 @@ export const drawPath_chiselNip = (points: IPointForce[], strokeThickness: numbe
  */
 // Drawing Function
 export const drawPath = (points: IPointForce[], strokeThickness: number): string => {
-  if (points.length < 3) {
+  if (points.length < 2) {
     return "";
   }
 

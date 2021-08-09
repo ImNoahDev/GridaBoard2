@@ -2,6 +2,7 @@
   "projects": {
     "default": "gridaboard",
     "test": "gridaboard-v2-test",
-    "live": "gridaboard"
+    "live": "gridaboard",
+    "dev": "gridaboard-v2-dev"
   }
 }

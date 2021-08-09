@@ -1,19 +1,25 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import '../../styles/buttons.css';
 import ThemeManager from "../../styles/ThemeManager";
 import GridaToolTip from "../../styles/GridaToolTip";
 import { Button, makeStyles, ClickAwayListener, Icon } from "@material-ui/core";
 import $ from "jquery";
 import getText from "../../language/language";
+import { ArrowDropDown, KeyboardArrowDown } from "@material-ui/icons";
 
 const themeManager: ThemeManager = ThemeManager.getInstance();
 const useStyle = makeStyles(theme => ({
   buttonStyle : {
-    marginRight: "4px",
+    width: "180px",
+    height: "40px",
     color : theme.custom.icon.mono[0],
+    background: '#FFFFFF',
     "&:hover" : {
       color : theme.palette.action.hover
-    }
+    },
+    "& > span" : {
+    },
+
   },
   dropDown : {
     display: "flex",
@@ -51,13 +57,32 @@ const neoStyle = {
 } as React.CSSProperties;
 
 export default function BackgroundButton() {
-  const [theme, setTheme] = useState(0);
+  let backgroundTheme;
+  if(localStorage.GridaBoard_theme === undefined){
+    backgroundTheme = 0;
+  }else{
+    backgroundTheme = parseInt(localStorage.GridaBoard_theme);
+  }
+  const [theme, setTheme] = useState(backgroundTheme);
   const [isOpen, setIsOpen] = useState(false);
   const classes = useStyle();
   const themeNameArr = ["basic", "neoprism"];
 
-  const setBackground = (background) => {
+  const setBackground = (background:number) => {
     setTheme(background);
+    setBg(background)
+    setIsOpen(false);
+    localStorage.GridaBoard_theme = background;
+  }
+
+  function handleClick() {
+    setIsOpen((prev) => !prev);
+  }
+  function handleClickAway(){
+    setIsOpen(false);
+  }
+  
+  function setBg(background){
     if(background === 0) {
       themeManager.setT1();
     } else if(background === 1) {
@@ -67,23 +92,21 @@ export default function BackgroundButton() {
     } else {
       themeManager.setT5();
     }
-    setIsOpen(false);
   }
 
-  function handleClick() {
-    setIsOpen((prev) => !prev);
-  }
-  function handleClickAway(){
-    setIsOpen(false);
-  }
+  useEffect(()=>{
+    setBg(theme);
+  },[])
+
   return (
     <ClickAwayListener onClickAway={handleClickAway}>
       <div>
         <div>
           <Button variant="outlined" type="button" className={classes.buttonStyle} onClick={handleClick}>
-                <span>
-                  {getText(`nav_background_${themeNameArr[theme]}`)}
-                </span>
+            <div style={{width: "122px", textAlign: "left"}}>
+              {getText(`nav_background_${themeNameArr[theme]}`)}
+            </div>
+            <div ><KeyboardArrowDown /></div>
           </Button>
         </div>
         {isOpen? (<div className={classes.dropDown}>

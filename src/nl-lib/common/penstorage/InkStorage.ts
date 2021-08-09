@@ -65,6 +65,10 @@ export default class InkStorage {
     return _storage_instance;
   }
 
+  public resetStrokes() {
+    this.completed = [];
+    this.completedOnPage = new Map();
+  }
   /**
    *
    * @param eventName
@@ -182,6 +186,10 @@ export default class InkStorage {
 
     if (isSameNcode(DefaultPlateNcode, {section, owner, book, page})) {
       pageId = InkStorage.makeNPageIdStr({ section: basePageInfo.section, book: basePageInfo.book, owner: basePageInfo.owner, page: basePageInfo.page });
+      stroke.section = basePageInfo.section;
+      stroke.book = basePageInfo.book;
+      stroke.owner = basePageInfo.owner;
+      stroke.page = basePageInfo.page;
     }
     // console.log( `add completed: ${mac},  ${pageId} = ${section}.${owner}.${book}.${page} `);
 

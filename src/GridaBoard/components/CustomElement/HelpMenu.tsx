@@ -6,12 +6,15 @@ import { useSelector } from 'react-redux';
 import { RootState } from "../../store/rootReducer";
 import HelpViewer from "../helpMenu"
 import Cookies from 'universal-cookie';
-export const setHelpMenu = (show: boolean) => {
-	showHelpMenu(show);
+export const setHelpMenu = (show: boolean, main:number, sub:number) => {
+	showHelpMenu(show, {
+    main : main,
+    sub : sub
+  });
 
   if(!show){
     const cookies = new Cookies();
-    cookies.set("firstHelp", true, {
+    cookies.set(`firstHelp_${main}_${sub}`, true, {
       maxAge: 99999999
     });
   }
@@ -34,10 +37,12 @@ const useStyle = makeStyles(theme=>({
 //menu의 이동 및 여러 동작들을 할 수 있도록 존재하는 컴포넌트
 const HelpMenu = ()=>{
 	const inVisible = useSelector((state: RootState) => state.ui.helpMenu.show);
+	const mainNo = useSelector((state: RootState) => state.ui.helpMenu.main);
+	const subNo = useSelector((state: RootState) => state.ui.helpMenu.sub);
 	const classes = useStyle();
 
 	const movePopup = (e:React.MouseEvent<HTMLDivElement, MouseEvent>)=>{
-    let div = e.currentTarget;
+    const div = e.currentTarget;
     div.style.cursor = "grabbing";
     
     const startDivX = div.offsetLeft, startDivY = div.offsetTop;
@@ -73,7 +78,7 @@ const HelpMenu = ()=>{
 	<React.Fragment>
 		{inVisible ? 
 		(
-			<HelpViewer className={classes.viewer} mainNo={1} subNo={1} onHeaderClick={movePopup} setHelpMenu={setHelpMenu}/>
+			<HelpViewer className={classes.viewer} mainNo={mainNo} subNo={subNo} onHeaderClick={movePopup} setHelpMenu={setHelpMenu}/>
 		)
 		: ""}
 	</React.Fragment>)

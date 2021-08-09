@@ -61,11 +61,13 @@ const useStyle = makeStyles(theme => ({
   }
 }));
 type Props = {
-  className : string
+  className : string,
+  tutorialMain : number,
+  tutorialSub : number,
 }
 
 const InformationButton = (props: Props) => {
-  const { className } = props;
+  const { className, tutorialMain, tutorialSub } = props;
   const [isOpen, setIsOpen] = useState(false);
   const classes = useStyle();
   const selectArr = [
@@ -85,7 +87,7 @@ const InformationButton = (props: Props) => {
       event : ()=>{
         setIsOpen(false);
         // openTutorial();
-        setHelpMenu(true);
+        setHelpMenu(true, tutorialMain, tutorialSub);
       }
     }
   ]

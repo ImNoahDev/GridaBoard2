@@ -193,6 +193,12 @@ export default class GridaDoc {
     setDocNumPages(this._pages.length);
   }
   private appendPdfDocumentForGrida = (pdfDoc: NeoPdfDocument, pageInfos: IPageSOBP[], basePageInfos: IPageSOBP[]) => {
+    const found = this._pdfd.find(item => item.fingerprint === pdfDoc.fingerprint);
+    if (found) {
+      alert(getText("alert_regedPdf"));
+      return -1;
+    }
+
     this._pdfd = [];
 
     // 2) PDF 배열에 정보를 추가하고
@@ -420,6 +426,10 @@ export default class GridaDoc {
 
   get pages() {
     return this._pages;
+  }
+
+  set pages(pages: GridaPage[]) {
+    this._pages = pages;
   }
 
   getPdfUrlAt = (pageNo: number) => {

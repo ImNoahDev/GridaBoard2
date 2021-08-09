@@ -1,11 +1,13 @@
 import React,{ useState } from "react";
 import '../../styles/buttons.css';
-import GridaToolTip from "../../styles/GridaToolTip";
 import { RootState } from '../../store/rootReducer';
 import { setRotationTrigger } from '../../store/reducers/rotate';
 import { useSelector } from 'react-redux';
 import GridaDoc from "../../GridaDoc";
 import { IconButton, IconButtonProps, makeStyles, SvgIcon } from "@material-ui/core";
+import { RotateRight } from "@material-ui/icons";
+import SimpleTooltip2 from "../SimpleTooltip2";
+import getText from 'GridaBoard/language/language';
 
 const RotateButton = (props: IconButtonProps) => {
   const doc = GridaDoc.getInstance();
@@ -55,16 +57,9 @@ const RotateButton = (props: IconButtonProps) => {
     //   }} title={undefined}>
   return (
     <IconButton id="pageRotateButton" onClick={onToggleRotate} {...props}>
-      <SvgIcon>
-        <path
-          d="M8.55 4.9l2.667-2a.5.5 0 000-.8L8.55.1a.5.5 0 00-.8.4v1.25C5.105 1.75 3 3.956 3 6.627c0 .793.185 1.544.514 2.208a.75.75 0 001.344-.666A3.462 3.462 0 014.5 6.626C4.5 4.74 5.977 3.25 7.75 3.25V4.5a.5.5 0 00.8.4z"
-        />
-          <path
-            fillRule="evenodd"
-            clipRule="evenodd"
-            d={pathArr[(isVertical?0:1)]}
-          />
-      </SvgIcon>
+      <SimpleTooltip2 title={getText('sideMenu_rotate')}>
+        <RotateRight/>
+      </SimpleTooltip2>
     </IconButton>
   );
 }

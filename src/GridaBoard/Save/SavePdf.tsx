@@ -14,14 +14,8 @@ const PDF_TO_SCREEN_SCALE = 6.72; // (56/600)*72
 
 // https://pdf-lib.js.org/
 
-const inkSt = InkStorage.getInstance();
 export async function savePDF(saveName: string) {
-
   const filename = saveName;
-
-  const doc = GridaDoc.getInstance();
-  const docPages = doc.pages;
-
   const pdfDoc = await makePdfDocument();
 
   addStrokesOnPage(pdfDoc);
@@ -141,7 +135,7 @@ export async function addStrokesOnPage(pdfDoc) {
 
   for (const [key, NeoStrokes] of inkSt.completedOnPage.entries()) {
     //잉크 스토리지에 저장된 스트로크가 몇번째 페이지인지 안전하게 검사
-    let gridaPageObj: {pageNo: number, rotation: number, isPdf: boolean} = {pageNo: 0, rotation: 0, isPdf: true};
+    const gridaPageObj: {pageNo: number, rotation: number, isPdf: boolean} = {pageNo: 0, rotation: 0, isPdf: true};
     findGridaPageObjByStrokeKey(gridaPageObj, key);
 
     const page = pages[gridaPageObj.pageNo];

@@ -5,10 +5,18 @@ import LeftSideLayer from "./LeftSideLayer";
 import ContentsLayer from "./ContentsLayer";
 import { ButtonProps, AppBar, makeStyles, Collapse, Button, IconButton } from "@material-ui/core";
 import { IFileBrowserReturn } from "nl-lib/common/structures";
-import {ArrowDropDown, ArrowDropUp} from '@material-ui/icons';
+import {FirstPage, LastPage} from '@material-ui/icons';
 import PenLogWindow from "../debugging/PenLogWindow";
 import TestButton from "../components/buttons/TestButton";
- 
+import CustomBadge from "../components/CustomElement/CustomBadge";
+import clsx from 'clsx';
+import { useSelector } from "react-redux";
+import { RootState } from "../store/rootReducer";
+import RotateButton from "../components/buttons/RotateButton";
+import PageClearButton from "../components/buttons/PageClearButton";
+import PageDeleteButton from "../components/buttons/PageDeleteButton";
+import SimpleTooltip from "../components/SimpleTooltip";
+
 /**
  *
  */
@@ -58,34 +66,58 @@ const useStyles = makeStyles((theme) => {
     },
     headerCollapse:{
       background: theme.custom.white[50]
-    }
-
+    },
+    tool: {
+      width: "56px",
+      height: "100%",
+      borderRight : "rgba(88, 98, 125, 0.15) solid 1px",
+    },
+    opener : {
+      width: "56px",
+      height: "56px",
+      background: "#58627D",
+      color: "#ffffff",
+      // borderRight : "rgba(88, 98, 125, 0.15) solid 1px",
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+      transition: theme.transitions.create('margin', {
+        easing: theme.transitions.easing.easeOut,
+        duration: theme.transitions.duration.enteringScreen,
+      }),
+      marginLeft: 0,
+    },
+    pageOptions: {
+      display: "flex",
+      flexDirection: "column",
+      width: "56px",
+      height: "56px",
+      alignItems: "center",
+    },
   })
 });
-
-
 
 // style={{"--appBar-height":"0px"}}
 const ViewLayer = (props: Props) => {
   const classes = useStyles();
   const [isView, setHeaderView] = useState(true); //헤더 뷰
   const [debugOpen, setDebugOpen] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(true);
 
-  //헤더 감추기 버튼
-  const HeaderController = ()=>{
-    return (
-    <div className={classes.headerViewBtn} onClick={()=>{setHeaderView((prev)=>!prev)}}> 
-      <IconButton
-        aria-label="open drawer"
-      >
-        {isView? (<ArrowDropUp />) : (<ArrowDropDown />)}
-      </IconButton>
-    </div>);
-  }
+  const activePageNo_store = useSelector((state: RootState) => state.activePage.activePageNo);
 
   const handlePenLogWindow = () => {
     setDebugOpen(!debugOpen);
   }
+
+  const hideHeader = () => {
+    setHeaderView((prev)=>!prev);
+  }
+
+  const handleDrawerOpen = () => {
+    if(activePageNo_store === -1) return ;
+    setDrawerOpen((prev)=>!prev);
+  };
 
   const hiddenTest = true;
 
@@ -93,15 +125,41 @@ const ViewLayer = (props: Props) => {
     <div className={classes.wrap}>
       <AppBar position="relative" color="transparent" elevation={0}> 
         <Collapse in={isView} className={classes.headerCollapse} timeout={0}>
-          <HeaderLayer {...props} handlePenLogWindow={handlePenLogWindow} hidden={hiddenTest}/>
-          <NavLayer {...props} />
+          <HeaderLayer {...props} handlePenLogWindow={handlePenLogWindow} hidden={hiddenTest} />
         </Collapse>
-        <HeaderController /> {/** 사라지면 안되기 때문에 collapse에서 빠진다 */}
-
+          <NavLayer {...props} hideHeader={hideHeader}/>
       </AppBar>
       <div className={classes.main}>
         <ContentsLayer {...props}/>
-        <LeftSideLayer {...props}/>
+        <LeftSideLayer {...props} drawerOpen={drawerOpen}/>
+
+        <div className={classes.tool}>
+
+          <div id="arrow-btn" className={classes.opener} onClick={handleDrawerOpen}>
+            <CustomBadge badgeContent={`L`}>
+              <IconButton disabled={false}>
+                {drawerOpen? (<FirstPage style={{color: "#ffffff"}}/>) : (<LastPage style={{color: "#ffffff"}}/>)}
+              </IconButton>
+            </CustomBadge>
+          </div>
+
+          <div className={classes.pageOptions}>
+            
+              <CustomBadge badgeContent={`TAB`}>
+                <RotateButton disabled={activePageNo_store === -1} />
+              </CustomBadge>
+
+              <CustomBadge badgeContent={`Y`}>
+                <PageClearButton disabled={activePageNo_store === -1} />
+              </CustomBadge>
+
+              <CustomBadge badgeContent={`D`}>
+                <PageDeleteButton disabled={activePageNo_store === -1} />
+              </CustomBadge>
+          </div>
+
+        </div>
+
       </div>
 
       <PenLogWindow open={debugOpen} hidden={hiddenTest}/>

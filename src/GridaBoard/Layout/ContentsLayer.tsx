@@ -4,19 +4,13 @@ import { RootState } from "../store/rootReducer";
 import GridaDoc from "../GridaDoc";
 import { NeoPdfDocument } from "nl-lib/common/neopdf";
 import { IFileBrowserReturn } from "nl-lib/common/structures";
-
 import { nullNcode } from "nl-lib/common/constants";
 import { MixedPageView } from "nl-lib/renderer";
 import { PLAYSTATE } from "nl-lib/common/enums";
 import { PenManager } from "nl-lib/neosmartpen";
-import RotateButton from "../components/buttons/RotateButton";
-import GridaToolTip from "../styles/GridaToolTip";
-import { Button, IconButton, makeStyles, Popover } from "@material-ui/core";
-import HelpIcon from '@material-ui/icons/Help';
-import PageClearButton from "../components/buttons/PageClearButton";
-import CustomBadge from "../components/CustomElement/CustomBadge";
+import { makeStyles } from "@material-ui/core";
 import InformationButton from "../components/buttons/InformationButton";
-import getText, { languageType } from "../language/language";
+import { languageType } from "../language/language";
 
 const useStyle = props=>makeStyles(theme=>({
   root : {
@@ -25,30 +19,6 @@ const useStyle = props=>makeStyles(theme=>({
     flex: 1,
     overflow: "auto",
     flexDirection: "column"
-  },
-  sideEventer : {
-    position: "fixed",
-    zIndex: 100,
-    right: "0px",
-    padding: "24px",
-    "& > span" : {
-      display: "flex",
-      "& > button": {
-        width: "56px",
-        height: "56px",
-        background: theme.custom.white[80],
-        boxShadow: "2px 0px 24px rgba(0, 0, 0, 0.15), inset 0px 2px 0px rgba(255, 255, 255, 1)",
-        borderRadius: "50%",
-        display: "block",
-        zoom: 1 / props.brZoom,
-        "&:hover": {
-          color: theme.palette.action.hover,
-        },
-      }
-    },
-    "& > span:first-child": {
-      marginBottom: "16px"
-    }
   },
   information : {
     right: "24px",
@@ -74,6 +44,11 @@ interface Props {
 const ContentsLayer = (props: Props) => {
   const { handlePdfOpen, ...rest } = props;
   const [pageWidth, setPageWidth] = useState(0);
+
+  let pdfPageNo = 1;
+  let pageInfos = [nullNcode()];
+  let basePageInfo = nullNcode();
+
   const {zoomStore} = useSelector((state: RootState) =>({
     zoomStore: state.zoomReducer.zoom as number,
   }));
@@ -98,11 +73,7 @@ const ContentsLayer = (props: Props) => {
   const pdfUrl = undefined as string;
   const pdfFilename = undefined as string;
   let pdf = undefined as NeoPdfDocument;
-  let pdfPageNo = 1;
   let rotation = 0;
-  let pageInfos = [nullNcode()];
-  let basePageInfo = nullNcode();
-  let pdfFingerprint = undefined as string;
 
   const viewFit_store = useSelector((state: RootState) => state.viewFitReducer.viewFit);
 
@@ -116,22 +87,24 @@ const ContentsLayer = (props: Props) => {
     if (activePageNo_store !== activePageNo) {
       setLocalActivePageNo(activePageNo_store);
     }
-  }, [activePageNo_store])
 
+  }, [activePageNo_store])
+  
   if (activePageNo_store >= 0) {
     const doc = GridaDoc.getInstance();
     const page = doc.getPageAt(activePageNo_store)
-    if (page._pdfPage !== undefined) {
-      rotation = page._pdfPage.viewport.rotation;
-    } else {
-      rotation = page.pageOverview.rotation;
-    }
-    pdf = page.pdf;
 
-    pdfFingerprint = doc.getPdfFingerprintAt(activePageNo_store);
-    pdfPageNo = doc.getPdfPageNoAt(activePageNo_store);
-    pageInfos = doc.getPageInfosAt(activePageNo_store);
-    basePageInfo = doc.getBasePageInfoAt(activePageNo_store);
+    if (doc.pages.length !== 0) {
+      if (page._pdfPage !== undefined) {
+        rotation = page._pdfPage.viewport.rotation;
+      } else {
+        rotation = page.pageOverview.rotation;
+      }
+      pdf = page.pdf;
+      pdfPageNo = doc.getPdfPageNoAt(activePageNo_store);
+      pageInfos = doc.getPageInfosAt(activePageNo_store);
+      basePageInfo = doc.getBasePageInfoAt(activePageNo_store);
+    }
   }
 
   const {renderCountNo_store} = useSelector((state: RootState) =>({
@@ -149,15 +122,7 @@ const ContentsLayer = (props: Props) => {
 
   return (
     <div id="main" className={`${classes.root}`}>
-      <div className={`${classes.sideEventer}`}>
-        <CustomBadge badgeContent={`TAB`}>
-          <RotateButton disabled={activePageNo_store === -1} />
-        </CustomBadge>
-        <CustomBadge badgeContent={`Y`}>
-          <PageClearButton disabled={activePageNo_store === -1} />
-        </CustomBadge>
-      </div>
-      {(languageType === "ko") ? <InformationButton className={classes.information}/> : ""}
+      {(languageType === "ko") ? <InformationButton className={classes.information} tutorialMain={1} tutorialSub={1} /> : ""}
       
       <div id="mixed-viewer-layer" style={{
         position: "relative",

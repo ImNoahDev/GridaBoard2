@@ -221,7 +221,7 @@ export default function PrintNcodedPdfButton(props: Props) {
   // _workingOption = g_defaultPrintOption;
   return (
     <React.Fragment>
-      <Button {...rest} onClick={startPrint}>
+      <Button {...rest} id="printBtn" onClick={startPrint}>
         {/* {props.children} */}{getText("print")}
       </Button>
 

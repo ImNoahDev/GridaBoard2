@@ -9,6 +9,7 @@ import GridaDoc from "./GridaDoc";
 import { setViewFit } from "./store/reducers/viewFitReducer";
 import { setZoomStore } from "./store/reducers/zoomReducer";
 import { setRotationTrigger } from "./store/reducers/rotate";
+import { showAlert } from "./store/reducers/listReducer";
 import { PEN_THICKNESS } from '../nl-lib/common/enums';
 import $ from "jquery";
 import { setPointerTracer } from "./store/reducers/pointerTracer";
@@ -56,20 +57,29 @@ export default function KeyBoardShortCut(evt: KeyboardEvent) {
 
   const cmd = (isCtrl ? 1 : 0) | (isAlt ? 2 : 0) | (isShift ? 4 : 0) | (evt.metaKey ? 8 : 0);
 
-  // console.log(`key down cmd=${cmd} ==> code=${evt.code}  key => ${evt.key}`);
-  
-  if (cmd == 0) {
-    switch (evt.key.toLocaleLowerCase()) {
-      case "0":
-      case "1":
-      case "2":
-      case "3":
-      case "4":
-      case "5":
-      case "6":
-      case "7":
-      case "8":
-      case "9":
+  // console.log(`key down cmd=${cmd} ==> code=${evt.code}  key => ${evt.key}`); 
+  if (cmd == 0 || (isShift && evt.key === "+")) {
+    switch (evt.code) {
+      case "Digit0":
+      case "Numpad0":
+      case "Digit1":
+      case "Numpad1":
+      case "Digit2":
+      case "Numpad2":
+      case "Digit3":
+      case "Numpad3":
+      case "Digit4":
+      case "Numpad4":
+      case "Digit5":
+      case "Numpad5":
+      case "Digit6":
+      case "Numpad6":
+      case "Digit7":
+      case "Numpad7":
+      case "Digit8":
+      case "Numpad8":
+      case "Digit9":
+      case "Numpad9":
         {
           if(evt.code.indexOf("Numpad") === -1){
             const color_num = evt.keyCode - 0x30;
@@ -79,43 +89,47 @@ export default function KeyBoardShortCut(evt: KeyboardEvent) {
 
         break;
 
-      case "a": // a
+      case "KeyA": // a
         // setPenThickness(1);
         break;
 
-      case "b": // b
+      case "KeyB": // b
         PenManager.getInstance().setThickness(PEN_THICKNESS.THICKNESS5);
         break;
 
-      case "c": // c
+      case "KeyC": // c
         PenManager.getInstance().setThickness(PEN_THICKNESS.THICKNESS3);
         break;
 
-      case "d": // d
+      case "KeyD": // d
         // setPenThickness(3);
+        showAlert({
+          type: "deletePage",
+          selected: null,
+        })
         break;
 
-      case "e": // e
+      case "KeyE": // e
         // setPenType(PenType.ERASER);
         PenManager.getInstance().setPenRendererType(IBrushType.ERASER);
         break;
 
-      case "f": // f
+      case "KeyF": // f
         // setPenThickness(4);
         break;
 
-      case "g": // g
+      case "KeyG": // g
         // setPenThickness(5);
         break;
 
-      case "h": // h
+      case "KeyH": // h
         // onBtn_fitHeight();
         setViewFit(ZoomFitEnum.HEIGHT);
         break;
-      case "l": //L
+      case "KeyL": //L
         (document.querySelector("#arrow-btn") as HTMLElement).click();
         break;
-      case "p":{ // P
+      case "KeyP":{ // P
         evt.preventDefault(); //web 기본 탭 기능 정지
         const activePageNo = store.getState().activePage.activePageNo;
         //페이지가 하나도 없으면 인쇄 못함
@@ -125,16 +139,16 @@ export default function KeyBoardShortCut(evt: KeyboardEvent) {
         break;
   
       }
-      case "q": // q
+      case "KeyQ": // q
         // setPenType(PenType.PEN);
         PenManager.getInstance().setPenRendererType(IBrushType.PEN);
         break;
 
-      case "r": // r
+      case "KeyR": // r
         PenManager.getInstance().setPenRendererType(IBrushType.MARKER);
         break;
 
-      case "s":{ // s => pdf save기능
+      case "KeyS":{ // s => pdf save기능
         evt.preventDefault(); //web 기본 탭 기능 정지
         const activePageNo = store.getState().activePage.activePageNo;
         //페이지가 하나도 없으면 저장 못함
@@ -149,7 +163,7 @@ export default function KeyBoardShortCut(evt: KeyboardEvent) {
         },0);
         break;
       }
-      case "t": {// t
+      case "KeyT": {// t
           const isTrace = store.getState().pointerTracer.isTrace;
           store.dispatch(setPointerTracer(!isTrace));
   
@@ -168,35 +182,35 @@ export default function KeyBoardShortCut(evt: KeyboardEvent) {
           break;
         }
 
-      case "v": // v
+      case "KeyV": // v
         // onBtn_fitPaper();
         PenManager.getInstance().setThickness(PEN_THICKNESS.THICKNESS4);
         break;
 
-      case "w": // w
+      case "KeyW": // w
         setViewFit(ZoomFitEnum.WIDTH);
         break;
-      case "x" : {
+      case "KeyX" : {
         PenManager.getInstance().setThickness(PEN_THICKNESS.THICKNESS2);
         break;
       }
-      case "y" : {
+      case "KeyY" : {
         (document.querySelector("#pageClearButton") as HTMLElement).click();
         break;
       }
-      case "z" : {
+      case "KeyZ" : {
         PenManager.getInstance().setThickness(PEN_THICKNESS.THICKNESS1);
         break;
       }
-      case "tab": {// <TAB>
+      case "Tab": {// <TAB>
         evt.preventDefault(); //web 기본 탭 기능 정지
         (document.querySelector("#pageRotateButton") as HTMLElement).click();
         break;
       }
 
       // page up
-      // case "pageup":
-      case "arrowleft": {// 키보드 ←  
+      // case "Keypageup":
+      case "ArrowLeft": {// 키보드 ←  
         if(document.querySelector("#main").clientHeight < (document.querySelector("#main") as HTMLElement).offsetHeight){
           //하단 스크롤 존재
           return ;
@@ -210,7 +224,7 @@ export default function KeyBoardShortCut(evt: KeyboardEvent) {
       }
       // page down
       // case "pagedown":
-      case "arrowright": {// →  
+      case "ArrowRight": {// →  
         if(document.querySelector("#main").clientHeight < (document.querySelector("#main") as HTMLElement).offsetHeight){
           //하단 스크롤 존재
           return ;
@@ -224,7 +238,18 @@ export default function KeyBoardShortCut(evt: KeyboardEvent) {
         break;
       }
 
-      case "+": {
+      case "Equal" : {
+        if(isShift){
+          setViewFit(ZoomFitEnum.FREE);
+          const zoom = store.getState().zoomReducer.zoom;
+          const delta = -100;
+          const newZoom = zoom * 0.9985 ** delta
+          setZoomStore(newZoom);
+        }
+
+        break;
+      }
+      case "NumpadAdd": {
         setViewFit(ZoomFitEnum.FREE);
         const zoom = store.getState().zoomReducer.zoom;
         const delta = -100;
@@ -233,7 +258,8 @@ export default function KeyBoardShortCut(evt: KeyboardEvent) {
         break;
       }
 
-      case "-": {
+      case "Minus" :
+      case "NumpadSubtract": {
         setViewFit(ZoomFitEnum.FREE);
         const zoom = store.getState().zoomReducer.zoom;
         const delta = 100;
@@ -241,7 +267,7 @@ export default function KeyBoardShortCut(evt: KeyboardEvent) {
         setZoomStore(newZoom);
         break;
       }
-      case "escape" : {
+      case "Escape" : {
         (document.querySelector("#arrow-btn") as HTMLElement).click();
         
         break ;
@@ -265,23 +291,23 @@ export default function KeyBoardShortCut(evt: KeyboardEvent) {
         break;
     }
   } else if (cmd == 1) {
-    switch (evt.key.toLocaleLowerCase()) {
-      case "o":{ // ctrl-o
+    switch (evt.code) {
+      case "keyO":{ // ctrl-o
         evt.preventDefault(); //web 기본 오픈 기능 강제 스탑
         (document.querySelector("#loadFileButton") as HTMLSpanElement).click();
         
         break;
       }
-      case "z": // ctrl-Z
+      case "keyZ": // ctrl-Z
         // onBtnUndo();
         break;
 
-      case "y": // ctrl-Z
+      case "keyY": // ctrl-Z
         // onBtnRedo();
         break;
 
       // ctrl - page up
-      case "home": {
+      case "Home": {
         const pageNo = 0;
         setActivePageNo(pageNo);
 
@@ -290,7 +316,7 @@ export default function KeyBoardShortCut(evt: KeyboardEvent) {
       }
 
       // ctrl - page down
-      case "end": {
+      case "End": {
         const doc = GridaDoc.getInstance();
         const pageNo = doc.numPages - 1;
         setActivePageNo(pageNo);
@@ -299,8 +325,10 @@ export default function KeyBoardShortCut(evt: KeyboardEvent) {
         break;
       }
 
-      case "+": 
-      case "-": {
+      case "Equal" : 
+      case "NumpadAdd": 
+      case "Minus" :
+      case "NumpadSubtract": {
         evt.cancelBubble = true;
         evt.returnValue = false;
         break;
