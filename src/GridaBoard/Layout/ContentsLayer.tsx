@@ -43,15 +43,11 @@ interface Props {
 
 const ContentsLayer = (props: Props) => {
   const { handlePdfOpen, ...rest } = props;
-  const [pageWidth, setPageWidth] = useState(0);
 
   let pdfPageNo = 1;
   let pageInfos = [nullNcode()];
   let basePageInfo = nullNcode();
 
-  const {zoomStore} = useSelector((state: RootState) =>({
-    zoomStore: state.zoomReducer.zoom as number,
-  }));
   const rotationTrigger = useSelector((state: RootState) => state.rotate.rotationTrigger);
   const {activePageNo_store} = useSelector((state: RootState) =>({
     activePageNo_store: state.activePage.activePageNo,
@@ -114,12 +110,6 @@ const ContentsLayer = (props: Props) => {
   const pens = useSelector((state: RootState) => state.appConfig.pens);
   const virtualPen = PenManager.getInstance().virtualPen;
 
-  const handlePageWidthNeeded = (width: number) => {
-    setPageWidth(width);
-  }
-  
-
-
   return (
     <div id="main" className={`${classes.root}`}>
       {(languageType === "ko") ? <InformationButton className={classes.information} tutorialMain={1} tutorialSub={1} /> : ""}
@@ -129,6 +119,7 @@ const ContentsLayer = (props: Props) => {
         height: '100%',
         float: "right",
       }}>
+
         <MixedPageView
           pdf={pdf}
           pdfUrl={pdfUrl} filename={pdfFilename}
@@ -142,14 +133,11 @@ const ContentsLayer = (props: Props) => {
 
           parentName={"grida-main-home"}
           viewFit={viewFit_store}
-          zoom={zoomStore}
           autoPageChange={true}
           fromStorage={false}
           fitMargin={10}
 
           activePageNo={activePageNo_store}
-          handlePageWidthNeeded = {(width) => handlePageWidthNeeded(width)}
-
           renderCountNo={renderCountNo_store}
 
           noInfo = {true}

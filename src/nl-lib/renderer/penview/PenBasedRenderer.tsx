@@ -133,7 +133,7 @@ class PenBasedRenderer extends React.Component<Props, State> {
   viewSize: ISize = { width: 0, height: 0 };
 
   mainDiv: HTMLDivElement = null;
-  canvasId = "";
+   canvasId = "";
   canvas: HTMLCanvasElement = null;
 
   inkStorage: InkStorage = null;
@@ -352,9 +352,9 @@ class PenBasedRenderer extends React.Component<Props, State> {
       ret_val = true;
     }
 
-    if (nextProps.viewSize.width !== this.viewSize.width || nextProps.viewSize.height !== this.viewSize.height) {
+    if (nextProps.viewSize.width !== this.props.viewSize.width || nextProps.viewSize.height !== this.props.viewSize.height) {
       this.viewSize = { ...nextProps.viewSize };
-      // console.log(`VIEW SIZE${callstackDepth()} WIDTH/HEIGHT:  ${this.viewSize.width}, ${this.viewSize.height}`);
+      console.log(`VIEW SIZE${callstackDepth()} WIDTH/HEIGHT:  ${this.viewSize.width}, ${this.viewSize.height}`);
       this.onViewResized(this.viewSize);
       ret_val = true;
     }
@@ -416,9 +416,10 @@ class PenBasedRenderer extends React.Component<Props, State> {
       ret_val = true;
     }
 
-    if (this.props.zoom !== nextProps.zoom) {
-      this.renderer.setCanvasZoomByButton(nextProps.zoom);
-    }
+    // if (this.props.zoom !== nextProps.zoom) {
+    //   this.renderer.setCanvasZoomByButton(nextProps.zoom);
+    // }
+
 
     if (this.props.renderCountNo !== nextProps.renderCountNo) {
       if (this.renderer) {
@@ -465,11 +466,6 @@ class PenBasedRenderer extends React.Component<Props, State> {
   }
 
   onViewResized = ({ width, height }) => {
-    const rect = { x: 0, y: 0, width, height };
-    const scale = this.pdfSize.scale;
-
-    // this.size = this.getSize(scale, rect);
-
     if (this.renderer) {
       this.renderer.onViewSizeChanged({ width, height });
     }

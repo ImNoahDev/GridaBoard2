@@ -108,9 +108,6 @@ export interface MixedViewProps {
   height?: number,
 
   noMorePdfSignal?: boolean;
-
-  handlePageWidthNeeded?: any;
-
   renderCountNo: number;
 
 }
@@ -184,7 +181,6 @@ const defaultMixedPageViewProps: MixedViewProps = {
   handleFileLoadNeeded: undefined,
 
   noMorePdfSignal: false,
-  handlePageWidthNeeded: undefined,
 
   activePageNo: 0,
 
@@ -327,30 +323,25 @@ class MixedPageView_module extends React.Component<MixedViewProps, State>  {
       this.setState({ forceToRenderCnt: this.state.forceToRenderCnt + 1 });
     }
 
-    let sizeChaned = false;
+    let sizeChanged = false;
     if (nextProps.width !== this.props.width || nextProps.height !== this.props.height) {
       this.onViewResized({ width: nextProps.width, height: nextProps.height });
-      sizeChaned = true;
-      this.setState({ forceToRenderCnt: this.state.forceToRenderCnt + 1 });
-      // this.setState({ forceToRenderCnt: this.state.forceToRenderCnt + 1 });
-
-      // this.forceUpdate();
-      // ret_val = true;
+      sizeChanged = true;
     }
 
     this._internal.noMorePdfSignal = nextProps.noMorePdfSignal;
 
     const pensChanged = nextProps.pens !== this.props.pens;
     const viewFitChanged = nextProps.viewFit !== this.props.viewFit;
-    const zoomChanged = nextProps.zoom !== this.props.zoom;
+    // const zoomChanged = nextProps.zoom !== this.props.zoom;
     const fixedChanged = nextProps.fixed !== this.props.fixed;
     const noInfo = nextProps.noInfo !== this.props.noInfo;
     const loaded = this.state.status === "loaded" && nextState.status !== this.state.status;
     const renderCntChanged = this.state.forceToRenderCnt !== nextState.forceToRenderCnt;
 
-    if (zoomChanged) {
-      // this._internal.viewPos.zoom = nextProps.zoom;
-    }
+    // if (zoomChanged) {
+    //   // this._internal.viewPos.zoom = nextProps.zoom;
+    // }
 
     if (((pdfChanged || pdfPageNoChanged) && this._internal.pdfPageNo > 0) || pageInfoChanged) {
       let size;
@@ -377,7 +368,7 @@ class MixedPageView_module extends React.Component<MixedViewProps, State>  {
       ret_val = true;
     }
 
-    ret_val = ret_val || pensChanged || pageInfoChanged || viewFitChanged || zoomChanged || fixedChanged || noInfo || loaded || renderCntChanged;
+    ret_val = ret_val || sizeChanged || pensChanged || pageInfoChanged || viewFitChanged || fixedChanged || noInfo || loaded || renderCntChanged;
 
     if(this.props.renderCountNo !== nextProps.renderCountNo) {
       ret_val = true;
@@ -555,30 +546,18 @@ class MixedPageView_module extends React.Component<MixedViewProps, State>  {
 
   }
 
-  handlePageWidthNeeded = (width: number) => {
-    if (this.props.parentName === "grida-main-home")
-      this.props.handlePageWidthNeeded(width);
-  }
-
-
   onCanvasPositionChanged = (arg: { offsetX: number, offsetY: number, zoom: number }) => {
     // console.log(arg);
     this._internal.viewPos = { ...arg };
-    this.setState({ forceToRenderCnt: this.state.forceToRenderCnt + 1 });
+    // this.setState({ forceToRenderCnt: this.state.forceToRenderCnt + 1 });
 
     if (this.props.isMainView) {
       setZoomStore(arg.zoom);
     }
 
-    this.handlePageWidthNeeded(this._internal.width);
     // const r = this._internal.renderCount;
     // this.setState({ renderCount: r + 1 });
   }
-
-
-  // handleClose = () => {
-  //   this.setState({ showFileOpenDlg: false });
-  // };
 
   render() {
     const { pdf } = this._internal;

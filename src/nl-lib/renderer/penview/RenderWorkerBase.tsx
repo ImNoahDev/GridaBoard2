@@ -572,7 +572,7 @@ export default abstract class RenderWorkerBase {
   };
 
   scrollBoundaryCheck = () => {
-    // const zoom = this.calcScaleFactor(this.viewFit, this.offset.zoom);
+    // const zoom = this.calcScaleFactor(this._opt.viewFit, this.offset.zoom);
     // if (zoom === 0) {
     //   this.reportCanvasChanged();
     //   return false;
@@ -580,7 +580,7 @@ export default abstract class RenderWorkerBase {
 
     // if (zoom !== this.offset.zoom) {
     //   this.offset.zoom = zoom;
-    //   this.zoomToPoint(undefined, zoom);
+      // this.zoomToPoint(undefined, zoom);
     // }
 
     // http://fabricjs.com/fabric-intro-part-5#pan_zoom
@@ -694,7 +694,6 @@ export default abstract class RenderWorkerBase {
 
     const z = zoom;
 
-    const oldOffsetZoom = this.offset.zoom;
     this.offset.x = x1;
     this.offset.y = y1;
     this.offset.zoom = z;
@@ -702,20 +701,9 @@ export default abstract class RenderWorkerBase {
     const zoomed_width = Math.round(this._opt.pageSize.width * z);
     const zoomed_height = Math.round(this._opt.pageSize.height * z);
 
-    const oldZoom = this.canvasFb.getZoom();
-    const oldWidth = this.canvasFb.getWidth();
-    const oldHeight = this.canvasFb.getHeight();
-
     this.canvasFb.setZoom(z);
     this.canvasFb.setWidth(zoomed_width);
     this.canvasFb.setHeight(zoomed_height);
-    // this.canvasFb.setDimensions({ width: zoomed_width, height: zoomed_height }, { cssOnly: false });
-
-    const newZoom = this.canvasFb.getZoom();
-    const newWidth = this.canvasFb.getWidth();
-    const newHeight = this.canvasFb.getHeight();
-
-    // this.canvasFb.renderAll();
 
     // console.log(`VIEW SIZE${callstackDepth()} zoomToPoint: ${oldOffsetZoom} old/new=${oldZoom}(${oldWidth},${oldHeight})/${newZoom}(${newWidth},${newHeight}) zoom=${z} ${zoomed_width}, ${zoomed_height} = ${zoomed_width / zoomed_height}`);
     this.scrollBoundaryCheck();
@@ -874,7 +862,7 @@ export default abstract class RenderWorkerBase {
 
     const szCanvas = { ...this._opt.viewSize };
     szCanvas.width -= this._opt.fitMargin;
-    szCanvas.height -= this._opt.fitMargin;
+    szCanvas.height -= this._opt.fitMargin * szCanvas.height / szCanvas.width;
 
     let scale = 0;
     switch (mode) {

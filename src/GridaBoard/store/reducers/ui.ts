@@ -177,7 +177,7 @@ export const showHelpMenu = (show: boolean, option : {main: number, sub: number}
 //]
 
 
-const defaultDrawerWidth = 220;
+const defaultDrawerWidth = 180;
 // export let g_drawerWidth = defaultDrawerWidth;
 const initialState = {
   waiting: {
