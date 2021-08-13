@@ -37,6 +37,24 @@ export const g_paperType_default: IPaperTypeSet = {
     "ncode_end_page": 300,
     "pdf_page_count": 301
   },
+  "3.27.1096": {
+    "id": "3.27.1096",
+    "section": 3,
+    "owner": 27,
+    "book": 1096,
+    "margin": {
+      "Xmin": 0,
+      "Ymin": 0,
+      "Xmax": 3553,
+      "Ymax": 2125
+    },
+    "title": "boogieboard",
+    "pdf_name": "boogieboard",
+    "nproj_file": "note_1096.nproj",
+    "ncode_start_page": 0,
+    "ncode_end_page": 300,
+    "pdf_page_count": 301
+  },
   "3.27.205": {
     "owner": 27,
     "pdf_page_count": 210,
