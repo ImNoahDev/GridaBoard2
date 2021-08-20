@@ -25,6 +25,7 @@ import { KeyboardArrowDown } from '@material-ui/icons';
 import { auth } from 'GridaBoard/util/firebase_config';
 import ProfileButton from '../components/buttons/ProfileButton';
 import { showAlert } from '../store/reducers/listReducer';
+import { setSaveOpen } from '../store/reducers/ui';
 
 const useStyles = props =>
   makeStyles(theme => ({
@@ -176,6 +177,12 @@ interface Props {
   hidden: boolean;
 }
 
+export function fileOpenHandler() {
+  const input = document.querySelector('#fileForconvert') as HTMLInputElement;
+  input.value = '';
+  input.click();
+}
+
 const HeaderLayer = (props: Props) => {
   const { handlePdfOpen, ...rest } = props;
 
@@ -184,11 +191,6 @@ const HeaderLayer = (props: Props) => {
 
   const docName = useSelector((state: RootState) => state.docConfig.docName);
 
-  function fileOpenHandler() {
-    const input = document.querySelector('#fileForconvert') as HTMLInputElement;
-    input.value = '';
-    input.click();
-  }
 
   const makePdfUrl = async () => {
     const doc = GridaDoc.getInstance();
@@ -289,11 +291,12 @@ const HeaderLayer = (props: Props) => {
     disabled = false;
   }
 
-  const [isSaveOpen, setIsSaveOpen] = useState(false);
+  // const [isSaveOpen, setIsSaveOpen] = useState(false);
   const [isExportOpen, setIsExportOpen] = useState(false);
+  const isSaveOpen = useSelector((state: RootState) => state.ui.simpleUiData.saveOpen);
 
   const handleClickSave = () => {
-    setIsSaveOpen(true);
+    setSaveOpen(true);
   };
 
   const handleClickExport = () => {
@@ -301,7 +304,7 @@ const HeaderLayer = (props: Props) => {
   };
 
   const handleClickSaveAway = () => {
-    setIsSaveOpen(false);
+    setSaveOpen(false);
   };
 
   const handleClickExportAway = () => {
@@ -340,7 +343,7 @@ const HeaderLayer = (props: Props) => {
                 <div>
                   <CustomBadge badgeContent={`S`}>
                     <Button
-                      className={`${classes.buttonStyle} ${classes.buttonFontStyle} saveButton`}
+                      className={`${classes.buttonStyle} ${classes.buttonFontStyle}`}
                       onClick={handleClickSave}
                       disabled={disabled}>
                       {getText('save_file')}
@@ -357,7 +360,7 @@ const HeaderLayer = (props: Props) => {
               <ClickAwayListener onClickAway={handleClickExportAway}>
                 <div>
                   <Button
-                    className={`${classes.buttonStyle} ${classes.buttonFontStyle} saveButton`}
+                    className={`${classes.buttonStyle} ${classes.buttonFontStyle}`}
                     onClick={handleClickExport}
                     disabled={disabled}>
                     {getText('export_file')}
@@ -373,7 +376,6 @@ const HeaderLayer = (props: Props) => {
               <div>
                 <CustomBadge badgeContent={`Ctrl-O`}>
                   <Button
-                    id="loadFileButton"
                     className={`loadDropDown ${classes.buttonStyle} ${classes.buttonFontStyle}`}
                     onClick={fileOpenHandler}>
                     {getText('load_file')}
