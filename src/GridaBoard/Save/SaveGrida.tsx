@@ -1,14 +1,9 @@
 import { saveAs } from "file-saver";
-import { degrees, PDFDocument } from 'pdf-lib';
 import GridaDoc from "../GridaDoc";
 import { InkStorage } from "nl-lib/common/penstorage";
-import { fabric } from "fabric";
-import { isSamePage } from "../../nl-lib/common/util";
-import { PlateNcode_1, PlateNcode_2 } from "../../nl-lib/common/constants";
-import { adjustNoteItemMarginForFilm, getNPaperInfo } from "../../nl-lib/common/noteserver";
-import { store } from "../client/pages/GridaBoard";
-import { makePdfDocument, addStrokesOnPage } from "./SavePdf";
+import { makePdfDocument } from "./SavePdf";
 import { IPageSOBP } from "../../nl-lib/common/structures";
+import { MappingStorage } from "../../nl-lib/common/mapper";
 
 const PDF_TO_SCREEN_SCALE = 6.72; // (56/600)*72
 
@@ -63,10 +58,32 @@ export async function makeGridaBlob() {
     pwd : "qwer"
   }
 
+  const mappingData = MappingStorage.getInstance()._data; //인쇄한 경우
+  const mappingTemporary = MappingStorage.getInstance()._temporary; //캘리브레이션한 경우
+
+  const fingerprint = doc.getPdfFingerprintAt(0);
+  
+  let targetMapper = undefined;
+
+  for (const doc of mappingTemporary.arrDocMap) {
+    if (doc.fingerprint === fingerprint) {
+      targetMapper = doc;
+      break;
+    }
+  }
+
+  for (const doc of mappingData.arrDocMap) {
+    if (doc.fingerprint === fingerprint) {
+      targetMapper = doc;
+      break;
+    }
+  }
+
   const gridaJson = {
     "pdf" : pdf,
     "stroke" : strokeInfos,
-    "gridaInfo" : gridaInfo
+    "gridaInfo" : gridaInfo,
+    "mapper": targetMapper,
   };
 
   console.log(gridaJson);

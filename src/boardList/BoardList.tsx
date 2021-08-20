@@ -27,6 +27,7 @@ import { forceUpdateBoardList } from '../GridaBoard/store/reducers/appConfigRedu
 import { languageType } from 'GridaBoard/language/language';
 import InformationButton from 'GridaBoard/components/buttons/InformationButton';
 import HelpMenu, { setHelpMenu } from "GridaBoard/components/CustomElement/HelpMenu";
+import { MappingStorage, PdfDocMapper } from '../nl-lib/common/mapper';
 const useStyle = makeStyles(theme => ({
   mainBackground: {
     width: '100%',
@@ -184,6 +185,15 @@ const BoardList = () => {
 
       const doc = GridaDoc.getInstance();
       doc.pages = [];
+
+      if (data.mapper !== undefined) {
+        const mapping = new PdfDocMapper(data.mapper.id, data.mapper.pagesPerSheet)
+        
+        mapping._arrMapped = data.mapper.params;
+
+        const msi = MappingStorage.getInstance();
+        msi.registerTemporary(mapping);
+      }
 
       await doc.openGridaFile(
         { url: url, filename: nowDocs.doc_name },
