@@ -4,7 +4,7 @@ import { cloneObj, getNowTimeStr, makeNPageId, makePdfId } from "../util";
 import CoordinateTanslater from "./CoordinateTanslater";
 
 export default class PdfDocMapper {
-  private _arrMapped: IPageMapItem[] = [];
+  public _arrMapped: IPageMapItem[] = [];
 
   private _docMap: IPdfToNcodeMapItem;
 
