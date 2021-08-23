@@ -31,7 +31,9 @@ export type IGetNPageTransformType = {
   };
 }
 
-
+export type MappingState = {
+    type: undefined | "printed" | "calibrated"
+}
 
 export type IMappingData = {
   nextIssuable: IPageSOBP;
