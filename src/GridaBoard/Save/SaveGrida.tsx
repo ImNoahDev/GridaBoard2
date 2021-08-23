@@ -4,6 +4,7 @@ import { InkStorage } from "nl-lib/common/penstorage";
 import { makePdfDocument } from "./SavePdf";
 import { IPageSOBP } from "../../nl-lib/common/structures";
 import { MappingStorage } from "../../nl-lib/common/mapper";
+import { store } from "../client/pages/GridaBoard";
 
 const PDF_TO_SCREEN_SCALE = 6.72; // (56/600)*72
 
@@ -58,19 +59,26 @@ export async function makeGridaBlob() {
     pwd : "qwer"
   }
 
-  const mappingData = MappingStorage.getInstance()._data; //인쇄한 경우
-  const mappingTemporary = MappingStorage.getInstance()._temporary; //캘리브레이션한 경우
+  const mappingState = store.getState().appConfig.mappingState;
+  let mappingData = undefined;
+
+  switch (mappingState) {
+    case "printed": {
+      mappingData = MappingStorage.getInstance()._data;
+      break;
+    }
+    case "calibrated": {
+      mappingData = MappingStorage.getInstance()._temporary;
+      break;
+    }
+    default: {
+      break;
+    }
+  }
 
   const fingerprint = doc.getPdfFingerprintAt(0);
   
   let targetMapper = undefined;
-
-  for (const doc of mappingTemporary.arrDocMap) {
-    if (doc.fingerprint === fingerprint) {
-      targetMapper = doc;
-      break;
-    }
-  }
 
   for (const doc of mappingData.arrDocMap) {
     if (doc.fingerprint === fingerprint) {

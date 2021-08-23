@@ -2,7 +2,7 @@ import { store } from "../../client/pages/GridaBoard";
 import GridaDoc from "../../GridaDoc";
 import { INeoSmartpen } from "nl-lib/common/neopen";
 
-import { IPrintOption } from "nl-lib/common/structures";
+import { IPrintOption, MappingState } from "nl-lib/common/structures";
 import { g_defaultPrintOption } from "nl-lib/ncodepod";
 import { NeoSmartpen } from "nl-lib/neosmartpen";
 //[Define Action Types
@@ -14,6 +14,7 @@ const ACTION_TYPE = Object.freeze({
   SET_PENS: `${ActionGroup}.SET_PENS`,
   UPDATE_BOARDLIST: `${ActionGroup}.UPDATE_BOARDLIST`,
   GET: `${ActionGroup}.GET`,
+  SET_MAPPING_STATE: `${ActionGroup}.SET_MAPPING_STATE`,
 });
 //]
 
@@ -37,6 +38,13 @@ export const forceUpdateBoardList = () => ({
     type: ACTION_TYPE.UPDATE_BOARDLIST,
     value: 1,
 })
+
+export const setMappingState = async (state: string) => {
+  store.dispatch({
+    type: ACTION_TYPE.SET_MAPPING_STATE,
+    value: state,
+  })
+}
 //]
 
 
@@ -46,6 +54,7 @@ const initialState = {
   pens: [] as INeoSmartpen[],
   num_pens: 0,
   updateCount: 1,
+  mappingState: undefined as MappingState,
 };
 
 export type IAppConfig = typeof initialState;
@@ -73,9 +82,13 @@ export default (state = initialState, action) => {
       return {
         ...state,
         updateCount: cnt + action.value,
-        
       };
-
+    }
+    case ACTION_TYPE.SET_MAPPING_STATE: {
+      return {
+        ...state,
+        mappingState: action.value,
+      };
     }
     default: {
       return state;

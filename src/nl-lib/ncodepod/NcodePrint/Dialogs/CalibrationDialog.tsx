@@ -19,6 +19,7 @@ import ConnectButton from "GridaBoard//components/buttons/ConnectButton";
 import getText from "GridaBoard//language/language";
 import GridaDoc from 'GridaBoard/GridaDoc';
 import { isWhiteBoard } from '../../../common/noteserver';
+import { setMappingState } from 'GridaBoard/store/reducers/appConfigReducer';
 
 const _penImageUrl = "/icons/image_calibration.png";
 
@@ -162,6 +163,9 @@ const CalibrationDialog = (props: IDialogProps) => {
 
   useEffect(() => {
     if (!(calibrationData.section === -1 && calibrationData.owner === -1 && calibrationData.page === -1 && calibrationData.book === -1)) {
+      if (pdf === undefined) {
+        return;
+      }
       const calibratedPageInfo: IPageSOBP = {
         section: calibrationData.section,
         book: calibrationData.book,
@@ -251,6 +255,7 @@ const CalibrationDialog = (props: IDialogProps) => {
 
         const msi = MappingStorage.getInstance();
         msi.registerTemporary(mapper);
+        setMappingState("calibrated");
 
         hideCalibrationDialog();
       }

@@ -3,6 +3,7 @@ import { saveAs } from "file-saver";
 import printJS from "print-js";
 
 import { showCalibrationDialog } from 'GridaBoard/store/reducers/calibrationReducer';
+import { setMappingState } from "GridaBoard/store/reducers/appConfigReducer";
 import { IPrintingEvent, IPrintingReport, IPrintOption, IUnitString, IProgressCallbackFunction, IPrintingSheetDesc, IPageMapItem } from "nl-lib/common/structures";
 
 import { MappingItem, MappingStorage, PdfDocMapper } from "nl-lib/common/mapper";
@@ -264,6 +265,7 @@ export default class PrintNcodedPdfWorker {
 
     // completed
     console.log("[PrintPdfMain] Print!!!");
+    setMappingState("printed"); //미리 해줘야 render하면서 바뀌고 mapping storage에서 print mapper로 등록됨
     this.setStatus("completed");
 
     // tempMapper 정보를 등록
