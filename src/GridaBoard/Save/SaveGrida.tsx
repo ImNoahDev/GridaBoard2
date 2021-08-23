@@ -80,10 +80,12 @@ export async function makeGridaBlob() {
   
   let targetMapper = undefined;
 
-  for (const doc of mappingData.arrDocMap) {
-    if (doc.fingerprint === fingerprint) {
-      targetMapper = doc;
-      break;
+  if (mappingData !== undefined) { 
+    for (const doc of mappingData.arrDocMap) {
+      if (doc.fingerprint === fingerprint) {
+        targetMapper = doc;
+        break;
+      }
     }
   }
 
