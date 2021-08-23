@@ -670,34 +670,6 @@ export async function updateDB(docName: string, thumb_path: string, grida_path: 
 
   const docId = `${userId}_${docName}_${date}`;
 
-  const mappingState = store.getState().appConfig.mappingState;
-  let mappingData = undefined;
-
-  switch (mappingState) {
-    case "printed": {
-      mappingData = MappingStorage.getInstance()._data;
-      break;
-    }
-    case "calibrated": {
-      mappingData = MappingStorage.getInstance()._temporary;
-      break;
-    }
-    default: {
-      break;
-    }
-  }
-
-  const fingerprint = doc.getPdfFingerprintAt(0);
-  
-  let targetMapper = undefined;
-
-  for (const doc of mappingData.arrDocMap) {
-    if (doc.fingerprint === fingerprint) {
-      targetMapper = doc;
-      break;
-    }
-  }
-
   db.collection(userId)
     .doc(docId)
     .update({
@@ -705,7 +677,6 @@ export async function updateDB(docName: string, thumb_path: string, grida_path: 
       grida_path: grida_path,
       thumb_path: thumb_path,
       docNumPages: doc.numPages,
-      mapper: targetMapper
     })
     .then(function () {
       console.log(`${docName} is created`);
@@ -724,35 +695,7 @@ export async function saveToDB(docName: string, thumb_path: string, grida_path: 
   const userId = firebase.auth().currentUser.email;
 
   const docId = `${userId}_${docName}_${nowDate.getTime()}`;
-  
-  const mappingState = store.getState().appConfig.mappingState;
-  let mappingData = undefined;
 
-  switch (mappingState) {
-    case "printed": {
-      mappingData = MappingStorage.getInstance()._data;
-      break;
-    }
-    case "calibrated": {
-      mappingData = MappingStorage.getInstance()._temporary;
-      break;
-    }
-    default: {
-      break;
-    }
-  }
-
-  const fingerprint = doc.getPdfFingerprintAt(0);
-  
-  let targetMapper = undefined;
-
-  for (const doc of mappingData.arrDocMap) {
-    if (doc.fingerprint === fingerprint) {
-      targetMapper = doc;
-      break;
-    }
-  }
-  
   let numPages = 0;
   if (docNumPages > 0) {
     numPages = docNumPages;
@@ -774,7 +717,6 @@ export async function saveToDB(docName: string, thumb_path: string, grida_path: 
       dateDeleted: 0,
       docId : docId,
       docNumPages: numPages,
-      mapper: targetMapper
     })
     .then(function () {
       console.log(`${docName} is created`);
