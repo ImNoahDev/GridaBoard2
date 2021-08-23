@@ -13,6 +13,7 @@ import { store } from '../client/pages/GridaBoard';
 import firebase, { secondaryFirebase } from 'GridaBoard/util/firebase_config';
 import { setDocName, setIsNewDoc } from '../store/reducers/docConfigReducer';
 import { setLoadingVisibility } from '../store/reducers/loadingCircle';
+import { showSnackbar } from '../store/reducers/listReducer';
 
 
 const useStyles = makeStyles((theme) => {

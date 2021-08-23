@@ -8,9 +8,10 @@ import { nullNcode } from "nl-lib/common/constants";
 import { MixedPageView } from "nl-lib/renderer";
 import { PLAYSTATE } from "nl-lib/common/enums";
 import { PenManager } from "nl-lib/neosmartpen";
-import { makeStyles } from "@material-ui/core";
+import { makeStyles, Slide, Snackbar, SnackbarContent } from "@material-ui/core";
 import InformationButton from "../components/buttons/InformationButton";
 import { languageType } from "../language/language";
+import getText from 'GridaBoard/language/language';
 
 const useStyle = props=>makeStyles(theme=>({
   root : {
@@ -43,6 +44,23 @@ interface Props {
 
 const ContentsLayer = (props: Props) => {
   const { handlePdfOpen, ...rest } = props;
+
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [snackbarMsg, setSnackbarMsg] = useState("");
+  const [snackbarMsgSuffix, setSnackbarMsgSuffix] = useState("");
+  const snackbarType = useSelector((state: RootState) => state.list.snackbar.type);
+
+  useEffect(() => {
+    switch (snackbarType) {
+      case "saveDoc": {
+        setSnackbarMsg(getText("saved_successfully"));
+        setSnackbarMsgSuffix("");
+        setOpenSnackbar(true);
+        break;
+      }
+      default: break;
+    }
+  }, [snackbarType])
 
   let pdfPageNo = 1;
   let pageInfos = [nullNcode()];
@@ -110,6 +128,14 @@ const ContentsLayer = (props: Props) => {
   const pens = useSelector((state: RootState) => state.appConfig.pens);
   const virtualPen = PenManager.getInstance().virtualPen;
 
+  const handleClose = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+
+    setOpenSnackbar(false);
+  };
+
   return (
     <div id="main" className={`${classes.root}`}>
       {(languageType === "ko") ? <InformationButton className={classes.information} tutorialMain={1} tutorialSub={1} /> : ""}
@@ -143,6 +169,22 @@ const ContentsLayer = (props: Props) => {
           noInfo = {true}
         />
       </div>
+
+      <Snackbar
+        open={openSnackbar}
+        autoHideDuration={4000}
+        TransitionComponent={Slide}
+        onClose={handleClose}
+      >
+        <SnackbarContent 
+          message={
+            <React.Fragment>
+              <span>{snackbarMsg}</span>
+              <span style={{borderBottom: "1px solid"}}>{snackbarMsgSuffix}</span>
+            </React.Fragment>
+          } 
+        />
+      </Snackbar>
     </div>
   );
 }
