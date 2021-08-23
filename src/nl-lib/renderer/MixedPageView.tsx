@@ -549,7 +549,7 @@ class MixedPageView_module extends React.Component<MixedViewProps, State>  {
   onCanvasPositionChanged = (arg: { offsetX: number, offsetY: number, zoom: number }) => {
     // console.log(arg);
     this._internal.viewPos = { ...arg };
-    // this.setState({ forceToRenderCnt: this.state.forceToRenderCnt + 1 });
+    this.setState({ forceToRenderCnt: this.state.forceToRenderCnt + 1 });
 
     if (this.props.isMainView) {
       setZoomStore(arg.zoom);
