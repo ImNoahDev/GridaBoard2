@@ -556,17 +556,7 @@ export class MappingStorage {
     cloud_util_func.uploadMappingInfo(mappingInfoObj);
   }
 
-  /**
-   * pen down시에 새로운 SOBP라면, 관련된 PDF가 있는지 찾을 때 쓰인다
-   */
-  findPdfPage = (ncodeXy: INcodeSOBPxy) => {
-    const tempFound = this._temporary.arrDocMap.find(m => isPageInMapper(ncodeXy, m, m.numPages));
-
-    if (tempFound) {
-      const pageMap = tempFound.params.find(param => isSamePage(ncodeXy, param.pageInfo));
-      return { pdf: tempFound, pageMapping: pageMap } as IAutoLoadDocDesc;
-    }
-
+  findPrintedMapper = (ncodeXy: INcodeSOBPxy) => {
     const dataFound = this._data.arrDocMap.find(m => isPageInRange(ncodeXy, m.printPageInfo, m.numPages));
 
     if (dataFound) {
@@ -576,6 +566,43 @@ export class MappingStorage {
     }
 
     return undefined;
+  }
+
+  findCalibratedMapper = (ncodeXy: INcodeSOBPxy) => {
+    const tempFound = this._temporary.arrDocMap.find(m => isPageInMapper(ncodeXy, m, m.numPages));
+
+    if (tempFound) {
+      const pageMap = tempFound.params.find(param => isSamePage(ncodeXy, param.pageInfo));
+      return { pdf: tempFound, pageMapping: pageMap } as IAutoLoadDocDesc;
+    }
+
+    return undefined;
+  }
+
+  /**
+   * pen down시에 새로운 SOBP라면, 관련된 PDF가 있는지 찾을 때 쓰인다
+   */
+  findPdfPage = (ncodeXy: INcodeSOBPxy) => {
+
+    const mappingState = store.getState().appConfig.mappingState;
+
+    switch (mappingState) {
+      case "printed": {
+        return this.findPrintedMapper(ncodeXy);
+      }
+      case "calibrated": {
+        return this.findCalibratedMapper(ncodeXy);
+      }
+      default: {
+        //state가 없는 경우 기존 로직대로
+        const calibratedMapper = this.findCalibratedMapper(ncodeXy);
+        if (calibratedMapper !== undefined) return calibratedMapper;
+
+        const printedMapper = this.findPrintedMapper(ncodeXy);
+        return printedMapper; //printedMapper도 없다면 undefined가 return
+
+      }
+    }
   }
 
 

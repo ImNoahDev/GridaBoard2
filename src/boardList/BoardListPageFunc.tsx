@@ -670,21 +670,27 @@ export async function updateDB(docName: string, thumb_path: string, grida_path: 
 
   const docId = `${userId}_${docName}_${date}`;
 
-  const mappingData = MappingStorage.getInstance()._data;
-  const mappingTemporary = MappingStorage.getInstance()._temporary;
+  const mappingState = store.getState().appConfig.mappingState;
+  let mappingData = undefined;
 
-  const fingerprint = doc.getPdfFingerprintAt(0);
-  
-  let targetMapper;
-
-  for (const doc of mappingTemporary.arrDocMap) {
-    if (doc.fingerprint === fingerprint) {
-      targetMapper = doc;
+  switch (mappingState) {
+    case "printed": {
+      mappingData = MappingStorage.getInstance()._data;
+      break;
+    }
+    case "calibrated": {
+      mappingData = MappingStorage.getInstance()._temporary;
+      break;
+    }
+    default: {
       break;
     }
   }
 
-  //인쇄로부터 나온 mapper 우선
+  const fingerprint = doc.getPdfFingerprintAt(0);
+  
+  let targetMapper = undefined;
+
   for (const doc of mappingData.arrDocMap) {
     if (doc.fingerprint === fingerprint) {
       targetMapper = doc;
@@ -719,21 +725,27 @@ export async function saveToDB(docName: string, thumb_path: string, grida_path: 
 
   const docId = `${userId}_${docName}_${nowDate.getTime()}`;
   
-  const mappingData = MappingStorage.getInstance()._data;
-  const mappingTemporary = MappingStorage.getInstance()._temporary;
+  const mappingState = store.getState().appConfig.mappingState;
+  let mappingData = undefined;
 
-  const fingerprint = doc.getPdfFingerprintAt(0);
-  
-  let targetMapper;
-
-  for (const doc of mappingTemporary.arrDocMap) {
-    if (doc.fingerprint === fingerprint) {
-      targetMapper = doc;
+  switch (mappingState) {
+    case "printed": {
+      mappingData = MappingStorage.getInstance()._data;
+      break;
+    }
+    case "calibrated": {
+      mappingData = MappingStorage.getInstance()._temporary;
+      break;
+    }
+    default: {
       break;
     }
   }
 
-  //인쇄로부터 나온 mapper 우선
+  const fingerprint = doc.getPdfFingerprintAt(0);
+  
+  let targetMapper = undefined;
+
   for (const doc of mappingData.arrDocMap) {
     if (doc.fingerprint === fingerprint) {
       targetMapper = doc;
