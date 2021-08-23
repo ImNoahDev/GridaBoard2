@@ -193,11 +193,12 @@ export default class GridaDoc {
     setDocNumPages(this._pages.length);
   }
   private appendPdfDocumentForGrida = (pdfDoc: NeoPdfDocument, pageInfos: IPageSOBP[], basePageInfos: IPageSOBP[]) => {
-    const found = this._pdfd.find(item => item.fingerprint === pdfDoc.fingerprint);
-    if (found) {
-      alert(getText("alert_regedPdf"));
-      return -1;
-    }
+    // const found = this._pdfd.find(item => item.fingerprint === pdfDoc.fingerprint);
+    // if (found) {
+    //   alert(getText("alert_regedPdf"));
+    //   return -1;
+    // }
+
 
     this._pdfd = [];
 
