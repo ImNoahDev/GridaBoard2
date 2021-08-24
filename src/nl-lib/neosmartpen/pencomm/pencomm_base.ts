@@ -18,7 +18,7 @@ import pen_prefixes from "./pen_prefixes.json";
 export async function deviceSelectDlg(): Promise<BluetoothDevice> {
   console.log("********* Requesting any Bluetooth Device... **********");
   
-  let options = pen_prefixes;
+  const options = pen_prefixes;
   options.filters[0].services.push(PEN_SERVICE_UUID_16);
   options.filters[0].services.push(PEN_SERVICE_UUID_128);
   // let result = await Bluetooth.requestDeviceAsync(options);
