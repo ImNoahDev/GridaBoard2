@@ -122,7 +122,10 @@ export const deleteBoardFromLive = async (docItems: IBoardData[]) => {
 
 export const deleteBoardsFromTrash = async (docItems: IBoardData[]) => {
   const db = secondaryFirebase.firestore();
+  const storageRef = secondaryFirebase.storage().ref();
+
   const userId = firebase.auth().currentUser.email;
+  const uid = firebase.auth().currentUser.uid;
 
   let result = 0;
   for await (const docItem of docItems) {
@@ -138,6 +141,24 @@ export const deleteBoardsFromTrash = async (docItems: IBoardData[]) => {
     }).catch((error) => {
       console.error("error delete document: ", error);
       result = 0;
+    });
+
+    const thumbnailRef = storageRef.child(`thumbnail/${uid}/${docId}.png`);
+    thumbnailRef.delete().then(function() {
+      result = 1;
+      console.log('thumbnail deleted sucessfully')
+    }).catch(function(error) {
+      result = 0;
+      console.log('error delete thumb: "', error)
+    });
+
+    const gridaRef = storageRef.child(`grida/${uid}/${docId}.grida`);
+    gridaRef.delete().then(function() {
+      result = 1;
+      console.log('grida deleted sucessfully')
+    }).catch(function(error) {
+      result = 0;
+      console.log('error delete grida: "', error)
     });
   }
 
