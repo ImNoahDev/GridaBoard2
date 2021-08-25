@@ -399,7 +399,7 @@ export default class PrintNcodedPdfWorker {
     else { pw = paperWidth_pt; ph = paperHeight_pt; }
 
     // kitty 2020/12/22 인쇄 영역 안에 들어가는 작은 사이즈 PDF를 만들기 위해
-    const { drawImageOnPdfMode } = printOption;
+    const { drawImageOnPdfMode, hasToPutNcode } = printOption;
 
     if (drawImageOnPdfMode === NcodePdfScaleMode.PAGE_SIZE_DOWN_TO_IMAGE) {
       // A4 기준으로, Chrome에서 용지 맞춤, 인쇄 가능 영역에서 출력 잘 됨 (기본과 100%에서는 출력 안됨)
@@ -408,13 +408,15 @@ export default class PrintNcodedPdfWorker {
 
     if (drawImageOnPdfMode === NcodePdfScaleMode.IMAGE_SIZE_UP_TO_PAGE_PADDING) {
       // A4 기준으로, Chrome, imagePadding만 10에서 모두 OK
-      const padding_delta_pt = convertUnit("mm" as IUnitString, (printOption.imagePadding - printOption.pdfPagePadding), "pt");
-
-      const scale = (w + padding_delta_pt) / w;
-      w = w * scale;
-      h = h * scale;
-
-      pw = w; ph = h;
+      if (hasToPutNcode) { //ncode A4에 인쇄하는 경우 pageSize가 a4 size
+        const padding_delta_pt = convertUnit("mm" as IUnitString, (printOption.imagePadding - printOption.pdfPagePadding), "pt");
+  
+        const scale = (w + padding_delta_pt) / w;
+        w = w * scale;
+        h = h * scale;
+  
+        pw = w; ph = h;
+      }
     }
 
 
