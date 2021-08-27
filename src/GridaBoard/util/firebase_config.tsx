@@ -82,15 +82,12 @@ export const signInWithApple = async () => {
 export const signInWith = async (user: firebase.User) => {
   const url = "https://us-central1-neonotes2-d0880.cloudfunctions.net";
   // const url = "https://us-central1-neostudio-staging.cloudfunctions.net";
-  let res = await fetch(`${url}/login?uid=${user.uid}`);
+  let res = await fetch(`${url}/login?uid=${user.uid}&email=${user.email}&name=${user.displayName}`);
   var token = await res.text();
 
-  const secondaryAuth = secondaryFirebase.auth();
+
   const loginData = await secondaryAuth.signInWithCustomToken(token);
 
-  if(loginData.user.email === null){
-    await fetch(`${url}/createEmail?uid=${user.uid}&email=${user.email}&name=${user.displayName}`);
-  }
 }
 
 export default firebase;
