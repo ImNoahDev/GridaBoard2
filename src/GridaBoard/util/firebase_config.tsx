@@ -15,7 +15,8 @@ let firebaseConfig:FirebaseConfig = null;
 let secondaryFirebaseConfig:FirebaseConfig = null;
 
 if(window.firebaseSetting === "dev"){
-  //neostudio staging
+  //neostudio staging(http://localhost:5001/neostudio-staging/us-central1/createEmail).  
+  // cloudfunctionsUrl = "http://localhost:5001/neostudio-staging/us-central1";
   cloudfunctionsUrl = "https://us-central1-neostudio-staging.cloudfunctions.net";
   firebaseConfig = {
     apiKey: "AIzaSyD7Yh_sCRUO-vmsF5dURj5xOLBeP8ekVto",
@@ -100,15 +101,18 @@ export const signInWithApple = async () => {
 export const signInWith = async (user: firebase.User) => {
   const url = cloudfunctionsUrl;
 
-  let res = await fetch(`${url}/login?uid=${user.uid}`);
+  let res = await fetch(`${url}/login?uid=${user.uid}&email=${user.email}&name=${user.displayName}`);
   var token = await res.text();
 
-  const secondaryAuth = secondaryFirebase.auth();
+
   const loginData = await secondaryAuth.signInWithCustomToken(token);
 
-  if(loginData.user.email === null){
-    await fetch(`${url}/createEmail?uid=${user.uid}&email=${user.email}&name=${user.displayName}`);
-  }
+  console.log("!!!!!!!!!!!!!!!!!!",loginData);
+  // if(loginData.user.email === null){
+  //   await fetch(`${url}/createEmail?uid=${user.uid}&email=${user.email}&name=${user.displayName}`);
+  //   console.log(loginData);
+  //   debugger;
+  // }
 }
 
 export default firebase;
