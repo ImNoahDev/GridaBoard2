@@ -829,12 +829,24 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
 
     const pointArray = [];
 
-    dotArray.forEach(dot => {
-      if(dot.point === undefined){
-        dot.point = this.ncodeToPdfXy(dot);
-      }
-      pointArray.push(dot.point);
-    });
+    const pageInfo = {section: stroke.section, owner: stroke.owner, book: stroke.book, page: stroke.page};
+
+    let isPlate = false;
+    if (isSamePage(pageInfo, PlateNcode_1) || isSamePage(pageInfo, PlateNcode_2)){
+      isPlate = true;
+    }
+
+    if (!isPlate){
+      dotArray.forEach(dot => {
+        const pt = this.ncodeToPdfXy_strokeHomography(dot, stroke.h);
+        pointArray.push(pt);
+      });
+    } else {
+      dotArray.forEach(dot => {
+        const pt = this.ncodeToPdfXy_plate(dot, pageInfo);
+        pointArray.push(pt);
+      });
+    }
 
     let strokeThickness = thickness / 64;
     switch (brushType) {
