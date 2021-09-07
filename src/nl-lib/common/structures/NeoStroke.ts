@@ -81,7 +81,7 @@ export class NeoStroke implements INeoStrokeProps {
 
   h: TransformParameters;
   h_origin: TransformParameters;
-
+  isPlate: boolean;
 
   /**
    *
@@ -113,6 +113,8 @@ export class NeoStroke implements INeoStrokeProps {
     this.dotCount = 0;
     this.dotArray = new Array(0);
     this.opened = true;
+
+    this.isPlate = false;
   }
 
 

@@ -5,7 +5,7 @@ import RenderWorkerBase, { IRenderWorkerOption } from './RenderWorkerBase';
 
 import { callstackDepth, drawPath, drawPath_arr, makeNPageIdStr, isSamePage, uuidv4, drawPath_chiselNip, isSameNcode } from 'nl-lib/common/util';
 import { IBrushType, PenEventName } from 'nl-lib/common/enums';
-import { IPoint, NeoStroke, NeoDot, IPageSOBP, INeoStrokeProps, StrokeStatus, ISize } from 'nl-lib/common/structures';
+import { IPoint, NeoStroke, NeoDot, IPageSOBP, INeoStrokeProps, StrokeStatus, ISize, TransformParameters } from 'nl-lib/common/structures';
 import { INeoSmartpen, IPenToViewerEvent } from 'nl-lib/common/neopen';
 import { InkStorage } from 'nl-lib/common/penstorage';
 import { PenManager } from 'nl-lib/neosmartpen';
@@ -13,7 +13,7 @@ import { adjustNoteItemMarginForFilm, getNPaperInfo, isPUI } from "nl-lib/common
 import { MappingStorage } from 'nl-lib/common/mapper/MappingStorage';
 import { calcRevH } from 'nl-lib/common/mapper/CoordinateTanslater';
 import { applyTransform } from 'nl-lib/common/math/echelon/SolveTransform';
-import { nullNcode, PlateNcode_1, PlateNcode_2 } from 'nl-lib/common/constants';
+import { nullNcode, PlateNcode_1, PlateNcode_2, PU_TO_NU } from 'nl-lib/common/constants';
 
 import GridaDoc from 'GridaBoard/GridaDoc';
 import { setActivePageNo } from 'GridaBoard/store/reducers/activePageReducer';
@@ -447,6 +447,8 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
     const noteItem = getNPaperInfo(pageInfo); //plate의 item
     adjustNoteItemMarginForFilm(noteItem, pageInfo);
 
+    const { x, y } = dot;
+
     const currentPage = GridaDoc.getInstance().getPage(store.getState().activePage.activePageNo);
 
     const npaperWidth = noteItem.margin.Xmax - noteItem.margin.Xmin;
@@ -460,8 +462,8 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
     let platePdfRatio = wRatio
     if (hRatio > wRatio) platePdfRatio = hRatio
 
-    const pdf_x = dot.x * platePdfRatio;
-    const pdf_y = dot.y * platePdfRatio;
+    const pdf_x = x * platePdfRatio;
+    const pdf_y = y * platePdfRatio;
 
     return {x: pdf_x, y: pdf_y, f: dot.f};
   }
@@ -597,7 +599,7 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
     }, REMOVE_HOVER_POINTS_INTERVAL);
   };
 
-  redrawStrokes = (pageInfo) => {
+  redrawStrokes = (pageInfo: IPageSOBP, isMainView?: boolean) => {
     if (isSamePage(this.pageInfo, pageInfo) || this.pageInfo === undefined) {
       this.removeAllCanvasObject();
       this.resetLocalPathArray();
@@ -606,7 +608,7 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
       const strokesAll = this.storage.getPageStrokes(pageInfo);
       const strokes = strokesAll.filter(stroke => stroke.brushType !== IBrushType.ERASER);
 
-      this.addStrokePaths(strokes);
+      this.addStrokePaths(strokes, isMainView);
     }
   };
 
@@ -782,12 +784,12 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
    * @private
    * @param {Array<NeoStroke>} strokes
    */
-  addStrokePaths = (strokes) => {
+  addStrokePaths = (strokes, isMainView?: boolean) => {
     if (!this.canvasFb) return;
 
     strokes.forEach(stroke => {
       if (stroke.dotArray.length > 0) {
-        const path = this.createFabricPathByStorage(stroke, true) as IExtendedPathType;
+        const path = this.createFabricPathByStorage(stroke, true, isMainView) as IExtendedPathType;
         this.canvasFb.add(path);
         this.localPathArray.push(path);
       }
@@ -824,28 +826,49 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
     return pathData_arr;
   };
 
-  createPathDataByStorage = (stroke: NeoStroke) => {
+  createPathDataByStorage = (stroke: NeoStroke, isMainView?: boolean) => {
     const { dotArray, brushType, thickness } = stroke;
 
     const pointArray = [];
 
     const pageInfo = {section: stroke.section, owner: stroke.owner, book: stroke.book, page: stroke.page};
 
-    let isPlate = false;
-    if (isSamePage(pageInfo, PlateNcode_1) || isSamePage(pageInfo, PlateNcode_2)){
-      isPlate = true;
-    }
-
-    if (!isPlate){
+    if (!stroke.isPlate){
       dotArray.forEach(dot => {
         const pt = this.ncodeToPdfXy_strokeHomography(dot, stroke.h);
         pointArray.push(pt);
       });
-    } else {
-      dotArray.forEach(dot => {
-        const pt = this.ncodeToPdfXy_plate(dot, pageInfo);
-        pointArray.push(pt);
-      });
+    } else { //plate인 경우. 이미 변환된 dot.point
+      if (isMainView) {
+        dotArray.forEach(dot => {
+          const radians = fabric.util.degreesToRadians(90) 
+          //여기 들어오는 경우는 isMainView가 parameter로 들어오는 경우니까 PenBasedRenderer에서 회전 버튼을 눌러 redrawStrokes가 호출되는 경우 뿐. 90으로 고정해놔도 문제없을듯
+          
+          //180, 0도로 갈 때는 src, dst를 바꿔줘야하지 않나? 일단 정상동작하니 이대로
+          const canvasCenterSrc = new fabric.Point(this._opt.pageSize.width/2, this._opt.pageSize.height/2)
+          const canvasCenterDst = new fabric.Point(this._opt.pageSize.height/2, this._opt.pageSize.width/2)
+
+          // 1. subtractEquals
+          dot.point.x -= canvasCenterSrc.x;
+          dot.point.y -= canvasCenterSrc.y;
+
+          // 2. rotateVector
+          const v = fabric.util.rotateVector(dot.point, radians);
+
+          // 3. addEquals
+          v.x += canvasCenterDst.x;
+          v.y += canvasCenterDst.y;
+
+          dot.point.x = v.x;
+          dot.point.y = v.y;
+
+          pointArray.push(dot.point);
+        });
+      } else {
+        dotArray.forEach(dot => {
+          pointArray.push(dot.point);
+        });
+      }
     }
 
     let strokeThickness = thickness / 64;
@@ -887,9 +910,9 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
     return pathData;
   };
 
-  createFabricPathByStorage = (stroke: NeoStroke, cache: boolean) => {
+  createFabricPathByStorage = (stroke: NeoStroke, cache: boolean, isMainView?: boolean) => {
     const { color, brushType, key } = stroke;
-    const pathData = this.createPathDataByStorage(stroke);
+    const pathData = this.createPathDataByStorage(stroke, isMainView);
 
     let opacity = 0;
     switch (brushType) {
