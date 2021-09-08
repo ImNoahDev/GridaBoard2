@@ -101,6 +101,7 @@ export const signInWithApple = async () => {
 export const signInWith = async (user: firebase.User) => {
   const url = cloudfunctionsUrl;
 
+
   let res = await fetch(`${url}/login?uid=${user.uid}&email=${user.email}&name=${user.displayName}`);
   var token = await res.text();
 
