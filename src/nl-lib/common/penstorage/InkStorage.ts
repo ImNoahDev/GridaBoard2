@@ -1,8 +1,8 @@
 import { EventDispatcher, EventCallbackType } from "../event";
 import { IBrushType, PenEventName } from "../enums";
 import { NeoStroke, IPageSOBP, StrokeStatus, INeoStrokeProps, NeoDot, TransformParameters } from "../structures";
-import { isSameNcode } from "nl-lib/common/util";
-import { DefaultPlateNcode } from "nl-lib/common/constants";
+import { isSameNcode, isSamePage } from "nl-lib/common/util";
+import { DefaultPlateNcode, PlateNcode_1, PlateNcode_2 } from "nl-lib/common/constants";
 import intersect from 'path-intersection';
 import { store } from "GridaBoard/client/pages/GridaBoard";
 import GridaDoc from "GridaBoard/GridaDoc";
@@ -399,7 +399,16 @@ export default class InkStorage {
     const stroke = this.realtime[strokeKey];
     stroke.h = h;
     stroke.h_origin = h_origin;
-    
+  
+    const pageInfo = { section: stroke.section, owner: stroke.owner, book: stroke.book, page: stroke.page }
+    if (isSamePage(pageInfo, PlateNcode_1) || isSamePage(pageInfo, PlateNcode_2)){
+      stroke.isPlate = true;
+      stroke.plateSection = pageInfo.section;
+      stroke.plateOwner = pageInfo.owner;
+      stroke.plateBook = pageInfo.book;
+      stroke.platePage = pageInfo.page;
+    }
+
     if (!stroke || stroke.brushType === IBrushType.ERASER) {
       console.error(`stroke was not initiated`);
       return;

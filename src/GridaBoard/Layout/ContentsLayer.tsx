@@ -8,9 +8,10 @@ import { nullNcode } from "nl-lib/common/constants";
 import { MixedPageView } from "nl-lib/renderer";
 import { PLAYSTATE } from "nl-lib/common/enums";
 import { PenManager } from "nl-lib/neosmartpen";
-import { makeStyles } from "@material-ui/core";
+import { makeStyles, Slide, Snackbar, SnackbarContent } from "@material-ui/core";
 import InformationButton from "../components/buttons/InformationButton";
 import { languageType } from "../language/language";
+import getText from 'GridaBoard/language/language';
 
 const useStyle = props=>makeStyles(theme=>({
   root : {
@@ -43,15 +44,28 @@ interface Props {
 
 const ContentsLayer = (props: Props) => {
   const { handlePdfOpen, ...rest } = props;
-  const [pageWidth, setPageWidth] = useState(0);
+
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [snackbarMsg, setSnackbarMsg] = useState("");
+  const [snackbarMsgSuffix, setSnackbarMsgSuffix] = useState("");
+  const snackbarType = useSelector((state: RootState) => state.list.snackbar.type);
+
+  useEffect(() => {
+    switch (snackbarType) {
+      case "saveDoc": {
+        setSnackbarMsg(getText("saved_successfully"));
+        setSnackbarMsgSuffix("");
+        setOpenSnackbar(true);
+        break;
+      }
+      default: break;
+    }
+  }, [snackbarType])
 
   let pdfPageNo = 1;
   let pageInfos = [nullNcode()];
   let basePageInfo = nullNcode();
 
-  const {zoomStore} = useSelector((state: RootState) =>({
-    zoomStore: state.zoomReducer.zoom as number,
-  }));
   const rotationTrigger = useSelector((state: RootState) => state.rotate.rotationTrigger);
   const {activePageNo_store} = useSelector((state: RootState) =>({
     activePageNo_store: state.activePage.activePageNo,
@@ -114,11 +128,13 @@ const ContentsLayer = (props: Props) => {
   const pens = useSelector((state: RootState) => state.appConfig.pens);
   const virtualPen = PenManager.getInstance().virtualPen;
 
-  const handlePageWidthNeeded = (width: number) => {
-    setPageWidth(width);
-  }
-  
+  const handleClose = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
 
+    setOpenSnackbar(false);
+  };
 
   return (
     <div id="main" className={`${classes.root}`}>
@@ -129,6 +145,7 @@ const ContentsLayer = (props: Props) => {
         height: '100%',
         float: "right",
       }}>
+
         <MixedPageView
           pdf={pdf}
           pdfUrl={pdfUrl} filename={pdfFilename}
@@ -142,19 +159,32 @@ const ContentsLayer = (props: Props) => {
 
           parentName={"grida-main-home"}
           viewFit={viewFit_store}
-          zoom={zoomStore}
           autoPageChange={true}
           fromStorage={false}
           fitMargin={10}
 
           activePageNo={activePageNo_store}
-          handlePageWidthNeeded = {(width) => handlePageWidthNeeded(width)}
-
           renderCountNo={renderCountNo_store}
 
           noInfo = {true}
         />
       </div>
+
+      <Snackbar
+        open={openSnackbar}
+        autoHideDuration={4000}
+        TransitionComponent={Slide}
+        onClose={handleClose}
+      >
+        <SnackbarContent 
+          message={
+            <React.Fragment>
+              <span>{snackbarMsg}</span>
+              <span style={{borderBottom: "1px solid"}}>{snackbarMsgSuffix}</span>
+            </React.Fragment>
+          } 
+        />
+      </Snackbar>
     </div>
   );
 }

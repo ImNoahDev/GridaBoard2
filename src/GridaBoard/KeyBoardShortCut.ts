@@ -13,8 +13,10 @@ import { showAlert } from "./store/reducers/listReducer";
 import { PEN_THICKNESS } from '../nl-lib/common/enums';
 import $ from "jquery";
 import { setPointerTracer } from "./store/reducers/pointerTracer";
-import { showShortCut } from './store/reducers/ui';
-
+import { setleftDrawerOpen, setSaveOpen, showShortCut } from './store/reducers/ui';
+import { onToggleRotate } from "./components/buttons/RotateButton";
+import { fileOpenHandler } from "./Layout/HeaderLayer";
+import { startPrint } from "../nl-lib/ncodepod/NcodePrint/PrintNcodedPdfButton";
 
 /* 
 let _isCtrl = false;
@@ -58,6 +60,7 @@ export default function KeyBoardShortCut(evt: KeyboardEvent) {
   const cmd = (isCtrl ? 1 : 0) | (isAlt ? 2 : 0) | (isShift ? 4 : 0) | (evt.metaKey ? 8 : 0);
 
   // console.log(`key down cmd=${cmd} ==> code=${evt.code}  key => ${evt.key}`); 
+  
   if (cmd == 0 || (isShift && evt.key === "+")) {
     switch (evt.code) {
       case "Digit0":
@@ -126,16 +129,20 @@ export default function KeyBoardShortCut(evt: KeyboardEvent) {
         // onBtn_fitHeight();
         setViewFit(ZoomFitEnum.HEIGHT);
         break;
-      case "KeyL": //L
-        (document.querySelector("#arrow-btn") as HTMLElement).click();
+      case "KeyL":{ //L
+        const activePageNo = store.getState().activePage.activePageNo;
+        const leftDrawerOpen = store.getState().ui.simpleUiData.leftDrawerOpen;
+        if(activePageNo === -1) break ;
+        setleftDrawerOpen(!leftDrawerOpen);
         break;
+      }
       case "KeyP":{ // P
         evt.preventDefault(); //web 기본 탭 기능 정지
         const activePageNo = store.getState().activePage.activePageNo;
         //페이지가 하나도 없으면 인쇄 못함
         if(activePageNo === -1) break;
 
-        (document.querySelector("#printBtn") as HTMLElement).click();
+        startPrint();
         break;
   
       }
@@ -153,32 +160,12 @@ export default function KeyBoardShortCut(evt: KeyboardEvent) {
         const activePageNo = store.getState().activePage.activePageNo;
         //페이지가 하나도 없으면 저장 못함
         if(activePageNo === -1) break;
-        if((document.querySelector(".save_drop_down") as HTMLElement) == null)
-          (document.querySelector(".saveButton") as HTMLElement).click();
-        //1틱 뒤에 동작해야함
-        setTimeout(()=>{
-          const saveBtn = document.querySelector(".save_drop_down") as HTMLElement;
-          if(saveBtn !== null)
-            saveBtn.click();
-        },0);
+        setSaveOpen(true);
         break;
       }
       case "KeyT": {// t
           const isTrace = store.getState().pointerTracer.isTrace;
           store.dispatch(setPointerTracer(!isTrace));
-  
-          const $elem = $(`#${"btn_tracepoint"}`);
-          if (!isTrace) {
-            const $elem = $("#btn_tracepoint").find(".c2");
-            $elem.addClass("checked");
-            $('#btn_tracepoint').css('background', 'white');
-            $('#tracer_svg_icon').css('color', '#688FFF');
-          } else {
-            const $elem = $("#btn_tracepoint").find(".c2");
-            $elem.removeClass("checked");
-            $('#btn_tracepoint').css('background', 'none');
-            $('#tracer_svg_icon').css('color', '#58627D');
-          }
           break;
         }
 
@@ -195,7 +182,13 @@ export default function KeyBoardShortCut(evt: KeyboardEvent) {
         break;
       }
       case "KeyY" : {
-        (document.querySelector("#pageClearButton") as HTMLElement).click();
+        const activePageNo = store.getState().activePage.activePageNo;
+        if(activePageNo === -1) return ;
+
+        showAlert({
+          type: "clearPage",
+          selected: null,
+        })
         break;
       }
       case "KeyZ" : {
@@ -204,7 +197,7 @@ export default function KeyBoardShortCut(evt: KeyboardEvent) {
       }
       case "Tab": {// <TAB>
         evt.preventDefault(); //web 기본 탭 기능 정지
-        (document.querySelector("#pageRotateButton") as HTMLElement).click();
+        onToggleRotate();
         break;
       }
 
@@ -268,8 +261,9 @@ export default function KeyBoardShortCut(evt: KeyboardEvent) {
         break;
       }
       case "Escape" : {
-        (document.querySelector("#arrow-btn") as HTMLElement).click();
-        
+        const activePageNo = store.getState().activePage.activePageNo;
+        if(activePageNo === -1) break ;
+        setleftDrawerOpen(false);
         break ;
       }
 
@@ -292,17 +286,16 @@ export default function KeyBoardShortCut(evt: KeyboardEvent) {
     }
   } else if (cmd == 1) {
     switch (evt.code) {
-      case "keyO":{ // ctrl-o
+      case "KeyO":{ // ctrl-o
         evt.preventDefault(); //web 기본 오픈 기능 강제 스탑
-        (document.querySelector("#loadFileButton") as HTMLSpanElement).click();
-        
+        fileOpenHandler();
         break;
       }
-      case "keyZ": // ctrl-Z
+      case "KeyZ": // ctrl-Z
         // onBtnUndo();
         break;
 
-      case "keyY": // ctrl-Z
+      case "KeyY": // ctrl-Z
         // onBtnRedo();
         break;
 

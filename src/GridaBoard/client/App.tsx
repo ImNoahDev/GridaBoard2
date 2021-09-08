@@ -4,6 +4,12 @@ import { Route } from 'react-router-dom';
 import { Login, BoardList, GridaBoard, LoginCheck } from "./pages"
 import { store } from '../client/pages/GridaBoard';
 
+declare global {
+  interface Window {
+    firebaseSetting: "dev" | "live";
+  }
+}
+
 
 const App = ()=>{
     /**

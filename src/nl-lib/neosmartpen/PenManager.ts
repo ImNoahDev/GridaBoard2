@@ -331,7 +331,9 @@ export default class PenManager {
   public onDisconnected = (opt: { pen: INeoSmartpen, event: IPenEvent }) => {
     const { pen } = opt;
     const btDeviceId = pen.getBtDevice().id;
+    
     const index = this.penArray.findIndex(penInfo => penInfo.id === btDeviceId);
+    
     if (index > -1) {
       alert(getText('pen_disconnected_alert'));
       this.penArray.splice(index, 1);

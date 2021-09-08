@@ -752,6 +752,11 @@ export async function saveToDB(docName: string, thumb_path: string, grida_path: 
           selectedDocName : [docName],
           selectedCategory : ""
         });
+      } else {
+        showSnackbar({
+          snackbarType :"saveDoc",
+          selectedDocName: [docName],
+        });
       }
       setLoadingVisibility(false);
     })

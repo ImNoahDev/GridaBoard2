@@ -26,7 +26,7 @@ const useStyle = makeStyles(theme=>({
       height : "32px",
       fontSize: "12px",
       lineHeight: "14px",
-      marginTop: "8px",
+      marginTop: "8px"
     },
   },
   alertDialog: {
@@ -36,10 +36,11 @@ const useStyle = makeStyles(theme=>({
     "& > .title" : {
       marginTop : "40px",
       marginLeft : "10px",
+      textAlign: "center",
       marginRight : "10px",
     },
     "& > .warn" : {
-      width: "100%",
+      width: "75%",
       height : "40px",
       fontSize: "14px",
       lineHeight: "16px",
@@ -48,6 +49,7 @@ const useStyle = makeStyles(theme=>({
       textAlign : "center",
       justifyContent : "center",
       alignItems : "center",
+      whiteSpace : "pre-wrap"
     },
     "& > .noWarnTitle" : {
       marginBottom: "34px",
@@ -143,7 +145,7 @@ const CombineDialog = (props : Props)=>{
   }else if(["moveDoc"].includes(diaType)){
     groupProps.classes.paper += `  ${classes.groupDialog}`;
     returnDialog = (<MoveDialog {...groupProps} docsObj={docsObj}/>);
-  }else if(["deleteDoc", "logout", "toBoardList", "deletePage", "clearPage"].includes(diaType)){
+  }else if(["deleteDoc", "logout", "toBoardList", "deletePage", "clearPage", "deleteGroup"].includes(diaType)){
     groupProps.classes.paper += `  ${classes.alertDialog}`;
     returnDialog = (<AlertDialog {...groupProps} />);
   }

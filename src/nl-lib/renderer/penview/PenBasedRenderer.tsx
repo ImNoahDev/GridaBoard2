@@ -14,7 +14,7 @@ import { INeoSmartpen, IPenToViewerEvent } from "nl-lib/common/neopen";
 import { MappingStorage } from "nl-lib/common/mapper";
 import { DefaultPlateNcode, DefaultPUINcode } from "nl-lib/common/constants";
 import { InkStorage } from "nl-lib/common/penstorage";
-import { isPUI } from "nl-lib/common/noteserver";
+import { isPlatePaper, isPUI } from "nl-lib/common/noteserver";
 
 import { setCalibrationData } from 'GridaBoard/store/reducers/calibrationDataReducer';
 import { store } from "GridaBoard/client/pages/GridaBoard";
@@ -133,7 +133,7 @@ class PenBasedRenderer extends React.Component<Props, State> {
   viewSize: ISize = { width: 0, height: 0 };
 
   mainDiv: HTMLDivElement = null;
-  canvasId = "";
+   canvasId = "";
   canvas: HTMLCanvasElement = null;
 
   inkStorage: InkStorage = null;
@@ -336,11 +336,20 @@ class PenBasedRenderer extends React.Component<Props, State> {
       // const ctx = this.canvas.getContext('2d');
       // ctx.rotate(180 * Math.PI / 180);
 
-      if (this.props.isMainView) {
-        this.renderer.rotate(nextProps.pageInfo);
+      let pageInfo = nextProps.pageInfo
+      const activePageNo = store.getState().activePage.activePageNo;
+      const activePage = GridaDoc.getInstance().getPageAt(activePageNo);
+      const activePageInfo = activePage.pageInfos[0];//plate에 쓰는 경우 plate의 pageInfo가 아닌 실제 pageInfo가 필요
+
+      if (isPlatePaper(nextProps.pageInfo)) {
+        pageInfo = activePageInfo
       }
 
-      this.renderer.redrawStrokes(nextProps.pageInfo);
+      const isMainView = this.props.isMainView;
+      if (isMainView) {
+        this.renderer.rotate(pageInfo);
+      }
+      this.renderer.redrawStrokes(pageInfo, isMainView); //nextProps.pageInfo로 하면 paper -> plate 순으로 쓰고 난 후에 회전하면 paper에 쓴 stroke이 회전안함
 
       //이건 pen viewer의 실제 rotate 처리
       const tmp = nextProps.pdfSize.width;
@@ -352,9 +361,9 @@ class PenBasedRenderer extends React.Component<Props, State> {
       ret_val = true;
     }
 
-    if (nextProps.viewSize.width !== this.viewSize.width || nextProps.viewSize.height !== this.viewSize.height) {
+    if (nextProps.viewSize.width !== this.props.viewSize.width || nextProps.viewSize.height !== this.props.viewSize.height) {
       this.viewSize = { ...nextProps.viewSize };
-      // console.log(`VIEW SIZE${callstackDepth()} WIDTH/HEIGHT:  ${this.viewSize.width}, ${this.viewSize.height}`);
+      console.log(`VIEW SIZE${callstackDepth()} WIDTH/HEIGHT:  ${this.viewSize.width}, ${this.viewSize.height}`);
       this.onViewResized(this.viewSize);
       ret_val = true;
     }
@@ -380,12 +389,12 @@ class PenBasedRenderer extends React.Component<Props, State> {
         }
 
         this.renderer._opt.rotation = nextProps.rotation;
-        const transform = MappingStorage.getInstance().getNPageTransform(pageInfo);
-        this.renderer.setTransformParameters(transform.h, this.pdfSize);
-
+        
         if (isSameNcode(nextProps.pageInfo, DefaultPlateNcode)){
           return;
         }
+        const transform = MappingStorage.getInstance().getNPageTransform(pageInfo);
+        this.renderer.setTransformParameters(transform.h, this.pdfSize);
 
         this.renderer.changePage(pageInfo, nextProps.pdfSize, false);
 
@@ -416,9 +425,10 @@ class PenBasedRenderer extends React.Component<Props, State> {
       ret_val = true;
     }
 
-    if (this.props.zoom !== nextProps.zoom) {
-      this.renderer.setCanvasZoomByButton(nextProps.zoom);
-    }
+    // if (this.props.zoom !== nextProps.zoom) {
+    //   this.renderer.setCanvasZoomByButton(nextProps.zoom);
+    // }
+
 
     if (this.props.renderCountNo !== nextProps.renderCountNo) {
       if (this.renderer) {
@@ -465,11 +475,6 @@ class PenBasedRenderer extends React.Component<Props, State> {
   }
 
   onViewResized = ({ width, height }) => {
-    const rect = { x: 0, y: 0, width, height };
-    const scale = this.pdfSize.scale;
-
-    // this.size = this.getSize(scale, rect);
-
     if (this.renderer) {
       this.renderer.onViewSizeChanged({ width, height });
     }

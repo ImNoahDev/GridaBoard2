@@ -28,6 +28,15 @@ export const UIActionTypes = Object.freeze({
   SHOW_HELPMENU: `${ActionGroup}.SHOW_HELPMENU`,
   GET_THEME: `${ActionGroup}.GET_THEME`,
   SET_THEME: `${ActionGroup}.SET_THEME`,
+  SET_LEFT_DRAWER_OPEN : `${ActionGroup}.SET_LEFT_DRAWER_OPEN`,
+  SET_SAVE_OPEN : `${ActionGroup}.SET_SAVE_OPEN`,
+
+
+  SET_PRINT_progressPercent : `${ActionGroup}.SET_PRINT_progressPercent`,
+  SET_PRINT_status : `${ActionGroup}.SET_PRINT_status`,
+  SET_PRINT_progressOn : `${ActionGroup}.SET_PRINT_progressOn`,
+  SET_PRINT_optionOn : `${ActionGroup}.SET_PRINT_optionOn`,
+  SET_PRINT_waitingOn : `${ActionGroup}.SET_PRINT_waitingOn`
 });
 //]
 
@@ -173,11 +182,30 @@ export const showHelpMenu = (show: boolean, option : {main: number, sub: number}
     sub: option.sub
   });
 }
-
+export const setleftDrawerOpen = (show:boolean)=>{
+  store.dispatch({
+    type: UIActionTypes.SET_LEFT_DRAWER_OPEN,
+    show : show
+  });
+}
 //]
+export const setSaveOpen = (open:boolean)=>{
+  store.dispatch({
+    type: UIActionTypes.SET_SAVE_OPEN,
+    open : open
+  });
+}
+export const setPrintOption = (types:string, data)=>{
+  store.dispatch({
+    type : UIActionTypes["SET_PRINT_" + types],
+    data : data
+  })
+}
 
 
-const defaultDrawerWidth = 220;
+
+
+const defaultDrawerWidth = 180;
 // export let g_drawerWidth = defaultDrawerWidth;
 const initialState = {
   waiting: {
@@ -214,6 +242,17 @@ const initialState = {
   shotcut : {
     show : false
   },
+  simpleUiData : {
+    leftDrawerOpen : true,
+    saveOpen : false,
+    print : {
+      progressPercent : 0,
+      status : "N/A",
+      progressOn : false,
+      optionOn : false,
+      waitingOn : false
+    }
+  },
   helpMenu : {
     show : false,
     main : 1,
@@ -225,6 +264,84 @@ const initialState = {
 //[Reducer
 export default (state = initialState, action) => {
   switch (action.type) {
+    case UIActionTypes.SET_PRINT_progressPercent : {
+      return {
+        ...state,
+        simpleUiData : {
+          ...state.simpleUiData,
+          print : {
+            ...state.simpleUiData.print,
+            progressPercent : action.data
+          }
+        }
+      }
+    }
+    case UIActionTypes.SET_PRINT_status : {
+      return {
+        ...state,
+        simpleUiData : {
+          ...state.simpleUiData,
+          print : {
+            ...state.simpleUiData.print,
+            status : action.data
+          }
+        }
+      }
+    }
+    case UIActionTypes.SET_PRINT_progressOn : {
+      return {
+        ...state,
+        simpleUiData : {
+          ...state.simpleUiData,
+          print : {
+            ...state.simpleUiData.print,
+            progressOn : action.data
+          }
+        }
+      }
+    }
+    case UIActionTypes.SET_PRINT_optionOn : {
+      return {
+        ...state,
+        simpleUiData : {
+          ...state.simpleUiData,
+          print : {
+            ...state.simpleUiData.print,
+            optionOn : action.data
+          }
+        }
+      }
+    }
+    case UIActionTypes.SET_PRINT_waitingOn : {
+      return {
+        ...state,
+        simpleUiData : {
+          ...state.simpleUiData,
+          print : {
+            ...state.simpleUiData.print,
+            waitingOn : action.data
+          }
+        }
+      }
+    }
+    case UIActionTypes.SET_SAVE_OPEN : {
+      return {
+        ...state,
+        simpleUiData : {
+          ...state.simpleUiData,
+          saveOpen : action.open
+        }
+      }
+    }
+    case UIActionTypes.SET_LEFT_DRAWER_OPEN : {
+      return {
+        ...state,
+        simpleUiData : {
+          ...state.simpleUiData,
+          leftDrawerOpen : action.show
+        }
+      }
+    }
     case UIActionTypes.SET_THEME: {
       return {
         ...state,
