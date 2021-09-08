@@ -403,6 +403,10 @@ export default class InkStorage {
     const pageInfo = { section: stroke.section, owner: stroke.owner, book: stroke.book, page: stroke.page }
     if (isSamePage(pageInfo, PlateNcode_1) || isSamePage(pageInfo, PlateNcode_2)){
       stroke.isPlate = true;
+      stroke.plateSection = pageInfo.section;
+      stroke.plateOwner = pageInfo.owner;
+      stroke.plateBook = pageInfo.book;
+      stroke.platePage = pageInfo.page;
     }
 
     if (!stroke || stroke.brushType === IBrushType.ERASER) {

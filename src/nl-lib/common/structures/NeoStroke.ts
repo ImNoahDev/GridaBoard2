@@ -81,6 +81,11 @@ export class NeoStroke implements INeoStrokeProps {
 
   h: TransformParameters;
   h_origin: TransformParameters;
+
+  plateSection: number;
+  plateOwner: number;
+  plateBook: number;
+  platePage: number;
   isPlate: boolean;
 
   /**
