@@ -9,6 +9,7 @@ import { fabric } from "fabric";
 import { PlateNcode_1, PlateNcode_2 } from "../../nl-lib/common/constants";
 import { adjustNoteItemMarginForFilm, getNPaperInfo } from "../../nl-lib/common/noteserver";
 import { store } from "../client/pages/GridaBoard";
+import { firebaseAnalytics } from "../util/firebase_config";
 
 const PDF_TO_SCREEN_SCALE = 6.72; // (56/600)*72
 
@@ -23,6 +24,10 @@ export async function savePDF(saveName: string) {
   const pdfBytes = await pdfDoc.save();
   const blob = new Blob([pdfBytes], { type: 'application/pdf' });
   saveAs(blob, filename);
+
+  firebaseAnalytics.logEvent('save_pdf', {
+    event_name: 'save_pdf'
+  });
 }
 
 export async function makePdfDocument() {

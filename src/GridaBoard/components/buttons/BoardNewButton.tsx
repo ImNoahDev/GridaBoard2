@@ -7,6 +7,7 @@ import { IFileBrowserReturn, IPageSOBP } from 'nl-lib/common/structures';
 import ConvertFileLoad from 'GridaBoard/Load/ConvertFileLoad';
 import { scrollToBottom } from '../../../nl-lib/common/util';
 import { setActivePageNo } from '../../store/reducers/activePageReducer';
+import { firebaseAnalytics } from '../../util/firebase_config';
 
 const menuStyle = makeStyles(theme => ({
   headerButton: {
@@ -89,6 +90,10 @@ const BoardNewButton = () => {
     setActivePageNo(pageNo);
     scrollToBottom("drawer_content");
     setOpen(false);
+
+    firebaseAnalytics.logEvent('new_page', {
+      event_name: 'new_page'
+    });
   }
 
   return (

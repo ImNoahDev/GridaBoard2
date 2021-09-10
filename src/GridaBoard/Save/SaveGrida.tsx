@@ -5,6 +5,7 @@ import { makePdfDocument } from "./SavePdf";
 import { IPageSOBP } from "../../nl-lib/common/structures";
 import { MappingStorage } from "../../nl-lib/common/mapper";
 import { store } from "../client/pages/GridaBoard";
+import { firebaseAnalytics } from "../util/firebase_config";
 
 const PDF_TO_SCREEN_SCALE = 6.72; // (56/600)*72
 
@@ -14,6 +15,10 @@ export async function saveGrida(gridaName: string) {
 
   const blob = await makeGridaBlob();
   saveAs(blob, gridaName);
+
+  firebaseAnalytics.logEvent('save_grida', {
+    event_name: 'save_grida'
+  });
 }
 
 export async function makeGridaBlob() {

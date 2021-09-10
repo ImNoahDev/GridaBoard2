@@ -20,6 +20,7 @@ import getText from "GridaBoard//language/language";
 import GridaDoc from 'GridaBoard/GridaDoc';
 import { isWhiteBoard } from '../../../common/noteserver';
 import { setMappingState } from 'GridaBoard/store/reducers/appConfigReducer';
+import { firebaseAnalytics } from '../../../../GridaBoard/util/firebase_config';
 
 const _penImageUrl = "/icons/image_calibration.png";
 
@@ -202,6 +203,11 @@ const CalibrationDialog = (props: IDialogProps) => {
 
       switch (progress) {
         case 0: {
+          firebaseAnalytics.logEvent('start_calibration', {
+            event_name: 'start_calibration',
+            item_id: `${calibrationData.section}_${calibrationData.owner}_${calibrationData.book}`
+          });
+
           nu.p0.x = calibrationData.nu.x;
           nu.p0.y = calibrationData.nu.y;
 
