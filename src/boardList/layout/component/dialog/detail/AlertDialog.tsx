@@ -152,6 +152,12 @@ const AlertDialog = (props : Props)=>{
     history.push(path);
   }
 
+  const onKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      success();
+    }
+  }
+
   const isWarn = subText !== undefined;
   console.log(subText);
 
@@ -161,6 +167,7 @@ const AlertDialog = (props : Props)=>{
       onClose={closeEvent}
       {...rest}
       open={open}
+      onKeyPress={onKeyPress}
     >
       <div className={`title ${isWarn?"" : "noWarnTitle" }`}>{selectedData.title}</div>
       {isWarn ? (<div className="warn">{subText}</div>) : ""}      

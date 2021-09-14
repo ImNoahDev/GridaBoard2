@@ -297,6 +297,12 @@ const MoveDialog = (props: Props)=>{
     });
   }
   
+  const onKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      save();
+    }
+  }
+
   return (<Dialog
     disableBackdropClick
     onClose={closeEvent}
@@ -305,6 +311,7 @@ const MoveDialog = (props: Props)=>{
     }}
     {...rest}
     open={open}
+    onKeyPress={onKeyPress}
   >
     <div className="header">
       <div>{getText("boardList_filemove_title")}</div>
