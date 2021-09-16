@@ -191,6 +191,7 @@ export const restoreBoardsFromTrash = async (docItems: IBoardData[]) => {
 }
 
 export const copyBoard = async (docItem: IBoardData) => {
+  setLoadingVisibility(true);
   const db = secondaryFirebase.firestore();
   const userId = firebase.auth().currentUser.email;
   const uid = firebase.auth().currentUser.uid;
