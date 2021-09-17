@@ -1,4 +1,6 @@
+import { PDFDocument } from "pdf-lib";
 import { sprintf } from "sprintf-js";
+import GridaDoc from "../../../GridaBoard/GridaDoc";
 import { g_availablePagesInSection, UNIT_TO_DPI } from "../constants";
 import { IUnitString, IPageSOBP, IPointDpi, IPdfToNcodeMapItem } from "../structures";
 
@@ -500,3 +502,79 @@ export function getBrowserZoomFactor() {
   // console.log( "detected ratio:" + ratio + "    stable zoom level:" + BrowserZoom );
   return BrowserZoom;
 }
+
+export const makePdfUrl = async () => {
+  const doc = GridaDoc.getInstance();
+  const docPages = doc.pages;
+  let isPdfEdited = false;
+
+  let pdfUrl,
+    pdfDoc = undefined;
+
+  for (const page of docPages) {
+    if (page.pdf === undefined) {
+      //ncode page일 경우
+      isPdfEdited = true; //여긴 무조건 pdf를 새로 만들어야 하는 상황
+      if (pdfDoc === undefined) {
+        pdfDoc = await PDFDocument.create();
+      }
+      const pageWidth = page.pageOverview.sizePu.width;
+      const pageHeight = page.pageOverview.sizePu.height;
+      const pdfPage = await pdfDoc.addPage([pageWidth, pageHeight]);
+      if (page._rotation === 90 || page._rotation === 270) {
+        const tmpWidth = pdfPage.getWidth();
+        pdfPage.setWidth(pdfPage.getHeight());
+        pdfPage.setHeight(tmpWidth);
+      }
+    } else {
+      //pdf인 경우
+      if (pdfUrl !== page.pdf.url) {
+        pdfUrl = page.pdf.url;
+        const existingPdfBytes = await fetch(page.pdf.url).then(res => res.arrayBuffer());
+        const pdfDocSrc = await PDFDocument.load(existingPdfBytes);
+        page.pdf.removedPage.forEach(el => {
+          pdfDocSrc.removePage(el);
+        });
+        /******************* pdfDoc에서 remove를 할경우
+         * pageCache에 값이 변하지 않아서 아래 getPages에서 기존의 개수가 그대로 나온다.
+         * pageCache는 원래 직접접근 하면 안되는 privite 이지만, 강제로 value를 업데이트 해준다
+         * 직접 접근 이외의 방법으로 업데이트가 가능하거나(현재 못찾음)
+         * pdf-lib가 업데이트 되어 필요없다면 삭제 필요
+         */
+        (pdfDocSrc as any).pageCache.value = (pdfDocSrc as any).pageCache.populate();
+
+        if (pdfDoc !== undefined) {
+          //ncode 페이지가 미리 생성돼서 그 뒤에다 붙여야하는 경우
+          isPdfEdited = true; //여기 들어오면 pdf가 여러개든지 pdf가 편집된 상황이다.
+
+          const srcLen = pdfDocSrc.getPages().length;
+          const totalPageArr = [];
+          for (let i = 0; i < srcLen; i++) {
+            totalPageArr.push(i);
+          }
+
+          const copiedPages = await pdfDoc.copyPages(pdfDocSrc, totalPageArr);
+
+          for (const copiedPage of copiedPages) {
+            await pdfDoc.addPage(copiedPage);
+          }
+        } else {
+          pdfDoc = pdfDocSrc;
+        }
+      } else {
+        continue;
+      }
+    }
+  }
+
+  if (!isPdfEdited) {
+    //pdf가 편집되지 않았으면 새로운 createObjectURL 할 필요 없음
+    return pdfUrl;
+  }
+
+  const pdfBytes = await pdfDoc.save();
+  const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+
+  const url = await URL.createObjectURL(blob);
+  return url;
+};

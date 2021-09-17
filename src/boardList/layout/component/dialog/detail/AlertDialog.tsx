@@ -12,6 +12,8 @@ import { InkStorage } from "nl-lib/common/penstorage";
 import { PageEventName } from "nl-lib/common/enums";
 import { changeGroup, showSnackbar } from "GridaBoard/store/reducers/listReducer";
 import { showMessageToast } from "GridaBoard/store/reducers/ui";
+import { showCalibrationDialog } from "../../../../../GridaBoard/store/reducers/calibrationReducer";
+import { makePdfUrl } from "../../../../../nl-lib/common/util";
 
 const confirmText = getText('print_popup_yes');
 const cancelText = getText('print_popup_no');
@@ -47,6 +49,11 @@ const dialogTypes = {
   "deleteGroup" : {
     title: getText("deleteGroup_title"),
     sub: getText("deleteGroup_sub"),
+    cancel: cancelText,
+    success : confirmText
+  },
+  "checkCalibration" : {
+    title: getText("check_calibration"),
     cancel: cancelText,
     success : confirmText
   }
@@ -113,6 +120,24 @@ const AlertDialog = (props : Props)=>{
       }
       case "toBoardList" : {
         routeChangeToBoardList();
+        break;
+      }
+      case "checkCalibration" : {
+        const new_url = await makePdfUrl();
+        const numPages = GridaDoc.getInstance().numPages;
+        const targetPages = Array.from({ length: numPages }, (_, i) => i + 1);
+
+        if (new_url) {
+          const option = {
+            url: new_url,
+            show: true,
+            targetPages: targetPages,
+            progress: 0,
+            calibrationMode: true,
+          };
+    
+          showCalibrationDialog(option);
+        }
         break;
       }
       case "deletePage" : {
