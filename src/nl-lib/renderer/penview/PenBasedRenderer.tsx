@@ -425,9 +425,9 @@ class PenBasedRenderer extends React.Component<Props, State> {
       ret_val = true;
     }
 
-    // if (this.props.zoom !== nextProps.zoom) {
-    //   this.renderer.setCanvasZoomByButton(nextProps.zoom);
-    // }
+    if (this.props.zoom !== nextProps.zoom) {
+      this.renderer.setCanvasZoomByButton(nextProps.zoom);
+    }
 
 
     if (this.props.renderCountNo !== nextProps.renderCountNo) {
