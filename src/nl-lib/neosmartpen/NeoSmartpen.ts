@@ -569,6 +569,10 @@ export default class NeoSmartpen implements INeoSmartpen {
     if (passcode.length !== 4) {
       alert(getText("pw_is_four_digits"))
     }
+    
+    if (retryCount >= 10) {
+      alert(getText('reset_penData'));
+    }
 
     this.protocolHandler.sendPasscode(passcode);
 
