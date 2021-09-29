@@ -428,17 +428,15 @@ export async function makeThumbnail() {
         opacity = 0.3;
       }
       const pointArray = [];
-      const pageInfo = {
+      let pageInfo = {
         section: NeoStrokes[j].section,
         owner: NeoStrokes[j].owner,
         book: NeoStrokes[j].book,
         page: NeoStrokes[j].page,
       };
-      let isPlate = false;
-      if (isSamePage(PlateNcode_1, pageInfo) || isSamePage(PlateNcode_2, pageInfo)) {
-        isPlate = true;
-      }
-      if (isPlate) {
+
+      if (NeoStrokes[j].isPlate) {
+        pageInfo = { section: NeoStrokes[j].plateSection, owner: NeoStrokes[j].plateOwner, book: NeoStrokes[j].plateBook, page: NeoStrokes[j].platePage }
         for (let k = 0; k < dotArr.length; k++) {
           const noteItem = getNPaperInfo(pageInfo); //plate의 item
           adjustNoteItemMarginForFilm(noteItem, pageInfo);
