@@ -84,7 +84,7 @@ function OptionLevel_1(props: ILeveledDialogProps) {
           <TableRow className={classes.tr}>
             <TableCell colSpan={1} style={cellRadioStyle}>
               <SelectField showHelp={help} colSpan={2} handleChange={handleChange2}
-                candidates={[getText("print_popup_detail_ncodelevel_low"), getText("print_popup_detail_ncodelevel_normal"), getText("print_popup_detail_ncodelevel_hard")]}
+                candidates={[getText("print_popup_detail_ncodelevel_normal"), getText("print_popup_detail_ncodelevel_hard")]}
                 value={(printOption.codeDensity === 2 ? getText("print_popup_detail_ncodelevel_normal") : getText("print_popup_detail_ncodelevel_hard"))}
                 color={color} name="codeDensity">
                 {getText("print_popup_detail_ncodelevel")}:
