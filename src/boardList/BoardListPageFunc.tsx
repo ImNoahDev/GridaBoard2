@@ -18,6 +18,7 @@ import { forceUpdateBoardList } from 'GridaBoard/store/reducers/appConfigReducer
 import { showSnackbar } from 'GridaBoard/store/reducers/listReducer';
 import { setLoadingVisibility } from 'GridaBoard/store/reducers/loadingCircle';
 import getText from "GridaBoard/language/language";
+import { addStroke } from '../GridaBoard/Save/SavePdf';
 
 export const resetGridaBoard = async () => {
   const doc = GridaDoc.getInstance();
@@ -411,98 +412,9 @@ export async function makeThumbnail() {
       continue;
     }
 
-    const pdfPage = pdfDoc.getPages()[0];
-    const pageHeight = pdfPage.getHeight();
+    const page = pdfDoc.getPages()[0];
 
-    for (let j = 0; j < NeoStrokes.length; j++) {
-      const thickness = NeoStrokes[j].thickness;
-      const brushType = NeoStrokes[j].brushType;
-      const dotArr = NeoStrokes[j].dotArray;
-      const rgbStrArr = NeoStrokes[j].color.match(/\d+/g);
-      const stroke_h = NeoStrokes[j].h;
-      const stroke_h_origin = NeoStrokes[j].h_origin;
-      const { a, b, c, d, e, f, g, h } = stroke_h;
-      const { a: a0, b: b0, c: c0, d: d0, e: e0, f: f0, g: g0, h: h0 } = stroke_h_origin;
-      let opacity = 1;
-      if (NeoStrokes[j].brushType === 1) {
-        opacity = 0.3;
-      }
-      const pointArray = [];
-      let pageInfo = {
-        section: NeoStrokes[j].section,
-        owner: NeoStrokes[j].owner,
-        book: NeoStrokes[j].book,
-        page: NeoStrokes[j].page,
-      };
-
-      if (NeoStrokes[j].isPlate) {
-        pageInfo = { section: NeoStrokes[j].plateSection, owner: NeoStrokes[j].plateOwner, book: NeoStrokes[j].plateBook, page: NeoStrokes[j].platePage }
-        for (let k = 0; k < dotArr.length; k++) {
-          const noteItem = getNPaperInfo(pageInfo); //plate의 item
-          adjustNoteItemMarginForFilm(noteItem, pageInfo);
-
-          const currentPage = GridaDoc.getInstance().getPage(store.getState().activePage.activePageNo);
-
-          const npaperWidth = noteItem.margin.Xmax - noteItem.margin.Xmin;
-          const npaperHeight = noteItem.margin.Ymax - noteItem.margin.Ymin;
-
-          const pageWidth = currentPage.pageOverview.sizePu.width;
-          const pageHeight = currentPage.pageOverview.sizePu.height;
-
-          const wRatio = pageWidth / npaperWidth;
-          const hRatio = pageHeight / npaperHeight;
-          let platePdfRatio = wRatio;
-          if (hRatio > wRatio) platePdfRatio = hRatio;
-
-          const dot = dotArr[k];
-          const pdf_x = dot.x * platePdfRatio;
-          const pdf_y = dot.y * platePdfRatio;
-
-          pointArray.push({ x: pdf_x, y: pdf_y, f: dot.f });
-        }
-      } else {
-        if (isPdf) {
-          for (let k = 0; k < dotArr.length; k++) {
-            const dot = dotArr[k];
-            const nominator = g0 * dot.x + h0 * dot.y + 1;
-            const px = (a0 * dot.x + b0 * dot.y + c0) / nominator;
-            const py = (d0 * dot.x + e0 * dot.y + f0) / nominator;
-
-            const pdf_xy = { x: px, y: py };
-
-            pointArray.push({ x: pdf_xy.x, y: pdf_xy.y, f: dot.f });
-          }
-        } else {
-          for (let k = 0; k < dotArr.length; k++) {
-            const dot = dotArr[k];
-            const nominator = g * dot.x + h * dot.y + 1;
-            const px = (a * dot.x + b * dot.y + c) / nominator;
-            const py = (d * dot.x + e * dot.y + f) / nominator;
-
-            const pdf_xy = { x: px, y: py };
-
-            pointArray.push({ x: pdf_xy.x, y: pdf_xy.y, f: dot.f });
-          }
-        }
-      }
-
-      let strokeThickness = thickness / 64;
-      switch (brushType) {
-        case 1:
-          strokeThickness *= 5;
-          break;
-        default:
-          break;
-      }
-
-      const pathData = drawPath(pointArray, strokeThickness);
-      pdfPage.moveTo(0, pageHeight);
-      pdfPage.drawSvgPath(pathData, {
-        color: rgb(Number(rgbStrArr[0]) / 255, Number(rgbStrArr[1]) / 255, Number(rgbStrArr[2]) / 255),
-        opacity: opacity,
-        scale: 1,
-      });
-    }
+    addStroke(page, NeoStrokes, isPdf);
   }
 
   /** Render pdf on canvas by PdfJs
