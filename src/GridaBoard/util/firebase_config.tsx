@@ -76,6 +76,7 @@ if(window.firebaseSetting === "dev"){
 // Initialize Firebase
 const mainFirebase = firebase.initializeApp(firebaseConfig);
 export const secondaryFirebase = firebase.initializeApp(secondaryFirebaseConfig, "secondary");
+export const firebaseAnalytics = secondaryFirebase.analytics();
 
 export const auth = firebase.auth();
 export const secondaryAuth = secondaryFirebase.auth();

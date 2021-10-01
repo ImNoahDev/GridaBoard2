@@ -15,6 +15,7 @@ import { IPdfToNcodeMapItem } from "nl-lib/common/structures";
 import { NcodePdfScaleMode } from "nl-lib/common/enums";
 import { NeoPdfDocument, NeoPdfManager } from "nl-lib/common/neopdf";
 import { g_nullNcode } from "nl-lib/common/constants";
+import { firebaseAnalytics } from "../../../GridaBoard/util/firebase_config";
 
 
 // https://stackoverflow.com/questions/9616426/javascript-print-iframe-contents-only/9616706
@@ -262,6 +263,12 @@ export default class PrintNcodedPdfWorker {
       const fn = getNcodedPdfName(filename, printOption.pdfToNcodeMap.printPageInfo, pagesPerSheet);
       saveAs(blob, fn);
     }
+
+    const printPageInfo = printOption.pdfToNcodeMap.printPageInfo;
+    firebaseAnalytics.logEvent('print', {
+      event_name: 'print',
+      item_id: `${printPageInfo.section}_${printPageInfo.owner}_${printPageInfo.book}`
+    });
 
     // completed
     console.log("[PrintPdfMain] Print!!!");

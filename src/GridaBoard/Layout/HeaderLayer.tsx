@@ -22,7 +22,7 @@ import TestButton from '../components/buttons/TestButton';
 import { useHistory } from 'react-router';
 import SimpleTooltip from '../components/SimpleTooltip';
 import { KeyboardArrowDown } from '@material-ui/icons';
-import { auth } from 'GridaBoard/util/firebase_config';
+import { auth, firebaseAnalytics } from 'GridaBoard/util/firebase_config';
 import ProfileButton from '../components/buttons/ProfileButton';
 import { showAlert } from '../store/reducers/listReducer';
 import { setSaveOpen } from '../store/reducers/ui';
@@ -316,6 +316,9 @@ const HeaderLayer = (props: Props) => {
   };
 
   const toBoardList = async () => {
+    firebaseAnalytics.logEvent('grida_home', {
+      event_name: 'grida_home'
+    });
     showAlert({
       type: 'toBoardList',
       selected: null,

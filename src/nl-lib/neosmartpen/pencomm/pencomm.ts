@@ -914,7 +914,8 @@ export default class PenComm extends ProtocolHandlerBase {
     const y = dotY + dotFy / 100;
     
     switch (this.deviceInfo.modelName) {
-      case 'NWP-F30': { //디모
+      case 'NWP-F30':  
+      case 'NWP-F30K': { //디모
         force += 600;
         break;
       }
