@@ -561,11 +561,19 @@ export default class NeoSmartpen implements INeoSmartpen {
     const retryCount = event.retryCount === undefined ? 0 : event.retryCount;
     let guide = "";
     if (retryCount > 0) {
-      guide = "\n비밀번호를 " + (retryCount) + "회 잘못 입력하셨습니다. \n10회 오류 시 필기 데이터가 초기화됩니다."
       guide = "\n" + getText("bluetooth_needPw_wrong").replace("%d", retryCount.toString());
     }
     const passcode = prompt(getText("bluetooth_needPw") + guide);
     if (passcode === null) return;
+    
+    if (passcode.length !== 4) {
+      alert(getText("pw_is_four_digits"))
+    }
+    
+    if (retryCount >= 10) {
+      alert(getText('reset_penData'));
+    }
+
     this.protocolHandler.sendPasscode(passcode);
 
     const mac = this.protocolHandler.getMac();

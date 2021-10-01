@@ -20,6 +20,8 @@ import getText from "GridaBoard//language/language";
 import GridaDoc from 'GridaBoard/GridaDoc';
 import { isWhiteBoard } from '../../../common/noteserver';
 import { setMappingState } from 'GridaBoard/store/reducers/appConfigReducer';
+import { store } from 'GridaBoard/client/pages/GridaBoard';
+import { showAlert } from 'GridaBoard/store/reducers/listReducer';
 import { firebaseAnalytics } from '../../../../GridaBoard/util/firebase_config';
 
 const _penImageUrl = "/icons/image_calibration.png";
@@ -407,17 +409,34 @@ export default function CalibrationButton(props: Props) {
     const numPages = GridaDoc.getInstance().numPages;
     const targetPages = Array.from({ length: numPages }, (_, i) => i + 1);
 
-    if (new_url) {
-      const option = {
-        url: new_url,
-        show: true,
-        targetPages: targetPages,
-        progress: 0,
-        calibrationMode: true,
-      };
-
-      showCalibrationDialog(option);
+    const mappingState = store.getState().appConfig.mappingState;
+    switch (mappingState) {
+      case "printed": 
+      case "calibrated": {
+        showAlert({
+          type: 'checkCalibration',
+          selected: null,
+          sub: null,
+        });
+        break;
+      }
+      default: {
+        if (new_url) {
+          const option = {
+            url: new_url,
+            show: true,
+            targetPages: targetPages,
+            progress: 0,
+            calibrationMode: true,
+          };
+    
+          showCalibrationDialog(option);
+        }
+        break;
+      }
     }
+
+
   }
 
   const activePageNo_store = useSelector((state: RootState) => state.activePage.activePageNo);

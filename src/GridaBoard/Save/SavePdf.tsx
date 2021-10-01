@@ -1,14 +1,13 @@
 import { saveAs } from "file-saver";
-import { degrees, degreesToRadians, PDFDocument, rgb, StandardFonts } from 'pdf-lib';
+import { degrees, PDFDocument, PDFPage, rgb, StandardFonts } from 'pdf-lib';
 
 import GridaDoc from "../GridaDoc";
 
 import { InkStorage } from "nl-lib/common/penstorage";
-import { drawPath, isSamePage } from "nl-lib/common/util";
-import { fabric } from "fabric";
-import { PlateNcode_1, PlateNcode_2 } from "../../nl-lib/common/constants";
+import { drawPath } from "nl-lib/common/util";
 import { adjustNoteItemMarginForFilm, getNPaperInfo } from "../../nl-lib/common/noteserver";
 import { store } from "../client/pages/GridaBoard";
+import { NeoStroke } from "../../nl-lib/common/structures";
 import { firebaseAnalytics } from "../util/firebase_config";
 
 const PDF_TO_SCREEN_SCALE = 6.72; // (56/600)*72
@@ -134,8 +133,6 @@ export async function findGridaPageObjByStrokeKey(gridaPageObj: {pageNo: number,
 
 export async function addStrokesOnPage(pdfDoc) {
   const inkSt = InkStorage.getInstance();
-  const docPages = GridaDoc.getInstance().pages;
-
   const pages = pdfDoc.getPages();
 
   for (const [key, NeoStrokes] of inkSt.completedOnPage.entries()) {
@@ -144,95 +141,99 @@ export async function addStrokesOnPage(pdfDoc) {
     findGridaPageObjByStrokeKey(gridaPageObj, key);
 
     const page = pages[gridaPageObj.pageNo];
-    const pageHeight = page.getHeight();
 
-    for (let j = 0; j < NeoStrokes.length; j++) {
-      const thickness = NeoStrokes[j].thickness;
-      const brushType = NeoStrokes[j].brushType;
-      const dotArr = NeoStrokes[j].dotArray;
-      const rgbStrArr = NeoStrokes[j].color.match(/\d+/g);
-      const stroke_h = NeoStrokes[j].h;
-      const stroke_h_origin = NeoStrokes[j].h_origin;
-      const { a, b, c, d, e, f, g, h } = stroke_h;
-      const { a: a0, b: b0, c: c0, d: d0, e: e0, f: f0, g: g0, h: h0 } = stroke_h_origin;
-      let opacity = 1;
-      if (NeoStrokes[j].brushType === 1) {
-        opacity = 0.3;
+    addStroke(page, NeoStrokes, gridaPageObj.isPdf)
+  }
+}
+
+export function addStroke(page: PDFPage, NeoStrokes: NeoStroke[], isPdf: boolean) {
+  const pageHeight = page.getHeight();
+
+  for (let j = 0; j < NeoStrokes.length; j++) {
+    const thickness = NeoStrokes[j].thickness;
+    const brushType = NeoStrokes[j].brushType;
+    const dotArr = NeoStrokes[j].dotArray;
+    const rgbStrArr = NeoStrokes[j].color.match(/\d+/g);
+    const stroke_h = NeoStrokes[j].h;
+    const stroke_h_origin = NeoStrokes[j].h_origin;
+    const { a, b, c, d, e, f, g, h } = stroke_h;
+    const { a: a0, b: b0, c: c0, d: d0, e: e0, f: f0, g: g0, h: h0 } = stroke_h_origin;
+    let opacity = 1;
+    if (NeoStrokes[j].brushType === 1) {
+      opacity = 0.3;
+    }
+    const pointArray = [];
+    let pageInfo = { section: NeoStrokes[j].section, owner: NeoStrokes[j].owner, book: NeoStrokes[j].book, page: NeoStrokes[j].page }
+
+    if (NeoStrokes[j].isPlate) {
+      pageInfo = { section: NeoStrokes[j].plateSection, owner: NeoStrokes[j].plateOwner, book: NeoStrokes[j].plateBook, page: NeoStrokes[j].platePage }
+      for (let k = 0; k < dotArr.length; k++) {
+        const noteItem = getNPaperInfo(pageInfo); //plate의 item
+        adjustNoteItemMarginForFilm(noteItem, pageInfo);
+    
+        const currentPage = GridaDoc.getInstance().getPage(store.getState().activePage.activePageNo);
+    
+        const npaperWidth = noteItem.margin.Xmax - noteItem.margin.Xmin;
+        const npaperHeight = noteItem.margin.Ymax - noteItem.margin.Ymin;
+    
+        const pageWidth = currentPage.pageOverview.sizePu.width;
+        const pageHeight =currentPage.pageOverview.sizePu.height;
+    
+        const wRatio = pageWidth / npaperWidth;
+        const hRatio = pageHeight / npaperHeight;
+        let platePdfRatio = wRatio
+        if (hRatio > wRatio) platePdfRatio = hRatio
+    
+        const dot = dotArr[k];
+        const pdf_x = dot.x * platePdfRatio;
+        const pdf_y = dot.y * platePdfRatio;
+
+        pointArray.push({ x: pdf_x, y: pdf_y, f: dot.f });
       }
-      const pointArray = [];
-      let pageInfo = { section: NeoStrokes[j].section, owner: NeoStrokes[j].owner, book: NeoStrokes[j].book, page: NeoStrokes[j].page }
-
-      if (NeoStrokes[j].isPlate) {
-        pageInfo = { section: NeoStrokes[j].plateSection, owner: NeoStrokes[j].plateOwner, book: NeoStrokes[j].plateBook, page: NeoStrokes[j].platePage }
+    } else {
+      if (isPdf) {
         for (let k = 0; k < dotArr.length; k++) {
-          const noteItem = getNPaperInfo(pageInfo); //plate의 item
-          adjustNoteItemMarginForFilm(noteItem, pageInfo);
-      
-          const currentPage = GridaDoc.getInstance().getPage(store.getState().activePage.activePageNo);
-      
-          const npaperWidth = noteItem.margin.Xmax - noteItem.margin.Xmin;
-          const npaperHeight = noteItem.margin.Ymax - noteItem.margin.Ymin;
-      
-          const pageWidth = currentPage.pageOverview.sizePu.width;
-          const pageHeight =currentPage.pageOverview.sizePu.height;
-      
-          const wRatio = pageWidth / npaperWidth;
-          const hRatio = pageHeight / npaperHeight;
-          let platePdfRatio = wRatio
-          if (hRatio > wRatio) platePdfRatio = hRatio
-      
           const dot = dotArr[k];
-          const pdf_x = dot.x * platePdfRatio;
-          const pdf_y = dot.y * platePdfRatio;
+          const nominator = g0 * dot.x + h0 * dot.y + 1;
+          const px = (a0 * dot.x + b0 * dot.y + c0) / nominator;
+          const py = (d0 * dot.x + e0 * dot.y + f0) / nominator;
+          
+          const pdf_xy = { x: px, y: py};
 
-          pointArray.push({ x: pdf_x, y: pdf_y, f: dot.f });
+          pointArray.push({ x: pdf_xy.x, y: pdf_xy.y, f: dot.f });
         }
         // page.setRotation(degrees(gridaPageObj.rotation));
       } else {
-        if (gridaPageObj.isPdf) {
-          for (let k = 0; k < dotArr.length; k++) {
-            const dot = dotArr[k];
-            const nominator = g0 * dot.x + h0 * dot.y + 1;
-            const px = (a0 * dot.x + b0 * dot.y + c0) / nominator;
-            const py = (d0 * dot.x + e0 * dot.y + f0) / nominator;
-            
-            const pdf_xy = { x: px, y: py};
-
-            pointArray.push({ x: pdf_xy.x, y: pdf_xy.y, f: dot.f });
-          }
-          // page.setRotation(degrees(gridaPageObj.rotation));
-        } else {
-          for (let k = 0; k < dotArr.length; k++) {
-            const dot = dotArr[k];
-            const nominator = g * dot.x + h * dot.y + 1;
-            const px = (a * dot.x + b * dot.y + c) / nominator;
-            const py = (d * dot.x + e * dot.y + f) / nominator;
-            
-            const pdf_xy = { x: px, y: py};
-            
-            pointArray.push({ x: pdf_xy.x, y: pdf_xy.y, f: dot.f });
-          }
+        for (let k = 0; k < dotArr.length; k++) {
+          const dot = dotArr[k];
+          const nominator = g * dot.x + h * dot.y + 1;
+          const px = (a * dot.x + b * dot.y + c) / nominator;
+          const py = (d * dot.x + e * dot.y + f) / nominator;
+          
+          const pdf_xy = { x: px, y: py};
+          
+          pointArray.push({ x: pdf_xy.x, y: pdf_xy.y, f: dot.f });
         }
       }
-
-      let strokeThickness = thickness / 64;
-      switch (brushType) {
-        case 1: strokeThickness *= 5; break;
-        default: break;
-      }
-
-      const pathData = drawPath(pointArray, strokeThickness);
-      page.moveTo(0, pageHeight);
-      page.drawSvgPath(pathData, {
-        color: rgb(
-          Number(rgbStrArr[0]) / 255,
-          Number(rgbStrArr[1]) / 255,
-          Number(rgbStrArr[2]) / 255
-        ),
-        opacity: opacity,
-        scale: 1,
-      });
     }
+
+    let strokeThickness = thickness / 64;
+    switch (brushType) {
+      case 1: strokeThickness *= 5; break;
+      default: break;
+    }
+
+    const pathData = drawPath(pointArray, strokeThickness);
+    page.moveTo(0, pageHeight);
+    page.drawSvgPath(pathData, {
+      color: rgb(
+        Number(rgbStrArr[0]) / 255,
+        Number(rgbStrArr[1]) / 255,
+        Number(rgbStrArr[2]) / 255
+      ),
+      opacity: opacity,
+      scale: 1,
+    });
   }
 }
 

@@ -6,6 +6,7 @@ import { IBoardData } from '../../../structures/BoardStructures';
 import { showDropDown } from 'GridaBoard/store/reducers/listReducer';
 import getText from "GridaBoard/language/language";
 import firebase, { secondaryFirebase } from 'GridaBoard/util/firebase_config';
+import BoardLoadingCircle from 'GridaBoard/Load/BoardLoadingCircle';
 
 interface Props extends React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement> {
   docsList?: Array<any>;
@@ -239,7 +240,9 @@ const GridView = (props: Props) => {
               className={`contentItem`}
               onMouseOver={e => updateShowBtns(idx, true)}
               onMouseLeave={e => updateShowBtns(idx, false)}>
-              <div style={{ backgroundImage: `url(${path})` }} onClick={() => routeChange(el.key)} />
+              <div style={{ backgroundImage: `url(${path})` }} onClick={() => routeChange(el.key)}>
+                <BoardLoadingCircle checked={isChecked(keyStr)} />
+              </div>
               <div>
                 <div>{el.doc_name}</div>
                 <div className="contentData">

@@ -232,7 +232,7 @@ export function OptionDialog(props: IDialogProps) {
         break;
 
       case "codeDensity":
-        printOption[name] = value === getText("print_popup_select_normal") ? 2 : (value === getText("print_popup_detail_ncodelevel_low") ? 1 : 3);
+        printOption[name] = value === getText("print_popup_detail_ncodelevel_normal") ? 2 : 3;
         break;
 
       case "imagePadding":

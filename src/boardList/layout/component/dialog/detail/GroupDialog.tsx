@@ -203,12 +203,19 @@ const GroupDialog = (props : Props)=>{
     }
   }
 
+  const onKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      save();
+    }
+  }
+
   return (
   <Dialog
     disableBackdropClick
     onClose={closeEvent}
     {...rest}
     open={open}
+    onKeyPress={onKeyPress}
   >
     <div className="title">{title}</div>
     <input ref={(e)=>{inputer=e}} className="inputer" autoFocus placeholder={placeHolder} onChange={inputChange} defaultValue={defaultText} />
