@@ -5,6 +5,8 @@ import { ButtonBase, makeStyles, Theme, Tooltip, TooltipProps, ClickAwayListener
 import { IBrushType, PenEventName } from "nl-lib/common/enums";
 import getText from "../../language/language";
 import SimpleTooltip from "../SimpleTooltip";
+import { useSelector } from 'react-redux';
+import { RootState } from '../../store/rootReducer';
 
 const manager: PenManager = PenManager.getInstance();
 
@@ -63,6 +65,10 @@ const useStyles = makeStyles((theme: Theme) => ({
 let btnStyles = [] as React.CSSProperties[];
 
 const ColorButtons = () => {
+  const {renderCountNo_store} = useSelector((state: RootState) =>({
+    renderCountNo_store: state.activePen.renderCount,
+  }));
+
   const [penType, setPenType] = useState(manager.penRendererType as IBrushType);
   const [color, setColor] = useState(manager.color as string);
   const [isOpen, setIsOpen] = useState(false);

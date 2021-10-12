@@ -7,6 +7,7 @@ import { INeoSmartpen, IPenToViewerEvent } from "nl-lib/common/neopen/INeoSmartp
 import NeoSmartpen from "./NeoSmartpen";
 import VirtualPen from "./VirtualPen";
 import getText from "GridaBoard/language/language";
+import { forceToRenderNav } from "../../GridaBoard/store/reducers/activePenReducer";
 
 let _penmanager_instance = null as PenManager;
 let _active_pen: INeoSmartpen = null;
@@ -201,6 +202,17 @@ export default class PenManager {
 
   setActivePen = async (penId: string) => {
     _active_pen = await this.penArray.find(penInfo => penInfo.pen.mac === penId).pen;
+    
+    const activePenColor = _active_pen.penState[_active_pen.penRendererType].color;
+    const activePenThickness = _active_pen.penState[_active_pen.penRendererType].thickness;
+
+    const color_num = this.pen_colors.indexOf(activePenColor);
+    
+    this.setColor(color_num);
+    this.setPenRendererType(_active_pen.penRendererType);
+    this.setThickness(activePenThickness)
+
+    forceToRenderNav();
   }
 
   setColor(color_num: number) {
