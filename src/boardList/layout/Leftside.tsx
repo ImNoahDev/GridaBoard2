@@ -6,6 +6,7 @@ import { AccessTime, DeleteOutline, Add, MoreVert } from '@material-ui/icons';
 import { showGroupDialog } from 'GridaBoard/store/reducers/listReducer';
 import { showDropDown } from 'GridaBoard/store/reducers/listReducer';
 import copylightLogo from "../copylight_logo.png";
+import SideBanner from './component/dialog/detail/SideBanner';
 const useStyle = makeStyles(theme=>({
   wrap : {
     background : theme.custom.white[50],
@@ -121,6 +122,8 @@ const useStyle = makeStyles(theme=>({
   },
   banner : {
     display: "flex",
+    
+    flexDirection: "column",
     bottom : "0px",
     width: "100%",
     position: "absolute",
@@ -159,6 +162,10 @@ const Leftside = (props : Props)=>{
   const selected = props.selected;
   // const keyList = props.categoryKey;
   const category = [...props.category];
+  /**
+   * category Data
+   * [Category Name, Order, Doc Count , DB Key]
+   */
   category.sort((a,b)=>a[1]-b[1]);
   // console.log(category);
 
@@ -192,7 +199,7 @@ const Leftside = (props : Props)=>{
         <div className="category">
           {category.map((el, idx)=>{
             if(el[1] == -1) return ;
-            const title = idx === 0 ? getText("boardList_unshelved").replace("%d", el[2]) : el[0] + ` (${el[2]})`;
+            const title = el[3] === 0 ? getText("boardList_unshelved").replace("%d", el[2]) : el[0] + ` (${el[2]})`;
             return (
             <div key={el[1]} onClick={e=>selectCategory(el[3])} className={selected === el[3]? classes.selected : "" }>
               <span>{title}</span>
@@ -213,7 +220,9 @@ const Leftside = (props : Props)=>{
       </div>
       <Liner />
       <div className={classes.banner}>
-        {/* <div className="banner"></div> */}
+        <div className="banner">
+          <SideBanner />
+        </div>
         <div className="copylight">
           <img src={copylightLogo} alt=""/> 
           <span>© NEOLAB Convergence Inc. All Rights</span>

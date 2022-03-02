@@ -9,6 +9,7 @@ import { RotateRight } from "@material-ui/icons";
 import SimpleTooltip2 from "../SimpleTooltip2";
 import getText from 'GridaBoard/language/language';
 import { store } from "GridaBoard/client/pages/GridaBoard";
+import { setNotFirstPenDown } from "../../store/reducers/gestureReducer";
 
 export const onToggleRotate = () => {
   const activePageNo = store.getState().activePage.activePageNo;
@@ -35,11 +36,14 @@ export const onToggleRotate = () => {
     page._rotation += 90;
   }
 
+  setNotFirstPenDown(false);
   // setIsVertical((prev)=>!prev);
 
   const tmp = page.pageOverview.sizePu.width ;
   page.pageOverview.sizePu.width = page.pageOverview.sizePu.height;
   page.pageOverview.sizePu.height = tmp;
+
+  setNotFirstPenDown(false);
 }
 
 const RotateButton = (props: IconButtonProps) => {

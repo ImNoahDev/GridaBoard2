@@ -1,24 +1,37 @@
 import React from "react";
 import {connect} from "react-redux";
-import { CSSProperties } from "@material-ui/core/styles/withStyles";
-import { Typography } from "@material-ui/core";
+import {CSSProperties} from "@material-ui/core/styles/withStyles";
+import {Typography} from "@material-ui/core";
 
-import { IRenderWorkerOption } from "./RenderWorkerBase";
+import {IRenderWorkerOption} from "./RenderWorkerBase";
 import PenBasedRenderWorker from "./PenBasedRenderWorker";
 
-import { IBrushType, PenEventName, PageEventName, PLAYSTATE, ZoomFitEnum } from "nl-lib/common/enums";
-import { IPageSOBP, ISize } from "nl-lib/common/structures";
-import { callstackDepth, isSamePage, isSameNcode, makeNPageIdStr, makeNCodeIdStr, uuidv4 } from "nl-lib/common/util";
+import {PageEventName, PenEventName, PLAYSTATE, ZoomFitEnum} from "nl-lib/common/enums";
+import {IPageSOBP, ISize, NeoDot, NeoStroke} from "nl-lib/common/structures";
+import {callstackDepth, isPlatePage, isSameNcode, isSamePage, makeNPageIdStr, scrollToThumbnail, uuidv4} from "nl-lib/common/util";
 
-import { INeoSmartpen, IPenToViewerEvent } from "nl-lib/common/neopen";
-import { MappingStorage } from "nl-lib/common/mapper";
-import { DefaultPlateNcode, DefaultPUINcode } from "nl-lib/common/constants";
-import { InkStorage } from "nl-lib/common/penstorage";
-import { isPlatePaper, isPUI } from "nl-lib/common/noteserver";
+import {INeoSmartpen, IPenToViewerEvent} from "nl-lib/common/neopen";
+import {MappingStorage} from "nl-lib/common/mapper";
+import {DefaultPlateNcode, DefaultPUINcode, nullNcode} from "nl-lib/common/constants";
+import {PlateNcode_3} from "nl-lib/common/constants/MapperConstants";
+import {InkStorage} from "nl-lib/common/penstorage";
+import {isPlatePaper, isPUI, getNPaperInfo, adjustNoteItemMarginForFilm} from "nl-lib/common/noteserver";
 
-import { setCalibrationData } from 'GridaBoard/store/reducers/calibrationDataReducer';
-import { store } from "GridaBoard/client/pages/GridaBoard";
+import {setCalibrationData} from 'GridaBoard/store/reducers/calibrationDataReducer';
+import {store} from "GridaBoard/client/pages/GridaBoard";
 import GridaDoc from "GridaBoard/GridaDoc";
+import { initializeCrossLine, setLeftToRightDiagonal, setRightToLeftDiagonal, setHideCanvasMode, incrementTapCount, initializeTap, setFirstDot, setNotFirstPenDown, showSymbol, hideSymbol, setGestureDisable } from "GridaBoard/store/reducers/gestureReducer";
+import { setActivePageNo } from "GridaBoard/store/reducers/activePageReducer";
+import { onToggleRotate } from "GridaBoard/components/buttons/RotateButton";
+import { hideToastMessage, showMessageToast } from "GridaBoard/store/reducers/ui";
+import getText from "GridaBoard/language/language";
+import { onClearPage } from "boardList/layout/component/dialog/detail/AlertDialog";
+import AddCircle from "@material-ui/icons/AddCircle";
+import { SvgIcon } from '@material-ui/core';
+import { theme } from "../../../GridaBoard/theme";
+import { PenManager } from "../../neosmartpen";
+
+
 
 /**
  * Properties
@@ -66,10 +79,39 @@ interface Props { // extends MixedViewProps {
   renderCountNo: number,
 
   calibrationData: any,
-  setCalibrationData2: any,
+  setCalibrationData: any,
   calibrationMode: boolean,
 
   isBlankPage: boolean,
+
+  tapCount: number;
+  firstDot: NeoDot;
+  incrementTapCount: any;
+  initializeTap: any;
+  setFirstDot: any;
+
+  initializeCrossLine: any;
+  leftToRightDiagonal: boolean;
+  rightToLeftDiagonal: boolean;
+  setLeftToRightDiagonal: any;
+  setRightToLeftDiagonal: any;
+
+  activePageNo: number;  
+  setActivePageNo: any;
+
+  hideCanvasMode: boolean;
+  setHideCanvasMode: any;
+
+  gestureMode: boolean;
+
+  notFirstPenDown: boolean;
+  show: boolean;
+  setNotFirstPenDown: any;
+  showSymbol: any;
+  hideSymbol: any;
+
+  gestureDisable: boolean;
+  setGestureDisable: any;
 }
 
 /**
@@ -87,7 +129,7 @@ interface State {
 
   renderCount: number,
 
-  numDocPages : number
+  numDocPages: number,
 }
 
 /**
@@ -111,7 +153,7 @@ class PenBasedRenderer extends React.Component<Props, State> {
 
     renderCount: 0,
 
-    numDocPages : store.getState().activePage.numDocPages
+    numDocPages: store.getState().activePage.numDocPages,
   };
 
   _renderer: PenBasedRenderWorker;
@@ -133,7 +175,7 @@ class PenBasedRenderer extends React.Component<Props, State> {
   viewSize: ISize = { width: 0, height: 0 };
 
   mainDiv: HTMLDivElement = null;
-   canvasId = "";
+  canvasId = "";
   canvas: HTMLCanvasElement = null;
 
   inkStorage: InkStorage = null;
@@ -141,6 +183,8 @@ class PenBasedRenderer extends React.Component<Props, State> {
   fitMargin = 0;
   fixed = false;
   shouldSendPageInfo = false;
+
+  symbolTimer: any;
 
   setMainDivRef = (div: HTMLDivElement) => {
     this.mainDiv = div;
@@ -233,6 +277,7 @@ class PenBasedRenderer extends React.Component<Props, State> {
       pen.removeEventListener(PenEventName.ON_PEN_MOVE, this.onLivePenMove);
       pen.removeEventListener(PenEventName.ON_PEN_UP, this.onLivePenUp);
       pen.removeEventListener(PenEventName.ON_HOVER_MOVE, this.onLiveHoverMove);
+      pen.removeEventListener(PenEventName.ON_PEN_HOVER_PAGEINFO, this.onLiveHoverPageInfo);
       pen.removeEventListener(PenEventName.ON_PEN_UP_FOR_HOMOGRAPHY, this.setTransformParametersForPen);
 
       pen.removeEventListener(PenEventName.ON_PEN_DOWN_VIRTUAL, this.onLivePenDown);
@@ -248,9 +293,9 @@ class PenBasedRenderer extends React.Component<Props, State> {
   }
 
   private unsubscribeAllPensEvent = () => {
-    this.subscribedPens.forEach(pen => {
+    this.subscribedPens.slice(0).forEach(pen => {
       this.unsubscribePenEvent(pen);
-    });
+    });    
   }
 
   /** pen array를 제외하고는 event listening을 하지 않도록 */
@@ -330,7 +375,6 @@ class PenBasedRenderer extends React.Component<Props, State> {
     if ((this.props.rotation !== nextProps.rotation) && isSamePage(this.props.basePageInfo, nextProps.basePageInfo)) {
       //회전 버튼을 누를 경우만 들어와야 하는 로직, 회전된 pdf를 로드할 때는 들어오면 안됨
       //로드할 경우에는 this.props의 basePageInfo가 nullNCode로 세팅돼있기 때문에 들어오지 않음
-
       this.renderer.setRotation(nextProps.rotation, this.pdfSize);
 
       // const ctx = this.canvas.getContext('2d');
@@ -358,6 +402,9 @@ class PenBasedRenderer extends React.Component<Props, State> {
 
       this.renderer.onPageSizeChanged(nextProps.pdfSize);
       this.pdfSize = { ...nextProps.pdfSize, scale: this.pdfSize.scale };
+
+      //회전 후 symbol(toast포함)의 display 상태 초기화(안보이도록 처리)
+      hideToastMessage();
       ret_val = true;
     }
 
@@ -385,16 +432,16 @@ class PenBasedRenderer extends React.Component<Props, State> {
 
         if (isSameNcode(nextProps.pageInfo, DefaultPUINcode) || isPUI(nextProps.pageInfo)) { 
           //1. PUI에 쓸 경우 페이지가 바뀌는 것을 막기 위함
-          return;
+          return false;
         }
-
+ 
         this.renderer._opt.rotation = nextProps.rotation;
         
         if (isSameNcode(nextProps.pageInfo, DefaultPlateNcode)){
-          return;
+          return false;
         }
         const transform = MappingStorage.getInstance().getNPageTransform(pageInfo);
-        this.renderer.setTransformParameters(transform.h, this.pdfSize);
+        this.renderer.setTransformParameters(transform.h, nextProps.pdfSize);
 
         this.renderer.changePage(pageInfo, nextProps.pdfSize, false);
 
@@ -403,6 +450,15 @@ class PenBasedRenderer extends React.Component<Props, State> {
 
         ret_val = true;
 
+        /** 페이지 이동했을 때, Symbol을 비롯한 제스처 로직들의 초기화가 이루어져야 한다.
+         *  notFirstPenDown - Symbol 첫 touch를 확인하기 위한 state
+         *  & crossLine, doubleTap 관련 state의 초기화
+         *  symbol(toast포함)의 display 상태 초기화(안보이도록 처리)
+         * */ 
+        this.props.setNotFirstPenDown(false);
+        this.props.initializeCrossLine();
+        this.props.initializeTap();
+        hideToastMessage();
       }
 
       if (this.props.calibrationMode) {
@@ -441,6 +497,15 @@ class PenBasedRenderer extends React.Component<Props, State> {
       }
     }
 
+    // hideCanvasMode 상태에 따른 로직 처리
+    if (this.props.isMainView) { // 메인 뷰의 화면만 처리해준다. (thumbnail 제외)
+      if (nextProps.hideCanvasMode) {
+        this.renderer.removeAllCanvasObject(); // hideCanvasMode true 일 때, 계속 삭제해준다. -> 페이지 이동같은 event일때도 처리를 해줘야 하므로,
+      } else if (this.props.hideCanvasMode !== nextProps.hideCanvasMode && !isSamePage(pageInfo, nullNcode())) { // false 이고 hideCanvasMode 상태가 바뀔 때, redraw 해준다.
+        this.renderer.redrawStrokes(this.renderer.pageInfo);
+      }
+    }
+  
     return ret_val;
   }
 
@@ -495,6 +560,8 @@ class PenBasedRenderer extends React.Component<Props, State> {
       this.inkStorage.removeEventListener(PageEventName.PAGE_CLEAR, this.removeAllCanvasObjectOnActivePage);
       this.inkStorage.removeEventListener(PenEventName.ON_ERASER_MOVE, this.renderer.redrawStrokes);
     }
+    this.props.initializeCrossLine();
+    this.props.initializeTap();
   }
 
   /**
@@ -502,7 +569,9 @@ class PenBasedRenderer extends React.Component<Props, State> {
    * @param {{strokeKey:string, mac:string, time:number, stroke:NeoStroke}} event
    */
   onLivePenDown = (event: IPenToViewerEvent) => {
-    // console.log(event);
+    if (this.props.hideCanvasMode) {
+      showMessageToast(getText('hide_canvas'));
+    }
     if (this.renderer) {
       // const { section, owner, book, page } = event;
       // if (isSamePage(this.props.pageInfo, { section, owner, book, page }))
@@ -525,18 +594,40 @@ class PenBasedRenderer extends React.Component<Props, State> {
   onLivePenPageInfo = (event: IPenToViewerEvent) => {
     const { section, owner, book, page } = event;
     const prevPageInfo = this.props.pageInfo;
+    let isRun = true;
+    
+
     if (isSamePage(prevPageInfo, event as IPageSOBP) && (!this.shouldSendPageInfo)) {
-      return;
+      isRun = false;
     }
     this.shouldSendPageInfo = false;
 
     if (this.props.calibrationMode) {
-      return;
+      isRun = false;
+    }
+    if (isPUI(event as IPageSOBP)) {
+      isRun = false;
+    }
+
+    if(event.mac !== PenManager.getInstance().virtualPen.mac && !isPUI(event as IPageSOBP) && !this.props.calibrationMode){ // 가상펜이 아닐 경우
+      const isPlate = isPlatePage(event as IPageSOBP);
+      if(isPlate && this.props.gestureDisable){
+        this.props.setGestureDisable(false);
+      }else if(!isPlate && !this.props.gestureDisable){
+        this.props.setGestureDisable(true);
+      }
     }
     /** pdf pageNo를 바꿀 수 있게, container에게 전달한다. */
-    if (this.props.onNcodePageChanged) {
+    if (isRun && this.props.onNcodePageChanged) {
       this.renderer.registerPageInfoForPlate(event);//hover page info를 거치지 않고 바로 page info로 들어오는 경우(빨리 찍으면 hover 안들어옴)
       this.props.onNcodePageChanged({ section, owner, book, page });
+      //Plate <-> NcodePage 변화에서의 symbol(toast포함)의 display 상태 초기화(안보이도록 처리)
+      hideToastMessage();
+    }
+
+    // (페이지가 refresh 되고) 부기보드를 첫 터치했을때 심볼이 보여지도록 한다. 추가, 회전 후 부기보드를 첫 터치할 때 심볼이 보여지도록 한다.
+    if (isPlatePage(this.props.pageInfo) && !this.props.notFirstPenDown) {
+      this.onSymbolUp();
     }
   }
 
@@ -553,12 +644,127 @@ class PenBasedRenderer extends React.Component<Props, State> {
    * @param {{strokeKey:string, mac:string, stroke:NeoStroke, dot:NeoDot}} event
    */
 
+
   onLivePenMove = (event: IPenToViewerEvent) => {
+    const { stroke } = event;
     if (this.renderer) {
+      if (this.props.hideCanvasMode) {
+        if(event.dot !== undefined){
+          event.dot.x *= -1;
+          event.dot.y *= -1;
+        }
+      }
       this.renderer.pushLiveDot(event, this.props.rotation);
     }
   }
 
+  /** Touble tap process */
+  doubleTapProcess = (isPlate: boolean, dot: NeoDot) => {
+    const pageInfo = this.renderer.pageInfo;
+    // plate에서 작업하는 중에 발생하는 double tap 처리를 영역별로 구분
+    if (isPlate) {
+      switch(this.findDotPositionOnPlate(dot)) {
+        case "top":
+          this.topControlZone();
+          break;
+        case "bottom":
+          this.bottomControlZone();
+          break;
+        case "left":
+          this.leftControlZone();
+          break;
+        case "right":
+          this.rightControlZone();
+          break;
+        case "top-left": 
+        case "top-right":
+        case "bottom-left":
+        case "bottom-right":
+          if (isSamePage(PlateNcode_3, this.props.pageInfo) && this.onPlusControlZone(dot)) {
+            this.plusControlZone();
+          }
+          break;
+        default:
+          return
+      }
+      this.removeDoubleTapStrokeOnActivePage(pageInfo);
+    }
+    this.props.initializeTap();
+  }
+
+  /**
+   * Tap count 하는 로직
+   *
+   * 1. 해당 동작이 Tap이 맞는지 아닌지 확인 -> dotArray의 맨 처음과 끝이 차이가 거의 없고, timeDiff 도 작은것만 tap으로 취급
+   *    -> 이 맞다면 아래 실행
+   * 2. firstDot이 null이면 해당 tap을 실행할때의 dotArray의 첫번째 값을 firstDot으로 설정해준다.
+   * 3. firstDot이 존재한다면 거리를 비교해서 특정 값 범위 안에 들어와있을경우 tap count를 증가시켜준다.
+   *
+   */
+  checkTap = (stroke: NeoStroke) => {
+    const [first, last] = this.getFirstLastItems(stroke.dotArray);
+    const timeDiff: number = this.getTimeDiff(first, last);
+    const distance: number = this.getDistance(first, last);
+
+    if (this.isTap(timeDiff, distance)) {
+      if (!this.props.firstDot) {
+        this.props.setFirstDot(first);
+        return true
+      }
+      return this.isNotFirstTap(first);
+    }
+    this.props.initializeTap();
+    return false
+  }
+
+  /**
+   * 해당 동작이 tap인지 아닌지 파악하는 로직
+   * -> 짧은 시간동안 동작했고, 라인의 첫부분과 끝부분의 좌표값 차이가 매우 작을때 tap touch라고 판단한다.
+   */
+  isTap = (timeDiff, distance) => {
+    return timeDiff < 170 && distance < 0.8 ? true: false
+  }
+
+  /**
+   * is not first tap case
+   * -> 현재 탭동작이 첫번째 탭이 아닐경우 첫번째 탭과의 거리를 비교한다.
+   * -> 거리가 가까우면 탭 카운트를 증가시켜주고, 멀면 현재탭은 첫번째 탭으로 설정해준다.
+   */
+  isNotFirstTap = (first) => {
+    if (this.getDistance(this.props.firstDot, first) < 3) {
+      this.props.incrementTapCount();
+      return true
+    }
+
+    this.props.setFirstDot(first);
+    return false
+  }
+
+  /** Top Control Zone - Page Up */
+  topControlZone = () => {
+    this.prevChange();
+  }
+
+  /** Bottom Control Zone - Page Down */
+  bottomControlZone = () => {
+    this.nextChange();
+  }
+
+  /** Left Control Zone - Rotate */
+  leftControlZone = () => {
+    onToggleRotate();
+  }
+
+  /** Right Control Zone - Hide Canvas */
+  rightControlZone = () => {
+    this.props.setHideCanvasMode(!this.props.hideCanvasMode);
+  }
+
+  /** Top Left Control Zone */
+  plusControlZone = () => {
+    // Add Blank Page
+    this.addBlankPage();
+  }
 
   onLivePenMove_byStorage = (event: IPenToViewerEvent) => {
     // if (this.renderer) {
@@ -571,13 +777,72 @@ class PenBasedRenderer extends React.Component<Props, State> {
    * @param {{strokeKey:string, mac:string, stroke, section:number, owner:number, book:number, page:number}} event
    */
   onLivePenUp = (event: IPenToViewerEvent) => {
-    // console.log("Pen Up");
+    const { stroke } = event;
+    this.crossLineEraser(stroke);
+
+    if (this.props.gestureMode && this.checkTap(stroke) && this.props.tapCount === 2) {
+      this.doubleTapProcess(stroke.isPlate, stroke.dotArray[0]);
+    }
+      
     if (this.props.calibrationMode) {
       this.onCalibrationUp(event);
     }
     else if (this.renderer) {
       this.renderer.closeLiveStroke(event);
     }
+  }
+
+  /** Paper에 X를 그렸을 때, stroke를 지우게 하기 위한 로직 */ 
+  crossLineEraser = (stroke: NeoStroke) => {
+    // gestureMode가 아니거나 플레이트가 아니라면 종료
+    if (!this.props.gestureMode || !stroke.isPlate) return
+
+    const [first, last] = this.getFirstLastItems(stroke.dotArray);
+    // 임시, 플레이트 윗 파티션은 stroke 에 dotArray 가 들어오지 않으므로 예외처리 해놓음.
+    if (!first?.point || !last?.point) return
+
+    if (this.checkLeftToRightDiagonal(first, last) && this.lineAccuracyTest(stroke)) {
+      this.props.setLeftToRightDiagonal();
+    }
+    if (this.checkRightToLeftDiagonal(first, last) && this.lineAccuracyTest(stroke)) {
+      this.props.setRightToLeftDiagonal();
+    }
+    
+    if (this.props.leftToRightDiagonal && this.props.rightToLeftDiagonal) {
+      onClearPage();
+      this.props.initializeCrossLine();
+    }
+  }
+
+  lineAccuracyTest = (stroke: NeoStroke) => {
+    const [first, last] = this.getFirstLastItems(stroke.dotArray);
+    /**
+     * Ax + By + C = 0 과 dot 사이의 distance 계산
+     * ~ y-y1 = (y2-y1)/(x2-x1) / (x-x1)
+     * ~ d = | A*target.x + B*target.y + C | / square_root(A^2 + B^2)
+     * stroke 안의 모든 dot을 검사하여 distance가 threshold 보다 클 경우 False를 반환
+     */
+    const A = first.point.y - last.point.y;
+    const B = last.point.x - first.point.x;
+    const C = (first.point.x-last.point.x)*first.point.y + (last.point.y-first.point.y)*first.point.x;
+    const threshold = 50;
+    for (const dot of stroke.dotArray) {
+      const x = dot.point.x;
+      const y = dot.point.y;                       
+      const distance = Math.abs(A*x+B*y+C)/Math.sqrt(Math.pow(A, 2) + Math.pow(B, 2));
+      if (distance > threshold) return false
+    }
+    return true
+  }
+
+  checkLeftToRightDiagonal = (first: NeoDot, last: NeoDot) => {
+    return  this.findDotPositionOnPlate(first) === 'top-left' && 
+            this.findDotPositionOnPlate(last) === 'bottom-right'
+  }
+
+  checkRightToLeftDiagonal = (first: NeoDot, last: NeoDot) => {
+    return  this.findDotPositionOnPlate(first) === 'top-right' &&
+            this.findDotPositionOnPlate(last) === 'bottom-left'
   }
 
   onCalibrationUp = (event: IPenToViewerEvent) => {
@@ -631,7 +896,7 @@ class PenBasedRenderer extends React.Component<Props, State> {
 
     const { section, owner, book, page } = event;
     const pageInfo = { section, owner, book, page } as IPageSOBP;
-    const { setCalibrationData2 } = this.props;
+    const { setCalibrationData } = this.props;
 
     const cali = {
       section : section,
@@ -641,7 +906,7 @@ class PenBasedRenderer extends React.Component<Props, State> {
       nu: {x: clicked_point.nu.x, y: clicked_point.nu.y},
     };
 
-    setCalibrationData2(cali);
+    setCalibrationData(cali);
 
     event.pen.calibrationData = {
       section: -1,
@@ -658,10 +923,12 @@ class PenBasedRenderer extends React.Component<Props, State> {
     
     const activePageNo = store.getState().activePage.activePageNo;
     const activePage = GridaDoc.getInstance().getPageAt(activePageNo);
+    if(activePageNo === -1) return ;
+    
     const activePageInfo = activePage.pageInfos[0];//plate에 쓰는 경우 plate의 pageInfo가 아닌 실제 pageInfo가 필요
 
     let isPlate = false;
-    if (isSamePage(activePageInfo, this.props.pageInfo) && isSameNcode(DefaultPlateNcode, pageInfo)) {
+    if (isSamePage(activePageInfo, this.props.pageInfo) && isSameNcode(DefaultPlateNcode, pageInfo) || isPUI(pageInfo)) {
       isPlate = true;
     }
 
@@ -690,6 +957,24 @@ class PenBasedRenderer extends React.Component<Props, State> {
     }
   }
 
+
+  /** 더블탭 stroke를 지우기 위한 로직 */
+  removeDoubleTapStrokeOnActivePage = (pageInfo: IPageSOBP) => {
+    const completed = this.renderer.storage.getPageStrokes(pageInfo);
+    completed.splice(-2);
+
+    // hideCanvas가 되어있을시 redraw 로직을 실행하면 다시 stroke가 생성되므로 로직이 실행되지 않도록 함수를 종료시켜준다. 
+    if (this.props.hideCanvasMode) return
+    
+    // Thumbnail 영역 redraw 를 위한 dispath 추가
+    this.renderer.storage.dispatcher.dispatch(PenEventName.ON_ERASER_MOVE, {
+      section: pageInfo.section,
+      owner: pageInfo.owner,
+      book: pageInfo.book,
+      page: pageInfo.page,
+    });
+  }
+
   onLiveHoverPageInfo = (event: IPenToViewerEvent) => {
     if (this.renderer) {
       this.renderer.registerPageInfoForPlate(event);
@@ -712,6 +997,181 @@ class PenBasedRenderer extends React.Component<Props, State> {
     pen.h_origin = this.renderer.h;
   }
 
+  /** Gesture 인식을 위한 dot 계산식 */
+  getFirstLastItems = (array: NeoDot[]) => {
+    return [array[0], array[array.length-1]]
+  }
+
+  getDistance = (d1: NeoDot, d2: NeoDot) => {
+    return d1 && d2 ? Math.sqrt(Math.pow(d1.x-d2.x, 2) + Math.pow(d1.y-d2.y, 2)) : null;
+  }
+
+  getTimeDiff = (d1: NeoDot, d2: NeoDot) => {
+    return d1 && d2 ? Math.abs(d1.time - d2.time) : null;
+  }
+
+
+  /** Page Up, Down 처리
+   * activePageNo - 0부터 시작, numDocPages - 1부터 시작
+  */
+  prevChange = () => {  // Page Up
+    if (this.props.activePageNo <= 0) {
+      return showMessageToast(getText('no_more_page'));
+    }
+    setActivePageNo(this.props.activePageNo-1);    
+    scrollToThumbnail(this.props.activePageNo-1);
+  }
+  nextChange = () => { // PageDown
+    if (this.props.activePageNo === this.state.numDocPages-1) {
+      return showMessageToast(getText('no_more_page'));
+    }
+    setActivePageNo(this.props.activePageNo+1);
+    scrollToThumbnail(this.props.activePageNo+1);
+  }
+
+
+  /** 빈페이지를 추가하기 위한 로직 */
+  addBlankPage = () => {
+    const doc = GridaDoc.getInstance();
+    const pageNo = doc.addBlankPage();
+    /** 직전 작업 페이지의 mode(landscape/portrait)에 따라 페이지 각도를 설정하는 로직 (사용미정) */ 
+    // if ([0, 180].includes(this.getRotationOnPageMode())) {
+    //   doc._pages[pageNo]._rotation = 270;
+    // }
+    doc._pages[pageNo]._rotation = (270+this.getRotationOnPageMode())%360;
+    setActivePageNo(pageNo);
+    scrollToThumbnail(pageNo);
+  }
+
+  /** Plate 내에서의 dot position 파악 (상, 하, 좌, 우, 좌상단) */
+  findDotPositionOnPlate = (dot: NeoDot) => {
+    if (!dot) return
+    /** 회전값을 반영하기위한 Shift Array 
+     *  회전각에 따라 rotateDegree{0: 0, 90: 1, 180: 2, 270:3}를 plate gesture 영역에 반영하여 계산한다.
+     *  4를 더하는 이유는 음수를 처리하기 위함.
+    */
+    const shiftArray = ['top', 'left', 'bottom', 'right'];
+    const shiftEdgeArray = ['top-left', 'bottom-left', 'bottom-right', 'top-right'];
+    const rotateDegree = this.getRotationOnPageMode() / 90;
+    let {x,y} = dot;
+    if(x < 0){
+      x *= -1;
+      y *= -1;
+    }
+    const {npaperWidth, npaperHeight, gestureArea} = this.getPaperSize();
+    if (this.onTopControlZone(x, y, npaperWidth, npaperHeight, gestureArea)) {
+      return shiftArray[(0-rotateDegree+4)%4];
+    }
+    else if (this.onLeftControlZone(x, y, npaperWidth, npaperHeight, gestureArea)) {
+      return shiftArray[(1-rotateDegree+4)%4];
+    }
+    else if (this.onBottomControlZone(x, y, npaperWidth, npaperHeight, gestureArea)) {
+      return shiftArray[(2-rotateDegree+4)%4];
+    }
+    else if (this.onRightControlZone(x, y, npaperWidth, npaperHeight, gestureArea)) {
+      return shiftArray[(3-rotateDegree+4)%4];
+    }
+    else if (this.onTopLeftControlZone(x, y, npaperWidth, npaperHeight, gestureArea)) {
+      return shiftEdgeArray[(0-rotateDegree+4)%4];
+    }
+    else if (this.onBottomLeftControlZone(x, y, npaperWidth, npaperHeight, gestureArea)) {
+      return shiftEdgeArray[(1-rotateDegree+4)%4];
+    }
+    else if (this.onBottomRightControlZone(x, y, npaperWidth, npaperHeight, gestureArea)) {
+      return shiftEdgeArray[(2-rotateDegree+4)%4];
+    }
+    else if (this.onTopRightControlZone(x, y, npaperWidth, npaperHeight, gestureArea)) {
+      return shiftEdgeArray[(3-rotateDegree+4)%4];
+    }
+  }
+  
+  onTopControlZone = (x: number, y: number, width: number, height: number, gestureArea: number) => {
+    return  x > (width-gestureArea)/2 && 
+            x < width-(width-gestureArea)/2 && 
+            y < gestureArea*(3/5)
+  }
+  onBottomControlZone = (x: number, y: number, width: number, height: number, gestureArea: number) => {
+    return  x > (width-gestureArea)/2 && 
+            x < width-(width-gestureArea)/2 && 
+            y > height-(gestureArea*(3/5))
+  }
+  onLeftControlZone = (x: number, y: number, width: number, height: number, gestureArea: number) => {
+    return  x < gestureArea*(3/5) && 
+            y > (height-gestureArea)/2 && 
+            y < height-(height-gestureArea)/2
+  }
+  onRightControlZone = (x: number, y: number, width: number, height: number, gestureArea: number) => {
+    return  x > width-(gestureArea*(3/5)) && 
+            y > (height-gestureArea)/2 && 
+            y < height-(height-gestureArea)/2
+  }
+  /**
+   * 모서리 부분의 control 영역은 plate의 짧은면 기준 26% ~ 흠 영역을 어떻게 하지
+   * 즉, gestureArea(plate 짧은면 width의 1/3) * 0.8 -> (+) 영역을 쓸 경우 너무 작아 인식이 잘 되지 않음.
+   */
+  onTopLeftControlZone = (x: number, y: number, width: number, height: number, gestureArea: number) => {
+    return x < gestureArea*0.8 && y < gestureArea*0.8
+  }
+  onTopRightControlZone = (x: number, y: number, width: number, height: number, gestureArea: number) => {
+    return x > width-(gestureArea*0.8) && y < gestureArea*0.8
+  }
+  onBottomLeftControlZone = (x: number, y: number, width: number, height: number, gestureArea: number) => {
+    return x < gestureArea*0.8 && y > height-(gestureArea*0.8)
+  }
+  onBottomRightControlZone = (x: number, y: number, width: number, height: number, gestureArea: number) => {
+    return x > width-(gestureArea*0.8) && y > height-(gestureArea*0.8)
+  }
+  onPlusControlZone = (dot: NeoDot) => {
+    const {gestureArea} = this.getPaperSize();
+    const x = dot.x;
+    const y = dot.y;
+    return x < gestureArea*(3/7) && y < gestureArea*(3/7)
+  }
+
+  getPaperSize = () => {
+    // plate일 때, 해당 plate의 info를 가져옴.
+    const noteItem = getNPaperInfo(this.props.pageInfo);
+    adjustNoteItemMarginForFilm(noteItem, this.props.pageInfo);
+    const npaperWidth = noteItem.margin.Xmax - noteItem.margin.Xmin;
+    const npaperHeight = noteItem.margin.Ymax - noteItem.margin.Ymin;
+
+    // 짧은면을 기준으로 1/3 만큼을 gesture 가능범위로 설정
+    const gestureArea = npaperWidth > npaperHeight ? npaperHeight/3 : npaperWidth/3
+
+    return {npaperWidth, npaperHeight, gestureArea}
+  }
+
+  /** 페이지 mode(landscape/portrait)에 따른 회전값을 가져오기 위한 함수 
+   * landscape: 현재 rotation 값을 그대로 가져옴
+   * portrait: landscape에서 90도 회전된 상태의 값을 주어야 하므로 현재 rotation 값에 90을 더해준다.
+  */
+  getRotationOnPageMode = () => {
+    const currentPage = GridaDoc.getInstance().getPage(store.getState().activePage.activePageNo);
+    if (!currentPage) return
+    
+    let pageMode = "portrait";
+    if (currentPage.pageOverview.landscape) {
+      pageMode = "landscape";
+    }
+    
+    return pageMode === "portrait" ? (this.props.rotation+90)%360 : this.props.rotation 
+  }
+
+  onSymbolUp = () => {
+    // clearTimeout(this.symbolTimer);
+    this.props.setNotFirstPenDown(true);
+    showMessageToast(getText('check_symbol_position'));
+    // this.props.showSymbol();
+    // this.symbolTimer = setTimeout(function() {
+    //   hideSymbol();
+    // }, 10000);
+  }
+
+  onSymbolDown = () => {
+    hideSymbol();
+    hideToastMessage();
+  }
+
   render() {
     let { zoom } = this.props.position;
 
@@ -724,6 +1184,7 @@ class PenBasedRenderer extends React.Component<Props, State> {
       top: this.props.position.offsetY / zoom,
       zIndex: 10,
       overflow: "hidden",
+      visibility: this.state.numDocPages <= 0 ? "hidden" : "visible",
     }
 
     const inkCanvas: CSSProperties = {
@@ -734,18 +1195,83 @@ class PenBasedRenderer extends React.Component<Props, State> {
       zIndex: 10,
     }
 
+    const symbolDiv: CSSProperties = {
+      position: "absolute",
+      left: ([0, 270]).includes(this.getRotationOnPageMode()) ? 20 : "",
+      right: ([90, 180]).includes(this.getRotationOnPageMode()) ? 20 : "",
+      top: ([0, 90]).includes(this.getRotationOnPageMode()) ? 20 : "",
+      bottom: ([180, 270]).includes(this.getRotationOnPageMode()) ? 20 : "",
+      zIndex: 11,
+    }
+
+    const symbolSize: CSSProperties = {
+      fontSize: "32px",
+      color: theme.palette.error.main,
+      opacity: 0.5,
+      visibility: !this.props.gestureDisable && this.props.isMainView ? 'visible' : 'hidden'
+    }
+
     const shadowStyle: CSSProperties = {
       color: "#a20",
       textShadow: "-1px 0 2px #fff, 0 1px 2px #fff, 1px 0 2px #fff, 0 -1px 2px #fff",
+    }
+    
+    const infoNoPageDiv: CSSProperties = {
+      display: "flex",
+      flexDirection: "column",
+      width: "246px",
+      height: this.viewSize.height,
+      justifyContent: "center",
+      alignItems: "center",
+      margin: "auto",
+      padding: "0px",
+    }
+
+    const infoNoPageIcon: CSSProperties = {
+      position: "static",
+      width: "80px",
+      height: "80px",
+      color: theme.custom.icon.mono[2],
+      marginBottom: "20px"
+    }
+
+    const infoNoPageTitle: CSSProperties = {
+      position: "static",
+      width: "360px",
+      
+      fontFamily: "Noto Sans CJK KR",
+      fontStyle: "normal",
+      fontWeight: "normal",
+      fontSize: "18px",
+      lineHeight: "26px",
+      letterSpacing: "0.25px",
+
+      color: theme.palette.secondary.contrastText
     }
 
     return (
       <div id="pen-based-renderer" ref={this.setMainDivRef} style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0 }}>
         {/* <Paper style={{ height: this.size.height, width: this.size.width }}> */}
 
-        < div id={`${this.props.parentName}-fabric_container`} style={inkContainerDiv} >
+        <div id={`${this.props.parentName}-fabric_container`} style={inkContainerDiv} >
           <canvas id={this.canvasId} style={inkCanvas} ref={this.setCanvasRef} />
+          <div style={symbolDiv}>
+            <AddCircle style={symbolSize} />
+          </div>
         </div >
+
+        {this.state.numDocPages <= 0 ? 
+          <div style={infoNoPageDiv}>
+            <SvgIcon id="no_page_svg_icon" style={infoNoPageIcon}>
+              <path fillRule="evenodd" clipRule="evenodd"
+                d="M18 10v10H6V4h6v6h6zm2-2v12a2 2 0 01-2 2H6a2 2 0 01-2-2V4a2 2 0 012-2h8l6 6zm-6-3.172L17.172 8H14V4.828z"
+              />
+            </SvgIcon>
+            <Typography style={infoNoPageTitle}>
+            {getText('initial_page_guide')}
+            </Typography>
+          </div>
+          : ""}
 
         {!this.props.noInfo ?
           < div id={`${this.props.parentName}-info`} style={inkContainerDiv} >
@@ -772,13 +1298,38 @@ class PenBasedRenderer extends React.Component<Props, State> {
   }
 }
 
+
+// const activePageNo = useSelector((state: RootState) => state.activePage.activePageNo);
+
 const mapStateToProps = (state) => ({
-    calibrationData: state.calibrationDataReducer.calibrationData,
-    calibrationMode: state.calibration.calibrationMode
+  calibrationData: state.calibrationDataReducer.calibrationData,
+  calibrationMode: state.calibration.calibrationMode,
+  tapCount: state.gesture.doubleTap.tapCount,
+  firstDot: state.gesture.doubleTap.firstDot,
+  leftToRightDiagonal: state.gesture.crossLine.leftToRightDiagonal,
+  rightToLeftDiagonal: state.gesture.crossLine.rightToLeftDiagonal,
+  notFirstPenDown: state.gesture.symbol.notFirstPenDown,
+  show: state.gesture.symbol.show,
+  hideCanvasMode: state.gesture.hideCanvasMode,
+  gestureMode: state.gesture.gestureMode,
+  gestureDisable: state.gesture.gestureDisable,
+  activePageNo: state.activePage.activePageNo
 });
 
 const mapDispatchToProps = (dispatch) => ({
-  setCalibrationData2: cali => setCalibrationData(cali),
+  setCalibrationData: cali => setCalibrationData(cali),
+  incrementTapCount: () => incrementTapCount(),
+  initializeTap: () => initializeTap(),
+  setFirstDot: (dot) => setFirstDot(dot),
+  setLeftToRightDiagonal: () => setLeftToRightDiagonal(),
+  setRightToLeftDiagonal: () => setRightToLeftDiagonal(),
+  initializeCrossLine: () => initializeCrossLine(),
+  setNotFirstPenDown: (bool) => setNotFirstPenDown(bool),
+  showSymbol: () => showSymbol(),
+  hideSymbol: () => hideSymbol(),
+  setGestureDisable: (bool) => setGestureDisable(bool),
+  setHideCanvasMode: (bool) => setHideCanvasMode(bool),
+  setActivePageNo: no => setActivePageNo(no)
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(PenBasedRenderer);

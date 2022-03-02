@@ -1,7 +1,7 @@
 import { PDFDocument } from "pdf-lib";
 import { sprintf } from "sprintf-js";
 import GridaDoc from "../../../GridaBoard/GridaDoc";
-import { g_availablePagesInSection, UNIT_TO_DPI } from "../constants";
+import { g_availablePagesInSection, UNIT_TO_DPI, PlateNcode_1, PlateNcode_2, PlateNcode_3 } from "../constants";
 import { IUnitString, IPageSOBP, IPointDpi, IPdfToNcodeMapItem } from "../structures";
 
 export function compareObject(curr: Object, next: Object, header = "") {
@@ -80,6 +80,15 @@ export function isSamePage(pg1: IPageSOBP, pg2: IPageSOBP): boolean {
   return true;
 }
 
+
+export const isPlatePage = (pageInfo:IPageSOBP)=>{
+  if (isSamePage(PlateNcode_1, pageInfo) || isSamePage(PlateNcode_2, pageInfo) || isSamePage(PlateNcode_3, pageInfo)) {
+    return true;
+  }else{
+    return false;
+  }
+
+}
 export function isSameNcode(pg1: IPageSOBP, pg2: IPageSOBP): boolean {
   if (pg1 === undefined && pg2 === undefined) return true;
   if (pg1 && !pg2) return false;
@@ -450,7 +459,16 @@ export function callstackDepth() {
 
 export function scrollToBottom(id: string) {
   const ele = document.querySelector("#" + id);
-  ele.scrollIntoView({ behavior: "smooth", block: "end" });
+  (ele) ? ele.scrollIntoView({ behavior: "smooth", block: "end" }) : null;
+  // (ele) ? ele.scrollTo(0, ele.scrollHeight) : null;
+}
+
+export function scrollToThumbnail(pageNo: Number, event?: KeyboardEvent){
+  if(event){
+    event.preventDefault();
+  }
+  const ele = document.getElementById("thumbnail - " + pageNo + " -mixed_view");
+  (ele) ? ele.scrollIntoView({behavior: "smooth", block: "center"}) : null;
 }
 
 

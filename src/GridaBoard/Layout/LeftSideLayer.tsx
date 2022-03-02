@@ -1,9 +1,11 @@
-import React, { useState } from "react";
+import React, { useRef, useEffect, useCallback } from "react";
 import { RootState } from "../store/rootReducer";
 import { useSelector } from "react-redux";
-import { makeStyles } from "@material-ui/core";
+import { makeStyles, Theme, useTheme } from "@material-ui/core";
 import PersistentDrawerRight from "../View/Drawer/PersistentDrawerRight";
 import { updateDrawerWidth } from "../store/reducers/ui";
+import { fileOpenHandler } from "./HeaderLayer";
+
 
 const useStyle = props => makeStyles(theme=>({
   wrap: {
@@ -59,6 +61,8 @@ interface Props {
   drawerOpen: boolean,
 }
 
+
+
 const LeftSideLayer = (props: Props) => {
   const {drawerOpen} = props;
   // const [drawerOpen, setDrawerOpen] = useState(false);
@@ -72,15 +76,78 @@ const LeftSideLayer = (props: Props) => {
   const brZoom = useSelector((state: RootState) => state.ui.browser.zoom);
   const drawerWidth = useSelector((state: RootState) => state.ui.drawer.width);
   const classes = useStyle({brZoom:brZoom, drawerOpen:drawerOpen, drawerWidth:drawerWidth})()
-
+  
   let disabled = true;
-
+  
   if (activePageNo_store !== -1) {
     disabled = false;
   }
+
+
+
+  /**
+   * Drag And Drop Code
+   */
+  ///////////////////////////////////////////////
+
+  const dragRef = useRef<HTMLDivElement | null >(null);
+  const themes = useTheme<Theme>();
+
+  const handleDragIn = useCallback((e) => {
+    e.preventDefault();
+    e.stopPropagation();
+  }, [])
+  const handleDragOut = useCallback((e) => {
+    console.log("Drag Out Layer")
+    dragRef.current.style.background = themes.custom.white[25]
+    dragRef.current.style.border = themes.palette.action.selected
+    e.preventDefault();
+    e.stopPropagation();
+  }, [])
+  const handleDragOver = useCallback((e) => {
+    console.log("Drag Over Layer")
+    dragRef.current.style.background = themes.custom.icon.blue[3]
+    dragRef.current.style.border = "2px solid" + themes.palette.primary.main
+    dragRef.current.style.zIndex = "1"
+    e.preventDefault();
+    e.stopPropagation();
+  }, [])
+  const handleDrop = useCallback((e) => {
+    console.log("Drop to Layer")
+    dragRef.current.style.background = themes.custom.white[25]
+    dragRef.current.style.border = themes.palette.action.selected
+    fileOpenHandler(e.dataTransfer.files)
+    e.preventDefault();
+    e.stopPropagation();
+    e.stopImmediatePropagation();
+  }, [])
+  const initDragEvents = useCallback(() => {
+    if(dragRef.current !== null){
+      dragRef.current.addEventListener("dragenter", handleDragIn);
+      dragRef.current.addEventListener("dragleave", handleDragOut);
+      dragRef.current.addEventListener("dragover", handleDragOver);
+      dragRef.current.addEventListener("drop", handleDrop);
+    }
+  }, [handleDragIn, handleDragOut, handleDragOver, handleDrop])
+
+  const resetDragEvents = useCallback(() => {
+    if(dragRef.current !== null){
+      dragRef.current.addEventListener("dragenter", handleDragIn);
+      dragRef.current.addEventListener("dragleave", handleDragOut);
+      dragRef.current.addEventListener("dragover", handleDragOver);
+      dragRef.current.addEventListener("drop", handleDrop);
+    }
+  }, [handleDragIn, handleDragOut, handleDragOver, handleDrop])
+
+  useEffect(() => {
+    initDragEvents();
+    return () => resetDragEvents();
+  }, [initDragEvents, resetDragEvents])
+
+  ////////////////////////////////////////////////////////////////
   
   return (
-      <div className={classes.wrap}>
+      <div className={classes.wrap} ref={dragRef}>
           <PersistentDrawerRight
             id="show"
             open={drawerOpen} onDrawerResize={onDrawerResize}

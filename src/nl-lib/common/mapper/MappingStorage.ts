@@ -760,9 +760,10 @@ function storageAvailable(type) {
 // https://www.bsidesoft.com/1426 , [js] localStorage 키별 용량 제약 처리
 // 이것 참고해서 더 수정할 것
 
-(function () {
-  const msi = MappingStorage.getInstance();
-  msi.loadMappingInfo();
+// (function () {
+  // await new Promise(resolve => setTimeout(resolve, 10));
+  // const msi = MappingStorage.getInstance();
+  // msi.loadMappingInfo();
 
   // https://developer.chrome.com/docs/apps/offline_storage/#query ==> enter
 
@@ -809,7 +810,7 @@ function storageAvailable(type) {
   //   function (e) { console.log('Error', e); }
   // );
 
-})();
+// })();
 
 
 

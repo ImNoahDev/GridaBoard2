@@ -6,12 +6,11 @@ import { RootState } from "./store/rootReducer";
 import { g_availablePagesInSection, nullNcode } from "nl-lib/common/constants";
 import { NeoPdfDocument, IPdfOpenOption, NeoPdfManager, PdfManagerEventName, IPdfManagerEvent } from "nl-lib/common/neopdf";
 import { IPdfToNcodeMapItem, IPageSOBP, IGetNPageTransformType } from "nl-lib/common/structures";
-import { isSamePage, makeNPageIdStr } from "nl-lib/common/util";
+import { isPlatePage, isSamePage, makeNPageIdStr, scrollToThumbnail } from "nl-lib/common/util";
 
 
 import { InkStorage } from "nl-lib/common/penstorage";
 import { MappingStorageEventName, IMappingStorageEvent, MappingStorage } from "nl-lib/common/mapper";
-import { scrollToBottom } from "nl-lib/common/util";
 import getText from "./language/language";
 
 
@@ -121,13 +120,13 @@ export default class GridaDoc {
 
     if (pdfDoc) {
       let activePageNo = await this.appendPdfDocument(pdfDoc, pageInfo, basePageInfo);
-      scrollToBottom("drawer_content");
 
       if (activePageNo === -1) {
         const state = store.getState() as RootState;
         activePageNo = state.activePage.activePageNo;
       }
       this.setActivePageNo(activePageNo);
+      scrollToThumbnail(activePageNo)
     }
   }
 
@@ -136,10 +135,8 @@ export default class GridaDoc {
     const pdfDoc = await NeoPdfManager.getInstance().getGrida({ url: option.url, filename: option.filename, purpose: "open pdf by GridaDoc" }, gridaRawData, neoStroke);
 
     if (pdfDoc) {
-      const found = this._pdfd.find(item => item.fingerprint === pdfDoc.fingerprint);
-      if (!found) {
-        this._pages = [];
-      }
+      this._pages = [];
+
       let activePageNo = await this.appendPdfDocumentForGrida(pdfDoc, pageInfos, basePageInfos); //이 안에서 doc에 pages를 넣어줌
       
       if (activePageNo === -1) {
@@ -150,8 +147,8 @@ export default class GridaDoc {
       }
 
       
-      scrollToBottom("drawer_content");
       this.setActivePageNo(activePageNo);
+      scrollToThumbnail(activePageNo)
 
       const msi = MappingStorage.getInstance();
       msi.dispatcher.dispatch(MappingStorageEventName.ON_MAPINFO_REFRESHED, null);
@@ -384,6 +381,7 @@ export default class GridaDoc {
           const activePageNo = this.addNcodePage(pageInfo);
           setDocNumPages(this._pages.length);
           setActivePageNo(activePageNo);
+          scrollToThumbnail(activePageNo)
           break;
         }
       }
@@ -467,4 +465,12 @@ export default class GridaDoc {
     if (pageNo < this.numPages) return this._pages[pageNo].basePageInfo;
     return undefined;
   }
+}
+
+export const addBlankPage = async () => {
+  const doc = GridaDoc.getInstance();
+  const pageNo = await doc.addBlankPage();
+  setActivePageNo(pageNo);
+
+  return pageNo;
 }

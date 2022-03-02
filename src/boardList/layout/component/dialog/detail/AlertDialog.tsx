@@ -11,9 +11,10 @@ import getText from "GridaBoard/language/language";
 import { InkStorage } from "nl-lib/common/penstorage";
 import { PageEventName } from "nl-lib/common/enums";
 import { changeGroup, showSnackbar } from "GridaBoard/store/reducers/listReducer";
-import { showMessageToast } from "GridaBoard/store/reducers/ui";
+import { setleftDrawerOpen, showMessageToast } from "GridaBoard/store/reducers/ui";
 import { showCalibrationDialog } from "../../../../../GridaBoard/store/reducers/calibrationReducer";
 import { makePdfUrl } from "../../../../../nl-lib/common/util";
+import { store } from "GridaBoard/client/pages/GridaBoard";
 
 const confirmText = getText('print_popup_yes');
 const cancelText = getText('print_popup_no');
@@ -59,6 +60,15 @@ const dialogTypes = {
   }
 }
 
+export const onClearPage = () => {
+  const doc = GridaDoc.getInstance();
+  const activePageNo = store.getState().activePage.activePageNo;
+  const pageInfo = doc.getPage(activePageNo).pageInfos[0];
+  const inkStorage = InkStorage.getInstance();
+  inkStorage.dispatcher.dispatch(PageEventName.PAGE_CLEAR, pageInfo);
+  inkStorage.removeStrokeFromPage(pageInfo);
+}
+
 interface Props extends  DialogProps {
   type ?: string
   closeEvent ?: (isChange:boolean)=>void
@@ -75,7 +85,7 @@ const AlertDialog = (props : Props)=>{
   const selectedData = dialogTypes[type];
   console.log(selectedData);
 
-  let subText = selectedData.sub;
+  const subText = selectedData.sub;
 
   if(type == "deleteDoc"){
     let count = 1;
@@ -143,16 +153,14 @@ const AlertDialog = (props : Props)=>{
       case "deletePage" : {
         if (activePageNo === -1) return ;
         await GridaDoc.getInstance().removePages(activePageNo);
+        if(GridaDoc.getInstance()._pages.length === 0){
+          setleftDrawerOpen(true);
+        }
         showMessageToast(getText("page_deleted"));
         break;
       }
       case "clearPage" : {
-        const doc = GridaDoc.getInstance();
-        const pageInfo = doc.getPage(activePageNo).pageInfos[0];
-    
-        const inkStorage = InkStorage.getInstance();
-        inkStorage.dispatcher.dispatch(PageEventName.PAGE_CLEAR, pageInfo);
-        inkStorage.removeStrokeFromPage(pageInfo);
+        onClearPage();
         break;
       }
       case "deleteGroup" : {

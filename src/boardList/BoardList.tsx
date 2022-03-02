@@ -13,14 +13,14 @@ import * as neolabTheme from 'GridaBoard/theme';
 import Header from './layout/Header';
 import Leftside from './layout/Leftside';
 import MainContent from './layout/MainContent';
-import { setDate, setDocName, setIsNewDoc } from '../GridaBoard/store/reducers/docConfigReducer';
+import { setDate, setDocId, setDocName, setIsNewDoc } from '../GridaBoard/store/reducers/docConfigReducer';
 import { RootState } from '../GridaBoard/store/rootReducer';
 import { showGroupDialog, hideGroupDialog, changeGroup } from 'GridaBoard/store/reducers/listReducer';
 import CombineDialog from './layout/component/dialog/CombineDialog';
 import { getCategoryArray } from "./BoardListPageFunc2";
 import GlobalDropdown from './layout/component/GlobalDropdown';
 import { setDefaultCategory, getDatabase } from "./BoardListPageFunc2"
-import { getTimeStamp } from './BoardListPageFunc';
+import { getTimeStamp, resetGridaBoard } from './BoardListPageFunc';
 import LoadingCircle from "GridaBoard/Load/LoadingCircle";
 import { setLoadingVisibility } from 'GridaBoard/store/reducers/loadingCircle'
 import { forceUpdateBoardList } from '../GridaBoard/store/reducers/appConfigReducer';
@@ -75,6 +75,7 @@ const BoardList = () => {
   const isShowDialog = useSelector((state: RootState) => state.list.dialog.show);
   const isShowDropdown = useSelector((state: RootState) => state.list.dropDown.show);
   const isCategoryChange = useSelector((state: RootState) => state.list.isChange.group);
+  const selectedCategory = useSelector((state: RootState) => state.list.dialog.selected);
   
   const categoryChange = async ()=>{
     const dataArr = await getCategoryArray();
@@ -86,11 +87,17 @@ const BoardList = () => {
     if(!isNaN(Number(category)) && Number(category) >= dataArr.length){
       setCategory((dataArr.length-1).toString());
     }
-
+    if(selectedCategory){
+      if(!isNaN(Number(selectedCategory[3])) && dataArr[selectedCategory[3]][1] === -1){
+        setCategory("0");
+      }
+    }
+    
     setDocsObj({
       ...docsObj,
       category: dataArr,
     });
+    dispatch(forceUpdateBoardList());
   }
   
   useEffect(()=>{
@@ -140,6 +147,7 @@ const BoardList = () => {
  
 
   const routeChange = async idx => {
+    await resetGridaBoard();
     const nowDocs = docsObj.docs[idx];
     if (nowDocs.dateDeleted !== 0) {
       return;
@@ -221,6 +229,7 @@ const BoardList = () => {
         );
         
         setDocName(nowDocs.doc_name);
+        setDocId(nowDocs.docId);
         setIsNewDoc(false);
 
         const m_sec = getTimeStamp(nowDocs.created)

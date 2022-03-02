@@ -532,6 +532,12 @@ class MixedPageView_module extends React.Component<MixedViewProps, State>  {
         case "note":
         default: {
           const size = getNPaperSize_pu(pageInfo);
+          if (this.props.rotation === 90 || this.props.rotation === 270) {
+            const tmpWidth = size.width;
+            size.width = size.height;
+            size.height = tmpWidth;
+          }
+
           this._internal.pdfSize = { ...size };
           console.log(`PDF SIZE: ${size.width}, ${size.height}`);
 
@@ -548,9 +554,25 @@ class MixedPageView_module extends React.Component<MixedViewProps, State>  {
 
   onCanvasPositionChanged = (arg: { offsetX: number, offsetY: number, zoom: number }) => {
     // console.log(arg);
+    const beforeViewPos = this._internal.viewPos;
     this._internal.viewPos = { ...arg };
-    this.setState({ forceToRenderCnt: this.state.forceToRenderCnt + 1 });
-
+    let moveX = 0, moveY = 0;
+    if(this._internal.viewPos.offsetX < 0){
+      moveX = -1 * this._internal.viewPos.offsetX;
+      this._internal.viewPos.offsetX = 0;
+    }
+    if(this._internal.viewPos.offsetY < 0){
+      moveY = -1 * this._internal.viewPos.offsetY;
+      this._internal.viewPos.offsetY = 0;
+    }
+    if (this.props.isMainView) {
+      document.querySelector(`#main`).scroll(moveX, moveY);
+    }
+    
+    if(beforeViewPos.offsetX !== this._internal.viewPos.offsetX || beforeViewPos.offsetY !== this._internal.viewPos.offsetY || beforeViewPos.zoom !== this._internal.viewPos.zoom){
+      this.setState({ forceToRenderCnt: this.state.forceToRenderCnt + 1 });
+    }
+      
     if (this.props.isMainView) {
       setZoomStore(arg.zoom);
     }

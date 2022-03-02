@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
 import { Button, ButtonProps } from '@material-ui/core';
-import { IFileBrowserReturn } from '../../nl-lib/common/structures';
+import { IFileBrowserReturn } from 'nl-lib/common/structures';
 import getText from "../language/language";
 import CloudConvert from 'cloudconvert';
 import { setLoadingVisibility } from '../store/reducers/loadingCircle';
 import GridaDoc from "../GridaDoc";
-import { InkStorage } from '../../nl-lib/common/penstorage';
+import { InkStorage } from 'nl-lib/common/penstorage';
 import { useHistory } from 'react-router';
-import { scrollToBottom } from '../../nl-lib/common/util';
-import { setDocName } from '../store/reducers/docConfigReducer';
+import { scrollToBottom, sleep } from 'nl-lib/common/util';
+import { setDocName, setIsNewDoc } from '../store/reducers/docConfigReducer';
 
 // import {fileConvert} from "./LoadGrida";
 
@@ -31,12 +31,22 @@ interface cloudImportResponse {
 
 interface Props extends ButtonProps {
   handlePdfOpen: (event: IFileBrowserReturn) => void,
+  isNewLoad?: Boolean
 }
 // 그리다 파일을 불러왔을때 이용
-function fileConvert(selectedFile){
+async function fileConvert(selectedFile){
   if (selectedFile.result === "success") {
     const file = selectedFile.file;
     const reader = new FileReader();
+    const doc = GridaDoc.getInstance();
+    
+    if(doc._pages.length !== 0){
+      // 기존에 사용하던게 있으면
+      if(!confirm(getText("toBoardList_sub"))){
+        setLoadingVisibility(false);
+        return ;
+      }
+    }
 
     let url = selectedFile.url;
     let jsonFile = null;
@@ -118,7 +128,7 @@ const checkPdfIsEncryptted = (selectedFile) => {
 
 const ConvertFileLoad = (props: Props) => {
   const [canConvert, setCanConvert] = useState(true);
-  const { handlePdfOpen } = props;
+  const { handlePdfOpen, isNewLoad } = props;
   const history = useHistory();
 
   async function inputChange()
@@ -142,14 +152,28 @@ const ConvertFileLoad = (props: Props) => {
     
     const fileType = fullFileName.substring(foundPosArr[foundPosArr.length - 1] + 1, fullFileName.length);
     fullFileName = fullFileName.substring(0, foundPosArr[foundPosArr.length - 1]);
-    setDocName(fullFileName);
+    if(isNewLoad){
+      setDocName(fullFileName);
+      setIsNewDoc(true);
+    }
 
+    if(!(fileType === "pdf" || fileType === "grida")) {
+      if(inputer.files[0].name[0] === "." || fullFileName.search(/[^a-zA-Z0-9가-힇ㄱ-ㅎㅏ-ㅣぁ-ゔァ-ヴー々〆〤一-龥0-9.+_\- .]/g) !== -1){
+        if(isNewLoad){
+          history.replace(`/list`);
+        }
+        alert(getText("alert_wrongFileName"));
+        return;
+      }
+    }
+    
     const result = {
       result : "success",
       file : null,
       url : null
     };
     setLoadingVisibility(true);
+    await sleep(10);
     if(fileType == "pdf" || fileType == "grida"){
       result.file = inputer.files[0];
       result.url = URL.createObjectURL(result.file);
@@ -169,43 +193,60 @@ const ConvertFileLoad = (props: Props) => {
     if(!canConvert) return ;
     
     //converting을 기다려야 하기 때문에 로딩 서클 켜주기
-
+    
     //cloudconvert에 업로드 할 수 있는 위치 및 시그니처 받기
     const res = await fetch("https://api.cloudconvert.com/v2/import/upload", {
-        method: "POST",
-        headers : {
-            "Authorization" : "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiIxIiwianRpIjoiNDNiZDVkZGIxNDMyNzAyNWQ0MzExMjJlYWY3ODc2M2FiNTZmMTJhNzBlYWQ4ZjgzM2YzNGYxODZhNTU4ZWM1MDkwM2Q3MmY5NWIyMWM1MGIiLCJpYXQiOiIxNjE3MjYxMDQ4LjY1NTQ4OCIsIm5iZiI6IjE2MTcyNjEwNDguNjU1NDkwIiwiZXhwIjoiNDc3MjkzNDY0OC42MTcwNDUiLCJzdWIiOiI0OTUwMjk4OSIsInNjb3BlcyI6WyJ0YXNrLnJlYWQiLCJ0YXNrLndyaXRlIl19.WgvnklhnmULiHZp5HKuWNlJcaahq7FJbJBMc9T9PqIMSxAovBEi4ikSPMHw4Q1E_ZGkc63Pmp5QZm5oERAWnEILWWu5IQRXDTf7BDWfvPpX0uetiBhqyzPD2WEqwWoLAN6Vc5p0PHcMOkmKDJzNBIyZf7Rrm17wQ0j5CgmwMcc6gO_grnrwTR1-w71rlsPI7YXTc1pTFp0nUgmGDqHOxqdq_u_zeO2HCxoaPqda5kHfEVyTuAjQGG1nyHbkT_tDB1pmk1j-nVShMgDJ5OQl1Rx_81qWHnla3JEHAo4j03JY3SAXkRQjJGtIi_EvbV7CKDItPuhpWiyxGR-aUMsIUPba03EsyMzudFlBQfviITl-bUqGNDBRMWUyGuR2X8i1hETCDIfyIJCdJuxcXPXtj8jxFXQG7fODc4all6KKwYqxqgz91iE8vwmAuUSsfpwMv__VQLpUqMbk_z0wNFCz2hZ4NdcDB52IqIPJcqCV32WKOkNRRpn6cVZy-6wboaU0oYnv1YvlnnZ1NTjykO8Hu8Sxs1yDmJmSous17g9i01vysA5XcT1HqIGV0Q7eCzov73ICZ_Sa-tbavLyrxUwWtSEhAPLAaTPCkRKW47oyaMdA9AaFIoxbPfD6eIBla11P3IKbQgAWmSefa-UWp8lPq2HkQBmRKHItdgejtTW7sfx0",
-            "Content-type": "application/json"
-        }
+      method: "POST",
+      headers : {
+        "Authorization" : "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiIxIiwianRpIjoiNDNiZDVkZGIxNDMyNzAyNWQ0MzExMjJlYWY3ODc2M2FiNTZmMTJhNzBlYWQ4ZjgzM2YzNGYxODZhNTU4ZWM1MDkwM2Q3MmY5NWIyMWM1MGIiLCJpYXQiOiIxNjE3MjYxMDQ4LjY1NTQ4OCIsIm5iZiI6IjE2MTcyNjEwNDguNjU1NDkwIiwiZXhwIjoiNDc3MjkzNDY0OC42MTcwNDUiLCJzdWIiOiI0OTUwMjk4OSIsInNjb3BlcyI6WyJ0YXNrLnJlYWQiLCJ0YXNrLndyaXRlIl19.WgvnklhnmULiHZp5HKuWNlJcaahq7FJbJBMc9T9PqIMSxAovBEi4ikSPMHw4Q1E_ZGkc63Pmp5QZm5oERAWnEILWWu5IQRXDTf7BDWfvPpX0uetiBhqyzPD2WEqwWoLAN6Vc5p0PHcMOkmKDJzNBIyZf7Rrm17wQ0j5CgmwMcc6gO_grnrwTR1-w71rlsPI7YXTc1pTFp0nUgmGDqHOxqdq_u_zeO2HCxoaPqda5kHfEVyTuAjQGG1nyHbkT_tDB1pmk1j-nVShMgDJ5OQl1Rx_81qWHnla3JEHAo4j03JY3SAXkRQjJGtIi_EvbV7CKDItPuhpWiyxGR-aUMsIUPba03EsyMzudFlBQfviITl-bUqGNDBRMWUyGuR2X8i1hETCDIfyIJCdJuxcXPXtj8jxFXQG7fODc4all6KKwYqxqgz91iE8vwmAuUSsfpwMv__VQLpUqMbk_z0wNFCz2hZ4NdcDB52IqIPJcqCV32WKOkNRRpn6cVZy-6wboaU0oYnv1YvlnnZ1NTjykO8Hu8Sxs1yDmJmSous17g9i01vysA5XcT1HqIGV0Q7eCzov73ICZ_Sa-tbavLyrxUwWtSEhAPLAaTPCkRKW47oyaMdA9AaFIoxbPfD6eIBla11P3IKbQgAWmSefa-UWp8lPq2HkQBmRKHItdgejtTW7sfx0",
+        "Content-type": "application/json"
+      }
     });
-
+    
     const responJson:cloudImportResponse = await res.json();
-
+    
     //전송할 form 데이터 생성
     // const inputer = document.getElementById("fileForconvert") as HTMLInputElement;
     const formData = new FormData();
-
+    
     for(const key in responJson.data.result.form.parameters){
-        formData.set(key, responJson.data.result.form.parameters[key]);
+      formData.set(key, responJson.data.result.form.parameters[key]);
     }
+
+
+    // const testArrayBuffer = new Uint8Array(await inputer.files[0].arrayBuffer());
+    
+    // const names = inputer.files[0].name.split(".");
+    // const fileType = names[names.length-1];
+    
+    // const file = new File([testArrayBuffer], "temp." + fileType, {
+    //   type : inputer.files[0].type,
+    //   lastModified : inputer.files[0].lastModified    
+    // });
+    
     formData.set("file", inputer.files[0]);
 
     const xhr = new XMLHttpRequest();
     
     xhr.open("POST" , responJson.data.result.form.url , true);
-    xhr.onreadystatechange = () => {
+    xhr.onreadystatechange = async () => {
+      try{
         if(xhr.readyState == 4){
           const response: HTMLAllCollection = xhr.responseXML.all;
           //전송 완료
           //TODO : 예외처리 해줘야 함
           //어떤 예외처리?? 모르겠음 찾아봐야함 분명 문제 생길듯
-          setTask(response);
+          await setTask(response, inputer.files[0].name);
         }
+      }catch(e){
+        console.log(e);
+        setLoadingVisibility(false);
+      }
     }
     xhr.send(formData);
   } 
 
-  async function setTask(res:HTMLAllCollection){
+  async function setTask(res:HTMLAllCollection, fileName: string){
     //컨버팅 중
       try{
         const subOption = {};
@@ -268,9 +309,8 @@ const ConvertFileLoad = (props: Props) => {
             //모든게 괜찮을 경우 open
             const url = job.tasks[0].result.files[0].url;
             console.log(url);
-      
             const doc = GridaDoc.getInstance();
-            await doc.openPdfFile({ url: url, filename: job.tasks[0].result.files[0].filename });
+            await doc.openPdfFile({ url: url, filename: fileName});
           }  
         }
       }catch(e){

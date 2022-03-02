@@ -3,7 +3,7 @@ import { fabric } from 'fabric';
 
 import RenderWorkerBase, { IRenderWorkerOption } from './RenderWorkerBase';
 
-import { callstackDepth, drawPath, drawPath_arr, makeNPageIdStr, isSamePage, uuidv4, drawPath_chiselNip, isSameNcode } from 'nl-lib/common/util';
+import { callstackDepth, drawPath, drawPath_arr, makeNPageIdStr, isSamePage,isPlatePage, uuidv4, drawPath_chiselNip, isSameNcode } from 'nl-lib/common/util';
 import { IBrushType, PenEventName } from 'nl-lib/common/enums';
 import { IPoint, NeoStroke, NeoDot, IPageSOBP, INeoStrokeProps, StrokeStatus, ISize, TransformParameters } from 'nl-lib/common/structures';
 import { INeoSmartpen, IPenToViewerEvent } from 'nl-lib/common/neopen';
@@ -13,12 +13,11 @@ import { adjustNoteItemMarginForFilm, getNPaperInfo, isPUI } from "nl-lib/common
 import { MappingStorage } from 'nl-lib/common/mapper/MappingStorage';
 import { calcRevH } from 'nl-lib/common/mapper/CoordinateTanslater';
 import { applyTransform } from 'nl-lib/common/math/echelon/SolveTransform';
-import { nullNcode, PlateNcode_1, PlateNcode_2, PU_TO_NU } from 'nl-lib/common/constants';
+import { nullNcode, PU_TO_NU } from 'nl-lib/common/constants';
 
 import GridaDoc from 'GridaBoard/GridaDoc';
 import { setActivePageNo } from 'GridaBoard/store/reducers/activePageReducer';
 import { store } from "GridaBoard/client/pages/GridaBoard";
-
 const NUM_HOVER_POINTERS = 6;
 const DFAULT_BRUSH_SIZE = 10;
 const REMOVE_HOVER_POINTS_INTERVAL = 50; // 50ms
@@ -221,12 +220,11 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
     }
 
     let isPlate = false;
-    if (isSamePage(PlateNcode_1, pageInfo) || isSamePage(PlateNcode_2, pageInfo)) {
+    if (isPlatePage(pageInfo)) {
       isPlate = true;
     }
 
     const dot = event.dot;
-
 
     let pt;
     if (!isPlate && !isSamePage(pageInfo, nullNcode())) {
@@ -242,7 +240,10 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
     const cursor = this.penCursors[event.mac];
     if (pen && pen.penRendererType === IBrushType.ERASER) {
       if (cursor.eraserLastPoint !== undefined) {
-        this.eraseOnLine(cursor.eraserLastPoint.x, cursor.eraserLastPoint.y, dot.point.x, dot.point.y, live.stroke, isPlate);
+        // 문제점: 스트로크가 빠르게 움직이먄 지우개가 제대로 동작하지 않음. -> 빠르게 움직이면 eraserLastPoint와 dot.point의 값이 같게 들어오는데 이를 잡지 못하는 듯
+        if (Math.abs(cursor.eraserLastPoint.x - dot.point.x) > 0.1 && Math.abs(cursor.eraserLastPoint.y - dot.point.y) > 0.1) {
+          this.eraseOnLine(cursor.eraserLastPoint.x, cursor.eraserLastPoint.y, dot.point.x, dot.point.y, live.stroke, isPlate);
+        }
       }
       cursor.eraserLastPoint = { x: dot.point.x, y: dot.point.y };
     } else {
@@ -350,6 +351,9 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
 
       let needThumbnailRedraw = false;
 
+      if (this.pathBoundsNotIncludeEraseLine(pathDataStr, eraserLine)) continue
+
+      // if (this.storage.collisionTest(fabricPath, eraserPath)) {
       if (this.storage.collisionTest(pathDataStr, eraserLine)) {
         this.canvasFb.remove(fabricPath);
         needThumbnailRedraw = true;
@@ -375,6 +379,27 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
         }
       }
     }
+  }
+
+  pathBoundsNotIncludeEraseLine = (pathDataStr, eraserLine) => {
+    const targetPath = new fabric.Path(pathDataStr);
+    const bound = targetPath.getBoundingRect();
+    
+    if 
+    (
+        (eraserLine.x0_pu >= bound.left 
+        && eraserLine.x0_pu <= bound.left+bound.width 
+        && eraserLine.y0_pu >= bound.top 
+        && eraserLine.y0_pu <= bound.top+bound.height) 
+      ||
+        (eraserLine.x1_pu >= bound.left 
+        && eraserLine.x1_pu <= bound.left+bound.width 
+        && eraserLine.y1_pu >= bound.top 
+        && eraserLine.y1_pu <= bound.top+bound.height)
+    )  
+      return false
+        
+    return true
   }
 
   createHoverCursor = (pen: INeoSmartpen) => {
@@ -447,25 +472,68 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
     const noteItem = getNPaperInfo(pageInfo); //plate의 item
     adjustNoteItemMarginForFilm(noteItem, pageInfo);
 
-    const { x, y } = dot;
+    let npaperWidth = noteItem.margin.Xmax - noteItem.margin.Xmin;
+    let npaperHeight = noteItem.margin.Ymax - noteItem.margin.Ymin;
+    let plateMode = ""; //landscape(가로 모드), portrait(세로 모드)
+
+    if(npaperWidth > npaperHeight){
+      plateMode = "landscape";
+    }else{
+      plateMode = "portrait";
+    }
 
     const currentPage = GridaDoc.getInstance().getPage(store.getState().activePage.activePageNo);
 
-    const npaperWidth = noteItem.margin.Xmax - noteItem.margin.Xmin;
-    const npaperHeight = noteItem.margin.Ymax - noteItem.margin.Ymin;
+    let pageMode = ""; //page 기본값의 모드
+
+    if(currentPage.pageOverview.landscape){
+      pageMode = "landscape";
+    }else{
+      pageMode = "portrait";
+    }
+
+    let addedRotation = 0;
+    if(plateMode === pageMode){
+      //둘다 같은 모드면 각도 조절이 필요 없음
+      addedRotation = 0;
+    }else{
+      // if(pageMode === "portrait"){
+        addedRotation = 90;
+      // }
+    }
+    const finalRotation = (addedRotation + currentPage._rotation) % 360;
+     
+    const { x, y } = dot;
+    //좌표 변환 먼저
+    let newX = Math.cos(Math.PI/180 * finalRotation) * x - Math.sin(Math.PI/180 * finalRotation) * y;
+    let newY = Math.sin(Math.PI/180 * finalRotation) * x + Math.cos(Math.PI/180 * finalRotation) * y;
+    if(finalRotation === 90){
+      newX += noteItem.margin.Ymax;
+    }else if(finalRotation === 180){
+      newX += noteItem.margin.Xmax;
+      newY += noteItem.margin.Ymax;      
+    }else if(finalRotation === 270){
+      newY += noteItem.margin.Xmax;
+    }
+
 
     const pageWidth = currentPage.pageOverview.sizePu.width;
     const pageHeight =currentPage.pageOverview.sizePu.height;
+    
+    if(finalRotation === 90 || finalRotation === 270){
+      npaperHeight = noteItem.margin.Xmax - noteItem.margin.Xmin;
+      npaperWidth = noteItem.margin.Ymax - noteItem.margin.Ymin;
+    }
 
     const wRatio = pageWidth / npaperWidth;
     const hRatio = pageHeight / npaperHeight;
     let platePdfRatio = wRatio
     if (hRatio > wRatio) platePdfRatio = hRatio
 
-    const pdf_x = x * platePdfRatio;
-    const pdf_y = y * platePdfRatio;
+    const pdf_x = newX * platePdfRatio;
+    const pdf_y = newY * platePdfRatio;
 
-    return {x: pdf_x, y: pdf_y, f: dot.f};
+    return {x: pdf_x, y: pdf_y, f: dot.f, finalRotation: finalRotation};
   }
 
   movePenTracker = (event: IPenToViewerEvent, pageInfo: IPageSOBP) => {
@@ -476,7 +544,7 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
     }
 
     let isPlate = false;
-    if (isSamePage(PlateNcode_1, pageInfo) || isSamePage(PlateNcode_2, pageInfo)) {
+    if (isPlatePage(pageInfo)) {
       isPlate = true;
     }
 
@@ -531,7 +599,7 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
     const dot = { x: e.event.x, y: e.event.y };
 
     let isPlate = false;
-    if (isSamePage(PlateNcode_1, this.currentPageInfo) || isSamePage(PlateNcode_2, this.currentPageInfo)) {
+    if (isPlatePage(this.currentPageInfo)) {
       isPlate = true;
     }
 
@@ -545,6 +613,8 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
     } else {
       pdf_xy = this.ncodeToPdfXy_plate(dot, this.currentPageInfo);
     }
+
+    hps[NUM_HOVER_POINTERS-1].set({ left: pdf_xy.x, top: pdf_xy.y })
 
     // hover point를 쉬프트해서 옮겨 놓는다
     for (let i = NUM_HOVER_POINTERS - 1; i > 0; i--) {
@@ -569,11 +639,11 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
     cursor.waitCount = 0;
     const self = this;
 
-    cursor.intervalHandle = window.setInterval(() => {
+    cursor.intervalHandle = window.setInterval(function(_cursor){
       const cursor = this.penCursors[e.mac];
       if (!cursor) {
         console.log(`ERROR: pen cursor has not been initiated`);
-        clearInterval(cursor.intervalHandle);
+        clearInterval(_cursor.intervalHandle);
         return;
       }
       const hps = cursor.hoverPoints;
@@ -596,11 +666,24 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
           clearInterval(cursor.intervalHandle);
         }
       }
-    }, REMOVE_HOVER_POINTS_INTERVAL);
+    }.bind(this, cursor), REMOVE_HOVER_POINTS_INTERVAL);
   };
 
   redrawStrokes = (pageInfo: IPageSOBP, isMainView?: boolean) => {
-    if (isSamePage(this.pageInfo, pageInfo) || this.pageInfo === undefined) {
+    const activePageNo = store.getState().activePage.activePageNo;
+    const activePage = GridaDoc.getInstance().getPageAt(activePageNo);
+    if (!activePage) return;
+    const activePageInfo = activePage.pageInfos[0];
+    /**
+     * 현재 문제 this.pageInfo가 undefined로 들아올 때, 아래의 redraw 로직을 타면 첫번째 thumbnail에 직전 작업했던 page의 stroke가 같이 들어감.
+     * 그렇다고 아래의 조건에서 this.pageInfo === undefined를 제외시키면 첫번째 thumbnail stroke의 회전이 제대로 동작하지 않음.
+     * 9c2678e0e3165c42796acabe6b656cededd156d1 커밋 참고
+     * 따라서, this.pageInfo가 undefined로 들어올 때 다른 페이지에서 동작(페이지이동/회전)시 첫번째 썸네일에 stroke가 들어오는 것을 막고,
+     * 첫번째 썸네일 페이지에서 회전시 정상적으로 동작되게 하기 위하여 activePageNo가 0(첫번째 thumbnail)일때만 동작하게 해야함
+     * 추가로, 현재 들어온 pageInfo와 activePageInfo가 같을때만 동작할 수 있도록 조건을 추가(1->0으로 이동시 activePageNo가 0으로 활성화되면서 로직을 타게됨)
+     * 정리: this.pageInfo가 undefined로 들어오면서 작업페이지가 첫번째(0) thumbnail일때만 아래의 로직을 타게 수정하면 된다.
+     */
+    if (isSamePage(this.pageInfo, pageInfo) || (this.pageInfo === undefined && activePageNo === 0 && isSamePage(pageInfo, activePageInfo))) {
       this.removeAllCanvasObject();
       this.resetLocalPathArray();
       this.resetPageDependentData();
@@ -780,6 +863,14 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
     }
   };
 
+  recoveryAllCanvasObject = () => {
+    if (this.localPathArray) {
+      this.localPathArray.forEach(path => {
+        this.canvasFb.add(path);
+      });
+    }
+  }
+
   /**
    * @private
    * @param {Array<NeoStroke>} strokes
@@ -801,7 +892,7 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
     const pointArray = [];
     
     let isPlate = false;
-    if (isSamePage(PlateNcode_1, pageInfo) || isSamePage(PlateNcode_2, pageInfo)) {
+    if (isPlatePage(pageInfo)) {
       isPlate = true;
     }
 
@@ -979,7 +1070,6 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
       originX: 'left',
       originY: 'top',
       selectable: false,
-
       data: STROKE_OBJECT_ID, // neostroke
       evented: true,
       key: key,

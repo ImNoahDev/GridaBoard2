@@ -6,8 +6,11 @@ import { setViewFit } from 'GridaBoard/store/reducers/viewFitReducer';
 import { setZoomStore } from 'GridaBoard/store/reducers/zoomReducer';
 import { setActivePageNo } from 'GridaBoard/store/reducers/activePageReducer';
 import { setPointerTracer } from 'GridaBoard/store/reducers/pointerTracer';
-import GridaDoc from '../GridaDoc';
+import GridaDoc, { addBlankPage } from '../GridaDoc';
 import { InkStorage } from 'nl-lib/common/penstorage';
+import { onToggleRotate } from './buttons/RotateButton';
+import { setHideCanvasMode } from '../store/reducers/gestureReducer';
+import { scrollToThumbnail } from '../../nl-lib/common/util';
 
 
 // 2020-12-09 현재 구현되어 있는 부분까지 PUI 완성(페이지 넘어가는 부분과 스트로크 찍히는 오류 수정할 것)
@@ -160,9 +163,6 @@ export default class PUIController {
    * @param {string} cmd
    */
   static executeCommand(cmd) {
-
-    const page_num = $('#page_input').val() - 1
-
     switch (cmd) {
       case "strokesize_up": {
         let thickness: number = PenManager.getInstance().getThickness();
@@ -307,6 +307,7 @@ export default class PUIController {
           return;
         }
         setActivePageNo(activePageNo-1);
+        scrollToThumbnail(activePageNo-1);
         break;
       }
       case "next": {
@@ -316,6 +317,37 @@ export default class PUIController {
           return;
         }
         setActivePageNo(activePageNo+1);
+        scrollToThumbnail(activePageNo+1);
+        break;
+      }
+      case "add_page" : {
+        const activePageNo = store.getState().activePage.activePageNo;
+        const doc = GridaDoc.getInstance();
+        const currentPage = doc.getPage(activePageNo);
+        const pageNo = doc.addBlankPage();
+
+        let currentRotation = 0;
+        let pageMode = "portrait";
+        if (currentPage) {
+          if (currentPage.pageOverview.landscape) {
+            pageMode = "landscape";
+          }
+          pageMode === "portrait" ? 
+            (currentRotation = (currentPage.pageOverview.rotation + 90) % 360) : 
+            (currentRotation = currentPage.pageOverview.rotation);
+        }
+
+        doc._pages[pageNo]._rotation = (270 + currentRotation) % 360;
+
+        setActivePageNo(pageNo);
+        break;
+      }
+      case "rotate_page" : {
+        onToggleRotate();
+        break;
+      }
+      case "hide_stroke" : {
+        setHideCanvasMode(!store.getState().gesture.hideCanvasMode);
         break;
       }
     }

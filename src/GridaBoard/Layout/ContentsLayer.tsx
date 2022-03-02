@@ -49,6 +49,7 @@ const ContentsLayer = (props: Props) => {
   const [snackbarMsg, setSnackbarMsg] = useState("");
   const [snackbarMsgSuffix, setSnackbarMsgSuffix] = useState("");
   const snackbarType = useSelector((state: RootState) => state.list.snackbar.type);
+  const isShowDialog = useSelector((state: RootState) => state.list.dialog.show);
 
   useEffect(() => {
     switch (snackbarType) {
@@ -101,12 +102,6 @@ const ContentsLayer = (props: Props) => {
     }
   }, [rotationTrigger])
 
-  useEffect(() => {
-    if (activePageNo_store !== activePageNo) {
-      setLocalActivePageNo(activePageNo_store);
-    }
-
-  }, [activePageNo_store])
   
   if (activePageNo_store >= 0) {
     const doc = GridaDoc.getInstance();
@@ -140,10 +135,10 @@ const ContentsLayer = (props: Props) => {
     setOpenSnackbar(false);
   };
 
+
   return (
     <div id="main" className={`${classes.root}`}>
       {(languageType === "ko") ? <InformationButton className={classes.information} tutorialMain={1} tutorialSub={1} /> : ""}
-      
       <div id="mixed-viewer-layer" style={{
         position: "relative",
         height: '100%',

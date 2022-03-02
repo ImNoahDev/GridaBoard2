@@ -6,18 +6,11 @@ import DrawerPages from './DrawerPages';
 import { RootState } from '../../store/rootReducer';
 import { useSelector } from "react-redux";
 import AddIcon from '@material-ui/icons/Add';
-import GridaDoc from '../../GridaDoc';
+import GridaDoc, { addBlankPage } from '../../GridaDoc';
 import { setActivePageNo } from "../../store/reducers/activePageReducer";
 import { scrollToBottom } from '../../../nl-lib/common/util';
 import getText from "../../language/language";
 
-
-const addBlankPage = async (event) => {
-  const doc = GridaDoc.getInstance();
-  const pageNo = await doc.addBlankPage();
-  setActivePageNo(pageNo);
-  scrollToBottom("drawer_content");
-}
 
 const useStyles = props => makeStyles((theme: Theme) => ({
   root: {
@@ -109,6 +102,29 @@ const useStyles = props => makeStyles((theme: Theme) => ({
     float: "left", 
     display: "flex",
     position: "relative"
+  },
+  newPage : {
+    padding: "60px 50px",
+    margin: "10px 24px",
+    background: theme.palette.background.paper,
+    // border: "1px" + theme.palette.primary.main,
+    // borderStyle: "dashed",
+    textAlign: "center",
+    color: theme.palette.primary.main,
+    fontWeight: "bold",
+    fontSize: "30px",
+    cursor: "pointer",
+    "&:hover" : {
+      backgroundColor: "rgba(0, 0, 0, 0.1)"
+    },
+    backgroundImage: `
+      repeating-linear-gradient(0deg, ${theme.palette.primary.main}, ${theme.palette.primary.main} 10px, transparent 10px, transparent 20px, ${theme.palette.primary.main} 20px), 
+      repeating-linear-gradient(90deg, ${theme.palette.primary.main}, ${theme.palette.primary.main} 10px, transparent 10px, transparent 20px, ${theme.palette.primary.main} 20px), 
+      repeating-linear-gradient(180deg, ${theme.palette.primary.main}, ${theme.palette.primary.main} 10px, transparent 10px, transparent 20px, ${theme.palette.primary.main} 20px), 
+      repeating-linear-gradient(270deg, ${theme.palette.primary.main}, ${theme.palette.primary.main} 10px, transparent 10px, transparent 20px, ${theme.palette.primary.main} 20px)`,
+    backgroundSize: "1px 100%, 100% 1px, 1px 100% , 100% 1px",
+    backgroundPosition: "0 0, 0 0, 100% 0, 0 100%",
+    backgroundRepeat: "no-repeat"
   }
 }));
 
@@ -126,6 +142,7 @@ export default function PersistentDrawerRight(props: Props) {
   const classes = useStyles({brZoom:brZoom, drawerWidth:drawerWidth})();
   const theme = useTheme();
   const [open, setOpen] = React.useState(props.open);
+  const numDocPages = useSelector((state: RootState) => state.activePage.numDocPages)
   // const [handleDrawerClose, setHandleDrawerClose] = React.useState(props.handleDrawerClose);
 
   // const [drawerWidth, setDrawerWidth] = React.useState(defaultDrawerWidth);
@@ -145,8 +162,12 @@ export default function PersistentDrawerRight(props: Props) {
       >
       {/* <Toolbar className={classes.customizeToolbar} /> */}
         <div id="drawer_content" className={classes.drawerContainer}>
+          {numDocPages === 0 ? 
+          <div className={classes.newPage} onClick={(e) => addBlankPage()}>
+            <AddIcon />
+          </div> 
+          : null}
           < DrawerPages noInfo={props.noInfo} />
-          <div className={classes.liner}></div>
           
           {/* <div className={classes.drawerFooter} >
             <Button variant="contained" color="primary" onClick={(evnet) => addBlankPage(event)} >

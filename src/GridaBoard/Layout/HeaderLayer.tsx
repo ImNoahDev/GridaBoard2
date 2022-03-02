@@ -177,10 +177,15 @@ interface Props {
   hidden: boolean;
 }
 
-export function fileOpenHandler() {
+export function fileOpenHandler(dndData: any) {
   const input = document.querySelector('#fileForconvert') as HTMLInputElement;
-  input.value = '';
-  input.click();
+  if(dndData === ""){
+    input.value = '';
+    input.click();
+  }else{
+    input.files = dndData;
+    input.dispatchEvent(new Event("change", {bubbles: true}));
+  }
 }
 
 const HeaderLayer = (props: Props) => {
@@ -380,7 +385,7 @@ const HeaderLayer = (props: Props) => {
                 <CustomBadge badgeContent={`Ctrl-O`}>
                   <Button
                     className={`loadDropDown ${classes.buttonStyle} ${classes.buttonFontStyle}`}
-                    onClick={fileOpenHandler}>
+                    onClick={e =>  fileOpenHandler("")}>
                     {getText('load_file')}
                     <ConvertFileLoad handlePdfOpen={handlePdfOpen} />
                   </Button>
@@ -434,7 +439,7 @@ const HeaderLayer = (props: Props) => {
           <KeyboardArrowDownRoundedIcon /> */}
         </div>
       </div>
-      <div style={{ height: '1px', background: 'rgba(255,255,255,1)', zoom: 1 / brZoom }}></div>
+      <div style={{ height: '1px', background: 'rgba(88, 98, 125, 0.15)', zoom: 1 / brZoom }}></div>
     </React.Fragment>
   );
 };

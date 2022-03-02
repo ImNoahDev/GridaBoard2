@@ -61,11 +61,12 @@ export async function makePdfDocument() {
         pdfDoc = await PDFDocument.create();
       }
       const pdfPage = await pdfDoc.addPage();
-      if (page._rotation === 90 || page._rotation === 270) {
-        const tmpWidth = pdfPage.getWidth();
-        pdfPage.setWidth(pdfPage.getHeight());
-        pdfPage.setHeight(tmpWidth);
-      }
+      pdfPage.setRotation(degrees(page._rotation));
+      // if (page._rotation === 90 || page._rotation === 270) {
+      //   const tmpWidth = pdfPage.getWidth();
+        // pdfPage.setWidth(pdfPage.getHeight());
+        // pdfPage.setHeight(tmpWidth);
+      // }
     }
     else {
       //pdf인 경우
@@ -101,10 +102,10 @@ export async function makePdfDocument() {
           }
         } else {
           pdfDoc = pdfDocSrc;
-          pdfDoc.getPages()[i++].setRotation(degrees(page._rotation));
+          pdfDoc.getPages()[i++].setRotation(degrees((page._rotation)%360));
         }
       } else {
-        pdfDoc.getPages()[i++].setRotation(degrees(page._rotation));
+        pdfDoc.getPages()[i++].setRotation(degrees((page._rotation)%360));
         continue;
       }
     }
@@ -148,16 +149,16 @@ export async function addStrokesOnPage(pdfDoc) {
 
 export function addStroke(page: PDFPage, NeoStrokes: NeoStroke[], isPdf: boolean) {
   const pageHeight = page.getHeight();
-
+  
   for (let j = 0; j < NeoStrokes.length; j++) {
     const thickness = NeoStrokes[j].thickness;
     const brushType = NeoStrokes[j].brushType;
     const dotArr = NeoStrokes[j].dotArray;
     const rgbStrArr = NeoStrokes[j].color.match(/\d+/g);
-    const stroke_h = NeoStrokes[j].h;
+    // const stroke_h = NeoStrokes[j].h;
     const stroke_h_origin = NeoStrokes[j].h_origin;
-    const { a, b, c, d, e, f, g, h } = stroke_h;
-    const { a: a0, b: b0, c: c0, d: d0, e: e0, f: f0, g: g0, h: h0 } = stroke_h_origin;
+    // const { a, b, c, d, e, f, g, h } = stroke_h;
+    // const { a: a0, b: b0, c: c0, d: d0, e: e0, f: f0, g: g0, h: h0 } = stroke_h_origin;
     let opacity = 1;
     if (NeoStrokes[j].brushType === 1) {
       opacity = 0.3;
@@ -168,43 +169,107 @@ export function addStroke(page: PDFPage, NeoStrokes: NeoStroke[], isPdf: boolean
     if (NeoStrokes[j].isPlate) {
       pageInfo = { section: NeoStrokes[j].plateSection, owner: NeoStrokes[j].plateOwner, book: NeoStrokes[j].plateBook, page: NeoStrokes[j].platePage }
       for (let k = 0; k < dotArr.length; k++) {
+        const dot = dotArr[k];
         const noteItem = getNPaperInfo(pageInfo); //plate의 item
         adjustNoteItemMarginForFilm(noteItem, pageInfo);
     
-        const currentPage = GridaDoc.getInstance().getPage(store.getState().activePage.activePageNo);
+        let npaperWidth = noteItem.margin.Xmax - noteItem.margin.Xmin;
+        let npaperHeight = noteItem.margin.Ymax - noteItem.margin.Ymin;
+        let plateMode = ""; //landscape(가로 모드), portrait(세로 모드)
     
-        const npaperWidth = noteItem.margin.Xmax - noteItem.margin.Xmin;
-        const npaperHeight = noteItem.margin.Ymax - noteItem.margin.Ymin;
+        if(npaperWidth > npaperHeight){
+          plateMode = "landscape";
+        }else{
+          plateMode = "portrait";
+        }
     
-        const pageWidth = currentPage.pageOverview.sizePu.width;
-        const pageHeight =currentPage.pageOverview.sizePu.height;
+        const pageSize = page.getSize()
+    
+        let pageMode = ""; //page 기본값의 모드
+    
+        if(pageSize.width > pageSize.height){
+          pageMode = "landscape";
+        }else{
+          pageMode = "portrait";
+        }
+    
+        let addedRotation = 0;
+        if(plateMode === pageMode){
+          //둘다 같은 모드면 각도 조절이 필요 없음
+          addedRotation = 0;
+        }else{
+          addedRotation = 90;
+        }
+
+        let { x, y } = dot;
+
+        const finalRotation = (addedRotation + 0) % 360;
+        
+        let pageRate = pageSize.width/pageSize.height;
+        const plateRate = npaperWidth/npaperHeight;
+        
+        if(addedRotation === 90) pageRate = 1/pageRate;
+        
+        // plate에 그렸을때 회전각에 따라 버려지는 좌표가 생김. 그 조정을 해줘야 함
+        let addedX = 0, addedY = 0;
+        if(plateRate > pageRate){
+          // 가로 남음
+          addedX = -(npaperWidth - pageRate * npaperHeight);
+        }else{
+          // 세로 남음
+          addedY = -(npaperHeight - npaperWidth / pageRate);
+        }
+        
+        if(dot.point.finalRotation === 90){
+          y += addedY;
+        }else if(dot.point.finalRotation === 180){
+          x += addedX;
+          y += addedY;
+        }else if(dot.point.finalRotation === 270){
+          x += addedX;
+        }
+    
+        //좌표 변환 먼저
+        let newX = Math.cos(Math.PI/180 * finalRotation) * x - Math.sin(Math.PI/180 * finalRotation) * y;
+        const newY = Math.sin(Math.PI/180 * finalRotation) * x + Math.cos(Math.PI/180 * finalRotation) * y;
+        if(finalRotation === 90){
+          newX += noteItem.margin.Ymax;
+        }
+    
+        const pageWidth = pageSize.width;
+        const pageHeight = pageSize.height;
+        
+        if(finalRotation === 90 || finalRotation === 270){
+          npaperHeight = noteItem.margin.Xmax - noteItem.margin.Xmin;
+          npaperWidth = noteItem.margin.Ymax - noteItem.margin.Ymin;
+        }
     
         const wRatio = pageWidth / npaperWidth;
         const hRatio = pageHeight / npaperHeight;
-        let platePdfRatio = wRatio
-        if (hRatio > wRatio) platePdfRatio = hRatio
+        let platePdfRatio = wRatio;
+        if (hRatio > wRatio) platePdfRatio = hRatio;
+        
+        const pdf_x = newX * platePdfRatio;
+        const pdf_y = newY * platePdfRatio;
     
-        const dot = dotArr[k];
-        const pdf_x = dot.x * platePdfRatio;
-        const pdf_y = dot.y * platePdfRatio;
-
         pointArray.push({ x: pdf_x, y: pdf_y, f: dot.f });
       }
     } else {
       if (isPdf) {
         for (let k = 0; k < dotArr.length; k++) {
+          const { a, b, c, d, e, f, g, h } = stroke_h_origin;
           const dot = dotArr[k];
-          const nominator = g0 * dot.x + h0 * dot.y + 1;
-          const px = (a0 * dot.x + b0 * dot.y + c0) / nominator;
-          const py = (d0 * dot.x + e0 * dot.y + f0) / nominator;
+          const nominator = g * dot.x + h * dot.y + 1;
+          const px = (a * dot.x + b * dot.y + c) / nominator;
+          const py = (d * dot.x + e * dot.y + f) / nominator;
           
           const pdf_xy = { x: px, y: py};
 
           pointArray.push({ x: pdf_xy.x, y: pdf_xy.y, f: dot.f });
         }
-        // page.setRotation(degrees(gridaPageObj.rotation));
       } else {
         for (let k = 0; k < dotArr.length; k++) {
+          const { a, b, c, d, e, f, g, h } = stroke_h_origin; //stroke_h;
           const dot = dotArr[k];
           const nominator = g * dot.x + h * dot.y + 1;
           const px = (a * dot.x + b * dot.y + c) / nominator;

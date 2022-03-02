@@ -110,12 +110,13 @@ export class NeoPdfDocument {
     return undefined;
   }
   deletePage = async (pageNo:number)=>{
+    this._pages[pageNo].pageNo = -1;
     this._pages.splice(pageNo,1);
     this._pagesOverview.splice(pageNo,1);
     this._numPages -= 1;
     
     for(let i = pageNo; i < this._numPages; i++){
-      this._pages[0].pageNo -= 1;
+      this._pages[i].pageNo -= 1;
     }
     this.removedPage.push(pageNo);
   }
@@ -378,9 +379,14 @@ export class NeoPdfDocument {
       const page = await this._pdfDoc.getPage(i + 1);
 
       const vpt: PDF_VIEWPORT_DESC = page.getViewport({ scale: 1, rotation: page.rotate });
-      const { width, height } = vpt;
       
-      const landscape = width > height;
+      const { width, height } = vpt;
+      let _LandWidth = width, _LandHeight = height;
+      if(page.rotate === 90 || page.rotate === 270 ){
+        _LandWidth = height, _LandHeight = width;
+      }
+      
+      const landscape = _LandWidth > _LandHeight;
       landscape ? numLandscapePages++ : numPortraitPages++;
 
       const pageOverview = {

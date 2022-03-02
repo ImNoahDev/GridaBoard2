@@ -38,6 +38,10 @@ export default class GridaPage {
     this._pdf = pdf;
     this._pdfPageNo = pdfPageNo;
     this._pdfPage = pdf.getPage(pdfPageNo);
+
+    if (this._pdf.pagesOverview[this._pdfPageNo - 1]) {
+      this._rotation = this._pdf.pagesOverview[this._pdfPageNo - 1].rotation;
+    }
     // this._pageToNcodeMap = this._pdfPage.pageToNcodeMap;
   }
 
@@ -98,6 +102,7 @@ export default class GridaPage {
     const pageInfo = this.getPageInfoAt(0);
     // undefined인 경우도 있을 것 같긴하다. 아래의 getNPaperSize_pu에서 예외처리 하고 있다.
     const pageSize = getNPaperSize_pu(pageInfo);
+    const landscape = pageSize.width > pageSize.height;
 
     //ncode 페이지는 NPaperSize_pu 안에서 회전 처리를 안하기 때문에 여기서 따로 바꿔준다
     if (this._rotation === 90 || this._rotation === 270) {
@@ -106,7 +111,6 @@ export default class GridaPage {
       pageSize.height = tmp;
     }
     
-    const landscape = pageSize.width > pageSize.height;
     const retVal: IPageOverview = {
       sizePu: pageSize,
       rotation: this._rotation,

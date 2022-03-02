@@ -78,7 +78,6 @@ export default class GridaApp {
     if (isSameNcode(pageInfo, DefaultPlateNcode) || isSameNcode(pageInfo, DefaultPUINcode) || isPUI(pageInfo)) {
         return;
     }
-
     const msi = MappingStorage.getInstance();
     const found = msi.getNPageTransform(pageInfo);
 
