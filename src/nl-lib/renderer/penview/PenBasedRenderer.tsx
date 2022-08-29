@@ -20,7 +20,7 @@ import {isPlatePaper, isPUI, getNPaperInfo, adjustNoteItemMarginForFilm} from "n
 import {setCalibrationData} from 'GridaBoard/store/reducers/calibrationDataReducer';
 import {store} from "GridaBoard/client/pages/GridaBoard";
 import GridaDoc from "GridaBoard/GridaDoc";
-import { initializeCrossLine, setLeftToRightDiagonal, setRightToLeftDiagonal, setHideCanvasMode, incrementTapCount, initializeTap, setFirstDot, setNotFirstPenDown, showSymbol, hideSymbol, setGestureDisable } from "GridaBoard/store/reducers/gestureReducer";
+import { initializeCrossLine, setLeftToRightDiagonal, setRightToLeftDiagonal, setHideCanvasMode, incrementTapCount, initializeTap, setFirstDot, setIsPageMode, setIsPenMode } from "GridaBoard/store/reducers/gestureReducer";
 import { setActivePageNo } from "GridaBoard/store/reducers/activePageReducer";
 import { onToggleRotate } from "GridaBoard/components/buttons/RotateButton";
 import { hideToastMessage, showMessageToast } from "GridaBoard/store/reducers/ui";
@@ -107,12 +107,9 @@ interface Props { // extends MixedViewProps {
 
   notFirstPenDown: boolean;
   show: boolean;
-  setNotFirstPenDown: any;
-  showSymbol: any;
-  hideSymbol: any;
 
-  gestureDisable: boolean;
-  setGestureDisable: any;
+  isPageMode: boolean;
+  setIsPageMode: any;
 }
 
 /**
@@ -157,6 +154,7 @@ class PenBasedRenderer extends React.Component<Props, State> {
     numDocPages: store.getState().activePage.numDocPages,
   };
 
+  renderCount = 0;
   _renderer: PenBasedRenderWorker;
   // pageInfo = nullNcode();
 
@@ -373,7 +371,9 @@ class PenBasedRenderer extends React.Component<Props, State> {
       this.setState({ numDocPages: storeNumDocPages });
     }
 
-    if ((this.props.rotation !== nextProps.rotation) && isSamePage(this.props.basePageInfo, nextProps.basePageInfo)) {
+    if ((this.props.rotation !== nextProps.rotation && isSamePage(this.props.basePageInfo, nextProps.basePageInfo)) || 
+      (this.props.rotation !== nextProps.rotation && !this.props.isMainView && this.renderCount === 0)
+    ) {
       //회전 버튼을 누를 경우만 들어와야 하는 로직, 회전된 pdf를 로드할 때는 들어오면 안됨
       //로드할 경우에는 this.props의 basePageInfo가 nullNCode로 세팅돼있기 때문에 들어오지 않음
       this.renderer.setRotation(nextProps.rotation, this.pdfSize);
@@ -404,8 +404,6 @@ class PenBasedRenderer extends React.Component<Props, State> {
       this.renderer.onPageSizeChanged(nextProps.pdfSize);
       this.pdfSize = { ...nextProps.pdfSize, scale: this.pdfSize.scale };
 
-      //회전 후 symbol(toast포함)의 display 상태 초기화(안보이도록 처리)
-      hideToastMessage();
       ret_val = true;
     }
 
@@ -452,11 +450,9 @@ class PenBasedRenderer extends React.Component<Props, State> {
         ret_val = true;
 
         /** 페이지 이동했을 때, Symbol을 비롯한 제스처 로직들의 초기화가 이루어져야 한다.
-         *  notFirstPenDown - Symbol 첫 touch를 확인하기 위한 state
          *  & crossLine, doubleTap 관련 state의 초기화
          *  symbol(toast포함)의 display 상태 초기화(안보이도록 처리)
          * */ 
-        this.props.setNotFirstPenDown(false);
         this.props.initializeCrossLine();
         this.props.initializeTap();
         hideToastMessage();
@@ -507,6 +503,7 @@ class PenBasedRenderer extends React.Component<Props, State> {
       }
     }
   
+    this.renderCount++;
     return ret_val;
   }
 
@@ -609,13 +606,19 @@ class PenBasedRenderer extends React.Component<Props, State> {
     if (isPUI(event as IPageSOBP)) {
       isRun = false;
     }
+    if(!store.getState().gesture.isPenMode && event.mac !== PenManager.getInstance().virtualPen.mac){
+      setIsPenMode(true);
+    }else if(store.getState().gesture.isPenMode && event.mac === PenManager.getInstance().virtualPen.mac){
+      setIsPenMode(false);
+    }
+    
 
-    if(event.mac !== PenManager.getInstance().virtualPen.mac && !isPUI(event as IPageSOBP) && !this.props.calibrationMode){ // 가상펜이 아닐 경우
+    if(store.getState().gesture.isPenMode && !isPUI(event as IPageSOBP) && !this.props.calibrationMode){ // 가상펜이 아닐 경우
       const isPlate = isPlatePage(event as IPageSOBP);
-      if(isPlate && this.props.gestureDisable){
-        this.props.setGestureDisable(false);
-      }else if(!isPlate && !this.props.gestureDisable){
-        this.props.setGestureDisable(true);
+      if(isPlate && this.props.isPageMode){
+        this.props.setIsPageMode(false);
+      }else if(!isPlate && !this.props.isPageMode){
+        this.props.setIsPageMode(true);
       }
     }
     /** pdf pageNo를 바꿀 수 있게, container에게 전달한다. */
@@ -626,10 +629,6 @@ class PenBasedRenderer extends React.Component<Props, State> {
       hideToastMessage();
     }
 
-    // (페이지가 refresh 되고) 부기보드를 첫 터치했을때 심볼이 보여지도록 한다. 추가, 회전 후 부기보드를 첫 터치할 때 심볼이 보여지도록 한다.
-    if (isPlatePage(this.props.pageInfo) && !this.props.notFirstPenDown) {
-      this.onSymbolUp();
-    }
   }
 
   onLivePenPageInfo_byStorage = (event: IPenToViewerEvent) => {
@@ -780,6 +779,7 @@ class PenBasedRenderer extends React.Component<Props, State> {
     });
     // Add Blank Page
     this.addBlankPage();
+    console.log("%cADD PAGE : plus button", "color:red;font-size:25px");
   }
 
   onLivePenMove_byStorage = (event: IPenToViewerEvent) => {
@@ -1071,7 +1071,9 @@ class PenBasedRenderer extends React.Component<Props, State> {
     */
     const shiftArray = ['top', 'left', 'bottom', 'right'];
     const shiftEdgeArray = ['top-left', 'bottom-left', 'bottom-right', 'top-right'];
-    const rotateDegree = this.getRotationOnPageMode() / 90;
+    // const rotateDegree = this.getRotationOnPageMode() / 90;
+    const rotateDegree = 0;
+
     let {x,y} = dot;
     if(x < 0){
       x *= -1;
@@ -1176,20 +1178,6 @@ class PenBasedRenderer extends React.Component<Props, State> {
     return pageMode === "portrait" ? (this.props.rotation+90)%360 : this.props.rotation 
   }
 
-  onSymbolUp = () => {
-    // clearTimeout(this.symbolTimer);
-    this.props.setNotFirstPenDown(true);
-    showMessageToast(getText('check_symbol_position'));
-    // this.props.showSymbol();
-    // this.symbolTimer = setTimeout(function() {
-    //   hideSymbol();
-    // }, 10000);
-  }
-
-  onSymbolDown = () => {
-    hideSymbol();
-    hideToastMessage();
-  }
 
   render() {
     let { zoom } = this.props.position;
@@ -1214,21 +1202,6 @@ class PenBasedRenderer extends React.Component<Props, State> {
       zIndex: 10,
     }
 
-    const symbolDiv: CSSProperties = {
-      position: "absolute",
-      left: ([0, 270]).includes(this.getRotationOnPageMode()) ? 20 : "",
-      right: ([90, 180]).includes(this.getRotationOnPageMode()) ? 20 : "",
-      top: ([0, 90]).includes(this.getRotationOnPageMode()) ? 20 : "",
-      bottom: ([180, 270]).includes(this.getRotationOnPageMode()) ? 20 : "",
-      zIndex: 11,
-    }
-
-    const symbolSize: CSSProperties = {
-      fontSize: "32px",
-      color: theme.palette.error.main,
-      opacity: 0.5,
-      visibility: !this.props.gestureDisable && this.props.isMainView ? 'visible' : 'hidden'
-    }
 
     const shadowStyle: CSSProperties = {
       color: "#a20",
@@ -1274,9 +1247,6 @@ class PenBasedRenderer extends React.Component<Props, State> {
 
         <div id={`${this.props.parentName}-fabric_container`} style={inkContainerDiv} >
           <canvas id={this.canvasId} style={inkCanvas} ref={this.setCanvasRef} />
-          <div style={symbolDiv}>
-            <AddCircle style={symbolSize} />
-          </div>
         </div >
 
         {this.state.numDocPages <= 0 ? 
@@ -1331,7 +1301,7 @@ const mapStateToProps = (state) => ({
   show: state.gesture.symbol.show,
   hideCanvasMode: state.gesture.hideCanvasMode,
   gestureMode: state.gesture.gestureMode,
-  gestureDisable: state.gesture.gestureDisable,
+  isPageMode: state.gesture.isPageMode,
   activePageNo: state.activePage.activePageNo
 });
 
@@ -1343,10 +1313,7 @@ const mapDispatchToProps = (dispatch) => ({
   setLeftToRightDiagonal: () => setLeftToRightDiagonal(),
   setRightToLeftDiagonal: () => setRightToLeftDiagonal(),
   initializeCrossLine: () => initializeCrossLine(),
-  setNotFirstPenDown: (bool) => setNotFirstPenDown(bool),
-  showSymbol: () => showSymbol(),
-  hideSymbol: () => hideSymbol(),
-  setGestureDisable: (bool) => setGestureDisable(bool),
+  setIsPageMode: (bool) => setIsPageMode(bool),
   setHideCanvasMode: (bool) => setHideCanvasMode(bool),
   setActivePageNo: no => setActivePageNo(no)
 });

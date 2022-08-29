@@ -13,6 +13,7 @@ import { getNPaperSize_pu } from "nl-lib/common/noteserver";
 import { PLAYSTATE, ZoomFitEnum } from "nl-lib/common/enums";
 import { INeoSmartpen } from "nl-lib/common/neopen";
 import { setZoomStore } from "GridaBoard/store/reducers/zoomReducer";
+import { store } from "GridaBoard/client/pages/GridaBoard";
 
 
 export const ZINDEX_INK_LAYER = 3;
@@ -216,6 +217,11 @@ class MixedPageView_module extends React.Component<MixedViewProps, State>  {
     }
     else {
       size = getNPaperSize_pu(props.pageInfo);
+      if(props.rotation === 90 || props.rotation === 270){
+        const temp = size.width;
+        size.width = size.height;
+        size.height = temp;
+      }
     }
     const pdfSize = { ...size };
 
@@ -265,7 +271,14 @@ class MixedPageView_module extends React.Component<MixedViewProps, State>  {
 
     let size;
     if (this.props.pdf) size = this.props.pdf.getPageSize(this.props.pdfPageNo);
-    else size = getNPaperSize_pu(this.props.pageInfo);
+    else{
+      size = getNPaperSize_pu(this.props.pageInfo);
+      if(this.props.rotation === 90 || this.props.rotation === 270){
+        const temp = size.width;
+        size.width = size.height;
+        size.height = temp;
+      }
+    }
 
     // this.setState({ pdfSize: { ...size }, status: "loaded" });
 
@@ -365,6 +378,7 @@ class MixedPageView_module extends React.Component<MixedViewProps, State>  {
     }
 
     if (this.props.rotation !== nextProps.rotation && this.props.activePageNo === nextProps.activePageNo) {
+      this.setState({ forceToRenderCnt: this.state.forceToRenderCnt + 1 });
       ret_val = true;
     }
 
@@ -566,7 +580,9 @@ class MixedPageView_module extends React.Component<MixedViewProps, State>  {
       this._internal.viewPos.offsetY = 0;
     }
     if (this.props.isMainView) {
-      document.querySelector(`#main`).scroll(moveX, moveY);
+      if(store.getState().gesture.isPenMode && store.getState().gesture.isPageMode){
+        document.querySelector(`#grida-main-view`).scroll(moveX, moveY);
+      }
     }
     
     if(beforeViewPos.offsetX !== this._internal.viewPos.offsetX || beforeViewPos.offsetY !== this._internal.viewPos.offsetY || beforeViewPos.zoom !== this._internal.viewPos.zoom){
@@ -595,6 +611,7 @@ class MixedPageView_module extends React.Component<MixedViewProps, State>  {
       top: this._internal.viewPos.offsetY / zoom,
       background: "#fff",
     }
+    // PDF 사이즈 문제
 
     // console.log(`MixedViewer: rendering, h=${JSON.stringify(this._internal.h)}`);
     // console.log(this._internal.viewPos);
@@ -613,7 +630,7 @@ class MixedPageView_module extends React.Component<MixedViewProps, State>  {
       isBlankPage = true;
     }
 
-    // console.log(`VIEW SIZE${callstackDepth()} MixedPageView(component): ${this._internal.pdfSize?.width}, ${this._internal.pdfSize?.height}`);
+    // console.log(`VIEW SIZE MixedPageView(component): ${this._internal.pdfSize?.width}, ${this._internal.pdfSize?.height}`);
 
     // const { position, pdfSize, pdfInfo, onNcodePageChanged, onCanvasPositionChanged, ...rest } = this.props;
     return (

@@ -117,7 +117,7 @@ export default class NeoPdfPageView extends Component<PageProps, PageState> {
       this.renderPage(nextState.page, nextState.zoom, nextState.pdfPageNo, nextProps.pdf.fingerprint, rotationChanged);
     }
 
-    if (rotationChanged && nextState.page && nextState.page.pageNo !== -1) { 
+    if (rotationChanged && nextState.page && nextState.page.pageNo !== -1 && nextProps.pdf && this.state.pdf === nextProps.pdf) { 
       nextState.page.viewport.rotation = nextProps.rotation;
       this.renderPage(nextState.page, nextState.zoom, nextState.pdfPageNo, nextProps.pdf.fingerprint, rotationChanged);
     }

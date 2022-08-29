@@ -472,6 +472,69 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
     const noteItem = getNPaperInfo(pageInfo); //plate의 item
     adjustNoteItemMarginForFilm(noteItem, pageInfo);
 
+    //Ncode
+    const npaperWidth = noteItem.margin.Xmax - noteItem.margin.Xmin;
+    const npaperHeight = noteItem.margin.Ymax - noteItem.margin.Ymin;
+    
+    const viewWidth = document.querySelector("#grida-main-view").clientWidth;
+    const viewHeight = document.querySelector("#grida-main-view").clientHeight;
+    const viewScrollTop = document.querySelector("#grida-main-view").scrollTop;
+    const viewScrollLeft = document.querySelector("#grida-main-view").scrollLeft;
+    
+    const nowPageWidth = document.querySelector("#grida-main-home-fabric_container").clientWidth;
+    const nowPageHeight = document.querySelector("#grida-main-home-fabric_container").clientHeight;
+
+    
+    const wRatio = viewWidth / npaperWidth;
+    const hRatio = viewHeight / npaperHeight;
+    
+    let nCodeRatio = wRatio;
+    if (hRatio > wRatio){
+      nCodeRatio = hRatio;
+    }
+
+
+
+    //좌표 변환 먼저(화면에 보이는 px 계산)
+    const { x, y } = dot;
+    let newX = x * nCodeRatio + viewScrollLeft;
+    let newY = y * nCodeRatio + viewScrollTop;
+
+    if(nowPageWidth < viewWidth){
+      // 좌우 여백 생김
+      // viewScrollLeft 는 0일것
+      const leftMargin = (viewWidth - nowPageWidth)/2;
+      newX -= leftMargin;
+    }
+    if(nowPageHeight < viewHeight){
+      // 상하 여백 생김
+      // viewScrollTop 는 0일것
+      const TopMargin = (viewHeight - nowPageHeight)/2;
+      newY -= TopMargin;
+    } 
+
+
+    //zoom 적용(실제 px로 만듬)
+    const zoom = store.getState().zoomReducer.zoom;
+    newX /= zoom;
+    newY /= zoom;
+
+
+    // const currentPage = GridaDoc.getInstance().getPage(store.getState().activePage.activePageNo);
+    
+    // const pageWidth = currentPage.pageOverview.sizePu.width;
+    // const pageHeight = currentPage.pageOverview.sizePu.height;
+    
+
+    // const pdf_x = newX * platePdfRatio;
+    // const pdf_y = newY * platePdfRatio;
+
+    return {x: newX, y: newY, f: dot.f};
+  }
+  ncodeToPdfXy_plate_temp = (dot: {x, y, f?}, pageInfo: IPageSOBP) => {
+    const noteItem = getNPaperInfo(pageInfo); //plate의 item
+    adjustNoteItemMarginForFilm(noteItem, pageInfo);
+
     let npaperWidth = noteItem.margin.Xmax - noteItem.margin.Xmin;
     let npaperHeight = noteItem.margin.Ymax - noteItem.margin.Ymin;
     let plateMode = ""; //landscape(가로 모드), portrait(세로 모드)
@@ -931,24 +994,15 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
       });
     } else { //plate인 경우. 이미 변환된 dot.point
       if (isMainView) {
+        //여기 들어오는 경우는 isMainView가 parameter로 들어오는 경우니까 PenBasedRenderer에서 회전 버튼을 눌러 redrawStrokes가 호출되는 경우 뿐. 90으로 고정해놔도 문제없을듯
+        
         dotArray.forEach(dot => {
-          const radians = fabric.util.degreesToRadians(90) 
-          //여기 들어오는 경우는 isMainView가 parameter로 들어오는 경우니까 PenBasedRenderer에서 회전 버튼을 눌러 redrawStrokes가 호출되는 경우 뿐. 90으로 고정해놔도 문제없을듯
-          
-          //180, 0도로 갈 때는 src, dst를 바꿔줘야하지 않나? 일단 정상동작하니 이대로
-          const canvasCenterSrc = new fabric.Point(this._opt.pageSize.width/2, this._opt.pageSize.height/2)
-          const canvasCenterDst = new fabric.Point(this._opt.pageSize.height/2, this._opt.pageSize.width/2)
-
-          // 1. subtractEquals
-          dot.point.x -= canvasCenterSrc.x;
-          dot.point.y -= canvasCenterSrc.y;
-
-          // 2. rotateVector
-          const v = fabric.util.rotateVector(dot.point, radians);
-
-          // 3. addEquals
-          v.x += canvasCenterDst.x;
-          v.y += canvasCenterDst.y;
+          const v = platePointRotate90({
+            pageWidth : this._opt.pageSize.width,
+            pageHeight : this._opt.pageSize.height,
+            pointX : dot.point.x,
+            pointY : dot.point.y
+          })
 
           dot.point.x = v.x;
           dot.point.y = v.y;
@@ -1099,6 +1153,7 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
 
     if (this.pageInfo === undefined) {
       const pageNo = await GridaDoc.getInstance().addBlankPage();
+      console.log("%cADD PAGE : 마우스 클릭..?", "color:red;font-size:25px");
       setActivePageNo(pageNo);
     }
     const { section, owner, book, page } = this.pageInfo;
@@ -1163,11 +1218,12 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
   };
 
   onPageSizeChanged = (pageSize: { width: number; height: number }) => {
+    
     this._opt.pageSize = { ...pageSize };
     if (this.pageInfo === undefined || this.pageInfo.section === undefined) return false;
 
     console.log(
-      `VIEW SIZE${callstackDepth()} onPageSizeChanged ${makeNPageIdStr(this.pageInfo)}: ${pageSize.width}, ${pageSize.height} = ${pageSize.width / pageSize.height
+      `VIEW SIZE${callstackDepth()} onPageSizeChanged canvas-${this._opt.canvasId} ${makeNPageIdStr(this.pageInfo)}: ${pageSize.width}, ${pageSize.height} = ${pageSize.width / pageSize.height
       }`
     );
     const zoom = this.calcScaleFactor(this._opt.viewFit, this.offset.zoom);
@@ -1178,4 +1234,36 @@ export default class PenBasedRenderWorker extends RenderWorkerBase {
     // this.onViewSizeChanged(this._opt.viewSize);
     return true;
   };
+}
+
+
+export const platePointRotate90 = (opt : {
+  pageWidth : number;
+  pageHeight : number;
+  pointX : number;
+  pointY : number;
+})=>{
+  const radians = fabric.util.degreesToRadians(90);
+  const point = {
+    x : opt.pointX,
+    y : opt.pointY
+  };
+
+  console.log(opt.pageWidth, opt.pageHeight)
+
+  const canvasCenterSrc = new fabric.Point(opt.pageWidth/2, opt.pageHeight/2)
+  const canvasCenterDst = new fabric.Point(opt.pageHeight/2, opt.pageWidth/2)
+
+  // 1. subtractEquals
+  point.x -= canvasCenterSrc.x;
+  point.y -= canvasCenterSrc.y;
+
+  // 2. rotateVector
+  const v = fabric.util.rotateVector(point, radians);
+
+  // 3. addEquals
+  v.x += canvasCenterDst.x;
+  v.y += canvasCenterDst.y;
+
+  return v;
 }
