@@ -71,7 +71,7 @@ const useStyle = makeStyles(theme=>({
     fontSize: "12px",
     lineHeight: "14px",
     letterSpacing: "0.25px",
-    
+    textTransform: "none",
     color: theme.palette.text.secondary
   },
   terms: {
@@ -108,29 +108,33 @@ const useStyle = makeStyles(theme=>({
   }
 }))
 
-const UserInfo = (props)=>{
-  const { forwardedRef } = props;
+const UserInfo = ()=>{
   const userData = JSON.parse(localStorage.GridaBoard_userData);
   const classes = useStyle();
   // default_user_img
-  const userImg = userData.photoURL === null ? "/default_user_img.png" : userData.photoURL;
-  const logout = () => {
-    showAlert({
-      type:"logout",
-      selected: null,
-      sub: null
-    });
+  const userImg = userData.profileImageUrl === null ? "/default_user_img.png" : userData.profileImageUrl;
+  const cloudOpen = () => {
+    let frame = null;
+    if(document.querySelector("#cloudOpener") !== null){
+      document.body.removeChild(document.querySelector("#cloudOpener"));
+    }
+      frame = document.createElement("iframe");
+    frame.id = "cloudOpener";
+    frame.src = "neolabcloud://";
+    frame.style.display="hidden";
+    document.body.appendChild(frame);
   };
+
   // getText('profile_logout')
   return (
-  <div className={classes.wrap} ref={forwardedRef}>
+  <div className={classes.wrap}>
     <div className={classes.userInfo}>
       <div style={{backgroundImage:"url('"+userImg+"')"}} />
-      <div>{userData.displayName}</div>
-      <div>{userData.email}</div>
+      <div>{userData.name}</div>
+      <div>{userData.id}</div>
     </div>
-    <Button className={classes.logout} onClick={logout}>
-      {getText('profile_logout')}
+    <Button className={classes.logout} onClick={cloudOpen}>
+      {getText('open_neolabcloud')}
     </Button>
     <div className={classes.liner}/>
     <div className={classes.terms}>
@@ -145,7 +149,7 @@ const UserInfo = (props)=>{
 }
 
 
-export default React.forwardRef((props, ref) => <UserInfo {...props} forwardedRef={ref} />);
+export default UserInfo;
 
 
 const ActionLinkLine = ()=>{

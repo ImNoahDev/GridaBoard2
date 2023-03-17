@@ -1,15 +1,15 @@
 import 'firebase/auth';
 import 'firebase/database';
-import firebase, { auth, secondaryFirebase } from 'GridaBoard/util/firebase_config';
 import Cookies from 'universal-cookie';
+import { GridaDB } from 'GridaBoard/util/NDP_config';
 
-import {getTimeStamp} from "./BoardListPageFunc";
 
 
 export default {}
 
 
-const db = secondaryFirebase.firestore();
+// const db = secondaryFirebase.firestore();
+const db = GridaDB.getInstance();
 const cookies = new Cookies();
 
 
@@ -20,9 +20,6 @@ const objectToArray = (obj)=>{
   const returnArr = [];
   for(let i = 0; i < lastKey+1; i++){
     returnArr[i] = obj[i];
-    // if(obj[i] === undefined){
-    //   returnArr[i] = ["", -1];
-    // }
   }
   return returnArr;
 }
@@ -31,18 +28,21 @@ const arrayToObject = (array)=>{
 }
 
 const saveCategory = async (categoryData)=>{
+  /**
+   * 카테고리 저장
+   */
   const userId = cookies.get('user_email');
   if(userId === undefined){
     return false;
   }
 
-  await db
-  .collection(userId)
-  .doc('categoryData')
-  .set(arrayToObject(categoryData));
+  await db.setDoc("categoryData", arrayToObject(categoryData));
 }
 
 export const setDefaultCategory = async ()=>{
+  /**
+   * 카테고리 기본값으로 초기화
+   */
   const userId = cookies.get('user_email');
   if(userId === undefined){
     return false;
@@ -59,23 +59,30 @@ export const setDefaultCategory = async ()=>{
 
 
 export const getCategoryArray = async () => {
+  /**
+   * 카테고리 가져오기
+   */
   const userId = cookies.get('user_email');
   if(userId === undefined){
     return [];
   }
   
-  const res = await db.collection(userId).doc('categoryData').get();
+  const res = await db.getDoc("categoryData");
 
-  return objectToArray(res.data());  
+  return objectToArray(res);  
 }
 
 export const createCategory = async (categoryName:string)=>{
+  /**
+   * 카테고리 생성
+   */
   const userId = cookies.get('user_email');
   if(userId === undefined){
     return false;
   }
   
   const dataArr = await getCategoryArray();
+
   if(dataArr.some((el)=>el[0]===categoryName)){
     console.log("already had");
     return "";
@@ -95,10 +102,14 @@ export const createCategory = async (categoryName:string)=>{
  * (category name) => new categoryList
  */
  export const deleteCategory = async (selected) => {
+  /**
+   * 카테고리 삭제
+   */
   const userId = cookies.get('user_email');
   if(userId === undefined){
     return false;
   }
+
   const selectedIdx = selected[3];
   
   const dataArr = await getCategoryArray();
@@ -128,6 +139,9 @@ export const createCategory = async (categoryName:string)=>{
 
 
 export const changeCategoryName = async (prevName:any[], nextName:string) => {
+  /**
+   * 카테고리 이름 변경
+   */
   const userId = cookies.get('user_email');
   if(userId === undefined){
     return false;
@@ -146,7 +160,6 @@ export const changeCategorySort = async (selected, type:"up"|"down", alpha:numbe
   if(userId === undefined){
     return false;
   }
-  
 
   const dataArr = await getCategoryArray();
   // let alpha = 1;
@@ -187,10 +200,7 @@ export const docCategoryChange = async (doc, categoryKey)=>{
     return false;
   }
 
-
-  await db
-  .collection(userId)
-  .doc(doc.docId).update({
+  await db.updateDoc(doc.docId, {
     category : categoryKey
   })
 }
@@ -203,12 +213,9 @@ export const changeDocName = async (doc, changeName)=>{
   }
   console.log(doc);
 
-  await db
-  .collection(userId)
-  .doc(doc.docId).update({
+  await db.updateDoc(doc.docId, {
     doc_name : changeName
   });
-
 }
 
 
@@ -221,20 +228,19 @@ export const getDatabase = async ()=>{
     return false;
   }
 
-
-  const data = await db.collection(userId).get();
+  const data = await db.getDocAll();
  
   const newDocs = [];
   let newCategoryData = null;
 
-  data.forEach(doc => {
-    if (doc.id === 'categoryData') {
-      newCategoryData = objectToArray(doc.data());
+  for(const key in data){
+    if (key === 'categoryData') {
+      newCategoryData = objectToArray(data[key]);
     } else {
-      newDocs.push(doc.data());
+      newDocs.push(data[key]);
       newDocs[newDocs.length - 1].key = newDocs.length - 1;
     }
-  });
+  }
 
   if (newCategoryData === null) {
     newCategoryData = await setDefaultCategory();
@@ -244,10 +250,4 @@ export const getDatabase = async ()=>{
     docs : newDocs,
     category : newCategoryData
   }
-  
-    // setDocsObj({
-    //   docs: newDocs,
-    //   category: newCategoryData,
-    // });
-
 }

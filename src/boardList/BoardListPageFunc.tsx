@@ -1,23 +1,27 @@
 import GridaDoc from 'GridaBoard/GridaDoc';
 import { setActivePageNo, setDocNumPages, setUrlAndFilename } from '../GridaBoard/store/reducers/activePageReducer';
 import { setDate, setDocId, setDocName, setIsNewDoc } from '../GridaBoard/store/reducers/docConfigReducer';
-import firebase, { secondaryFirebase, auth } from 'GridaBoard/util/firebase_config';
 import { IBoardData } from './structures/BoardStructures';
-import { MappingStorage } from 'nl-lib/common/mapper';
+import { MappingStorage, PdfDocMapper } from 'nl-lib/common/mapper';
 import { InkStorage } from 'nl-lib/common/penstorage';
 import Cookies from 'universal-cookie';
 import { degrees, PDFDocument, rgb } from 'pdf-lib';
-import { isSamePage, drawPath } from 'nl-lib/common/util';
-import { adjustNoteItemMarginForFilm, getNPaperInfo } from 'nl-lib/common/noteserver';
 import { store } from 'GridaBoard/client/pages/GridaBoard';
 import * as PdfJs from 'pdfjs-dist';
-import { clearCanvas } from 'nl-lib/common/util';
+import { clearCanvas, sleep } from 'nl-lib/common/util';
 import { makeGridaBlob } from 'GridaBoard/Save/SaveGrida';
 import { forceUpdateBoardList } from 'GridaBoard/store/reducers/appConfigReducer';
 import { showSnackbar } from 'GridaBoard/store/reducers/listReducer';
 import { setLoadingVisibility } from 'GridaBoard/store/reducers/loadingCircle';
 import getText from "GridaBoard/language/language";
 import { addStroke } from '../GridaBoard/Save/SavePdf';
+import { useHistory } from 'react-router-dom';
+import { GridaDB } from 'GridaBoard/util/NDP_config';
+
+
+const db = GridaDB.getInstance();
+const cookies = new Cookies();
+
 
 export const resetGridaBoard = async () => {
   const doc = GridaDoc.getInstance();
@@ -35,8 +39,6 @@ export const resetGridaBoard = async () => {
 export const startNewGridaPage = async () => {
   resetGridaBoard();
 
-  // const pageNo = await GridaDoc.getInstance().addBlankPage();
-  // setActivePageNo(pageNo);
   setDocName('undefined');
   setDocId("undefined");
   setIsNewDoc(true);
@@ -44,184 +46,124 @@ export const startNewGridaPage = async () => {
 }
 
 export const deleteAllFromTrash = async () => {
+  /**
+   * DB에서 휴지통에 있는 모든 파일 완전 삭제
+   */
+ 
   const docArr = [];
-  const db = secondaryFirebase.firestore();
-  const userId = firebase.auth().currentUser.email;
-  const uid = firebase.auth().currentUser.uid;
 
   //delete from db
-  await db.collection(userId)
-  .get()
-  .then(async querySnapshot => {
-    querySnapshot.forEach(doc => {
-      if (doc.data().dateDeleted > 0) {
-        docArr.push(doc.data())
-      }
-    });
-  })
-
-
-  //delete from storage
-  const storageRef = secondaryFirebase.storage().ref();
+  const data = await db.getDocAll();
+  
+  for(const key in data){
+    const doc = data[key];
+    if (doc.dateDeleted > 0) {
+      docArr.push(doc)
+    }
+  }
 
   let result = 0;
 
   for await (const el of docArr) {
-    const m_sec = getTimeStamp(el.created);
-    // const deletedDocId = `${userId}_${el.doc_name}_${m_sec}`;
     const deletedDocId = el.docId;
 
-    await db.collection(userId)
-    .doc(deletedDocId).delete().then(() => {
-      result = 1;
-    }).catch((error) => {
-      console.error("error removing document: " , error);
-      result = 0;
-    });
+    await db.deleteDoc(deletedDocId);
 
+    result = 1;
       
-    const thumbnailRef = storageRef.child(`thumbnail/${uid}/${deletedDocId}.png`);
-    thumbnailRef.delete().then(function() {
-      // File deleted successfully
-    }).catch(function(error) {
-      // Uh-oh, an error occurred!
-    });
+    const thumbnailPath = `${deletedDocId}.png`;
+    await db.deleteFile(thumbnailPath);
 
-    const gridaRef = storageRef.child(`grida/${uid}/${deletedDocId}.grida`);
-    gridaRef.delete().then(function() {
-      // File deleted successfully
-    }).catch(function(error) {
-      // Uh-oh, an error occurred!
-    });
 
+    const gridaPath = `${deletedDocId}.grida`;
+    await db.deleteFile(gridaPath);
   }
 
   return result;
 }
 
 export const deleteBoardFromLive = async (docItems: IBoardData[]) => {
-  const userId = firebase.auth().currentUser.email;
-  const db = secondaryFirebase.firestore();
-
+  /**
+   * 선택한 보드 리스트를 휴지통으로 이동
+   */
   let result = 0;
 
   for await (const docItem of docItems) {
-    const docName = docItem.doc_name;
-    const m_sec = getTimeStamp(docItem.created);
-    // const docId = `${userId}_${docName}_${m_sec}`;
     const docId = docItem.docId;
 
-    await db.collection(userId)
-    .doc(docId)
-    .update({
-      dateDeleted : Date.now(),
-    }).then(() => {
-      result = 1;
-    }).catch((error) => {
-      console.error("error updating document: ", error);
-      result = 0;
+    await db.updateDoc(docId, {
+      dateDeleted : Date.now()
     });
+    result = 1;
   }
+
   return result;
 }
 
 export const deleteBoardsFromTrash = async (docItems: IBoardData[]) => {
-  const db = secondaryFirebase.firestore();
-  const storageRef = secondaryFirebase.storage().ref();
-
-  const userId = firebase.auth().currentUser.email;
-  const uid = firebase.auth().currentUser.uid;
-
+  /**
+   * 휴지통에서 선택한 보드 리스트를 완전 삭제
+   */
   let result = 0;
   for await (const docItem of docItems) {
     const docName = docItem.doc_name;
     if (docName === undefined) continue;
     const docId = docItem.docId;
   
-    await db.collection(userId)
-    .doc(docId)
-    .delete()
-    .then(() => {
-      result = 1;
-    }).catch((error) => {
-      console.error("error delete document: ", error);
-      result = 0;
-    });
+    await db.deleteDoc(docId);
+    result = 1;
 
-    const thumbnailRef = storageRef.child(`thumbnail/${uid}/${docId}.png`);
-    thumbnailRef.delete().then(function() {
+    try{
+      const thumbnailPath = `${docId}.png`;
+      await db.deleteFile(thumbnailPath);
+      
+      const gridaPath = `${docId}.grida`;
+      await db.deleteFile(gridaPath);
       result = 1;
-      console.log('thumbnail deleted sucessfully')
-    }).catch(function(error) {
+    }catch(e){
       result = 0;
-      console.log('error delete thumb: "', error)
-    });
-
-    const gridaRef = storageRef.child(`grida/${uid}/${docId}.grida`);
-    gridaRef.delete().then(function() {
-      result = 1;
-      console.log('grida deleted sucessfully')
-    }).catch(function(error) {
-      result = 0;
-      console.log('error delete grida: "', error)
-    });
+      console.log(e);
+    }
   }
 
   return result;
 }
 
 export const restoreBoardsFromTrash = async (docItems: IBoardData[]) => {
-  const db = secondaryFirebase.firestore();
-  const userId = firebase.auth().currentUser.email;
-
+  /**
+   * 휴지통에서 선택한 보드 리스트를 복구
+   */
   let result = 0;
   for await (const docItem of docItems) {
     const docName = docItem.doc_name;
     if (docName === undefined) continue;
     const docId = docItem.docId;
   
-    await db.collection(userId)
-    .doc(docId)
-    .update({
+    await db.updateDoc(docId, {
       dateDeleted : 0,
-    }).then(() => {
-      result = 1;
-    }).catch((error) => {
-      console.error("error updating document: ", error);
-      result = 0;
     });
+    
+    result = 1;
   }
 
   return result;
 }
 
 export const copyBoard = async (docItem: IBoardData) => {
+  /**
+   * 선택한 보드 리스트를 복제
+   */
   setLoadingVisibility(true);
-  const db = secondaryFirebase.firestore();
-  const userId = firebase.auth().currentUser.email;
-  const uid = firebase.auth().currentUser.uid;
-
+  const userId = cookies.get('user_email');
   const docName = docItem.doc_name + getText('boardList_copied');
   const numPages = docItem.docNumPages;
   const date = new Date();
   const timeStamp = date.getTime();
   const docId = `${userId}_${docName}_${timeStamp}`;
   
-  const storage = secondaryFirebase.storage();
-  const storageRef = storage.ref();
-  let gridaPath;
-  let thumbNailPath;
-  try{
-    gridaPath = await storageRef.child(`grida/${uid}/${docItem.docId}.grida`).getDownloadURL();
-  }catch(e){
-   gridaPath = await storageRef.child(`grida/${docItem.docId}.grida`).getDownloadURL();
-  }
-  try{
-    thumbNailPath = await storageRef.child(`thumbnail/${uid}/${docItem.docId}.png`).getDownloadURL();
-  }catch(e){
-   thumbNailPath = await storageRef.child(`thumbnail/${docItem.docId}.png`).getDownloadURL();
-  }
-
+  const gridaPath = (await db.getFilePath(`${docItem.docId}.grida`)).url;
+  const thumbNailPath = (await db.getFilePath(`${docItem.docId}.png`)).url;
+  
   let imageBlob;
   await fetch(thumbNailPath)
   .then(res => { return res.blob(); })
@@ -232,102 +174,40 @@ export const copyBoard = async (docItem: IBoardData) => {
   await fetch(gridaPath)
   .then(res => res.json())
   .then(async data => {
-    
     const gridaStr = JSON.stringify(data);
     const gridaBlob = new Blob([gridaStr], { type: 'application/json' });
 
-    const storageRef = secondaryFirebase.storage().ref();
     const gridaFileName = `${docId}.grida`;
-    const gridaRef = storageRef.child(`grida/${uid}/${gridaFileName}`);
+    // const gridaPath = `${gridaFileName}`;
 
-    const gridaUploadTask = gridaRef.put(gridaBlob);
-    gridaUploadTask.on(
-      firebase.storage.TaskEvent.STATE_CHANGED,
-      function (snapshot) {
-        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-        console.log('Grida Upload is ' + progress + '% done');
-        switch (snapshot.state) {
-          case firebase.storage.TaskState.PAUSED: // or 'paused'
-            console.log('Upload is paused');
-            break;
-          case firebase.storage.TaskState.RUNNING: // or 'running'
-            console.log('Upload is running');
-            break;
-        }
-      },
-      function (error) {
-        switch (error.code) {
-          case 'storage/unauthorized':
-            // User doesn't have permission to access the object
-            break;
-  
-          case 'storage/canceled':
-            // User canceled the upload
-            break;
-  
-          case 'storage/unknown':
-            // Unknown error occurred, inspect error.serverResponse
-            break;
-        }
-      },
-      async function () {
+    await db.saveGrida(gridaBlob,gridaFileName, gridaFileName);
 
-        const thumbFileName = `${userId}_${docName}_${timeStamp}.png`;
-        const pngRef = storageRef.child(`thumbnail/${uid}/${thumbFileName}`);
+    const thumbFileName = `${docId}.png`;
+    // const pngPath = `${thumbFileName}`;
 
-        const thumbUploadTask = pngRef.put(imageBlob);
-        await thumbUploadTask.on(
-          firebase.storage.TaskEvent.STATE_CHANGED,
-          function (snapshot) {
-            const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-            console.log('Thumbnail Upload is ' + progress + '% done');
-            switch (snapshot.state) {
-              case firebase.storage.TaskState.PAUSED: // or 'paused'
-                console.log('Upload is paused');
-                break;
-              case firebase.storage.TaskState.RUNNING: // or 'running'
-                console.log('Upload is running');
-                break;
-            }
-          },
-          function (error) {
-            switch (error.code) {
-              case 'storage/unauthorized':
-                // User doesn't have permission to access the object
-                break;
+    await db.savePng(imageBlob, thumbFileName, thumbFileName);
 
-              case 'storage/canceled':
-                // User canceled the upload
-                break;
-
-              case 'storage/unknown':
-                // Unknown error occurred, inspect error.serverResponse
-                break;
-            }
-          },
-          async function () {
-            saveToDB(docName, "thumb_path", "grida_path", date, true, numPages);
-          }
-        );
-      }
-    );
+    saveToDB(docName, date, true, numPages);
   })
 }
 
-export const getTimeStamp = (created: {nanoseconds: number, seconds: number}) => {
-  const nano_sec = Number(created.nanoseconds) / 1000000;
-  let nano_sec_str = nano_sec.toString();
-  nano_sec_str = nano_sec_str.padStart(3,'0'); //firstore에서 nano는 3자리 채워서 들어감
+export const getTimeStamp = (created: number) => {
+  // const nano_sec = Number(created.nanoseconds) / 1000000;
+  // let nano_sec_str = nano_sec.toString();
+  // nano_sec_str = nano_sec_str.padStart(3,'0'); //firstore에서 nano는 3자리 채워서 들어감
 
-  const sec = created.seconds.toString();
-  return sec + nano_sec_str;
+  // const sec = created.seconds.toString();
+  // return sec + nano_sec_str;
 }
 
 export const fbLogout = () => {
-  auth.signOut();
-  secondaryFirebase.auth().signOut();
-  const cookies = new Cookies();
-  cookies.remove('user_email');
+  /**
+   * 로그아웃
+   */ 
+  // auth.signOut();
+  // secondaryFirebase.auth().signOut();
+  // const cookies = new Cookies();
+  // cookies.remove('user_email');
 };
 
 
@@ -341,38 +221,6 @@ const makePdfJsDoc = async (loadingTask: any) => {
         console.error('error code : ' + e);
       }
     );
-  });
-
-  return new Promise(resolve => {
-    loadingTask.promise.then(async function (pdfDocument) {
-      console.log('# PDF document loaded.');
-
-      // Get the first page.
-      pdfDocument.getPage(1).then(async function (page) {
-        // Render the page on a Node canvas with 100% scale.
-        const canvas: any = document.createElement('canvas');
-
-        const viewport = page.getViewport({ scale: 1, rotation: 0 });
-        const ctx = canvas.getContext('2d');
-
-        // const canvas = document.createElement("canvas");
-        canvas.id = `scratchCanvas`;
-        canvas.width = Math.floor(viewport.width);
-        canvas.height = Math.floor(viewport.height);
-
-        clearCanvas(canvas, ctx);
-
-        const renderContext = {
-          canvasContext: ctx,
-          transform: [1, 0, 0, 1, 0, 0],
-          viewport: viewport,
-        };
-
-        await page.render(renderContext).promise; //promise~~~~~~~~~~~~~~~~~~~~~~~SS
-
-        resolve(canvas);
-      });
-    });
   });
 };
 
@@ -517,100 +365,37 @@ export async function makeThumbnail() {
 }
 
 export async function saveGridaToDB(docName: string) {
+  /**
+   * 파일 업로드. 그리다 파일 올리고, 썸네일 올리고 디비를 올린다.
+   */
   setLoadingVisibility(true);
   const imageBlob = await makeThumbnail();
 
   /** Save Thumbnail as PNG file
    * -----------------------------------------------------------------------------------
    */
-  const storageRef = secondaryFirebase.storage().ref();
-
-  const userId = firebase.auth().currentUser.email;
-  const uid = firebase.auth().currentUser.uid;
+  const userId = cookies.get('user_email');
   const date = new Date();
   const timeStamp = date.getTime();
   setDate(timeStamp.toString());
 
   const gridaFileName = `${userId}_${docName}_${timeStamp}.grida`;
-  const gridaRef = storageRef.child(`grida/${uid}/${gridaFileName}`);
+  // const gridaPath = `grida/${gridaFileName}`;
 
   /** Make & Upload Grida
    * -----------------------------------------------------------------------------------
    */
   const gridaBlob = await makeGridaBlob();
 
-  const gridaUploadTask = gridaRef.put(gridaBlob);
-  await gridaUploadTask.on(
-    firebase.storage.TaskEvent.STATE_CHANGED,
-    function (snapshot) {
-      const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-      console.log('Grida Upload is ' + progress + '% done');
-      switch (snapshot.state) {
-        case firebase.storage.TaskState.PAUSED: // or 'paused'
-          console.log('Upload is paused');
-          break;
-        case firebase.storage.TaskState.RUNNING: // or 'running'
-          console.log('Upload is running');
-          break;
-      }
-    },
-    function (error) {
-      switch (error.code) {
-        case 'storage/unauthorized':
-          // User doesn't have permission to access the object
-          break;
+  await db.saveGrida(gridaBlob, gridaFileName, gridaFileName);
 
-        case 'storage/canceled':
-          // User canceled the upload
-          break;
+  const thumbFileName = `${userId}_${docName}_${timeStamp}.png`;
+  // const pngPath = `thumbnail/${thumbFileName}`;
 
-        case 'storage/unknown':
-          // Unknown error occurred, inspect error.serverResponse
-          break;
-      }
-    },
-    async function () {
-      const thumbFileName = `${userId}_${docName}_${timeStamp}.png`;
-      const pngRef = storageRef.child(`thumbnail/${uid}/${thumbFileName}`);
+  await db.savePng(imageBlob, thumbFileName, thumbFileName);
+  
 
-      const thumbUploadTask = pngRef.put(imageBlob);
-      await thumbUploadTask.on(
-        firebase.storage.TaskEvent.STATE_CHANGED,
-        function (snapshot) {
-          const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-          console.log('Thumbnail Upload is ' + progress + '% done');
-          switch (snapshot.state) {
-            case firebase.storage.TaskState.PAUSED: // or 'paused'
-              console.log('Upload is paused');
-              break;
-            case firebase.storage.TaskState.RUNNING: // or 'running'
-              console.log('Upload is running');
-              break;
-          }
-        },
-        function (error) {
-          switch (error.code) {
-            case 'storage/unauthorized':
-              // User doesn't have permission to access the object
-              break;
-
-            case 'storage/canceled':
-              // User canceled the upload
-              break;
-
-            case 'storage/unknown':
-              // Unknown error occurred, inspect error.serverResponse
-              break;
-          }
-          setLoadingVisibility(false);
-        },
-        async function () {
-          saveToDB(docName, "thumb_path", "grida_path", date, false);
-        }
-      );
-    }
-  );
-
+  saveToDB(docName, date, false);
 
   return gridaFileName;
   /** Upload thumbnail image using Firebase
@@ -621,36 +406,30 @@ export async function saveGridaToDB(docName: string) {
 }
 
 export async function updateDB(docId: string, thumb_path: string, grida_path: string, date) {
+  /**
+   * 디비 데이터 업데이트
+   */
   const doc = GridaDoc.getInstance();
-
-  const db = secondaryFirebase.firestore();
-  const userId = firebase.auth().currentUser.email;
 
   // const docId = `${userId}_${docName}_${date}`;
 
-  db.collection(userId)
-    .doc(docId)
-    .update({
-      last_modified: new Date(),
-      grida_path: grida_path,
-      thumb_path: thumb_path,
-      docNumPages: doc.numPages,
-    })
-    .then(function () {
-      console.log(`${docId} is created`);
-      setLoadingVisibility(false);
-    })
-    .catch(error => {
-      console.error('Error adding document: ', error);
-      setLoadingVisibility(false);
-    });
+  await db.updateDoc(docId,{
+    last_modified: new Date(),
+    grida_path: grida_path,
+    thumb_path: thumb_path,
+    docNumPages: doc.numPages,
+  })
+
+  setLoadingVisibility(false);
 }
 
-export async function saveToDB(docName: string, thumb_path: string, grida_path: string, nowDate: Date, isCopyProcess: boolean, docNumPages?: number) {
+export async function saveToDB(docName: string, nowDate: Date, isCopyProcess: boolean, docNumPages?: number) {
+  /**
+   * 디비 데이터 생성
+   */
   const doc = GridaDoc.getInstance();
   
-  const db = secondaryFirebase.firestore();
-  const userId = firebase.auth().currentUser.email;
+  const userId = cookies.get('user_email');
 
   const docId = `${userId}_${docName}_${nowDate.getTime()}`;
 
@@ -661,41 +440,165 @@ export async function saveToDB(docName: string, thumb_path: string, grida_path: 
     numPages = doc.numPages;
   }
 
-  await db.collection(userId)
-    .doc(docId)
-    .set({
-      category: '0',
-      created: nowDate,
-      last_modified: nowDate,
-      doc_name: docName,
-      favorite: false,
-      id: userId,
-      grida_path: grida_path,
-      thumb_path: thumb_path,
-      dateDeleted: 0,
-      docId : docId,
-      docNumPages: numPages,
-    })
-    .then(function () {
-      console.log(`${docName} is created`);
-      if (isCopyProcess) {
-        store.dispatch(forceUpdateBoardList());
-        showSnackbar({
-          snackbarType : "copyDoc",
-          selectedDocName : [docName],
-          selectedCategory : ""
-        });
-      } else {
-        showSnackbar({
-          snackbarType :"saveDoc",
-          selectedDocName: [docName],
-        });
-      }
-      setLoadingVisibility(false);
-    })
-    .catch(error => {
-      console.error('Error adding document: ', error);
+  await db.setDoc(docId,{
+    category: '0',
+    created: nowDate,
+    last_modified: nowDate,
+    doc_name: docName,
+    favorite: false,
+    id: userId,
+    dateDeleted: 0,
+    docId : docId,
+    docNumPages: numPages
+  });
+
+  console.log(`${docName} is created`);
+  if (isCopyProcess) {
+    store.dispatch(forceUpdateBoardList());
+    showSnackbar({
+      snackbarType : "copyDoc",
+      selectedDocName : [docName],
+      selectedCategory : ""
     });
+  } else {
+    showSnackbar({
+      snackbarType :"saveDoc",
+      selectedDocName: [docName],
+    });
+  }
+  setLoadingVisibility(false);
+}
+
+export const getThumbNailPath = async (docsList)=>{
+  /**
+   * 독스 리스트를 통해 썸네일 uri 리스트 가져오기
+   */  
+  const pathList = [];
+  for(let i = 0; i < docsList.length; i++){
+    if(docsList[i].thumbNailPath === undefined || docsList[i].thumbNailPath.expiredDatetime < new Date()){
+      docsList[i].thumbNailPath = await db.getFilePath(`${docsList[i].docId}.png`);
+    }
+
+    if(docsList[i].thumbNailPath !== null){
+      pathList.push(docsList[i].thumbNailPath.url);
+    }
+  }
+  return pathList;
+}
+
+export const overwrite = async () => {
+  setLoadingVisibility(true);
+  /**
+   * 현재 보고 있는 페이지 덮어 쓰기
+   */
+
+  //1. 썸네일 새로 만들기
+  const imageBlob = await makeThumbnail();
+
+  //2. grida 새로 만들기
+  const gridaBlob = await makeGridaBlob();
+
+  //3. thumbnail, last_modifed, grida 업데이트
+  const docId = store.getState().docConfig.docId;
+  const date = store.getState().docConfig.date;
+
+  const gridaFileName = `${docId}.grida`; // `${userId}_${docName}_${date}.grida`;
+
+  // const gridaPath = `grida/${gridaFileName}`;
+
+  await db.saveGrida(gridaBlob, gridaFileName, gridaFileName);
+
+  const thumbFileName = `${docId}.png`; // `${userId}_${docName}_${date}.png`;
+  // const pngPath = `thumbnail/${thumbFileName}`;
+
+
+  await db.savePng(imageBlob, thumbFileName, thumbFileName);
+
+  await updateDB(docId, "thumb_path", "grida_path", date);
+}
+
+
+
+export const routeChange = async (nowDocs, historyCallback ?: Function) => {
+  /**
+   * 그리다 파일 열기
+   */
+
+  await resetGridaBoard();
+  if (nowDocs.dateDeleted !== 0) {
+    return false;
+  }
+  if(historyCallback){
+    await historyCallback();
+  }
+
+  GridaDoc.getInstance()._pages = [];
+
+  const gridaFile = await db.getFile(`${nowDocs.docId}.grida`, "json");
+
+  await jsonToOpen(gridaFile, nowDocs.doc_name);
+    
+  setDocName(nowDocs.doc_name);
+  setDocId(nowDocs.docId);
+  setIsNewDoc(false);
+
+  const m_sec = new Date(nowDocs.created).getTime();
+  setDate(m_sec.toString());
+};
+
+export const jsonToOpen = async (data, fileName:string)=>{
+  const pdfRawData = data.pdf.pdfInfo.rawData;
+  const neoStroke = data.stroke;
+
+  const pageInfos = data.pdf.pdfInfo.pageInfos;
+  const basePageInfos = data.pdf.pdfInfo.basePageInfos;
+
+  // pdf의 url을 만들어 주기 위해 rawData를 blob으로 만들어 createObjectURL을 한다
+  const rawDataBuf = new ArrayBuffer(pdfRawData.length*2);
+  const rawDataBufView = new Uint8Array(rawDataBuf);
+  for (let i = 0; i < pdfRawData.length; i++) {
+    rawDataBufView[i] = pdfRawData.charCodeAt(i);
+  }
+  const blob = new Blob([rawDataBufView], {type: 'application/pdf'});
+  const url = await URL.createObjectURL(blob);
+
+  const completed = InkStorage.getInstance().completedOnPage;
+  completed.clear();
+
+  const gridaArr = [];
+  const pageId = []
+
+  for (let i = 0; i < neoStroke.length; i++) {
+    pageId[i] = InkStorage.makeNPageIdStr(neoStroke[i][0]);
+    if (!completed.has(pageId[i])) {
+      completed.set(pageId[i], new Array(0));
+    }
+
+    gridaArr[i] = completed.get(pageId[i]);
+    for (let j = 0; j < neoStroke[i].length; j++){
+      gridaArr[i].push(neoStroke[i][j]);
+    }
+  }
+
+  const doc = GridaDoc.getInstance();
+  doc.pages = [];
+  
+  if (data.mapper !== undefined) {
+    const mapping = new PdfDocMapper(data.mapper.id, data.mapper.pagesPerSheet)
+    
+    mapping._arrMapped = data.mapper.params;
+
+    const msi = MappingStorage.getInstance();
+    msi.registerTemporary(mapping);
+  }
+
+  await doc.openGridaFile(
+    { url: url, filename: fileName },
+    pdfRawData,
+    neoStroke,
+    pageInfos,
+    basePageInfos
+  );
 }
 
 //div screenshot sample

@@ -55,7 +55,7 @@ const useStyle = makeStyles(theme=>({
     "& > .noWarnTitle" : {
       marginBottom: "34px",
       marginTop: "70px !important"
-    },
+    }
   },
  
   gestureDialog: {
@@ -97,13 +97,10 @@ const useStyle = makeStyles(theme=>({
       display: "flex",
       justifyContent: "flex-end",
       "& > button" : {
-        height: "40px",
+        height: "40px", 
         marginRight: "16px",
         padding: "8px",
-        "&:first-child" : {
-          border: "1px solid" + theme.custom.icon.mono[2],
-        }
-      }
+      },
     },
   },
   paper : {
@@ -155,8 +152,13 @@ const useStyle = makeStyles(theme=>({
         borderRadius: "60px",
         "&:first-child" : {
           border: "1px solid" + theme.custom.icon.mono[2],
+        },
+      },
+      "&.singleButton" : {
+        "& > button" : {
+          width : "312px",
         }
-      }
+      },
     }
   }
 }))
@@ -191,16 +193,16 @@ const CombineDialog = (props : Props)=>{
   let returnDialog = null;
   if(["newGroup", "changeGroupName", "changeDocName"].includes(diaType)){
     groupProps.classes.paper += `  ${classes.groupDialog}`;
-    returnDialog = (<GroupDialog {...groupProps} />);
+    returnDialog = (<GroupDialog id="globalDialog" {...groupProps} />);
   }else if(["moveDoc"].includes(diaType)){
     groupProps.classes.paper += `  ${classes.groupDialog}`;
-    returnDialog = (<MoveDialog {...groupProps} docsObj={docsObj}/>);
-  }else if(["deleteDoc", "logout", "toBoardList", "deletePage", "clearPage", "deleteGroup", "checkCalibration", "deleteTrash"].includes(diaType)){
+    returnDialog = (<MoveDialog id="globalDialog" {...groupProps} docsObj={docsObj}/>);
+  }else if(["deleteDoc", "logout", "toBoardList", "deletePage", "clearPage", "deleteGroup", "checkCalibration", "deleteTrash", "getPenOwner", "lostPenOwner"].includes(diaType)){
     groupProps.classes.paper += `  ${classes.alertDialog}`;
-    returnDialog = (<AlertDialog {...groupProps} />);
+    returnDialog = (<AlertDialog id="globalDialog" {...groupProps} />);
   }else if(["noticeGesture"].includes(diaType)){
     groupProps.classes.paper = `  ${classes.gestureDialog}`;
-    returnDialog = (<GestureDialog {...groupProps} />);
+    returnDialog = (<GestureDialog id="globalDialog" {...groupProps} />);
   }
 
   return returnDialog;

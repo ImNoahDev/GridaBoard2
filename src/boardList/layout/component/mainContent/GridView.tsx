@@ -1,12 +1,12 @@
 import { makeStyles, Grow, IconButton, Checkbox, Fade, SvgIcon } from '@material-ui/core';
 import React, { useEffect, useState } from 'react';
 import {MoreVert, DeleteOutline} from '@material-ui/icons';
-import { getTimeStamp } from '../../../BoardListPageFunc';
+import { getThumbNailPath, routeChange } from '../../../BoardListPageFunc';
 import { IBoardData } from '../../../structures/BoardStructures';
 import { showDropDown } from 'GridaBoard/store/reducers/listReducer';
 import getText from "GridaBoard/language/language";
-import firebase, { secondaryFirebase } from 'GridaBoard/util/firebase_config';
 import BoardLoadingCircle from 'GridaBoard/Load/BoardLoadingCircle';
+import { useHistory } from 'react-router-dom';
 
 interface Props extends React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement> {
   docsList?: Array<any>;
@@ -14,7 +14,6 @@ interface Props extends React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElem
   category?: string;
   allCategory?: Object;
   selectedItems?: IBoardData[];
-  routeChange?: (idx: number) => void;
   updateSelectedItems?: (el: IBoardData, checked: boolean) => void;
 }
 
@@ -79,36 +78,11 @@ const useStyle = makeStyles(theme => ({
 
   }
 }));
-const getThumbNailPath = async (docsList)=>{
-  const storage = secondaryFirebase.storage();
-  const storageRef = storage.ref();
-  const user = firebase.auth().currentUser;
-  if(user === null){
-    return [];
-  }
-  const uid = user.uid;
 
-  const pathList = [];
-  for(let i = 0; i < docsList.length; i++){
-    let thumbNailPath;
-    if(docsList[i].thumbNailPath !== undefined){
-      thumbNailPath = docsList[i].thumbNailPath;
-    }else{
-      try{
-        thumbNailPath = await storageRef.child(`thumbnail/${uid}/${docsList[i].docId}.png`).getDownloadURL();
-      }catch(e){
-      thumbNailPath = await storageRef.child(`thumbnail/${docsList[i].docId}.png`).getDownloadURL();
-      }
-    }
-    pathList.push(thumbNailPath);
-    docsList[i].thumbNailPath = thumbNailPath;
-  }
-  return pathList;
-}
 
 const GridView = (props: Props) => {
   const classes = useStyle();
-  const { selectedClass, ref, routeChange, category, selectedItems, allCategory, ...rest } = props;
+  const { selectedClass, ref, category, selectedItems, allCategory, ...rest } = props;
   const { docsList } = props;
 
   const [showMoreBtns, setShowMoreBtns] = useState([]);
@@ -116,6 +90,7 @@ const GridView = (props: Props) => {
   const [forcedToShowCheckBoxes, setForcedToShowCheckBoxes] = useState([]);
   const [forcedNotToShowMoreBtns, setForcedNotToShowMoreBtns] = useState(false);
   const [pathList, setPathList] = useState([]);
+  const history = useHistory();
 
   const getData = async ()=>{
     const _pathList = await getThumbNailPath(docsList);
@@ -189,7 +164,7 @@ const GridView = (props: Props) => {
   const isChecked = keyStr => {
     for (const selectedItem of selectedItems) {
       if (selectedItem.doc_name === undefined) continue;
-      const timestamp = getTimeStamp(selectedItem.created);
+      const timestamp = new Date(selectedItem.created).getTime();
       const itemKey = selectedItem.doc_name + '_' + timestamp;
       if (keyStr === itemKey) {
         return true;
@@ -228,8 +203,8 @@ const GridView = (props: Props) => {
     <React.Fragment>
       {docsList.map((el, idx) => {
         const path = pathList[idx];
-        const times = new Date(el.last_modified.seconds * 1000);
-        const timestamp = getTimeStamp(el.created);
+        const times = new Date(el.last_modified);
+        const timestamp = new Date(el.created).getTime();
         const keyStr = el.doc_name + '_' + timestamp;
         let categoryNo = el.category;
         if(!allCategory[categoryNo]) categoryNo = 0;
@@ -244,7 +219,13 @@ const GridView = (props: Props) => {
               className={`contentItem`}
               onMouseOver={e => updateShowBtns(idx, true)}
               onMouseLeave={e => updateShowBtns(idx, false)}>
-              <div style={{ backgroundImage: `url(${path})` }} onClick={() => routeChange(el.key)}>
+              <div style={{ backgroundImage: `url(${path})` }} onClick={async () => {
+                
+                await routeChange(el, async ()=>{
+                  const path = `/app`;
+                  await history.push(path);
+                });
+              }}>
                 <BoardLoadingCircle checked={isChecked(keyStr)} />
               </div>
               <div>

@@ -19,10 +19,10 @@ import Home from "../../View/Home";
 import LoadingCircle from "../../Load/LoadingCircle";
 import { turnOnGlobalKeyShortCut } from "../../GlobalFunctions";
 import CombineDialog from 'boardList/layout/component/dialog/CombineDialog';
-import firebase, { auth, secondaryAuth, secondaryFirebase, signInWith } from 'GridaBoard/util/firebase_config';
 import Cookies from "universal-cookie";
 import { MappingStorage } from "nl-lib/common/mapper/MappingStorage";
 import { showNoticeGestureDialog } from "../../store/reducers/listReducer";
+import NDP from "../../../NDP-lib";
 
 
 
@@ -136,28 +136,34 @@ const GridaBoard = () => {
   if (userId === undefined) {
     //로그인으로 자동으로 넘기기
     forsedWait = true;
-    auth.onAuthStateChanged(user => {
-      if(user !== null){
-        //로그인 완료
-        user.getIdTokenResult().then(function(result){
-          const expirationTime = new Date(result.expirationTime)
-          cookies.set("user_email", user.email, {
-            expires: expirationTime
-          });
-          if(secondaryAuth.currentUser === null){
-            signInWith(user).then(()=>{
+    useEffect(()=>{
+      const checkClient = async ()=>{
+        if(!(await NDP.getInstance().Client.clientOpenCheck())){
+          //클라이언트 연결 안됨, 바로 로그인
+            location.replace("/");
+        }else{
+          NDP.getInstance().onAuthStateChanged(async userId => {
+            // user.email
+            if(userId !== null){
+              //로그인 완료
+              console.log("logined", userId);
+              const expirationTime = new Date(NDP.getInstance().tokenExpired);
+              cookies.set("user_email", userId, {
+                expires: expirationTime
+              });
+              const user = await NDP.getInstance().User.getUserData();
+              localStorage.GridaBoard_userData = JSON.stringify(user);
               setForsedUpdate(forsedUpdate+1);
-              // dispatch(forceUpdateBoardList());
-            });
-          }else{
-            setForsedUpdate(forsedUpdate+1);
-            // dispatch(forceUpdateBoardList());
-          }
-        });
-      } else {
-        history.push("/");
+            } else {
+              location.replace("/");
+            }
+          });
+        }
       }
-    })
+      
+      checkClient();
+      
+    },[])
   }
 
  
