@@ -1,29 +1,29 @@
 # Gridaboard v2
 
-### npm install 시 react-virtualized가 react@^17.0.1 에서 문제를 일으킨다.
-    npm install --legacy-peer-deps react-virtualized
-로 따로 설치해 줘야 한다
+### When npm install, react-virtualized causes a problem in react@^17.0.1.
+     npm install --legacy-peer-deps react-virtualized
+It must be installed separately.
 
-### 한글 문자열을 i18n해야 한다
+### Korean strings must be i18n
 
-문자열 찾기에서 정규식 표현으로 다음을 넣고 한글 문자열을 찾은 다음, localization을 해야.
-```["'].[ㄱ-ㅎㅏ-ㅣ가-힣]+.*[."]```
+In the string search, enter the following as a regular expression to find the Korean string, then localize it.
+```["'].[ㄱ-ㅎㅏ-ㅣga-hi]+.*[."]```
 
-### Fabric.js가 들어가면 electron에서 compile이 안된다.
-이는 canvas 2.6.1을 쓰면서 nan 2.14.1을 쓰기 때문으로, nan 2.14.0을 쓰게 하면 된다.
+### If Fabric.js is included, it will not compile in electron.
+This is because nan 2.14.1 is used while canvas 2.6.1 is used, so nan 2.14.0 can be used.
 npm uninstall nan && npm install nan@2.14.0
 
 https://www.npmjs.com/package/canvas
 https://github.com/Automattic/node-canvas/wiki/Installation:-Windows
 
-아래의 두개 package를 설치하고, "영문" 버전의 visual studio 2019 community를 C++ 데스크탑 어플리케이션 개발용으로 설치
+Install the two packages below and install the "English" version of visual studio 2019 community for developing C++ desktop applications.
 
 C:/GTK
 C:/libjpeg-turbo64
 
 
-### deploy시
-1. index.html에서 "dev" 를 "live"로 바꾸어주어야 한다
+### When deploying
+1. In index.html, “dev” must be changed to “live”
 
 
 
